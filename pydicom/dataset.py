@@ -1988,6 +1988,39 @@ class Dataset(dict):
             dataset.add(data_element)
         return dataset
 
+    def to_json_dict(self, bulk_data_threshold=1,
+                     bulk_data_element_handler=None):
+        """Return a dictionary representation of the :class:`Dataset`
+        conforming to the DICOM JSON Model as described in the DICOM
+        Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
+
+        Parameters
+        ----------
+        bulk_data_threshold : int, optional
+            Threshold for the length of a base64-encoded binary data element
+            above which the element should be considered bulk data and the
+            value provided as a URI rather than included inline (default:
+            ``1``).
+        bulk_data_element_handler : callable, optional
+            Callable function that accepts a bulk data element and returns a
+            JSON representation of the data element (dictionary including the
+            "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
+
+        Returns
+        -------
+        dict
+            :class:`Dataset` representation based on the DICOM JSON Model.
+        """
+        json_dataset = {}
+        for key in self.keys():
+            json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
+            data_element = self[key]
+            json_dataset[json_key] = data_element.to_json_dict(
+                bulk_data_element_handler=bulk_data_element_handler,
+                bulk_data_threshold=bulk_data_threshold
+            )
+        return json_dataset
+
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
                 dump_handler=None):
         """Return a JSON representation of the :class:`Dataset`.
@@ -2008,8 +2041,7 @@ class Dataset(dict):
         dump_handler : callable, optional
             Callable function that accepts a :class:`dict` and returns the
             serialized (dumped) JSON string (by default uses
-            :func:`json.dumps`). Use ``dump_handler=lambda d: d`` to return
-            non-serialized :class:`dict` object.
+            :func:`json.dumps`).
 
             .. note:
 
@@ -2032,17 +2064,10 @@ class Dataset(dict):
             def json_dump(d):
                 return json.dumps(d, sort_keys=True)
 
-            logger.debug('using default json.dumps function')
             dump_handler = json_dump
-        json_dataset = {}
-        for key in self.keys():
-            json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
-            data_element = self[key]
-            json_dataset[json_key] = data_element.to_json(
-                bulk_data_element_handler=bulk_data_element_handler,
-                bulk_data_threshold=bulk_data_threshold
-            )
-        return dump_handler(json_dataset)
+
+        return dump_handler(
+            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
 
     __repr__ = __str__
 

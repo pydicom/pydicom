@@ -13,7 +13,7 @@ from pydicom.valuerep import PersonNameUnicode, PersonName3
 
 
 class TestPersonName(object):
-    def test_json_PN_from_file(self):
+    def test_json_pn_from_file(self):
         with open(get_testdata_files("test_PN.json")[0]) as s:
             ds = Dataset.from_json(s.read())
         assert isinstance(ds[0x00080090].value,
@@ -24,7 +24,7 @@ class TestPersonName(object):
         dataelem = inner_seq[0][0x00100010]
         assert isinstance(dataelem.value, (PersonNameUnicode, PersonName3))
 
-    def test_PN_components_to_json(self):
+    def test_pn_components_to_json(self):
         def check_name(tag, components):
             # we cannot directly compare the dictionaries, as they are not
             # ordered in Python 2
@@ -50,7 +50,7 @@ class TestPersonName(object):
         ds.add_new(0x00091005, 'PN', u'==やまだ^たろう')
         ds.add_new(0x00091006, 'PN', u'=山田^太郎')
         ds.add_new(0x00091007, 'PN', u'Yamada^Tarou=山田^太郎')
-        ds_json = json.loads(ds.to_json())
+        ds_json = ds.to_json_dict()
         check_name('00100010', ['Yamada^Tarou', u'山田^太郎', u'やまだ^たろう'])
         check_name('00091001', ['Yamada^Tarou'])
         check_name('00091002', ['Yamada^Tarou'])
@@ -60,7 +60,7 @@ class TestPersonName(object):
         check_name('00091006', ['', u'山田^太郎'])
         check_name('00091007', ['Yamada^Tarou', u'山田^太郎'])
 
-    def test_PN_components_from_json(self):
+    def test_pn_components_from_json(self):
         # this is the encoded dataset from the previous test, with some
         # empty components omitted
         ds_json = (u'{"00100010": {"vr": "PN", "Value": [{"Alphabetic": '
@@ -100,7 +100,7 @@ class TestPersonName(object):
     def test_empty_value(self):
         ds = Dataset()
         ds.add_new(0x00100010, 'PN', '')
-        ds_json = json.loads(ds.to_json())
+        ds_json = ds.to_json_dict()
         assert '00100010' in ds_json
         assert 'Value' not in ds_json['00100010']
 
@@ -108,7 +108,7 @@ class TestPersonName(object):
         ds = Dataset()
         patient_names = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
         ds.add_new(0x00091001, 'PN', patient_names)
-        ds_json = json.loads(ds.to_json())
+        ds_json = ds.to_json_dict()
         assert [{'Alphabetic': u'Buc^Jérôme'},
                 {'Alphabetic': u'Διονυσιος'},
                 {'Alphabetic': u'Люкceмбypг'}] == ds_json['00091001']['Value']
@@ -128,7 +128,7 @@ class TestAT(object):
         ds.add_new(0x00091002, 'AT', Tag(0x28, 0x02))
         ds.add_new(0x00091003, 'AT', BaseTag(0x00280002))
         ds.add_new(0x00091004, 'AT', [0x00280002, Tag('PatientName')])
-        ds_json = json.loads(ds.to_json())
+        ds_json = ds.to_json_dict()
 
         assert ['00100010', '00100020'] == ds_json['00091001']['Value']
         assert ['00280002'] == ds_json['00091002']['Value']
@@ -157,6 +157,10 @@ class TestDataSetToJson(object):
     def test_json_from_dicom_file(self):
         ds1 = Dataset(dcmread(get_testdata_files("CT_small.dcm")[0]))
         ds_json = ds1.to_json(bulk_data_threshold=100000)
+        ds2 = Dataset.from_json(ds_json)
+        assert ds1 == ds2
+
+        ds_json = ds1.to_json_dict(bulk_data_threshold=100000)
         ds2 = Dataset.from_json(ds_json)
         assert ds1 == ds2
 
@@ -202,6 +206,8 @@ class TestDataSetToJson(object):
 
         json_string = ds.to_json(bulk_data_threshold=100)
         json_model = json.loads(json_string)
+        assert json_model == ds.to_json_dict(bulk_data_threshold=100)
+
         assert json_model['00080005']['Value'] == ['ISO_IR 100']
         assert json_model['00091007']['Value'] == ['1.2.3.4.5.6']
         assert json_model['0009100A']['Value'] == ['20200101115500.000000']
@@ -214,8 +220,10 @@ class TestDataSetToJson(object):
 
         ds2 = Dataset.from_json(json_string)
         assert ds == ds2
+        ds2 = Dataset.from_json(json_model)
+        assert ds == ds2
 
-    def test_dumphandler(self):
+    def test_dataset_dumphandler(self):
         ds = Dataset()
         ds.add_new(0x00100010, 'PN', 'Jane^Doe')
         # as the order of the keys is not defined, we have to check both
@@ -228,6 +236,18 @@ class TestDataSetToJson(object):
                    "00100010": {
                        "vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]}
                } == ds.to_json(dump_handler=lambda d: d)
+
+    def test_dataelement_dumphandler(self):
+        element = DataElement(0x00100010, 'PN', 'Jane^Doe')
+        # as the order of the keys is not defined, we have to check both
+        assert element.to_json() in ('{"vr": "PN", "Value": [{'
+                                     '"Alphabetic": "Jane^Doe"}]}',
+                                     '{"Value": [{'
+                                     '"Alphabetic": "Jane^Doe"}], "vr": "PN"}')
+
+        assert {
+                   "vr": "PN", "Value": [{"Alphabetic": "Jane^Doe"}]
+               } == element.to_json(dump_handler=lambda d: d)
 
     def test_sort_order(self):
         """Test that tags are serialized in ascending order."""
@@ -247,7 +267,9 @@ class TestSequence(object):
     def test_nested_sequences(self):
         test1_json = get_testdata_files("test1.json")[0]
         with open(test1_json) as f:
-            ds = Dataset.from_json(f.read())
+            with pytest.warns(UserWarning,
+                              match='no bulk data URI handler provided '):
+                ds = Dataset.from_json(f.read())
             del ds.PixelData
         ds2 = Dataset.from_json(ds.to_json())
         assert ds == ds2
@@ -257,7 +279,7 @@ class TestBinary(object):
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, 'OB', b'BinaryContent')
-        ds_json = json.loads(ds.to_json(bulk_data_threshold=20))
+        ds_json = ds.to_json_dict(bulk_data_threshold=20)
         assert "00091002" in ds_json
         assert "QmluYXJ5Q29udGVudA==" == ds_json["00091002"]["InlineBinary"]
         ds1 = Dataset.from_json(ds_json)

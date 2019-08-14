@@ -256,9 +256,10 @@ class DataElement(object):
                 )
             )
 
-    def to_json(self, bulk_data_element_handler, bulk_data_threshold):
-        """Converts a :class:`DataElement` to a :class:`dict` that will used
-        for the JSON serialization.
+    def to_json_dict(self, bulk_data_element_handler, bulk_data_threshold):
+        """Return a dictionary representation of the :class:`DataElement`
+        conforming to the DICOM JSON Model as described in the DICOM
+        Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
 
         Parameters
         ----------
@@ -350,6 +351,49 @@ class DataElement(object):
                 json_element['Value'], self.VR
             )
         return json_element
+
+    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
+                dump_handler=None):
+        """Return a JSON representation of the :class:`DataElement`.
+
+        Parameters
+        ----------
+        bulk_data_element_handler: callable or None
+            Callable that accepts a bulk data element and returns the
+            "BulkDataURI" for retrieving the value of the data element
+            via DICOMweb WADO-RS
+        bulk_data_threshold: int
+            Size of base64 encoded data element above which a value will be
+            provided in form of a "BulkDataURI" rather than "InlineBinary"
+        dump_handler : callable, optional
+            Callable function that accepts a :class:`dict` and returns the
+            serialized (dumped) JSON string (by default uses
+            :func:`json.dumps`).
+
+        Returns
+        -------
+        dict
+            Mapping representing a JSON encoded data element
+
+        Raises
+        ------
+        TypeError
+            When size of encoded data element exceeds `bulk_data_threshold`
+            but `bulk_data_element_handler` is ``None`` and hence not callable
+
+        See also
+        --------
+        Dataset.to_json
+        """
+        if dump_handler is None:
+            def json_dump(d):
+                return json.dumps(d, sort_keys=True)
+
+            dump_handler = json_dump
+
+        return dump_handler(
+            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+
 
     @property
     def value(self):
