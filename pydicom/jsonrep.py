@@ -6,7 +6,6 @@ import warnings
 
 from pydicom import compat
 from pydicom.compat import int_type
-from pydicom.config import empty_value_for_VR
 from pydicom.valuerep import PersonNameUnicode
 
 # Order of keys is significant!
@@ -58,7 +57,7 @@ class JsonDataElementConverter(object):
 
         Parameters
         ----------
-        dataset_class : Dataset derived class
+        dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
         tag : BaseTag
             The data element tag.
@@ -90,15 +89,15 @@ class JsonDataElementConverter(object):
         or PersonName3 or PersonNameUnicode or list of any of these types
             The value or value list of the newly created data element.
         """
+        from pydicom.dataelem import empty_value_for_VR
         if self.value_key == 'Value':
             if not isinstance(self.value, list):
                 fmt = '"{}" of data element "{}" must be a list.'
                 raise TypeError(fmt.format(self.value_key, self.tag))
             if not self.value:
                 return empty_value_for_VR(self.vr)
-            element_value = []
-            for v in self.value:
-                element_value.append(self.get_regular_element_value(v))
+            element_value = [self.get_regular_element_value(v)
+                             for v in self.value]
             if len(element_value) == 1 and self.vr != 'SQ':
                 element_value = element_value[0]
             return convert_to_python_number(element_value, self.vr)
@@ -161,11 +160,11 @@ class JsonDataElementConverter(object):
         return value
 
     def get_sequence_item(self, value):
-        """Return a sequence item as a `dataset_class` instance.
+        """Return a sequence item for the JSON dict `value`.
 
         Parameters
         ----------
-        value : dict
+        value : dict or None
             The sequence item from the JSON entry.
 
         Returns
@@ -189,7 +188,8 @@ class JsonDataElementConverter(object):
                     set(val.keys()) & set(JSON_VALUE_KEYS)
                 )
                 from pydicom import DataElement
-                if len(unique_value_keys) == 0:
+                from pydicom.dataelem import empty_value_for_VR
+                if not unique_value_keys:
                     # data element with no value
                     elem = DataElement(
                         tag=int(key, 16),

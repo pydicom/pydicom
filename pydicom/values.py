@@ -11,7 +11,8 @@ from pydicom import config
 from pydicom import compat
 from pydicom.compat import in_py2
 from pydicom.charset import (default_encoding, text_VRs, decode_string)
-from pydicom.config import logger, empty_value_for_VR
+from pydicom.config import logger
+from pydicom.dataelem import empty_value_for_VR
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, TupleTag)

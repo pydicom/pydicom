@@ -18,7 +18,7 @@ from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
 from pydicom.compat import in_py2
-from pydicom.config import logger, empty_value_for_VR
+from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -41,6 +41,42 @@ BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
 ]
+
+
+def empty_value_for_VR(VR, raw=False):
+    """Return the value for an empty element for `VR`.
+
+    The behavior of this property depends on the setting of
+    :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
+    an empty value is always represented by ``None``, otherwise it depends
+    on `VR`. For text VRs (this includes 'AE', 'AS', 'CS', 'DA', 'DT', 'LO',
+    'LT', 'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR' and 'UT') an empty string
+    is used as empty value representation, for all other VRs, ``None``.
+    Note that this is used only if decoding the element - it is always
+    possible to set the value to another empty value representation,
+    which will be preserved during the element object lifetime.
+
+    Parameters
+    ----------
+    VR : str
+        The VR of the corresponding element.
+
+    raw : bool
+        If ``True``, returns the value for a :class:`RawDataElement`,
+        otherwise for a :class:`DataElement`
+
+    Returns
+    -------
+    str or bytes or None
+        The value a data element with `VR` is assigned on decoding
+        if it is empty.
+    """
+    if config.use_none_as_empty_text_VR_value:
+        return None
+    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
+              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+        return b'' if raw else ''
+    return None
 
 
 def isMultiValue(value):
@@ -223,7 +259,7 @@ class DataElement(object):
 
         Parameters
         ----------
-        dataset_class : Dataset derived class
+        dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
         tag : BaseTag or int
             The data element tag.

@@ -2014,7 +2014,7 @@ class Dataset(dict):
         """
         json_dataset = {}
         for key in self.keys():
-            json_key = '{0:04x}{1:04x}'.format(key.group, key.element).upper()
+            json_key = '{:08X}'.format(key)
             data_element = self[key]
             json_dataset[json_key] = data_element.to_json_dict(
                 bulk_data_element_handler=bulk_data_element_handler,
@@ -2047,7 +2047,7 @@ class Dataset(dict):
             .. note:
 
                 Make sure to use a dump handler that sorts the keys (see
-                example below) do create DICOM-conform JSON.
+                example below) to create DICOM-conformant JSON.
 
         Returns
         -------

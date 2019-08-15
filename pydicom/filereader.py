@@ -14,10 +14,10 @@ from pydicom import compat  # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import (default_encoding, convert_encodings)
 from pydicom.compat import in_py2
-from pydicom.config import logger, empty_value_for_VR
+from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw)
+                              DataElement_from_raw, empty_value_for_VR)
 from pydicom.dataset import (Dataset, FileDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
