@@ -2114,11 +2114,12 @@ class FileDataset(Dataset):
         self.file_meta = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
+        filename = None
         if isinstance(filename_or_obj, compat.string_types):
-            self.filename = filename_or_obj
+            filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):
-            self.filename = filename_or_obj.name
+            filename = filename_or_obj.name
             # This is the appropriate constructor for io.BufferedReader
             self.fileobj_type = open
         else:
@@ -2126,17 +2127,20 @@ class FileDataset(Dataset):
             # http://docs.python.org/reference/datamodel.html
             self.fileobj_type = filename_or_obj.__class__
             if getattr(filename_or_obj, "name", False):
-                self.filename = filename_or_obj.name
+                filename = filename_or_obj.name
             elif getattr(filename_or_obj, "filename",
                          False):  # gzip python <2.7?
-                self.filename = filename_or_obj.filename
+                filename = filename_or_obj.filename
             else:
                 # e.g. came from BytesIO or something file-like
-                self.filename = None
+                self.filename = filename_or_obj
+
         self.timestamp = None
-        if self.filename and os.path.exists(self.filename):
-            statinfo = os.stat(self.filename)
-            self.timestamp = statinfo.st_mtime
+        if filename:
+            self.filename = filename
+            if os.path.exists(filename):
+                statinfo = os.stat(filename)
+                self.timestamp = statinfo.st_mtime
 
     def __eq__(self, other):
         """Compare `self` and `other` for equality.

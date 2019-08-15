@@ -44,7 +44,7 @@ def data_element_generator(fp,
     Parameters
     ----------
     fp : file-like
-        The file like to read from.
+        The file-like to read from.
     is_implicit_VR : bool
         ``True`` if the data is encoded as implicit VR, ``False`` otherwise.
     is_little_endian : bool
@@ -912,28 +912,57 @@ def data_element_offset_to_value(is_implicit_VR, VR):
     return offset
 
 
-def read_deferred_data_element(fileobj_type, filename, timestamp,
+def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
                                raw_data_elem):
     """Read the previously deferred value from the file into memory
-    and return a raw data element"""
+    and return a raw data element.
+
+    Parameters
+    ----------
+    fileobj_type : type
+        The type of the original file object.
+    filename_or_obj : str or file-like
+        The filename of the original file if one exists, or the file-like
+        object where the data element persists.
+    timestamp : time or None
+        The time the original file has been read, if not a file-like.
+    raw_data_elem : dataelem.RawDataElement
+        The raw data element with no value set.
+
+    Returns
+    -------
+    dataelem.RawDataElement
+        The data element with the value set.
+
+    Raises
+    ------
+    IOError
+        If `filename_or_obj` is ``None``.
+    IOError
+        If `filename_or_obj` is a filename and the corresponding file does
+        not exist.
+    ValueError
+        If the VR or tag of `raw_data_elem` does not match the read value.
+    """
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
-    if filename is None:
+    if filename_or_obj is None:
         raise IOError("Deferred read -- original filename not stored. "
                       "Cannot re-open")
+    is_file = isinstance(filename_or_obj, compat.string_types)
+
     # Check that the file is the same as when originally read
-    if not os.path.exists(filename):
+    if is_file and not os.path.exists(filename_or_obj):
         raise IOError(u"Deferred read -- original file "
-                      "{0:s} is missing".format(filename))
+                      "{0:s} is missing".format(filename_or_obj))
     if timestamp is not None:
-        statinfo = os.stat(filename)
+        statinfo = os.stat(filename_or_obj)
         if statinfo.st_mtime != timestamp:
             warnings.warn("Deferred read warning -- file modification time "
                           "has changed.")
 
     # Open the file, position to the right place
-    # fp = self.typefileobj(self.filename, "rb")
-    fp = fileobj_type(filename, 'rb')
+    fp = fileobj_type(filename_or_obj, 'rb') if is_file else filename_or_obj
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
