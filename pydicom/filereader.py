@@ -917,6 +917,11 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
     """Read the previously deferred value from the file into memory
     and return a raw data element.
 
+    .. note:
+
+        This is called internally by pydicom and will normally not be
+        needed in user code.
+
     Parameters
     ----------
     fileobj_type : type
@@ -949,10 +954,10 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
     if filename_or_obj is None:
         raise IOError("Deferred read -- original filename not stored. "
                       "Cannot re-open")
-    is_file = isinstance(filename_or_obj, compat.string_types)
+    is_filename = isinstance(filename_or_obj, compat.string_types)
 
     # Check that the file is the same as when originally read
-    if is_file and not os.path.exists(filename_or_obj):
+    if is_filename and not os.path.exists(filename_or_obj):
         raise IOError(u"Deferred read -- original file "
                       "{0:s} is missing".format(filename_or_obj))
     if timestamp is not None:
@@ -962,7 +967,8 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
                           "has changed.")
 
     # Open the file, position to the right place
-    fp = fileobj_type(filename_or_obj, 'rb') if is_file else filename_or_obj
+    fp = (fileobj_type(filename_or_obj, 'rb')
+          if is_filename else filename_or_obj)
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
