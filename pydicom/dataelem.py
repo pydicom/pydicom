@@ -22,7 +22,8 @@ from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
-                              dictionary_VM, repeater_has_tag)
+                              repeater_has_tag)
+from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
@@ -48,9 +49,9 @@ def empty_value_for_VR(VR, raw=False):
     The behavior of this property depends on the setting of
     :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
     an empty value is always represented by ``None``, otherwise it depends
-    on `VR`. For text VRs (not including VRs that represent a number in
-    textual representation) an empty string is used as empty value
-    representation, for all other VRs, ``None``.
+    on `VR`. For text VRs (this includes 'AE', 'AS', 'CS', 'DA', 'DT', 'LO',
+    'LT', 'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR' and 'UT') an empty string
+    is used as empty value representation, for all other VRs, ``None``.
     Note that this is used only if decoding the element - it is always
     possible to set the value to another empty value representation,
     which will be preserved during the element object lifetime.
@@ -253,14 +254,14 @@ class DataElement(object):
 
     @classmethod
     def from_json(cls, dataset_class, tag, vr, value, value_key,
-                  bulk_data_uri_handler=None, encodings=None):
+                  bulk_data_uri_handler=None):
         """Return a :class:`DataElement` from JSON.
 
         Parameters
         ----------
-        dataset_class : Dataset derived class
+        dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
-        tag : BaseTag
+        tag : BaseTag or int
             The data element tag.
         vr : str
             The data element value representation.
@@ -279,127 +280,22 @@ class DataElement(object):
         DataElement
         """
         # TODO: test wado-rs retrieve wrapper
+        converter = JsonDataElementConverter(dataset_class, tag, vr, value,
+                                             value_key, bulk_data_uri_handler)
+        elem_value = converter.get_element_values()
         try:
-            vm = dictionary_VM(tag)
-        except KeyError:
-            # Private tag
-            vm = str(len(value))
-        if value_key == 'Value':
-            if not(isinstance(value, list)):
-                fmt = '"{}" of data element "{}" must be a list.'
-                raise TypeError(fmt.format(value_key, tag))
-        elif value_key in {'InlineBinary', 'BulkDataURI'}:
-            if isinstance(value, list):
-                fmt = '"{}" of data element "{}" must be a {}.'
-                expected_type = ('string' if value_key == 'BulkDataURI'
-                                 else 'bytes-like object')
-                raise TypeError(fmt.format(value_key, tag, expected_type))
-        if vr == 'SQ':
-            elem_value = []
-            for value_item in value:
-                ds = dataset_class()
-                if value_item:
-                    for key, val in value_item.items():
-                        if 'vr' not in val:
-                            fmt = 'Data element "{}" must have key "vr".'
-                            raise KeyError(fmt.format(tag))
-                        unique_value_keys = tuple(
-                            set(val.keys()) & set(jsonrep.JSON_VALUE_KEYS)
-                        )
-                        if len(unique_value_keys) == 0:
-                            logger.debug(
-                                'data element has neither key "{}".'.format(
-                                    '" nor "'.join(jsonrep.JSON_VALUE_KEYS)
-                                )
-                            )
-                            elem = DataElement(tag=tag, value='', VR=vr)
-                        else:
-                            value_key = unique_value_keys[0]
-                            elem = cls.from_json(
-                                dataset_class, key, val['vr'],
-                                val[value_key], value_key
-                            )
-                        ds.add(elem)
-                elem_value.append(ds)
-        elif vr == 'PN':
-            # Special case, see DICOM Part 18 Annex F2.2
-            elem_value = []
-            for v in value:
-                if not isinstance(v, dict):
-                    # Some DICOMweb services get this wrong, so we
-                    # workaround the issue and warn the user
-                    # rather than raising an error.
-                    logger.warning(
-                        'value of data element "{}" with VR Person Name (PN) '
-                        'is not formatted correctly'.format(tag)
-                    )
-                    elem_value.append(v)
-                else:
-                    if 'Phonetic' in v:
-                        comps = ['', '', '']
-                    elif 'Ideographic' in v:
-                        comps = ['', '']
-                    else:
-                        comps = ['']
-                    if 'Alphabetic' in v:
-                        comps[0] = v['Alphabetic']
-                    if 'Ideographic' in v:
-                        comps[1] = v['Ideographic']
-                    if 'Phonetic' in v:
-                        comps[2] = v['Phonetic']
-                    elem_value.append('='.join(comps))
-            if len(elem_value) == 1:
-                elem_value = elem_value[0]
-            elif not elem_value:
-                elem_value = empty_value_for_VR(vr)
-        elif vr == 'AT':
-            elem_value = []
-            for v in value:
-                try:
-                    elem_value.append(int(v, 16))
-                except ValueError:
-                    warnings.warn('Invalid value "{}" for AT element - '
-                                  'ignoring it'.format(v))
-                value = value[0]
-            if not elem_value:
-                elem_value = empty_value_for_VR(vr)
-            elif len(elem_value) == 1:
-                elem_value = elem_value[0]
-        else:
-            if isinstance(value, list) and len(value) == 1:
-                value = value[0]
-            if value_key == 'InlineBinary':
-                elem_value = base64.b64decode(value)
-            elif value_key == 'BulkDataURI':
-                if bulk_data_uri_handler is None:
-                    logger.warning(
-                        'no bulk data URI handler provided for retrieval '
-                        'of value of data element "{}"'.format(tag)
-                    )
-                    elem_value = empty_value_for_VR(vr, raw=True)
-                else:
-                    elem_value = bulk_data_uri_handler(value)
-            else:
-                elem_value = value
-        if elem_value is None:
-            elem_value = empty_value_for_VR(vr)
-
-        elem_value = jsonrep.convert_to_python_number(elem_value, vr)
-
-        try:
-            if compat.in_py2 and vr == "PN":
-                elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return DataElement(tag=tag, value=elem_value, VR=vr)
         except Exception:
             raise ValueError(
                 'Data element "{}" could not be loaded from JSON: {}'.format(
                     tag, elem_value
-                    )
+                )
             )
 
-    def to_json(self, bulk_data_element_handler,
-                bulk_data_threshold, dump_handler):
-        """Converts a :class:`DataElement` to JSON representation.
+    def to_json_dict(self, bulk_data_element_handler, bulk_data_threshold):
+        """Return a dictionary representation of the :class:`DataElement`
+        conforming to the DICOM JSON Model as described in the DICOM
+        Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
 
         Parameters
         ----------
@@ -446,14 +342,14 @@ class DataElement(object):
                     )
                     json_element['InlineBinary'] = encoded_value
         elif self.VR == 'SQ':
-            # recursive call to co-routine to format sequence contents
+            # recursive call to get sequence item JSON dicts
             value = [
-                json.loads(e.to_json(
+                ds.to_json(
                     bulk_data_element_handler=bulk_data_element_handler,
                     bulk_data_threshold=bulk_data_threshold,
-                    dump_handler=dump_handler
-                ))
-                for e in self
+                    dump_handler=lambda d: d
+                )
+                for ds in self
             ]
             json_element['Value'] = value
         elif self.VR == 'PN':
@@ -491,6 +387,49 @@ class DataElement(object):
                 json_element['Value'], self.VR
             )
         return json_element
+
+    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
+                dump_handler=None):
+        """Return a JSON representation of the :class:`DataElement`.
+
+        Parameters
+        ----------
+        bulk_data_element_handler: callable or None
+            Callable that accepts a bulk data element and returns the
+            "BulkDataURI" for retrieving the value of the data element
+            via DICOMweb WADO-RS
+        bulk_data_threshold: int
+            Size of base64 encoded data element above which a value will be
+            provided in form of a "BulkDataURI" rather than "InlineBinary"
+        dump_handler : callable, optional
+            Callable function that accepts a :class:`dict` and returns the
+            serialized (dumped) JSON string (by default uses
+            :func:`json.dumps`).
+
+        Returns
+        -------
+        dict
+            Mapping representing a JSON encoded data element
+
+        Raises
+        ------
+        TypeError
+            When size of encoded data element exceeds `bulk_data_threshold`
+            but `bulk_data_element_handler` is ``None`` and hence not callable
+
+        See also
+        --------
+        Dataset.to_json
+        """
+        if dump_handler is None:
+            def json_dump(d):
+                return json.dumps(d, sort_keys=True)
+
+            dump_handler = json_dump
+
+        return dump_handler(
+            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+
 
     @property
     def value(self):
@@ -628,9 +567,8 @@ class DataElement(object):
             return True
 
         if isinstance(other, self.__class__):
-            if self.tag == other.tag and self.VR == other.VR \
-                    and self.value == other.value:
-                return True
+            return (self.tag == other.tag and self.VR == other.VR
+                    and self.value == other.value)
 
         return NotImplemented
 
