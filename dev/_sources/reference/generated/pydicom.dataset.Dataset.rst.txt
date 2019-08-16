@@ -46,6 +46,7 @@ pydicom.dataset.Dataset
       ~Dataset.set_original_encoding
       ~Dataset.setdefault
       ~Dataset.to_json
+      ~Dataset.to_json_dict
       ~Dataset.top
       ~Dataset.trait_names
       ~Dataset.update

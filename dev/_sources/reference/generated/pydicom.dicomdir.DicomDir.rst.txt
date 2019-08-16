@@ -47,6 +47,7 @@ pydicom.dicomdir.DicomDir
       ~DicomDir.set_original_encoding
       ~DicomDir.setdefault
       ~DicomDir.to_json
+      ~DicomDir.to_json_dict
       ~DicomDir.top
       ~DicomDir.trait_names
       ~DicomDir.update

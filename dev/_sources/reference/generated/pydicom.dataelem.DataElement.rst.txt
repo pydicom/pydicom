@@ -18,6 +18,7 @@ pydicom.dataelem.DataElement
       ~DataElement.description
       ~DataElement.from_json
       ~DataElement.to_json
+      ~DataElement.to_json_dict
    
    
 
