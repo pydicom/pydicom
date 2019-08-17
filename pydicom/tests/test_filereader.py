@@ -3,6 +3,7 @@
 """Unit tests for the pydicom.filereader module."""
 
 import gzip
+import io
 from io import BytesIO
 import os
 import shutil
@@ -917,6 +918,14 @@ class TestDeferredRead(object):
         # before the fix, this threw an error as file reading was not in
         # the right place, it was re-opened as a normal file, not a zip file
         ds.InstanceNumber
+
+    def test_filelike_deferred(self):
+        """Deferred values work with file-like objects."""
+        with open(ct_name, 'rb') as fp:
+            data = fp.read()
+        filelike = io.BytesIO(data)
+        dataset = pydicom.dcmread(filelike, defer_size=1024)
+        assert 32768 == len(dataset.PixelData)
 
 
 class TestReadTruncatedFile(object):
