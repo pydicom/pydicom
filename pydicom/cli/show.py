@@ -24,7 +24,6 @@ def add_subparser(subparsers):
         help="Only show basic information",
         action="store_true",
     )
-    subparser.add_argument("-c", "--code", help="Execute code snippet on ds")
 
     subparser.set_defaults(func=do_command)
 
@@ -39,9 +38,7 @@ def do_command(args):
     if args.exclude_private:
         ds.remove_private_tags()
 
-    if args.code:
-        exec(args.code, {}, {"ds": ds})
-    elif args.quiet:
+    if args.quiet:
         show_quiet(ds)
     elif args.top:
         print(ds.top())
