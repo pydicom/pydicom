@@ -23,6 +23,12 @@ values given in the table below.
 +=============+===========================+======+==============+==========+
 | (0028,0002) | SamplesPerPixel           | 1    | N            | Required |
 +-------------+---------------------------+------+--------------+----------+
+| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1  | Required |
+|             |                           |      | MONOCHROME2  |          |
+|             |                           |      | RGB          |          |
+|             |                           |      | YBR_FULL     |          |
+|             |                           |      | YBR_FULL_422 |          |
++-------------+---------------------------+------+--------------+----------+
 | (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0008) | NumberOfFrames            | 1C   | N            | Optional |
@@ -276,9 +282,9 @@ def get_pixeldata(ds, read_only=False):
         # PS 3.3, Annex C.7.6.3
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # Check to ensure we do have subsampled YBR 422 data
-            full_len = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
+            ybr_full_length = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
             # >= as may also include excess padding
-            if actual_length >= full_len:
+            if actual_length >= ybr_full_length:
                 msg = (
                     "The Photometric Interpretation of the dataset is "
                     "YBR_FULL_422, however the length of the pixel data "
@@ -302,10 +308,10 @@ def get_pixeldata(ds, read_only=False):
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
             out = np.zeros(expected_len // 2 * 3, dtype=pixel_dtype(ds))
-            out[::6] = arr[::4] # Y1
-            out[3::6] = arr[1::4] # Y2
-            out[1::6], out[4::6] = arr[2::4], arr[2::4] # B
-            out[2::6], out[5::6] = arr[3::4], arr[3::4] # R
+            out[::6] = arr[::4]  # Y1
+            out[3::6] = arr[1::4]  # Y2
+            out[1::6], out[4::6] = arr[2::4], arr[2::4]  # B
+            out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
             arr = out
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
