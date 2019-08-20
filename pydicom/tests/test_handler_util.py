@@ -553,6 +553,7 @@ class TestNumpy_ConvertColourSpace(object):
         rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
         # All pixels within +/- 1 units
         assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
 
     def test_rgb_ybr_rgb_multi_frame(self):
         """Test round trip conversion of multi-framed pixel data."""
@@ -599,6 +600,7 @@ class TestNumpy_ConvertColourSpace(object):
         rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
         # All pixels within +/- 1 units
         assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
