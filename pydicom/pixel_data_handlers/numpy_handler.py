@@ -207,7 +207,7 @@ def get_pixeldata(ds, read_only=False):
         The :class:`Dataset` containing an Image Pixel module and the
         *Pixel Data* to be converted. If (0028,0004) *Photometric
         Interpretation* is `'YBR_FULL_422'` then the pixel data will be
-        resampled to 3 channel data as per Part 3, :dcm:`Annex C.6.3.1.2
+        resampled to 3 channel data as per Part 3, :dcm:`Annex C.7.6.3.1.2
         <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of the DICOM Standard.
     read_only : bool, optional
         If ``False`` (default) then returns a writeable array that no longer
