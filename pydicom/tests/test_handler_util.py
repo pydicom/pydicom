@@ -735,6 +735,7 @@ class TestNumpy_GetExpectedLength(object):
     def test_length_in_bytes(self, shape, bits, length):
         """Test get_expected_length(ds, unit='bytes')."""
         ds = Dataset()
+        ds.PhotometricInterpretation = 'MONOCHROME2'
         ds.Rows = shape[1]
         ds.Columns = shape[2]
         ds.BitsAllocated = bits
@@ -748,6 +749,7 @@ class TestNumpy_GetExpectedLength(object):
     def test_length_in_pixels(self, shape, bits, length):
         """Test get_expected_length(ds, unit='pixels')."""
         ds = Dataset()
+        ds.PhotometricInterpretation = 'MONOCHROME2'
         ds.Rows = shape[1]
         ds.Columns = shape[2]
         ds.BitsAllocated = bits

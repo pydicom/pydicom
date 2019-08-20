@@ -255,7 +255,8 @@ def get_pixeldata(ds, read_only=False):
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
             warnings.warn(
-                "The pixel data length is odd and misses a padding byte.")
+                "The odd length pixel data is missing a trailing padding byte"
+            )
         else:
             raise ValueError(
                 "The length of the pixel data in the dataset ({} bytes) "
@@ -273,19 +274,17 @@ def get_pixeldata(ds, read_only=False):
             .format(actual_length, actual_length - expected_len)
         )
         # PS 3.3, Annex C.7.6.3
-        print(ds.PhotometricInterpretation)
-        if getattr(ds, 'ds.PhotometricInterpretation', None) == 'YBR_FULL_422':
+        if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # Check to ensure we do have subsampled YBR 422 data
             full_len = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
-            print(full_len, actual_length)
             # >= as may also include excess padding
             if actual_length >= full_len:
                 msg = (
                     "The Photometric Interpretation of the dataset is "
                     "YBR_FULL_422, however the length of the pixel data "
                     "({} bytes) is a third larger than expected ({} bytes) "
-                    "which indicates that this may not be correct. If this is"
-                    "the case please change the Photometric Interpretation to "
+                    "which indicates that this may be incorrect. You may "
+                    "need to change the Photometric Interpretation to "
                     "the correct value.".format(actual_length, expected_len)
                 )
         warnings.warn(msg)
@@ -296,10 +295,10 @@ def get_pixeldata(ds, read_only=False):
         nr_pixels = get_expected_length(ds, unit='pixels')
         arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
-        # Skip the trailing padding byte if present
+        # Skip the trailing padding byte(s) if present
         data = ds.PixelData[:expected_len]
         arr = np.frombuffer(data, dtype=pixel_dtype(ds))
-        if getattr(ds, 'PhotometricInterpretation', None) == 'YBR_FULL_422':
+        if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
             out = np.zeros(expected_len // 2 * 3, dtype=pixel_dtype(ds))

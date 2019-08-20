@@ -584,37 +584,6 @@ class TestNumpy_NumpyHandler(object):
         assert (192, 128, 128) == tuple(arr[85, 50, :])
         assert (255, 128, 128) == tuple(arr[95, 50, :])
 
-    def test_8bit_1frame_ybr422_excess_padding(self):
-        pass
-
-    def test_8bit_1frame_ybr422_wrong_interpretation(self):
-        ds = dcmread(EXPL_8_3_1F_YBR)
-        assert ds.PhotometricInterpretation == 'YBR_FULL'
-        assert len(ds.PixelData) == 30000
-        ds.PhotometricInterpretation == 'YBR_FULL_422'
-        msg = r"The Photometric Interpretation of the dataset is YBR_FULL_422"
-        with pytest.warns(UserWarning, match=msg):
-            arr = ds.pixel_array
-
-        # Check resampling
-        assert [
-            [76, 85, 255],
-            [76, 85, 255],
-            [76, 85, 255],
-            [76, 85, 255]
-        ] == arr[0:4, 0, :].tolist()
-        # Check values
-        assert (76, 85, 255) == tuple(arr[5, 50, :])
-        assert (166, 106, 193) == tuple(arr[15, 50, :])
-        assert (150, 46, 20) == tuple(arr[25, 50, :])
-        assert (203, 86, 75) == tuple(arr[35, 50, :])
-        assert (29, 255, 107) == tuple(arr[45, 50, :])
-        assert (142, 193, 118) == tuple(arr[55, 50, :])
-        assert (0, 128, 128) == tuple(arr[65, 50, :])
-        assert (64, 128, 128) == tuple(arr[75, 50, :])
-        assert (192, 128, 128) == tuple(arr[85, 50, :])
-        assert (255, 128, 128) == tuple(arr[95, 50, :])
-
     def test_8bit_3sample_1frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         # Check supported syntaxes
@@ -1002,6 +971,7 @@ class TestNumpy_NumpyHandler(object):
         ds.BitsAllocated = 16
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
+        ds.PhotometricInterpretation = 'MONOCHROME2'
         arr = np.ones((10, 10), dtype='uint16')
         ds.PixelData = arr.tobytes()
 
@@ -1064,7 +1034,7 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_8_3_1F_ODD)
         # remove the padding byte
         ds.PixelData = ds.PixelData[:-1]
-        msg = "The pixel data length is odd and misses a padding byte."
+        msg = r"The odd length pixel data is missing a trailing padding byte"
         with pytest.warns(UserWarning, match=msg):
             get_pixeldata(ds)
 
@@ -1112,6 +1082,43 @@ class TestNumpy_GetPixelData(object):
 
         arr = get_pixeldata(ds, read_only=True)
         assert arr.flags.writeable
+
+    def test_ybr422_excess_padding(self):
+        """Test YBR data with excess padding."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        ds.PixelData += b'\x00\x00\x00\x00'
+        msg = (
+            r"The length of the pixel data in the dataset \(20004 bytes\) "
+            r"indicates it contains excess padding. 4 bytes will be removed "
+            r"from the end of the data"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        assert (76, 85, 255) == tuple(arr[5, 50, :])
+        assert (166, 106, 193) == tuple(arr[15, 50, :])
+        assert (150, 46, 20) == tuple(arr[25, 50, :])
+        assert (203, 86, 75) == tuple(arr[35, 50, :])
+        assert (29, 255, 107) == tuple(arr[45, 50, :])
+        assert (142, 193, 118) == tuple(arr[55, 50, :])
+        assert (0, 128, 128) == tuple(arr[65, 50, :])
+        assert (64, 128, 128) == tuple(arr[75, 50, :])
+        assert (192, 128, 128) == tuple(arr[85, 50, :])
+        assert (255, 128, 128) == tuple(arr[95, 50, :])
+
+    def test_ybr422_wrong_interpretation(self):
+        """Test YBR data with wrong Photometric Interpretation."""
+        ds = dcmread(EXPL_8_3_1F_YBR)
+        assert ds.PhotometricInterpretation == 'YBR_FULL'
+        assert len(ds.PixelData) == 30000
+        ds.PhotometricInterpretation = 'YBR_FULL_422'
+        msg = r"The Photometric Interpretation of the dataset is YBR_FULL_422"
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        # Resulting data will be nonsense but of correct shape
+        assert (100, 100, 3) == arr.shape
 
 
 REFERENCE_PACK_UNPACK = [
