@@ -21,3 +21,5 @@ Enhancements
 * Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
   using `Dataset.overlay_array()` (issue:`912`)
 * Added support for deferred reading in file-like objects (:issue:`932`)
+* Added support for uncompressed pixel data with (0028,0004) *Photometric
+  Interpretation* of `YBR_FULL_422` to the numpy pixel data handler.

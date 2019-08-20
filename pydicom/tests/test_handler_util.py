@@ -756,3 +756,17 @@ class TestNumpy_GetExpectedLength(object):
         ds.SamplesPerPixel = shape[3]
 
         assert length[1] == get_expected_length(ds, unit='pixels')
+
+    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    def test_length_ybr_422(self, shape, bits, length):
+        """Test get_expected_length for YBR_FULL_422."""
+        ds = Dataset()
+        ds.PhotometricInterpretation = 'YBR_FULL_422'
+        ds.Rows = shape[1]
+        ds.Columns = shape[2]
+        ds.BitsAllocated = bits
+        if shape[0] != 0:
+            ds.NumberOfFrames = shape[0]
+        ds.SamplesPerPixel = shape[3]
+
+        assert length[0] // 3 * 2 == get_expected_length(ds, unit='bytes')

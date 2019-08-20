@@ -383,9 +383,9 @@ def get_expected_length(ds, unit='bytes'):
     else:
         length *= bits_allocated // 8
 
-    # DICOM Standard, Part 4, Annex C.7.6.3
-    if ds.PhotometricInterpretation == 'YBR_FULL_422':
-        length = length / 3 * 2
+    # DICOM Standard, Part 4, Annex C.7.6.3.1.2
+    if getattr(ds, 'PhotometricInterpretation', None) == 'YBR_FULL_422':
+        length = length // 3 * 2
 
     return length
 

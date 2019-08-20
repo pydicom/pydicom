@@ -123,6 +123,11 @@ SC_rgb.dcm
   * 2 frame versions created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
+SC_ybr_full_422_uncompressed.dcm
+    * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
+    * Converted to YBR_FULL_422 using a script by @scaramallion
+    * PhotometricIntepretation is YBR_FULL_422
+
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)

@@ -273,9 +273,11 @@ def get_pixeldata(ds, read_only=False):
             .format(actual_length, actual_length - expected_len)
         )
         # PS 3.3, Annex C.7.6.3
-        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+        print(ds.PhotometricInterpretation)
+        if getattr(ds, 'ds.PhotometricInterpretation', None) == 'YBR_FULL_422':
             # Check to ensure we do have subsampled YBR 422 data
             full_len = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
+            print(full_len, actual_length)
             # >= as may also include excess padding
             if actual_length >= full_len:
                 msg = (
@@ -296,17 +298,16 @@ def get_pixeldata(ds, read_only=False):
     else:
         # Skip the trailing padding byte if present
         data = ds.PixelData[:expected_len]
-        if ds.PhotometricInterpretation != 'YBR_FULL_422':
-            arr = np.frombuffer(data, dtype=pixel_dtype(ds))
-        else:
-            # YBR_FULL_422 data needs to be resampled: PS3.3 C.7.6.3.1.2
-            # # Y1 Y2 B1 R1 Y3 Y4 B2 R2 -> Y1 B1 R1 Y2 B1 R1 Y3 B2 R2 Y4 B2 R2
-            arr = np.zeros(expected_len)
-            tmp = np.frombuffer(data, dtype=pixel_dtype(ds))
-            arr[::6] = tmp[::4] # Y1
-            arr[3::6] = tmp[1::4] # Y2
-            arr[1::6], arr[4::6] = tmp[2::4] # B
-            arr[2::6], arr[5::6] = tmp[3::4] # R
+        arr = np.frombuffer(data, dtype=pixel_dtype(ds))
+        if getattr(ds, 'PhotometricInterpretation', None) == 'YBR_FULL_422':
+            # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
+            # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
+            out = np.zeros(expected_len // 2 * 3, dtype=pixel_dtype(ds))
+            out[::6] = arr[::4] # Y1
+            out[3::6] = arr[1::4] # Y2
+            out[1::6], out[4::6] = arr[2::4], arr[2::4] # B
+            out[2::6], out[5::6] = arr[3::4], arr[3::4] # R
+            arr = out
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
