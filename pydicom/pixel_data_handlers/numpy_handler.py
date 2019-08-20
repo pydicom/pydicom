@@ -199,7 +199,10 @@ def get_pixeldata(ds, read_only=False):
     ----------
     ds : Dataset
         The :class:`Dataset` containing an Image Pixel module and the
-        *Pixel Data* to be converted.
+        *Pixel Data* to be converted. If (0028,0004) *Photometric
+        Interpretation* is `'YBR_FULL_422'` then the pixel data will be
+        resampled to 3 channel data as per Part 3, :dcm:`Annex C.6.3.1.2
+        <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of the DICOM Standard.
     read_only : bool, optional
         If ``False`` (default) then returns a writeable array that no longer
         uses the original memory. If ``True`` and the value of (0028,0100)
@@ -246,8 +249,8 @@ def get_pixeldata(ds, read_only=False):
 
     # Check that the actual length of the pixel data is as expected
     actual_length = len(ds.PixelData)
-    # Correct for the trailing NULL byte padding for odd length data
 
+    # Correct for the trailing NULL byte padding for odd length data
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
@@ -269,6 +272,20 @@ def get_pixeldata(ds, read_only=False):
             "end of the data"
             .format(actual_length, actual_length - expected_len)
         )
+        # PS 3.3, Annex C.7.6.3
+        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+            # Check to ensure we do have subsampled YBR 422 data
+            full_len = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
+            # >= as may also include excess padding
+            if actual_length >= full_len:
+                msg = (
+                    "The Photometric Interpretation of the dataset is "
+                    "YBR_FULL_422, however the length of the pixel data "
+                    "({} bytes) is a third larger than expected ({} bytes) "
+                    "which indicates that this may not be correct. If this is"
+                    "the case please change the Photometric Interpretation to "
+                    "the correct value.".format(actual_length, expected_len)
+                )
         warnings.warn(msg)
 
     # Unpack the pixel data into a 1D ndarray
@@ -278,8 +295,18 @@ def get_pixeldata(ds, read_only=False):
         arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
         # Skip the trailing padding byte if present
-        arr = np.frombuffer(ds.PixelData[:expected_len],
-                            dtype=pixel_dtype(ds))
+        data = ds.PixelData[:expected_len]
+        if ds.PhotometricInterpretation != 'YBR_FULL_422':
+            arr = np.frombuffer(data, dtype=pixel_dtype(ds))
+        else:
+            # YBR_FULL_422 data needs to be resampled: PS3.3 C.7.6.3.1.2
+            # # Y1 Y2 B1 R1 Y3 Y4 B2 R2 -> Y1 B1 R1 Y2 B1 R1 Y3 B2 R2 Y4 B2 R2
+            arr = np.zeros(expected_len)
+            tmp = np.frombuffer(data, dtype=pixel_dtype(ds))
+            arr[::6] = tmp[::4] # Y1
+            arr[3::6] = tmp[1::4] # Y2
+            arr[1::6], arr[4::6] = tmp[2::4] # B
+            arr[2::6], arr[5::6] = tmp[3::4] # R
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
