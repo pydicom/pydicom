@@ -240,8 +240,10 @@ def get_pixeldata(ds, read_only=False):
         )
 
     # Check required elements
-    required_elements = ['PixelData', 'BitsAllocated', 'Rows', 'Columns',
-                         'PixelRepresentation', 'SamplesPerPixel']
+    required_elements = [
+        'PixelData', 'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
+        'SamplesPerPixel', 'PhotometricInterpretation'
+    ]
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
