@@ -47,12 +47,6 @@ class TestNoNumpy(object):
                            match="Numpy is required to reshape"):
             reshape_pixel_array(None, None)
 
-    def test_convert_color_space_raises(self):
-        """Test that convert_color_space raises exception."""
-        with pytest.raises(ImportError,
-                           match="Numpy is required to convert"):
-            convert_color_space(None, None, None)
-
 
 # Tests with Numpy available
 REFERENCE_DTYPE = [
@@ -516,10 +510,16 @@ class TestNumpy_ConvertColourSpace(object):
                            match="Conversion from RGB to TEST is not suppo"):
             convert_color_space(None, 'RGB', 'TEST')
 
-    def test_current_is_desired(self):
+    @pytest.mark.parametrize(
+        'current, desired',
+        [('RGB', 'RGB'),
+         ('YBR_FULL', 'YBR_FULL'), ('YBR_FULL', 'YBR_FULL_422'),
+         ('YBR_FULL_422', 'YBR_FULL_422'), ('YBR_FULL_422', 'YBR_FULL')]
+    )
+    def test_current_is_desired(self, current, desired):
         """Test that the array is unchanged when current matches desired."""
         arr = np.ones((2, 3))
-        assert np.array_equal(arr, convert_color_space(arr, 'RGB', 'RGB'))
+        assert np.array_equal(arr, convert_color_space(arr, current, desired))
 
     def test_rgb_ybr_rgb_single_frame(self):
         """Test round trip conversion of single framed pixel data."""
@@ -551,16 +551,9 @@ class TestNumpy_ConvertColourSpace(object):
 
         # Round trip -> rounding errors get compounded
         rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
-        assert (254, 0, 0) == tuple(rgb[5, 50, :])
-        assert (255, 128, 129) == tuple(rgb[15, 50, :])
-        assert (0, 255, 1) == tuple(rgb[25, 50, :])
-        assert (129, 255, 129) == tuple(rgb[35, 50, :])
-        assert (0, 0, 254) == tuple(rgb[45, 50, :])
-        assert (128, 127, 255) == tuple(rgb[55, 50, :])
-        assert (0, 0, 0) == tuple(rgb[65, 50, :])
-        assert (64, 64, 64) == tuple(rgb[75, 50, :])
-        assert (192, 192, 192) == tuple(rgb[85, 50, :])
-        assert (255, 255, 255) == tuple(rgb[95, 50, :])
+        # All pixels within +/- 1 units
+        assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
 
     def test_rgb_ybr_rgb_multi_frame(self):
         """Test round trip conversion of multi-framed pixel data."""
@@ -605,27 +598,9 @@ class TestNumpy_ConvertColourSpace(object):
 
         # Round trip -> rounding errors get compounded
         rgb = convert_color_space(ybr, 'YBR_FULL', 'RGB')
-        assert (254, 0, 0) == tuple(rgb[0, 5, 50, :])
-        assert (255, 128, 129) == tuple(rgb[0, 15, 50, :])
-        assert (0, 255, 1) == tuple(rgb[0, 25, 50, :])
-        assert (129, 255, 129) == tuple(rgb[0, 35, 50, :])
-        assert (0, 0, 254) == tuple(rgb[0, 45, 50, :])
-        assert (128, 127, 255) == tuple(rgb[0, 55, 50, :])
-        assert (0, 0, 0) == tuple(rgb[0, 65, 50, :])
-        assert (64, 64, 64) == tuple(rgb[0, 75, 50, :])
-        assert (192, 192, 192) == tuple(rgb[0, 85, 50, :])
-        assert (255, 255, 255) == tuple(rgb[0, 95, 50, :])
-        # Frame 2
-        assert (1, 255, 255) == tuple(rgb[1, 5, 50, :])
-        assert (1, 127, 126) == tuple(rgb[1, 15, 50, :])
-        assert (255, 0, 254) == tuple(rgb[1, 25, 50, :])
-        assert (126, 0, 126) == tuple(rgb[1, 35, 50, :])
-        assert (255, 255, 1) == tuple(rgb[1, 45, 50, :])
-        assert (127, 128, 1) == tuple(rgb[1, 55, 50, :])
-        assert (255, 255, 255) == tuple(rgb[1, 65, 50, :])
-        assert (191, 191, 191) == tuple(rgb[1, 75, 50, :])
-        assert (63, 63, 63) == tuple(rgb[1, 85, 50, :])
-        assert (0, 0, 0) == tuple(rgb[1, 95, 50, :])
+        # All pixels within +/- 1 units
+        assert np.allclose(rgb, arr, atol=1)
+        assert rgb.shape == arr.shape
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
