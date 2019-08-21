@@ -1,13 +1,13 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
-"""Access SR dictionary information"""
+"""Access code dictionary information"""
 
 from itertools import chain
 import inspect
 
-from pydicom.sr._concepts_dict import concepts
-from pydicom.sr._cid_dict import name_for_cid, cid_concepts
-from pydicom.sr.coding import Code, CodedConcept
+from pydicom.coding import Code
+from pydicom._concepts_dict import concepts
+from pydicom._cid_dict import name_for_cid, cid_concepts
 
 
 # Reverse lookup for cid names
@@ -138,18 +138,14 @@ class _CID_Dict(object):
             whether CID contains `code`
 
         """
-        coded_concept = CodedConcept(
-            value=code.value,
-            scheme_designator=code.scheme_designator,
-            meaning=code.meaning
-        )
-        return any([coded_concept == concept for concept in self.concepts.values()])
+        return any([concept == code for concept in self.concepts.values()])
 
     def trait_names(self):
-        """Return a list of valid names for auto-completion code.
+        """Returns a list of valid names for auto-completion code.
 
         Used in IPython, so that data element names can be found and offered
         for autocompletion on the IPython command line.
+
         """
         return dir(self)
 
@@ -213,7 +209,7 @@ class _CodesDict(object):
             )
 
     def dir(self, *filters):
-        """Return an alphabetical list of SR identifiers based on a partial
+        """Returns an alphabetical list of SR identifiers based on a partial
         match.
 
         Intended mainly for use in interactive Python sessions.
@@ -229,6 +225,7 @@ class _CodesDict(object):
         list of str
             The matching SR keywords. If no filters are
             used then all keywords are returned.
+
         """
         allnames = set(chain(*(x.keys() for x in self._dict.values())))
         return _filtered(allnames, filters)
@@ -237,10 +234,11 @@ class _CodesDict(object):
         return self._dict.keys()
 
     def trait_names(self):
-        """Return a list of valid names for auto-completion code.
+        """Returns a list of valid names for auto-completion code.
 
         Used in IPython, so that data element names can be found and offered
         for autocompletion on the IPython command line.
+
         """
         return dir(self)
 
