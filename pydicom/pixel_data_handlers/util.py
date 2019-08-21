@@ -21,33 +21,45 @@ def convert_color_space(arr, current, desired):
         or (rows, columns, planes).
     current : str
         The current color space, should be a valid value for (0028,0004)
-        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
-        For ``YBR_FULL_422`` use ``'YBR_FULL'``.
+        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
+        ``'YBR_FULL_422'``.
     desired : str
         The desired color space, should be a valid value for (0028,0004)
-        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``.
-        For ``YBR_FULL_422`` use ``'YBR_FULL'``.
+        *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
+        ``'YBR_FULL_422'``.
 
     Returns
     -------
     numpy.ndarray
         The image(s) converted to the desired color space.
-    """
-    if not HAVE_NP:
-        raise ImportError(
-            "Numpy is required to convert the color space."
-        )
 
-    # No change needed
-    if current == desired:
+    References
+    ----------
+
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.7.6.3.1.2<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>`
+    * ISO/IEC 10918-5:2012 (`ITU T.871
+      <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
+      Section 7
+    """
+    def _no_change(arr):
         return arr
 
     _converters = {
+        'YBR_FULL_422': {
+            'YBR_FULL_422': _no_change,
+            'YBR_FULL': _no_change,
+            'RGB': _convert_YBR_FULL_to_RGB,
+        },
         'YBR_FULL': {
-            'RGB': _convert_YBR_FULL_to_RGB
+            'YBR_FULL': _no_change,
+            'YBR_FULL_422': _no_change,
+            'RGB': _convert_YBR_FULL_to_RGB,
         },
         'RGB': {
+            'RGB': _no_change,
             'YBR_FULL': _convert_RGB_to_YBR_FULL,
+            'YBR_FULL_422': _convert_RGB_to_YBR_FULL,
         }
     }
     try:
@@ -408,34 +420,26 @@ def _convert_RGB_to_YBR_FULL(arr):
 
     * DICOM Standard, Part 3,
       :dcm:`Annex C.7.6.3.1.2<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>`
-    * ISO/IEC 10918-5:2012, Section 7
+    * ISO/IEC 10918-5:2012 (`ITU T.871
+      <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
+      Section 7
     """
     orig_dtype = arr.dtype
-    arr = arr.astype(np.float)
 
     rgb_to_ybr = np.asarray(
-        [[+0.299, +0.587, +0.114],
-         [-0.299, -0.587, +0.886],
-         [+0.701, -0.587, -0.114]], dtype=np.float)
+        [[+0.299, -0.299 / 1.772, +0.701 / 1.402],
+         [+0.587, -0.587 / 1.772, -0.587 / 1.402],
+         [+0.114, +0.886 / 1.772, -0.114 / 1.402]],
+        dtype=np.float
+    )
 
-    arr = np.dot(arr, rgb_to_ybr.T)
-    if len(arr.shape) == 4:
-        # Multi-frame
-        arr[:, :, :, 1] /= 1.772
-        arr[:, :, :, 2] /= 1.402
-    else:
-        # Single frame
-        arr[:, :, 1] /= 1.772
-        arr[:, :, 2] /= 1.402
-
-    arr += [0, 128, 128]
-
-    # Round(x) -> floor of (arr + 0.5)
-    arr = np.floor(arr + 0.5)
+    arr = np.dot(arr, rgb_to_ybr)
+    arr += [0.5, 128.5, 128.5]
+    # Round(x) -> floor of (arr + 0.5) : 0.5 added in previous step
+    arr = np.floor(arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
-    arr[np.where(arr < 0)] = 0
     # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
-    arr[np.where(arr > 255)] = 255
+    arr = np.clip(arr, 0, 255)
 
     return arr.astype(orig_dtype)
 
@@ -463,19 +467,20 @@ def _convert_YBR_FULL_to_RGB(arr):
     orig_dtype = arr.dtype
 
     ybr_to_rgb = np.asarray(
-        [[1.0, +0.0, +1.402],
-         [1.0, -0.114 * 1.772 / 0.587, -0.299 * 1.402 / 0.587],
-         [1.0, +1.772, +0.0]], dtype=np.float)
+        [[1.000, 1.000, 1.000],
+         [0.000, -0.114 * 1.772 / 0.587, 1.772],
+         [1.402, -0.299 * 1.402 / 0.587, 0.000]],
+        dtype=np.float
+    )
 
     arr = arr.astype(np.float)
     arr -= [0, 128, 128]
-    arr = np.dot(arr, ybr_to_rgb.T)
+    arr = np.dot(arr, ybr_to_rgb)
 
     # Round(x) -> floor of (arr + 0.5)
     arr = np.floor(arr + 0.5)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
-    arr[np.where(arr < 0)] = 0
     # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
-    arr[np.where(arr > 255)] = 255
+    arr = np.clip(arr, 0, 255)
 
     return arr.astype(orig_dtype)
