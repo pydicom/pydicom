@@ -19,10 +19,10 @@ How to reproduce the issue. Please include:
 1. A minimum working code sample
 2. The traceback (if one occurred)
 3. Which of the following packages are available and their versions:
-..* Numpy
-..* Pillow
-..* JPEG-LS
-..* GDCM
+  * Numpy
+  * Pillow
+  * JPEG-LS
+  * GDCM
 4. The anonymized DICOM dataset (if possible).
 
 **Your environment**
