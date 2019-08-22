@@ -50,23 +50,23 @@ This example illustrates how to print the data set in your own format.
      Patient's Birth Date = ''
      Patient's Sex = 'F'
      Patient's Size = None
-     Patient's Weight = "80.0000"
+     Patient's Weight = "80.0"
      Contrast/Bolus Agent = ''
      Scanning Sequence = 'SE'
      Sequence Variant = 'NONE'
      Scan Options = ''
      MR Acquisition Type = '3D'
-     Slice Thickness = "0.8000"
-     Repetition Time = "4000.0000"
-     Echo Time = "240.0000"
-     Number of Averages = "1.0000"
-     Imaging Frequency = "63.92433900"
+     Slice Thickness = "0.8"
+     Repetition Time = "4000.0"
+     Echo Time = "240.0"
+     Number of Averages = "1.0"
+     Imaging Frequency = "63.924339"
      Imaged Nucleus = 'H'
      Echo Number(s) = "1"
      Echo Train Length = None
      Device Serial Number = '-0000200'
      Software Version(s) = 'V3.51*P25'
-     Flip Angle = "90"
+     Flip Angle = "90.0"
      Patient Position = 'HFS'
      Study Instance UID = '1.3.6.1.4.1.5962.1.2.4.20040826185059.5457'
      Series Instance UID = '1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457'
@@ -79,7 +79,7 @@ This example illustrates how to print the data set in your own format.
      Frame of Reference UID = '1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457'
      Laterality = ''
      Position Reference Indicator = ''
-     Slice Location = "0.0000"
+     Slice Location = "0.0"
      Image Comments = 'Uncompressed'
      Samples per Pixel = 1
      Photometric Interpretation = 'MONOCHROME2'
@@ -92,8 +92,8 @@ This example illustrates how to print the data set in your own format.
      Pixel Representation = 1
      Smallest Image Pixel Value = 0
      Largest Image Pixel Value = 4000
-     Window Center = "600"
-     Window Width = "1600"
+     Window Center = "600.0"
+     Window Width = "1600.0"
     <item not printed -- in the "don't print" list>
      Data Set Trailing Padding = b'\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00\x...
 
@@ -154,7 +154,7 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.036 seconds)
+   **Total running time of the script:** ( 0 minutes  0.042 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:

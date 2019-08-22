@@ -147,9 +147,9 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0010, 1010) Patient's Age                       AS: '000Y'
 
-    - (0010, 1030) Patient's Weight                    DS: "80.0000"
+    - (0010, 1030) Patient's Weight                    DS: "80.0"
 
-    + (0010, 1030) Patient's Weight                    DS: "0.000000"
+    + (0010, 1030) Patient's Weight                    DS: "0.0"
 
     + (0010, 21b0) Additional Patient History          LT: ''
 
@@ -171,23 +171,23 @@ This examples illustrates how to find the differences between two DICOM files.
 
     - (0018, 0023) MR Acquisition Type                 CS: '3D'
 
-    - (0018, 0050) Slice Thickness                     DS: "0.8000"
+    - (0018, 0050) Slice Thickness                     DS: "0.8"
 
-    + (0018, 0050) Slice Thickness                     DS: "5.000000"
+    + (0018, 0050) Slice Thickness                     DS: "5.0"
 
-    - (0018, 0080) Repetition Time                     DS: "4000.0000"
+    - (0018, 0080) Repetition Time                     DS: "4000.0"
 
-    - (0018, 0081) Echo Time                           DS: "240.0000"
+    - (0018, 0081) Echo Time                           DS: "240.0"
 
-    + (0018, 0060) KVP                                 DS: "120"
+    + (0018, 0060) KVP                                 DS: "120.0"
 
-    + (0018, 0088) Spacing Between Slices              DS: "5.000000"
+    + (0018, 0088) Spacing Between Slices              DS: "5.0"
 
-    + (0018, 0090) Data Collection Diameter            DS: "480.000000"
+    + (0018, 0090) Data Collection Diameter            DS: "480.0"
 
-    - (0018, 0083) Number of Averages                  DS: "1.0000"
+    - (0018, 0083) Number of Averages                  DS: "1.0"
 
-    - (0018, 0084) Imaging Frequency                   DS: "63.92433900"
+    - (0018, 0084) Imaging Frequency                   DS: "63.924339"
 
     - (0018, 0085) Imaged Nucleus                      SH: 'H'
 
@@ -203,13 +203,13 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0018, 1040) Contrast/Bolus Route                LO: 'IV'
 
-    + (0018, 1100) Reconstruction Diameter             DS: "338.671600"
+    + (0018, 1100) Reconstruction Diameter             DS: "338.6716"
 
     + (0018, 1110) Distance Source to Detector         DS: "1099.3100585938"
 
-    + (0018, 1111) Distance Source to Patient          DS: "630.000000"
+    + (0018, 1111) Distance Source to Patient          DS: "630.0"
 
-    + (0018, 1120) Gantry/Detector Tilt                DS: "0.000000"
+    + (0018, 1120) Gantry/Detector Tilt                DS: "0.0"
 
     + (0018, 1130) Table Height                        DS: "133.699997"
 
@@ -217,13 +217,13 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0018, 1151) X-Ray Tube Current                  IS: "170"
 
-    - (0018, 1314) Flip Angle                          DS: "90"
+    - (0018, 1314) Flip Angle                          DS: "90.0"
 
     + (0018, 1152) Exposure                            IS: "170"
 
     + (0018, 1160) Filter Type                         SH: 'LARGE BOWTIE FIL'
 
-    + (0018, 1190) Focal Spot(s)                       DS: "0.700000"
+    + (0018, 1190) Focal Spot(s)                       DS: "0.7"
 
     + (0018, 1210) Convolution Kernel                  SH: 'STANDARD'
 
@@ -235,9 +235,9 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 1002) [Detector Channel]                  SL: 912
 
-    + (0019, 1003) [Cell number at Theta]              DS: "373.750000"
+    + (0019, 1003) [Cell number at Theta]              DS: "373.75"
 
-    + (0019, 1004) [Cell spacing]                      DS: "1.016600"
+    + (0019, 1004) [Cell spacing]                      DS: "1.0166"
 
     + (0019, 100f) [Horiz. Frame of ref.]              DS: "955.799988"
 
@@ -255,15 +255,15 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 1018) [First scan ras]                    LO: 'S'
 
-    + (0019, 1019) [First scan location]               DS: "7.791870"
+    + (0019, 1019) [First scan location]               DS: "7.79187"
 
     + (0019, 101a) [Last scan ras]                     LO: 'I'
 
     + (0019, 101b) [Last scan loc]                     DS: "-320.197968"
 
-    + (0019, 101e) [Display field of view]             DS: "0.000000"
+    + (0019, 101e) [Display field of view]             DS: "0.0"
 
-    + (0019, 1023) [Table Speed [mm/rotation]]         DS: "5.000000"
+    + (0019, 1023) [Table Speed [mm/rotation]]         DS: "5.0"
 
     + (0019, 1024) [Mid Scan Time [sec]]               DS: "17.784578"
 
@@ -271,7 +271,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 1026) [Tube Azimuth [degree]]             SL: 0
 
-    + (0019, 1027) [Rotation Speed [msec]]             DS: "1.000000"
+    + (0019, 1027) [Rotation Speed [msec]]             DS: "1.0"
 
     + (0019, 102a) [x-ray On position]                 DS: "178.079926"
 
@@ -281,7 +281,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 102e) [Angle of first view]               DS: "-718.079956"
 
-    + (0019, 102f) [Trigger frequency]                 DS: "984.000000"
+    + (0019, 102f) [Trigger frequency]                 DS: "984.0"
 
     + (0019, 1039) [SFOV Type]                         SS: 16
 
@@ -293,7 +293,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 1043) [Total Segments Required]           SS: 0
 
-    + (0019, 1044) [Interscan delay]                   DS: "1.000000"
+    + (0019, 1044) [Interscan delay]                   DS: "1.0"
 
     + (0019, 1047) [View compression factor]           SS: 1
 
@@ -325,25 +325,25 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0019, 1071) [Set if fatq estimates were used]   SS: 0
 
-    + (0019, 1072) [Z chan avg over views]             DS: "0.000000"
+    + (0019, 1072) [Z chan avg over views]             DS: "0.0"
 
-    + (0019, 1073) [Avg of left ref chans over views]  DS: "0.000000"
+    + (0019, 1073) [Avg of left ref chans over views]  DS: "0.0"
 
-    + (0019, 1074) [Max left chan over views]          DS: "0.000000"
+    + (0019, 1074) [Max left chan over views]          DS: "0.0"
 
-    + (0019, 1075) [Avg of right ref chans over views] DS: "0.000000"
+    + (0019, 1075) [Avg of right ref chans over views] DS: "0.0"
 
-    + (0019, 1076) [Max right chan over views]         DS: "0.000000"
+    + (0019, 1076) [Max right chan over views]         DS: "0.0"
 
     + (0019, 10da) [Reference channel used]            SS: 0
 
-    + (0019, 10db) [Back projector coefficient]        DS: "0.000000"
+    + (0019, 10db) [Back projector coefficient]        DS: "0.0"
 
     + (0019, 10dc) [Primary speed correction used]     SS: 1
 
     + (0019, 10dd) [Overrange correction used]         SS: 1
 
-    + (0019, 10de) [Dynamic Z alpha value]             DS: "0.000000"
+    + (0019, 10de) [Dynamic Z alpha value]             DS: "0.0"
 
     - (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
 
@@ -383,7 +383,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0020, 1040) Position Reference Indicator        LO: 'SN'
 
-    - (0020, 1041) Slice Location                      DS: "0.0000"
+    - (0020, 1041) Slice Location                      DS: "0.0"
 
     + (0020, 1041) Slice Location                      DS: "-77.2040634155"
 
@@ -533,17 +533,17 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0028, 0120) Pixel Padding Value                 SS: -2000
 
-    + (0028, 1052) Rescale Intercept                   DS: "-1024"
+    + (0028, 1052) Rescale Intercept                   DS: "-1024.0"
 
-    + (0028, 1053) Rescale Slope                       DS: "1"
+    + (0028, 1053) Rescale Slope                       DS: "1.0"
 
     + (0029, 0010) Private Creator                     LO: 'GEMS_IMPS_01'
 
     + (0029, 1004) [Lower range of Pixels1]            SL: 0
 
-    + (0029, 1005) [Lower range of Pixels1]            DS: "0.000000"
+    + (0029, 1005) [Lower range of Pixels1]            DS: "0.0"
 
-    + (0029, 1006) [Lower range of Pixels1]            DS: "0.000000"
+    + (0029, 1006) [Lower range of Pixels1]            DS: "0.0"
 
     + (0029, 1007) [Lower range of Pixels1]            SL: 87
 
@@ -561,11 +561,11 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0043, 0010) Private Creator                     LO: 'GEMS_PARM_01'
 
-    - (0028, 1050) Window Center                       DS: "600"
+    - (0028, 1050) Window Center                       DS: "600.0"
 
     + (0043, 1010) [Window value]                      US: 400
 
-    - (0028, 1051) Window Width                        DS: "1600"
+    - (0028, 1051) Window Width                        DS: "1600.0"
 
     + (0043, 1011) [Total input views]                 US: 10431
 
@@ -579,7 +579,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0043, 1016) [Number of overranges]              SS: 0
 
-    + (0043, 1017) [IBH image scale factors]           DS: "0.095000"
+    + (0043, 1017) [IBH image scale factors]           DS: "0.095"
 
     + (0043, 1018) [BBH coefficients]                  DS: [0.085000, 1.102000, 0.095000]
 
@@ -593,11 +593,11 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0043, 101d) [Level value]                       SS: 40
 
-    + (0043, 101e) [Delta Start Time [msec]]           DS: "2.000000"
+    + (0043, 101e) [Delta Start Time [msec]]           DS: "2.0"
 
     + (0043, 101f) [Max overranges in a view]          SL: 0
 
-    + (0043, 1020) [Avg overranges all views]          DS: "0.000000"
+    + (0043, 1020) [Avg overranges all views]          DS: "0.0"
 
     + (0043, 1021) [Corrected after glow terms]        SS: 0
 
@@ -698,7 +698,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.124 seconds)
+   **Total running time of the script:** ( 0 minutes  0.133 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:
