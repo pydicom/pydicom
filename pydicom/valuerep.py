@@ -346,8 +346,9 @@ class DSfloat(float):
     def __str__(self):
         if hasattr(self, 'original_string'):
             return self.original_string
-        else:
-            return super(DSfloat, self).__str__()
+
+        # Issue #937 (Python 3.8 compatibility)
+        return str(float(self))
 
     def __repr__(self):
         return "\"" + str(self) + "\""
@@ -513,11 +514,15 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
-    def __repr__(self):
+    def __str__(self):
         if hasattr(self, 'original_string'):
-            return "\"" + self.original_string + "\""
-        else:
-            return "\"" + int.__str__(self) + "\""
+            return self.original_string
+
+        # Issue #937 (Python 3.8 compatibility)
+        return str(int(self))
+
+    def __repr__(self):
+        return "\"" + str(self) + "\""
 
 
 def MultiString(val, valtype=str):
