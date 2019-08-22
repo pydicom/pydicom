@@ -348,10 +348,10 @@ class DSfloat(float):
             return self.original_string
 
         # Issue #937 (Python 3.8 compatibility)
-        return str(float(self))
+        return repr(self)[1:-1]
 
     def __repr__(self):
-        return "\"" + str(self) + "\""
+        return '"{}"'.format(super(DSfloat, self).__repr__())
 
 
 class DSdecimal(Decimal):
@@ -519,10 +519,10 @@ class IS(int):
             return self.original_string
 
         # Issue #937 (Python 3.8 compatibility)
-        return str(int(self))
+        return repr(self)[1:-1]
 
     def __repr__(self):
-        return "\"" + str(self) + "\""
+        return '"{}"'.format(super(IS, self).__repr__())
 
 
 def MultiString(val, valtype=str):
