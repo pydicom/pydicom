@@ -19,12 +19,17 @@ from pydicom.pixel_data_handlers.util import (
     reshape_pixel_array,
     convert_color_space,
     pixel_dtype,
-    get_expected_length
+    get_expected_length,
+    apply_color_palette
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
 
 
+# 8/8, 1 sample/pixel, 1 frame
+# PALETTE COLOR colorspace
+PAL_8_256_0_16 = get_testdata_files("OBXXXX1A.dcm")[0]
+PAL_8_200_0_16 = get_testdata_files("OT-PAL-8-face.dcm")[0]
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
@@ -705,7 +710,7 @@ REFERENCE_LENGTH = [
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_GetExpectedLength(object):
-    """Tests for numpy_handler.get_expected_length."""
+    """Tests for util.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
         """Test get_expected_length(ds, unit='bytes')."""
@@ -731,3 +736,23 @@ class TestNumpy_GetExpectedLength(object):
         ds.SamplesPerPixel = shape[3]
 
         assert length[1] == get_expected_length(ds, unit='pixels')
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_PaletteColor(object):
+    """Tests for util.apply_color_palette."""
+    def setup(self):
+        pass
+
+    def test_start(self):
+        """"""
+        import matplotlib.pyplot as plt
+        ds = dcmread(PAL_8_256_0_16)
+        ds = dcmread(PAL_8_200_0_16, force=True)
+        ds.file_meta = Dataset()
+        from pydicom.uid import ImplicitVRLittleEndian
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        arr = ds.pixel_array
+        arr = apply_color_palette(arr, ds)
+        plt.imshow(arr / 65535)
+        plt.show()
