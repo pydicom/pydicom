@@ -40,6 +40,28 @@ def get_files(base, pattern):
     return files
 
 
+def get_palette_files(pattern="*"):
+    """Return palette data files from pydicom data root.
+
+    Parameters
+    ----------
+    pattern : str, optional (default="*")
+        A string pattern to filter the files
+
+    Returns
+    -------
+    files : list of str
+        The list of filenames matched.
+
+    """
+    data_path = join(DATA_ROOT, 'palettes')
+
+    files = get_files(base=data_path, pattern=pattern)
+    files = [filename for filename in files if not filename.endswith('.py')]
+
+    return files
+
+
 def get_testdata_files(pattern="*"):
     """Return test data files from pydicom data root.
 
