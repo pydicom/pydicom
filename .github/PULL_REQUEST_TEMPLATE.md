@@ -12,4 +12,4 @@ The related issue or a description of the bug or feature that this PR addresses.
 - [ ] Documentation updated (if relevant)
   - [ ] No warnings during build
   - [ ] Preview link (CircleCI -> Artifacts -> `[...]/_build/html/index.html`)
-- [ ] Unit tests passing and PR coverage above 90% after adding fix/feature
+- [ ] Unit tests passing and overall coverage the same or better
