@@ -59,6 +59,11 @@ image_dfl.dcm
   * Compressed (using "deflate" zlib compression) after FileMeta
   * 'image_dfl' from http://www.dclunie.com/images/compressed/
 
+gdcm-US-ALOKA-16.dcm (from GDCM)
+  * Little endian implicit
+  * (0, 0, 16) Palette Color LUT Descriptor
+  * Segmented Palette Color LUT Data
+
 ExplVR_BigEnd.dcm
   * Big Endian test image
   * Also is Samples Per Pixel of 3 (RGB)

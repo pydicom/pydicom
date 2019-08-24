@@ -1,30 +1,30 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Test the data manager"""
+"""Unit tests for pydicom.data_manager"""
 
 import os
-import unittest
 from os.path import basename
-from pydicom.data import (get_charset_files,
-                          get_testdata_files)
 
+import pytest
+
+from pydicom.data import (
+    get_charset_files, get_testdata_files, get_palette_files
+)
 from pydicom.data.data_manager import DATA_ROOT
 
 
-class TestGetData(unittest.TestCase):
-
+class TestGetData(object):
     def test_get_dataset(self):
         """Test the different functions to get lists of data files."""
-
         # Test base locations
         charbase = os.path.join(DATA_ROOT, 'charset_files')
-        self.assertTrue(os.path.exists(charbase))
+        assert os.path.exists(charbase)
 
         testbase = os.path.join(DATA_ROOT, 'test_files')
-        self.assertTrue(os.path.exists(testbase))
+        assert os.path.exists(testbase)
 
         # Test file get
         chardata = get_charset_files()
-        self.assertTrue(len(chardata) > 15)
+        assert 15 < len(chardata)
 
         # Test that top level file is included
         bases = [basename(x) for x in chardata]
@@ -32,20 +32,32 @@ class TestGetData(unittest.TestCase):
         # Test that subdirectory files included
         testdata = get_testdata_files()
         bases = [basename(x) for x in testdata]
-        self.assertTrue('2693' in bases)
-        self.assertTrue(len(testdata) > 70)
+        assert '2693' in bases
+        assert 70 < len(testdata)
 
         # The files should be from their respective bases
-        [self.assertTrue(testbase in x) for x in testdata]
-        [self.assertTrue(charbase in x) for x in chardata]
+        for x in testdata:
+            assert testbase in x
+        for x in chardata:
+            assert charbase in x
 
     def test_get_dataset_pattern(self):
         """Test that pattern is working properly."""
-
         pattern = 'CT_small'
         filename = get_testdata_files(pattern)
-        self.assertTrue(filename[0].endswith('CT_small.dcm'))
+        assert filename[0].endswith('CT_small.dcm')
 
         pattern = 'chrX1'
         filename = get_charset_files(pattern)
-        self.assertTrue(filename[0].endswith('chrX1.dcm'))
+        assert filename[0].endswith('chrX1.dcm')
+
+    def test_get_palette_files(self):
+        """Test data_manager.get_palette_files."""
+        palbase = os.path.join(DATA_ROOT, 'palettes')
+        assert os.path.exists(palbase)
+
+        palettes = get_palette_files('*.dcm')
+        assert 8 == len(palettes)
+
+        for x in palettes:
+            assert palbase in x

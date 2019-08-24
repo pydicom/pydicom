@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in the pixel data handlers."""
 
+from struct import unpack
 from sys import byteorder
 import warnings
 
@@ -10,8 +11,10 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom import dcmread
 
-def apply_color_palette(arr, ds):
+
+def apply_color_palette(arr, ds=None, palette=None):
     """
 
     +------------------------------------------------+---------------+----------+
@@ -25,125 +28,79 @@ def apply_color_palette(arr, ds):
     +-------------+---------------------------+------+---------------+----------+
     | (0028,0100) | BitsAllocated             | 1    | 8, 16         | Required |
     +-------------+---------------------------+------+---------------+----------+
-    | (0028,1101) | RedPaletteColorLookupTableDescriptor   | 1C | Required |
-    | (0028,1102) | BluePaletteColorLookupTableDescriptor  | 1C | Required |
-    | (0028,1103) | GreenPaletteColorLookupTableDescriptor | 1C | Required |
-    | (0028,1201) | RedPaletteColorLookupTableData         | 1C | Required |
-    | (0028,1202) | BluePaletteColorLookupTableData        | 1C | Required |
-    | (0028,1203) | GreenPaletteColorLookupTableData       | 1C | Required |
+
+    | (0028,1101) | RedPaletteColorLookupTableDescriptor      | 1C | Required |
+    | (0028,1102) | BluePaletteColorLookupTableDescriptor     | 1C | Required |
+    | (0028,1103) | GreenPaletteColorLookupTableDescriptor    | 1C | Required |
+    | (0028,1201) | RedPaletteColorLookupTableData            | 1C | Required |
+    | (0028,1202) | BluePaletteColorLookupTableData           | 1C | Required |
+    | (0028,1203) | GreenPaletteColorLookupTableData          | 1C | Required |
+
+    | (0028,1221) | SegmentedRedPaletteColorLookupTableData   | 1C | Required |
+    | (0028,1222) | SegmentedGreenPaletteColorLookupTableData | 1C | Required |
+    | (0028,1223) | SegmentedBluePaletteColorLookupTableData  | 1C | Required |
 
 
     Parameters
     ----------
     arr : numpy.ndarray
         The pixel data to apply the color palette to.
-    ds : dataset.Dataset
-        The :class:`~pydicom.dataset.Dataset` containing the stuff.
+    ds : dataset.Dataset, optional
+        Required if `palette` is not supplied. A
+        :class:`~pydicom.dataset.Dataset` containing a suitable
+        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`,
+        :dcm:`Palette Color Lookup Table<part03/sect_C.7.9.html>`
+        or :dcm:`Supplemental Palette Lookup Table<part03/sect_C.7.6.19.html>`
+        Module.
+    palette : str or uid.UID, optional
+        Required if `ds` is not supplied. The name of one of the
+        :dcm:`well-known<part06/chapter_B.html>` color palettes defined by the
+        DICOM Standard. One of: ``'HOT_IRON'``, ``'PET'``,
+        ``'HOT_METAL_BLUE'``, ``'PET_20_STEP'``, ``'SPRING'``, ``'SUMMER'``,
+         ``'FALL'``, ``'WINTER'`` or the corresponding (0008,0018) *SOP
+         Instance UID*.
 
     Returns
     -------
     numpy.ndarray
         The RGB pixel data as (frames, rows, columns)
-
-    Pixel Presentation at the image level is ``'COLOR'`` or ``'MIXED'``
-
-    COLOR: Image is best displayed in color using Supplemental Palette Color
-    LUT but can be displayed in greyscale. See PS3.3, C.8.16.2.1.1.1.
-    MIXED: Frames within the image SOP Instance contain different values for
-    the Pixel Presentation value in the MR Image Frame Type Functional Group
-    or CT Image Frame Type Functional Group.
-    COLOR_REF: Image intended to be displayed in color using an externally
-    defined Palette Color LUTs but can be displayed in greyscale. (0028,0304)
-    *Referenced Color Palette Instance UID*.
-    COLOR_RANGE: A Palette Color LUT is supplied or referenced. (0028,1199)
-    *Palette Color Lookup Table UID*
-
-    If COLOR stored values are split into two ranges:
-    1. Value up to R/G/B Palette Colour LUT Descriptor[1] - 1: to greyscale
-      pipeline
-    2. Values >= R/G/B Palette Colour LUT Descriptor[1]: mapped to the Palette
-      Color LUTs
-
-    May be used with Icon Image Sequence
-
-    Image Pixel module: 1 sample/pixel, if PI is PALETTE COLOR then RGB Palette
-    Color Lookup Tables shall be present.
-
-
-    Photometric Interpretation is ``'PALETTE COLOR'``
-
-    Palette Color Lookup Table C.7.9
-    Enhanced Palette Color Lookup Table C.7.6.23
-    Supplemental Palette Color Lookup Table C.7.6.19
-      - Required if Pixel Presentation is COLOR or MIXED
-
-    C.7.6.3.1.5 Palette Color Lookup Table Descriptor
-
-    The three values of PC LUT described the format of the LUT data in the
-    corresponding element (0028,1201-1204) or (0028,1221-1223). 'input value'
-    is either the PC LUT input value described by (0028,140B) or if missing
-    the stored pixel value.
-
-    The first PC LUT value is the number of entries in the LUT. When the number
-    of table entries is 2^16 then this value shall be 0 (?). The first value
-    shall be identical for RGBA PC LUT Descriptors.
-
-    The second value is the first input value mapped. This input value is
-    mapped to the first entry in the LUT data. All input values less than the
-    first value mapped are also mapped to the first entry in the LUT data
-    if the PI is PALETTE COLOR.
-
-    In the case of the Supplemental PC LUT, the stored pixel values less than
-    the second descriptor value are greyscale.
-
-    An input value one greater than the first value mapped is mapped to the
-    second entry in the LUT data. Subsequent IVs are mapped to the subsequent
-    entries in the LUT data up to an IV equal to the number of entries + first
-    value mapped - 1, which is mapped to the last entry of the LUT data. IVs
-    greater than or equal to the number of entries + first value mapped
-    are also mapped to the last entry in the LUT data. The second value shall
-    be identical for RGBA PC LUT descriptors.
-
-    The third value specifies the number of bits for each entry in the LUT
-    data. It shall be 8 or 16. The LUT data shall be stored in a format
-    equivalent to 8/16 bits allocated depending on the value. High bit is
-    equal to bits allocated. The third value shall also be identifical for RGB
-    PC LUT descriptors. If A PC LUT is used the value shall be 8.
-
-    ** Some implementations have encoded 8-bit entries with 16 bits allocated,
-    padding the high bits. This can be detected by comparing the number of
-    entries with the actual value length of the LUT data entry. Should be
-    equal if 8 bit, double if 16.
-
-    C.7.6.3.1.6 Palette Color LUT Data
-
-    PC values must always be scaled across the full range of available
-    intensities. For example, if 16 bits per entry specified and only 8 bits
-    are truly used then the 8 bit intensities from 0 to 255 must be scaled to
-    the corresponding 16 bit intensities from 0 to 65535. To do this, replicate
-    the value in both the most and least significant bytes.
-
-    00 01 -> 01 01
-    00 ff -> ff ff
-
-    C.7.6.16.2.26 Stored Value Color Range Macro
-
-    Range of stored pixel values of this frame mapped using the PC LUT
-
-    C.7.6.19 Supplemental PC LUT Module
-
-    Used with multi-frame IODs that use RGB color in a number of frames. Pixel
-    Presentation is COLOR.
-
-    C.7.6.23 Enhanced Palette Color LUT Module
-
-    - Not supported
-
-    C.7.9 Palette Color LUT Module
-
-    When present conditional requirements take precedence over those in Image
-    Pixel Module.
     """
+    if not ds and not palette:
+        raise ValueError("Either 'ds' or 'palette' is required")
+
+    if palette:
+        datasets = {
+            '1.2.840.10008.1.5.1': 'hotiron.dcm',
+            '1.2.840.10008.1.5.2': 'pet.dcm',
+            '1.2.840.10008.1.5.3': 'hotmetalblue.dcm',
+            '1.2.840.10008.1.5.4': 'pet20step.dcm',
+            '1.2.840.10008.1.5.5': 'spring.dcm',
+            '1.2.840.10008.1.5.6': 'summer.dcm',
+            '1.2.840.10008.1.5.7': 'fall.dcm',
+            '1.2.840.10008.1.5.8': 'winter.dcm',
+        }
+        if not UID(palette).is_valid:
+            try:
+                uids = {
+                    'HOT_IRON': '1.2.840.10008.1.5.1',
+                    'PET': '1.2.840.10008.1.5.2',
+                    'HOT_METAL_BLUE': '1.2.840.10008.1.5.3',
+                    'PET_20_STEP': '1.2.840.10008.1.5.4',
+                    'SPRING': '1.2.840.10008.1.5.5',
+                    'SUMMER': '1.2.840.10008.1.5.6',
+                    'FALL': '1.2.840.10008.1.5.8',
+                    'WINTER': '1.2.840.10008.1.5.7',
+                }
+                palette = uids[palette]
+            except KeyError:
+                raise ValueError("Unknown palette '{}'".format(palette))
+
+        try:
+            fname = datasets[palette]
+            ds = dcmread(get_palette_files(fname)[0])
+        except KeyError:
+            raise ValueError("Unknown palette '{}'".format(palette))
+
     # LUT Descriptor is described by PS3.3, C.7.6.3.1.5
     r_desc = ds.RedPaletteColorLookupTableDescriptor
     g_desc = ds.GreenPaletteColorLookupTableDescriptor
@@ -167,10 +124,22 @@ def apply_color_palette(arr, ds):
     print('First mapping:', first_map)
     print('Nominal bit depth:', nominal_depth)
 
-    # LUT Data is described by PS3.3, C.7.6.3.1.6
-    r_data = ds.RedPaletteColorLookupTableData
-    g_data = ds.GreenPaletteColorLookupTableData
-    b_data = ds.BluePaletteColorLookupTableData
+    if 'RedPaletteColorLookupTableData' in ds:
+        # LUT Data is described by PS3.3, C.7.6.3.1.6
+        r_data = ds.RedPaletteColorLookupTableData
+        g_data = ds.GreenPaletteColorLookupTableData
+        b_data = ds.BluePaletteColorLookupTableData
+    elif 'SegmentedRedPaletteColorLookupTableData' in ds:
+        # Segmented LUT Data is described by PS3.3, C.7.9.2
+        r_data = _expand_segmented_lut(
+            ds.SegmentedRedPaletteColorLookupTableData
+        )
+        g_data = _expand_segmented_lut(
+            ds.SegmentedGreenPaletteColorLookupTableData
+        )
+        b_data = _expand_segmented_lut(
+            ds.SegmentedBluePaletteColorLookupTableData
+        )
 
     if len(set([len(r_data), len(g_data), len(b_data)])) != 1:
         raise ValueError(
@@ -385,6 +354,43 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
         return numpy_dtype.newbyteorder('S')
 
     return numpy_dtype
+
+
+def _expand_segmented_lut(data, bit_depth):
+    """
+    """
+    def _discrete(bytestream, previous):
+        """
+        0 - Opcode (0)
+        1 - Segment length (N)
+        2 to 2 + N - entry values
+        """
+        # Probably need to unpack, but what bit depth?
+        length = bytestream[0]
+        return bytestream[0], bytestream[1:1 + length]
+
+    def _linear(bytestream, previous):
+        """
+        0 - Opcode (1)
+        1 - Segment length (N)
+        2 - Y1 (1)
+        """
+        # val = (2**bit_depth) - y1 ???
+        y1 = bytestream[0]
+        return 2, None
+
+    funcs = {0: _discrete, 1: _linear, 2: _indirect}
+
+    lut = bytearray()
+    offset = 0
+    while offset < len(data):
+        opcode = data[offset]
+        func = funcs[opcode]
+        bytes_read, segment = func(data[offset + 1:], lut[-1])
+        lut.expand(segment)
+        offset += bytes_read + 1
+
+    return bytes(lut)
 
 
 def get_expected_length(ds, unit='bytes'):
