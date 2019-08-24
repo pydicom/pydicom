@@ -1,7 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in the pixel data handlers."""
 
-from struct import unpack
+from struct import unpack, pack
 from sys import byteorder
 import warnings
 
@@ -10,8 +10,6 @@ try:
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
-
-from pydicom import dcmread
 
 
 def apply_color_palette(arr, ds=None, palette=None):
@@ -131,14 +129,20 @@ def apply_color_palette(arr, ds=None, palette=None):
         b_data = ds.BluePaletteColorLookupTableData
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
+        endianness = '<' if ds.is_little_endian else '>'
+        if entry_size == 1:
+            struct_fmt = '{}B'.format(endianness)
+        else:
+            struct_fmt = '{}H'.format(endianness)
+
         r_data = _expand_segmented_lut(
-            ds.SegmentedRedPaletteColorLookupTableData
+            ds.SegmentedRedPaletteColorLookupTableData, 16, is_little
         )
         g_data = _expand_segmented_lut(
-            ds.SegmentedGreenPaletteColorLookupTableData
+            ds.SegmentedGreenPaletteColorLookupTableData, 16, is_little
         )
         b_data = _expand_segmented_lut(
-            ds.SegmentedBluePaletteColorLookupTableData
+            ds.SegmentedBluePaletteColorLookupTableData, 16, is_little
         )
 
     if len(set([len(r_data), len(g_data), len(b_data)])) != 1:
@@ -356,39 +360,46 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     return numpy_dtype
 
 
-def _expand_segmented_lut(data, bit_depth):
+def _expand_segmented_lut(data):
     """
+
+    Parameters
+    ----------
+    data : tuple of int
+        The decoded segmented palette lookup table data.
+
+    Returns
+    -------
+    list of int
+        The reconstructed lookup table data.
     """
-    def _discrete(bytestream, previous):
-        """
-        0 - Opcode (0)
-        1 - Segment length (N)
-        2 to 2 + N - entry values
-        """
-        # Probably need to unpack, but what bit depth?
-        length = bytestream[0]
-        return bytestream[0], bytestream[1:1 + length]
-
-    def _linear(bytestream, previous):
-        """
-        0 - Opcode (1)
-        1 - Segment length (N)
-        2 - Y1 (1)
-        """
-        # val = (2**bit_depth) - y1 ???
-        y1 = bytestream[0]
-        return 2, None
-
-    funcs = {0: _discrete, 1: _linear, 2: _indirect}
-
-    lut = bytearray()
+    lut = []
     offset = 0
     while offset < len(data):
         opcode = data[offset]
-        func = funcs[opcode]
-        bytes_read, segment = func(data[offset + 1:], lut[-1])
-        lut.expand(segment)
-        offset += bytes_read + 1
+        offset += 1
+        length = data[offset:offset + 1]
+        offset += 1
+        if opcode == 0:
+            # Discrete
+            extension = data[offset:offset + length]
+            assert len(extension) == length
+            lut.extend(extension)
+            offset += length
+        elif opcode == 1:
+            # Linear
+            #length *= entry_size
+            y1 = data[offset:offset + 1]
+            y0 = lut[-1]
+            step = (y1 - y0) // length
+            vals = list(range(y0 + step, y1 + step, step))
+            lut.extend(vals)
+            offset += 1
+        elif opcode == 2:
+            # Indirect
+            pass
+        else:
+            raise ValueError("Unknown opcode")
 
     return bytes(lut)
 

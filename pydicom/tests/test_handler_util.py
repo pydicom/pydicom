@@ -20,7 +20,8 @@ from pydicom.pixel_data_handlers.util import (
     convert_color_space,
     pixel_dtype,
     get_expected_length,
-    apply_color_palette
+    apply_color_palette,
+    _expand_segmented_lut,
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -756,3 +757,54 @@ class TestNumpy_PaletteColor(object):
         arr = apply_color_palette(arr, ds)
         plt.imshow(arr / 65535)
         plt.show()
+
+
+class TestExpandSegmentedLUT(object):
+    """Test for _expand_segmented_lut()."""
+    def test_discrete(self):
+        """Test expanding a discrete segment."""
+        data = (0, 1, 0)
+        assert [0] == _expand_segmented_lut(data)
+
+        data = (0, 2, 0, 112)
+        assert [0, 112] == _expand_segmented_lut(data)
+
+        data = (0, 2, 0, 112, 0, 0, 0)
+        assert [0, 112] == _expand_segmented_lut(data)
+
+    def test_linear(self):
+        """Test expanding a linear segment."""
+        # Linear can never be the first segment
+        data = (0, 2, 0, 112, 1, 5, 192)
+        out = _expand_segmented_lut(data)
+        assert [0, 112, 128, 144, 160, 176, 192] == out
+
+        data = (0, 2, 0, 4112, 1, 5, 49344)
+        out = _expand_segmented_lut(data)
+        assert [0, 4112, 32896, 37008, 41120, 45232, 49344] == out
+
+    def test_indirect(self):
+        """Test expanding an indirect segment."""
+        pass
+
+    def test_unknown_opcode_raises(self):
+        """"""
+        pass
+
+    def test_08_08(self):
+        """"""
+        pass
+
+    def test_08_16(self):
+        """"""
+        # Little endian
+        pass
+
+        # Big endian
+
+    def test_16_16(self):
+        """"""
+        # Little endian
+
+        # Big endian
+        pass
