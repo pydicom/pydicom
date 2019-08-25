@@ -129,6 +129,7 @@ def apply_color_palette(arr, ds=None, palette=None):
         b_data = ds.BluePaletteColorLookupTableData
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
+        # VR is 'OW' so always 16-bit
         endianness = '<' if ds.is_little_endian else '>'
         if entry_size == 1:
             struct_fmt = '{}B'.format(endianness)
@@ -360,13 +361,15 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     return numpy_dtype
 
 
-def _expand_segmented_lut(data):
+def _expand_segmented_lut(data, nr_segments=None, last_value=None):
     """
 
     Parameters
     ----------
     data : tuple of int
         The decoded segmented palette lookup table data.
+    nr_segments : int, optional
+        Read at most `nr_segments` from the data.
 
     Returns
     -------
@@ -375,33 +378,43 @@ def _expand_segmented_lut(data):
     """
     lut = []
     offset = 0
+    segments_read = 0
     while offset < len(data):
         opcode = data[offset]
-        offset += 1
-        length = data[offset:offset + 1]
-        offset += 1
+        length = data[offset + 1]
+        offset += 2
         if opcode == 0:
             # Discrete
-            extension = data[offset:offset + length]
-            assert len(extension) == length
-            lut.extend(extension)
+            lut.extend(data[offset:offset + length])
             offset += length
         elif opcode == 1:
             # Linear
-            #length *= entry_size
-            y1 = data[offset:offset + 1]
-            y0 = lut[-1]
-            step = (y1 - y0) // length
-            vals = list(range(y0 + step, y1 + step, step))
-            lut.extend(vals)
+            y1 = data[offset]
+            if lut:
+                y0 = lut[-1]
+            elif last_value:
+                y0 = last_value
+            else:
+                raise ValueError("Linear segments cannot come first")
+            if y0 == y1:
+                lut.extend([y1] * length)
+            else:
+                step = (y1 - y0) // length
+                lut.extend(list(range(y0 + step, y1 + step, step)))
             offset += 1
         elif opcode == 2:
-            # Indirect
-            pass
+            # Indirect: reuse existing segment(s)
+            subdata_offset = data[offset + 1] << 16 | data[offset]
+            lut.extend(_expand_segmented_lut(data[subdata_offset:], length, lut[-1]))
+            offset += 2
         else:
             raise ValueError("Unknown opcode")
 
-    return bytes(lut)
+        segments_read += 1
+        if nr_segments is not None and segments_read == nr_segments:
+            return lut
+
+    return lut
 
 
 def get_expected_length(ds, unit='bytes'):

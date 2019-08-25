@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for the pixel_data_handlers.util module."""
 
+from struct import unpack
 from sys import byteorder
 
 import pytest
@@ -31,6 +32,8 @@ from pydicom.uid import (ExplicitVRLittleEndian,
 # PALETTE COLOR colorspace
 PAL_8_256_0_16 = get_testdata_files("OBXXXX1A.dcm")[0]
 PAL_8_200_0_16 = get_testdata_files("OT-PAL-8-face.dcm")[0]
+# PALETTE COLOR segmented LUT Data
+PAL_SEG = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
@@ -769,7 +772,7 @@ class TestExpandSegmentedLUT(object):
         data = (0, 2, 0, 112)
         assert [0, 112] == _expand_segmented_lut(data)
 
-        data = (0, 2, 0, 112, 0, 0, 0)
+        data = (0, 2, 0, 112, 0, 0)
         assert [0, 112] == _expand_segmented_lut(data)
 
     def test_linear(self):
@@ -779,13 +782,34 @@ class TestExpandSegmentedLUT(object):
         out = _expand_segmented_lut(data)
         assert [0, 112, 128, 144, 160, 176, 192] == out
 
-        data = (0, 2, 0, 4112, 1, 5, 49344)
+        # Test positive slope
+        data = (0, 2, 0, 28672, 1, 5, 49152)
         out = _expand_segmented_lut(data)
-        assert [0, 4112, 32896, 37008, 41120, 45232, 49344] == out
+        assert [0, 28672, 32768, 36864, 40960, 45056, 49152] == out
+
+        # Test neutral slope
+        data = (0, 2, 0, 28672, 1, 5, 28672)
+        out = _expand_segmented_lut(data)
+        assert [0, 28672, 28672, 28672, 28672, 28672, 28672] == out
+
+        # Test negative slope
+        data = (0, 2, 0, 49152, 1, 5, 28672)
+        out = _expand_segmented_lut(data)
+        assert [0, 49152, 45056, 40960, 36864, 32768, 28672] == out
 
     def test_indirect(self):
         """Test expanding an indirect segment."""
-        pass
+        # Start from a discrete segment
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 2, 0, 0)
+        out = _expand_segmented_lut(data)
+        assert [0, 112, 128, 144, 160, 176, 192] * 2 == out
+
+        # Start from a linear segment
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 4, 0)
+        out = _expand_segmented_lut(data)
+        assert [
+            0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192
+        ] == out
 
     def test_unknown_opcode_raises(self):
         """"""
@@ -804,7 +828,22 @@ class TestExpandSegmentedLUT(object):
 
     def test_16_16(self):
         """"""
+        # 1750 data start
+        ds = dcmread(PAL_SEG)
         # Little endian
+        bs = ds.SegmentedRedPaletteColorLookupTableData
+        data = unpack('<{}H'.format(len(bs) // 2), bs)
+        out = _expand_segmented_lut(data)
+
+        bs = ds.SegmentedGreenPaletteColorLookupTableData
+        data = unpack('<{}H'.format(len(bs) // 2), bs)
+        out = _expand_segmented_lut(data)
+
+        bs = ds.SegmentedBluePaletteColorLookupTableData
+        data = unpack('<{}H'.format(len(bs) // 2), bs)
+        out = _expand_segmented_lut(data)
+
+
 
         # Big endian
         pass
