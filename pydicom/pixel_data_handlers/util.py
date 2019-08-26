@@ -12,15 +12,15 @@ except ImportError:
     HAVE_NP = False
 
 
-def apply_color_palette(arr, ds=None, palette=None):
-    """
+def apply_color_lut(arr, ds=None, palette=None):
+    """Apply a color palette lookup table to `arr`.
 
     +------------------------------------------------+---------------+----------+
     | Element                                        | Supported     |          |
     +-------------+---------------------------+------+ values        |          |
     | Tag         | Keyword                   | Type |               |          |
     +=============+===========================+======+===============+==========+
-    | (0008,9205) | PixelPresentation         |      |               | Optional |
+    | (0008,9205) | PixelPresentation         |      | COLOR         | Optional |
     +-------------+---------------------------+------+---------------+----------+
     | (0028,0004) | PhotometricInterpretation | 1    | PALETTE COLOR | Required |
     +-------------+---------------------------+------+---------------+----------+
@@ -61,12 +61,13 @@ def apply_color_palette(arr, ds=None, palette=None):
     Returns
     -------
     numpy.ndarray
-        The RGB pixel data as (frames, rows, columns)
+        The RGB pixel data.
     """
     if not ds and not palette:
         raise ValueError("Either 'ds' or 'palette' is required")
 
     if palette:
+        # Well-known palettes are all 8-bits per entry
         datasets = {
             '1.2.840.10008.1.5.1': 'hotiron.dcm',
             '1.2.840.10008.1.5.2': 'pet.dcm',
@@ -99,10 +100,20 @@ def apply_color_palette(arr, ds=None, palette=None):
         except KeyError:
             raise ValueError("Unknown palette '{}'".format(palette))
 
+    is_supplemental = False
+    px_presentation = getattr(ds, 'PixelPresentation', None)
+    if px_presentation == 'MIXED':
+        raise ValueError('A value of MIXED is not supported')
+    elif px_presentation == 'COLOR':
+        # C.8.16.2.1.1.1: Supplemental Palette Color LUT
+        # Stored values less than the second descriptor are greyscale
+        is_supplemental = True
+
     # LUT Descriptor is described by PS3.3, C.7.6.3.1.5
     r_desc = ds.RedPaletteColorLookupTableDescriptor
     g_desc = ds.GreenPaletteColorLookupTableDescriptor
     b_desc = ds.BluePaletteColorLookupTableDescriptor
+    a_desc = getattr(ds, 'AlphaPaletteColorLookupTableDescriptor', None)
 
     # Check RGB descriptors are the same - alpha may be different
     # TODO: leave for now but probably relegate to warning in the docstring
@@ -124,26 +135,28 @@ def apply_color_palette(arr, ds=None, palette=None):
 
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
+        # VR is 'OW' but may be 8-bit
         r_data = ds.RedPaletteColorLookupTableData
         g_data = ds.GreenPaletteColorLookupTableData
         b_data = ds.BluePaletteColorLookupTableData
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
-        # VR is 'OW' so always 16-bit
+        # VR is 'OW' but may be 8-bit
         endianness = '<' if ds.is_little_endian else '>'
         if entry_size == 1:
             struct_fmt = '{}B'.format(endianness)
         else:
             struct_fmt = '{}H'.format(endianness)
 
+        # Returns the LUT data as a list
         r_data = _expand_segmented_lut(
-            ds.SegmentedRedPaletteColorLookupTableData, 16, is_little
+            ds.SegmentedRedPaletteColorLookupTableData, 16
         )
         g_data = _expand_segmented_lut(
-            ds.SegmentedGreenPaletteColorLookupTableData, 16, is_little
+            ds.SegmentedGreenPaletteColorLookupTableData, 16
         )
         b_data = _expand_segmented_lut(
-            ds.SegmentedBluePaletteColorLookupTableData, 16, is_little
+            ds.SegmentedBluePaletteColorLookupTableData, 16
         )
 
     if len(set([len(r_data), len(g_data), len(b_data)])) != 1:
@@ -362,14 +375,19 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
 
 
 def _expand_segmented_lut(data, nr_segments=None, last_value=None):
-    """
+    """Return a list containing the expanded lookup table.
 
     Parameters
     ----------
     data : tuple of int
         The decoded segmented palette lookup table data.
     nr_segments : int, optional
-        Read at most `nr_segments` from the data.
+        Read at most `nr_segments` from the data. Typically only used when
+        the opcode is ``2`` (indirect). If used then `last_value` should also
+        be used.
+    last_value : int, optional
+        The previous value in the expanded lookup table. Should be used when
+        the opcode is ``2`` (indirect)
 
     Returns
     -------
@@ -404,14 +422,19 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
             offset += 1
         elif opcode == 2:
             # Indirect: reuse existing segment(s)
+            # subdata offset is a 32 bit value stored as LS 16 bits followed
+            #   by MS 16 bits
+            # If 8-bit segment data then 4 items rather than 2...
             subdata_offset = data[offset + 1] << 16 | data[offset]
-            lut.extend(_expand_segmented_lut(data[subdata_offset:], length, lut[-1]))
+            lut.extend(
+                _expand_segmented_lut(data[subdata_offset:], length, lut[-1])
+            )
             offset += 2
         else:
             raise ValueError("Unknown opcode")
 
         segments_read += 1
-        if nr_segments is not None and segments_read == nr_segments:
+        if segments_read == nr_segments:
             return lut
 
     return lut

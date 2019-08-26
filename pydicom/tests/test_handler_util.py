@@ -21,7 +21,7 @@ from pydicom.pixel_data_handlers.util import (
     convert_color_space,
     pixel_dtype,
     get_expected_length,
-    apply_color_palette,
+    apply_color_lut,
     _expand_segmented_lut,
 )
 from pydicom.uid import (ExplicitVRLittleEndian,
@@ -757,9 +757,30 @@ class TestNumpy_PaletteColor(object):
         from pydicom.uid import ImplicitVRLittleEndian
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         arr = ds.pixel_array
-        arr = apply_color_palette(arr, ds)
+        arr = apply_color_lut(arr, ds)
         plt.imshow(arr / 65535)
         plt.show()
+
+    def test_08_08(self):
+        pass
+
+    def test_08_16(self):
+        pass
+
+    def test_16_16(self):
+        pass
+
+    def test_alpha(self):
+        pass
+
+    def test_segmented_lut(self):
+        pass
+
+    def test_well_known_name(self):
+        pass
+
+    def test_well_known_uid(self):
+        pass
 
 
 class TestExpandSegmentedLUT(object):
@@ -842,8 +863,6 @@ class TestExpandSegmentedLUT(object):
         bs = ds.SegmentedBluePaletteColorLookupTableData
         data = unpack('<{}H'.format(len(bs) // 2), bs)
         out = _expand_segmented_lut(data)
-
-
 
         # Big endian
         pass
