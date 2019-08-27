@@ -54,7 +54,7 @@ URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
 VERSION = __version__
-REQUIRES = ['enum34;python_version<"3.4"']
+REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 TESTS_REQUIRE = ['pytest']
 
