@@ -34,6 +34,8 @@ PAL_8_256_0_16 = get_testdata_files("OBXXXX1A.dcm")[0]
 PAL_8_200_0_16 = get_testdata_files("OT-PAL-8-face.dcm")[0]
 # PALETTE COLOR segmented LUT Data
 PAL_SEG = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
+# Supplemental
+SUPP_16 = get_testdata_files("eCT_Supplemental.dcm")[0]
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
@@ -752,13 +754,19 @@ class TestNumpy_PaletteColor(object):
         """"""
         import matplotlib.pyplot as plt
         ds = dcmread(PAL_8_256_0_16)
-        ds = dcmread(PAL_8_200_0_16, force=True)
+        #ds = dcmread(PAL_8_200_0_16, force=True)
+        #ds = dcmread(SUPP_16)
         ds.file_meta = Dataset()
         from pydicom.uid import ImplicitVRLittleEndian
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         arr = ds.pixel_array
+
         arr = apply_color_lut(arr, ds)
+        #arr = apply_color_lut(arr, palette='HOT_METAL_BLUE')
+        #plt.imshow(arr[95]/ 65535)
         plt.imshow(arr / 65535)
+        #plt.imshow(arr[0] / 255)
+        #plt.imshow(arr / 255)
         plt.show()
 
     def test_08_08(self):
@@ -831,6 +839,26 @@ class TestExpandSegmentedLUT(object):
         assert [
             0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192
         ] == out
+
+    def test_combined(self):
+        data = (0, 1, 0, 1, 255, 0)
+        out = _expand_segmented_lut(data)
+        assert [0] * 256 == out
+
+        data = (0, 1, 255, 1, 255, 128)
+        out = _expand_segmented_lut(data)
+        assert 256 == len(out)
+        assert [255, 254, 254, 253, 253] == out[:5]
+        assert [129, 129, 128, 128, 127] == out[-5:]
+
+        data = (0, 1, 0, 1, 127, 0, 1, 128, 254, 0)
+        out = _expand_segmented_lut(data)
+        assert 256 == len(out)
+        assert [0] * 128 == out[:128]
+        assert [246, 248, 250, 252, 254] == out[-5:]
+
+    def test_well_known_palettes(self):
+        pass
 
     def test_unknown_opcode_raises(self):
         """"""

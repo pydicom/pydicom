@@ -11,6 +11,9 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom.data import get_palette_files
+from pydicom.uid import UID
+
 
 def apply_color_lut(arr, ds=None, palette=None):
     """Apply a color palette lookup table to `arr`.
@@ -63,6 +66,10 @@ def apply_color_lut(arr, ds=None, palette=None):
     numpy.ndarray
         The RGB pixel data.
     """
+    # Note: input value (IV) is either the Palette Color LUT input value from
+    #   Enhanced Palette Color Lookup Table Sequence (0028,140B) or if that
+    #   is missing, the stored pixel value
+
     if not ds and not palette:
         raise ValueError("Either 'ds' or 'palette' is required")
 
@@ -95,43 +102,43 @@ def apply_color_lut(arr, ds=None, palette=None):
                 raise ValueError("Unknown palette '{}'".format(palette))
 
         try:
+            from pydicom import dcmread
             fname = datasets[palette]
             ds = dcmread(get_palette_files(fname)[0])
         except KeyError:
             raise ValueError("Unknown palette '{}'".format(palette))
 
+    # TODO: Check that the bit depth of `arr` is suitable
+    #if arr.dtype != 'uint8':
+    #    raise ValueError(
+    #        "The bit depth of 'arr' does not match that of the "
+    #    )
+
     is_supplemental = False
     px_presentation = getattr(ds, 'PixelPresentation', None)
     if px_presentation == 'MIXED':
-        raise ValueError('A value of MIXED is not supported')
+        raise ValueError(
+            "A '(0008,9205) Pixel Presentation' value of 'MIXED' is not "
+            "currently supported"
+        )
     elif px_presentation == 'COLOR':
         # C.8.16.2.1.1.1: Supplemental Palette Color LUT
         # Stored values less than the second descriptor are greyscale
         is_supplemental = True
 
     # LUT Descriptor is described by PS3.3, C.7.6.3.1.5
-    r_desc = ds.RedPaletteColorLookupTableDescriptor
-    g_desc = ds.GreenPaletteColorLookupTableDescriptor
-    b_desc = ds.BluePaletteColorLookupTableDescriptor
-    a_desc = getattr(ds, 'AlphaPaletteColorLookupTableDescriptor', None)
-
-    # Check RGB descriptors are the same - alpha may be different
-    # TODO: leave for now but probably relegate to warning in the docstring
-    if r_desc != g_desc and r_desc != b_desc:
-        warnings.warn(
-            "There's a difference in values between the Red, Blue and Green "
-            "Palette Color Lookup Table Descriptor elements, the Red value "
-            "will be used"
-        )
+    # All channels are supposed to be identical
+    lut_desc = ds.RedPaletteColorLookupTableDescriptor
 
     # A value of 0 = 2^16 entries
-    nr_entries = r_desc[0] or 2**16
-    first_map = r_desc[1]
+    nr_entries = lut_desc[0] or 2**16
+    first_map = lut_desc[1]
     # Nominal bit depth - actual bit depth may be smaller
-    nominal_depth = r_desc[2]
+    nominal_depth = lut_desc[2]
     print('Entries:', nr_entries)
     print('First mapping:', first_map)
-    print('Nominal bit depth:', nominal_depth)
+    print('Nominal bits per entry:', nominal_depth)
+    np_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
 
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
@@ -139,45 +146,58 @@ def apply_color_lut(arr, ds=None, palette=None):
         r_data = ds.RedPaletteColorLookupTableData
         g_data = ds.GreenPaletteColorLookupTableData
         b_data = ds.BluePaletteColorLookupTableData
+        a_data = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
+
+        bit_depth = len(r_data) / nr_entries * 8
+
+        r_data = np.frombuffer(r_data, dtype=np_dtype)
+        g_data = np.frombuffer(g_data, dtype=np_dtype)
+        b_data = np.frombuffer(b_data, dtype=np_dtype)
+        if a_data:
+            a_data = np.frombuffer(a_data, dtype=np_dtype)
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
         # VR is 'OW' but may be 8-bit
         endianness = '<' if ds.is_little_endian else '>'
-        if entry_size == 1:
-            struct_fmt = '{}B'.format(endianness)
-        else:
-            struct_fmt = '{}H'.format(endianness)
+        fmt = 'B' if nominal_depth // 8 == 1 else 'H'
 
         # Returns the LUT data as a list
+        len_r = len(ds.SegmentedRedPaletteColorLookupTableData)
         r_data = _expand_segmented_lut(
-            ds.SegmentedRedPaletteColorLookupTableData, 16
+            unpack(
+                endianness + str(len_r) + fmt,
+                ds.SegmentedRedPaletteColorLookupTableData
+            )
         )
+        len_g = len(ds.SegmentedGreenPaletteColorLookupTableData)
         g_data = _expand_segmented_lut(
-            ds.SegmentedGreenPaletteColorLookupTableData, 16
+            unpack(
+                endianness + str(len_g) + fmt,
+                ds.SegmentedGreenPaletteColorLookupTableData
+            )
         )
+        len_b = len(ds.SegmentedBluePaletteColorLookupTableData)
         b_data = _expand_segmented_lut(
-            ds.SegmentedBluePaletteColorLookupTableData, 16
+            unpack(
+                endianness + str(len_b) + fmt,
+                ds.SegmentedBluePaletteColorLookupTableData
+            )
         )
+        r_data = np.asarray(r_data, dtype=np_dtype)
+        g_data = np.asarray(g_data, dtype=np_dtype)
+        b_data = np.asarray(b_data, dtype=np_dtype)
+        a_data = None
 
     if len(set([len(r_data), len(g_data), len(b_data)])) != 1:
-        raise ValueError(
-            "LUT data must be the same length"
-        )
+        raise ValueError("LUT data must be the same length")
 
     # Some implementations have 8-bit data in 16-bit allocations
-    # Should be 8 or 16
-    bit_depth = len(r_data) / nr_entries * 8
     if bit_depth not in [8, 16]:
         raise ValueError(
             "The bit depth of the LUT data '{}' is invalid (only 8 or 16 "
             "bits per entry allowed)".format(bit_depth)
         )
-    print('Actual bit depth:', bit_depth)
-
-    np_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
-    r_data = np.frombuffer(r_data, dtype=np_dtype)
-    g_data = np.frombuffer(g_data, dtype=np_dtype)
-    b_data = np.frombuffer(b_data, dtype=np_dtype)
+    print('Actual bits per entry:', bit_depth)
 
     # Need to rescale if 8-bit data in 16-bit entries
     #   values must be scaled across full range of available intensities
@@ -185,13 +205,41 @@ def apply_color_lut(arr, ds=None, palette=None):
         r_data = r_data / 255 * 65535
         g_data = g_data / 255 * 65535
         b_data = b_data / 255 * 65535
+        if a_data:
+            a_data = a_data / 255 * 65535
 
-    out = np.empty((ds.Rows, ds.Columns, 3), dtype=np_dtype)
+    out_shape = list(arr.shape) + [4 if a_data else 3]
+    # TODO: Indices greater than number of entries get clipped to last entry
     if first_map == 0:
-        out[:, :, 0] = r_data[arr]
-        out[:, :, 1] = g_data[arr]
-        out[:, :, 2] = b_data[arr]
+        clipped_iv = np.clip(arr, 0, nr_entries - 1)
+        out = np.empty(out_shape, dtype=np_dtype)
+        #print(r_data, g_data, b_data)
+        out[..., 0] = r_data[clipped_iv]
+        out[..., 1] = g_data[clipped_iv]
+        out[..., 2] = b_data[clipped_iv]
+        if a_data:
+            out[..., 3] = a_data[clipped_iv]
+
         return out
+
+    # IVs in `arr` >= `first_map` are mapped by the Palette Color LUTs
+    colour_pixels = arr >= first_map
+    colour_iv = np.full_like(arr, np.nan)
+    colour_iv[colour_pixels] = arr[colour_pixels] - first_map
+    if not is_supplemental:
+        # If not supplemental, IVs < `first_map` = first LUT data entry
+        colour_iv[~colour_pixels] = 0
+    # IVs > (nr_entries + first_map) = last LUT data entry
+    colour_iv = np.clip(colour_iv, 0, nr_entries - 1)
+
+    out = np.full(out_shape, np.nan, dtype=np_dtype)
+    out[..., 0] = r_data[colour_iv]
+    out[..., 1] = g_data[colour_iv]
+    out[..., 2] = b_data[colour_iv]
+    if a_data:
+        out[..., 3] = a_data[colour_iv]
+
+    return out
 
 
 def convert_color_space(arr, current, desired):
@@ -380,7 +428,8 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
     Parameters
     ----------
     data : tuple of int
-        The decoded segmented palette lookup table data.
+        The decoded segmented palette lookup table data. May be padded by a
+        trailing null.
     nr_segments : int, optional
         Read at most `nr_segments` from the data. Typically only used when
         the opcode is ``2`` (indirect). If used then `last_value` should also
@@ -397,10 +446,13 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
     lut = []
     offset = 0
     segments_read = 0
-    while offset < len(data):
+    # Use `offset + 1` to account for possible trailing null
+    #   possible because all segment types are longer than 2
+    while offset + 1 < len(data):
         opcode = data[offset]
         length = data[offset + 1]
         offset += 2
+
         if opcode == 0:
             # Discrete
             lut.extend(data[offset:offset + length])
@@ -414,17 +466,24 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
                 y0 = last_value
             else:
                 raise ValueError("Linear segments cannot come first")
+
             if y0 == y1:
                 lut.extend([y1] * length)
             else:
-                step = (y1 - y0) // length
-                lut.extend(list(range(y0 + step, y1 + step, step)))
+                step = (y1 - y0) / length
+                vals = np.floor(np.arange(y0 + step, y1 + step, step))
+                lut.extend([int(vv) for vv in vals])
             offset += 1
         elif opcode == 2:
             # Indirect: reuse existing segment(s)
             # subdata offset is a 32 bit value stored as LS 16 bits followed
             #   by MS 16 bits
             # If 8-bit segment data then 4 items rather than 2...
+            # 8-bit items -> what order are they stored in?
+            if bit_depth == 8:
+                lsb = data[offset]
+                subdata_offset = data[offset + 1] << 16 | data[offset]
+            # 16-bit items
             subdata_offset = data[offset + 1] << 16 | data[offset]
             lut.extend(
                 _expand_segmented_lut(data[subdata_offset:], length, lut[-1])
