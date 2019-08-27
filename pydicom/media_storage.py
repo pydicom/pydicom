@@ -11,7 +11,7 @@ class ImageStorage(MediaStorage):
 
     pass
 
-class SRStorage(MediaStorage):
+class SRDocumentStorage(MediaStorage):
 
     pass
 
