@@ -39,6 +39,12 @@ CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
 
+eCT_Supplemental.dcm
+  * Original filename CT0012
+  * Taken from ftp://medical.nema.org/medical/dicom/Multiframe/CT/nemamfct.images.tar.bz2
+  * 2 frames, 16 bits allocated/stored, MONOCHROME2
+  * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
@@ -61,8 +67,7 @@ image_dfl.dcm
 
 gdcm-US-ALOKA-16.dcm (from GDCM)
   * Little endian implicit
-  * (0, 0, 16) Palette Color LUT Descriptor
-  * Segmented Palette Color LUT Data
+  * Segmented 16-bit Palette Color LUT Data
 
 ExplVR_BigEnd.dcm
   * Big Endian test image
@@ -217,6 +222,7 @@ MR-SIEMENS-DICOM-WithOverlays.dcm (from GDCM)
     * Single frame, single channel Pixel Data
     * Single frame Overlay Data in group 0x6000
     * Icon Image Sequence
+    * 8-bit Palette Color LUT
 
 
 == Licenses ==

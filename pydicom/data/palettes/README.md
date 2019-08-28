@@ -21,3 +21,9 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html
 +----------------------------+---------------------+------------------+
 | WINTER                     | 1.2.840.10008.1.5.8 | winter.dcm       |
 +----------------------------+---------------------+------------------+
+
+* All color palettes have 256 LUT entries, a first mapping of 0, and 8-bit
+  entries
+* HOT_IRON, PET, HOT_METAL_BLUE, and PET_20_STEP use normal color palette LUT
+  data.
+* SPRING, SUMMER, FALL and WINTER use segmented color palette LUT data.

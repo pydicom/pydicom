@@ -443,6 +443,7 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
     list of int
         The reconstructed lookup table data.
     """
+    bit_depth = 16
     lut = []
     offset = 0
     segments_read = 0
@@ -483,8 +484,10 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
             if bit_depth == 8:
                 lsb = data[offset]
                 subdata_offset = data[offset + 1] << 16 | data[offset]
-            # 16-bit items
-            subdata_offset = data[offset + 1] << 16 | data[offset]
+            else:
+                # 16-bit items
+                subdata_offset = data[offset + 1] << 16 | data[offset]
+
             lut.extend(
                 _expand_segmented_lut(data[subdata_offset:], length, lut[-1])
             )
