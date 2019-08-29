@@ -23,7 +23,8 @@ from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
 from pydicom.fileutil import read_undefined_length_value
-from pydicom.media_storage import ImageStorage, SRStorage, WaveformStorage
+from pydicom.media_storage import (ImageStorage, SRDocumentStorage,
+                                   WaveformStorage)
 from pydicom.misc import size_in_bytes
 from pydicom.sequence import Sequence
 from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
@@ -767,7 +768,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     if class_uid and class_uid.name == "Media Storage Directory Storage":
         dataset_class = DicomDir
     elif class_uid and class_uid.name.endswith("SR Storage"):
-        dataset_class = SRStorage
+        dataset_class = SRDocumentStorage
     elif class_uid and class_uid.name.endswith("Image Storage"):
         dataset_class = ImageStorage
     elif class_uid and class_uid.name.endswith("Waveform Storage"):
