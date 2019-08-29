@@ -18,29 +18,71 @@ from pydicom.uid import UID
 def apply_color_lut(arr, ds=None, palette=None):
     """Apply a color palette lookup table to `arr`.
 
+    Requirements common to supported modules:
+
+    +----------------------------------------------------------------+----------+
+    | Element                                                        |          |
+    +-------------+-------------------------------------------+------+          |
+    | Tag         | Keyword                                   | Type |          |
+    +=============+===========================================+======+==========+
+    | (0028,1101) | RedPaletteColorLookupTableDescriptor      | 1    | Required |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1102) | BluePaletteColorLookupTableDescriptor     | 1    | Required |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1103) | GreenPaletteColorLookupTableDescriptor    | 1    | Required |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1201) | RedPaletteColorLookupTableData            | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1202) | BluePaletteColorLookupTableData           | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1203) | GreenPaletteColorLookupTableData          | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1204) | AlphaPaletteColorLookupTableData          | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1221) | SegmentedRedPaletteColorLookupTableData   | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1222) | SegmentedGreenPaletteColorLookupTableData | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1223) | SegmentedBluePaletteColorLookupTableData  | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+    | (0028,1224) | SegmentedAlphaPaletteColorLookupTableData | 1C   | Optional |
+    +-------------+-------------------------------------------+------+----------+
+
+    If (0028,1201-3) *Palette Color Lookup Table Data* are missing
+    then (0028-1221-3) *Segmented Palette Color Lookup Table Data* must be
+    present and vice versa. The presence of (0028,1204) *Alpha Palette Color
+    Lookup Table Data* or (0028,1224) *Segmented Palette Color Lookup Table
+    Data* is optional.
+
+    Requirements for use with the :dcm:`Image Pixel Module
+    <part03/sect_C.7.6.3.html>` or :dcm:`Palette Color LUT Module
+    <part03/sect_C.7.9.html>`:
+
     +------------------------------------------------+---------------+----------+
     | Element                                        | Supported     |          |
     +-------------+---------------------------+------+ values        |          |
     | Tag         | Keyword                   | Type |               |          |
     +=============+===========================+======+===============+==========+
-    | (0008,9205) | PixelPresentation         |      | COLOR         | Optional |
-    +-------------+---------------------------+------+---------------+----------+
     | (0028,0004) | PhotometricInterpretation | 1    | PALETTE COLOR | Required |
     +-------------+---------------------------+------+---------------+----------+
     | (0028,0100) | BitsAllocated             | 1    | 8, 16         | Required |
     +-------------+---------------------------+------+---------------+----------+
 
-    | (0028,1101) | RedPaletteColorLookupTableDescriptor      | 1C | Required |
-    | (0028,1102) | BluePaletteColorLookupTableDescriptor     | 1C | Required |
-    | (0028,1103) | GreenPaletteColorLookupTableDescriptor    | 1C | Required |
-    | (0028,1201) | RedPaletteColorLookupTableData            | 1C | Required |
-    | (0028,1202) | BluePaletteColorLookupTableData           | 1C | Required |
-    | (0028,1203) | GreenPaletteColorLookupTableData          | 1C | Required |
+    Requirements for use with the :dcm:`Supplemental Palette Color LUT Module
+    <part03/sect_C.7.6.19.html>`:
 
-    | (0028,1221) | SegmentedRedPaletteColorLookupTableData   | 1C | Required |
-    | (0028,1222) | SegmentedGreenPaletteColorLookupTableData | 1C | Required |
-    | (0028,1223) | SegmentedBluePaletteColorLookupTableData  | 1C | Required |
+    +------------------------------------------------+-------------+----------+
+    | Element                                        | Supported   |          |
+    +-------------+---------------------------+------+ values      |          |
+    | Tag         | Keyword                   | Type |             |          |
+    +=============+===========================+======+=============+==========+
+    | (0008,9205) | PixelPresentation         | 1    | COLOR       | Required |
+    +-------------+---------------------------+------+-------------+----------+
+    | (0028,0100) | BitsAllocated             | 1    | 8, 16       | Required |
+    +-------------+---------------------------+------+-------------+----------+
 
+    Use of this function with the :dcm:`Enhanced Palette Color Lookup Table
+    Module<part03/sect_C.7.6.23.html>` is not supported.
 
     Parameters
     ----------
@@ -49,22 +91,30 @@ def apply_color_lut(arr, ds=None, palette=None):
     ds : dataset.Dataset, optional
         Required if `palette` is not supplied. A
         :class:`~pydicom.dataset.Dataset` containing a suitable
-        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`,
-        :dcm:`Palette Color Lookup Table<part03/sect_C.7.9.html>`
-        or :dcm:`Supplemental Palette Lookup Table<part03/sect_C.7.6.19.html>`
-        Module.
+        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` or
+        :dcm:`Palette Color Lookup Table<part03/sect_C.7.9.html>` Module.
     palette : str or uid.UID, optional
         Required if `ds` is not supplied. The name of one of the
         :dcm:`well-known<part06/chapter_B.html>` color palettes defined by the
         DICOM Standard. One of: ``'HOT_IRON'``, ``'PET'``,
         ``'HOT_METAL_BLUE'``, ``'PET_20_STEP'``, ``'SPRING'``, ``'SUMMER'``,
-         ``'FALL'``, ``'WINTER'`` or the corresponding (0008,0018) *SOP
-         Instance UID*.
+         ``'FALL'``, ``'WINTER'`` or the corresponding well-known (0008,0018)
+         *SOP Instance UID*.
 
     Returns
     -------
     numpy.ndarray
         The RGB pixel data.
+
+    References
+    ----------
+
+    * :dcm:`Image Pixel Module<part03/sect_C.7.6.3.html>`
+    * :dcm:`Supplemental Palette Color LUT Module<part03/sect_C.7.6.19.html>`
+    * :dcm:`Enhanced Palette Color LUT Module<part03/sect_C.7.6.23.html>`
+    * :dcm:`Palette Colour LUT Module<part03/sect_C.7.9.html>`
+    * :dcm:`Supplemental Palette Color LUTs
+      <part03/sect_C.8.16.2.html#sect_C.8.16.2.1.1.1>`
     """
     # Note: input value (IV) is either the Palette Color LUT input value from
     #   Enhanced Palette Color Lookup Table Sequence (0028,140B) or if that
@@ -114,6 +164,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     #        "The bit depth of 'arr' does not match that of the "
     #    )
 
+    # C.8.16.2.1.1.1: Supplemental Palette Color LUT
     is_supplemental = False
     px_presentation = getattr(ds, 'PixelPresentation', None)
     if px_presentation == 'MIXED':
@@ -122,11 +173,8 @@ def apply_color_lut(arr, ds=None, palette=None):
             "currently supported"
         )
     elif px_presentation == 'COLOR':
-        # C.8.16.2.1.1.1: Supplemental Palette Color LUT
-        # Stored values less than the second descriptor are greyscale
         is_supplemental = True
 
-    # LUT Descriptor is described by PS3.3, C.7.6.3.1.5
     # All channels are supposed to be identical
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
 
@@ -138,28 +186,27 @@ def apply_color_lut(arr, ds=None, palette=None):
     print('Entries:', nr_entries)
     print('First mapping:', first_map)
     print('Nominal bits per entry:', nominal_depth)
-    np_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
+    entry_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
 
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
-        # VR is 'OW' but may be 8-bit
         r_data = ds.RedPaletteColorLookupTableData
         g_data = ds.GreenPaletteColorLookupTableData
         b_data = ds.BluePaletteColorLookupTableData
         a_data = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
 
-        bit_depth = len(r_data) / nr_entries * 8
+        actual_depth = len(r_data) / nr_entries * 8
 
-        r_data = np.frombuffer(r_data, dtype=np_dtype)
-        g_data = np.frombuffer(g_data, dtype=np_dtype)
-        b_data = np.frombuffer(b_data, dtype=np_dtype)
+        r_data = np.frombuffer(r_data, dtype=entry_dtype)
+        g_data = np.frombuffer(g_data, dtype=entry_dtype)
+        b_data = np.frombuffer(b_data, dtype=entry_dtype)
         if a_data:
-            a_data = np.frombuffer(a_data, dtype=np_dtype)
+            a_data = np.frombuffer(a_data, dtype=entry_dtype)
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
-        # VR is 'OW' but may be 8-bit
         endianness = '<' if ds.is_little_endian else '>'
         fmt = 'B' if nominal_depth // 8 == 1 else 'H'
+        actual_depth = nominal_depth
 
         # Returns the LUT data as a list
         len_r = len(ds.SegmentedRedPaletteColorLookupTableData)
@@ -167,77 +214,81 @@ def apply_color_lut(arr, ds=None, palette=None):
             unpack(
                 endianness + str(len_r) + fmt,
                 ds.SegmentedRedPaletteColorLookupTableData
-            )
+            ),
+            endianness + fmt
         )
+        r_data = np.asarray(r_data, dtype=entry_dtype)
+
         len_g = len(ds.SegmentedGreenPaletteColorLookupTableData)
         g_data = _expand_segmented_lut(
             unpack(
                 endianness + str(len_g) + fmt,
                 ds.SegmentedGreenPaletteColorLookupTableData
-            )
+            ),
+            endianness + fmt
         )
+        g_data = np.asarray(g_data, dtype=entry_dtype)
+
         len_b = len(ds.SegmentedBluePaletteColorLookupTableData)
         b_data = _expand_segmented_lut(
             unpack(
                 endianness + str(len_b) + fmt,
                 ds.SegmentedBluePaletteColorLookupTableData
-            )
+            ),
+            endianness + fmt
         )
-        r_data = np.asarray(r_data, dtype=np_dtype)
-        g_data = np.asarray(g_data, dtype=np_dtype)
-        b_data = np.asarray(b_data, dtype=np_dtype)
-        a_data = None
+        b_data = np.asarray(b_data, dtype=entry_dtype)
 
-    if len(set([len(r_data), len(g_data), len(b_data)])) != 1:
-        raise ValueError("LUT data must be the same length")
+        if hasattr(ds, 'SegmentedAlphaPaletteColorLookupTableData'):
+            len_a = len(ds.SegmentedAlphaPaletteColorLookupTableData)
+            a_data = _expand_segmented_lut(
+                unpack(
+                    endianness + str(len_a) + fmt,
+                    ds.SegmentedAlphaPaletteColorLookupTableData
+                ),
+                endianness + fmt
+            )
+            a_data = np.asarray(a_data, dtype=entry_dtype)
+        else:
+            a_data = None
 
     # Some implementations have 8-bit data in 16-bit allocations
-    if bit_depth not in [8, 16]:
+    if actual_depth not in [8, 16]:
         raise ValueError(
             "The bit depth of the LUT data '{}' is invalid (only 8 or 16 "
-            "bits per entry allowed)".format(bit_depth)
+            "bits per entry allowed)".format(actual_depth)
         )
-    print('Actual bits per entry:', bit_depth)
+
+    luts = [r_data, g_data, b_data] + ([a_data] if a_data else [])
+    if False in [len(item) == len(luts[0]) for item in luts]:
+        raise ValueError("LUT data must be the same length")
 
     # Need to rescale if 8-bit data in 16-bit entries
-    #   values must be scaled across full range of available intensities
-    if bit_depth == 8 and nominal_depth == 16:
-        r_data = r_data / 255 * 65535
-        g_data = g_data / 255 * 65535
-        b_data = b_data / 255 * 65535
-        if a_data:
-            a_data = a_data / 255 * 65535
+    if actual_depth == 8 and nominal_depth == 16:
+        # In-place modification
+        [np.multiply(item, 257, out=item) for item in luts]
 
-    out_shape = list(arr.shape) + [4 if a_data else 3]
-    # TODO: Indices greater than number of entries get clipped to last entry
     if first_map == 0:
+        # IVs > than number of entries get set to last entry
         clipped_iv = np.clip(arr, 0, nr_entries - 1)
-        out = np.empty(out_shape, dtype=np_dtype)
-        #print(r_data, g_data, b_data)
-        out[..., 0] = r_data[clipped_iv]
-        out[..., 1] = g_data[clipped_iv]
-        out[..., 2] = b_data[clipped_iv]
-        if a_data:
-            out[..., 3] = a_data[clipped_iv]
+    else:
+        # If supplemental we will have pixels with no LUT mapping, so use NaN
+        clipped_iv = np.full_like(arr, np.nan)
 
-        return out
+        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        colour_pixels = arr >= first_map
+        clipped_iv[colour_pixels] = arr[colour_pixels] - first_map
+        if not is_supplemental:
+            # IVs < `first_map` get set to first LUT entry
+            clipped_iv[~colour_pixels] = 0
 
-    # IVs in `arr` >= `first_map` are mapped by the Palette Color LUTs
-    colour_pixels = arr >= first_map
-    colour_iv = np.full_like(arr, np.nan)
-    colour_iv[colour_pixels] = arr[colour_pixels] - first_map
-    if not is_supplemental:
-        # If not supplemental, IVs < `first_map` = first LUT data entry
-        colour_iv[~colour_pixels] = 0
-    # IVs > (nr_entries + first_map) = last LUT data entry
-    colour_iv = np.clip(colour_iv, 0, nr_entries - 1)
+        # IVs > than number of entries get set to last entry
+        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
-    out = np.full(out_shape, np.nan, dtype=np_dtype)
-    out[..., 0] = r_data[colour_iv]
-    out[..., 1] = g_data[colour_iv]
-    out[..., 2] = b_data[colour_iv]
-    if a_data:
-        out[..., 3] = a_data[colour_iv]
+    out_shape = list(arr.shape) + [len(luts)]
+    out = np.full(out_shape, np.nan, dtype=entry_dtype)
+    for ii, lut in enumerate(luts):
+        out[..., ii] = lut[clipped_iv]
 
     return out
 
@@ -422,51 +473,68 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     return numpy_dtype
 
 
-def _expand_segmented_lut(data, nr_segments=None, last_value=None):
-    """Return a list containing the expanded lookup table.
+def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
+    """Return a list containing the expanded lookup table data.
 
     Parameters
     ----------
     data : tuple of int
         The decoded segmented palette lookup table data. May be padded by a
         trailing null.
+    fmt : str
+        The format of the data, one of `'H'`, `'<B'`, `'>B'`.
     nr_segments : int, optional
-        Read at most `nr_segments` from the data. Typically only used when
+        Expand at most `nr_segments` from the data. Should be used when
         the opcode is ``2`` (indirect). If used then `last_value` should also
         be used.
     last_value : int, optional
         The previous value in the expanded lookup table. Should be used when
-        the opcode is ``2`` (indirect)
+        the opcode is ``2`` (indirect). If used then `nr_segments` should also
+        be used.
 
     Returns
     -------
     list of int
         The reconstructed lookup table data.
+
+    References
+    ----------
+
+    * DICOM Standard, Part 3, Annex C.7.9
     """
-    bit_depth = 16
+    # Indirect segment byte offset is dependent on endianness for 8-bit
+    # Little endian: e.g. 0x0302 0x0100, big endian, e.g. 0x0203 0x0001
+    indirect_ii = [3, 2, 1, 0] if '<' in fmt else [2, 3, 0, 1]
+
     lut = []
     offset = 0
     segments_read = 0
     # Use `offset + 1` to account for possible trailing null
-    #   possible because all segment types are longer than 2
+    #   can do this because all segment types are longer than 2
     while offset + 1 < len(data):
         opcode = data[offset]
         length = data[offset + 1]
         offset += 2
 
         if opcode == 0:
-            # Discrete
+            # C.7.9.2.1: Discrete segment
             lut.extend(data[offset:offset + length])
             offset += length
         elif opcode == 1:
-            # Linear
-            y1 = data[offset]
+            # C.7.9.2.2: Linear segment
             if lut:
                 y0 = lut[-1]
             elif last_value:
+                # Indirect segment with linear segment at 0th offset
                 y0 = last_value
             else:
-                raise ValueError("Linear segments cannot come first")
+                raise ValueError(
+                    "Error expanding a segmented palette color lookup table: "
+                    "the first segment cannot be a linear segment"
+                )
+
+            y1 = data[offset]
+            offset += 1
 
             if y0 == y1:
                 lut.extend([y1] * length)
@@ -474,26 +542,32 @@ def _expand_segmented_lut(data, nr_segments=None, last_value=None):
                 step = (y1 - y0) / length
                 vals = np.floor(np.arange(y0 + step, y1 + step, step))
                 lut.extend([int(vv) for vv in vals])
-            offset += 1
         elif opcode == 2:
-            # Indirect: reuse existing segment(s)
-            # subdata offset is a 32 bit value stored as LS 16 bits followed
-            #   by MS 16 bits
-            # If 8-bit segment data then 4 items rather than 2...
-            # 8-bit items -> what order are they stored in?
-            if bit_depth == 8:
-                lsb = data[offset]
-                subdata_offset = data[offset + 1] << 16 | data[offset]
+            # C.7.9.2.3: Indirect segment
+            if 'B' in fmt:
+                # 8-bit segment entries
+                ii = [data[offset + vv] for vv in indirect_ii]
+                byte_offset = (ii[0] << 8 | ii[1]) << 16 | (ii[2] << 8 | ii[3])
+                offset += 4
             else:
-                # 16-bit items
-                subdata_offset = data[offset + 1] << 16 | data[offset]
+                # 16-bit segment entries
+                byte_offset = data[offset + 1] << 16 | data[offset]
+                offset += 2
+
+            if not lut:
+                raise ValueError(
+                    "Error expanding a segmented palette color lookup table: "
+                    "the first segment cannot be an indirect segment"
+                )
 
             lut.extend(
-                _expand_segmented_lut(data[subdata_offset:], length, lut[-1])
+                _expand_segmented_lut(data[byte_offset:], fmt, length, lut[-1])
             )
-            offset += 2
         else:
-            raise ValueError("Unknown opcode")
+            raise ValueError(
+                "Error expanding a segmented palette lookup table: "
+                "unknown segment type '{}'".format(opcode)
+            )
 
         segments_read += 1
         if segments_read == nr_segments:
