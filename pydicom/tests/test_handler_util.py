@@ -754,8 +754,8 @@ class TestNumpy_PaletteColor(object):
         """"""
         import matplotlib.pyplot as plt
         ds = dcmread(PAL_8_256_0_16)
-        #ds = dcmread(PAL_8_200_0_16, force=True)
-        #ds = dcmread(SUPP_16)
+        ds = dcmread(PAL_8_200_0_16, force=True)
+        ds = dcmread(SUPP_16)
         ds.file_meta = Dataset()
         from pydicom.uid import ImplicitVRLittleEndian
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
@@ -763,19 +763,28 @@ class TestNumpy_PaletteColor(object):
 
         arr = apply_color_lut(arr, ds)
         #arr = apply_color_lut(arr, palette='HOT_METAL_BLUE')
-        #plt.imshow(arr[95]/ 65535)
-        plt.imshow(arr / 65535)
+        plt.imshow(arr[0]/ 65535)
+        #plt.imshow(arr / 65535)
         #plt.imshow(arr[0] / 255)
         #plt.imshow(arr / 255)
         plt.show()
 
-    def test_08_08(self):
+    def test_08_08_uint(self):
         pass
 
-    def test_08_16(self):
+    def test_08_16_uint(self):
         pass
 
-    def test_16_16(self):
+    def test_16_16_uint(self):
+        pass
+
+    def test_08_08_int(self):
+        pass
+
+    def test_08_16_int(self):
+        pass
+
+    def test_16_16_int(self):
         pass
 
     def test_alpha(self):
@@ -796,63 +805,110 @@ class TestExpandSegmentedLUT(object):
     def test_discrete(self):
         """Test expanding a discrete segment."""
         data = (0, 1, 0)
-        assert [0] == _expand_segmented_lut(data)
+        assert [0] == _expand_segmented_lut(data, 'H')
 
         data = (0, 2, 0, 112)
-        assert [0, 112] == _expand_segmented_lut(data)
+        assert [0, 112] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, -112)
+        assert [0, -112] == _expand_segmented_lut(data, 'H')
 
         data = (0, 2, 0, 112, 0, 0)
-        assert [0, 112] == _expand_segmented_lut(data)
+        assert [0, 112] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, -112, 0, 0)
+        assert [0, -112] == _expand_segmented_lut(data, 'H')
 
     def test_linear(self):
         """Test expanding a linear segment."""
         # Linear can never be the first segment
-        data = (0, 2, 0, 112, 1, 5, 192)
-        out = _expand_segmented_lut(data)
-        assert [0, 112, 128, 144, 160, 176, 192] == out
-
-        # Test positive slope
+        # Positive slope
         data = (0, 2, 0, 28672, 1, 5, 49152)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [0, 28672, 32768, 36864, 40960, 45056, 49152] == out
 
-        # Test neutral slope
+        data = (0, 1, -400, 1, 5, 0)
+        out = _expand_segmented_lut(data, 'H')
+        assert [-400, -320, -240, -160, -80, 0] == out
+
+        # No slope
         data = (0, 2, 0, 28672, 1, 5, 28672)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [0, 28672, 28672, 28672, 28672, 28672, 28672] == out
 
-        # Test negative slope
+        data = (0, 1, -100, 1, 5, -100)
+        out = _expand_segmented_lut(data, 'H')
+        assert [-100, -100, -100, -100, -100, -100] == out
+
+        # Negative slope
         data = (0, 2, 0, 49152, 1, 5, 28672)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [0, 49152, 45056, 40960, 36864, 32768, 28672] == out
 
-    def test_indirect(self):
-        """Test expanding an indirect segment."""
+        data = (0, 1, 0, 1, 5, -400)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, -80, -160, -240, -320, -400] == out
+
+    def test_indirect_08(self):
+        """Test expanding an indirect segment encoded as 8-bit."""
+        # LSB, MSB
+        ref_a = [0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192]
+
+        # Little endian
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 4, 0, 0, 0)
+        out = _expand_segmented_lut(data, '<B')
+        assert ref_a == out
+
+        data = (0, 2, 0, 112, 2, 1, 0, 0, 0, 0)
+        out = _expand_segmented_lut(data, '<B')
+        assert [0, 112, 0, 112] == out
+
+        # 0x0100 0x0302 is 66051 in LE 16-bit MSB, LSB
+        data = [0, 1, 0] * 22017 + [0, 2, 1, 2] + [2, 1, 3, 2, 1, 0]
+        out = _expand_segmented_lut(data, '<B')
+        assert [0] * 22017 + [1, 2, 1, 2] == out
+
+        # Big endian
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 0, 4, 0, 0)
+        out = _expand_segmented_lut(data, '>B')
+        assert ref_a == out
+
+        data = (0, 2, 0, 112, 2, 1, 0, 0, 0, 0)
+        out = _expand_segmented_lut(data, '>B')
+        assert [0, 112, 0, 112] == out
+
+        # 0x0001 0x0203 is 66051 in BE 16-bit MSB, LSB
+        data = [0, 1, 0] * 22017 + [0, 2, 1, 2] + [2, 1, 2, 3, 0, 1]
+        out = _expand_segmented_lut(data, '>B')
+        assert [0] * 22017 + [1, 2, 1, 2] == out
+
+    def test_indirect_16(self):
+        """Test expanding an indirect segment encoded as 16-bit."""
         # Start from a discrete segment
         data = (0, 2, 0, 112, 1, 5, 192, 2, 2, 0, 0)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [0, 112, 128, 144, 160, 176, 192] * 2 == out
 
         # Start from a linear segment
         data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 4, 0)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [
             0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192
         ] == out
 
     def test_combined(self):
         data = (0, 1, 0, 1, 255, 0)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert [0] * 256 == out
 
         data = (0, 1, 255, 1, 255, 128)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert 256 == len(out)
         assert [255, 254, 254, 253, 253] == out[:5]
         assert [129, 129, 128, 128, 127] == out[-5:]
 
         data = (0, 1, 0, 1, 127, 0, 1, 128, 254, 0)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, 'H')
         assert 256 == len(out)
         assert [0] * 128 == out[:128]
         assert [246, 248, 250, 252, 254] == out[-5:]
@@ -882,15 +938,15 @@ class TestExpandSegmentedLUT(object):
         # Little endian
         bs = ds.SegmentedRedPaletteColorLookupTableData
         data = unpack('<{}H'.format(len(bs) // 2), bs)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, '<H')
 
         bs = ds.SegmentedGreenPaletteColorLookupTableData
         data = unpack('<{}H'.format(len(bs) // 2), bs)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, '<H')
 
         bs = ds.SegmentedBluePaletteColorLookupTableData
         data = unpack('<{}H'.format(len(bs) // 2), bs)
-        out = _expand_segmented_lut(data)
+        out = _expand_segmented_lut(data, '<H')
 
         # Big endian
         pass

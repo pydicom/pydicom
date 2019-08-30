@@ -87,7 +87,8 @@ def apply_color_lut(arr, ds=None, palette=None):
     Parameters
     ----------
     arr : numpy.ndarray
-        The pixel data to apply the color palette to.
+        The pixel data to apply the color palette to, may contain signed or
+        unsigned data.
     ds : dataset.Dataset, optional
         Required if `palette` is not supplied. A
         :class:`~pydicom.dataset.Dataset` containing a suitable
@@ -104,7 +105,8 @@ def apply_color_lut(arr, ds=None, palette=None):
     Returns
     -------
     numpy.ndarray
-        The RGB pixel data.
+        The RGB or RGBA pixel data as unsigned values with a bit depth given
+        by value 3 of the *Palette Color Lookup Table Descriptor* elements.
 
     References
     ----------
@@ -116,10 +118,8 @@ def apply_color_lut(arr, ds=None, palette=None):
     * :dcm:`Supplemental Palette Color LUTs
       <part03/sect_C.8.16.2.html#sect_C.8.16.2.1.1.1>`
     """
-    # Note: input value (IV) is either the Palette Color LUT input value from
-    #   Enhanced Palette Color Lookup Table Sequence (0028,140B) or if that
-    #   is missing, the stored pixel value
-
+    # Note: input value (IV) is the stored pixel value in `arr`
+    # LUTs[IV] -> [R, G, B] values at the IV pixel location in `arr`
     if not ds and not palette:
         raise ValueError("Either 'ds' or 'palette' is required")
 
@@ -159,10 +159,6 @@ def apply_color_lut(arr, ds=None, palette=None):
             raise ValueError("Unknown palette '{}'".format(palette))
 
     # TODO: Check that the bit depth of `arr` is suitable
-    #if arr.dtype != 'uint8':
-    #    raise ValueError(
-    #        "The bit depth of 'arr' does not match that of the "
-    #    )
 
     # C.8.16.2.1.1.1: Supplemental Palette Color LUT
     is_supplemental = False
@@ -180,13 +176,12 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
+    # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
     # Nominal bit depth - actual bit depth may be smaller
     nominal_depth = lut_desc[2]
-    print('Entries:', nr_entries)
-    print('First mapping:', first_map)
-    print('Nominal bits per entry:', nominal_depth)
     entry_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
+    print(lut_desc)
 
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
@@ -265,32 +260,110 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     # Need to rescale if 8-bit data in 16-bit entries
     if actual_depth == 8 and nominal_depth == 16:
-        # In-place modification
         [np.multiply(item, 257, out=item) for item in luts]
 
-    if first_map == 0:
-        # IVs > than number of entries get set to last entry
-        clipped_iv = np.clip(arr, 0, nr_entries - 1)
-    else:
-        # If supplemental we will have pixels with no LUT mapping, so use NaN
-        clipped_iv = np.full_like(arr, np.nan)
 
-        # IVs >= `first_map` are mapped by the Palette Color LUTs
-        colour_pixels = arr >= first_map
-        clipped_iv[colour_pixels] = arr[colour_pixels] - first_map
-        if not is_supplemental:
-            # IVs < `first_map` get set to first LUT entry
-            clipped_iv[~colour_pixels] = 0
+    print('IVs', arr, arr.shape)
 
-        # IVs > than number of entries get set to last entry
-        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+    # IVs >= `first_map`
+    ge = np.ma.masked_less(arr, first_map)
+    ge = ge - first_map
+    np.clip(ge, 0, nr_entries - 1, out=ge)
+    print('GE', ge.min(), ge.max(), ge, ge.shape)
+
+    if is_supplemental:
+        grey = apply_modality_lut(grey, ds)
+        grey = apply_voi_lut(grey, ds)
+        grey = apply_presentation_lut(grey, ds)
+
+        # Combine grey with RGB
+        pass
+
+    # IVs < `first_map`
+    #lt = np.ma.masked_greater_equal(arr, first_map)
+    #if not is_supplemental:
+    #    # IVs < `first_map` get set to first LUT entry
+    #    lt[~lt.mask] = 0
+
+
+    #print(ge.min(), ge.max(), ge, lt)
+    #print(mask)
+    #clipped_iv = np.full_like(arr, np.nan, dtype=np.double)
+    # IVs >= `first_map` are mapped by the Palette Color LUTs
+    #mapped_pixels = arr >= first_map
+    # `first_map` may be negative, positive or 0
+    #clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+    #if not is_supplemental:
+    #    # IVs < `first_map` get set to first LUT entry
+    #    clipped_iv[~mapped_pixels] = 0
+
+    # IVs > number of entries get set to last entry
+
+    #np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
     out_shape = list(arr.shape) + [len(luts)]
-    out = np.full(out_shape, np.nan, dtype=entry_dtype)
+    out = np.zeros(out_shape, dtype=entry_dtype)
+    #clipped_iv = clipped_iv[np.where(clipped_iv != np.nan)].astype(entry_dtype)
+    #print(clipped_iv)
+    #print(~np.isnan(clipped_iv).shape)
+    #mask = ~np.isnan(clipped_iv)
+    #clipped_iv = clipped_iv[mask].astype(entry_dtype)
+    #print(mask, clipped_iv)
+    #print(ge)
+    ge.fill_value = 0
+    print(out[0, 0, 0:10, 0])
     for ii, lut in enumerate(luts):
-        out[..., ii] = lut[clipped_iv]
+        out[..., ii] = lut[ge]
+        print(ii, out[0, 0, 0:10, ii])
+
+    print(ge[0, 200, 200:270])
+    print(luts[0][ge[0, 200, 200:270]])
 
     return out
+
+
+def apply_modality_lut(arr, ds):
+    """Apply a modality lookup table to `arr`.
+
+    C.11.1 Modality LUT Module
+    Either a Modality LUT Sequence containing a single item or Rescale Slope
+    and Intercept values shall be present but not both.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The ndarray containing greyscale values to apply the modality LUT to.
+    ds : dataset.Dataset
+        A dataset containing :dcm:`Modality LUT Module
+        <part03/sect_C.11.html#sect_C.11.1>` elements.
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+    if hasattr(ds, 'ModalityLUTSequence'):
+        item = ds.ModalityLUTSequence[0]
+        nr_entries = item.LUTDescriptor[0] or 2**16
+        first_map = item.LUTDescriptor[1]
+        nr_bits = item.LUTDescriptor[3]
+
+        lut_type = item.ModalityLUTType
+        lut_data = item.LUTData
+    else:
+        arr = arr * ds.RescaleSlope
+        arr += ds.RescaleIntercept
+
+    return arr
+
+
+def apply_presentation_lut(arr, ds):
+    """Apply a presentation lookup table to `arr`."""
+    return arr
+
+
+def apply_voi_lut(arr, ds):
+    """Apply a VOI lookup table to `arr`."""
+    return arr
 
 
 def convert_color_space(arr, current, desired):
