@@ -68,6 +68,11 @@ image_dfl.dcm
 gdcm-US-ALOKA-16.dcm (from GDCM)
   * Little endian implicit
   * Segmented 16-bit Palette Color LUT Data
+  * Modified to remove original patient name and ID from Pixel Data
+
+gdcm-US-ALOKA-16_big.dcm (from GDCM)
+  * Big endian implicit version of gdcm-US-ALOKA-16.dcm
+  * Created by @scaramallion using a script
 
 ExplVR_BigEnd.dcm
   * Big Endian test image

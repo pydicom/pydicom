@@ -54,7 +54,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     Lookup Table Data* or (0028,1224) *Segmented Palette Color Lookup Table
     Data* is optional.
 
-    Requirements for use with the :dcm:`Image Pixel Module
+    Required elements for use with the :dcm:`Image Pixel Module
     <part03/sect_C.7.6.3.html>` or :dcm:`Palette Color LUT Module
     <part03/sect_C.7.9.html>`:
 
@@ -65,24 +65,10 @@ def apply_color_lut(arr, ds=None, palette=None):
     +=============+===========================+======+===============+==========+
     | (0028,0004) | PhotometricInterpretation | 1    | PALETTE COLOR | Required |
     +-------------+---------------------------+------+---------------+----------+
-    | (0028,0100) | BitsAllocated             | 1    | 8, 16         | Required |
-    +-------------+---------------------------+------+---------------+----------+
-
-    Requirements for use with the :dcm:`Supplemental Palette Color LUT Module
-    <part03/sect_C.7.6.19.html>`:
-
-    +------------------------------------------------+-------------+----------+
-    | Element                                        | Supported   |          |
-    +-------------+---------------------------+------+ values      |          |
-    | Tag         | Keyword                   | Type |             |          |
-    +=============+===========================+======+=============+==========+
-    | (0008,9205) | PixelPresentation         | 1    | COLOR       | Required |
-    +-------------+---------------------------+------+-------------+----------+
-    | (0028,0100) | BitsAllocated             | 1    | 8, 16       | Required |
-    +-------------+---------------------------+------+-------------+----------+
 
     Use of this function with the :dcm:`Enhanced Palette Color Lookup Table
-    Module<part03/sect_C.7.6.23.html>` is not supported.
+    Module<part03/sect_C.7.6.23.html>` or :dcm:`Supplemental Palette Color LUT
+    Module <part03/sect_C.7.6.19.html>` is not currently supported.
 
     Parameters
     ----------
@@ -158,18 +144,13 @@ def apply_color_lut(arr, ds=None, palette=None):
         except KeyError:
             raise ValueError("Unknown palette '{}'".format(palette))
 
-    # TODO: Check that the bit depth of `arr` is suitable
-
     # C.8.16.2.1.1.1: Supplemental Palette Color LUT
-    is_supplemental = False
-    px_presentation = getattr(ds, 'PixelPresentation', None)
-    if px_presentation == 'MIXED':
+    # TODO: Requires greyscale visualisation pipeline
+    if getattr(ds, 'PixelPresentation', None) in ['MIXED', 'COLOR']:
         raise ValueError(
-            "A '(0008,9205) Pixel Presentation' value of 'MIXED' is not "
-            "currently supported"
+            "Use of this function with the Supplemental Palette Color Lookup "
+            "Table Module is not currently supported"
         )
-    elif px_presentation == 'COLOR':
-        is_supplemental = True
 
     # All channels are supposed to be identical
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
@@ -178,146 +159,67 @@ def apply_color_lut(arr, ds=None, palette=None):
     nr_entries = lut_desc[0] or 2**16
     # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
-    # Nominal bit depth - actual bit depth may be smaller
+    # Actual bit depth may be smaller
     nominal_depth = lut_desc[2]
-    entry_dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
-    print(lut_desc)
+    dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
 
+    luts = []
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
-        r_data = ds.RedPaletteColorLookupTableData
-        g_data = ds.GreenPaletteColorLookupTableData
-        b_data = ds.BluePaletteColorLookupTableData
-        a_data = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
+        r_lut = ds.RedPaletteColorLookupTableData
+        g_lut = ds.GreenPaletteColorLookupTableData
+        b_lut = ds.BluePaletteColorLookupTableData
+        a_lut = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
 
-        actual_depth = len(r_data) / nr_entries * 8
+        actual_depth = len(r_lut) / nr_entries * 8
 
-        r_data = np.frombuffer(r_data, dtype=entry_dtype)
-        g_data = np.frombuffer(g_data, dtype=entry_dtype)
-        b_data = np.frombuffer(b_data, dtype=entry_dtype)
-        if a_data:
-            a_data = np.frombuffer(a_data, dtype=entry_dtype)
+        for lut in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
+            luts.append(np.frombuffer(lut, dtype=dtype))
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
+        r_lut = ds.SegmentedRedPaletteColorLookupTableData
+        g_lut = ds.SegmentedGreenPaletteColorLookupTableData
+        b_lut = ds.SegmentedBluePaletteColorLookupTableData
+        a_lut = getattr(ds, 'SegmentedAlphaPaletteColorLookupTableData', None)
+
         endianness = '<' if ds.is_little_endian else '>'
-        fmt = 'B' if nominal_depth // 8 == 1 else 'H'
+        byte_depth = nominal_depth // 8
+        fmt = 'B' if byte_depth == 1 else 'H'
         actual_depth = nominal_depth
 
-        # Returns the LUT data as a list
-        len_r = len(ds.SegmentedRedPaletteColorLookupTableData)
-        r_data = _expand_segmented_lut(
-            unpack(
-                endianness + str(len_r) + fmt,
-                ds.SegmentedRedPaletteColorLookupTableData
-            ),
-            endianness + fmt
-        )
-        r_data = np.asarray(r_data, dtype=entry_dtype)
-
-        len_g = len(ds.SegmentedGreenPaletteColorLookupTableData)
-        g_data = _expand_segmented_lut(
-            unpack(
-                endianness + str(len_g) + fmt,
-                ds.SegmentedGreenPaletteColorLookupTableData
-            ),
-            endianness + fmt
-        )
-        g_data = np.asarray(g_data, dtype=entry_dtype)
-
-        len_b = len(ds.SegmentedBluePaletteColorLookupTableData)
-        b_data = _expand_segmented_lut(
-            unpack(
-                endianness + str(len_b) + fmt,
-                ds.SegmentedBluePaletteColorLookupTableData
-            ),
-            endianness + fmt
-        )
-        b_data = np.asarray(b_data, dtype=entry_dtype)
-
-        if hasattr(ds, 'SegmentedAlphaPaletteColorLookupTableData'):
-            len_a = len(ds.SegmentedAlphaPaletteColorLookupTableData)
-            a_data = _expand_segmented_lut(
-                unpack(
-                    endianness + str(len_a) + fmt,
-                    ds.SegmentedAlphaPaletteColorLookupTableData
-                ),
-                endianness + fmt
-            )
-            a_data = np.asarray(a_data, dtype=entry_dtype)
-        else:
-            a_data = None
+        for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
+            len_seg = len(seg) // byte_depth
+            s_fmt = endianness + str(len_seg) + fmt
+            lut = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
+            luts.append(np.asarray(lut, dtype=dtype))
 
     # Some implementations have 8-bit data in 16-bit allocations
     if actual_depth not in [8, 16]:
         raise ValueError(
-            "The bit depth of the LUT data '{}' is invalid (only 8 or 16 "
+            "The bit depth of the LUT data '{:.1f}' is invalid (only 8 or 16 "
             "bits per entry allowed)".format(actual_depth)
         )
 
-    luts = [r_data, g_data, b_data] + ([a_data] if a_data else [])
     if False in [len(item) == len(luts[0]) for item in luts]:
         raise ValueError("LUT data must be the same length")
 
-    # Need to rescale if 8-bit data in 16-bit entries
+    # Need to rescale if 8-bit LUT data in 16-bit entries
     if actual_depth == 8 and nominal_depth == 16:
-        [np.multiply(item, 257, out=item) for item in luts]
+        luts = [np.multiply(item, 257) for item in luts]
 
-
-    print('IVs', arr, arr.shape)
-
-    # IVs >= `first_map`
-    ge = np.ma.masked_less(arr, first_map)
-    ge = ge - first_map
-    np.clip(ge, 0, nr_entries - 1, out=ge)
-    print('GE', ge.min(), ge.max(), ge, ge.shape)
-
-    if is_supplemental:
-        grey = apply_modality_lut(grey, ds)
-        grey = apply_voi_lut(grey, ds)
-        grey = apply_presentation_lut(grey, ds)
-
-        # Combine grey with RGB
-        pass
-
-    # IVs < `first_map`
-    #lt = np.ma.masked_greater_equal(arr, first_map)
-    #if not is_supplemental:
-    #    # IVs < `first_map` get set to first LUT entry
-    #    lt[~lt.mask] = 0
-
-
-    #print(ge.min(), ge.max(), ge, lt)
-    #print(mask)
-    #clipped_iv = np.full_like(arr, np.nan, dtype=np.double)
+    # IVs < `first_map` get set to first LUT entry (i.e. 0)
+    clipped_iv = np.zeros(arr.shape, dtype=dtype)
     # IVs >= `first_map` are mapped by the Palette Color LUTs
-    #mapped_pixels = arr >= first_map
     # `first_map` may be negative, positive or 0
-    #clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-    #if not is_supplemental:
-    #    # IVs < `first_map` get set to first LUT entry
-    #    clipped_iv[~mapped_pixels] = 0
-
+    mapped_pixels = arr >= first_map
+    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
     # IVs > number of entries get set to last entry
+    np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
-    #np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
-
-    out_shape = list(arr.shape) + [len(luts)]
-    out = np.zeros(out_shape, dtype=entry_dtype)
-    #clipped_iv = clipped_iv[np.where(clipped_iv != np.nan)].astype(entry_dtype)
-    #print(clipped_iv)
-    #print(~np.isnan(clipped_iv).shape)
-    #mask = ~np.isnan(clipped_iv)
-    #clipped_iv = clipped_iv[mask].astype(entry_dtype)
-    #print(mask, clipped_iv)
-    #print(ge)
-    ge.fill_value = 0
-    print(out[0, 0, 0:10, 0])
+    # Output array may be RGB or RGBA
+    out = np.empty(list(arr.shape) + [len(luts)], dtype=dtype)
     for ii, lut in enumerate(luts):
-        out[..., ii] = lut[ge]
-        print(ii, out[0, 0, 0:10, ii])
-
-    print(ge[0, 200, 200:270])
-    print(luts[0][ge[0, 200, 200:270]])
+        out[..., ii] = lut[clipped_iv]
 
     return out
 
@@ -334,35 +236,43 @@ def apply_modality_lut(arr, ds):
     arr : numpy.ndarray
         The ndarray containing greyscale values to apply the modality LUT to.
     ds : dataset.Dataset
-        A dataset containing :dcm:`Modality LUT Module
-        <part03/sect_C.11.html#sect_C.11.1>` elements.
+        A dataset containing a :dcm:`Modality LUT Module
+        <part03/sect_C.11.html#sect_C.11.1>`.
 
     Returns
     -------
     numpy.ndarray
+        The array with applied modality LUT. If *Modality LUT Sequence* is used
+        then returns an array containing unsigned integers. If (0028,1052)
+        *Rescale Intercept* and (0028,1053) *Rescale Slope* are present then
+        returns an array containing either signed or unsigned integers
+        depending values depending on the sign of *Rescale Intercept*. If
+        neither are present then `arr` will be returned unchanged.
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.1
+      <part03/sect_C.11.html#sect_C.11.1>`
     """
+    # Test files: CT_small.dcm, eCT_Supplemental.dcm
     if hasattr(ds, 'ModalityLUTSequence'):
         item = ds.ModalityLUTSequence[0]
         nr_entries = item.LUTDescriptor[0] or 2**16
         first_map = item.LUTDescriptor[1]
-        nr_bits = item.LUTDescriptor[3]
+        nominal_depth = item.LUTDescriptor[3]
+        actual_depth = len(item.LUTData) / nr_entries * 8
 
-        lut_type = item.ModalityLUTType
-        lut_data = item.LUTData
-    else:
+        dtype = 'uint{}'.format(nominal_depth)
+        lut_data = np.frombytes(item.LUTData, dtype=dtype)
+        if nominal_depth == 16 and actual_depth == 8:
+            np.multiple(lut_data, 257, out=lut_data)
+
+        arr = np.clip(arr, 0, nr_entries - 1)
+        return lut_data[arr]
+    elif hasattr(ds, 'RescaleSlope'):
         arr = arr * ds.RescaleSlope
         arr += ds.RescaleIntercept
 
-    return arr
-
-
-def apply_presentation_lut(arr, ds):
-    """Apply a presentation lookup table to `arr`."""
-    return arr
-
-
-def apply_voi_lut(arr, ds):
-    """Apply a VOI lookup table to `arr`."""
     return arr
 
 
@@ -555,7 +465,8 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
         The decoded segmented palette lookup table data. May be padded by a
         trailing null.
     fmt : str
-        The format of the data, one of `'H'`, `'<B'`, `'>B'`.
+        The format of the data, should contain `'B'` for 8-bit, `'H'` for
+        16-bit, `'<'` for little endian and `'>'` for bid endian.
     nr_segments : int, optional
         Expand at most `nr_segments` from the data. Should be used when
         the opcode is ``2`` (indirect). If used then `last_value` should also
@@ -613,7 +524,7 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
                 lut.extend([y1] * length)
             else:
                 step = (y1 - y0) / length
-                vals = np.floor(np.arange(y0 + step, y1 + step, step))
+                vals = np.around(np.arange(y0 + step, y1 + step, step))
                 lut.extend([int(vv) for vv in vals])
         elif opcode == 2:
             # C.7.9.2.3: Indirect segment
