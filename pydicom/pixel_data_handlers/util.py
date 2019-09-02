@@ -157,6 +157,9 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
+    # Workaround for #942: first value is always unsigned
+    if nr_entries < 0:
+        nr_entries += 2**16
     # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
     # Actual bit depth may be smaller
@@ -227,14 +230,10 @@ def apply_color_lut(arr, ds=None, palette=None):
 def apply_modality_lut(arr, ds):
     """Apply a modality lookup table to `arr`.
 
-    C.11.1 Modality LUT Module
-    Either a Modality LUT Sequence containing a single item or Rescale Slope
-    and Intercept values shall be present but not both.
-
     Parameters
     ----------
     arr : numpy.ndarray
-        The ndarray containing greyscale values to apply the modality LUT to.
+        The :class:`~numpy.ndarray` to apply the modality LUT to.
     ds : dataset.Dataset
         A dataset containing a :dcm:`Modality LUT Module
         <part03/sect_C.11.html#sect_C.11.1>`.
@@ -243,34 +242,46 @@ def apply_modality_lut(arr, ds):
     -------
     numpy.ndarray
         The array with applied modality LUT. If *Modality LUT Sequence* is used
-        then returns an array containing unsigned integers. If (0028,1052)
-        *Rescale Intercept* and (0028,1053) *Rescale Slope* are present then
-        returns an array containing either signed or unsigned integers
-        depending values depending on the sign of *Rescale Intercept*. If
-        neither are present then `arr` will be returned unchanged.
+        then returns an array of ``np.uint8`` or ``np.uint16``, depending on
+        the 3rd value of (0028,3002) *LUT Descriptor*. If (0028,1052) *Rescale
+        Intercept* and (0028,1053) *Rescale Slope* are present then returns an
+        array of ``np.float64``. If neither are present then `arr` will be
+        returned unchanged.
 
     References
     ----------
     * DICOM Standard, Part 3, :dcm:`Annex C.11.1
       <part03/sect_C.11.html#sect_C.11.1>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    # Test files: CT_small.dcm, eCT_Supplemental.dcm
     if hasattr(ds, 'ModalityLUTSequence'):
         item = ds.ModalityLUTSequence[0]
         nr_entries = item.LUTDescriptor[0] or 2**16
+        # Workaround for #942: first value is always unsigned
+        if nr_entries < 0:
+            nr_entries += 2**16
         first_map = item.LUTDescriptor[1]
-        nominal_depth = item.LUTDescriptor[3]
+        nominal_depth = item.LUTDescriptor[2]
         actual_depth = len(item.LUTData) / nr_entries * 8
 
         dtype = 'uint{}'.format(nominal_depth)
-        lut_data = np.frombytes(item.LUTData, dtype=dtype)
+        lut_data = np.asarray(item.LUTData, dtype=dtype)
         if nominal_depth == 16 and actual_depth == 8:
-            np.multiple(lut_data, 257, out=lut_data)
+            np.multiply(lut_data, 257, out=lut_data)
 
-        arr = np.clip(arr, 0, nr_entries - 1)
-        return lut_data[arr]
+        # IVs < `first_map` get set to first LUT entry (i.e. 0)
+        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        # `first_map` may be negative, positive or 0
+        mapped_pixels = arr >= first_map
+        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+        # IVs > number of entries get set to last entry
+        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+
+        return lut_data[clipped_iv]
     elif hasattr(ds, 'RescaleSlope'):
-        arr = arr * ds.RescaleSlope
+        arr = arr.astype(np.float64) * ds.RescaleSlope
         arr += ds.RescaleIntercept
 
     return arr

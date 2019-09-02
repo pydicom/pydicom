@@ -46,6 +46,10 @@ SUP_16_16_2F = get_testdata_files("eCT_Supplemental.dcm")[0]
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+# Modality LUT
+MOD_1 = get_testdata_files("CT_small.dcm")[0]
+MOD_2 = get_testdata_files("mlut_18.dcm")[0]
+MOD_3 = get_testdata_files("mlut_19.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -754,6 +758,64 @@ class TestNumpy_ModalityLUT(object):
     """Tests for util.apply_modality_lut()."""
     def setup(self):
         pass
+
+    def test_slope_intercept(self):
+        """Test the rescale slope/intercept transform."""
+        ds = dcmread(MOD_1)
+        arr = ds.pixel_array
+        arr2 = apply_modality_lut(arr, ds)
+
+        assert np.array_equal(arr - 1024, arr2)
+        assert arr2.flags.writeable
+        assert arr2.dtype == np.float64
+        #import matplotlib.pyplot as plt
+        #fig, (ax1, ax2) = plt.subplots(1, 2)
+        #ax1.imshow(arr, cmap='gray')
+        #ax2.imshow(arr2, cmap='gray')
+        #plt.show()
+
+    @pytest.mark.skip()
+    def test_lut_sequence(self):
+        """Test the rescale slope/intercept transform."""
+        # LUTDescriptor: 4096, 63488, 16
+        ds = dcmread(MOD_2)
+        # min -2048, max 4095
+        arr = ds.pixel_array
+        print(arr.min(), arr.max())
+        arr2 = apply_modality_lut(arr, ds)
+
+        #assert np.array_equal(arr - 1024, arr2)
+        #assert arr2.flags.writeable
+        #assert arr2.dtype == np.float64
+        import matplotlib.pyplot as plt
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        ax1.imshow(arr, cmap='gray')
+        ax2.imshow(arr2, cmap='gray')
+        plt.show()
+
+    def test_lut_sequence2(self):
+        """Test the rescale slope/intercept transform."""
+        # LUTDescriptor: 4096, 63488, 16
+        ds = dcmread(MOD_3)
+        seq = ds.ModalityLUTSequence[0]
+        assert seq.LUTDescriptor == [4096, -2048, 16]
+        last_entry = seq.LUTData[-1]
+        # min -2048, max 4095
+        arr = ds.pixel_array
+        arr2 = apply_modality_lut(arr, ds)
+
+        # All IVs > last entry = last entry
+        assert arr2[arr > 2048][0] == last_entry
+        assert (arr2[arr > 2048] == last_entry).all()
+
+        #assert np.array_equal(arr - 1024, arr2)
+        #assert arr2.flags.writeable
+        #assert arr2.dtype == np.float64
+        import matplotlib.pyplot as plt
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        ax1.imshow(arr, cmap='gray')
+        ax2.imshow(arr2, cmap='gray')
+        plt.show()
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
