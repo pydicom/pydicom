@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in the pixel data handlers."""
+from __future__ import division
 
 from struct import unpack, pack
 from sys import byteorder
