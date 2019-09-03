@@ -49,7 +49,6 @@ RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 # Modality LUT
 MOD_1 = get_testdata_files("CT_small.dcm")[0]
 MOD_2 = get_testdata_files("mlut_18.dcm")[0]
-MOD_3 = get_testdata_files("mlut_19.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -756,66 +755,88 @@ class TestGetExpectedLength(object):
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ModalityLUT(object):
     """Tests for util.apply_modality_lut()."""
-    def setup(self):
-        pass
-
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
         ds = dcmread(MOD_1)
+        assert ds.RescaleSlope == 1
+        assert ds.RescaleIntercept == -1024
         arr = ds.pixel_array
-        arr2 = apply_modality_lut(arr, ds)
+        out = apply_modality_lut(arr, ds)
+        assert out.flags.writeable
+        assert out.dtype == np.float64
 
-        assert np.array_equal(arr - 1024, arr2)
-        assert arr2.flags.writeable
-        assert arr2.dtype == np.float64
-        #import matplotlib.pyplot as plt
-        #fig, (ax1, ax2) = plt.subplots(1, 2)
-        #ax1.imshow(arr, cmap='gray')
-        #ax2.imshow(arr2, cmap='gray')
-        #plt.show()
+        assert np.array_equal(arr - 1024, out)
 
-    @pytest.mark.skip()
+        ds.RescaleSlope = 2.5
+        ds.RescaleIntercept = -2048
+        out = apply_modality_lut(arr, ds)
+        assert np.array_equal(arr * 2.5 - 2048, out)
+
     def test_lut_sequence(self):
-        """Test the rescale slope/intercept transform."""
-        # LUTDescriptor: 4096, 63488, 16
+        """Test the LUT Sequence transform."""
         ds = dcmread(MOD_2)
-        # min -2048, max 4095
-        arr = ds.pixel_array
-        print(arr.min(), arr.max())
-        arr2 = apply_modality_lut(arr, ds)
-
-        #assert np.array_equal(arr - 1024, arr2)
-        #assert arr2.flags.writeable
-        #assert arr2.dtype == np.float64
-        import matplotlib.pyplot as plt
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-        ax1.imshow(arr, cmap='gray')
-        ax2.imshow(arr2, cmap='gray')
-        plt.show()
-
-    def test_lut_sequence2(self):
-        """Test the rescale slope/intercept transform."""
-        # LUTDescriptor: 4096, 63488, 16
-        ds = dcmread(MOD_3)
         seq = ds.ModalityLUTSequence[0]
         assert seq.LUTDescriptor == [4096, -2048, 16]
-        last_entry = seq.LUTData[-1]
-        # min -2048, max 4095
         arr = ds.pixel_array
-        arr2 = apply_modality_lut(arr, ds)
+        assert -2048 == arr.min()
+        assert 4095 == arr.max()
+        out = apply_modality_lut(arr, ds)
 
-        # All IVs > last entry = last entry
-        assert arr2[arr > 2048][0] == last_entry
-        assert (arr2[arr > 2048] == last_entry).all()
+        # IV > 2047 -> LUT[4095]
+        mapped_pixels = arr > 2047
+        assert seq.LUTData[-1] == out[mapped_pixels][0]
+        assert (seq.LUTData[-1] == out[mapped_pixels]).all()
+        assert out.flags.writeable
+        assert out.dtype == np.uint16
 
-        #assert np.array_equal(arr - 1024, arr2)
-        #assert arr2.flags.writeable
-        #assert arr2.dtype == np.float64
-        import matplotlib.pyplot as plt
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-        ax1.imshow(arr, cmap='gray')
-        ax2.imshow(arr2, cmap='gray')
-        plt.show()
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
+    def test_lut_sequence_zero_entries(self):
+        """Test that 0 entries is interpreted correctly."""
+        # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
+        # attempt to access LUTData[4096] or higher will raise IndexError
+        ds = dcmread(MOD_2)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [0, 0, 16]
+        assert 4096 == len(seq.LUTData)
+        arr = np.asarray([0, 4095, 4096, 65535])
+        msg = r"index 4096 is out of bounds"
+        with pytest.raises(IndexError, match=msg):
+            apply_modality_lut(arr, ds)
+
+        # LUTData with 65536 entries
+        seq.LUTData = [0] * 65535 + [1]
+        out = apply_modality_lut(arr, ds)
+        assert [0, 0, 0, 1] == list(out)
+
+    def test_lut_sequence_entries_negative(self):
+        """Test workaround for #942: SS VR should give uint nr entries."""
+        ds = dcmread(MOD_2)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [-32767, 0, 16]  # 32769
+        seq.LUTData = [0] * 32768 + [1]
+        arr = np.asarray([-10, 0, 32767, 32768, 32769])
+        out = apply_modality_lut(arr, ds)
+        # IV < index 0 -> 0
+        # IV > index 32768 -> 32768
+        assert [0, 0, 0, 1, 1] == list(out)
+
+    def test_unchanged(self):
+        """Test no modality LUT transform."""
+        ds = dcmread(MOD_1)
+        del ds.RescaleSlope
+        del ds.RescaleIntercept
+        arr = ds.pixel_array
+        out = apply_modality_lut(arr, ds)
+        assert arr is out
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
@@ -1022,6 +1043,26 @@ class TestNumpy_PaletteColor(object):
         assert ([33280, 61952, 65280] == rgb[arr == 60]).all()
         assert [60160, 25600, 37376] == list(rgb[arr == 130][0])
         assert ([60160, 25600, 37376] == rgb[arr == 130]).all()
+
+    def test_nr_entries_negative(self):
+        """Test workaround for #942: SS VR should give uint nr entries."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.RedPaletteColorLookupTableDescriptor[0] = -32767  # 32769
+        # 16-bit entries, 32769 entries per LUT
+        ds.RedPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        ds.GreenPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        ds.BluePaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        # IV < index 0 -> 0
+        # IV > index 32768 -> 32768
+        arr = np.asarray([-10, 0, 32767, 32768, 32769])
+        rgb = apply_color_lut(arr, ds)
+        assert [0, 0, 0] == list(rgb[0])
+        assert [0, 0, 0] == list(rgb[1])
+        assert [0, 0, 0] == list(rgb[2])
+        assert [65535, 65535, 65535] == list(rgb[3])
+        assert [65535, 65535, 65535] == list(rgb[4])
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

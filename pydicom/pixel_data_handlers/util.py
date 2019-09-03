@@ -18,63 +18,20 @@ from pydicom.uid import UID
 def apply_color_lut(arr, ds=None, palette=None):
     """Apply a color palette lookup table to `arr`.
 
-    Requirements common to supported modules:
-
-    +----------------------------------------------------------------+----------+
-    | Element                                                        |          |
-    +-------------+-------------------------------------------+------+          |
-    | Tag         | Keyword                                   | Type |          |
-    +=============+===========================================+======+==========+
-    | (0028,1101) | RedPaletteColorLookupTableDescriptor      | 1    | Required |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1102) | BluePaletteColorLookupTableDescriptor     | 1    | Required |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1103) | GreenPaletteColorLookupTableDescriptor    | 1    | Required |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1201) | RedPaletteColorLookupTableData            | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1202) | BluePaletteColorLookupTableData           | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1203) | GreenPaletteColorLookupTableData          | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1204) | AlphaPaletteColorLookupTableData          | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1221) | SegmentedRedPaletteColorLookupTableData   | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1222) | SegmentedGreenPaletteColorLookupTableData | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1223) | SegmentedBluePaletteColorLookupTableData  | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-    | (0028,1224) | SegmentedAlphaPaletteColorLookupTableData | 1C   | Optional |
-    +-------------+-------------------------------------------+------+----------+
-
     If (0028,1201-3) *Palette Color Lookup Table Data* are missing
     then (0028-1221-3) *Segmented Palette Color Lookup Table Data* must be
     present and vice versa. The presence of (0028,1204) *Alpha Palette Color
     Lookup Table Data* or (0028,1224) *Segmented Palette Color Lookup Table
     Data* is optional.
 
-    Required elements for use with the :dcm:`Image Pixel Module
-    <part03/sect_C.7.6.3.html>` or :dcm:`Palette Color LUT Module
-    <part03/sect_C.7.9.html>`:
-
-    +------------------------------------------------+---------------+----------+
-    | Element                                        | Supported     |          |
-    +-------------+---------------------------+------+ values        |          |
-    | Tag         | Keyword                   | Type |               |          |
-    +=============+===========================+======+===============+==========+
-    | (0028,0004) | PhotometricInterpretation | 1    | PALETTE COLOR | Required |
-    +-------------+---------------------------+------+---------------+----------+
-
     Use of this function with the :dcm:`Enhanced Palette Color Lookup Table
     Module<part03/sect_C.7.6.23.html>` or :dcm:`Supplemental Palette Color LUT
-    Module <part03/sect_C.7.6.19.html>` is not currently supported.
+    Module<part03/sect_C.7.6.19.html>` is not currently supported.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        The pixel data to apply the color palette to, may contain signed or
-        unsigned data.
+        The pixel data to apply the color palette to.
     ds : dataset.Dataset, optional
         Required if `palette` is not supplied. A
         :class:`~pydicom.dataset.Dataset` containing a suitable
@@ -91,8 +48,9 @@ def apply_color_lut(arr, ds=None, palette=None):
     Returns
     -------
     numpy.ndarray
-        The RGB or RGBA pixel data as unsigned values with a bit depth given
-        by value 3 of the *Palette Color Lookup Table Descriptor* elements.
+        The RGB or RGBA pixel data as an array of ``np.uint8`` or ``np.uint16``
+        values, depending on the 3rd value of (0028,1201) *Red Palette Color
+        Lookup Table Descriptor*.
 
     References
     ----------
@@ -160,6 +118,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     # Workaround for #942: first value is always unsigned
     if nr_entries < 0:
         nr_entries += 2**16
+
     # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
     # Actual bit depth may be smaller
@@ -241,12 +200,12 @@ def apply_modality_lut(arr, ds):
     Returns
     -------
     numpy.ndarray
-        The array with applied modality LUT. If *Modality LUT Sequence* is used
-        then returns an array of ``np.uint8`` or ``np.uint16``, depending on
-        the 3rd value of (0028,3002) *LUT Descriptor*. If (0028,1052) *Rescale
-        Intercept* and (0028,1053) *Rescale Slope* are present then returns an
-        array of ``np.float64``. If neither are present then `arr` will be
-        returned unchanged.
+        An array with applied modality LUT. If (0028,3000) *Modality LUT
+        Sequence* is present then returns an array of ``np.uint8`` or
+        ``np.uint16``, depending on the 3rd value of (0028,3002) *LUT
+        Descriptor*. If (0028,1052) *Rescale Intercept* and (0028,1053)
+        *Rescale Slope* are present then returns an array of ``np.float64``.
+        If neither are present then `arr` will be returned unchanged.
 
     References
     ----------
@@ -263,12 +222,9 @@ def apply_modality_lut(arr, ds):
             nr_entries += 2**16
         first_map = item.LUTDescriptor[1]
         nominal_depth = item.LUTDescriptor[2]
-        actual_depth = len(item.LUTData) / nr_entries * 8
 
         dtype = 'uint{}'.format(nominal_depth)
         lut_data = np.asarray(item.LUTData, dtype=dtype)
-        if nominal_depth == 16 and actual_depth == 8:
-            np.multiply(lut_data, 257, out=lut_data)
 
         # IVs < `first_map` get set to first LUT entry (i.e. 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
