@@ -86,6 +86,21 @@ class TestConvertText(object):
         expected = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         assert expected == convert_single_string(bytestring, encodings)
 
+    def test_value_ending_with_padding(self):
+        bytestring = b'Value ending with spaces   '
+        assert 'Value ending with spaces' == convert_single_string(bytestring)
+        assert 'Value ending with spaces' == convert_text(bytestring)
+
+        bytestring = b'Values  \\with spaces   '
+        assert ['Values', 'with spaces'] == convert_text(bytestring)
+
+        bytestring = b'Value ending with zeros\0\0\0'
+        assert 'Value ending with zeros' == convert_single_string(bytestring)
+        assert 'Value ending with zeros' == convert_text(bytestring)
+
+        bytestring = b'Values\0\0\\with zeros\0'
+        assert ['Values', 'with zeros'] == convert_text(bytestring)
+
 
 class TestConvertAT(object):
     def test_big_endian(self):

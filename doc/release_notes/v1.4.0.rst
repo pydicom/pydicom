@@ -21,3 +21,4 @@ Enhancements
 * Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
   using `Dataset.overlay_array()` (issue:`912`)
 * Added support for deferred reading in file-like objects (:issue:`932`)
+* Tolerate values with multiple and/or incorrect padding bytes (:issue:`940`)
