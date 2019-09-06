@@ -545,7 +545,7 @@ def MultiString(val, valtype=str):
     # 2005.05.25: also check for trailing 0, error made
     # in PET files we are converting
 
-    if val and (val.endswith(' ') or val.endswith('\x00')):
+    while val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
     splitup = val.split("\\")
 
