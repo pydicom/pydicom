@@ -2,7 +2,7 @@
 """Tests for the pixel_data_handlers.util module."""
 
 import os
-from struct import unpack
+from struct import unpack, pack
 from sys import byteorder
 
 import pytest
@@ -758,12 +758,12 @@ class TestNumpy_ModalityLUT(object):
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
         ds = dcmread(MOD_1)
-        assert ds.RescaleSlope == 1
-        assert ds.RescaleIntercept == -1024
+        assert 1 == ds.RescaleSlope
+        assert -1024 == ds.RescaleIntercept
         arr = ds.pixel_array
         out = apply_modality_lut(arr, ds)
         assert out.flags.writeable
-        assert out.dtype == np.float64
+        assert np.float64 == out.dtype
 
         assert np.array_equal(arr - 1024, out)
 
@@ -776,7 +776,7 @@ class TestNumpy_ModalityLUT(object):
         """Test the LUT Sequence transform."""
         ds = dcmread(MOD_2)
         seq = ds.ModalityLUTSequence[0]
-        assert seq.LUTDescriptor == [4096, -2048, 16]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
         arr = ds.pixel_array
         assert -2048 == arr.min()
         assert 4095 == arr.max()
@@ -929,11 +929,21 @@ class TestNumpy_PaletteColor(object):
         with pytest.raises(ValueError, match=msg):
             apply_color_lut(ds.pixel_array, ds)
 
+    def test_no_palette_color(self):
+        """Test that an unequal LUT lengths raise an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        del ds.RedPaletteColorLookupTableData
+        msg = r"No suitable Palette Color Lookup Table Module found"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
     def test_uint08_16(self):
         """Test uint8 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
         ds.file_meta = Dataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert 8 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
         arr = ds.pixel_array
         orig = arr.copy()
         rgb = apply_color_lut(arr, ds)
@@ -949,6 +959,8 @@ class TestNumpy_PaletteColor(object):
     def test_uint16_16_segmented(self):
         """Test uint16 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_SEG_LE_16_1F)
+        assert 16 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
         arr = ds.pixel_array
         orig = arr.copy()
         rgb = apply_color_lut(arr, ds)
@@ -964,6 +976,23 @@ class TestNumpy_PaletteColor(object):
         assert [10280, 11565, 16705] == list(rgb[479, 639, :])
 
         assert (orig == arr).all()
+
+    def test_16_entry_8_data(self):
+        """Test LUT with 8-bit data in 16-bit entries."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert [200, 0, 16] == ds.RedPaletteColorLookupTableDescriptor
+        lut = pack('200B', *list(range(0, 200)))
+        print(len(lut))
+        ds.RedPaletteColorLookupTableData = lut
+        ds.GreenPaletteColorLookupTableData = lut
+        ds.BluePaletteColorLookupTableData = lut
+        arr = ds.pixel_array
+        print(arr.min(), arr.max())
+        out = apply_color_lut(arr, ds)
+        mapped_pixels = arr > 200
+        print(out)
 
     def test_alpha(self):
         """Test applying a color palette with an alpha channel."""
@@ -1261,6 +1290,16 @@ class TestNumpy_ExpandSegmentedLUT(object):
         msg = (
             r"Error expanding a segmented palette color lookup table: "
             r"the first segment cannot be a linear segment"
+        )
+        with pytest.raises(ValueError, match=msg):
+            _expand_segmented_lut(data, 'H')
+
+    def test_first_indirect_raises(self):
+        """Test having a linear segment first raises exception."""
+        data = (2, 5, 2, 0)
+        msg = (
+            r"Error expanding a segmented palette color lookup table: "
+            r"the first segment cannot be an indirect segment"
         )
         with pytest.raises(ValueError, match=msg):
             _expand_segmented_lut(data, 'H')

@@ -19,5 +19,12 @@ Enhancements
 ............
 
 * Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
-  using `Dataset.overlay_array()` (issue:`912`)
+  using :meth:`Dataset.overlay_array()
+  <pydicom.dataset.Dataset.overlay_array>` (issue:`912`)
 * Added support for deferred reading in file-like objects (:issue:`932`)
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_color_lut` function for
+  applying color palette LUTs (:issue:`205`)
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
+  for applying modality LUTs.
+* Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
+  palette color datasets.

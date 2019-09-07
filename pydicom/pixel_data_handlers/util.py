@@ -135,6 +135,7 @@ def apply_color_lut(arr, ds=None, palette=None):
         a_lut = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
 
         actual_depth = len(r_lut) / nr_entries * 8
+        dtype = np.dtype('uint{:.0f}'.format(actual_depth))
 
         for lut in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             luts.append(np.frombuffer(lut, dtype=dtype))
@@ -155,6 +156,8 @@ def apply_color_lut(arr, ds=None, palette=None):
             s_fmt = endianness + str(len_seg) + fmt
             lut = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
             luts.append(np.asarray(lut, dtype=dtype))
+    else:
+        raise ValueError("No suitable Palette Color Lookup Table Module found")
 
     # Some implementations have 8-bit data in 16-bit allocations
     if actual_depth not in [8, 16]:
@@ -166,9 +169,14 @@ def apply_color_lut(arr, ds=None, palette=None):
     if False in [len(item) == len(luts[0]) for item in luts]:
         raise ValueError("LUT data must be the same length")
 
+    # Palette color values must always be scaled across the full range of
+    #   available intensities...
+
     # Need to rescale if 8-bit LUT data in 16-bit entries
     if actual_depth == 8 and nominal_depth == 16:
         luts = [np.multiply(item, 257) for item in luts]
+
+    print(len(luts[0]))
 
     # IVs < `first_map` get set to first LUT entry (i.e. 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
@@ -251,8 +259,8 @@ def convert_color_space(arr, current, desired):
     ----------
     arr : numpy.ndarray
         The image(s) as a :class:`numpy.ndarray` with
-        :attr:`~numpy.ndarray.shape` (frames, rows, columns, planes)
-        or (rows, columns, planes).
+        :attr:`~numpy.ndarray.shape` (frames, rows, columns, 3)
+        or (rows, columns, 3).
     current : str
         The current color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
