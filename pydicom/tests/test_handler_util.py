@@ -31,12 +31,14 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
 
 
 # PAL: PALETTE COLOR Photometric Interpretation
-# SEG: Segmented LUT data
-# SUP: uses Supplemental Palette Color
+# SEG: Segmented Palette Color
+# SUP: Supplemental Palette Color
 # LE, BE: little endian, big endian encoding
 # 8/8, 1 sample/pixel, 1 frame
 PAL_08_256_0_16_1F = get_testdata_files("OBXXXX1A.dcm")[0]
 PAL_08_200_0_16_1F = get_testdata_files("OT-PAL-8-face.dcm")[0]
+# 8/8, 1 sample/pixel, 2 frame
+PAL_08_256_0_16_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
 # PALETTE COLOR with 16-bit LUTs (no indirect segments)
 PAL_SEG_LE_16_1F = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
 PAL_SEG_BE_16_1F = get_testdata_files("gdcm-US-ALOKA-16_big.dcm")[0]
@@ -975,9 +977,43 @@ class TestNumpy_PaletteColor(object):
         assert [27904, 33536, 0] == list(rgb[0, 638, :])
         assert [18688, 24320, 0] == list(rgb[479, 639, :])
 
-        assert (orig == arr).all()
+        # original `arr` is unchanged
+        assert np.array_equal(orig, arr)
 
-    def test_uint16_16_segmented(self):
+    def test_uint08_16_2frame(self):
+        """Test 2 frame uint8 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_08_256_0_16_2F)
+        assert 8 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (2, 600, 800, 3) == rgb.shape
+        assert [9472, 15872, 24064] == list(rgb[0, 0, 0, :])
+        assert [34816, 43520, 54016] == list(rgb[0, 12, 12, :])
+        assert [65280, 65280, 65280] == list(rgb[0, 17, 110, :])
+        assert [0, 0, 0] == list(rgb[0, 77, 103, :])
+        assert [23040, 52480, 65280] == list(rgb[0, 478, 793, :])
+
+        # 2nd frame is inverse of 1st, so won't be coloured correctly
+        ref = np.asarray(
+            [[26112, 26112, 26112],
+             [54528, 54528, 54528],
+             [54528, 54528, 54528],
+             [16640, 16640, 16640],
+             [49152, 45056, 22016],
+             [34816, 43520, 54016],
+             [5632, 9984, 14848],
+             [62464, 2816, 2816],
+             [3072, 5632, 8192],
+             [3072, 5632, 8192]]
+        )
+        assert np.array_equal(ref, rgb[1, 143:153, 355, :])
+
+        # original `arr` is unchanged
+        assert np.array_equal(orig, arr)
+
+    def test_uint16_16_segmented_litle(self):
         """Test uint16 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_SEG_LE_16_1F)
         assert 16 == ds.BitsStored
@@ -997,6 +1033,25 @@ class TestNumpy_PaletteColor(object):
         assert [10280, 11565, 16705] == list(rgb[479, 639, :])
 
         assert (orig == arr).all()
+
+    def test_uint16_16_segmented_big(self):
+        """Test big endian uint16 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_SEG_BE_16_1F)
+        assert 16 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (480, 640, 3) == rgb.shape
+        assert [10280, 11565, 16705] == list(rgb[0, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 639, :])
+        assert [0, 0, 0] == list(rgb[240, 0, :])
+        assert [257, 257, 257] == list(rgb[240, 320, :])
+        assert [2313, 2313, 2313] == list(rgb[240, 639, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 639, :])
 
     def test_16_entry_8_data(self):
         """Test LUT with 8-bit data in 16-bit entries."""
