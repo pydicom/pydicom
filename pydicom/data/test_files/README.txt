@@ -95,6 +95,9 @@ liver.dcm
     used to fix the pixel data for PR #714
   * Single frame versions created using a script for PR #714
 
+mlut_18.dcm
+  * Modality LUT Sequence
+
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
 rtdose.dcm       Implicit VR, Little Endian

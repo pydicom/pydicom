@@ -48,9 +48,10 @@ SUP_16_16_2F = get_testdata_files("eCT_Supplemental.dcm")[0]
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-# Modality LUT
-MOD_1 = get_testdata_files("CT_small.dcm")[0]
-MOD_2 = get_testdata_files("mlut_18.dcm")[0]
+# MOD: Modality LUT
+# SEQ: Modality LUT Sequence
+MOD_16 = get_testdata_files("CT_small.dcm")[0]
+MOD_16_SEQ = get_testdata_files("mlut_18.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -780,7 +781,7 @@ class TestNumpy_ModalityLUT(object):
     """Tests for util.apply_modality_lut()."""
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
-        ds = dcmread(MOD_1)
+        ds = dcmread(MOD_16)
         assert 1 == ds.RescaleSlope
         assert -1024 == ds.RescaleIntercept
         arr = ds.pixel_array
@@ -797,7 +798,7 @@ class TestNumpy_ModalityLUT(object):
 
     def test_lut_sequence(self):
         """Test the LUT Sequence transform."""
-        ds = dcmread(MOD_2)
+        ds = dcmread(MOD_16_SEQ)
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
         arr = ds.pixel_array
@@ -826,7 +827,7 @@ class TestNumpy_ModalityLUT(object):
         """Test that 0 entries is interpreted correctly."""
         # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
         # attempt to access LUTData[4096] or higher will raise IndexError
-        ds = dcmread(MOD_2)
+        ds = dcmread(MOD_16_SEQ)
         seq = ds.ModalityLUTSequence[0]
         seq.LUTDescriptor = [0, 0, 16]
         assert 4096 == len(seq.LUTData)
@@ -842,7 +843,7 @@ class TestNumpy_ModalityLUT(object):
 
     def test_lut_sequence_entries_negative(self):
         """Test workaround for #942: SS VR should give uint nr entries."""
-        ds = dcmread(MOD_2)
+        ds = dcmread(MOD_16_SEQ)
         seq = ds.ModalityLUTSequence[0]
         seq.LUTDescriptor = [-32767, 0, 16]  # 32769
         seq.LUTData = [0] * 32768 + [1]
@@ -854,7 +855,7 @@ class TestNumpy_ModalityLUT(object):
 
     def test_unchanged(self):
         """Test no modality LUT transform."""
-        ds = dcmread(MOD_1)
+        ds = dcmread(MOD_16)
         del ds.RescaleSlope
         del ds.RescaleIntercept
         arr = ds.pixel_array
