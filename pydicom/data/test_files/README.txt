@@ -126,6 +126,11 @@ SC_rgb.dcm
 SC_ybr_full_uncompressed.dcm
   * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
   * PhotometricIntepretation is YBR_FULL
+  
+SC_ybr_full_422_uncompressed.dcm
+    * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
+    * Converted to YBR_FULL_422 using a script by @scaramallion
+    * PhotometricIntepretation is YBR_FULL_422
 
 zipMR.gz
   * a gzipped version of MR_small.dcm
