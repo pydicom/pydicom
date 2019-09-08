@@ -346,11 +346,12 @@ class DSfloat(float):
     def __str__(self):
         if hasattr(self, 'original_string'):
             return self.original_string
-        else:
-            return super(DSfloat, self).__str__()
+
+        # Issue #937 (Python 3.8 compatibility)
+        return repr(self)[1:-1]
 
     def __repr__(self):
-        return "\"" + str(self) + "\""
+        return '"{}"'.format(super(DSfloat, self).__repr__())
 
 
 class DSdecimal(Decimal):
@@ -513,11 +514,15 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
-    def __repr__(self):
+    def __str__(self):
         if hasattr(self, 'original_string'):
-            return "\"" + self.original_string + "\""
-        else:
-            return "\"" + int.__str__(self) + "\""
+            return self.original_string
+
+        # Issue #937 (Python 3.8 compatibility)
+        return repr(self)[1:-1]
+
+    def __repr__(self):
+        return '"{}"'.format(super(IS, self).__repr__())
 
 
 def MultiString(val, valtype=str):
@@ -540,7 +545,7 @@ def MultiString(val, valtype=str):
     # 2005.05.25: also check for trailing 0, error made
     # in PET files we are converting
 
-    if val and (val.endswith(' ') or val.endswith('\x00')):
+    while val and (val.endswith(' ') or val.endswith('\x00')):
         val = val[:-1]
     splitup = val.split("\\")
 

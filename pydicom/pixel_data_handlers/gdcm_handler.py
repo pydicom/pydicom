@@ -237,6 +237,10 @@ def get_pixeldata(dicom_dataset):
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
     expected_length_bytes = get_expected_length(dicom_dataset)
+    if dicom_dataset.PhotometricInterpretation == 'YBR_FULL_422':
+        # GDCM has already resampled the pixel data, see PS3.3 C.7.6.3.1.2
+        expected_length_bytes = expected_length_bytes // 2 * 3
+
     if len(pixel_bytearray) > expected_length_bytes:
         # We make sure that all the bytes after are in fact zeros
         padding = pixel_bytearray[expected_length_bytes:]

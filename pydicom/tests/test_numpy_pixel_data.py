@@ -92,6 +92,10 @@ EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
 # 8/8, 3 samples/pixel, 1 frame, 3 x 3
 EXPL_8_3_1F_ODD = get_testdata_files('SC_rgb_small_odd.dcm')[0]
+# 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
+EXPL_8_3_1F_YBR422 = get_testdata_files('SC_ybr_full_422_uncompressed.dcm')[0]
+# 8/8, 3 sample/pixel, 1 frame, YBR_FULL
+EXPL_8_3_1F_YBR = get_testdata_files('SC_ybr_full_uncompressed.dcm')[0]
 # 8/8, 3 sample/pixel, 2 frame
 EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
@@ -384,6 +388,7 @@ REFERENCE_DATA_LITTLE = [
     (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
     (EXPL_8_1_1F, (EXPL, 8, 1, 0, 1, (600, 800), 'uint8')),
     (EXPL_8_3_1F_ODD, (EXPL, 8, 3, 0, 1, (3, 3, 3), 'uint8')),
+    (EXPL_8_3_1F_YBR422, (EXPL, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (EXPL_8_1_2F, (EXPL, 8, 1, 0, 2, (2, 600, 800), 'uint8')),
     (EXPL_8_3_1F, (EXPL, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (EXPL_8_3_2F, (EXPL, 8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
@@ -554,6 +559,31 @@ class TestNumpy_NumpyHandler(object):
                 [158, 158, 158], [158, 158, 158], [158, 158, 158]
             ]
 
+    def test_8bit_3sample_1frame_ybr422(self):
+        """Test pixel_array for YBR_FULL_422 pixel data."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        arr = ds.pixel_array
+
+        # Check resampling
+        assert [
+            [76, 85, 255],
+            [76, 85, 255],
+            [76, 85, 255],
+            [76, 85, 255]
+        ] == arr[0:4, 0, :].tolist()
+        # Check values
+        assert (76, 85, 255) == tuple(arr[5, 50, :])
+        assert (166, 106, 193) == tuple(arr[15, 50, :])
+        assert (150, 46, 20) == tuple(arr[25, 50, :])
+        assert (203, 86, 75) == tuple(arr[35, 50, :])
+        assert (29, 255, 107) == tuple(arr[45, 50, :])
+        assert (142, 193, 118) == tuple(arr[55, 50, :])
+        assert (0, 128, 128) == tuple(arr[65, 50, :])
+        assert (64, 128, 128) == tuple(arr[75, 50, :])
+        assert (192, 128, 128) == tuple(arr[85, 50, :])
+        assert (255, 128, 128) == tuple(arr[95, 50, :])
+
     def test_8bit_3sample_1frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
         # Check supported syntaxes
@@ -622,6 +652,9 @@ class TestNumpy_NumpyHandler(object):
             nr_frames = getattr(ds, 'NumberOfFrames', 1)
             # Odd sized data is padded by a final 0x00 byte
             size = ds.Rows * ds.Columns * nr_frames * data[1] / 8 * data[2]
+            # YBR_FULL_422 data is 2/3rds usual size
+            if ds.PhotometricInterpretation == 'YBR_FULL_422':
+                size = size // 3 * 2
             assert len(ds.PixelData) == size + size % 2
             if size % 2:
                 assert ds.PixelData[-1] == b'\x00'[0]
@@ -938,6 +971,7 @@ class TestNumpy_NumpyHandler(object):
         ds.BitsAllocated = 16
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
+        ds.PhotometricInterpretation = 'MONOCHROME2'
         arr = np.ones((10, 10), dtype='uint16')
         ds.PixelData = arr.tobytes()
 
@@ -1000,7 +1034,7 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_8_3_1F_ODD)
         # remove the padding byte
         ds.PixelData = ds.PixelData[:-1]
-        msg = "The pixel data length is odd and misses a padding byte."
+        msg = r"The odd length pixel data is missing a trailing padding byte"
         with pytest.warns(UserWarning, match=msg):
             get_pixeldata(ds)
 
@@ -1048,6 +1082,43 @@ class TestNumpy_GetPixelData(object):
 
         arr = get_pixeldata(ds, read_only=True)
         assert arr.flags.writeable
+
+    def test_ybr422_excess_padding(self):
+        """Test YBR data with excess padding."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        ds.PixelData += b'\x00\x00\x00\x00'
+        msg = (
+            r"The length of the pixel data in the dataset \(20004 bytes\) "
+            r"indicates it contains excess padding. 4 bytes will be removed "
+            r"from the end of the data"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        assert (76, 85, 255) == tuple(arr[5, 50, :])
+        assert (166, 106, 193) == tuple(arr[15, 50, :])
+        assert (150, 46, 20) == tuple(arr[25, 50, :])
+        assert (203, 86, 75) == tuple(arr[35, 50, :])
+        assert (29, 255, 107) == tuple(arr[45, 50, :])
+        assert (142, 193, 118) == tuple(arr[55, 50, :])
+        assert (0, 128, 128) == tuple(arr[65, 50, :])
+        assert (64, 128, 128) == tuple(arr[75, 50, :])
+        assert (192, 128, 128) == tuple(arr[85, 50, :])
+        assert (255, 128, 128) == tuple(arr[95, 50, :])
+
+    def test_ybr422_wrong_interpretation(self):
+        """Test YBR data with wrong Photometric Interpretation."""
+        ds = dcmread(EXPL_8_3_1F_YBR)
+        assert ds.PhotometricInterpretation == 'YBR_FULL'
+        assert len(ds.PixelData) == 30000
+        ds.PhotometricInterpretation = 'YBR_FULL_422'
+        msg = r"The Photometric Interpretation of the dataset is YBR_FULL_422"
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        # Resulting data will be nonsense but of correct shape
+        assert (100, 100, 3) == arr.shape
 
 
 REFERENCE_PACK_UNPACK = [

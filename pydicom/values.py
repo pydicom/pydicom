@@ -407,7 +407,7 @@ def convert_single_string(byte_string, encodings=None):
     """
     encodings = encodings or [default_encoding]
     value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)
-    if value and value.endswith(' '):
+    while value and (value.endswith(' ') or value.endswith('\0')):
         value = value[:-1]
     return value
 
