@@ -1054,22 +1054,26 @@ class TestNumpy_PaletteColor(object):
         assert [10280, 11565, 16705] == list(rgb[479, 320, :])
         assert [10280, 11565, 16705] == list(rgb[479, 639, :])
 
-    def test_16_entry_8_data(self):
-        """Test LUT with 8-bit data in 16-bit entries."""
+    def test_16_allocated_8_entries(self):
+        """Test LUT with 8-bit entries in 16 bits allocated."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
         ds.file_meta = Dataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        assert [200, 0, 16] == ds.RedPaletteColorLookupTableDescriptor
-        lut = pack('200B', *list(range(0, 200)))
-        print(len(lut))
+        ds.RedPaletteColorLookupTableDescriptor = [200, 0, 8]
+        lut = pack('<200H', *list(range(0, 200)))
+        assert 400 == len(lut)
         ds.RedPaletteColorLookupTableData = lut
         ds.GreenPaletteColorLookupTableData = lut
         ds.BluePaletteColorLookupTableData = lut
         arr = ds.pixel_array
-        print(arr.min(), arr.max())
+        assert (56, 149) == (arr.min(), arr.max())
         out = apply_color_lut(arr, ds)
-        mapped_pixels = arr > 200
-        print(out)
+        # Because the LUTs are mapped index to value (i.e. LUT[0] = 0,
+        # LUT[149] = 149), the output array should equal the input array
+        # but with three channels of identical values
+        assert np.array_equal(arr, out[:, :, 0])
+        assert np.array_equal(arr, out[:, :, 1])
+        assert np.array_equal(arr, out[:, :, 2])
 
     def test_alpha(self):
         """Test applying a color palette with an alpha channel."""

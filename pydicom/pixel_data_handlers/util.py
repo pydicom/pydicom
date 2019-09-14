@@ -113,7 +113,6 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     # All channels are supposed to be identical
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
-
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
     # Workaround for #942: first value is always unsigned
@@ -122,7 +121,7 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
-    # Actual bit depth may be smaller
+    # Actual bit depth may be larger (8 bit entries in 16 bits allocated)
     nominal_depth = lut_desc[2]
     dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
 
@@ -168,15 +167,6 @@ def apply_color_lut(arr, ds=None, palette=None):
 
     if False in [len(item) == len(luts[0]) for item in luts]:
         raise ValueError("LUT data must be the same length")
-
-    # Palette color values must always be scaled across the full range of
-    #   available intensities...
-
-    # Need to rescale if 8-bit LUT data in 16-bit entries
-    if actual_depth == 8 and nominal_depth == 16:
-        luts = [np.multiply(item, 257) for item in luts]
-
-    print(len(luts[0]))
 
     # IVs < `first_map` get set to first LUT entry (i.e. 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
