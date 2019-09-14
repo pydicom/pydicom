@@ -2,7 +2,7 @@
 """Utility functions used in the pixel data handlers."""
 from __future__ import division
 
-from struct import unpack, pack
+from struct import unpack
 from sys import byteorder
 import warnings
 
@@ -158,7 +158,6 @@ def apply_color_lut(arr, ds=None, palette=None):
     else:
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 
-    # Some implementations have 8-bit data in 16-bit allocations
     if actual_depth not in [8, 16]:
         raise ValueError(
             "The bit depth of the LUT data '{:.1f}' is invalid (only 8 or 16 "
