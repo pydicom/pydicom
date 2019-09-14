@@ -97,6 +97,8 @@ liver.dcm
 
 mlut_18.dcm
   * Modality LUT Sequence
+  * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
+    images
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian

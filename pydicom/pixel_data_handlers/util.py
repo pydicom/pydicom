@@ -22,8 +22,8 @@ def apply_color_lut(arr, ds=None, palette=None):
     If (0028,1201-3) *Palette Color Lookup Table Data* are missing
     then (0028-1221-3) *Segmented Palette Color Lookup Table Data* must be
     present and vice versa. The presence of (0028,1204) *Alpha Palette Color
-    Lookup Table Data* or (0028,1224) *Segmented Palette Color Lookup Table
-    Data* is optional.
+    Lookup Table Data* or (0028,1224) *Alpha Segmented Palette Color Lookup
+    Table Data* is optional.
 
     Use of this function with the :dcm:`Enhanced Palette Color Lookup Table
     Module<part03/sect_C.7.6.23.html>` or :dcm:`Supplemental Palette Color LUT
@@ -43,8 +43,8 @@ def apply_color_lut(arr, ds=None, palette=None):
         :dcm:`well-known<part06/chapter_B.html>` color palettes defined by the
         DICOM Standard. One of: ``'HOT_IRON'``, ``'PET'``,
         ``'HOT_METAL_BLUE'``, ``'PET_20_STEP'``, ``'SPRING'``, ``'SUMMER'``,
-         ``'FALL'``, ``'WINTER'`` or the corresponding well-known (0008,0018)
-         *SOP Instance UID*.
+        ``'FALL'``, ``'WINTER'`` or the corresponding well-known (0008,0018)
+        *SOP Instance UID*.
 
     Returns
     -------
@@ -186,12 +186,13 @@ def apply_color_lut(arr, ds=None, palette=None):
 
 
 def apply_modality_lut(arr, ds):
-    """Apply a modality lookup table to `arr`.
+    """Apply a modality lookup table or rescale operation to `arr`.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        The :class:`~numpy.ndarray` to apply the modality LUT to.
+        The :class:`~numpy.ndarray` to apply the modality LUT or rescale
+        operation to.
     ds : dataset.Dataset
         A dataset containing a :dcm:`Modality LUT Module
         <part03/sect_C.11.html#sect_C.11.1>`.
