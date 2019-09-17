@@ -14,6 +14,7 @@ Fixes
 * Fixed handling of data too large to written in explicit transfer syntax
 * Fixed handling of known tags with VR UN (:issue:`899`)
 * Fixed assigning of empty values to data elements (:issue:`896`)
+* Fixed error in unpickling dataset (:issue:`947`)
 
 Enhancements
 ............
