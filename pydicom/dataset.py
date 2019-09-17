@@ -766,21 +766,23 @@ class Dataset(dict):
               value (if present).
         """
         tag = tag_for_keyword(name)
-        if tag is None:  # `name` isn't a DICOM element keyword
-            # Try the base class attribute getter (fix for issue 332)
-            return object.__getattribute__(self, name)
-        tag = Tag(tag)
-        if tag not in self._dict:  # DICOM DataElement not in the Dataset
-            # Try the base class attribute getter (fix for issue 332)
-            return object.__getattribute__(self, name)
-        else:
-            data_elem = self[tag]
-            value = data_elem.value
-            if data_elem.VR == 'SQ':
-                # let a sequence know its parent dataset, as sequence items
-                # may need parent dataset tags to resolve ambiguous tags
-                value.parent = self
-            return value
+        if tag is not None:  # `name` isn't a DICOM element keyword
+            tag = Tag(tag)
+            if tag in self._dict:  # DICOM DataElement not in the Dataset
+                data_elem = self[tag]
+                value = data_elem.value
+                if data_elem.VR == 'SQ':
+                    # let a sequence know its parent dataset, as sequence items
+                    # may need parent dataset tags to resolve ambiguous tags
+                    value.parent = self
+                return value
+
+        # no tag or tag not contained in the dataset
+        if name == '_dict':
+            # special handling for contained dict, needed for pickle
+            return {}
+        # Try the base class attribute getter (fix for issue 332)
+        return object.__getattribute__(self, name)
 
     @property
     def _character_set(self):

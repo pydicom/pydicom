@@ -1382,6 +1382,14 @@ class TestFileDataset(object):
     def setup(self):
         self.test_file = get_testdata_files('CT_small.dcm')[0]
 
+    def test_pickle(self):
+        ds = pydicom.dcmread(self.test_file)
+        import pickle
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds == ds1
+        assert ds1.Modality == 'CT'
+
     def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
         d = dcmread(self.test_file)
