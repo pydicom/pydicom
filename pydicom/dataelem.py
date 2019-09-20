@@ -430,7 +430,6 @@ class DataElement(object):
         return dump_handler(
             self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
 
-
     @property
     def value(self):
         """Return the element's value."""
@@ -511,11 +510,10 @@ class DataElement(object):
         except AttributeError:  # not a list
             return self._convert(val)
         else:
-            return MultiValue(lambda x: self._convert(x), val)
+            return MultiValue(self._convert, val)
 
     def _convert(self, val):
         """Convert `val` to an appropriate type for the element's VR."""
-
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
         # here to allow for byte string input in these cases
