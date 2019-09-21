@@ -26,7 +26,6 @@ class MultiValue(MutableSequence):
 
     def __init__(self, type_constructor, iterable):
         """Initialize the list of values
-
         Parameters
         ----------
         type_constructor : type
@@ -48,6 +47,12 @@ class MultiValue(MutableSequence):
             type_constructor = number_string_type_constructor
         for x in iterable:
             self._list.append(type_constructor(x))
+
+    def __getstate__(self):
+        # TODO: Workaround for #951, to be removed when Python 2 not supported
+        state = self.__dict__.copy()
+        del state['type_constructor']
+        return state
 
     def insert(self, position, val):
         self._list.insert(position, self.type_constructor(val))
