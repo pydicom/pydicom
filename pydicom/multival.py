@@ -26,7 +26,7 @@ class MultiValue(MutableSequence):
 
     def __init__(self, type_constructor, iterable):
         """Initialize the list of values
-        
+
         Parameters
         ----------
         type_constructor : type
