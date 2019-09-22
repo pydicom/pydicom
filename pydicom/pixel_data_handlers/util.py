@@ -164,7 +164,7 @@ def apply_color_lut(arr, ds=None, palette=None):
             "bits per entry allowed)".format(actual_depth)
         )
 
-    if not all([len(item) == len(luts[0]) for item in luts]):
+    if not all(len(item) == len(luts[0]) for item in luts):
         raise ValueError("LUT data must be the same length")
 
     # IVs < `first_map` get set to first LUT entry (i.e. 0)
