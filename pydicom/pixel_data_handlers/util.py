@@ -19,8 +19,8 @@ from pydicom.uid import UID
 def apply_color_lut(arr, ds=None, palette=None):
     """Apply a color palette lookup table to `arr`.
 
-    If (0028,1201-3) *Palette Color Lookup Table Data* are missing
-    then (0028-1221-3) *Segmented Palette Color Lookup Table Data* must be
+    If (0028,1201-1203) *Palette Color Lookup Table Data* are missing
+    then (0028,1221-1223) *Segmented Palette Color Lookup Table Data* must be
     present and vice versa. The presence of (0028,1204) *Alpha Palette Color
     Lookup Table Data* or (0028,1224) *Alpha Segmented Palette Color Lookup
     Table Data* is optional.
@@ -164,7 +164,7 @@ def apply_color_lut(arr, ds=None, palette=None):
             "bits per entry allowed)".format(actual_depth)
         )
 
-    if False in [len(item) == len(luts[0]) for item in luts]:
+    if not all([len(item) == len(luts[0]) for item in luts]):
         raise ValueError("LUT data must be the same length")
 
     # IVs < `first_map` get set to first LUT entry (i.e. 0)
@@ -432,7 +432,7 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
         trailing null.
     fmt : str
         The format of the data, should contain `'B'` for 8-bit, `'H'` for
-        16-bit, `'<'` for little endian and `'>'` for bid endian.
+        16-bit, `'<'` for little endian and `'>'` for big endian.
     nr_segments : int, optional
         Expand at most `nr_segments` from the data. Should be used when
         the opcode is ``2`` (indirect). If used then `last_value` should also
@@ -494,6 +494,12 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
                 lut.extend([int(vv) for vv in vals])
         elif opcode == 2:
             # C.7.9.2.3: Indirect segment
+            if not lut:
+                raise ValueError(
+                    "Error expanding a segmented palette color lookup table: "
+                    "the first segment cannot be an indirect segment"
+                )
+
             if 'B' in fmt:
                 # 8-bit segment entries
                 ii = [data[offset + vv] for vv in indirect_ii]
@@ -503,12 +509,6 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
                 # 16-bit segment entries
                 byte_offset = data[offset + 1] << 16 | data[offset]
                 offset += 2
-
-            if not lut:
-                raise ValueError(
-                    "Error expanding a segmented palette color lookup table: "
-                    "the first segment cannot be an indirect segment"
-                )
 
             lut.extend(
                 _expand_segmented_lut(data[byte_offset:], fmt, length, lut[-1])

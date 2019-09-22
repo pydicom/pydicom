@@ -99,7 +99,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.
     rgb = apply_color_lut(arr, ds)
 
 
-Its also possible to apply one of the DICOM
+It's also possible to apply one of the DICOM
 :dcm:`well-known color palettes<part06/chapter_B.html>` provided the bit-depth
 of the pixel data is 8-bit.
 
@@ -129,7 +129,8 @@ converts raw unitless pixel data values to a specific output unit (such as
 Hounsfield units for CT). The
 :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function can be
 used with an input array of raw values and a dataset containing a Modality LUT
-module to return the defined values.
+module to return the defined values. When a dataset requires multiple grayscale
+transformations, the Modality LUT transformation is always applied first.
 
 .. code-block:: python
 
