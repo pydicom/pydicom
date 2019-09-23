@@ -102,14 +102,14 @@ of ``3`` and a (0028,0004) *Photometric Interpretation* which is non-RGB (i.e.
 ``YBR_FULL``, ``YBR_FULL_422``, etc) then the returned pixel data may be in
 a different color space depending on the package used to decompress the data.
 
-* For GDCM the data will be in the color space listed in *Photometric
+* For GDCM, the data will be in the color space listed in *Photometric
   Interpretation*
 * For Pillow, YBR data will be converted automatically to RGB
 
 *pydicom* offers a limited ability to convert between RGB and YBR color spaces
 through the :func:`~pydicom.pixel_data_handlers.util.convert_color_space`
-function. When changing the color space you will also need to change the value
-of the *Photometric Interpretation*.
+function. When changing the color space you should also change the value
+of *Photometric Interpretation* to match.
 
 
 .. note:: See the DICOM Standard, Part 3,

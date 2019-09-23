@@ -391,14 +391,14 @@ of <code class="docutils literal notranslate"><span class="pre">3</span></code> 
 <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code>, etc) then the returned pixel data may be in
 a different color space depending on the package used to decompress the data.</p>
 <ul class="simple">
-<li><p>For GDCM the data will be in the color space listed in <em>Photometric
+<li><p>For GDCM, the data will be in the color space listed in <em>Photometric
 Interpretation</em></p></li>
 <li><p>For Pillow, YBR data will be converted automatically to RGB</p></li>
 </ul>
 <p><em>pydicom</em> offers a limited ability to convert between RGB and YBR color spaces
 through the <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
-function. When changing the color space you will also need to change the value
-of the <em>Photometric Interpretation</em>.</p>
+function. When changing the color space you should also change the value
+of <em>Photometric Interpretation</em> to match.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the DICOM Standard, Part 3,

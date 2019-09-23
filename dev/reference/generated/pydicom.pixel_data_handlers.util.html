@@ -215,6 +215,12 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.apply_color_lut" title="pydicom.pixel_data_handlers.util.apply_color_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_color_lut</span></code></a>(arr[, ds, palette])</p></td>
+<td><p>Apply a color palette lookup table to <cite>arr</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_modality_lut</span></code></a>(arr, ds)</p></td>
+<td><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_color_space</span></code></a>(arr, current, desired)</p></td>
 <td><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p></td>
 </tr>
@@ -233,15 +239,93 @@
 </tbody>
 </table>
 <dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.apply_color_lut">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">apply_color_lut</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">ds=None</em>, <em class="sig-param">palette=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L19"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.apply_color_lut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a color palette lookup table to <cite>arr</cite>.</p>
+<p>If (0028,1201-1203) <em>Palette Color Lookup Table Data</em> are missing
+then (0028,1221-1223) <em>Segmented Palette Color Lookup Table Data</em> must be
+present and vice versa. The presence of (0028,1204) <em>Alpha Palette Color
+Lookup Table Data</em> or (0028,1224) <em>Alpha Segmented Palette Color Lookup
+Table Data</em> is optional.</p>
+<p>Use of this function with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.23.html">Enhanced Palette Color Lookup Table
+Module</a> or <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.19.html">Supplemental Palette Color LUT
+Module</a> is not currently supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The pixel data to apply the color palette to.</p></li>
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a><em>, </em><em>optional</em>) – Required if <cite>palette</cite> is not supplied. A
+<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing a suitable
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> or
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.9.html">Palette Color Lookup Table</a> Module.</p></li>
+<li><p><strong>palette</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><em>uid.UID</em></a><em>, </em><em>optional</em>) – Required if <cite>ds</cite> is not supplied. The name of one of the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_B.html">well-known</a> color palettes defined by the
+DICOM Standard. One of: <code class="docutils literal notranslate"><span class="pre">'HOT_IRON'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PET'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'HOT_METAL_BLUE'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PET_20_STEP'</span></code>, <code class="docutils literal notranslate"><span class="pre">'SPRING'</span></code>, <code class="docutils literal notranslate"><span class="pre">'SUMMER'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'FALL'</span></code>, <code class="docutils literal notranslate"><span class="pre">'WINTER'</span></code> or the corresponding well-known (0008,0018)
+<em>SOP Instance UID</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The RGB or RGBA pixel data as an array of <code class="docutils literal notranslate"><span class="pre">np.uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">np.uint16</span></code>
+values, depending on the 3rd value of (0028,1201) <em>Red Palette Color
+Lookup Table Descriptor</em>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel Module</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.19.html">Supplemental Palette Color LUT Module</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.23.html">Enhanced Palette Color LUT Module</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.9.html">Palette Colour LUT Module</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.8.16.2.html#sect_C.8.16.2.1.1.1">Supplemental Palette Color LUTs</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydicom.pixel_data_handlers.util.apply_modality_lut">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">apply_modality_lut</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L188"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.apply_modality_lut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a modality lookup table or rescale operation to <cite>arr</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to apply the modality LUT or rescale
+operation to.</p></li>
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – A dataset containing a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT Module</a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array with applied modality LUT. If (0028,3000) <em>Modality LUT
+Sequence</em> is present then returns an array of <code class="docutils literal notranslate"><span class="pre">np.uint8</span></code> or
+<code class="docutils literal notranslate"><span class="pre">np.uint16</span></code>, depending on the 3rd value of (0028,3002) <em>LUT
+Descriptor</em>. If (0028,1052) <em>Rescale Intercept</em> and (0028,1053)
+<em>Rescale Slope</em> are present then returns an array of <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>.
+If neither are present then <cite>arr</cite> will be returned unchanged.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>DICOM Standard, Part 3, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Annex C.11.1</a></p></li>
+<li><p>DICOM Standard, Part 4, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_N.2.html#sect_N.2.1.1">Annex N.2.1.1</a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.convert_color_space">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">current</em>, <em class="sig-param">desired</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3395dfe2/pydicom/pixel_data_handlers/util.py#L13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param">arr</em>, <em class="sig-param">current</em>, <em class="sig-param">desired</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L246"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.convert_color_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The image(s) as a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.17)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a> (frames, rows, columns, planes)
-or (rows, columns, planes).</p></li>
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.17)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a> (frames, rows, columns, 3)
+or (rows, columns, 3).</p></li>
 <li><p><strong>current</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current color space, should be a valid value for (0028,0004)
 <em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'YBR_FULL_422'</span></code>.</p></li>
@@ -268,7 +352,7 @@ Section 7</p></li>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">dtype_corrected_for_endianness</code><span class="sig-paren">(</span><em class="sig-param">is_little_endian</em>, <em class="sig-param">numpy_dtype</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3395dfe2/pydicom/pixel_data_handlers/util.py#L76"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">dtype_corrected_for_endianness</code><span class="sig-paren">(</span><em class="sig-param">is_little_endian</em>, <em class="sig-param">numpy_dtype</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L393"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.dtype_corrected_for_endianness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> corrected for system and <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>
 endianness.</p>
 <dl class="field-list simple">
@@ -294,7 +378,7 @@ endianess.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.get_expected_length">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">unit='bytes'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3395dfe2/pydicom/pixel_data_handlers/util.py#L343"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">unit='bytes'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L530"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.get_expected_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Pixel
 Data</em>.</p>
 <table class="docutils align-default">
@@ -370,7 +454,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.pixel_dtype">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">pixel_dtype</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3395dfe2/pydicom/pixel_data_handlers/util.py#L109"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">pixel_dtype</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L592"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.pixel_dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a> for the <em>Pixel Data</em> in <cite>ds</cite>.</p>
 <p>Suitable for use with IODs containing the Image Pixel module.</p>
 <table class="docutils align-default">
@@ -423,7 +507,7 @@ wish to get the data type for.</p>
 
 <dl class="function">
 <dt id="pydicom.pixel_data_handlers.util.reshape_pixel_array">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">reshape_pixel_array</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/3395dfe2/pydicom/pixel_data_handlers/util.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.util.</code><code class="sig-name descname">reshape_pixel_array</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/43d66eb0/pydicom/pixel_data_handlers/util.py#L679"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.util.reshape_pixel_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reshaped <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <table class="docutils align-default">
 <colgroup>

@@ -9,6 +9,8 @@ pydicom.pixel\_data\_handlers.util
 
    .. autosummary::
    
+      apply_color_lut
+      apply_modality_lut
       convert_color_space
       dtype_corrected_for_endianness
       get_expected_length
