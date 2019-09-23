@@ -39,6 +39,12 @@ CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
 
+eCT_Supplemental.dcm
+  * Original filename CT0012
+  * Taken from ftp://medical.nema.org/medical/dicom/Multiframe/CT/nemamfct.images.tar.bz2
+  * 2 frames, 16 bits allocated/stored, MONOCHROME2
+  * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
@@ -58,6 +64,15 @@ JPEG2000.dcm
 image_dfl.dcm
   * Compressed (using "deflate" zlib compression) after FileMeta
   * 'image_dfl' from http://www.dclunie.com/images/compressed/
+
+gdcm-US-ALOKA-16.dcm (from GDCM)
+  * Little endian implicit
+  * Segmented 16-bit Palette Color LUT Data
+  * Modified to remove original patient name and ID from Pixel Data
+
+gdcm-US-ALOKA-16_big.dcm (from GDCM)
+  * Big endian implicit version of gdcm-US-ALOKA-16.dcm
+  * Converted to big endian using DCMTK's dcmodify +tb
 
 ExplVR_BigEnd.dcm
   * Big Endian test image
@@ -79,6 +94,11 @@ liver.dcm
   * Explicit VR big endian versions created using DCMTK's dcmconv and a script
     used to fix the pixel data for PR #714
   * Single frame versions created using a script for PR #714
+
+mlut_18.dcm
+  * Modality LUT Sequence
+  * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
+    images
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
@@ -126,7 +146,7 @@ SC_rgb.dcm
 SC_ybr_full_uncompressed.dcm
   * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
   * PhotometricIntepretation is YBR_FULL
-  
+
 SC_ybr_full_422_uncompressed.dcm
     * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
     * Converted to YBR_FULL_422 using a script by @scaramallion
@@ -217,6 +237,7 @@ MR-SIEMENS-DICOM-WithOverlays.dcm (from GDCM)
     * Single frame, single channel Pixel Data
     * Single frame Overlay Data in group 0x6000
     * Icon Image Sequence
+    * 8-bit Palette Color LUT
 
 
 == Licenses ==

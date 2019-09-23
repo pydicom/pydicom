@@ -1,9 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """pydicom data manager"""
 
-from .data_manager import get_charset_files
-from .data_manager import get_testdata_files
-from .data_manager import DATA_ROOT
+from .data_manager import (
+    get_charset_files, get_testdata_files, get_palette_files, DATA_ROOT
+)
 
-__all__ = ['get_charset_files',
-           'get_testdata_files']
+__all__ = ['get_charset_files', 'get_testdata_files', 'get_palette_files']

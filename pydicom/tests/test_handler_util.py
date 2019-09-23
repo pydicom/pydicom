@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Tests for the pixel_data_handlers.util module."""
 
+import os
+from struct import unpack, pack
 from sys import byteorder
 
 import pytest
@@ -12,23 +14,44 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_files, get_palette_files
 from pydicom.dataset import Dataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
     convert_color_space,
     pixel_dtype,
-    get_expected_length
+    get_expected_length,
+    apply_color_lut,
+    _expand_segmented_lut,
+    apply_modality_lut,
 )
-from pydicom.uid import (ExplicitVRLittleEndian,
+from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
 
 
+# PAL: PALETTE COLOR Photometric Interpretation
+# SEG: Segmented Palette Color
+# SUP: Supplemental Palette Color
+# LE, BE: little endian, big endian encoding
+# 8/8, 1 sample/pixel, 1 frame
+PAL_08_256_0_16_1F = get_testdata_files("OBXXXX1A.dcm")[0]
+PAL_08_200_0_16_1F = get_testdata_files("OT-PAL-8-face.dcm")[0]
+# 8/8, 1 sample/pixel, 2 frame
+PAL_08_256_0_16_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
+# PALETTE COLOR with 16-bit LUTs (no indirect segments)
+PAL_SEG_LE_16_1F = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
+PAL_SEG_BE_16_1F = get_testdata_files("gdcm-US-ALOKA-16_big.dcm")[0]
+# Supplemental palette colour
+SUP_16_16_2F = get_testdata_files("eCT_Supplemental.dcm")[0]
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
 RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+# MOD: Modality LUT
+# SEQ: Modality LUT Sequence
+MOD_16 = get_testdata_files("CT_small.dcm")[0]
+MOD_16_SEQ = get_testdata_files("mlut_18.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -705,9 +728,8 @@ REFERENCE_LENGTH = [
 ]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_GetExpectedLength(object):
-    """Tests for numpy_handler.get_expected_length."""
+class TestGetExpectedLength(object):
+    """Tests for util.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
         """Test get_expected_length(ds, unit='bytes')."""
@@ -752,3 +774,623 @@ class TestNumpy_GetExpectedLength(object):
         ds.SamplesPerPixel = shape[3]
 
         assert length[2] == get_expected_length(ds, unit='bytes')
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_ModalityLUT(object):
+    """Tests for util.apply_modality_lut()."""
+    def test_slope_intercept(self):
+        """Test the rescale slope/intercept transform."""
+        ds = dcmread(MOD_16)
+        assert 1 == ds.RescaleSlope
+        assert -1024 == ds.RescaleIntercept
+        arr = ds.pixel_array
+        out = apply_modality_lut(arr, ds)
+        assert out.flags.writeable
+        assert np.float64 == out.dtype
+
+        assert np.array_equal(arr - 1024, out)
+
+        ds.RescaleSlope = 2.5
+        ds.RescaleIntercept = -2048
+        out = apply_modality_lut(arr, ds)
+        assert np.array_equal(arr * 2.5 - 2048, out)
+
+    def test_lut_sequence(self):
+        """Test the LUT Sequence transform."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        arr = ds.pixel_array
+        assert -2048 == arr.min()
+        assert 4095 == arr.max()
+        out = apply_modality_lut(arr, ds)
+
+        # IV > 2047 -> LUT[4095]
+        mapped_pixels = arr > 2047
+        assert seq.LUTData[-1] == out[mapped_pixels][0]
+        assert (seq.LUTData[-1] == out[mapped_pixels]).all()
+        assert out.flags.writeable
+        assert out.dtype == np.uint16
+
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
+    def test_lut_sequence_zero_entries(self):
+        """Test that 0 entries is interpreted correctly."""
+        # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
+        # attempt to access LUTData[4096] or higher will raise IndexError
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [0, 0, 16]
+        assert 4096 == len(seq.LUTData)
+        arr = np.asarray([0, 4095, 4096, 65535])
+        msg = r"index 4096 is out of bounds"
+        with pytest.raises(IndexError, match=msg):
+            apply_modality_lut(arr, ds)
+
+        # LUTData with 65536 entries
+        seq.LUTData = [0] * 65535 + [1]
+        out = apply_modality_lut(arr, ds)
+        assert [0, 0, 0, 1] == list(out)
+
+    def test_lut_sequence_entries_negative(self):
+        """Test workaround for #942: SS VR should give uint nr entries."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [-32767, 0, 16]  # 32769
+        seq.LUTData = [0] * 32768 + [1]
+        arr = np.asarray([-10, 0, 32767, 32768, 32769])
+        out = apply_modality_lut(arr, ds)
+        # IV < index 0 -> 0
+        # IV > index 32768 -> 32768
+        assert [0, 0, 0, 1, 1] == list(out)
+
+    def test_unchanged(self):
+        """Test no modality LUT transform."""
+        ds = dcmread(MOD_16)
+        del ds.RescaleSlope
+        del ds.RescaleIntercept
+        arr = ds.pixel_array
+        out = apply_modality_lut(arr, ds)
+        assert arr is out
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_PaletteColor(object):
+    """Tests for util.apply_color_lut()."""
+    def setup(self):
+        """Setup the tests"""
+        self.o_palette = get_palette_files('pet.dcm')[0]
+        self.n_palette = get_palette_files('pet.dcm')[0][:-3] + 'tmp'
+
+    def teardown(self):
+        """Teardown the tests"""
+        if os.path.exists(self.n_palette):
+            os.rename(self.n_palette, self.o_palette)
+
+    def test_neither_ds_nor_palette_raises(self):
+        """Test missing `ds` and `palette` raise an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        msg = r"Either 'ds' or 'palette' is required"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array)
+
+    def test_palette_unknown_raises(self):
+        """Test using an unknown `palette` raise an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        # Palette name
+        msg = r"Unknown palette 'TEST'"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, palette='TEST')
+
+        # SOP Instance UID
+        msg = r"Unknown palette '1.2.840.10008.1.1'"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, palette='1.2.840.10008.1.1')
+
+    def test_palette_unavailable_raises(self):
+        """Test using a missing `palette` raise an exception."""
+        os.rename(self.o_palette, self.n_palette)
+        ds = dcmread(PAL_08_256_0_16_1F)
+        msg = r"list index out of range"
+        with pytest.raises(IndexError, match=msg):
+            apply_color_lut(ds.pixel_array, palette='PET')
+
+    def test_supplemental_raises(self):
+        """Test that supplemental palette color LUT raises exception."""
+        ds = dcmread(SUP_16_16_2F)
+        msg = (
+            r"Use of this function with the Supplemental Palette Color Lookup "
+            r"Table Module is not currently supported"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
+    def test_invalid_bit_depth_raises(self):
+        """Test that an invalid bit depth raises an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        ds.RedPaletteColorLookupTableDescriptor[2] = 15
+        msg = (
+            r'data type "uint15" not understood'
+        )
+        with pytest.raises(TypeError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
+    def test_invalid_lut_bit_depth_raises(self):
+        """Test that an invalid LUT bit depth raises an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        ds.RedPaletteColorLookupTableData = (
+            ds.RedPaletteColorLookupTableData[:-2]
+        )
+        ds.GreenPaletteColorLookupTableData = (
+            ds.GreenPaletteColorLookupTableData[:-2]
+        )
+        ds.BluePaletteColorLookupTableData = (
+            ds.BluePaletteColorLookupTableData[:-2]
+        )
+        msg = (
+            r"The bit depth of the LUT data '15.9' is invalid \(only 8 or 16 "
+            r"bits per entry allowed\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
+    def test_unequal_lut_length_raises(self):
+        """Test that an unequal LUT lengths raise an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        ds.BluePaletteColorLookupTableData = (
+            ds.BluePaletteColorLookupTableData[:-2]
+        )
+        msg = r"LUT data must be the same length"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
+    def test_no_palette_color(self):
+        """Test that an unequal LUT lengths raise an exception."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        del ds.RedPaletteColorLookupTableData
+        msg = r"No suitable Palette Color Lookup Table Module found"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
+    def test_uint08_16(self):
+        """Test uint8 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        assert 8 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (480, 640, 3) == rgb.shape
+        assert [0, 0, 0] == list(rgb[0, 0, :])
+        assert [9216, 9216, 9216] == list(rgb[0, 4, :])
+        assert [18688, 18688, 18688] == list(rgb[0, 9, :])
+        assert [27904, 33536, 0] == list(rgb[0, 638, :])
+        assert [18688, 24320, 0] == list(rgb[479, 639, :])
+
+        # original `arr` is unchanged
+        assert np.array_equal(orig, arr)
+
+    def test_uint08_16_2frame(self):
+        """Test 2 frame uint8 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_08_256_0_16_2F)
+        assert 8 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (2, 600, 800, 3) == rgb.shape
+        assert [9472, 15872, 24064] == list(rgb[0, 0, 0, :])
+        assert [34816, 43520, 54016] == list(rgb[0, 12, 12, :])
+        assert [65280, 65280, 65280] == list(rgb[0, 17, 110, :])
+        assert [0, 0, 0] == list(rgb[0, 77, 103, :])
+        assert [23040, 52480, 65280] == list(rgb[0, 478, 793, :])
+
+        # 2nd frame is inverse of 1st, so won't be coloured correctly
+        ref = np.asarray(
+            [[26112, 26112, 26112],
+             [54528, 54528, 54528],
+             [54528, 54528, 54528],
+             [16640, 16640, 16640],
+             [49152, 45056, 22016],
+             [34816, 43520, 54016],
+             [5632, 9984, 14848],
+             [62464, 2816, 2816],
+             [3072, 5632, 8192],
+             [3072, 5632, 8192]]
+        )
+        assert np.array_equal(ref, rgb[1, 143:153, 355, :])
+
+        # original `arr` is unchanged
+        assert np.array_equal(orig, arr)
+
+    def test_uint16_16_segmented_litle(self):
+        """Test uint16 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_SEG_LE_16_1F)
+        assert 16 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (480, 640, 3) == rgb.shape
+        assert [10280, 11565, 16705] == list(rgb[0, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 639, :])
+        assert [0, 0, 0] == list(rgb[240, 0, :])
+        assert [257, 257, 257] == list(rgb[240, 320, :])
+        assert [2313, 2313, 2313] == list(rgb[240, 639, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 639, :])
+
+        assert (orig == arr).all()
+
+    def test_uint16_16_segmented_big(self):
+        """Test big endian uint16 Pixel Data with 16-bit LUT entries."""
+        ds = dcmread(PAL_SEG_BE_16_1F)
+        assert 16 == ds.BitsStored
+        assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
+        arr = ds.pixel_array
+        orig = arr.copy()
+        rgb = apply_color_lut(arr, ds)
+        assert (480, 640, 3) == rgb.shape
+        assert [10280, 11565, 16705] == list(rgb[0, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[0, 639, :])
+        assert [0, 0, 0] == list(rgb[240, 0, :])
+        assert [257, 257, 257] == list(rgb[240, 320, :])
+        assert [2313, 2313, 2313] == list(rgb[240, 639, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 0, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 320, :])
+        assert [10280, 11565, 16705] == list(rgb[479, 639, :])
+
+    def test_16_allocated_8_entries(self):
+        """Test LUT with 8-bit entries in 16 bits allocated."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.RedPaletteColorLookupTableDescriptor = [200, 0, 8]
+        lut = pack('<200H', *list(range(0, 200)))
+        assert 400 == len(lut)
+        ds.RedPaletteColorLookupTableData = lut
+        ds.GreenPaletteColorLookupTableData = lut
+        ds.BluePaletteColorLookupTableData = lut
+        arr = ds.pixel_array
+        assert (56, 149) == (arr.min(), arr.max())
+        out = apply_color_lut(arr, ds)
+        # Because the LUTs are mapped index to value (i.e. LUT[0] = 0,
+        # LUT[149] = 149), the output array should equal the input array
+        # but with three channels of identical values
+        assert np.array_equal(arr, out[:, :, 0])
+        assert np.array_equal(arr, out[:, :, 1])
+        assert np.array_equal(arr, out[:, :, 2])
+
+    def test_alpha(self):
+        """Test applying a color palette with an alpha channel."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        ds.AlphaPaletteColorLookupTableData = b'\x00\x80' * 256
+        arr = ds.pixel_array
+        rgba = apply_color_lut(arr, ds)
+        assert (600, 800, 4) == rgba.shape
+        assert 32768 == rgba[:, :, 3][0, 0]
+        assert (32768 == rgba[:, :, 3]).any()
+
+    def test_well_known_palette(self):
+        """Test using a well-known palette."""
+        ds = dcmread(PAL_08_256_0_16_1F)
+        # Drop it to 8-bit
+        arr = ds.pixel_array
+        rgb = apply_color_lut(arr, palette='PET')
+        line = rgb[68:88, 364, :]
+        ref = [
+            [249, 122, 12],
+            [255, 130, 4],
+            [255, 136, 16],
+            [255, 134, 12],
+            [253, 126, 4],
+            [239, 112, 32],
+            [211, 84, 88],
+            [197, 70, 116],
+            [177, 50, 156],
+            [168, 40, 176],
+            [173, 46, 164],
+            [185, 58, 140],
+            [207, 80, 96],
+            [209, 82, 92],
+            [189, 62, 132],
+            [173, 46, 164],
+            [168, 40, 176],
+            [162, 34, 188],
+            [162, 34, 188],
+            [154, 26, 204],
+        ]
+        assert np.array_equal(np.asarray(ref), line)
+        uid = apply_color_lut(arr, palette='1.2.840.10008.1.5.2')
+        assert np.array_equal(uid, rgb)
+
+    def test_first_map_positive(self):
+        """Test a positive first mapping value."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.RedPaletteColorLookupTableDescriptor[1] = 10
+        arr = ds.pixel_array
+        rgb = apply_color_lut(arr, ds)
+        # All IVs < 10 should be set to LUT[0]
+        # All IVs >= 10 should be shifted down 10 entries
+        # Original IV range is 56 to 149 -> 46 to 139
+        # LUT[88] -> LUT[78] = [33280, 56320, 65280]
+        # LUT[149] -> LUT[139] = [50944, 16384, 27904]
+        assert [33280, 56320, 65280] == list(rgb[arr == 88][0])
+        assert ([33280, 56320, 65280] == rgb[arr == 88]).all()
+        assert [50944, 16384, 27904] == list(rgb[arr == 149][0])
+        assert ([50944, 16384, 27904] == rgb[arr == 149]).all()
+
+    def test_first_map_negative(self):
+        """Test a positive first mapping value."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.RedPaletteColorLookupTableDescriptor[1] = -10
+        arr = ds.pixel_array
+        rgb = apply_color_lut(arr, ds)
+        # All IVs < -10 should be set to LUT[0]
+        # All IVs >= -10 should be shifted up 10 entries
+        # Original IV range is 56 to 149 -> 66 to 159
+        # LUT[60] -> LUT[70] = [33280 61952 65280]
+        # LUT[130] -> LUT[140] = [60160, 25600, 37376]
+        assert [33280, 61952, 65280] == list(rgb[arr == 60][0])
+        assert ([33280, 61952, 65280] == rgb[arr == 60]).all()
+        assert [60160, 25600, 37376] == list(rgb[arr == 130][0])
+        assert ([60160, 25600, 37376] == rgb[arr == 130]).all()
+
+    def test_nr_entries_negative(self):
+        """Test workaround for #942: SS VR should give uint nr entries."""
+        ds = dcmread(PAL_08_200_0_16_1F, force=True)
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        ds.RedPaletteColorLookupTableDescriptor[0] = -32767  # 32769
+        # 16-bit entries, 32769 entries per LUT
+        ds.RedPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        ds.GreenPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        ds.BluePaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
+        # IV < index 0 -> 0
+        # IV > index 32768 -> 32768
+        arr = np.asarray([-10, 0, 32767, 32768, 32769])
+        rgb = apply_color_lut(arr, ds)
+        assert [0, 0, 0] == list(rgb[0])
+        assert [0, 0, 0] == list(rgb[1])
+        assert [0, 0, 0] == list(rgb[2])
+        assert [65535, 65535, 65535] == list(rgb[3])
+        assert [65535, 65535, 65535] == list(rgb[4])
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_ExpandSegmentedLUT(object):
+    """Tests for util._expand_segmented_lut()."""
+    def test_discrete(self):
+        """Test expanding a discrete segment."""
+        data = (0, 1, 0)
+        assert [0] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, 112)
+        assert [0, 112] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, -112)
+        assert [0, -112] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, 112, 0, 0)
+        assert [0, 112] == _expand_segmented_lut(data, 'H')
+
+        data = (0, 2, 0, -112, 0, 0)
+        assert [0, -112] == _expand_segmented_lut(data, 'H')
+
+    def test_linear(self):
+        """Test expanding a linear segment."""
+        # Linear can never be the first segment
+        # Positive slope
+        data = (0, 2, 0, 28672, 1, 5, 49152)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, 28672, 32768, 36864, 40960, 45056, 49152] == out
+
+        data = (0, 1, -400, 1, 5, 0)
+        out = _expand_segmented_lut(data, 'H')
+        assert [-400, -320, -240, -160, -80, 0] == out
+
+        # No slope
+        data = (0, 2, 0, 28672, 1, 5, 28672)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, 28672, 28672, 28672, 28672, 28672, 28672] == out
+
+        data = (0, 1, -100, 1, 5, -100)
+        out = _expand_segmented_lut(data, 'H')
+        assert [-100, -100, -100, -100, -100, -100] == out
+
+        # Negative slope
+        data = (0, 2, 0, 49152, 1, 5, 28672)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, 49152, 45056, 40960, 36864, 32768, 28672] == out
+
+        data = (0, 1, 0, 1, 5, -400)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, -80, -160, -240, -320, -400] == out
+
+    def test_indirect_08(self):
+        """Test expanding an indirect segment encoded as 8-bit."""
+        # No real world test data available for this
+        # LSB, MSB
+        ref_a = [0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192]
+
+        # Little endian
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 4, 0, 0, 0)
+        out = _expand_segmented_lut(data, '<B')
+        assert ref_a == out
+
+        data = (0, 2, 0, 112, 2, 1, 0, 0, 0, 0)
+        out = _expand_segmented_lut(data, '<B')
+        assert [0, 112, 0, 112] == out
+
+        # 0x0100 0x0302 is 66051 in LE 16-bit MSB, LSB
+        data = [0, 1, 0] * 22017 + [0, 2, 1, 2] + [2, 1, 3, 2, 1, 0]
+        out = _expand_segmented_lut(data, '<B')
+        assert [0] * 22017 + [1, 2, 1, 2] == out
+
+        # Big endian
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 0, 4, 0, 0)
+        out = _expand_segmented_lut(data, '>B')
+        assert ref_a == out
+
+        data = (0, 2, 0, 112, 2, 1, 0, 0, 0, 0)
+        out = _expand_segmented_lut(data, '>B')
+        assert [0, 112, 0, 112] == out
+
+        # 0x0001 0x0203 is 66051 in BE 16-bit MSB, LSB
+        data = [0, 1, 0] * 22017 + [0, 2, 1, 2] + [2, 1, 2, 3, 0, 1]
+        out = _expand_segmented_lut(data, '>B')
+        assert [0] * 22017 + [1, 2, 1, 2] == out
+
+    def test_indirect_16(self):
+        """Test expanding an indirect segment encoded as 16-bit."""
+        # Start from a discrete segment
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 2, 0, 0)
+        out = _expand_segmented_lut(data, 'H')
+        assert [0, 112, 128, 144, 160, 176, 192] * 2 == out
+
+        # Start from a linear segment
+        data = (0, 2, 0, 112, 1, 5, 192, 2, 1, 4, 0)
+        out = _expand_segmented_lut(data, 'H')
+        assert [
+            0, 112, 128, 144, 160, 176, 192, 192, 192, 192, 192, 192
+        ] == out
+
+    def test_palettes_spring(self):
+        """Test expanding the SPRING palette."""
+        ds = dcmread(get_palette_files('spring.dcm')[0])
+
+        bs = ds.SegmentedRedPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [255] * 256 == out
+
+        bs = ds.SegmentedGreenPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert list(range(0, 256)) == out
+
+        bs = ds.SegmentedBluePaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert list(range(255, -1, -1)) == out
+
+    def test_palettes_summer(self):
+        """Test expanding the SUMMER palette."""
+        ds = dcmread(get_palette_files('summer.dcm')[0])
+
+        bs = ds.SegmentedRedPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [0] * 256 == out
+
+        bs = ds.SegmentedGreenPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [255, 255, 254, 254, 253] == out[:5]
+        assert [130, 129, 129, 128, 128] == out[-5:]
+
+        bs = ds.SegmentedBluePaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [0] * 128 == out[:128]
+        assert [246, 248, 250, 252, 254] == out[-5:]
+
+    def test_palettes_fall(self):
+        """Test expanding the FALL palette."""
+        ds = dcmread(get_palette_files('fall.dcm')[0])
+
+        bs = ds.SegmentedRedPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [255] * 256 == out
+
+        bs = ds.SegmentedGreenPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert list(range(255, -1, -1)) == out
+
+        bs = ds.SegmentedBluePaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [0] * 256 == out
+
+    def test_palettes_winter(self):
+        """Test expanding the WINTER palette."""
+        ds = dcmread(get_palette_files('winter.dcm')[0])
+
+        bs = ds.SegmentedRedPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [0] * 128 == out[:128]
+        assert [123, 124, 125, 126, 127] == out[-5:]
+
+        bs = ds.SegmentedGreenPaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert list(range(0, 256)) == out
+
+        bs = ds.SegmentedBluePaletteColorLookupTableData
+        fmt = '<{}B'.format(len(bs))
+        data = unpack(fmt, bs)
+        out = _expand_segmented_lut(data, fmt)
+        assert [255, 255, 254, 254, 253] == out[:5]
+        assert [130, 129, 129, 128, 128] == out[-5:]
+
+    def test_first_linear_raises(self):
+        """Test having a linear segment first raises exception."""
+        data = (1, 5, 49152)
+        msg = (
+            r"Error expanding a segmented palette color lookup table: "
+            r"the first segment cannot be a linear segment"
+        )
+        with pytest.raises(ValueError, match=msg):
+            _expand_segmented_lut(data, 'H')
+
+    def test_first_indirect_raises(self):
+        """Test having a linear segment first raises exception."""
+        data = (2, 5, 2, 0)
+        msg = (
+            r"Error expanding a segmented palette color lookup table: "
+            r"the first segment cannot be an indirect segment"
+        )
+        with pytest.raises(ValueError, match=msg):
+            _expand_segmented_lut(data, 'H')
+
+    def test_unknown_opcode_raises(self):
+        """Test having an unknown opcode raises exception."""
+        data = (3, 5, 49152)
+        msg = (
+            r"Error expanding a segmented palette lookup table: "
+            r"unknown segment type '3'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            _expand_segmented_lut(data, 'H')
