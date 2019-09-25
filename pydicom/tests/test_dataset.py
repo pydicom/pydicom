@@ -1390,6 +1390,23 @@ class TestFileDataset(object):
         assert ds == ds1
         assert ds1.Modality == 'CT'
 
+    def test_pickle_modified(self):
+        """Test pickling a modified dataset."""
+        ds = pydicom.dcmread(self.test_file)
+        ds.PixelSpacing = [1.0, 1.0]
+        import pickle
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds == ds1
+        assert ds1.PixelSpacing == [1.0, 1.0]
+
+        # Test workaround for python 2
+        if compat.in_py2:
+            ds1.PixelSpacing = ds1.PixelSpacing
+
+        ds1.PixelSpacing.insert(1, 2)
+        assert [1, 2, 1] == ds1.PixelSpacing
+
     def test_equality_file_meta(self):
         """Dataset: equality returns correct value if with metadata"""
         d = dcmread(self.test_file)

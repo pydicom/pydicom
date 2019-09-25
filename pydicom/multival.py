@@ -49,6 +49,13 @@ class MultiValue(MutableSequence):
         for x in iterable:
             self._list.append(type_constructor(x))
 
+    # TODO: Workaround for #951, to be removed when Python 2 not supported
+    if compat.in_py2:
+        def __getstate__(self):
+            state = self.__dict__.copy()
+            del state['type_constructor']
+            return state
+
     def insert(self, position, val):
         self._list.insert(position, self.type_constructor(val))
 
