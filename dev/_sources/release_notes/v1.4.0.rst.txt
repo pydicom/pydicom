@@ -15,6 +15,7 @@ Fixes
 * Fixed handling of known tags with VR UN (:issue:`899`)
 * Fixed assigning of empty values to data elements (:issue:`896`)
 * Fixed error in unpickling dataset (:issue:`947`)
+* Fixed error in pickling modified datasets (:issue:`951`)
 
 Enhancements
 ............
