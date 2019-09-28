@@ -200,12 +200,13 @@ def apply_modality_lut(arr, ds):
     Returns
     -------
     numpy.ndarray
-        An array with applied modality LUT. If (0028,3000) *Modality LUT
-        Sequence* is present then returns an array of ``np.uint8`` or
-        ``np.uint16``, depending on the 3rd value of (0028,3002) *LUT
-        Descriptor*. If (0028,1052) *Rescale Intercept* and (0028,1053)
-        *Rescale Slope* are present then returns an array of ``np.float64``.
-        If neither are present then `arr` will be returned unchanged.
+        An array with applied modality LUT or rescale operation. If
+        (0028,3000) *Modality LUT Sequence* is present then returns an array
+        of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
+        (0028,3002) *LUT Descriptor*. If (0028,1052) *Rescale Intercept* and
+        (0028,1053) *Rescale Slope* are present then returns an array of
+        ``np.float64``. If neither are present then `arr` will be returned
+        unchanged.
 
     References
     ----------
@@ -239,6 +240,123 @@ def apply_modality_lut(arr, ds):
     elif hasattr(ds, 'RescaleSlope'):
         arr = arr.astype(np.float64) * ds.RescaleSlope
         arr += ds.RescaleIntercept
+
+    return arr
+
+
+def apply_voi_lut(arr, ds, index=0):
+    """Apply a VOI lookup table or windowing operation to `arr`.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the VOI LUT or windowing operation
+        to.
+    ds : dataset.Dataset
+        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
+        If (0028,3010) *VOI LUT Sequence* is present then returns an array
+        of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
+        (0028,3002) *LUT Descriptor*. If (0028,1050) *Window Center* and
+        (0028,1051) *Window Width* are present then returns an array of
+        ``np.float64``. If neither are present then `arr` will be returned
+        unchanged.
+    index : int, optional
+        Where the VOI LUT Module contains multiple possible views, this is
+        the index of the view to return (default ``0``).
+
+    Returns
+    -------
+    numpy.ndarray
+        An array with applied VOI LUT or windowing operation.
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
+      <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
+    """
+    if hasattr(ds, 'VOILUTSequence'):
+        # VOI LUT Sequence contains one or more items
+        item = ds.VOILUTSequence[index]
+        nr_entries = item.LUTDescriptor[0] or 2**16
+        first_map = item.LUTDescriptor[1]
+        nominal_depth = item.LUTDescriptor[2]
+
+        dtype = 'uint{}'.format(nominal_depth)
+        lut_data = np.asarray(item.LUTData, dtype=dtype)
+
+        # IVs < `first_map` get set to first LUT entry (i.e. 0)
+        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        # `first_map` may be negative, positive or 0
+        mapped_pixels = arr >= first_map
+        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+        # IVs > number of entries get set to last entry
+        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+
+        return lut_data[clipped_iv]
+    elif hasattr(ds, 'WindowCenter'):
+        if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
+            raise ValueError(
+                "Only (0028,0004) Photometric Interpretation values of "
+                "'MONOCHROME1' and 'MONOCHROME2' are allowed"
+            )
+
+        # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
+        voi_func = getattr(ds, 'VOILUTFunction', 'LINEAR')
+        # VR DS, VM 1-n
+        elem = ds['WindowCenter']
+        center = elem.value[index] if elem.VM > 1 else elem.value
+        elem = ds['WindowWidth']
+        width = elem.value[index] if elem.VM > 1 else elem.value
+
+        # The input `arr` may be float or integer depending on previous
+        # operations (i.e. apply_modality_lut returns float for rescale)
+        arr_dtype = pixel_dtype(ds)
+        y_min, y_max = np.iinfo(arr_dtype).min, np.iinfo(arr_dtype).max
+
+        y_range = y_max - y_min
+        arr = arr.astype('float64')
+
+        if voi_func in ['LINEAR', 'LINEAR_EXACT']:
+            # PS3.3 C.11.2.1.2.1 and C.11.2.1.3.2
+            if voi_func == 'LINEAR':
+                if width < 1:
+                    raise ValueError(
+                        "The (0028,1051) Window Width must be greater than or "
+                        "equal to 1 for a 'LINEAR' windowing operation"
+                    )
+                center -= 0.5
+                width -= 1
+            elif width <= 0:
+                raise ValueError(
+                    "The (0028,1051) Window Width must be greater than 0 "
+                    "for a 'LINEAR_EXACT' windowing operation"
+                )
+
+            lower = arr <= (center - width / 2)
+            upper = arr > (center + width / 2)
+            between = np.logical_and(~lower, ~upper)
+
+            arr[lower] = y_min
+            arr[upper] = y_max
+            if between.any():
+                arr[between] = ((arr - center) / width + 0.5) * y_range + y_min
+        elif voi_func == 'SIGMOID':
+            # PS3.3 C.11.2.1.3.1
+            if width <= 0:
+                raise ValueError(
+                    "The (0028,1051) Window Width must be greater than 0 "
+                    "for a 'SIGMOID' windowing operation"
+                )
+
+            arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
+        else:
+            raise ValueError(
+                "Unsupported (0028,1056) VOI LUT Function value '{}'"
+                .format(voi_func)
+            )
 
     return arr
 
