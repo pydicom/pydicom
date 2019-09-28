@@ -16,7 +16,7 @@ Fixes
 * Fixed assigning of empty values to data elements (:issue:`896`)
 * Fixed error in unpickling dataset (:issue:`947`)
 * Fixed error in pickling modified datasets (:issue:`951`)
-* Fixed improper conversion of the first (and third) values of the *LUT
+* Fixed improper conversion of the first value of the *LUT
   Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
 
 Enhancements
