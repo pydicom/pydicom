@@ -686,6 +686,13 @@ RawDataElement = namedtuple('RawDataElement', msg)
 RawDataElement.is_raw = True
 
 
+# The first and third values of the following elements are always US
+#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
+# (0028,1101-1103) RGB Palette Color LUT Descriptor
+# (0028,3002) LUT Descriptor
+_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
+
+
 def DataElement_from_raw(raw_data_element, encoding=None):
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -738,5 +745,10 @@ def DataElement_from_raw(raw_data_element, encoding=None):
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+
+    if raw.tag in _LUT_DESCRIPTOR_TAGS and value[0] < 0:
+        # We only fix the first value as the third value is 8 or 16
+        value[0] += 65536
+
     return DataElement(raw.tag, VR, value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)
