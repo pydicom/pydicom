@@ -314,13 +314,15 @@
 <li><p>Fixed assigning of empty values to data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/896">#896</a>)</p></li>
 <li><p>Fixed error in unpickling dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/947">#947</a>)</p></li>
 <li><p>Fixed error in pickling modified datasets (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/951">#951</a>)</p></li>
+<li><p>Fixed improper conversion of the first value of the <em>LUT
+Descriptor</em> elements (0028,1101-1103) and (0028,3002) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/942">#942</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="enhancements">
 <h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added support for converting (60xx,3000) <em>Overlay Data</em> to a numpy ndarray
-using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a> (issue:<cite>912</cite>)</p></li>
+using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/912">#912</a>)</p></li>
 <li><p>Added support for deferred reading in file-like objects (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/932">#932</a>)</p></li>
 <li><p>Tolerate values with multiple and/or incorrect padding bytes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/940">#940</a>)</p></li>
 <li><p>Added support for uncompressed pixel data with (0028,0004) <em>Photometric
