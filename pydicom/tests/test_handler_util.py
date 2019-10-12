@@ -25,6 +25,7 @@ from pydicom.pixel_data_handlers.util import (
     apply_color_lut,
     _expand_segmented_lut,
     apply_modality_lut,
+    apply_voi_lut,
 )
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -42,7 +43,7 @@ PAL_08_256_0_16_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
 # PALETTE COLOR with 16-bit LUTs (no indirect segments)
 PAL_SEG_LE_16_1F = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
 PAL_SEG_BE_16_1F = get_testdata_files("gdcm-US-ALOKA-16_big.dcm")[0]
-# Supplemental palette colour
+# Supplemental palette colour + VOI windowing
 SUP_16_16_2F = get_testdata_files("eCT_Supplemental.dcm")[0]
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
@@ -52,6 +53,9 @@ RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 # SEQ: Modality LUT Sequence
 MOD_16 = get_testdata_files("CT_small.dcm")[0]
 MOD_16_SEQ = get_testdata_files("mlut_18.dcm")[0]
+# VOI: VOI LUT Sequence
+# WIN: Windowing operation
+WIN_12_1F = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -1394,3 +1398,59 @@ class TestNumpy_ExpandSegmentedLUT(object):
         )
         with pytest.raises(ValueError, match=msg):
             _expand_segmented_lut(data, 'H')
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_VOILUT(object):
+    """Tests for util.apply_voi_lut()."""
+    def test_voi_single(self):
+        pass
+
+    def test_voi_multi(self):
+        pass
+
+    def test_voi_zero_entries(self):
+        pass
+
+    def test_voi_entries_negative(self):
+        pass
+
+    def test_window_single(self):
+        pass
+
+    def test_window_multi(self):
+        """Test windowing with multiple views."""
+        ds = dcmread(VOI_WIN_12)
+        assert 16 == ds.BitsAllocated
+        assert 12 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        assert [450, 200] == ds.WindowCenter
+        assert [790, 443] == ds.WindowWidth
+
+        arr = ds.pixel_array
+        out = apply_voi_lut(arr, ds)
+        import matplotlib.pyplot as plt
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+        ax1.imshow(arr, cmap='gray')
+        ax2.imshow(out, cmap='gray')
+        out2 = apply_voi_lut(arr, ds, index=1)
+        ax3.imshow(out2, cmap='gray')
+        plt.show()
+
+    def test_window_uint8(self):
+        pass
+
+    def test_window_uint16(self):
+        pass
+
+    def test_window_int8(self):
+        pass
+
+    def test_window_int16(self):
+        pass
+
+    def test_window_float(self):
+        pass
+
+    def test_unchanged(self):
+        pass

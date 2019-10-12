@@ -21,15 +21,23 @@ it doesn't do anything with pixel data except read in the raw bytes::
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
-``PixelData`` contains the raw bytes exactly as found in the file. If the
-image is JPEG compressed, these bytes will be the compressed pixel data, not
-the expanded, uncompressed image. Whether the image is e.g. 16-bit or 8-bit,
-multiple frames or not, ``PixelData`` contains the same raw bytes. But there is
-a function that can shape the pixels more sensibly if you need to work with
-them ...
+``PixelData`` contains the raw image ``bytes`` exactly as found in the file.
+In the case of a dataset with a compressed transfer syntax (such as
+``1.2.840.10008.1.2.4.50`` *JPEG Baseline*) then the ``PixelData`` will be
+the encoded image data that is has also been
+:dcm:`encapsulated<part05/sect_A.4.html>`. To test whether or not the *Pixel
+Data* is compressed you can do:
+
+  >>> ds.file_meta.TransferSyntaxUID.is_compressed
+  False
 
 ``Dataset.pixel_array``
 -----------------------
+
+Handling *Pixel Data* is one of the two main annoyances with
+DICOM datasets (the other being non-conformance), but fortunately *pydicom*
+provides an easy way to get the *Pixel Data* in a more convenient form; 
+:attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 .. warning::
 
@@ -121,16 +129,17 @@ of the pixel data is 8-bit.
     :dcm:`C.7.9<part03/sect_C.7.9.html>` for more information.
 
 
-Modality LUT
-------------
+Modality LUT or Rescale Operation
+---------------------------------
 
 The DICOM :dcm:`Modality LUT<part03/sect_C.11.html#sect_C.11.1>` module
-converts raw unitless pixel data values to a specific output unit (such as
-Hounsfield units for CT). The
+converts raw pixel data values to a specific (possibly unitless) physical
+quantity, such as Hounsfield units for CT. The
 :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function can be
 used with an input array of raw values and a dataset containing a Modality LUT
-module to return the defined values. When a dataset requires multiple grayscale
-transformations, the Modality LUT transformation is always applied first.
+module to return the converted values. When a dataset requires multiple
+grayscale transformations, the Modality LUT transformation is always applied
+first.
 
 .. code-block:: python
 
@@ -140,3 +149,22 @@ transformations, the Modality LUT transformation is always applied first.
     ds = dcmread(fname)
     arr = ds.pixel_array
     hu = apply_modality_lut(arr, ds)
+
+
+VOI LUT or Windowing Operation
+------------------------------
+
+The DICOM :dcm:'VOI LUT<>' module applies a VOI or windowing operation to input
+values. The :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
+can be used with an input array and a dataset containing a VOI LUT module to
+return the VOI or windowed values. When multiple VOIs or windowing operations
+are present they can be returned by using the `index` keyword parameter.
+
+.. code-block:: python
+
+    from pydicom.pixel_data_handlers.util import apply_voi_lut
+
+    fname = get_testdata_files("")[0]
+    ds = dcmread(fname)
+    arr = ds.pixel_array
+    out = apply_voi_lut(arr, ds, index=0)

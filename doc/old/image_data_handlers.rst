@@ -106,8 +106,9 @@ a different color space depending on the package used to decompress the data.
   Interpretation*
 * For Pillow, YBR data will be converted automatically to RGB
 
-*pydicom* offers a limited ability to convert between RGB and YBR color spaces
-through the :func:`~pydicom.pixel_data_handlers.util.convert_color_space`
+*pydicom* offers a limited ability to convert between 8-bits/channel RGB and
+YBR color spaces through the
+:func:`~pydicom.pixel_data_handlers.util.convert_color_space`
 function. When changing the color space you should also change the value
 of *Photometric Interpretation* to match.
 
