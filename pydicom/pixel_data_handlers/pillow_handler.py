@@ -81,6 +81,23 @@ def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
 
 
 def _decompress_single_frame(data, transfer_syntax, photometric_interpretation):
+    """Decompresses a single frame of an encapsulated Pixel Data element.
+
+    Parameters
+    ----------
+    data: bytes
+        Compressed pixel data
+    transfer_syntax: str
+        Transfer Syntax UID
+    photometric_interpretation: str
+        Photometric Interpretation
+
+    Returns
+    -------
+    bytes
+        Decompressed pixel data
+
+    """
     fio = io.BytesIO(data)
     try:
         image = Image.open(fio)
