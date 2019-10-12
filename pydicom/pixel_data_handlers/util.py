@@ -312,13 +312,8 @@ def apply_voi_lut(arr, ds, index=0):
     elif hasattr(ds, 'WindowCenter'):
         if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
             raise ValueError(
-<<<<<<< Updated upstream
-                "Only (0028,0004) Photometric Interpretation values of "
-                "'MONOCHROME1' and 'MONOCHROME2' are allowed"
-=======
                 "Only 'MONOCHROME1' and 'MONOCHROME2' are allowed for "
                 "(0028,0004) Photometric Interpretation"
->>>>>>> Stashed changes
             )
 
         # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
@@ -329,12 +324,6 @@ def apply_voi_lut(arr, ds, index=0):
         elem = ds['WindowWidth']
         width = elem.value[index] if elem.VM > 1 else elem.value
 
-<<<<<<< Updated upstream
-        # The input `arr` may be float or integer depending on previous
-        # operations (i.e. apply_modality_lut returns float for rescale)
-        arr_dtype = pixel_dtype(ds)
-        y_min, y_max = np.iinfo(arr_dtype).min, np.iinfo(arr_dtype).max
-=======
         # If output range depends on whether or not a rescale operation has
         #   been applied - if not then the range is the available bit depth
         if ds.PixelRepresentation:
@@ -348,7 +337,6 @@ def apply_voi_lut(arr, ds, index=0):
             # Otherwise its the actual data range - see PS3.3 C.11.1.1.1
             y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
             y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
->>>>>>> Stashed changes
 
         y_range = y_max - y_min
         arr = arr.astype('float64')
@@ -369,16 +357,6 @@ def apply_voi_lut(arr, ds, index=0):
                     "for a 'LINEAR_EXACT' windowing operation"
                 )
 
-<<<<<<< Updated upstream
-            lower = arr <= (center - width / 2)
-            upper = arr > (center + width / 2)
-            between = np.logical_and(~lower, ~upper)
-
-            arr[lower] = y_min
-            arr[upper] = y_max
-            if between.any():
-                arr[between] = ((arr - center) / width + 0.5) * y_range + y_min
-=======
             below = arr <= (center - width / 2)
             above = arr > (center + width / 2)
             between = np.logical_and(~below, ~above)
@@ -389,7 +367,6 @@ def apply_voi_lut(arr, ds, index=0):
                 arr[between] = (
                     ((arr[between] - center) / width + 0.5) * y_range + y_min
                 )
->>>>>>> Stashed changes
         elif voi_func == 'SIGMOID':
             # PS3.3 C.11.2.1.3.1
             if width <= 0:
