@@ -197,9 +197,9 @@ class TestCharset(object):
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
 
         with pytest.warns(UserWarning, match='Failed to decode byte string '
-                                             'with encodings: iso-2022-jp'):
+                                             'with encodings: iso2022_jp_2'):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
-            assert u'����������' == elem.value
+            assert u'���������' == elem.value
 
     def test_bad_decoded_multi_byte_encoding_enforce_standard(self):
         """Test handling bad encoding for single encoding if
@@ -207,7 +207,7 @@ class TestCharset(object):
         config.enforce_valid_values = True
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-        msg = ("'iso2022_jp' codec can't decode bytes in position 0-3: "
+        msg = ("'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
                "illegal multibyte sequence")
         with pytest.raises(UnicodeDecodeError, match=msg):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
@@ -437,9 +437,9 @@ class TestCharset(object):
 
     def test_japanese_multi_byte_encoding(self):
         """Test japanese multi byte strings are correctly encoded."""
-        encoded = pydicom.charset.encode_string(u'あaｱア',
-                                                ['shift_jis', 'iso2022_jp'])
-        assert b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b(J' == encoded
+        encoded = pydicom.charset.encode_string(u'あaｱア齩',
+                                                ['shift_jis', 'iso2022_jp', 'iso2022_jp_2'])
+        assert b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b$(DmN\x1b(J' == bytes(encoded)
 
     def test_bad_japanese_encoding(self):
         """Test japanese multi byte strings are not correctly encoded."""

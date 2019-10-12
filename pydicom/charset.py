@@ -45,7 +45,7 @@ python_encoding = {
     'ISO 2022 IR 144': 'iso_ir_144',
     'ISO 2022 IR 148': 'iso_ir_148',
     'ISO 2022 IR 149': 'euc_kr',
-    'ISO 2022 IR 159': 'iso-2022-jp',
+    'ISO 2022 IR 159': 'iso2022_jp_2',
     'ISO 2022 IR 166': 'iso_ir_166',
     'ISO 2022 IR 58': 'iso_ir_58',
     'ISO_IR 192': 'UTF8',  # from Chinese example, 2008 PS3.5 Annex J p1-4
@@ -81,7 +81,7 @@ CODES_TO_ENCODINGS = {
     ESC + b'-M': 'iso_ir_148',
     ESC + b'-T': 'iso_ir_166',
     ESC + b'$)C': 'euc_kr',
-    ESC + b'$(D': 'iso-2022-jp',
+    ESC + b'$(D': 'iso2022_jp_2',
     ESC + b'$)A': 'iso_ir_58',
 }
 
@@ -92,7 +92,7 @@ ENCODINGS_TO_CODES['shift_jis'] = ESC + b')I'
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
 handled_encodings = ('iso2022_jp',
-                     'iso-2022-jp',
+                     'iso2022_jp_2',
                      'iso_ir_58')
 
 
@@ -165,10 +165,17 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     return encoded
 
-
 def _encode_to_jis_x_0208(value, errors='strict'):
-    """Convert a unicode string into JIS X 0208 byte string using iso2022_jp
-    encodings.
+    """Convert a unicode string into JIS X 0208 byte string."""
+    return _encode_to_given_charset(value, 'ISO 2022 IR 87', errors=errors)
+
+
+def _encode_to_jis_x_0212(value, errors='strict'):
+    """Convert a unicode string into JIS X 0212 byte string."""
+    return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
+
+def _encode_to_given_charset(value, character_set, errors='strict'):
+    """Convert a unicode string into given character set.
     The escape sequence which is located at the end of the encoded value has
     to vary depending on the value 1 of SpecificCharacterSet. So we have to
     trim it and append the correct escape sequence manually.
@@ -177,6 +184,8 @@ def _encode_to_jis_x_0208(value, errors='strict'):
     ----------
     value : text type
         The unicode string as presented to the user.
+    character_set: str:
+        Character set for result.
     errors : str
         The behavior of a character which could not be encoded. This value
         is passed to errors argument of str.encode().
@@ -185,28 +194,29 @@ def _encode_to_jis_x_0208(value, errors='strict'):
     -------
     byte string
         The encoded string. If some characters in value could not be encoded to
-        JIS X 0208, it depends on the behavior of iso2022_jp encoder.
+        given character_set, it depends on the behavior of corresponding python encoder.
 
     Raises
     ------
     UnicodeEncodeError
-        If errors is set to 'strict' and `value` could not be encoded with
-        JIS X 0208.
+        If errors is set to 'strict' and `value` could not be encoded with given
+        character_set.
     """
 
+    encoding = python_encoding[character_set]
     # If errors is not strict, this function is used as fallback.
     # So keep the tail escape sequence of encoded for backward compatibility.
     if errors != 'strict':
-        return value.encode('iso2022_jp', errors=errors)
+        return value.encode(encoding, errors=errors)
 
-    Encoder = codecs.getincrementalencoder('iso2022-jp')
+    Encoder = codecs.getincrementalencoder(encoding)
     encoder = Encoder()
 
     encoded = encoder.encode(value[0])
-    if encoded[:3] != ENCODINGS_TO_CODES['iso2022_jp']:
+    if not encoded.startswith(ENCODINGS_TO_CODES[encoding]):
         raise UnicodeEncodeError(
-            'iso2022_jp', value, 0, len(value),
-            'Given character is out of ISO IR 87')
+            encoding, value, 0, len(value),
+            'Given character is out of {}'.format(character_set))
 
     for i, c in enumerate(value[1:], 1):
         try:
@@ -215,10 +225,11 @@ def _encode_to_jis_x_0208(value, errors='strict'):
             e.start = i
             e.end = len(value)
             raise e
-        if b[:3] == ENCODINGS_TO_CODES['iso8859']:
+        seq_length = 4 if b.startswith((b'\x1b$(', b'\x1b$)')) else 3
+        if b[:1] == ESC:
             raise UnicodeEncodeError(
-                'iso2022_jp', value, i, len(value),
-                'Given character is out of ISO IR 87')
+                encoding, value, i, len(value),
+                'Given character is out of {}'.format(character_set))
         encoded += b
     return encoded
 
@@ -262,13 +273,13 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
 
 
 # These encodings need escape sequence to handle alphanumeric characters.
-need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso-2022-jp')
+need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso2022_jp_2')
 
 
 custom_encoders = {
     'shift_jis': _encode_to_jis_x_0201,
     'iso2022_jp': _encode_to_jis_x_0208,
-    'iso-2022-jp': _encode_to_jis_x_0208
+    'iso2022_jp_2': _encode_to_jis_x_0212
 }
 
 
