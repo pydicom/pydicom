@@ -223,7 +223,7 @@ def apply_modality_lut(arr, ds):
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if hasattr(ds, 'ModalityLUTSequence'):
+    if 'ModalityLUTSequence' in ds:
         item = ds.ModalityLUTSequence[0]
         nr_entries = item.LUTDescriptor[0] or 2**16
         # Workaround for #942: first value is always unsigned
@@ -245,7 +245,7 @@ def apply_modality_lut(arr, ds):
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
         return lut_data[clipped_iv]
-    elif hasattr(ds, 'RescaleSlope'):
+    elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
         arr = arr.astype(np.float64) * ds.RescaleSlope
         arr += ds.RescaleIntercept
 
@@ -289,7 +289,7 @@ def apply_voi_lut(arr, ds, index=0):
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if hasattr(ds, 'VOILUTSequence'):
+    if 'VOISequence' in ds:
         # VOI LUT Sequence contains one or more items
         item = ds.VOILUTSequence[index]
         nr_entries = item.LUTDescriptor[0] or 2**16
@@ -309,7 +309,7 @@ def apply_voi_lut(arr, ds, index=0):
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
         return lut_data[clipped_iv]
-    elif hasattr(ds, 'WindowCenter'):
+    elif 'WindowCenter' in ds and 'WindowWidth' in ds:
         if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
             raise ValueError(
                 "Only 'MONOCHROME1' and 'MONOCHROME2' are allowed for "
