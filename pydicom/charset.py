@@ -174,6 +174,7 @@ def _encode_to_jis_x_0212(value, errors='strict'):
     """Convert a unicode string into JIS X 0212 byte string."""
     return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
 
+
 def _encode_to_given_charset(value, character_set, errors='strict'):
     """Convert a unicode string into given character set.
     The escape sequence which is located at the end of the encoded value has
@@ -194,13 +195,14 @@ def _encode_to_given_charset(value, character_set, errors='strict'):
     -------
     byte string
         The encoded string. If some characters in value could not be encoded to
-        given character_set, it depends on the behavior of corresponding python encoder.
+        given character_set, it depends on the behavior of corresponding python
+        encoder.
 
     Raises
     ------
     UnicodeEncodeError
-        If errors is set to 'strict' and `value` could not be encoded with given
-        character_set.
+        If errors is set to 'strict' and `value` could not be encoded with
+        given character_set.
     """
 
     encoding = python_encoding[character_set]
