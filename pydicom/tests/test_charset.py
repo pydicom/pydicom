@@ -9,6 +9,7 @@ from pydicom import dcmread, config
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
+from pydicom.valuerep import PersonName3
 
 # The file names (without '.dcm' extension) of most of the character test
 # files, together with the respective decoded PatientName tag values.
@@ -434,6 +435,20 @@ class TestCharset(object):
             fp.seek(0)
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
+
+        japanese_pn = PersonName3(u"Mori^Ogai=森^鷗外=もり^おうがい")
+        python_encodings = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
+                                                              "ISO 2022 IR 87",
+                                                              "ISO 2022 IR 159"])
+        actual_encoded = bytes(japanese_pn.encode(python_encodings))
+        expect_encoded = (
+            b"\x4d\x6f\x72\x69\x5e\x4f\x67\x61\x69\x3d\x1b\x24\x42\x3f"
+            b"\x39\x1b\x28\x42\x5e\x1b\x24\x28\x44\x6c\x3f\x1b\x24\x42"
+            b"\x33\x30\x1b\x28\x42\x3d\x1b\x24\x42\x24\x62\x24\x6a\x1b"
+            b"\x28\x42\x5e\x1b\x24\x42\x24\x2a\x24\x26\x24\x2c\x24\x24"
+            b"\x1b\x28\x42"
+        )
+        assert expect_encoded == actual_encoded
 
     def test_japanese_multi_byte_encoding(self):
         """Test japanese multi byte strings are correctly encoded."""
