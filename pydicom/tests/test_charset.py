@@ -437,10 +437,10 @@ class TestCharset(object):
             assert original_string == ds_out.PatientName.original_string
 
         japanese_pn = PersonName3(u"Mori^Ogai=森^鷗外=もり^おうがい")
-        python_encodings = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
-                                                              "ISO 2022 IR 87",
-                                                              "ISO 2022 IR 159"])
-        actual_encoded = bytes(japanese_pn.encode(python_encodings))
+        pyencs = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
+                                                    "ISO 2022 IR 87",
+                                                    "ISO 2022 IR 159"])
+        actual_encoded = bytes(japanese_pn.encode(pyencs))
         expect_encoded = (
             b"\x4d\x6f\x72\x69\x5e\x4f\x67\x61\x69\x3d\x1b\x24\x42\x3f"
             b"\x39\x1b\x28\x42\x5e\x1b\x24\x28\x44\x6c\x3f\x1b\x24\x42"
