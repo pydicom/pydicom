@@ -575,7 +575,7 @@ def _encode_string_parts(value, encodings):
     # unencoded_part is empty - we are done, return the encoded string
     if best_encoding in need_tail_escape_sequence_encodings:
         encoded += _get_escape_sequence_for_encoding(encodings[0])
-    return encoded
+    return bytes(encoded)
 
 
 def _encode_string_impl(value, encoding, errors='strict'):
