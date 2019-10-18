@@ -89,21 +89,25 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 
 
 def get_pixeldata(ds):
-    """Use Pillow to decompress compressed *Pixel Data*.
+    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
+
+    Parameters
+    ----------
+    ds : Dataset
+        The :class:`Dataset` containing an Image Pixel module and the
+        *Pixel Data* to be decompressed and returned.
 
     Returns
     -------
     numpy.ndarray
-       The *Pixel Data* as a :class:`numpy.ndarray`.
+       The contents of (7FE0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     ImportError
         If Pillow is not available.
     NotImplementedError
-        if the transfer syntax is not supported
-    TypeError
-        if the pixel data type is unsupported
+        If the transfer syntax is not supported
     """
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", HAVE_PIL)
@@ -154,10 +158,7 @@ def get_pixeldata(ds):
         decompressed_image = Image.open(io.BytesIO(pixel_data))
         pixel_bytes.extend(decompressed_image.tobytes())
 
-
-    logger.debug(
-        "Successfully read %s pixel bytes", len(pixel_bytes)
-    )
+    logger.debug("Successfully read %s pixel bytes", len(pixel_bytes))
 
     arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
