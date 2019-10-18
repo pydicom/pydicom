@@ -201,7 +201,7 @@
 <h1>pydicom.charset.convert_encodings<a class="headerlink" href="#pydicom-charset-convert-encodings" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.charset.convert_encodings">
-<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">convert_encodings</code><span class="sig-paren">(</span><em class="sig-param">encodings</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/charset.py#L592"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.convert_encodings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">convert_encodings</code><span class="sig-paren">(</span><em class="sig-param">encodings</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/charset.py#L592"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.convert_encodings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert DICOM <cite>encodings</cite> into corresponding Python encodings.</p>
 <p>Handles some common spelling mistakes and issues a warning in this case.</p>
 <p>Handles stand-alone encodings: if they are the first encodings,
@@ -217,7 +217,7 @@ respective warning issued, if
 Set</em>.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of Python encodings corresponding to the DICOM
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of Python encodings corresponding to the DICOM
 encodings. If an encoding is already a Python encoding, it is returned
 unchanged. Encodings with common spelling errors are replaced by the
 correct encoding, and invalid encodings are replaced with the default
@@ -229,7 +229,7 @@ encoding if
 <dd class="field-odd"><p>list of str</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.7)"><strong>LookupError</strong></a> – If <cite>encodings</cite> contains a value that could not be converted and
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.8)"><strong>LookupError</strong></a> – If <cite>encodings</cite> contains a value that could not be converted and
     <a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
     <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>

@@ -207,17 +207,17 @@
 <h1>pydicom.uid.generate_uid<a class="headerlink" href="#pydicom-uid-generate-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.uid.generate_uid">
-<code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">generate_uid</code><span class="sig-paren">(</span><em class="sig-param">prefix='1.2.826.0.1.3680043.8.498.'</em>, <em class="sig-param">entropy_srcs=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/uid.py#L273"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.generate_uid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">generate_uid</code><span class="sig-paren">(</span><em class="sig-param">prefix='1.2.826.0.1.3680043.8.498.'</em>, <em class="sig-param">entropy_srcs=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/uid.py#L273"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.generate_uid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a 64 character UID which starts with <cite>prefix</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – The UID prefix to use when creating the UID. Default is the <em>pydicom</em>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The UID prefix to use when creating the UID. Default is the <em>pydicom</em>
 root UID <code class="docutils literal notranslate"><span class="pre">'1.2.826.0.1.3680043.8.498.'</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then a prefix of
 <code class="docutils literal notranslate"><span class="pre">'2.25.'</span></code> will be used with the integer form of a UUID generated
-using the <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.uuid4" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code></a> algorithm.</p></li>
-<li><p><strong>entropy_srcs</strong> (<em>list of str</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – If <cite>prefix</cite> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>, then <cite>prefix</cite> will be appended with a
-SHA512 hash of the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> which means the result is
+using the <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.uuid4" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code></a> algorithm.</p></li>
+<li><p><strong>entropy_srcs</strong> (<em>list of str</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – If <cite>prefix</cite> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>, then <cite>prefix</cite> will be appended with a
+SHA512 hash of the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> which means the result is
 deterministic and should make the original data unrecoverable. If
 <code class="docutils literal notranslate"><span class="pre">None</span></code> random data will be used (default).</p></li>
 </ul>
@@ -229,7 +229,7 @@ deterministic and should make the original data unrecoverable. If
 <dd class="field-odd"><p><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If <cite>prefix</cite> is invalid or greater than 63 characters.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>prefix</cite> is invalid or greater than 63 characters.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

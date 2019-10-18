@@ -19,6 +19,7 @@ pydicom.valuerep.DT
       ~DT.ctime
       ~DT.date
       ~DT.dst
+      ~DT.fromisocalendar
       ~DT.fromisoformat
       ~DT.fromordinal
       ~DT.fromtimestamp

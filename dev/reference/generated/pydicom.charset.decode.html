@@ -201,7 +201,7 @@
 <h1>pydicom.charset.decode<a class="headerlink" href="#pydicom-charset-decode" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.charset.decode">
-<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">data_element</em>, <em class="sig-param">dicom_character_set</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/charset.py#L792"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.decode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">data_element</em>, <em class="sig-param">dicom_character_set</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/charset.py#L792"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply the DICOM character encoding to a data element</p>
 <div class="deprecated">
 <p><span class="versionmodified deprecated">Deprecated since version 1.4: </span>This function is deprecated, use <code class="xref py py-func docutils literal notranslate"><span class="pre">decode_element()</span></code> instead.</p>
@@ -211,7 +211,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_element</strong> (<a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><em>dataelem.DataElement</em></a>) – The <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> instance
 containing an encoded byte string value to decode.</p></li>
-<li><p><strong>dicom_character_set</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><em>list of str</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – The value of (0008,0005) <em>Specific Character Set</em>, which may be a
+<li><p><strong>dicom_character_set</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>list of str</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The value of (0008,0005) <em>Specific Character Set</em>, which may be a
 single value, a multiple value (code extension), or may also be <code class="docutils literal notranslate"><span class="pre">''</span></code>
 or <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case <code class="docutils literal notranslate"><span class="pre">'ISO_IR</span> <span class="pre">6'</span></code> will be used.</p></li>
 </ul>

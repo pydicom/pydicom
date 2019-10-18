@@ -215,22 +215,22 @@
 <h1>pydicom.datadict.dictionary_is_retired<a class="headerlink" href="#pydicom-datadict-dictionary-is-retired" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.datadict.dictionary_is_retired">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">dictionary_is_retired</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/datadict.py#L269"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.dictionary_is_retired" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">dictionary_is_retired</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/datadict.py#L269"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.dictionary_is_retired" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the element corresponding to <cite>tag</cite> is retired.</p>
 <p>Only performs the lookup for official DICOM elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The tag for the element whose retirement status is being checked.</p>
+<dd class="field-odd"><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The tag for the element whose retirement status is being checked.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if the element’s retirement status is ‘Retired’, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><strong>KeyError</strong></a> – If the tag is not present in the DICOM data dictionary.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the tag is not present in the DICOM data dictionary.</p>
 </dd>
 </dl>
 </dd></dl>

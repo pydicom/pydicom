@@ -14,6 +14,7 @@ pydicom.tag.BaseTag
    .. autosummary::
    
       ~BaseTag.__init__
+      ~BaseTag.as_integer_ratio
       ~BaseTag.bit_length
       ~BaseTag.conjugate
       ~BaseTag.from_bytes

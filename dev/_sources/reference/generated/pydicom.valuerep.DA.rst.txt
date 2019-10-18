@@ -15,6 +15,7 @@ pydicom.valuerep.DA
    
       ~DA.__init__
       ~DA.ctime
+      ~DA.fromisocalendar
       ~DA.fromisoformat
       ~DA.fromordinal
       ~DA.fromtimestamp

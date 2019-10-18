@@ -219,7 +219,7 @@
 <h1>pydicom.valuerep.PersonName<a class="headerlink" href="#pydicom-valuerep-personname" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.valuerep.PersonName">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/valuerep.py#L887"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/valuerep.py#L887"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human-friendly class to hold the value of elements with VR  of ‘PN’.</p>
 <p>The value is parsed into the following properties:</p>
 <ul class="simple">
@@ -229,7 +229,7 @@
 </ul>
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/valuerep.py#L832"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/valuerep.py#L832"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the PN properties</p>
 </dd></dl>
 
@@ -246,8 +246,8 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">capitalize</span></code>()</p></td>
 <td><p>Return a copy of B with only its first character capitalized (ASCII) and the rest lower-cased.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">center</span></code>(width[, fillchar])</p></td>
-<td><p>Return B centered in a string of length width.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">center</span></code></p></td>
+<td><p>Return a centered string of length width.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(sub[, start[, end]])</p></td>
 <td><p>Return the number of non-overlapping occurrences of subsection sub in bytes B[start:end].</p></td>
@@ -261,8 +261,8 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">endswith</span></code>(suffix[, start[, end]])</p></td>
 <td><p>Return True if B ends with the specified suffix, False otherwise.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">expandtabs</span></code>([tabsize])</p></td>
-<td><p>Return a copy of B where all tab characters are expanded using spaces.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">expandtabs</span></code></p></td>
+<td><p>Return a copy where all tab characters are expanded using spaces.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.PersonName.family_comma_given" title="pydicom.valuerep.PersonName.family_comma_given"><code class="xref py py-obj docutils literal notranslate"><span class="pre">family_comma_given</span></code></a>()</p></td>
 <td><p>Return name as ‘Family-name, Given-name’</p></td>
@@ -276,8 +276,8 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromhex</span></code></p></td>
 <td><p>Create a bytes object from a string of hexadecimal numbers.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hex</span></code>()</p></td>
-<td><p>Create a string of hexadecimal numbers from a bytes object.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">hex</span></code></p></td>
+<td><p>Create a str of hexadecimal numbers from a bytes object.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(sub[, start[, end]])</p></td>
 <td><p>Return the lowest index in B where subsection sub is found, such that sub is contained within B[start,end].</p></td>
@@ -309,8 +309,8 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">join</span></code></p></td>
 <td><p>Concatenate any number of bytes objects.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ljust</span></code>(width[, fillchar])</p></td>
-<td><p>Return B left justified in a string of length width.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ljust</span></code></p></td>
+<td><p>Return a left-justified string of length width.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code>()</p></td>
 <td><p>Return a copy of B with all ASCII characters converted to lowercase.</p></td>
@@ -336,8 +336,8 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rindex</span></code>(sub[, start[, end]])</p></td>
 <td><p>Return the highest index in B where subsection sub is found, such that sub is contained within B[start,end].</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rjust</span></code>(width[, fillchar])</p></td>
-<td><p>Return B right justified in a string of length width.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rjust</span></code></p></td>
+<td><p>Return a right-justified string of length width.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rpartition</span></code></p></td>
 <td><p>Partition the bytes into three parts using the given separator.</p></td>
@@ -372,20 +372,20 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper</span></code>()</p></td>
 <td><p>Return a copy of B with all ASCII characters converted to uppercase.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zfill</span></code>(width)</p></td>
-<td><p>Pad a numeric string B with zeros on the left, to fill a field of the specified width.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">zfill</span></code></p></td>
+<td><p>Pad a numeric string with zeros on the left, to fill a field of the given width.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/valuerep.py#L904"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.encode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/valuerep.py#L904"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dummy method to mimic py2 str behavior in py3 bytes subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.family_comma_given">
-<code class="sig-name descname">family_comma_given</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/40652fc0/pydicom/valuerep.py#L910"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.family_comma_given" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">family_comma_given</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4964dd90/pydicom/valuerep.py#L910"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.family_comma_given" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return name as ‘Family-name, Given-name’</p>
 </dd></dl>
 
