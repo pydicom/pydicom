@@ -9,6 +9,7 @@ from pydicom import dcmread, config
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
+from pydicom.valuerep import PersonName3
 
 # The file names (without '.dcm' extension) of most of the character test
 # files, together with the respective decoded PatientName tag values.
@@ -197,9 +198,9 @@ class TestCharset(object):
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
 
         with pytest.warns(UserWarning, match='Failed to decode byte string '
-                                             'with encodings: iso-2022-jp'):
+                                             'with encodings: iso2022_jp_2'):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
-            assert u'����������' == elem.value
+            assert u'���������' == elem.value
 
     def test_bad_decoded_multi_byte_encoding_enforce_standard(self):
         """Test handling bad encoding for single encoding if
@@ -207,7 +208,7 @@ class TestCharset(object):
         config.enforce_valid_values = True
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-        msg = ("'iso2022_jp' codec can't decode bytes in position 0-3: "
+        msg = ("'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
                "illegal multibyte sequence")
         with pytest.raises(UnicodeDecodeError, match=msg):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
@@ -435,11 +436,26 @@ class TestCharset(object):
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
 
+        japanese_pn = PersonName3(u"Mori^Ogai=森^鷗外=もり^おうがい")
+        pyencs = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
+                                                    "ISO 2022 IR 87",
+                                                    "ISO 2022 IR 159"])
+        actual_encoded = bytes(japanese_pn.encode(pyencs))
+        expect_encoded = (
+            b"\x4d\x6f\x72\x69\x5e\x4f\x67\x61\x69\x3d\x1b\x24\x42\x3f"
+            b"\x39\x1b\x28\x42\x5e\x1b\x24\x28\x44\x6c\x3f\x1b\x24\x42"
+            b"\x33\x30\x1b\x28\x42\x3d\x1b\x24\x42\x24\x62\x24\x6a\x1b"
+            b"\x28\x42\x5e\x1b\x24\x42\x24\x2a\x24\x26\x24\x2c\x24\x24"
+            b"\x1b\x28\x42"
+        )
+        assert expect_encoded == actual_encoded
+
     def test_japanese_multi_byte_encoding(self):
         """Test japanese multi byte strings are correctly encoded."""
-        encoded = pydicom.charset.encode_string(u'あaｱア',
-                                                ['shift_jis', 'iso2022_jp'])
-        assert b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b(J' == encoded
+        encoded = pydicom.charset.encode_string(u'あaｱア齩', ['shift_jis',
+                                                'iso2022_jp', 'iso2022_jp_2'])
+        expect = b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b$(DmN\x1b(J'
+        assert expect == bytes(encoded)
 
     def test_bad_japanese_encoding(self):
         """Test japanese multi byte strings are not correctly encoded."""
