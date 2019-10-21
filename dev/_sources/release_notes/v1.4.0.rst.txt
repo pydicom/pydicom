@@ -18,6 +18,7 @@ Fixes
 * Fixed error in pickling modified datasets (:issue:`951`)
 * Fixed improper conversion of the first value of the *LUT
   Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
+* Fixed handling of ISO IR 159 encoding (:issue: `917`)
 
 Enhancements
 ............
