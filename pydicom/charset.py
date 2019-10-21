@@ -227,7 +227,6 @@ def _encode_to_given_charset(value, character_set, errors='strict'):
             e.start = i
             e.end = len(value)
             raise e
-        seq_length = 4 if b.startswith((b'\x1b$(', b'\x1b$)')) else 3
         if b[:1] == ESC:
             raise UnicodeEncodeError(
                 encoding, value, i, len(value),
