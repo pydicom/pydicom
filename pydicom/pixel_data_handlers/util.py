@@ -168,7 +168,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     if not all(ii == lut_lengths[0] for ii in lut_lengths[1:]):
         raise ValueError("LUT data must be the same length")
 
-    # IVs < `first_map` get set to first LUT entry (i.e. 0)
+    # IVs < `first_map` get set to first LUT entry (i.e. index 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
     # IVs >= `first_map` are mapped by the Palette Color LUTs
     # `first_map` may be negative, positive or 0
@@ -235,9 +235,9 @@ def apply_modality_lut(arr, ds):
         dtype = 'uint{}'.format(nominal_depth)
         lut_data = np.asarray(item.LUTData, dtype=dtype)
 
-        # IVs < `first_map` get set to first LUT entry (i.e. 0)
+        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
-        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        # IVs >= `first_map` are mapped by the Modality LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
         clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
@@ -256,9 +256,6 @@ def apply_voi_lut(arr, ds, index=0):
     """Apply a VOI lookup table or windowing operation to `arr`.
 
     C.7.6.16.2.10 (0028,9132) Frame VOI LUT Sequence -> doc
-    C.8.11.3.1.5
-        * Windowing shall not produce a signed result
-        * LUT Descriptor[2] shall be between 10-16
 
     Parameters
     ----------
@@ -286,6 +283,8 @@ def apply_voi_lut(arr, ds, index=0):
     ----------
     * DICOM Standard, Part 3, :dcm:`Annex C.11.2
       <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
+      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
@@ -294,14 +293,24 @@ def apply_voi_lut(arr, ds, index=0):
         item = ds.VOILUTSequence[index]
         nr_entries = item.LUTDescriptor[0] or 2**16
         first_map = item.LUTDescriptor[1]
-        nominal_depth = item.LUTDescriptor[2]
 
-        dtype = 'uint{}'.format(nominal_depth)
+        # PS3.3 C.8.11.3.1.5: may be 8, 10-16
+        nominal_depth = item.LUTDescriptor[2]
+        if nominal_depth in list(range(10, 17)):
+            dtype = 'uint16'
+        elif nominal_depth == 8:
+            dtype = 'uint8'
+        else:
+            raise NotImplementedError(
+                "'{}' bits per LUT entry is not supported"
+                .format(nominal_depth)
+            )
+
         lut_data = np.asarray(item.LUTData, dtype=dtype)
 
-        # IVs < `first_map` get set to first LUT entry (i.e. 0)
+        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
-        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        # IVs >= `first_map` are mapped by the VOI LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
         clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
@@ -312,12 +321,13 @@ def apply_voi_lut(arr, ds, index=0):
     elif 'WindowCenter' in ds and 'WindowWidth' in ds:
         if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
             raise ValueError(
-                "Only 'MONOCHROME1' and 'MONOCHROME2' are allowed for "
-                "(0028,0004) Photometric Interpretation"
+                "When performing a windowing operation only 'MONOCHROME1' and "
+                "'MONOCHROME2' are allowed for (0028,0004) Photometric "
+                "Interpretation"
             )
 
         # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
-        voi_func = getattr(ds, 'VOILUTFunction', 'LINEAR')
+        voi_func = getattr(ds, 'VOILUTFunction', 'LINEAR').upper()
         # VR DS, VM 1-n
         elem = ds['WindowCenter']
         center = elem.value[index] if elem.VM > 1 else elem.value
