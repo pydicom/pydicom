@@ -88,8 +88,8 @@ Default ``False``
 
 use_none_as_empty_text_VR_value = False
 """ If ``True``, the value of a decoded empty data element with
-a text VR is ``None``, otherwise (the default), it is is an empty string. 
-For all other VRs the behavior does not change - the value is en empty 
+a text VR is ``None``, otherwise (the default), it is is an empty string.
+For all other VRs the behavior does not change - the value is en empty
 list for VR 'SQ' and ``None`` for all other VRs.
 Note that the default of this value will change to ``True`` in version 2.0.
 """
