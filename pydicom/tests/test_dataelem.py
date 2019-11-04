@@ -503,6 +503,23 @@ class TestDataElement(object):
             check_empty_binary_element(MultiValue(int, []))
             check_empty_binary_element(None)
 
+    def test_empty_sequence_is_handled_as_array(self):
+        ds = Dataset()
+        ds.AcquisitionContextSequence = []
+        elem = ds['AcquisitionContextSequence']
+        assert bool(elem.value) is False
+        assert 0 == elem.VM
+        assert elem.value == []
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = True
+        filewriter.write_dataset(fp, ds)
+        ds_read = dcmread(fp, force=True)
+        elem = ds_read['AcquisitionContextSequence']
+        assert 0 == elem.VM
+        assert elem.value == []
+
 
 class TestRawDataElement(object):
     """Tests for dataelem.RawDataElement."""
