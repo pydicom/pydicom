@@ -10,6 +10,7 @@ import pytest
 
 from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
+from pydicom.data import get_testdata_files
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -280,15 +281,15 @@ class TestDataElement(object):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    @pytest.mark.skipif(sys.version_info >= (3, ), reason='Python 2 behavior')
+    @pytest.mark.skipif(sys.version_info >= (3,), reason='Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
         elem = DataElement(0x00100010, 'PN', u'ANON')
         # Make sure elem.value is actually unicode
         assert isinstance(elem.value, unicode)
         assert (
-            u"(0010, 0010) Patient's Name                      PN: ANON"
-        ) == unicode(elem)
+                   u"(0010, 0010) Patient's Name                      PN: ANON"
+               ) == unicode(elem)
         assert isinstance(unicode(elem), unicode)
         assert not isinstance(unicode(elem), str)
         # Make sure elem.value is still unicode
@@ -298,8 +299,8 @@ class TestDataElement(object):
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
         assert (
-            u"(0010, 0010) Patient's Name                      LO: 12345"
-        ) == unicode(elem)
+                   u"(0010, 0010) Patient's Name                      LO: 12345"
+               ) == unicode(elem)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
@@ -310,13 +311,13 @@ class TestDataElement(object):
     def test_repval_large_elem(self):
         """Test DataElement.repval doesn't return a huge string for a large
         value"""
-        elem = DataElement(0x00820003, 'UT', 'a'*1000)
+        elem = DataElement(0x00820003, 'UT', 'a' * 1000)
         assert len(elem.repval) < 100
 
     def test_repval_large_vm(self):
         """Test DataElement.repval doesn't return a huge string for a large
         vm"""
-        elem = DataElement(0x00080054, 'AE', 'a\\'*1000+'a')
+        elem = DataElement(0x00080054, 'AE', 'a\\' * 1000 + 'a')
         assert len(elem.repval) < 100
 
     def test_repval_strange_type(self):
@@ -379,6 +380,16 @@ class TestDataElement(object):
         assert 'CS' == ds[0x00080005].VR
         assert 'PN' == ds[0x00100010].VR
         assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
+
+    def test_reading_ds_with_known_tags_with_UN_VR(self):
+        """Known tags with VR UN are correctly read."""
+        test_file = get_testdata_files('explicit_VR-UN.dcm')[0]
+        ds = dcmread(test_file)
+        assert 'CS' == ds[0x00080005].VR
+        assert 'TM' == ds[0x00080030].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert 'DA' == ds[0x00100030].VR
 
     def test_unknown_tags_with_UN_VR(self):
         """Unknown tags with VR UN are not decoded."""

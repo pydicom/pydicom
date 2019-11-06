@@ -745,6 +745,15 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
                 msg += " can't look up VR"
                 raise KeyError(msg)
+    elif VR == 'UN' and not raw.tag.is_private:
+        # handle rare case of incorrectly set 'UN' in explicit encoding
+        # see also DataElement.__init__()
+        if (raw.length == 0xffffffff or raw.value is None or
+                len(raw.value) < 0xffff):
+            try:
+                VR = dictionary_VR(raw.tag)
+            except KeyError:
+                pass
     try:
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
