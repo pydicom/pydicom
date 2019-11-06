@@ -299,7 +299,8 @@ class TestDataElement(object):
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
         assert (
-                   u"(0010, 0010) Patient's Name                      LO: 12345"
+                   u"(0010, 0010) Patient's Name"
+                   u"                      LO: 12345"
                ) == unicode(elem)
 
     def test_getitem_raises(self):
