@@ -1986,7 +1986,7 @@ class Dataset(dict):
                 value_key = unique_value_keys[0]
                 value = mapping[value_key]
             data_element = DataElement.from_json(
-                cls, tag, vr, value, value_key
+                cls, tag, vr, value, value_key, bulk_data_uri_handler
             )
             dataset.add(data_element)
         return dataset
