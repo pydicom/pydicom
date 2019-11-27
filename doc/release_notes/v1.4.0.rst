@@ -37,3 +37,5 @@ Enhancements
   for applying modality LUTs.
 * Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
   palette color datasets.
+* Raise on end of file errors if `config.enforce_valid_values` is set
+  (:issue:`277`)
