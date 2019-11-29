@@ -6,14 +6,19 @@ import pytest
 from pydicom.data import get_testdata_files
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
-from pydicom import read_file
-
+from pydicom import read_file, config
 
 TEST_FILE = get_testdata_files('DICOMDIR')[0]
+IMPLICIT_TEST_FILE = get_testdata_files('DICOMDIR-implicit')[0]
+BIGENDIAN_TEST_FILE = get_testdata_files('DICOMDIR-bigEnd')[0]
 
 
 class TestDicomDir(object):
     """Test dicomdir.DicomDir class"""
+
+    def teardown(self):
+        config.enforce_valid_values = False
+
     def test_read_file(self):
         """Test creation of DicomDir instance using filereader.read_file"""
         ds = read_file(TEST_FILE)
@@ -43,3 +48,18 @@ class TestDicomDir(object):
         assert len(ds.patient_records) == 2
         assert ds.patient_records[0].PatientName == 'Doe^Archibald'
         assert ds.patient_records[1].PatientName == 'Doe^Peter'
+
+    def test_invalid_transfer_syntax(self):
+        with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
+            read_file(IMPLICIT_TEST_FILE)
+        with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
+            read_file(BIGENDIAN_TEST_FILE)
+
+    def test_invalid_transfer_syntax_strict_mode(self):
+        config.enforce_valid_values = True
+        with pytest.raises(InvalidDicomError,
+                           match='Invalid transfer syntax*'):
+            read_file(IMPLICIT_TEST_FILE)
+        with pytest.raises(InvalidDicomError,
+                           match='Invalid transfer syntax*'):
+            read_file(BIGENDIAN_TEST_FILE)
