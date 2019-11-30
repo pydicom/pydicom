@@ -9,7 +9,7 @@ import pytest
 from pydicom.data import (
     get_charset_files, get_testdata_files, get_palette_files
 )
-from pydicom.data.data_manager import DATA_ROOT
+from pydicom.data.data_manager import DATA_ROOT, get_testdata_file
 
 
 class TestGetData(object):
@@ -50,6 +50,12 @@ class TestGetData(object):
         pattern = 'chrX1'
         filename = get_charset_files(pattern)
         assert filename[0].endswith('chrX1.dcm')
+
+    def test_get_testdata_file(self):
+        """Test that file name is working properly."""
+        name = 'DICOMDIR'
+        filename = get_testdata_file(name)
+        assert filename and filename.endswith('DICOMDIR')
 
     def test_get_palette_files(self):
         """Test data_manager.get_palette_files."""
