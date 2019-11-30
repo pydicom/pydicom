@@ -39,3 +39,6 @@ Enhancements
   palette color datasets.
 * Raise on end of file errors if `config.enforce_valid_values` is set
   (:issue:`277`)
+* Added user warning, or exception in strict mode, if a DICOMDIR has an
+  unexpected transfer syntax (:issue:`848`)
+  

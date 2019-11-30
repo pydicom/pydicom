@@ -33,7 +33,7 @@ files = []
 print('glob: {}'.format(sys.argv[1]))
 for fname in glob.glob(sys.argv[1], recursive=False):
     print("loading: {}".format(fname))
-    files.append(pydicom.read_file(fname))
+    files.append(pydicom.dcmread(fname))
 
 print("file count: {}".format(len(files)))
 

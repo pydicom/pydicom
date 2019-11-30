@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Module for DicomDir class."""
+import warnings
 
+from pydicom import config
 from pydicom.errors import InvalidDicomError
 from pydicom.dataset import FileDataset
 
@@ -47,6 +49,14 @@ class DicomDir(FileDataset):
         is_little_endian : bool
             ``True`` if little endian transfer syntax used (default); ``False``
             if big endian.
+
+        Raises
+        ------
+        InvalidDicomError
+            If the file transfer syntax is not Little Endian Explicit and
+            :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+            is ``True``.
+
         """
         # Usually this class is created through filereader.read_partial,
         # and it checks class SOP, but in case of direct creation,
@@ -56,6 +66,12 @@ class DicomDir(FileDataset):
             if not class_uid.name == "Media Storage Directory Storage":
                 msg = "SOP Class is not Media Storage Directory (DICOMDIR)"
                 raise InvalidDicomError(msg)
+        if is_implicit_VR or not is_little_endian:
+            msg = ('Invalid transfer syntax for DICOMDIR - '
+                   'Implicit Little Endian expected.')
+            if config.enforce_valid_values:
+                raise InvalidDicomError(msg)
+            warnings.warn(msg, UserWarning)
         FileDataset.__init__(
             self,
             filename_or_obj,
