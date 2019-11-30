@@ -5,7 +5,10 @@
 
 Computation times
 =================
-**00:00.040** total execution time for **auto_examples_image_processing** files:
+**00:00.005** total execution time for **auto_examples_image_processing** files:
 
-- **00:00.040**: :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``plot_downsize_image.py``)
-- **00:00.000**: :ref:`sphx_glr_auto_examples_image_processing_reslice.py` (``reslice.py``)
++----------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``plot_downsize_image.py``) | 00:00.005 | 0.0 MB |
++----------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_image_processing_reslice.py` (``reslice.py``)                         | 00:00.000 | 0.0 MB |
++----------------------------------------------------------------------------------------------------+-----------+--------+

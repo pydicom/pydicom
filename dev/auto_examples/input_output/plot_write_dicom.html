@@ -194,21 +194,21 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmp30axj38b.dcm
+Writing test file /tmp/tmp7pic4axu.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpa8367_in.dcm
-Load file /tmp/tmp30axj38b.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20191116&#39;
-(0008, 0033) Content Time                        TM: &#39;143025.396576&#39;
+Writing test file as Big Endian Explicit VR /tmp/tmpurgkxyhn.dcm
+Load file /tmp/tmp7pic4axu.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20191130&#39;
+(0008, 0033) Content Time                        TM: &#39;210557.546733&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp30axj38b.dcm ...
-Load file /tmp/tmpa8367_in.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20191116&#39;
-(0008, 0033) Content Time                        TM: &#39;143025.396576&#39;
+Remove file /tmp/tmp7pic4axu.dcm ...
+Load file /tmp/tmpurgkxyhn.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20191130&#39;
+(0008, 0033) Content Time                        TM: &#39;210557.546733&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpa8367_in.dcm ...
+Remove file /tmp/tmpurgkxyhn.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -222,12 +222,12 @@ Remove file /tmp/tmpa8367_in.dcm ...
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span>
 
 <span class="c1"># Create some temporary filenames</span>
-<span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
-<span class="n">filename_little_endian</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<span class="n">filename_big_endian</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="View documentation for tempfile.NamedTemporaryFile"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="View documentation for tempfile.NamedTemporaryFile"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting file meta information...&quot;</span><span class="p">)</span>
 <span class="c1"># Populate required values for file meta information</span>
@@ -239,7 +239,7 @@ Remove file /tmp/tmpa8367_in.dcm ...
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting dataset values...&quot;</span><span class="p">)</span>
 <span class="c1"># Create the FileDataset instance (initially no data elements, but file_meta</span>
 <span class="c1"># supplied)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">FileDataset</span><span class="p">(</span><span class="n">filename_little_endian</span><span class="p">,</span> <span class="p">{},</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">FileDataset</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">,</span> <span class="p">{},</span>
                  <span class="n">file_meta</span><span class="o">=</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">preamble</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">128</span><span class="p">)</span>
 
 <span class="c1"># Add the data elements -- not trying to set all required here. Check DICOM</span>
@@ -252,13 +252,13 @@ Remove file /tmp/tmpa8367_in.dcm ...
 <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="c1"># Set creation date/time</span>
-<span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ContentDate</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">timeStr</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H%M%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># long format with micro seconds</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ContentTime</span> <span class="o">=</span> <span class="n">timeStr</span>
+<a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="View documentation for datetime.datetime"><span class="n">dt</span></a> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ContentDate</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime" title="View documentation for datetime.datetime.strftime"><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span></a><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">timeStr</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime" title="View documentation for datetime.datetime.strftime"><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span></a><span class="p">(</span><span class="s1">&#39;%H%M%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># long format with micro seconds</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ContentTime</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">timeStr</span></a>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file&quot;</span><span class="p">,</span> <span class="n">filename_little_endian</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">filename_little_endian</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File saved.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Write as a different transfer syntax XXX shouldn&#39;t need this but pydicom</span>
@@ -267,21 +267,21 @@ Remove file /tmp/tmpa8367_in.dcm ...
 <span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file as Big Endian Explicit VR&quot;</span><span class="p">,</span> <span class="n">filename_big_endian</span><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">filename_big_endian</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file as Big Endian Explicit VR&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">)</span>
 
 <span class="c1"># reopen the data just for checking</span>
-<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><span class="n">filename_little_endian</span><span class="p">,</span> <span class="n">filename_big_endian</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Load file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="ow">in</span> <span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Load file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">))</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
     <span class="c1"># remove the created file</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Remove file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Remove file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">))</span>
+    <a href="https://docs.python.org/3/library/os.html#os.remove" title="View documentation for os.remove"><span class="n">os</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.033 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.005 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7e3f494a513e0ac1eb4963e47afed114/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>

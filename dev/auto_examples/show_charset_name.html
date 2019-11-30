@@ -190,8 +190,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">compat</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="k">import</span> <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">compat</span>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a>
 
 <span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="k">as</span> <span class="nn">tkinter</span>
@@ -202,7 +202,7 @@
 
 <span class="n">default_encoding</span> <span class="o">=</span> <span class="s1">&#39;iso8859&#39;</span>
 
-<span class="n">root</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+<span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="View documentation for tkinter.Tk"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
 <span class="c1"># root.geometry(&quot;%dx%d%+d%+d&quot; % (800, 600, 0, 0))</span>
 
 <span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>

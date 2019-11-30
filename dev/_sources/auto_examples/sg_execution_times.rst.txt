@@ -5,8 +5,12 @@
 
 Computation times
 =================
-**00:00.129** total execution time for **auto_examples** files:
+**00:00.093** total execution time for **auto_examples** files:
 
-- **00:00.129**: :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``plot_dicom_difference.py``)
-- **00:00.000**: :ref:`sphx_glr_auto_examples_dicomtree.py` (``dicomtree.py``)
-- **00:00.000**: :ref:`sphx_glr_auto_examples_show_charset_name.py` (``show_charset_name.py``)
++---------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_dicom_difference.py` (``plot_dicom_difference.py``) | 00:00.093 | 0.0 MB |
++---------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_dicomtree.py` (``dicomtree.py``)                         | 00:00.000 | 0.0 MB |
++---------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_show_charset_name.py` (``show_charset_name.py``)         | 00:00.000 | 0.0 MB |
++---------------------------------------------------------------------------------------+-----------+--------+

@@ -215,7 +215,7 @@
 <h1>pydicom.datadict.add_dict_entry<a class="headerlink" href="#pydicom-datadict-add-dict-entry" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.datadict.add_dict_entry">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_dict_entry</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">keyword</em>, <em class="sig-param">description</em>, <em class="sig-param">VM='1'</em>, <em class="sig-param">is_retired=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c5852160/pydicom/datadict.py#L49"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_dict_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_dict_entry</code><span class="sig-paren">(</span><em class="sig-param">tag</em>, <em class="sig-param">VR</em>, <em class="sig-param">keyword</em>, <em class="sig-param">description</em>, <em class="sig-param">VM='1'</em>, <em class="sig-param">is_retired=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5e6ae9e6/pydicom/datadict.py#L49"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_dict_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the DICOM dictionary with a new non-private entry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,7 +246,7 @@ Will replace an existing entry if the tag already exists in the dictionary.</p>
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="k">import</span> <span class="n">Dataset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">add_dict_entry</span><span class="p">(</span><span class="mh">0x10021001</span><span class="p">,</span> <span class="s2">&quot;UL&quot;</span><span class="p">,</span> <span class="s2">&quot;TestOne&quot;</span><span class="p">,</span> <span class="s2">&quot;Test One&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">add_dict_entry</span><span class="p">(</span><span class="mh">0x10021002</span><span class="p">,</span> <span class="s2">&quot;DS&quot;</span><span class="p">,</span> <span class="s2">&quot;TestTwo&quot;</span><span class="p">,</span> <span class="s2">&quot;Test Two&quot;</span><span class="p">,</span> <span class="n">VM</span><span class="o">=</span><span class="s1">&#39;3&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>

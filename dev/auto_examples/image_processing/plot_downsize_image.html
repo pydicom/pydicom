@@ -279,33 +279,33 @@ The information of the data set after downsampling:
 <span class="c1"># license : MIT</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
 <span class="c1"># FIXME: add a full-sized MR image in the testing data</span>
-<span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 
 <span class="c1"># get the pixel information into a numpy array</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The image has </span><span class="si">{}</span><span class="s1"> x </span><span class="si">{}</span><span class="s1"> voxels&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                            <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-<span class="n">data_downsampling</span> <span class="o">=</span> <span class="n">data</span><span class="p">[::</span><span class="mi">8</span><span class="p">,</span> <span class="p">::</span><span class="mi">8</span><span class="p">]</span>
+<a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">data</span></a> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The image has </span><span class="si">{}</span><span class="s1"> x </span><span class="si">{}</span><span class="s1"> voxels&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="View documentation for numpy.ndarray.shape"><span class="n">data</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                            <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="View documentation for numpy.ndarray.shape"><span class="n">data</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">data_downsampling</span></a> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">data</span></a><span class="p">[::</span><span class="mi">8</span><span class="p">,</span> <span class="p">::</span><span class="mi">8</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The downsampled image has </span><span class="si">{}</span><span class="s1"> x </span><span class="si">{}</span><span class="s1"> voxels&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="View documentation for numpy.ndarray.shape"><span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="View documentation for numpy.ndarray.shape"><span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 <span class="c1"># copy the data back to the original data set</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="View documentation for numpy.ndarray.tobytes"><span class="n">data_downsampling</span><span class="o">.</span><span class="n">tobytes</span></a><span class="p">()</span>
 <span class="c1"># update the information regarding the shape of the data array</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="View documentation for numpy.ndarray.shape"><span class="n">data_downsampling</span><span class="o">.</span><span class="n">shape</span></a>
 
 <span class="c1"># print the image information given in the dataset</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The information of the data set after downsampling: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.040 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.005 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/032a903dae32dc4e934f88d87905b561/plot_downsize_image.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></p>

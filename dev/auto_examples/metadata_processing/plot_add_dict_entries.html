@@ -207,28 +207,28 @@ missing from pydicom’s DICOM dictionaries.</p>
 <span class="c1">#           Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="k">import</span> <span class="n">DicomDictionary</span><span class="p">,</span> <span class="n">keyword_dict</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="k">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.datadict</span> <span class="kn">import</span> <span class="n">DicomDictionary</span><span class="p">,</span> <span class="n">keyword_dict</span>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
 <span class="c1"># Define items as (VR, VM, description, is_retired flag, keyword)</span>
 <span class="c1">#   Leave is_retired flag blank.</span>
-<span class="n">new_dict_items</span> <span class="o">=</span> <span class="p">{</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">new_dict_items</span></a> <span class="o">=</span> <span class="p">{</span>
     <span class="mh">0x10011001</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;UL&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s2">&quot;Test One&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;TestOne&#39;</span><span class="p">),</span>
     <span class="mh">0x10011002</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;OB&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s2">&quot;Test Two&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;TestTwo&#39;</span><span class="p">),</span>
     <span class="mh">0x10011003</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;UI&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s2">&quot;Test Three&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;TestThree&#39;</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="c1"># Update the dictionary itself</span>
-<span class="n">DicomDictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_dict_items</span><span class="p">)</span>
+<span class="n">DicomDictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">new_dict_items</span></a><span class="p">)</span>
 
 <span class="c1"># Update the reverse mapping from name to tag</span>
-<span class="n">new_names_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
-                       <span class="n">new_dict_items</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-<span class="n">keyword_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_names_dict</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">new_names_dict</span></a> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">val</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span>
+                       <a href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="View documentation for builtins.dict.items"><span class="n">new_dict_items</span><span class="o">.</span><span class="n">items</span></a><span class="p">()])</span>
+<span class="n">keyword_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">new_names_dict</span></a><span class="p">)</span>
 
 <span class="c1"># Test that it is working</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>  <span class="c1"># or could get one from dcmread, etc</span>
@@ -240,7 +240,7 @@ missing from pydicom’s DICOM dictionaries.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">top</span><span class="p">())</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.030 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.001 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-add-dict-entries-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/b09c4a9ac1947f91877d5cbf389a2b2e/plot_add_dict_entries.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_add_dict_entries.py</span></code></a></p>

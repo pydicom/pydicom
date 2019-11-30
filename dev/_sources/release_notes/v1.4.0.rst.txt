@@ -37,3 +37,5 @@ Enhancements
   for applying modality LUTs.
 * Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
   palette color datasets.
+* Added user warning, or exception in strict mode, if a DICOMDIR has an
+  unexpected transfer syntax (:issue:`848`)

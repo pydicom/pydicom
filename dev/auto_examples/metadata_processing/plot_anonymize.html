@@ -195,29 +195,25 @@ optionally remove curves and private tags, and write the results in a new file.<
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">tempfile</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
 <div class="section" id="anonymize-a-single-file">
 <h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 
-<span class="n">data_elements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">]</span>
-<span class="k">for</span> <span class="n">de</span> <span class="ow">in</span> <span class="n">data_elements</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="n">de</span><span class="p">))</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">de</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">data_elements</span></a><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">de</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -234,15 +230,15 @@ curves tags.</p>
 
 
 <span class="k">def</span> <span class="nf">curves_callback</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">group</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">==</span> <span class="mh">0x5000</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">dataset</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">tag</span></a><span class="o">.</span><span class="n">group</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">==</span> <span class="mh">0x5000</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">dataset</span><span class="p">[</span><span class="n">data_element</span><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">tag</span></a><span class="p">]</span>
 </pre></div>
 </div>
 <p>We can use the different callback function to iterate through the dataset but
 also some other tags such that patient ID, etc.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
-<span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">person_names_callback</span><span class="p">)</span>
-<span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">curves_callback</span><span class="p">)</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">person_names_callback</span></a><span class="p">)</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">curves_callback</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>pydicom allows to remove private tags using <code class="docutils literal notranslate"><span class="pre">remove_private_tags</span></code> method</p>
@@ -260,19 +256,19 @@ also some other tags such that patient ID, etc.</p>
 </div>
 <p>For data elements of type 2, this is possible to blank it by assigning a
 blank string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tag</span> <span class="o">=</span> <span class="s1">&#39;PatientBirthDate&#39;</span>
-<span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-    <span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;19000101&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">tag</span></a> <span class="o">=</span> <span class="s1">&#39;PatientBirthDate&#39;</span>
+<span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">tag</span></a> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">tag</span></a><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;19000101&#39;</span>
 </pre></div>
 </div>
 <p>Finally, this is possible to store the image</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_elements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">data_elements</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PatientID&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;PatientBirthDate&#39;</span><span class="p">]</span>
-<span class="k">for</span> <span class="n">de</span> <span class="ow">in</span> <span class="n">data_elements</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><span class="n">de</span><span class="p">))</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">de</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">data_elements</span></a><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data_element</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">de</span></a><span class="p">))</span>
 
-<span class="n">output_filename</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
-<span class="n">dataset</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">output_filename</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="View documentation for tempfile.NamedTemporaryFile"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">output_filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -280,7 +276,7 @@ blank string.</p>
 (0010, 0030) Patient&#39;s Birth Date                DA: &#39;19000101&#39;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.037 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.008 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-anonymize-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/cdbc1bcbae90b5ff13fdc9b19581006e/plot_anonymize.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_anonymize.py</span></code></a></p>

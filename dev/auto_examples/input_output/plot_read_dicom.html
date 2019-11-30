@@ -212,31 +212,31 @@ Slice location...: -77.2040634155
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
-<span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 
 <span class="c1"># Normal mode:</span>
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filename.........:&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Filename.........:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Storage type.....:&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">SOPClassUID</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">()</span>
 
-<span class="n">pat_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span>
-<span class="n">display_name</span> <span class="o">=</span> <span class="n">pat_name</span><span class="o">.</span><span class="n">family_name</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">pat_name</span><span class="o">.</span><span class="n">given_name</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Patient&#39;s name...:&quot;</span><span class="p">,</span> <span class="n">display_name</span><span class="p">)</span>
+<a href="../../reference/generated/pydicom.valuerep.PersonName3.html#pydicom.valuerep.PersonName3" title="View documentation for pydicom.valuerep.PersonName3"><span class="n">pat_name</span></a> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">display_name</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.valuerep.PersonName3.html#pydicom.valuerep.PersonName3" title="View documentation for pydicom.valuerep.PersonName3"><span class="n">pat_name</span></a><span class="o">.</span><span class="n">family_name</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <a href="../../reference/generated/pydicom.valuerep.PersonName3.html#pydicom.valuerep.PersonName3" title="View documentation for pydicom.valuerep.PersonName3"><span class="n">pat_name</span></a><span class="o">.</span><span class="n">given_name</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Patient&#39;s name...:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">display_name</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Patient id.......:&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Modality.........:&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">Modality</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Study Date.......:&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">StudyDate</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="s1">&#39;PixelData&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-    <span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">Rows</span><span class="p">)</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">rows</span></a> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">Rows</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">cols</span></a> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">Columns</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Image size.......: </span><span class="si">{rows:d}</span><span class="s2"> x </span><span class="si">{cols:d}</span><span class="s2">, </span><span class="si">{size:d}</span><span class="s2"> bytes&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">rows</span><span class="o">=</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)))</span>
+        <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">rows</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">rows</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">cols</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">cols</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">PixelData</span><span class="p">)))</span>
     <span class="k">if</span> <span class="s1">&#39;PixelSpacing&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pixel spacing....:&quot;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">PixelSpacing</span><span class="p">)</span>
 
@@ -248,7 +248,7 @@ Slice location...: -77.2040634155
 <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="View documentation for matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.116 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.090 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/5e2195081f5a423e984744f70649688b/plot_read_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom.py</span></code></a></p>
