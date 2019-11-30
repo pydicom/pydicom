@@ -6,7 +6,7 @@ import pytest
 from pydicom.data import get_testdata_files
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
-from pydicom import read_file, config
+from pydicom import config, dcmread
 
 TEST_FILE = get_testdata_files('DICOMDIR')[0]
 IMPLICIT_TEST_FILE = get_testdata_files('DICOMDIR-implicit')[0]
@@ -20,13 +20,13 @@ class TestDicomDir(object):
         config.enforce_valid_values = False
 
     def test_read_file(self):
-        """Test creation of DicomDir instance using filereader.read_file"""
-        ds = read_file(TEST_FILE)
+        """Test creation of DicomDir instance using pydicom.dcmread"""
+        ds = dcmread(TEST_FILE)
         assert isinstance(ds, DicomDir)
 
     def test_invalid_sop_file_meta(self):
         """Test exception raised if SOP Class is not Media Storage Directory"""
-        ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_files('CT_small.dcm')[0])
         with pytest.raises(InvalidDicomError,
                            match=r"SOP Class is not Media Storage "
                                  r"Directory \(DICOMDIR\)"):
@@ -34,7 +34,7 @@ class TestDicomDir(object):
 
     def test_invalid_sop_no_file_meta(self):
         """Test exception raised if invalid sop class but no file_meta"""
-        ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_files('CT_small.dcm')[0])
         with pytest.raises(AttributeError,
                            match="'DicomDir' object has no attribute "
                                  "'DirectoryRecordSequence'"):
@@ -42,7 +42,7 @@ class TestDicomDir(object):
 
     def test_parse_records(self):
         """Test DicomDir.parse_records"""
-        ds = read_file(TEST_FILE)
+        ds = dcmread(TEST_FILE)
         assert hasattr(ds, 'patient_records')
         # There are two top level PATIENT records
         assert len(ds.patient_records) == 2
@@ -51,15 +51,15 @@ class TestDicomDir(object):
 
     def test_invalid_transfer_syntax(self):
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
-            read_file(IMPLICIT_TEST_FILE)
+            dcmread(IMPLICIT_TEST_FILE)
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
-            read_file(BIGENDIAN_TEST_FILE)
+            dcmread(BIGENDIAN_TEST_FILE)
 
     def test_invalid_transfer_syntax_strict_mode(self):
         config.enforce_valid_values = True
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
-            read_file(IMPLICIT_TEST_FILE)
+            dcmread(IMPLICIT_TEST_FILE)
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
-            read_file(BIGENDIAN_TEST_FILE)
+            dcmread(BIGENDIAN_TEST_FILE)
