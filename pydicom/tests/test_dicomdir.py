@@ -3,14 +3,14 @@
 
 import pytest
 
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom import config, dcmread
 
-TEST_FILE = get_testdata_files('DICOMDIR')[0]
-IMPLICIT_TEST_FILE = get_testdata_files('DICOMDIR-implicit')[0]
-BIGENDIAN_TEST_FILE = get_testdata_files('DICOMDIR-bigEnd')[0]
+TEST_FILE = get_testdata_file('DICOMDIR')
+IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
+BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 
 
 class TestDicomDir(object):
@@ -26,7 +26,7 @@ class TestDicomDir(object):
 
     def test_invalid_sop_file_meta(self):
         """Test exception raised if SOP Class is not Media Storage Directory"""
-        ds = dcmread(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(InvalidDicomError,
                            match=r"SOP Class is not Media Storage "
                                  r"Directory \(DICOMDIR\)"):
@@ -34,7 +34,7 @@ class TestDicomDir(object):
 
     def test_invalid_sop_no_file_meta(self):
         """Test exception raised if invalid sop class but no file_meta"""
-        ds = dcmread(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(AttributeError,
                            match="'DicomDir' object has no attribute "
                                  "'DirectoryRecordSequence'"):

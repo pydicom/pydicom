@@ -1,9 +1,9 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """pydicom data manager"""
 
-from os import walk
-from os.path import abspath, dirname, join
 import fnmatch
+import os
+from os.path import abspath, dirname, join
 
 DATA_ROOT = abspath(dirname(__file__))
 
@@ -30,7 +30,7 @@ def get_files(base, pattern):
     pattern = "*" + pattern + "*"
 
     files = []
-    for root, dirnames, filenames in walk(base):
+    for root, _, filenames in os.walk(base):
         for filename in filenames:
             filename_filter = fnmatch.filter([join(root, filename)],
                                              pattern)
@@ -60,6 +60,28 @@ def get_palette_files(pattern="*"):
     files = [filename for filename in files if not filename.endswith('.py')]
 
     return files
+
+
+def get_testdata_file(name):
+    """Return the first test data file path with the given name found under
+    the pydicom test data root.
+
+    Parameters
+    ----------
+    name : str
+        The full file name (without path)
+
+    Returns
+    -------
+    str, None
+        The full path of the file if found, or None.
+
+    """
+    data_path = join(DATA_ROOT, 'test_files')
+    for root, _, filenames in os.walk(data_path):
+        for filename in filenames:
+            if filename == name:
+                return os.path.join(root, filename)
 
 
 def get_testdata_files(pattern="*"):
