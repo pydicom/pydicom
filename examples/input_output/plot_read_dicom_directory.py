@@ -14,11 +14,11 @@ from os.path import dirname, join
 from pprint import pprint
 
 import pydicom
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.filereader import read_dicomdir
 
 # fetch the path to the test data
-filepath = get_testdata_files('DICOMDIR')[0]
+filepath = get_testdata_file('DICOMDIR')
 print('Path to the DICOM directory: {}'.format(filepath))
 # load the data
 dicom_dir = read_dicomdir(filepath)
