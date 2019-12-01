@@ -55,7 +55,7 @@ Somewhere to start
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="========================================= Show a dicom file using hierarchical tree ===========...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sudo apt install tix-dev sudo pip install -U pydicom python3 dicomtree.py file.dcm Or in file b...">
 
 .. only:: html
 
