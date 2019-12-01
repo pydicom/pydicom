@@ -41,6 +41,12 @@ def data_element_generator(fp,
 
     """Create a generator to efficiently return the raw data elements.
 
+    .. note::
+
+        This function is used internally - usually there is no need to call it
+        from user code. To read data from a DICOM file, :func:`dcmread`
+        shall be used instead.
+
     Parameters
     ----------
     fp : file-like
