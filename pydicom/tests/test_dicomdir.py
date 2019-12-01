@@ -12,6 +12,11 @@ TEST_FILE = get_testdata_file('DICOMDIR')
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
 BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 
+TEST_FILES = (
+    get_testdata_file('DICOMDIR'),
+    get_testdata_file('DICOMDIR-nooffset')
+)
+
 
 class TestDicomDir(object):
     """Test dicomdir.DicomDir class"""
@@ -19,9 +24,10 @@ class TestDicomDir(object):
     def teardown(self):
         config.enforce_valid_values = False
 
-    def test_read_file(self):
-        """Test creation of DicomDir instance using pydicom.dcmread"""
-        ds = dcmread(TEST_FILE)
+    @pytest.mark.parametrize("testfile", TEST_FILES)
+    def test_read_file(self, testfile):
+        """Test creation of DicomDir instance using filereader.read_file"""
+        ds = dcmread(testfile)
         assert isinstance(ds, DicomDir)
 
     def test_invalid_sop_file_meta(self):
@@ -40,9 +46,10 @@ class TestDicomDir(object):
                                  "'DirectoryRecordSequence'"):
             DicomDir("some_name", ds, b'\x00' * 128, None, True, True)
 
-    def test_parse_records(self):
+    @pytest.mark.parametrize("testfile", TEST_FILES)
+    def test_parse_records(self, testfile):
         """Test DicomDir.parse_records"""
-        ds = dcmread(TEST_FILE)
+        ds = dcmread(testfile)
         assert hasattr(ds, 'patient_records')
         # There are two top level PATIENT records
         assert len(ds.patient_records) == 2
