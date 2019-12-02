@@ -12,14 +12,14 @@ datasets saved as blobs in a database.
 
 from __future__ import print_function
 
+from io import BytesIO
+
 from pydicom import dcmread, dcmwrite
 from pydicom.filebase import DicomFileLike
 
 print(__doc__)
 
 usage = "Usage: python memory_dataset.py dicom_filename"
-
-from io import BytesIO
 
 
 def write_dataset_to_bytes(filepath):
