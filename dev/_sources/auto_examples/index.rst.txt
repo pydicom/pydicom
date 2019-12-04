@@ -55,6 +55,26 @@ Somewhere to start
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Show how to write a DICOM dataset into a byte array and to read it back from a byte array. This...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_memory_dataset_thumb.png
+
+     :ref:`sphx_glr_auto_examples_memory_dataset.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/memory_dataset
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="sudo apt install tix-dev sudo pip install -U pydicom python3 dicomtree.py file.dcm Or in file b...">
 
 .. only:: html

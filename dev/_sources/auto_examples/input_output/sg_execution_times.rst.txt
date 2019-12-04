@@ -5,7 +5,7 @@
 
 Computation times
 =================
-**00:00.143** total execution time for **auto_examples_input_output** files:
+**00:00.142** total execution time for **auto_examples_input_output** files:
 
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)                     | 00:00.088 | 0.0 MB |
