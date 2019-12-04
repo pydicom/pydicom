@@ -22,9 +22,7 @@ print(__doc__)
 usage = "Usage: python memory_dataset.py dicom_filename"
 
 
-def write_dataset_to_bytes(filepath):
-    # read the dataset from a file
-    dataset = dcmread(filepath)
+def write_dataset_to_bytes(dataset):
     # create a buffer
     with BytesIO() as buffer:
         # create a DicomLike object that has some properties of DataSet
@@ -37,9 +35,25 @@ def write_dataset_to_bytes(filepath):
         return memory_dataset.read()
 
 
-def read_dataset_from_bytes(blob):
+def adapt_dataset_from_bytes(blob):
     # you can just read the dataset from the byte array
-    return dcmread(BytesIO(blob))
+    dataset = dcmread(BytesIO(blob))
+    # do some interesting stuff
+    dataset.is_little_endian = False
+    dataset.PatientName = 'Bond^James'
+    dataset.PatientID = '007'
+    return dataset
+
+
+class DummyDataBase(object):
+    def __init__(self):
+        self._blobs = {}
+
+    def save(self, name, blob):
+        self._blobs[name] = blob
+
+    def load(self, name):
+        return self._blobs.get(name)
 
 
 if __name__ == '__main__':
@@ -49,7 +63,23 @@ if __name__ == '__main__':
         print("Please supply a dicom file name:\n")
         print(usage)
         sys.exit(-1)
-    ds_bytes = write_dataset_to_bytes(sys.argv[1])
-    print(ds_bytes)
-    ds = read_dataset_from_bytes(ds_bytes)
-    print(ds)
+    file_path = sys.argv[1]
+    db = DummyDataBase()
+
+    # Convert a dataset to a byte array:
+    # - read the dataset from a file
+    dataset = dcmread(file_path)
+    print(dataset)
+    # - convert the dataset to bytes
+    ds_bytes = write_dataset_to_bytes(dataset)
+    # - save the bytes in some storage
+    db.save('dataset', ds_bytes)
+
+    # Convert a byte array to a dataset:
+    # - get the bytes from storage
+    read_bytes = db.load('dataset')
+    # - convert the bytes into a dataset and do something interesting with it
+    read_dataset = adapt_dataset_from_bytes(read_bytes)
+    print(read_dataset)
+    # - you can write your dataset to a file if wanted
+    dcmwrite(file_path + '_new', read_dataset)
