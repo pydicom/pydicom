@@ -363,6 +363,8 @@ class TestNumpy_RLEHandler(object):
             )
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
+            with pytest.raises(NotImplementedError, match=exc_msg):
+                ds.decompress(handler=RLE_HANDLER)
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
@@ -370,6 +372,7 @@ class TestNumpy_RLEHandler(object):
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
+        assert len(ds.PixelData)
 
     def test_pixel_array_signed(self):
         """Test pixel_array for unsigned -> signed data."""
@@ -407,6 +410,19 @@ class TestNumpy_RLEHandler(object):
         assert arr.flags.writeable
 
         assert np.array_equal(arr, ref)
+        assert (600, 800) == arr.shape
+        assert 244 == arr[0].min() == arr[0].max()
+        assert (1, 246, 1) == tuple(arr[300, 491:494])
+        assert 0 == arr[-1].min() == arr[-1].max()
+
+    def test_decompress_with_handler(self):
+        """Test that decompress works with the correct handler."""
+        ds = dcmread(RLE_8_1_1F)
+        with pytest.raises(NotImplementedError, match='Unable to decode*'):
+            ds.decompress(handler=NP_HANDLER)
+        ds.decompress(handler=RLE_HANDLER)
+        assert hasattr(ds, '_pixel_array')
+        arr = ds.pixel_array
         assert (600, 800) == arr.shape
         assert 244 == arr[0].min() == arr[0].max()
         assert (1, 246, 1) == tuple(arr[300, 491:494])

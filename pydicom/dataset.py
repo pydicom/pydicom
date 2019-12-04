@@ -1268,9 +1268,16 @@ class Dataset(dict):
             self[key] = default
         return default
 
-    def convert_pixel_data(self):
+    def convert_pixel_data(self, handler=None):
         """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
         internally.
+
+        Parameters
+        ----------
+        handler: module or None
+            The pixel handler module that shall be used to decode the data.
+            If ``None`` (the default), a matching handler is used from the
+            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
         -------
@@ -1295,8 +1302,16 @@ class Dataset(dict):
 
         # Find all possible handlers that support the transfer syntax
         transfer_syntax = self.file_meta.TransferSyntaxUID
-        possible_handlers = [hh for hh in pydicom.config.pixel_data_handlers
-                             if hh.supports_transfer_syntax(transfer_syntax)]
+        if handler is not None:
+            possible_handlers = (
+                [handler] if handler.supports_transfer_syntax(transfer_syntax)
+                else []
+            )
+        else:
+            possible_handlers = [
+                hh for hh in pydicom.config.pixel_data_handlers
+                if hh.supports_transfer_syntax(transfer_syntax)
+            ]
 
         # No handlers support the transfer syntax
         if not possible_handlers:
@@ -1375,7 +1390,7 @@ class Dataset(dict):
 
         raise last_exception
 
-    def decompress(self):
+    def decompress(self, handler=None):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
@@ -1387,8 +1402,15 @@ class Dataset(dict):
 
         - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
           form
-        - :func:`~pydicom.dataelem.DataElement.is_undefined_length`
+        - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7fe0,0010) *Pixel Data* element.
+
+        Parameters
+        ----------
+        handler: module or None
+            The pixel handler module that shall be used to decode the data.
+            If ``None`` (the default), a matching handler is used from the
+            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
         -------
@@ -1400,7 +1422,7 @@ class Dataset(dict):
             If the pixel data was originally compressed but file is not
             *Explicit VR Little Endian* as required by the DICOM Standard.
         """
-        self.convert_pixel_data()
+        self.convert_pixel_data(handler)
         self.is_decompressed = True
         # May have been undefined length pixel data, but won't be now
         if 'PixelData' in self:
