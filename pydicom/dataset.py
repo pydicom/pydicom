@@ -1369,7 +1369,7 @@ class Dataset(dict):
                 "'{0}' ({1}) as there are no pixel data handlers "
                 "available that support it. Please see the pydicom "
                 "documentation for information on supported transfer syntaxes "
-                    .format(transfer_syntax, transfer_syntax.name)
+                .format(transfer_syntax, transfer_syntax.name)
             )
 
         # Handlers that both support the transfer syntax and have their
@@ -1395,7 +1395,7 @@ class Dataset(dict):
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
                     "{} (req. {})"
-                        .format(hh.HANDLER_NAME, ', '.join(names))
+                    .format(hh.HANDLER_NAME, ', '.join(names))
                 )
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
@@ -1421,7 +1421,7 @@ class Dataset(dict):
             "Please see the list of supported Transfer Syntaxes in the "
             "pydicom documentation for alternative packages that might "
             "be able to decode the data"
-                .format(", ".join([str(hh) for hh in available_handlers]))
+            .format(", ".join([str(hh) for hh in available_handlers]))
         )
         raise last_exception
 
