@@ -1328,6 +1328,10 @@ class Dataset(dict):
             handler_name += '_handler'
         if handler_name == 'numpy_handler':
             handler_name = 'np_handler'
+        if handler_name == 'jpeg_ls_handler':
+            # the name in config differs from the actual handler name
+            # we allow both
+            handler_name = 'jpegls_handler'
         if not hasattr(pydicom.config, handler_name):
             raise ValueError("'{}' is not a known handler name".format(name))
         handler = getattr(pydicom.config, handler_name)

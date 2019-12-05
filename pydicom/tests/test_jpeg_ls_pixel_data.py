@@ -63,6 +63,9 @@ color_3d_jpeg_baseline = get_testdata_files(
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
+SUPPORTED_HANDLER_NAMES = (
+    'jpegls', 'jpeg_ls', 'JPEG_LS', 'jpegls_handler', 'JPEG_LS_Handler'
+)
 
 class TestJPEGLS_no_jpeg_ls(object):
     def setup(self):
@@ -183,8 +186,9 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls(object):
         assert b.mean() == a.mean()
         assert a.flags.writeable
 
-    def test_decompress_using_jpeg_ls(self):
-        self.emri_jpeg_ls_lossless.decompress(handler_name='jpeg_ls')
+    @pytest.mark.parametrize("handler_name", SUPPORTED_HANDLER_NAMES)
+    def test_decompress_using_handler(self, handler_name):
+        self.emri_jpeg_ls_lossless.decompress(handler_name=handler_name)
         a = self.emri_jpeg_ls_lossless.pixel_array
         b = self.emri_small.pixel_array
         assert b.mean() == a.mean()
