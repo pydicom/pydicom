@@ -489,10 +489,10 @@ class TestsWithGDCM(object):
         assert a.mean() == b.mean()
         assert a.flags.writeable
 
-    def test_decompress_using_gdcm(self):
-        self.jpeg_2k_lossless.decompress(handler_name='gdcm')
-        a = self.jpeg_2k_lossless.pixel_array
-        b = self.mr_small.pixel_array
+    def test_decompress_using_gdcm(self, jpeg_2k_lossless, mr_small):
+        jpeg_2k_lossless.decompress(handler_name='gdcm')
+        a = jpeg_2k_lossless.pixel_array
+        b = mr_small.pixel_array
         assert a.mean() == b.mean()
 
     def test_emri_JPEG2000PixelArray(self, emri_jpeg_2k_lossless, emri_small):
