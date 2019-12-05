@@ -304,6 +304,13 @@ class Test_JPEG2000Tests_with_pillow(object):
 
         assert a.flags.writeable
 
+    def test_decompress_using_pillow(self):
+        """Test decompressing JPEG2K with pillow handler succeeds."""
+        self.jpeg_2k_lossless.decompress(handler_name='pillow')
+        a = self.jpeg_2k_lossless.pixel_array
+        b = self.mr_small.pixel_array
+        assert np.array_equal(a, b)
+
     def test_emri_JPEG2000PixelArray(self):
         """Test decoding JPEG2K with pillow handler succeeds."""
         a = self.emri_jpeg_2k_lossless.pixel_array

@@ -364,7 +364,7 @@ class TestNumpy_RLEHandler(object):
             with pytest.raises(NotImplementedError, match=exc_msg):
                 ds.pixel_array
             with pytest.raises(NotImplementedError, match=exc_msg):
-                ds.decompress(handler=RLE_HANDLER)
+                ds.decompress(handler_name='rle')
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
@@ -418,9 +418,12 @@ class TestNumpy_RLEHandler(object):
     def test_decompress_with_handler(self):
         """Test that decompress works with the correct handler."""
         ds = dcmread(RLE_8_1_1F)
+        with pytest.raises(ValueError,
+                           match="'zip' is not a known handler name"):
+            ds.decompress(handler_name='zip')
         with pytest.raises(NotImplementedError, match='Unable to decode*'):
-            ds.decompress(handler=NP_HANDLER)
-        ds.decompress(handler=RLE_HANDLER)
+            ds.decompress(handler_name='numpy')
+        ds.decompress(handler_name='rle')
         assert hasattr(ds, '_pixel_array')
         arr = ds.pixel_array
         assert (600, 800) == arr.shape

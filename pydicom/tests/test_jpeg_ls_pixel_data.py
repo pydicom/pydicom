@@ -183,6 +183,12 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls(object):
         assert b.mean() == a.mean()
         assert a.flags.writeable
 
+    def test_decompress_using_jpeg_ls(self):
+        self.emri_jpeg_ls_lossless.decompress(handler_name='jpeg_ls')
+        a = self.emri_jpeg_ls_lossless.pixel_array
+        b = self.emri_small.pixel_array
+        assert b.mean() == a.mean()
+
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class TestJPEGLS_JPEG2000_with_jpeg_ls(object):
