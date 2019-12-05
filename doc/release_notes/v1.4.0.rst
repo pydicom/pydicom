@@ -43,4 +43,5 @@ Enhancements
   unexpected transfer syntax (:issue:`848`)
 * Handle missing offset tags in DICOMDIR (:issue:`981`)
 * Added optional `handler` argument to
-  :func:`~pydicom.dataset.Dataset.decompress` (:issue:`537`)
+  :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
+  particular handler, rather than following pydicom's default order (:issue:`537`)

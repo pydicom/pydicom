@@ -1276,9 +1276,8 @@ class Dataset(dict):
         ----------
         handler_name: str
             The (optional) name of the pixel handler that shall be used to
-            decode the data. This lets you specify a particular handler, rather
-            than following pydicom's default order. Currently supported
-            handler names are: 'gdcm', 'pillow', 'jpeg_ls', 'rle' and 'numpy'.
+            decode the data. Currently supported handler names are: 'gdcm',
+            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
             If empty (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
@@ -1458,11 +1457,9 @@ class Dataset(dict):
 
         Parameters
         ----------
-        handler_name: str
             The (optional) name of the pixel handler that shall be used to
-            decode the data. This lets you specify a particular handler, rather
-            than following pydicom's default order. Currently supported
-            handler names are: 'gdcm', 'pillow', 'jpeg_ls', 'rle' and 'numpy'.
+            decode the data. Currently supported handler names are: 'gdcm',
+            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
             If empty (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
