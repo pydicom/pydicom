@@ -1319,7 +1319,7 @@ class Dataset(dict):
             self._convert_pixel_data_without_handler()
 
     def _convert_pixel_data_using_handler(self, name):
-        """Convert the pixel data using handler with thw given name.
+        """Convert the pixel data using handler with the given name.
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
         # handle some variations in name
