@@ -1418,6 +1418,7 @@ class TestNumpy_VOILUT(object):
     def test_window_single(self):
         pass
 
+    #@pytest.mark.skip('dev only')
     def test_window_multi(self):
         """Test windowing with multiple views."""
         # 12-bit unsigned

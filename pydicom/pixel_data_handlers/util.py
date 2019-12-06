@@ -115,9 +115,6 @@ def apply_color_lut(arr, ds=None, palette=None):
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
-    # Workaround for #942: first value is always unsigned
-    if nr_entries < 0:
-        nr_entries += 2**16
 
     # May be negative if Pixel Representation is 1
     first_map = lut_desc[1]
@@ -226,9 +223,6 @@ def apply_modality_lut(arr, ds):
     if 'ModalityLUTSequence' in ds:
         item = ds.ModalityLUTSequence[0]
         nr_entries = item.LUTDescriptor[0] or 2**16
-        # Workaround for #942: first value is always unsigned
-        if nr_entries < 0:
-            nr_entries += 2**16
         first_map = item.LUTDescriptor[1]
         nominal_depth = item.LUTDescriptor[2]
 
