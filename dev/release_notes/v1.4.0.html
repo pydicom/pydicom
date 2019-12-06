@@ -214,6 +214,9 @@ palette color datasets.</p></li>
 <li><p>Added user warning, or exception in strict mode, if a DICOMDIR has an
 unexpected transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/848">#848</a>)</p></li>
 <li><p>Handle missing offset tags in DICOMDIR (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/981">#981</a>)</p></li>
+<li><p>Added optional <cite>handler</cite> argument to
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a>. This lets you specify a
+particular handler, rather than following pydicom’s default order (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/537">#537</a>)</p></li>
 </ul>
 </div>
 </div>
