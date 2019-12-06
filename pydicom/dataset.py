@@ -1268,14 +1268,34 @@ class Dataset(dict):
             self[key] = default
         return default
 
-    def convert_pixel_data(self):
+    def convert_pixel_data(self, handler_name=''):
         """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
         internally.
+
+        Parameters
+        ----------
+        handler_name: str
+            The (optional) name of the pixel handler that shall be used to
+            decode the data. Currently supported handler names are: 'gdcm',
+            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
+            If empty (the default), a matching handler is used from the
+            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
         -------
         None
             Converted pixel data is stored internally in the dataset.
+
+        Raises
+        ------
+        ValueError
+            If `name` is not a valid handler name.
+        NotImplementedError
+            If the given handler or any handler, if none given, is able to
+            decompress pixel data with the current transfer syntax
+        RuntimeError
+            If the given handler, or the handler that has been selected if
+            none given, is not available.
 
         Notes
         -----
@@ -1293,10 +1313,57 @@ class Dataset(dict):
         if already_have:
             return
 
+        if handler_name:
+            self._convert_pixel_data_using_handler(handler_name)
+        else:
+            self._convert_pixel_data_without_handler()
+
+    def _convert_pixel_data_using_handler(self, name):
+        """Convert the pixel data using handler with the given name.
+        See :meth:`~Dataset.convert_pixel_data` for more information.
+        """
+        # handle some variations in name
+        handler_name = name.lower()
+        if not handler_name.endswith('_handler'):
+            handler_name += '_handler'
+        if handler_name == 'numpy_handler':
+            handler_name = 'np_handler'
+        if handler_name == 'jpeg_ls_handler':
+            # the name in config differs from the actual handler name
+            # we allow both
+            handler_name = 'jpegls_handler'
+        if not hasattr(pydicom.config, handler_name):
+            raise ValueError("'{}' is not a known handler name".format(name))
+        handler = getattr(pydicom.config, handler_name)
+
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        if not handler.supports_transfer_syntax(transfer_syntax):
+            raise NotImplementedError(
+                "Unable to decode pixel data with a transfer syntax UID"
+                " of '{0}' ({1}) using the pixel data handler '{2}'. "
+                "Please see the pydicom documentation for information "
+                "on supported transfer syntaxes.".format(
+                    transfer_syntax, transfer_syntax.name, name)
+            )
+        if not handler.is_available():
+            raise RuntimeError(
+                "The pixel data handler '{0}' is not available on your system."
+                " Please refer to the pydicom documentation for information "
+                "on installing needed packages.".format(name)
+            )
+        # if the conversion fails, the exception is propagated up
+        self._do_pixel_data_conversion(handler)
+
+    def _convert_pixel_data_without_handler(self):
+        """Convert the pixel data using the first matching handler.
+        See :meth:`~Dataset.convert_pixel_data` for more information.
+        """
         # Find all possible handlers that support the transfer syntax
         transfer_syntax = self.file_meta.TransferSyntaxUID
-        possible_handlers = [hh for hh in pydicom.config.pixel_data_handlers
-                             if hh.supports_transfer_syntax(transfer_syntax)]
+        possible_handlers = [
+            hh for hh in pydicom.config.pixel_data_handlers
+            if hh.supports_transfer_syntax(transfer_syntax)
+        ]
 
         # No handlers support the transfer syntax
         if not possible_handlers:
@@ -1305,8 +1372,7 @@ class Dataset(dict):
                 "'{0}' ({1}) as there are no pixel data handlers "
                 "available that support it. Please see the pydicom "
                 "documentation for information on supported transfer syntaxes "
-                .format(self.file_meta.TransferSyntaxUID,
-                        self.file_meta.TransferSyntaxUID.name)
+                .format(transfer_syntax, transfer_syntax.name)
             )
 
         # Handlers that both support the transfer syntax and have their
@@ -1340,19 +1406,7 @@ class Dataset(dict):
         last_exception = None
         for handler in available_handlers:
             try:
-                # Use the handler to get a 1D numpy array of the pixel data
-                arr = handler.get_pixeldata(self)
-                self._pixel_array = reshape_pixel_array(self, arr)
-
-                # Some handler/transfer syntax combinations may need to
-                #   convert the color space from YCbCr to RGB
-                if handler.needs_to_convert_to_RGB(self):
-                    self._pixel_array = convert_color_space(self._pixel_array,
-                                                            'YBR_FULL',
-                                                            'RGB')
-
-                self._pixel_id = id(self.PixelData)
-
+                self._do_pixel_data_conversion(handler)
                 return
             except Exception as exc:
                 logger.debug(
@@ -1372,10 +1426,25 @@ class Dataset(dict):
             "be able to decode the data"
             .format(", ".join([str(hh) for hh in available_handlers]))
         )
-
         raise last_exception
 
-    def decompress(self):
+    def _do_pixel_data_conversion(self, handler):
+        """Do the actual data conversion using the given handler."""
+
+        # Use the handler to get a 1D numpy array of the pixel data
+        arr = handler.get_pixeldata(self)
+        self._pixel_array = reshape_pixel_array(self, arr)
+
+        # Some handler/transfer syntax combinations may need to
+        #   convert the color space from YCbCr to RGB
+        if handler.needs_to_convert_to_RGB(self):
+            self._pixel_array = convert_color_space(self._pixel_array,
+                                                    'YBR_FULL',
+                                                    'RGB')
+
+        self._pixel_id = id(self.PixelData)
+
+    def decompress(self, handler_name=''):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
@@ -1387,8 +1456,16 @@ class Dataset(dict):
 
         - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
           form
-        - :func:`~pydicom.dataelem.DataElement.is_undefined_length`
+        - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7fe0,0010) *Pixel Data* element.
+
+        Parameters
+        ----------
+            The (optional) name of the pixel handler that shall be used to
+            decode the data. Currently supported handler names are: 'gdcm',
+            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
+            If empty (the default), a matching handler is used from the
+            handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
         -------
@@ -1400,7 +1477,7 @@ class Dataset(dict):
             If the pixel data was originally compressed but file is not
             *Explicit VR Little Endian* as required by the DICOM Standard.
         """
-        self.convert_pixel_data()
+        self.convert_pixel_data(handler_name)
         self.is_decompressed = True
         # May have been undefined length pixel data, but won't be now
         if 'PixelData' in self:
