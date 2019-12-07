@@ -282,7 +282,7 @@ def apply_voi_lut(arr, ds, index=0):
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if 'VOISequence' in ds:
+    if 'VOILUTSequence' in ds:
         # VOI LUT Sequence contains one or more items
         item = ds.VOILUTSequence[index]
         nr_entries = item.LUTDescriptor[0] or 2**16

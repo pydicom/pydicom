@@ -152,6 +152,11 @@ SC_ybr_full_422_uncompressed.dcm
     * Converted to YBR_FULL_422 using a script by @scaramallion
     * PhotometricIntepretation is YBR_FULL_422
 
+vlut_04.dcm
+    * VOI LUT Sequence
+    * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
+      images
+
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)

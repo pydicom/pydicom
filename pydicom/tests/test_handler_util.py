@@ -56,6 +56,7 @@ MOD_16_SEQ = get_testdata_files("mlut_18.dcm")[0]
 # VOI: VOI LUT Sequence
 # WIN: Windowing operation
 WIN_12_1F = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
+VOI_08_1F = get_testdata_files("vlut_04.dcm")[0]
 
 
 # Tests with Numpy unavailable
@@ -1403,25 +1404,119 @@ class TestNumpy_ExpandSegmentedLUT(object):
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_VOILUT(object):
     """Tests for util.apply_voi_lut()."""
-    def test_voi_single(self):
-        pass
+    def test_voi_single_view(self):
+        """Test VOI LUT with a single view."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        voi_item = ds.VOILUTSequence[0]
+        assert [256, 0, 16] == voi_item.LUTDescriptor
+        lut = voi_item.LUTData
+        assert 0 == lut[0]
+        assert 19532 == lut[76]
+        assert 45746 == lut[178]
+        assert 65535 == lut[255]
 
-    def test_voi_multi(self):
-        pass
+        arr = ds.pixel_array
+        assert 0 == arr[387, 448]
+        assert 76 == arr[178, 126]
+        assert 178 == arr[186, 389]
+        assert 255 == arr[129, 79]
+
+        out = apply_voi_lut(arr, ds)
+        assert 0 == out[387, 448]
+        assert 19532 == out[178, 126]
+        assert 45746 == out[186, 389]
+        assert 65535 == out[129, 79]
+
+    def test_voi_multi_view(self):
+        """Test VOI LUT with multiple views."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        item0 = ds.VOILUTSequence[0]
+        # Add another view thats the inverse
+        ds.VOILUTSequence.append(Dataset())
+        item1 = ds.VOILUTSequence[1]
+        item1.LUTDescriptor = [256, 0, 16]
+        item1.LUTData = item0.LUTData[::-1]
+
+        arr = ds.pixel_array
+        assert 0 == arr[387, 448]
+        assert 76 == arr[178, 126]
+        assert 178 == arr[186, 389]
+        assert 255 == arr[129, 79]
+
+        out0 = apply_voi_lut(arr, ds)
+        assert 0 == out0[387, 448]
+        assert 19532 == out0[178, 126]
+        assert 45746 == out0[186, 389]
+        assert 65535 == out0[129, 79]
+
+        out1 = apply_voi_lut(arr, ds, index=1)
+        assert 65535 == out1[387, 448]
+        assert 46003 == out1[178, 126]
+        assert 19789 == out1[186, 389]
+        assert 0 == out1[129, 79]
+
+    def test_voi_multi_frame(self):
+        """Test VOI with a multiple frames."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+
+        arr = ds.pixel_array
+        arr = np.stack([arr, 255 - arr])
+        assert (2, 512, 512) == arr.shape
+
+        out = apply_voi_lut(arr, ds)
+        assert 0 == out[0, 387, 448]
+        assert 19532 == out[0, 178, 126]
+        assert 45746 == out[0, 186, 389]
+        assert 65535 == out[0, 129, 79]
+        assert 65535 == out[1, 387, 448]
+        assert 46003 == out[1, 178, 126]
+        assert 19789 == out[1, 186, 389]
+        assert 0 == out[1, 129, 79]
 
     def test_voi_zero_entries(self):
-        pass
+        """Test that 0 entries is interpreted correctly."""
+        ds = dcmread(VOI_08_1F)
+        seq = ds.VOILUTSequence[0]
+        seq.LUTDescriptor = [0, 0, 16]
+        assert 256 == len(seq.LUTData)
+        arr = np.asarray([0, 255, 256, 65535])
+        msg = r"index 256 is out of bounds"
+        with pytest.raises(IndexError, match=msg):
+            apply_voi_lut(arr, ds)
 
-    def test_voi_entries_negative(self):
-        pass
+        # LUTData with 65536 entries
+        seq.LUTData = [0] * 65535 + [1]
+        out = apply_voi_lut(arr, ds)
+        assert [0, 0, 0, 1] == list(out)
 
-    def test_window_single(self):
-        pass
-
-    #@pytest.mark.skip('dev only')
-    def test_window_multi(self):
-        """Test windowing with multiple views."""
+    def test_window_single_view(self):
+        """Test windowing with a single view."""
         # 12-bit unsigned
+        ds = dcmread(WIN_12_1F)
+        assert 16 == ds.BitsAllocated
+        assert 12 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        ds.WindowCenter = 450
+        ds.WindowWidth = 790
+        assert 450 == ds.WindowCenter
+        assert 790 == ds.WindowWidth
+
+        arr = ds.pixel_array
+        assert 642 == arr[326, 130]
+        out = apply_voi_lut(arr, ds)
+        assert 3046.6 == pytest.approx(out[326, 130], abs=0.1)
+
+    def test_window_multi_view(self):
+        """Test windowing with multiple views."""
         ds = dcmread(WIN_12_1F)
         assert 16 == ds.BitsAllocated
         assert 12 == ds.BitsStored
@@ -1430,14 +1525,11 @@ class TestNumpy_VOILUT(object):
         assert [790, 443] == ds.WindowWidth
 
         arr = ds.pixel_array
+        assert 642 == arr[326, 130]
         out = apply_voi_lut(arr, ds)
-        import matplotlib.pyplot as plt
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-        ax1.imshow(arr, cmap='gray')
-        ax2.imshow(out, cmap='gray')
-        out2 = apply_voi_lut(arr, ds, index=1)
-        ax3.imshow(out2, cmap='gray')
-        plt.show()
+        assert 3046.6 == pytest.approx(out[326, 130], abs=0.1)
+        out = apply_voi_lut(arr, ds, index=1)
+        assert 4095.0 == pytest.approx(out[326, 130], abs=0.1)
 
     def test_window_uint8(self):
         """Test windowing an 8-bit unsigned array."""
@@ -1659,8 +1751,50 @@ class TestNumpy_VOILUT(object):
             )
         )
 
+    def test_window_multi_frame(self):
+        """Test windowing with a multiple frames."""
+        ds = dcmread(WIN_12_1F)
+        assert 16 == ds.BitsAllocated
+        assert 12 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        ds.WindowCenter = 450
+        ds.WindowWidth = 790
+        assert 450 == ds.WindowCenter
+        assert 790 == ds.WindowWidth
+
+        arr = ds.pixel_array
+        arr = np.stack([arr, 4095 - arr])
+        assert (2, 484, 484) == arr.shape
+        assert 642 == arr[0, 326, 130]
+        assert 3453 == arr[1, 326, 130]
+        out = apply_voi_lut(arr, ds)
+        assert 3046.6 == pytest.approx(out[0, 326, 130], abs=0.1)
+        assert 4095.0 == pytest.approx(out[1, 326, 130], abs=0.1)
+
     def test_window_rescale(self):
-        pass
+        """Test windowing after a rescale operation."""
+        ds = dcmread(WIN_12_1F)
+        assert 16 == ds.BitsAllocated
+        assert 12 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        assert [450, 200] == ds.WindowCenter
+        assert [790, 443] == ds.WindowWidth
+        ds.RescaleSlope = 1.2
+        ds.RescaleIntercept = 0
+
+        arr = ds.pixel_array
+        assert 0 == arr[16, 60]
+        assert 642 == arr[326, 130]
+        assert 1123 == arr[316, 481]
+        hu = apply_modality_lut(arr, ds)
+        assert 0 == hu[16, 60]
+        assert 770.4 == hu[326, 130]
+        assert 1347.6 == hu[316, 481]
+        # With rescale -> output range is 0 to 4914
+        out = apply_voi_lut(hu, ds)
+        assert 0 == pytest.approx(out[16, 60], abs=0.1)
+        assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
+        assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
 
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""

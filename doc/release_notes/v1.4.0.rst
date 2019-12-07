@@ -31,7 +31,3 @@ Enhancements
   applying color palette LUTs (:issue:`205`)
 * Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
   for applying modality LUTs.
-* Added :func:`~pydicom.data.data_manager.get_palette_files` for retrieving
-  well-known palette color datasets.
-* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function for
-  apply VOI LUTs.

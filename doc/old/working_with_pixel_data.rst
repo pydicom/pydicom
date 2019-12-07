@@ -36,7 +36,7 @@ Data* is compressed you can do:
 
 Handling *Pixel Data* is one of the two main annoyances with
 DICOM datasets (the other being non-conformance), but fortunately *pydicom*
-provides an easy way to get the *Pixel Data* in a more convenient form; 
+provides an easy way to get the *Pixel Data* in a more convenient form;
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 .. warning::
@@ -154,8 +154,9 @@ first.
 VOI LUT or Windowing Operation
 ------------------------------
 
-The DICOM :dcm:'VOI LUT<>' module applies a VOI or windowing operation to input
-values. The :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
+The DICOM :dcm:'VOI LUT<part03/sect_C.11.html#sect_C.11.2>' module applies a
+VOI or windowing operation to input values. The
+:func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
 can be used with an input array and a dataset containing a VOI LUT module to
 return the VOI or windowed values. When multiple VOIs or windowing operations
 are present they can be returned by using the `index` keyword parameter.
