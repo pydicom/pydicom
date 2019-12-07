@@ -1461,6 +1461,7 @@ class Dataset(dict):
 
         Parameters
         ----------
+        handler_name : str, optional
             The (optional) name of the pixel handler that shall be used to
             decode the data. Currently supported handler names are: 'gdcm',
             'pillow', 'jpeg_ls', 'rle' and 'numpy'.
