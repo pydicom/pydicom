@@ -1378,9 +1378,9 @@ class TestNumpy_VOILUT(object):
         assert 8 == ds.BitsAllocated
         assert 8 == ds.BitsStored
         assert 0 == ds.PixelRepresentation
-        voi_item = ds.VOILUTSequence[0]
-        assert [256, 0, 16] == voi_item.LUTDescriptor
-        lut = voi_item.LUTData
+        item = ds.VOILUTSequence[0]
+        assert [256, 0, 16] == item.LUTDescriptor
+        lut = item.LUTData
         assert 0 == lut[0]
         assert 19532 == lut[76]
         assert 45746 == lut[178]
@@ -1465,6 +1465,76 @@ class TestNumpy_VOILUT(object):
         seq.LUTData = [0] * 65535 + [1]
         out = apply_voi_lut(arr, ds)
         assert [0, 0, 0, 1] == list(out)
+
+    def test_voi_uint8(self):
+        """Test uint VOI LUT with an 8-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 8]
+        item.LUTData = [0, 127, 128, 255]
+        arr = np.asarray([0, 1, 128, 254, 255], dtype='uint8')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint8' == out.dtype
+        assert [0, 127, 255, 255, 255] == out.tolist()
+
+    def test_voi_uint16(self):
+        """Test uint VOI LUT with an 16-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='uint16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_voi_int8(self):
+        """Test int VOI LUT with an 8-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 1
+        ds.BitsStored = 8
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 8]
+        item.LUTData = [0, 127, 128, 255]
+        arr = np.asarray([0, -1, 2, -128, 127], dtype='int8')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint8' == out.dtype
+        assert [0, 0, 128, 0, 255] == out.tolist()
+
+    def test_voi_int16(self):
+        """Test int VOI LUT with an 16-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, -1, 2, -128, 255], dtype='int16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 0, 32768, 0, 65535] == out.tolist()
+
+    def test_voi_bad_depth(self):
+        """Test bad LUT depth raises exception."""
+        ds = dcmread(VOI_08_1F)
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor[2] = 7
+        msg = r"'7' bits per LUT entry is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+        item.LUTDescriptor[2] = 17
+        msg = r"'17' bits per LUT entry is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
 
     def test_window_single_view(self):
         """Test windowing with a single view."""
@@ -1763,6 +1833,33 @@ class TestNumpy_VOILUT(object):
         assert 0 == pytest.approx(out[16, 60], abs=0.1)
         assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
         assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
+
+    def test_window_bad_photometric_interp(self):
+        """Test bad photometric interpretation raises exception."""
+        ds = dcmread(WIN_12_1F)
+        ds.PhotometricInterpretation = 'RGB'
+        msg = r"only 'MONOCHROME1' and 'MONOCHROME2' are allowed"
+        with pytest.raises(ValueError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+    def test_window_bad_parameters(self):
+        """Test bad windowing parameters raise exceptions."""
+        ds = dcmread(WIN_12_1F)
+        ds.WindowWidth = 0
+        ds.VOILUTFunction = 'LINEAR'
+        msg = r"Width must be greater than or equal to 1"
+        with pytest.raises(ValueError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+        ds.VOILUTFunction = 'SIGMOID'
+        msg = r"Width must be greater than 0"
+        with pytest.raises(ValueError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+        ds.VOILUTFunction = 'UNKNOWN'
+        msg = r"Unsupported \(0028,1056\) VOI LUT Function value 'UNKNOWN'"
+        with pytest.raises(ValueError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
 
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""

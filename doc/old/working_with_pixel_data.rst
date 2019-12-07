@@ -34,9 +34,8 @@ Data* is compressed you can do:
 ``Dataset.pixel_array``
 -----------------------
 
-Handling *Pixel Data* is one of the two main annoyances with
-DICOM datasets (the other being non-conformance), but fortunately *pydicom*
-provides an easy way to get the *Pixel Data* in a more convenient form;
+Converting the raw *Pixel Data* bytes into usable image data can be complicated,
+but fortunately *pydicom* provides a convenient way to get it:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 .. warning::

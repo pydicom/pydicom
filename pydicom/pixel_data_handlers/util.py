@@ -249,8 +249,6 @@ def apply_modality_lut(arr, ds):
 def apply_voi_lut(arr, ds, index=0):
     """Apply a VOI lookup table or windowing operation to `arr`.
 
-    C.7.6.16.2.10 (0028,9132) Frame VOI LUT Sequence -> doc
-
     Parameters
     ----------
     arr : numpy.ndarray
