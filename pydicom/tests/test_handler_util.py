@@ -1851,6 +1851,11 @@ class TestNumpy_VOILUT(object):
         with pytest.raises(ValueError, match=msg):
             apply_voi_lut(ds.pixel_array, ds)
 
+        ds.VOILUTFunction = 'LINEAR_EXACT'
+        msg = r"Width must be greater than 0"
+        with pytest.raises(ValueError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
         ds.VOILUTFunction = 'SIGMOID'
         msg = r"Width must be greater than 0"
         with pytest.raises(ValueError, match=msg):
