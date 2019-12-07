@@ -207,7 +207,7 @@ def apply_modality_lut(arr, ds):
 
     Notes
     -----
-    When *Rescale Slope* and *Rescale Intercept* are used the output range
+    When *Rescale Slope* and *Rescale Intercept* are used, the output range
     is from (min. pixel value * Rescale Slope + Rescale Intercept) to
     (max. pixel value * Rescale Slope + Rescale Intercept), where min. and
     max. pixel value are determined from (0028,0101) *Bits Stored* and

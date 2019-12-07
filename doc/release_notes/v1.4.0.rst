@@ -46,4 +46,4 @@ Enhancements
   :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
   particular handler, rather than following pydicom's default order (:issue:`537`)
 * Added :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function for
-  apply VOI LUTs.
+  applying VOI LUTs or windowing operations.

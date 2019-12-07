@@ -153,12 +153,16 @@ first.
 VOI LUT or Windowing Operation
 ------------------------------
 
-The DICOM :dcm:'VOI LUT<part03/sect_C.11.html#sect_C.11.2>' module applies a
+The DICOM :dcm:`VOI LUT<part03/sect_C.11.html#sect_C.11.2>` module applies a
 VOI or windowing operation to input values. The
 :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
 can be used with an input array and a dataset containing a VOI LUT module to
-return the VOI or windowed values. When multiple VOIs or windowing operations
-are present they can be returned by using the `index` keyword parameter.
+return the VOI or windowed values. When a dataset contains multiple VOI or
+windowing views then a particular view can be returned by using the `index`
+keyword parameter.
+
+When a dataset requires multiple greyscale transformations, then its assumed
+that the modality LUT or rescale operation has already been applied.
 
 .. code-block:: python
 
