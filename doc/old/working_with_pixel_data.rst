@@ -153,7 +153,7 @@ first.
 VOI LUT or Windowing Operation
 ------------------------------
 
-The DICOM :dcm:`VOI LUT<part03/sect_C.11.html#sect_C.11.2>` module applies a
+The DICOM :dcm:`VOI LUT<part03/sect_C.11.2.html>` module applies a
 VOI or windowing operation to input values. The
 :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
 can be used with an input array and a dataset containing a VOI LUT module to
