@@ -41,6 +41,12 @@ def data_element_generator(fp,
 
     """Create a generator to efficiently return the raw data elements.
 
+    .. note::
+
+        This function is used internally - usually there is no need to call it
+        from user code. To read data from a DICOM file, :func:`dcmread`
+        shall be used instead.
+
     Parameters
     ----------
     fp : file-like
@@ -373,9 +379,10 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     except StopIteration:
         pass
     except EOFError as details:
-        # XXX is this error visible enough to user code with just logging?
-        logger.error(str(details) + " in file " +
-                     getattr(fp, "name", "<no filename>"))
+        if config.enforce_valid_values:
+            raise
+        msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
+        warnings.warn(msg, UserWarning)
     except NotImplementedError as details:
         logger.error(details)
 
@@ -737,7 +744,9 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
                                stop_when=stop_when, defer_size=defer_size,
                                specific_tags=specific_tags)
     except EOFError:
-        pass  # error already logged in read_dataset
+        if config.enforce_valid_values:
+            raise
+        # warning already logged in read_dataset
 
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set._dict)

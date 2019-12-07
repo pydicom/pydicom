@@ -846,18 +846,6 @@ class TestNumpy_ModalityLUT(object):
         out = apply_modality_lut(arr, ds)
         assert [0, 0, 0, 1] == list(out)
 
-    def test_lut_sequence_entries_negative(self):
-        """Test workaround for #942: SS VR should give uint nr entries."""
-        ds = dcmread(MOD_16_SEQ)
-        seq = ds.ModalityLUTSequence[0]
-        seq.LUTDescriptor = [-32767, 0, 16]  # 32769
-        seq.LUTData = [0] * 32768 + [1]
-        arr = np.asarray([-10, 0, 32767, 32768, 32769])
-        out = apply_modality_lut(arr, ds)
-        # IV < index 0 -> 0
-        # IV > index 32768 -> 32768
-        assert [0, 0, 0, 1, 1] == list(out)
-
     def test_unchanged(self):
         """Test no modality LUT transform."""
         ds = dcmread(MOD_16)
@@ -1158,26 +1146,6 @@ class TestNumpy_PaletteColor(object):
         assert ([33280, 61952, 65280] == rgb[arr == 60]).all()
         assert [60160, 25600, 37376] == list(rgb[arr == 130][0])
         assert ([60160, 25600, 37376] == rgb[arr == 130]).all()
-
-    def test_nr_entries_negative(self):
-        """Test workaround for #942: SS VR should give uint nr entries."""
-        ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
-        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        ds.RedPaletteColorLookupTableDescriptor[0] = -32767  # 32769
-        # 16-bit entries, 32769 entries per LUT
-        ds.RedPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
-        ds.GreenPaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
-        ds.BluePaletteColorLookupTableData = b'\x00\x00' * 32768 + b'\xff\xff'
-        # IV < index 0 -> 0
-        # IV > index 32768 -> 32768
-        arr = np.asarray([-10, 0, 32767, 32768, 32769])
-        rgb = apply_color_lut(arr, ds)
-        assert [0, 0, 0] == list(rgb[0])
-        assert [0, 0, 0] == list(rgb[1])
-        assert [0, 0, 0] == list(rgb[2])
-        assert [65535, 65535, 65535] == list(rgb[3])
-        assert [65535, 65535, 65535] == list(rgb[4])
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")

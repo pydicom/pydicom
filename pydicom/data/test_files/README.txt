@@ -24,6 +24,7 @@ MR_small.dcm            : Expl VR Little Endian
 OBXXXX1A.dcm            : Expl VR Little Endian
 reportsi.dcm            : Expl VR Little Endian
 test-SR.dcm             : Expl VR Little Endian
+explicit_VR-UN.dcm      : Expl VR Little Endian
 
 MR_small_implicit.dcm   : Impl VR Little Endian
 nested_priv_SQ.dcm      : Impl VR Little Endian
@@ -160,6 +161,13 @@ vlut_04.dcm
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)
+  
+explicit_VR-UN.dcm
+  * taken from test data in issue #968
+  * original image taken from https://www.cancerimagingarchive.net,
+    (freely available de-identified datasets)
+  * image was compressed using "gdcmconv --j2k <original.dcm>"
+  * almost all tags have VR "UN" due to gdcmconv issue
 
 == DICOMDIR tests ==
 

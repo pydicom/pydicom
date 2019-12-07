@@ -47,6 +47,7 @@ from pydicom.uid import (
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -61,7 +62,6 @@ try:
     )
 except ImportError:
     NP_HANDLER = None
-
 
 # Paths to the test datasets
 # IMPL: Implicit VR Little Endian
@@ -177,11 +177,15 @@ REFERENCE_DATA_UNSUPPORTED = [
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
+SUPPORTED_HANDLER_NAMES = (
+    'numpy', 'NumPy', 'np', 'np_handler', 'numpy_handler'
+)
 
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -234,11 +238,19 @@ class TestNoNumpy_NoNumpyHandler(object):
                                match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
+    def test_using_numpy_handler_raises(self):
+        ds = dcmread(EXPL_16_1_1F)
+        msg = ("The pixel data handler 'numpy' is not available on your "
+               "system. Please refer to the pydicom documentation*")
+        with pytest.raises(RuntimeError, match=msg):
+            ds.decompress('numpy')
+
 
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -309,6 +321,7 @@ class TestNoNumpy_NumpyHandler(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
 class TestNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -406,6 +419,7 @@ REFERENCE_DATA_LITTLE = [
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NumpyHandler(object):
     """Tests for handling Pixel Data with the handler."""
+
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -479,6 +493,16 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
+    @pytest.mark.parametrize("handler_name", SUPPORTED_HANDLER_NAMES)
+    def test_decompress_using_handler(self, handler_name):
+        """Test different possibilities for the numpy handler name."""
+        ds = dcmread(EXPL_8_1_1F)
+        ds.decompress(handler_name)
+        assert (600, 800) == ds.pixel_array.shape
+        assert 244 == ds.pixel_array[0].min() == ds.pixel_array[0].max()
+        assert (1, 246, 1) == tuple(ds.pixel_array[300, 491:494])
+        assert 0 == ds.pixel_array[-1].min() == ds.pixel_array[-1].max()
+
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
@@ -539,7 +563,7 @@ class TestNumpy_NumpyHandler(object):
             assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
             assert 0 == arr[0, -1].min() == arr[0, -1].max()
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_8bit_3sample_1frame_odd_size(self):
         """Test pixel_array for odd sized (3x3) pixel data."""
@@ -567,11 +591,11 @@ class TestNumpy_NumpyHandler(object):
 
         # Check resampling
         assert [
-            [76, 85, 255],
-            [76, 85, 255],
-            [76, 85, 255],
-            [76, 85, 255]
-        ] == arr[0:4, 0, :].tolist()
+                   [76, 85, 255],
+                   [76, 85, 255],
+                   [76, 85, 255],
+                   [76, 85, 255]
+               ] == arr[0:4, 0, :].tolist()
         # Check values
         assert (76, 85, 255) == tuple(arr[5, 50, :])
         assert (166, 106, 193) == tuple(arr[15, 50, :])
@@ -628,7 +652,7 @@ class TestNumpy_NumpyHandler(object):
             assert (192, 192, 192) == tuple(frame[85, 50, :])
             assert (255, 255, 255) == tuple(frame[95, 50, :])
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
@@ -854,7 +878,7 @@ class TestNumpy_NumpyHandler(object):
             assert (49344, 49344, 49344) == tuple(arr[0, 85, 50, :])
             assert (65535, 65535, 65535) == tuple(arr[0, 95, 50, :])
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_little_32bit_1sample_1frame(self):
         """Test pixel_array for little 32-bit, 1 sample/pixel, 1 frame."""
@@ -948,7 +972,7 @@ class TestNumpy_NumpyHandler(object):
                 arr[0, 95, 50, :]
             )
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Big endian datasets
     @pytest.mark.parametrize('little, big', MATCHING_DATASETS)
@@ -991,6 +1015,7 @@ class TestNumpy_NumpyHandler(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_GetPixelData(object):
     """Tests for numpy_handler.get_pixeldata with numpy."""
+
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
         ds = dcmread(EXPL_16_1_1F)
@@ -1040,6 +1065,7 @@ class TestNumpy_GetPixelData(object):
 
     def test_change_photometric_interpretation(self):
         """Test get_pixeldata changes PhotometricInterpretation if required."""
+
         def to_rgb(ds):
             """Override the original function that returned False"""
             return True
@@ -1150,6 +1176,7 @@ REFERENCE_PACK_UNPACK = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_UnpackBits(object):
     """Tests for numpy_handler.unpack_bits."""
+
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
     def test_unpack(self, input, output):
         """Test unpacking data."""
@@ -1180,6 +1207,7 @@ REFERENCE_PACK_PARTIAL = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PackBits(object):
     """Tests for numpy_handler.pack_bits."""
+
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""

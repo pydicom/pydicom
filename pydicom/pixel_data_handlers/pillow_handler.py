@@ -23,8 +23,8 @@ except ImportError:
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
-import pydicom.encaps
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+from pydicom.encaps import defragment_data, decode_data_sequence
+from pydicom.pixel_data_handlers.util import pixel_dtype
 import pydicom.uid
 
 
@@ -69,7 +69,7 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in PillowSupportedTransferSyntaxes
 
 
-def needs_to_convert_to_RGB(dicom_dataset):
+def needs_to_convert_to_RGB(ds):
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
@@ -78,36 +78,40 @@ def needs_to_convert_to_RGB(dicom_dataset):
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+def should_change_PhotometricInterpretation_to_RGB(ds):
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = dicom_dataset.SamplesPerPixel == 3
+    should_change = ds.SamplesPerPixel == 3
     return False
 
 
-def get_pixeldata(dicom_dataset):
-    """Use Pillow to decompress compressed *Pixel Data*.
+def get_pixeldata(ds):
+    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
+
+    Parameters
+    ----------
+    ds : Dataset
+        The :class:`Dataset` containing an Image Pixel module and the
+        *Pixel Data* to be decompressed and returned.
 
     Returns
     -------
     numpy.ndarray
-       The *Pixel Data* as a :class:`numpy.ndarray`.
+       The contents of (7FE0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     ImportError
         If Pillow is not available.
     NotImplementedError
-        if the transfer syntax is not supported
-    TypeError
-        if the pixel data type is unsupported
+        If the transfer syntax is not supported
     """
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", HAVE_PIL)
-    transfer_syntax = dicom_dataset.file_meta.TransferSyntaxUID
+    transfer_syntax = ds.file_meta.TransferSyntaxUID
     if not HAVE_PIL:
         msg = ("The pillow package is required to use pixel_array for "
                "this transfer syntax {0}, and pillow could not be "
@@ -132,94 +136,38 @@ def get_pixeldata(dicom_dataset):
                .format(transfer_syntax.name))
         raise NotImplementedError(msg)
 
-    # Make NumPy format code, e.g. "uint16", "int32" etc
-    # from two pieces of info:
-    # dicom_dataset.PixelRepresentation -- 0 for unsigned, 1 for signed;
-    # dicom_dataset.BitsAllocated -- 8, 16, or 32
-    if dicom_dataset.PixelRepresentation == 0:
-        format_str = 'uint{}'.format(dicom_dataset.BitsAllocated)
-    elif dicom_dataset.PixelRepresentation == 1:
-        format_str = 'int{}'.format(dicom_dataset.BitsAllocated)
-    else:
-        format_str = 'bad_pixel_representation'
-    try:
-        numpy_format = numpy.dtype(format_str)
-    except TypeError:
-        msg = ("Data type not understood by NumPy: "
-               "format='{}', PixelRepresentation={}, "
-               "BitsAllocated={}".format(
-                   format_str,
-                   dicom_dataset.PixelRepresentation,
-                   dicom_dataset.BitsAllocated))
-        raise TypeError(msg)
-
-    numpy_format = dtype_corrected_for_endianness(
-        dicom_dataset.is_little_endian, numpy_format)
-
-    # decompress here
     if transfer_syntax in PillowJPEGTransferSyntaxes:
         logger.debug("This is a JPEG lossy format")
-        if dicom_dataset.BitsAllocated > 8:
+        if ds.BitsAllocated > 8:
             raise NotImplementedError("JPEG Lossy only supported if "
                                       "Bits Allocated = 8")
-        generic_jpeg_file_header = b''
-        frame_start_from = 0
     elif transfer_syntax in PillowJPEG2000TransferSyntaxes:
         logger.debug("This is a JPEG 2000 format")
-        generic_jpeg_file_header = b''
-        # generic_jpeg_file_header = b'\x00\x00\x00\x0C\x6A'
-        #     b'\x50\x20\x20\x0D\x0A\x87\x0A'
-        frame_start_from = 0
     else:
         logger.debug("This is a another pillow supported format")
-        generic_jpeg_file_header = b''
-        frame_start_from = 0
 
-    try:
-        UncompressedPixelData = bytearray()
-        if ('NumberOfFrames' in dicom_dataset and
-                dicom_dataset.NumberOfFrames > 1):
-            # multiple compressed frames
-            CompressedPixelDataSeq = \
-                pydicom.encaps.decode_data_sequence(
-                    dicom_dataset.PixelData)
-            for frame in CompressedPixelDataSeq:
-                data = generic_jpeg_file_header + \
-                    frame[frame_start_from:]
-                fio = io.BytesIO(data)
-                try:
-                    decompressed_image = Image.open(fio)
-                except IOError as e:
-                    raise NotImplementedError(e.strerror)
-                UncompressedPixelData.extend(decompressed_image.tobytes())
-        else:
-            # single compressed frame
-            pixel_data = pydicom.encaps.defragment_data(
-                dicom_dataset.PixelData)
-            pixel_data = generic_jpeg_file_header + \
-                pixel_data[frame_start_from:]
-            try:
-                fio = io.BytesIO(pixel_data)
-                decompressed_image = Image.open(fio)
-            except IOError as e:
-                raise NotImplementedError(e.strerror)
-            UncompressedPixelData.extend(decompressed_image.tobytes())
-    except Exception:
-        raise
+    pixel_bytes = bytearray()
+    if getattr(ds, 'NumberOfFrames', 1) > 1:
+        # multiple compressed frames
+        for frame in decode_data_sequence(ds.PixelData):
+            decompressed_image = Image.open(io.BytesIO(frame))
+            pixel_bytes.extend(decompressed_image.tobytes())
+    else:
+        # single compressed frame
+        pixel_data = defragment_data(ds.PixelData)
+        decompressed_image = Image.open(io.BytesIO(pixel_data))
+        pixel_bytes.extend(decompressed_image.tobytes())
 
-    logger.debug(
-        "Successfully read %s pixel bytes", len(UncompressedPixelData)
-    )
+    logger.debug("Successfully read %s pixel bytes", len(pixel_bytes))
 
-    pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
+    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
-    if (transfer_syntax in
-            PillowJPEG2000TransferSyntaxes and
-            dicom_dataset.BitsStored == 16):
+    if (transfer_syntax in PillowJPEG2000TransferSyntaxes and
+            ds.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
-        pixel_array &= 0x7FFF
+        arr &= 0x7FFF
 
-    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
-        dicom_dataset.PhotometricInterpretation = "RGB"
+    if should_change_PhotometricInterpretation_to_RGB(ds):
+        ds.PhotometricInterpretation = "RGB"
 
-    return pixel_array
+    return arr

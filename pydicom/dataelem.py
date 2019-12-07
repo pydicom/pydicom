@@ -48,10 +48,12 @@ def empty_value_for_VR(VR, raw=False):
 
     The behavior of this property depends on the setting of
     :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
-    an empty value is always represented by ``None``, otherwise it depends
-    on `VR`. For text VRs (this includes 'AE', 'AS', 'CS', 'DA', 'DT', 'LO',
-    'LT', 'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR' and 'UT') an empty string
-    is used as empty value representation, for all other VRs, ``None``.
+    an empty value is represented by ``None`` (except for VR 'SQ'), otherwise
+    it depends on `VR`. For text VRs (this includes 'AE', 'AS', 'CS', 'DA',
+    'DT', 'LO', 'LT', 'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR' and 'UT') an
+    empty string is used as empty value representation, for all other VRs
+    except 'SQ', ``None``. For empty sequence values (VR 'SQ') an empty list
+    is used in all cases.
     Note that this is used only if decoding the element - it is always
     possible to set the value to another empty value representation,
     which will be preserved during the element object lifetime.
@@ -67,10 +69,12 @@ def empty_value_for_VR(VR, raw=False):
 
     Returns
     -------
-    str or bytes or None
+    str or bytes or None or list
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
+    if VR == 'SQ':
+        return []
     if config.use_none_as_empty_text_VR_value:
         return None
     if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
@@ -686,6 +690,13 @@ RawDataElement = namedtuple('RawDataElement', msg)
 RawDataElement.is_raw = True
 
 
+# The first and third values of the following elements are always US
+#   even if the VR is SS (PS3.3 C.7.6.3.1.5, C.11.1, C.11.2).
+# (0028,1101-1103) RGB Palette Color LUT Descriptor
+# (0028,3002) LUT Descriptor
+_LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
+
+
 def DataElement_from_raw(raw_data_element, encoding=None):
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -734,9 +745,23 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
                 msg += " can't look up VR"
                 raise KeyError(msg)
+    elif VR == 'UN' and not raw.tag.is_private:
+        # handle rare case of incorrectly set 'UN' in explicit encoding
+        # see also DataElement.__init__()
+        if (raw.length == 0xffffffff or raw.value is None or
+                len(raw.value) < 0xffff):
+            try:
+                VR = dictionary_VR(raw.tag)
+            except KeyError:
+                pass
     try:
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+
+    if raw.tag in _LUT_DESCRIPTOR_TAGS and value[0] < 0:
+        # We only fix the first value as the third value is 8 or 16
+        value[0] += 65536
+
     return DataElement(raw.tag, VR, value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)

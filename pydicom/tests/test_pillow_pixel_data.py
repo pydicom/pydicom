@@ -287,11 +287,6 @@ class Test_JPEG2000Tests_with_pillow(object):
         """Reset the pixel data handlers."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
-    def test_raises_if_endianess_not_set(self):
-        self.jpeg_2k_lossless.is_little_endian = None
-        with pytest.raises(ValueError):
-            _ = self.jpeg_2k_lossless.pixel_array
-
     def testJPEG2000(self):
         """Test reading element values works OK with pillow pixel handler."""
         # XX also tests multiple-valued AT data element
@@ -308,6 +303,13 @@ class Test_JPEG2000Tests_with_pillow(object):
         assert np.array_equal(a, b)
 
         assert a.flags.writeable
+
+    def test_decompress_using_pillow(self):
+        """Test decompressing JPEG2K with pillow handler succeeds."""
+        self.jpeg_2k_lossless.decompress(handler_name='pillow')
+        a = self.jpeg_2k_lossless.pixel_array
+        b = self.mr_small.pixel_array
+        assert np.array_equal(a, b)
 
     def test_emri_JPEG2000PixelArray(self):
         """Test decoding JPEG2K with pillow handler succeeds."""
@@ -354,7 +356,8 @@ class Test_JPEGlossyTests_with_pillow(object):
 
     def testJPEGlossyPixelArray(self):
         """Test decoding JPEG lossy with pillow handler fails."""
-        with pytest.raises(NotImplementedError):
+        msg = r"JPEG Lossy only supported if Bits Allocated = 8"
+        with pytest.raises(NotImplementedError, match=msg):
             self.jpeg_lossy.pixel_array
 
     def testJPEGBaselineColor3DPixelArray(self):
@@ -608,5 +611,5 @@ class Test_JPEGlosslessTests_with_pillow(object):
 
     def testJPEGlosslessPixelArray(self):
         """Test decoding JPEG lossless with pillow handler fails."""
-        with pytest.raises(RuntimeError):
+        with pytest.raises(IOError, match=r"cannot identify image file"):
             self.jpeg_lossless.pixel_array

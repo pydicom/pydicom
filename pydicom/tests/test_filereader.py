@@ -7,6 +7,7 @@ import io
 from io import BytesIO
 import os
 import shutil
+from struct import unpack
 import sys
 import tempfile
 
@@ -87,12 +88,17 @@ emri_jpeg_ls_lossless = get_testdata_files(
     "emri_small_jpeg_ls_lossless.dcm")[0]
 emri_jpeg_2k_lossless = get_testdata_files(
     "emri_small_jpeg_2k_lossless.dcm")[0]
+emri_jpeg_2k_lossless_too_short = get_testdata_files(
+    "emri_small_jpeg_2k_lossless_too_short.dcm")[0]
 color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
 class TestReader(object):
+    def teardown(self):
+        config.enforce_valid_values = False
+
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as ``None``."""
@@ -290,6 +296,20 @@ class TestReader(object):
         )
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
+
+    def test_tag_with_unknown_length_tag_too_short(self):
+        """Tests handling of incomplete sequence value."""
+        # the data set is the same as emri_jpeg_2k_lossless,
+        # with the last 8 bytes removed to provoke the EOF error
+        unknown_len_tag = Tag(0x7fe0, 0x0010)  # Pixel Data
+        with pytest.warns(UserWarning, match='End of file reached*'):
+            dcmread(emri_jpeg_2k_lossless_too_short,
+                    specific_tags=[unknown_len_tag])
+
+        config.enforce_valid_values = True
+        with pytest.raises(EOFError, match='End of file reached*'):
+            dcmread(emri_jpeg_2k_lossless_too_short,
+                    specific_tags=[unknown_len_tag])
 
     def test_private_SQ(self):
         """Can read private undefined length SQ without error."""
@@ -630,6 +650,27 @@ class TestReader(object):
             pass
         except EOFError:
             self.fail('Unexpected EOFError raised')
+
+    def test_lut_descriptor(self):
+        """Regression test for #942: incorrect first value"""
+        prefixes = [
+            b'\x28\x00\x01\x11',
+            b'\x28\x00\x02\x11',
+            b'\x28\x00\x03\x11',
+            b'\x28\x00\x02\x30'
+        ]
+        suffix = b'\x53\x53\x06\x00\x00\xf5\x00\xf8\x10\x00'
+
+        for raw_tag in prefixes:
+            tag = unpack('<2H', raw_tag)
+            bs = DicomBytesIO(raw_tag + suffix)
+            bs.is_little_endian = True
+            bs.is_implicit_VR = False
+
+            ds = dcmread(bs, force=True)
+            elem = ds[tag]
+            assert elem.VR == 'SS'
+            assert elem.value == [62720, -2048, 16]
 
 
 class TestIncorrectVR(object):

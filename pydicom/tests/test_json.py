@@ -329,3 +329,14 @@ class TestBinary(object):
         ds_json = '{"00091002": {"vr": "OB", "BulkDataURI": [42]}}'
         with pytest.raises(TypeError, match=msg):
             Dataset.from_json(ds_json)
+
+    def test_bulk_data_reader_is_called(self):
+        def bulk_data_reader(_):
+            return b'xyzzy'
+
+        json_data = {
+            "00091002": {"vr": "OB", "BulkDataURI": "https://a.dummy.url"}
+        }
+        ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
+
+        assert b'xyzzy' == ds[0x00091002].value

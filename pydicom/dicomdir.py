@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Module for DicomDir class."""
+import warnings
 
+from pydicom import config
 from pydicom.errors import InvalidDicomError
 from pydicom.dataset import FileDataset
 
@@ -47,6 +49,14 @@ class DicomDir(FileDataset):
         is_little_endian : bool
             ``True`` if little endian transfer syntax used (default); ``False``
             if big endian.
+
+        Raises
+        ------
+        InvalidDicomError
+            If the file transfer syntax is not Little Endian Explicit and
+            :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+            is ``True``.
+
         """
         # Usually this class is created through filereader.read_partial,
         # and it checks class SOP, but in case of direct creation,
@@ -56,6 +66,12 @@ class DicomDir(FileDataset):
             if not class_uid.name == "Media Storage Directory Storage":
                 msg = "SOP Class is not Media Storage Directory (DICOMDIR)"
                 raise InvalidDicomError(msg)
+        if is_implicit_VR or not is_little_endian:
+            msg = ('Invalid transfer syntax for DICOMDIR - '
+                   'Implicit Little Endian expected.')
+            if config.enforce_valid_values:
+                raise InvalidDicomError(msg)
+            warnings.warn(msg, UserWarning)
         FileDataset.__init__(
             self,
             filename_or_obj,
@@ -81,7 +97,8 @@ class DicomDir(FileDataset):
             """
             sibling_list = [record]
             current_record = record
-            while current_record.OffsetOfTheNextDirectoryRecord:
+            while ('OffsetOfTheNextDirectoryRecord' in current_record and
+                   current_record.OffsetOfTheNextDirectoryRecord):
                 offset_of_next = current_record.OffsetOfTheNextDirectoryRecord
                 sibling = map_offset_to_record[offset_of_next]
                 sibling_list.append(sibling)
@@ -98,12 +115,13 @@ class DicomDir(FileDataset):
 
         # Find the children of each record
         for record in records:
-            child_offset = record.OffsetOfReferencedLowerLevelDirectoryEntity
-            if child_offset:
-                child = map_offset_to_record[child_offset]
-                record.children = get_siblings(child, map_offset_to_record)
-            else:
-                record.children = []
+            record.children = []
+            if 'OffsetOfReferencedLowerLevelDirectoryEntity' in record:
+                child_offset = (record.
+                                OffsetOfReferencedLowerLevelDirectoryEntity)
+                if child_offset:
+                    child = map_offset_to_record[child_offset]
+                    record.children = get_siblings(child, map_offset_to_record)
 
         # Find the top-level records : siblings of the first record
         self.patient_records = get_siblings(records[0], map_offset_to_record)
