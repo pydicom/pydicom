@@ -222,6 +222,10 @@ class BaseTag(BaseTag_base_class):
         """Return ``True`` if the tag is a private creator."""
         return self.is_private and 0x0010 <= self.element < 0x0100
 
+    @property
+    def keyword(self):
+        from pydicom.datadict import keyword_for_tag
+        return keyword_for_tag(self)
 
 def TupleTag(group_elem):
     """Fast factory for :class:`BaseTag` object with known safe (group, elem)

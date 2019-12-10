@@ -45,3 +45,4 @@ Enhancements
 * Added optional `handler` argument to
   :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
   particular handler, rather than following pydicom's default order (:issue:`537`)
+* Added keyword propery to Tag class.  e.g. Tag(0x7fe00010).keyword give 'PixelData'
