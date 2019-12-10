@@ -441,6 +441,10 @@ class Dataset(dict):
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
+    @classmethod
+    def clear_handler_classes(cls):
+        cls._handler_classes = {}
+    
     def data_element(self, name):
         """Return the element corresponding to the element keyword `name`.
 
