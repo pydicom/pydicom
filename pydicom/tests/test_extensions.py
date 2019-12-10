@@ -9,9 +9,6 @@ from pydicom.dataelem import DataElement
 from pydicom.extensions import handle_dataset_tags
 
 
-
-
-
 class TestDatasetExtension(object):
     """Test handlers which extend Dataset"""
     def setup(self):
@@ -31,7 +28,7 @@ class TestDatasetExtension(object):
                     # This one leaves underlying dataset alone
                     return DataElement(tag, "PN", "anonymous")
                 else:
-                    NotImplementedError("handled tag without code to deal with it")
+                    NotImplementedError("Unhandled tag")
         self.ds = Dataset()
         self.ds.PatientName = "Patient^Joe"
         self.ds.ImagePositionPatient = [0.0, 0.0, 0.0]

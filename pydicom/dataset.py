@@ -444,7 +444,7 @@ class Dataset(dict):
     @classmethod
     def clear_handler_classes(cls):
         cls._handler_classes = {}
-    
+
     def data_element(self, name):
         """Return the element corresponding to the element keyword `name`.
 
