@@ -46,3 +46,11 @@ class TestDatasetExtension(object):
         assert "anonymous" == self.ds["PatientName"].value
         # Check that one we haven't changed is okay
         assert "123" == self.ds["PatientID"].value
+
+    def test_get_attr(self):
+        """Test handler handles specified tags when retrieved by keyword."""
+        assert [1.0, 1.0, 1.0] == self.ds.ImagePositionPatient
+        assert "anonymous" == self.ds.PatientName
+
+        # assert that unchanged on still okay
+        assert "123" == self.ds.PatientID
