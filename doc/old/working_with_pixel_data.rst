@@ -30,13 +30,11 @@ of different ways:
  - There may be :dcm:`multiple planes per frame
    <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1>` (i.e. RGB) and the :dcm:`order
    of the pixels<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3>` may be different
- - For image data with multiple planes, the :dcm:`color space
-   <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` may need
-   :ref:`conversion<colorspace>` (i.e. YBR to RGB)
  - The image data may be encoded using one of the available compression
    standards (``1.2.840.10008.1.2.4.50`` *JPEG Baseline*,
-   ``1.2.840.10008.1.2.5`` *RLE Lossless*, etc). Encoded image data must also
-   be :dcm:`encapsulated<part05/sect_A.4.html>` into one or more fragments.
+   ``1.2.840.10008.1.2.5`` *RLE Lossless*, etc). Encoded image data will also
+   be :dcm:`encapsulated<part05/sect_A.4.html>` and each encapsulated image
+   frame may be broken up into one or more fragments.
 
 Because of the complexity in getting the raw *Pixel Data* bytes into
 a usable form, *pydicom* provides a convenient way to get it:
