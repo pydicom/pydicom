@@ -271,6 +271,15 @@ def apply_voi_lut(arr, ds, index=0):
     numpy.ndarray
         An array with applied VOI LUT or windowing operation.
 
+    Notes
+    -----
+    When the dataset requires a rescale operation as part of the Modality LUT
+    module then that must be applied before any windowing operation.
+
+    See Also
+    --------
+    `~pydicom.pixel_data_handlers.util.apply_modality_lut`
+
     References
     ----------
     * DICOM Standard, Part 3, :dcm:`Annex C.11.2
