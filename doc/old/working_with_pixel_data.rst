@@ -14,10 +14,10 @@ Introduction
 pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
 it doesn't do anything with pixel data except read in the raw bytes::
 
-  >>> import pydicom
-  >>> from pydicom.data import get_testdata_files
-  >>> filename = get_testdata_files("MR_small.dcm")[0]
-  >>> ds = pydicom.dcmread(filename)
+  >>> from pydicom import dcmread
+  >>> from pydicom.data import get_testdata_file
+  >>> filename = get_testdata_file("MR_small.dcm")
+  >>> ds = dcmread(filename)
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
@@ -108,7 +108,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.
 
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_files("OBXXXX1A.dcm")[0]
+    fname = get_testdata_file("OBXXXX1A.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     rgb = apply_color_lut(arr, ds)
@@ -122,7 +122,7 @@ of the pixel data is 8-bit.
 
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_files("OBXXXX1A.dcm")[0]
+    fname = get_testdata_file("OBXXXX1A.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     # You could also use the corresponding well-known SOP Instance UID
@@ -152,7 +152,7 @@ first.
 
     from pydicom.pixel_data_handlers.util import apply_modality_lut
 
-    fname = get_testdata_files("CT_small.dcm")[0]
+    fname = get_testdata_file("CT_small.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     hu = apply_modality_lut(arr, ds)
@@ -176,7 +176,7 @@ that the modality LUT or rescale operation has already been applied.
 
     from pydicom.pixel_data_handlers.util import apply_voi_lut
 
-    fname = get_testdata_files("")[0]
+    fname = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     out = apply_voi_lut(arr, ds, index=0)

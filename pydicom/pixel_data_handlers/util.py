@@ -337,10 +337,12 @@ def apply_voi_lut(arr, ds, index=0):
 
         # The output range depends on whether or not a rescale operation has
         #   been applied - if not then the range is the available bit depth
-        if ds.PixelRepresentation:
+        if ds.PixelRepresentation == 1:
+            # Signed
             y_min = -2**(ds.BitsStored - 1)
             y_max = 2**(ds.BitsStored - 1) - 1
         else:
+            # Unsigned
             y_min = 0
             y_max = 2**ds.BitsStored - 1
 
