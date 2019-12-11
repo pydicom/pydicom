@@ -21,22 +21,30 @@ it doesn't do anything with pixel data except read in the raw bytes::
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
-``PixelData`` contains the raw image ``bytes`` exactly as found in the file.
-In the case of a dataset with a compressed transfer syntax (such as
-``1.2.840.10008.1.2.4.50`` *JPEG Baseline*) then the ``PixelData`` will be
-the encoded image data that is has also been
-:dcm:`encapsulated<part05/sect_A.4.html>`. To test whether or not the *Pixel
-Data* is compressed you can do:
+``PixelData`` contains the ``bytes`` exactly as found in the file and is not
+typically in an immediately useful form as data may be stored in a variety
+of different ways:
 
-  >>> ds.file_meta.TransferSyntaxUID.is_compressed
-  False
+ - The pixel values may be signed or unsigned
+ - There may be multiple image frames
+ - There may be :dcm:`multiple planes per frame
+   <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1>` (i.e. RGB) and the :dcm:`order
+   of the pixels<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3>` may be different
+ - For image data with multiple planes, the :dcm:`color space
+   <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` may need
+   :ref:`conversion<colorspace>` (i.e. YBR to RGB)
+ - The image data may be encoded using one of the available compression
+   standards (``1.2.840.10008.1.2.4.50`` *JPEG Baseline*,
+   ``1.2.840.10008.1.2.5`` *RLE Lossless*, etc). Encoded image data must also
+   be :dcm:`encapsulated<part05/sect_A.4.html>` into one or more fragments.
+
+Because of the complexity in getting the raw *Pixel Data* bytes into
+a usable form, *pydicom* provides a convenient way to get it:
+:attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
+
 
 ``Dataset.pixel_array``
 -----------------------
-
-Converting the raw *Pixel Data* bytes into usable image data can be complicated,
-but fortunately *pydicom* provides a convenient way to get it:
-:attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 .. warning::
 
@@ -157,9 +165,9 @@ The DICOM :dcm:`VOI LUT<part03/sect_C.11.2.html>` module applies a
 VOI or windowing operation to input values. The
 :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
 can be used with an input array and a dataset containing a VOI LUT module to
-return the VOI or windowed values. When a dataset contains multiple VOI or
-windowing views then a particular view can be returned by using the `index`
-keyword parameter.
+return values with applied VOI LUT or windowing. When a dataset contains
+multiple VOI or windowing views then a particular view can be returned by
+using the `index` keyword parameter.
 
 When a dataset requires multiple greyscale transformations, then its assumed
 that the modality LUT or rescale operation has already been applied.

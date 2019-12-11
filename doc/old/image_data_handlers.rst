@@ -93,6 +93,8 @@ options:
    The *Photometric Interpretation* may not match the pixel data, depending on
    the used decompression handler.
 
+.. _colorspace:
+
 Color space
 ...........
 

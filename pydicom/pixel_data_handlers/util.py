@@ -278,7 +278,7 @@ def apply_voi_lut(arr, ds, index=0):
 
     See Also
     --------
-    `~pydicom.pixel_data_handlers.util.apply_modality_lut`
+    :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut`
 
     References
     ----------
@@ -335,7 +335,7 @@ def apply_voi_lut(arr, ds, index=0):
         elem = ds['WindowWidth']
         width = elem.value[index] if elem.VM > 1 else elem.value
 
-        # If output range depends on whether or not a rescale operation has
+        # The output range depends on whether or not a rescale operation has
         #   been applied - if not then the range is the available bit depth
         if ds.PixelRepresentation:
             y_min = -2**(ds.BitsStored - 1)

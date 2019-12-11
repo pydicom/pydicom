@@ -1866,6 +1866,14 @@ class TestNumpy_VOILUT(object):
         with pytest.raises(ValueError, match=msg):
             apply_voi_lut(ds.pixel_array, ds)
 
+    def test_window_bad_index(self):
+        ds = dcmread(WIN_12_1F)
+        assert 2 == len(ds.WindowWidth)
+        arr = ds.pixel_array
+        with pytest.raises(IndexError, match=r"list index out of range"):
+            apply_voi_lut(arr, ds, index=2)
+
+
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""
         ds = Dataset()
