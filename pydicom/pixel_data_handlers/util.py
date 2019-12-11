@@ -273,8 +273,9 @@ def apply_voi_lut(arr, ds, index=0):
 
     Notes
     -----
-    When the dataset requires a rescale operation as part of the Modality LUT
-    module then that must be applied before any windowing operation.
+    When the dataset requires a modality LUT or rescale operation as part of
+    the Modality LUT module then that must be applied before any windowing
+    operation.
 
     See Also
     --------
@@ -335,19 +336,20 @@ def apply_voi_lut(arr, ds, index=0):
         elem = ds['WindowWidth']
         width = elem.value[index] if elem.VM > 1 else elem.value
 
-        # The output range depends on whether or not a rescale operation has
-        #   been applied - if not then the range is the available bit depth
-        if ds.PixelRepresentation == 1:
-            # Signed
-            y_min = -2**(ds.BitsStored - 1)
-            y_max = 2**(ds.BitsStored - 1) - 1
-        else:
+        # The output range depends on whether or not a modality LUT or rescale
+        #   operation has been applied - if not then the range is the available
+        #   bit depth - see PS3.3 C.11.1.1.1
+        if ds.PixelRepresentation == 0 or 'ModalityLUTSequence' in ds:
             # Unsigned
             y_min = 0
             y_max = 2**ds.BitsStored - 1
+        else:
+            # Signed
+            y_min = -2**(ds.BitsStored - 1)
+            y_max = 2**(ds.BitsStored - 1) - 1
 
         if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
-            # Otherwise its the actual data range - see PS3.3 C.11.1.1.1
+            # Otherwise its the actual data range
             y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
             y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
 

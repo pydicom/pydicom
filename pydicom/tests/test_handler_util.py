@@ -1834,6 +1834,33 @@ class TestNumpy_VOILUT(object):
         assert 4455.6 == pytest.approx(out[326, 130], abs=0.1)
         assert 4914.0 == pytest.approx(out[316, 481], abs=0.1)
 
+    def test_window_modality_lut(self):
+        """Test windowing after a modality LUT operation."""
+        ds = dcmread(MOD_16_SEQ)
+        ds.WindowCenter = [450, 200]
+        ds.WindowWidth = [790, 443]
+        assert 16 == ds.BitsAllocated
+        assert 12 == ds.BitsStored
+        assert 1 == ds.PixelRepresentation  # Signed
+        assert 'RescaleSlope' not in ds
+        assert 'ModalityLUTSequence' in ds
+
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        arr = ds.pixel_array
+        assert -2048 == arr.min()
+        assert 4095 == arr.max()
+
+        arr = ds.pixel_array
+        assert 2047 == arr[16, 60]
+        hu = apply_modality_lut(arr, ds)
+        assert 65535 == hu[16, 60]
+        out = apply_voi_lut(hu, ds)
+        assert 4095.0 == pytest.approx(out[16, 60], abs=0.1)
+        # Output range must be 0 to 2**12 - 1
+        assert 4095 == out.max()
+        assert 0 == out.min()
+
     def test_window_bad_photometric_interp(self):
         """Test bad photometric interpretation raises exception."""
         ds = dcmread(WIN_12_1F)
