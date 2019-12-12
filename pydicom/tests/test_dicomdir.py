@@ -14,6 +14,7 @@ BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 
 TEST_FILES = (
     get_testdata_file('DICOMDIR'),
+    get_testdata_file('DICOMDIR-reordered'),
     get_testdata_file('DICOMDIR-nooffset')
 )
 
