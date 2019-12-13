@@ -1837,7 +1837,7 @@ class TestNumpy_VOILUT(object):
     def test_window_modality_lut(self):
         """Test windowing after a modality LUT operation."""
         ds = dcmread(MOD_16_SEQ)
-        ds.WindowCenter = [450, 200]
+        ds.WindowCenter = [49147, 200]
         ds.WindowWidth = [790, 443]
         assert 16 == ds.BitsAllocated
         assert 12 == ds.BitsStored
@@ -1853,12 +1853,15 @@ class TestNumpy_VOILUT(object):
 
         arr = ds.pixel_array
         assert 2047 == arr[16, 60]
+        assert 1023 == arr[0, 1]
         hu = apply_modality_lut(arr, ds)
         assert 65535 == hu[16, 60]
+        assert 49147 == hu[0, 1]
         out = apply_voi_lut(hu, ds)
-        assert 4095.0 == pytest.approx(out[16, 60], abs=0.1)
-        # Output range must be 0 to 2**12 - 1
-        assert 4095 == out.max()
+        assert 65535.0 == pytest.approx(out[16, 60], abs=0.1)
+        assert 32809.0 == pytest.approx(out[0, 1], abs=0.1)
+        # Output range must be 0 to 2**16 - 1
+        assert 65535 == out.max()
         assert 0 == out.min()
 
     def test_window_bad_photometric_interp(self):

@@ -337,9 +337,13 @@ def apply_voi_lut(arr, ds, index=0):
         width = elem.value[index] if elem.VM > 1 else elem.value
 
         # The output range depends on whether or not a modality LUT or rescale
-        #   operation has been applied - if not then the range is the available
-        #   bit depth - see PS3.3 C.11.1.1.1
-        if ds.PixelRepresentation == 0 or 'ModalityLUTSequence' in ds:
+        #   operation has been applied
+        if 'ModalityLUTSequence' in ds:
+            # Unsigned - see PS3.3 C.11.1.1.1
+            y_min = 0
+            bit_depth = ds.ModalityLUTSequence[0].LUTDescriptor[2]
+            y_max = 2**bit_depth - 1
+        elif ds.PixelRepresentation == 0:
             # Unsigned
             y_min = 0
             y_max = 2**ds.BitsStored - 1
