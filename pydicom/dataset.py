@@ -1269,8 +1269,7 @@ class Dataset(dict):
         return default
 
     def convert_pixel_data(self, handler_name=''):
-        """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
-        internally.
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
 
         Parameters
         ----------
@@ -1304,10 +1303,17 @@ class Dataset(dict):
         """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
+        px_elements = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+        px_elem = [kw for kw in px_elements if kw in self]
+        if len(px_elem) != 1:
+            raise AttributeError(
+                ""
+            )
+
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != id(self.PixelData):
+        elif self._pixel_id != id(getattr(self, px_elem[0])):
             already_have = False
 
         if already_have:
@@ -1438,11 +1444,18 @@ class Dataset(dict):
         # Some handler/transfer syntax combinations may need to
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
-            self._pixel_array = convert_color_space(self._pixel_array,
-                                                    'YBR_FULL',
-                                                    'RGB')
+            self._pixel_array = convert_color_space(
+                self._pixel_array, 'YBR_FULL', 'RGB'
+            )
 
-        self._pixel_id = id(self.PixelData)
+        px_elements = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+        px_elem = [kw for kw in px_elements if kw in self]
+        if len(px_elem) != 1:
+            raise AttributeError(
+                ""
+            )
+
+        self._pixel_id = id(getattr(self, px_elem[0]))
 
     def decompress(self, handler_name=''):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`

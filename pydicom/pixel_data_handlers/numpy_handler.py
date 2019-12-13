@@ -321,11 +321,13 @@ def get_pixeldata(ds, read_only=False):
     else:
         # Skip the trailing padding byte(s) if present
         data = pixel_data[:expected_len]
-        arr = np.frombuffer(data, dtype=pixel_dtype(ds))
+        as_float = True if 'Float' in px_elem[0] else False
+        dtype = pixel_dtype(ds, as_float=as_float)
+        arr = np.frombuffer(data, dtype=dtype)
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
-            out = np.zeros(expected_len // 2 * 3, dtype=pixel_dtype(ds))
+            out = np.zeros(expected_len // 2 * 3, dtype=dtype)
             out[::6] = arr[::4]  # Y1
             out[3::6] = arr[1::4]  # Y2
             out[1::6], out[4::6] = arr[2::4], arr[2::4]  # B

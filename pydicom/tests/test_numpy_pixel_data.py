@@ -974,6 +974,72 @@ class TestNumpy_NumpyHandler(object):
             # Frame 2 is frame 1 inverted
             assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
+    def test_little_32bit_float_1frame(self):
+        """Test pixel_array for float pixel data, 1 frame."""
+        ds = dcmread(IMPL_32_1_1F)
+        ds.FloatPixelData = ds.PixelData
+        del ds.PixelData
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+
+            arr = ds.pixel_array
+
+            assert arr.flags.writeable
+            assert (10, 10) == arr.shape
+            assert 1.75e-39 == pytest.approx(arr[0, 0], abs=0.01e-39)
+            assert 1.44e-39 == pytest.approx(arr[4, 3], abs=0.01e-39)
+            assert 1.13e-39 == pytest.approx(arr[-1, -3], abs=0.01e-39)
+
+    def test_little_32bit_float_15frame(self):
+        """Test pixel_array for float pixel data, 15 frames."""
+        ds = dcmread(IMPL_32_1_15F)
+        ds.FloatPixelData = ds.PixelData
+        del ds.PixelData
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+
+            arr = ds.pixel_array
+
+            assert arr.flags.writeable
+            assert (15, 10, 10) == arr.shape
+            assert 1.75e-39 == pytest.approx(arr[0, 0, 0], abs=0.01e-39)
+            assert 1.44e-39 == pytest.approx(arr[0, 4, 3], abs=0.01e-39)
+            assert 1.13e-39 == pytest.approx(arr[0, -1, -3], abs=0.01e-39)
+
+    def test_little_64bit_float_1frame(self):
+        """Test pixel_array for double float pixel data, 1 frame."""
+        ds = dcmread(IMPL_32_1_1F)
+        ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
+        del ds.PixelData
+        ds.BitsAllocated = 64
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+
+            arr = ds.pixel_array
+
+            assert arr.flags.writeable
+            assert (10, 10) == arr.shape
+            assert 2.65e-308 == pytest.approx(arr[0, 0], abs=0.01e-308)
+            assert 1.80e-308 == pytest.approx(arr[4, 3], abs=0.01e-308)
+            assert 1.69e-308 == pytest.approx(arr[-1, -3], abs=0.01e-308)
+
+    def test_little_64bit_float_15frame(self):
+        """Test pixel_array for double float pixel data, 15 frames."""
+        ds = dcmread(IMPL_32_1_15F)
+        ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
+        del ds.PixelData
+        ds.BitsAllocated = 64
+        for uid in SUPPORTED_SYNTAXES[:3]:
+            ds.file_meta.TransferSyntaxUID = uid
+
+            arr = ds.pixel_array
+
+            assert arr.flags.writeable
+            assert (15, 10, 10) == arr.shape
+            assert 2.65e-308 == pytest.approx(arr[0, 0, 0], abs=0.01e-308)
+            assert 1.80e-308 == pytest.approx(arr[0, 4, 3], abs=0.01e-308)
+            assert 1.69e-308 == pytest.approx(arr[0, -1, -3], abs=0.01e-308)
+
     # Big endian datasets
     @pytest.mark.parametrize('little, big', MATCHING_DATASETS)
     def test_big_endian_datasets(self, little, big):
@@ -1015,7 +1081,6 @@ class TestNumpy_NumpyHandler(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_GetPixelData(object):
     """Tests for numpy_handler.get_pixeldata with numpy."""
-
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
         ds = dcmread(EXPL_16_1_1F)
@@ -1151,6 +1216,26 @@ class TestNumpy_GetPixelData(object):
 
         # Resulting data will be nonsense but of correct shape
         assert (100, 100, 3) == arr.shape
+
+    def test_float_pixel_data(self):
+        """Test handling of Float Pixel Data."""
+        # Only 1 sample per pixel allowed
+        ds = dcmread(IMPL_32_1_1F)
+        ds.FloatPixelData = ds.PixelData
+        del ds.PixelData
+        assert 32 == ds.BitsAllocated
+        arr = get_pixeldata(ds)
+        assert 'float32' == arr.dtype
+
+    def test_double_float_pixel_data(self):
+        """Test handling of Double Float Pixel Data."""
+        # Only 1 sample per pixel allowed
+        ds = dcmread(IMPL_32_1_1F)
+        ds.DoubleFloatPixelData = ds.PixelData + ds.PixelData
+        del ds.PixelData
+        ds.BitsAllocated = 64
+        arr = get_pixeldata(ds)
+        assert 'float64' == arr.dtype
 
 
 REFERENCE_PACK_UNPACK = [

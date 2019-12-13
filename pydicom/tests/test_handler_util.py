@@ -73,11 +73,12 @@ class TestNoNumpy(object):
 
 # Tests with Numpy available
 REFERENCE_DTYPE = [
-    # BitsAllocated, PixelRepresentation, numpy dtype string
-    (1, 0, 'uint8'), (1, 1, 'uint8'),
-    (8, 0, 'uint8'), (8, 1, 'int8'),
-    (16, 0, 'uint16'), (16, 1, 'int16'),
-    (32, 0, 'uint32'), (32, 1, 'int32'),
+    # BitsAllocated, PixelRepresentation, as_float, numpy dtype string
+    (1, 0, False, 'uint8'), (1, 1, False, 'uint8'),
+    (8, 0, False, 'uint8'), (8, 1, False, 'int8'),
+    (16, 0, False, 'uint16'), (16, 1, False, 'int16'),
+    (32, 0, False, 'uint32'), (32, 1, False, 'int32'),
+    (32, 0, True, 'float32'), (64, 0, True, 'float64'),
 ]
 
 
@@ -132,8 +133,8 @@ class TestNumpy_PixelDtype(object):
                            match="data type 'uint24' needed to contain"):
             pixel_dtype(self.ds)
 
-    @pytest.mark.parametrize('bits, pixel_repr, dtype', REFERENCE_DTYPE)
-    def test_supported_dtypes(self, bits, pixel_repr, dtype):
+    @pytest.mark.parametrize('bits, pixel_repr, as_float, dtype', REFERENCE_DTYPE)
+    def test_supported_dtypes(self, bits, pixel_repr, as_float, dtype):
         """Test supported dtypes."""
         self.ds.BitsAllocated = bits
         self.ds.PixelRepresentation = pixel_repr
@@ -143,7 +144,7 @@ class TestNumpy_PixelDtype(object):
         if endianness != (byteorder == 'little'):
             ref_dtype = ref_dtype.newbyteorder('S')
 
-        assert ref_dtype == pixel_dtype(self.ds)
+        assert ref_dtype == pixel_dtype(self.ds, as_float=as_float)
 
     def test_byte_swapping(self):
         """Test that the endianess of the system is taken into account."""
