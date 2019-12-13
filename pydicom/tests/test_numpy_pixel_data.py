@@ -1021,7 +1021,13 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_16_1_1F)
         del ds.PixelData
         assert 'PixelData' not in ds
-        with pytest.raises(AttributeError, match=' dataset: PixelData'):
+        assert 'FloatPixelData' not in ds
+        assert 'DoubleFloatPixelData' not in ds
+        msg = (
+            r"Unable to convert the pixel data as no Pixel Data, Float Pixel "
+            r"Data or Double Float Pixel Data element found in the dataset"
+        )
+        with pytest.raises(AttributeError, match=msg):
             get_pixeldata(ds)
 
     def test_unknown_pixel_representation_raises(self):

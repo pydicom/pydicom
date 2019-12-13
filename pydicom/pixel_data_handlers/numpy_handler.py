@@ -11,36 +11,39 @@ Data* to a :class:`numpy.ndarray`.
 
 **Supported data**
 
-The numpy handler supports the conversion of data in the (7fe0,0010)
-*Pixel Data* element to a :class:`~numpy.ndarray` provided the
-related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have
-values given in the table below.
+The numpy handler supports the conversion of data in the (7fe0,0008) *Float
+Pixel Data*, (7fe0,0090) *Double Float Pixel Data* and (7fe0,0010)
+*Pixel Data* elements to a :class:`~numpy.ndarray` provided the
+related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`, :dcm:`Floating Point
+Image Pixel<part03/sect_C.7.6.24.html>` or  :dcm:`Double Floating Point Image
+Pixel<part03/sect_C.7.6.25.html>` module elements have values given in the
+table below.
 
-+------------------------------------------------+--------------+----------+
-| Element                                        | Supported    |          |
-+-------------+---------------------------+------+ values       |          |
-| Tag         | Keyword                   | Type |              |          |
-+=============+===========================+======+==============+==========+
-| (0028,0002) | SamplesPerPixel           | 1    | N            | Required |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1  | Required |
-|             |                           |      | MONOCHROME2  |          |
-|             |                           |      | RGB          |          |
-|             |                           |      | YBR_FULL     |          |
-|             |                           |      | YBR_FULL_422 |          |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0008) | NumberOfFrames            | 1C   | N            | Optional |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0010) | Rows                      | 1    | N            | Required |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0011) | Columns                   | 1    | N            | Required |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32 | Required |
-+-------------+---------------------------+------+--------------+----------+
-| (0028,0103) | PixelRepresentation       | 1    | 0, 1         | Required |
-+-------------+---------------------------+------+--------------+----------+
++------------------------------------------------+------------------+----------+
+| Element                                        | Supported        |          |
++-------------+---------------------------+------+ values           |          |
+| Tag         | Keyword                   | Type |                  |          |
++=============+===========================+======+==================+==========+
+| (0028,0002) | SamplesPerPixel           | 1    | N                | Required |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1      | Required |
+|             |                           |      | MONOCHROME2      |          |
+|             |                           |      | RGB              |          |
+|             |                           |      | YBR_FULL         |          |
+|             |                           |      | YBR_FULL_422     |          |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0006) | PlanarConfiguration       | 1C   | 0, 1             | Optional |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0008) | NumberOfFrames            | 1C   | N                | Optional |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0010) | Rows                      | 1    | N                | Required |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0011) | Columns                   | 1    | N                | Required |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32, 64 | Required |
++-------------+---------------------------+------+------------------+----------+
+| (0028,0103) | PixelRepresentation       | 1    | 0, 1             | Required |
++-------------+---------------------------+------+------------------+----------+
 
 """
 
@@ -204,9 +207,11 @@ def get_pixeldata(ds, read_only=False):
     Parameters
     ----------
     ds : Dataset
-        The :class:`Dataset` containing an Image Pixel module and the
-        *Pixel Data* to be converted. If (0028,0004) *Photometric
-        Interpretation* is `'YBR_FULL_422'` then the pixel data will be
+        The :class:`Dataset` containing an Image Pixel, Floating Point Image
+        Pixel or Double Floating Point Image Pixel module and the
+        *Pixel Data*, *Float Pixel Data* or *Double Float Pixel Data* to be
+        converted. If (0028,0004) *Photometric Interpretation* is
+        `'YBR_FULL_422'` then the pixel data will be
         resampled to 3 channel data as per Part 3, :dcm:`Annex C.7.6.3.1.2
         <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of the DICOM Standard.
     read_only : bool, optional
@@ -240,8 +245,16 @@ def get_pixeldata(ds, read_only=False):
         )
 
     # Check required elements
+    px_elements = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+    px_elem = [elem for elem in px_elements if elem in ds]
+    if len(px_elem) != 1:
+        raise AttributeError(
+            "Unable to convert the pixel data as no Pixel Data, Float Pixel "
+            "Data or Double Float Pixel Data element found in the dataset"
+        )
+
     required_elements = [
-        'PixelData', 'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
+        'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
         'SamplesPerPixel', 'PhotometricInterpretation'
     ]
     missing = [elem for elem in required_elements if elem not in ds]
@@ -255,8 +268,11 @@ def get_pixeldata(ds, read_only=False):
     #   Note: this does NOT include the trailing null byte for odd length data
     expected_len = get_expected_length(ds)
 
+    # May be Pixel Data, FLoat Pixel Data or Double Float Pixel Data
+    pixel_data = getattr(ds, px_elem[0])
+
     # Check that the actual length of the pixel data is as expected
-    actual_length = len(ds.PixelData)
+    actual_length = len(pixel_data)
 
     # Correct for the trailing NULL byte padding for odd length data
     padded_expected_len = expected_len + expected_len % 2
@@ -301,10 +317,10 @@ def get_pixeldata(ds, read_only=False):
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
         nr_pixels = get_expected_length(ds, unit='pixels')
-        arr = unpack_bits(ds.PixelData)[:nr_pixels]
+        arr = unpack_bits(pixel_data)[:nr_pixels]
     else:
         # Skip the trailing padding byte(s) if present
-        data = ds.PixelData[:expected_len]
+        data = pixel_data[:expected_len]
         arr = np.frombuffer(data, dtype=pixel_dtype(ds))
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled

@@ -583,26 +583,30 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
-def pixel_dtype(ds):
+def pixel_dtype(ds, as_float=False):
     """Return a :class:`numpy.dtype` for the *Pixel Data* in `ds`.
 
     Suitable for use with IODs containing the Image Pixel module.
 
-    +------------------------------------------+--------------+
-    | Element                                  | Supported    |
-    +-------------+---------------------+------+ values       |
-    | Tag         | Keyword             | Type |              |
-    +=============+=====================+======+==============+
-    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
-    +-------------+---------------------+------+--------------+
-    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
-    +-------------+---------------------+------+--------------+
+    +------------------------------------------+------------------+
+    | Element                                  | Supported        |
+    +-------------+---------------------+------+ values           |
+    | Tag         | Keyword             | Type |                  |
+    +=============+=====================+======+==================+
+    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32, 64 |
+    +-------------+---------------------+------+------------------+
+    | (0028,0103) | PixelRepresentation | 1    | 0, 1             |
+    +-------------+---------------------+------+------------------+
 
     Parameters
     ----------
     ds : Dataset
         The :class:`~pydicom.dataset.Dataset` containing the *Pixel Data* you
         wish to get the data type for.
+    as_float : bool, optional
+        If ``True`` then return a float dtype, otherwise return an integer
+        dtype (default ``False``). Float dtypes are only supported when
+        (0028,0101) *Bits Allocated* is 32 or 64.
 
     Returns
     -------
@@ -621,21 +625,24 @@ def pixel_dtype(ds):
     if ds.is_little_endian is None:
         ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
 
-    # (0028,0103) Pixel Representation, US, 1
-    #   Data representation of the pixel samples
-    #   0x0000 - unsigned int
-    #   0x0001 - 2's complement (signed int)
-    pixel_repr = ds.PixelRepresentation
-    if pixel_repr == 0:
-        dtype_str = 'uint'
-    elif pixel_repr == 1:
-        dtype_str = 'int'
+    if not as_float:
+        # (0028,0103) Pixel Representation, US, 1
+        #   Data representation of the pixel samples
+        #   0x0000 - unsigned int
+        #   0x0001 - 2's complement (signed int)
+        pixel_repr = ds.PixelRepresentation
+        if pixel_repr == 0:
+            dtype_str = 'uint'
+        elif pixel_repr == 1:
+            dtype_str = 'int'
+        else:
+            raise ValueError(
+                "Unable to determine the data type to use to contain the "
+                "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
+                "Representation' is invalid".format(pixel_repr)
+            )
     else:
-        raise ValueError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is invalid".format(pixel_repr)
-        )
+        dtype_str = 'float'
 
     # (0028,0100) Bits Allocated, US, 1
     #   The number of bits allocated for each pixel sample
