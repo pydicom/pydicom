@@ -14,19 +14,32 @@ Introduction
 pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
 it doesn't do anything with pixel data except read in the raw bytes::
 
-  >>> import pydicom
-  >>> from pydicom.data import get_testdata_files
-  >>> filename = get_testdata_files("MR_small.dcm")[0]
-  >>> ds = pydicom.dcmread(filename)
+  >>> from pydicom import dcmread
+  >>> from pydicom.data import get_testdata_file
+  >>> filename = get_testdata_file("MR_small.dcm")
+  >>> ds = dcmread(filename)
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
-``PixelData`` contains the raw bytes exactly as found in the file. If the
-image is JPEG compressed, these bytes will be the compressed pixel data, not
-the expanded, uncompressed image. Whether the image is e.g. 16-bit or 8-bit,
-multiple frames or not, ``PixelData`` contains the same raw bytes. But there is
-a function that can shape the pixels more sensibly if you need to work with
-them ...
+``PixelData`` contains the ``bytes`` exactly as found in the file and is not
+typically in an immediately useful form as data may be stored in a variety
+of different ways:
+
+ - The pixel values may be signed or unsigned
+ - There may be multiple image frames
+ - There may be :dcm:`multiple planes per frame
+   <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1>` (i.e. RGB) and the :dcm:`order
+   of the pixels<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3>` may be different
+ - The image data may be encoded using one of the available compression
+   standards (``1.2.840.10008.1.2.4.50`` *JPEG Baseline*,
+   ``1.2.840.10008.1.2.5`` *RLE Lossless*, etc). Encoded image data will also
+   be :dcm:`encapsulated<part05/sect_A.4.html>` and each encapsulated image
+   frame may be broken up into one or more fragments.
+
+Because of the complexity in getting the raw *Pixel Data* bytes into
+a usable form, *pydicom* provides a convenient way to get it:
+:attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
+
 
 ``Dataset.pixel_array``
 -----------------------
@@ -93,7 +106,7 @@ to apply a palette color LUT to the pixel data to produce an RGB image.
 
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_files("OBXXXX1A.dcm")[0]
+    fname = get_testdata_file("OBXXXX1A.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     rgb = apply_color_lut(arr, ds)
@@ -107,7 +120,7 @@ of the pixel data is 8-bit.
 
     from pydicom.pixel_data_handlers.util import apply_color_lut
 
-    fname = get_testdata_files("OBXXXX1A.dcm")[0]
+    fname = get_testdata_file("OBXXXX1A.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     # You could also use the corresponding well-known SOP Instance UID
@@ -121,22 +134,47 @@ of the pixel data is 8-bit.
     :dcm:`C.7.9<part03/sect_C.7.9.html>` for more information.
 
 
-Modality LUT
-------------
+Modality LUT or Rescale Operation
+---------------------------------
 
 The DICOM :dcm:`Modality LUT<part03/sect_C.11.html#sect_C.11.1>` module
-converts raw unitless pixel data values to a specific output unit (such as
-Hounsfield units for CT). The
+converts raw pixel data values to a specific (possibly unitless) physical
+quantity, such as Hounsfield units for CT. The
 :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function can be
 used with an input array of raw values and a dataset containing a Modality LUT
-module to return the defined values. When a dataset requires multiple grayscale
-transformations, the Modality LUT transformation is always applied first.
+module to return the converted values. When a dataset requires multiple
+grayscale transformations, the Modality LUT transformation is always applied
+first.
 
 .. code-block:: python
 
     from pydicom.pixel_data_handlers.util import apply_modality_lut
 
-    fname = get_testdata_files("CT_small.dcm")[0]
+    fname = get_testdata_file("CT_small.dcm")
     ds = dcmread(fname)
     arr = ds.pixel_array
     hu = apply_modality_lut(arr, ds)
+
+
+VOI LUT or Windowing Operation
+------------------------------
+
+The DICOM :dcm:`VOI LUT<part03/sect_C.11.2.html>` module applies a
+VOI or windowing operation to input values. The
+:func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function
+can be used with an input array and a dataset containing a VOI LUT module to
+return values with applied VOI LUT or windowing. When a dataset contains
+multiple VOI or windowing views then a particular view can be returned by
+using the `index` keyword parameter.
+
+When a dataset requires multiple greyscale transformations, then its assumed
+that the modality LUT or rescale operation has already been applied.
+
+.. code-block:: python
+
+    from pydicom.pixel_data_handlers.util import apply_voi_lut
+
+    fname = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
+    ds = dcmread(fname)
+    arr = ds.pixel_array
+    out = apply_voi_lut(arr, ds, index=0)

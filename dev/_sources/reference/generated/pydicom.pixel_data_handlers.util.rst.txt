@@ -11,6 +11,7 @@ pydicom.pixel\_data\_handlers.util
    
       apply_color_lut
       apply_modality_lut
+      apply_voi_lut
       convert_color_space
       dtype_corrected_for_endianness
       get_expected_length
