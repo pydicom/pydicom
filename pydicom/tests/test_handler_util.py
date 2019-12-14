@@ -138,7 +138,9 @@ class TestNumpy_PixelDtype(object):
                            match="data type 'uint24' needed to contain"):
             pixel_dtype(self.ds)
 
-    @pytest.mark.parametrize('bits, pixel_repr, as_float, dtype', REFERENCE_DTYPE)
+    @pytest.mark.parametrize(
+        'bits, pixel_repr, as_float, dtype', REFERENCE_DTYPE
+    )
     def test_supported_dtypes(self, bits, pixel_repr, as_float, dtype):
         """Test supported dtypes."""
         self.ds.BitsAllocated = bits
