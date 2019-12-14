@@ -68,7 +68,7 @@ class DicomDir(FileDataset):
                 raise InvalidDicomError(msg)
         if is_implicit_VR or not is_little_endian:
             msg = ('Invalid transfer syntax for DICOMDIR - '
-                   'Implicit Little Endian expected.')
+                   'Explicit Little Endian expected.')
             if config.enforce_valid_values:
                 raise InvalidDicomError(msg)
             warnings.warn(msg, UserWarning)
@@ -123,5 +123,9 @@ class DicomDir(FileDataset):
                     child = map_offset_to_record[child_offset]
                     record.children = get_siblings(child, map_offset_to_record)
 
-        # Find the top-level records : siblings of the first record
-        self.patient_records = get_siblings(records[0], map_offset_to_record)
+        self.patient_records = [
+            record for record in records
+            if getattr(record, 'DirectoryRecordType') == 'PATIENT'
+        ]
+        if not self.patient_records:
+            raise InvalidDicomError('Missing PATIENT record(s) in DICOMDIR')
