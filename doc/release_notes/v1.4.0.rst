@@ -45,5 +45,8 @@ Enhancements
 * Added optional `handler` argument to
   :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
   particular handler, rather than following pydicom's default order (:issue:`537`)
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function for
+  applying VOI LUTs or windowing operations.
 * Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
-  Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array` (:issue:``)
+  Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
+  (:issue:`452`)
