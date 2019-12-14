@@ -16,8 +16,6 @@ from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
-    ExplicitVRLittleEndian,
-    RLELossless,
     PYDICOM_IMPLEMENTATION_UID
 )
 

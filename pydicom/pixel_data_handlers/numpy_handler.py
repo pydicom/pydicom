@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the `numpy <https://numpy.org/>`_ package to convert supported *Pixel
-Data* to a :class:`numpy.ndarray`.
+"""Use the `numpy <https://numpy.org/>`_ package to convert supported pixel
+data to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -12,7 +12,7 @@ Data* to a :class:`numpy.ndarray`.
 **Supported data**
 
 The numpy handler supports the conversion of data in the (7fe0,0008) *Float
-Pixel Data*, (7fe0,0090) *Double Float Pixel Data* and (7fe0,0010)
+Pixel Data*, (7fe0,0009) *Double Float Pixel Data* and (7fe0,0010)
 *Pixel Data* elements to a :class:`~numpy.ndarray` provided the
 related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`, :dcm:`Floating Point
 Image Pixel<part03/sect_C.7.6.24.html>` or  :dcm:`Double Floating Point Image
@@ -26,10 +26,10 @@ table below.
 +=============+===========================+======+===============+==========+
 | (0028,0002) | SamplesPerPixel           | 1    | N             | Required |
 +-------------+---------------------------+------+---------------+----------+
-| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1   | Required |
-|             |                           |      | MONOCHROME2   |          |
-|             |                           |      | RGB           |          |
-|             |                           |      | YBR_FULL      |          |
+| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1,  | Required |
+|             |                           |      | MONOCHROME2,  |          |
+|             |                           |      | RGB,          |          |
+|             |                           |      | YBR_FULL,     |          |
 |             |                           |      | YBR_FULL_422  |          |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0006) | PlanarConfiguration       | 1C   | 0, 1          | Optional |
@@ -41,7 +41,7 @@ table below.
 | (0028,0011) | Columns                   | 1    | N             | Required |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32, | Required |
-|             |                           |      | 64            | Required |
+|             |                           |      | 64            |          |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0103) | PixelRepresentation       | 1    | 0, 1          | Required |
 +-------------+---------------------------+------+---------------+----------+
@@ -267,7 +267,7 @@ def get_pixeldata(ds, read_only=False):
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
-    # May be Pixel Data, FLoat Pixel Data or Double Float Pixel Data
+    # May be Pixel Data, Float Pixel Data or Double Float Pixel Data
     pixel_data = getattr(ds, px_keyword[0])
 
     # Calculate the expected length of the pixel data (in bytes)
