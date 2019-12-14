@@ -795,6 +795,9 @@ class Dataset(dict):
         tag = tag_for_keyword(name)
         if tag is None:  # `name` isn't a DICOM element keyword
             # Try the base class attribute getter (fix for issue 332)
+            if name == '_dict':
+                # special handling for contained dict, needed for pickle
+                return {}
             return object.__getattribute__(self, name)
         tag = Tag(tag)
         if tag not in self._dict:  # tag not in the Dataset
@@ -802,9 +805,6 @@ class Dataset(dict):
             if hasattr(self, 'file_meta') and self.file_meta is not None:
                 if tag in self.file_meta:
                     return self.file_meta[tag].value
-            if name == '_dict':
-                # special handling for contained dict, needed for pickle
-                return {}
             # Try the base class attribute getter (fix for issue 332)
             return object.__getattribute__(self, name)
         else:
