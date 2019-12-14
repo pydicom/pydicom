@@ -1307,7 +1307,9 @@ class Dataset(dict):
         px_elem = [kw for kw in px_elements if kw in self]
         if len(px_elem) != 1:
             raise AttributeError(
-                ""
+                "Unable to convert the pixel data: one of Pixel Data, Float "
+                "Pixel Data or Double Float Pixel Data must be present in "
+                "the dataset"
             )
 
         already_have = True
@@ -1438,6 +1440,7 @@ class Dataset(dict):
         """Do the actual data conversion using the given handler."""
 
         # Use the handler to get a 1D numpy array of the pixel data
+        # Will raise an exception if no pixel data element
         arr = handler.get_pixeldata(self)
         self._pixel_array = reshape_pixel_array(self, arr)
 
@@ -1450,11 +1453,6 @@ class Dataset(dict):
 
         px_elements = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
         px_elem = [kw for kw in px_elements if kw in self]
-        if len(px_elem) != 1:
-            raise AttributeError(
-                ""
-            )
-
         self._pixel_id = id(getattr(self, px_elem[0]))
 
     def decompress(self, handler_name=''):
@@ -1595,12 +1593,14 @@ class Dataset(dict):
 
     @property
     def pixel_array(self):
-        """Return the *Pixel Data* as a :class:`numpy.ndarray`.
+        """Return the pixel data as a :class:`numpy.ndarray`.
 
         Returns
         -------
         numpy.ndarray
-            The (7fe0,0010) *Pixel Data* converted to a :class:`numpy.ndarray`.
+            The (7fe0,0008) *Float Pixel Data*, (7fe0,0009) *Double Float
+            Pixel Data* or (7fe0,0010) *Pixel Data* converted to a
+            :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
         return self._pixel_array

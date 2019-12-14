@@ -11,8 +11,22 @@ Working with Pixel Data
 Introduction
 ------------
 
+Many DICOM SOP classes contain bulk pixel data - usually image data - in the
+(7fe0,0010) *Pixel Data* element. The only exception to this is
+:dcm:`Parametric Map Storage<part03/FIXME>` which may instead contain
+data in the (7fe0,0008) *Float Pixel Data* or (7fe0,0009) *Double Float
+Pixel Data* elements.
+
+.. note::
+
+    In the following section the term *pixel data* will be used to refer to
+    the bulk data from *Pixel Data*, *Float Pixel Data* and *Double Float
+    Pixel Data* elements. While the examples use ``PixelData``,
+    ``FloatPixelData`` or ``DoubleFloatPixelData`` could also be used
+    interchangeably provided the dataset contains the corresponding element.
+
 pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
-it doesn't do anything with pixel data except read in the raw bytes::
+it doesn't do anything with *pixel data* except read in the raw bytes::
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_files
@@ -37,7 +51,7 @@ them ...
     requires `NumPy <http://numpy.org/>`_.
 
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` returns a
-:class:`numpy.ndarray` containing the *Pixel Data*::
+:class:`numpy.ndarray` containing the *pixel data*::
 
   >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
@@ -50,7 +64,7 @@ them ...
   >>> ds.pixel_array.shape
   (64, 64)
 
-If the *Pixel Data* is compressed then
+If the *pixel data* is compressed then
 :attr:`~pydicom.dataset.Dataset.pixel_array` will return the uncompressed data,
 provided the dependencies of the required pixel data handler are available. See
 :doc:`handling compressed image data <image_data_handlers>` for more

@@ -249,8 +249,9 @@ def get_pixeldata(ds, read_only=False):
     px_elem = [elem for elem in px_elements if elem in ds]
     if len(px_elem) != 1:
         raise AttributeError(
-            "Unable to convert the pixel data as no Pixel Data, Float Pixel "
-            "Data or Double Float Pixel Data element found in the dataset"
+            "Unable to convert the pixel data: one of Pixel Data, Float "
+            "Pixel Data or Double Float Pixel Data must be present in "
+            "the dataset"
         )
 
     required_elements = [
@@ -321,8 +322,7 @@ def get_pixeldata(ds, read_only=False):
     else:
         # Skip the trailing padding byte(s) if present
         data = pixel_data[:expected_len]
-        as_float = True if 'Float' in px_elem[0] else False
-        dtype = pixel_dtype(ds, as_float=as_float)
+        dtype = pixel_dtype(ds, as_float=('Float' in px_elem[0]))
         arr = np.frombuffer(data, dtype=dtype)
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled

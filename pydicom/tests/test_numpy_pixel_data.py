@@ -1089,8 +1089,9 @@ class TestNumpy_GetPixelData(object):
         assert 'FloatPixelData' not in ds
         assert 'DoubleFloatPixelData' not in ds
         msg = (
-            r"Unable to convert the pixel data as no Pixel Data, Float Pixel "
-            r"Data or Double Float Pixel Data element found in the dataset"
+            r"Unable to convert the pixel data: one of Pixel Data, Float "
+            r"Pixel Data or Double Float Pixel Data must be present in "
+            r"the dataset"
         )
         with pytest.raises(AttributeError, match=msg):
             get_pixeldata(ds)
