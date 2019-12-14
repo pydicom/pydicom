@@ -27,7 +27,7 @@ The only exception to this is :dcm:`Parametric Map Storage
     ``FloatPixelData`` or ``DoubleFloatPixelData`` could also be used
     interchangeably provided the dataset contains the corresponding element.
 
-By default *pydicom* reads in *pixel data* as the raw bytes found in the file::
+By default *pydicom* reads in pixel data as the raw bytes found in the file::
 
   >>> from pydicom import dcmread
   >>> from pydicom.data import get_testdata_file
@@ -50,8 +50,8 @@ stored in a variety of different ways:
    be :dcm:`encapsulated<part05/sect_A.4.html>` and each encapsulated image
    frame may be broken up into one or more fragments.
 
-Because of the complexity in interpreting the *pixel data*, *pydicom* provides
-a way to get it where all the hard work has already been done:
+Because of the complexity in interpreting the pixel data, *pydicom* provides
+an easy way to get it in a convenient form:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 
@@ -64,7 +64,7 @@ a way to get it where all the hard work has already been done:
     requires `NumPy <http://numpy.org/>`_.
 
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` returns a
-:class:`numpy.ndarray` containing the *pixel data*::
+:class:`numpy.ndarray` containing the pixel data::
 
   >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
@@ -77,9 +77,10 @@ a way to get it where all the hard work has already been done:
   >>> ds.pixel_array.shape
   (64, 64)
 
-If the *pixel data* is compressed then
+If the pixel data is compressed then
 :attr:`~pydicom.dataset.Dataset.pixel_array` will return the uncompressed data,
-provided the dependencies of the required :ref:`pixel data handler<api_handlers_pixeldata>` are available. See
+provided the dependencies of the required :ref:`pixel data handler
+<api_handlers_pixeldata>` are available. See
 :doc:`handling compressed image data <image_data_handlers>` for more
 information.
 
@@ -101,7 +102,7 @@ they must be written back to the dataset's ``PixelData`` element.
   ds.save_as("temp.dcm")
 
 Some changes may require other DICOM tags to be modified. For example, if the
-*pixel data* is reduced (e.g. a :math:`512 \times 512` image is collapsed to
+image size is reduced (e.g. a :math:`512 \times 512` image is collapsed to
 :math:`256 \times 256`) then ``Rows`` and ``Columns`` should be set
 appropriately. You must explicitly set these yourself; *pydicom* does not do so
 automatically.
@@ -187,7 +188,7 @@ return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by
 using the `index` keyword parameter.
 
-When a dataset requires multiple greyscale transformations, then its assumed
+When a dataset requires multiple grayscale transformations, then its assumed
 that the modality LUT or rescale operation has already been applied.
 
 .. code-block:: python
