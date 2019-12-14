@@ -123,14 +123,9 @@ class DicomDir(FileDataset):
                     child = map_offset_to_record[child_offset]
                     record.children = get_siblings(child, map_offset_to_record)
 
-        # Find the first patient record
-        first_patient_record = records[0]
-        for record in records:
-            if hasattr(record, 'DirectoryRecordType'):
-                if record.DirectoryRecordType == 'PATIENT':
-                    first_patient_record = record
-                    break
-
-        # Find the top-level records : siblings of the first record
-        self.patient_records = get_siblings(
-            first_patient_record, map_offset_to_record)
+        self.patient_records = [
+            record for record in records
+            if getattr(record, 'DirectoryRecordType') == 'PATIENT'
+        ]
+        if not self.patient_records:
+            raise InvalidDicomError('Missing PATIENT record(s) in DICOMDIR')

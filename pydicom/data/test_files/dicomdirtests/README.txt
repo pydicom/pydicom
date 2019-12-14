@@ -17,3 +17,5 @@ DICOMDIR-reordered:
 created from DICOMDIR by reordering the first 4 entries (IMAGE - SERIES - STUDY - PATIENT
 instead of PATIENT - STUDY - SERIES - IMAGE) and adapting the offsets
 
+DICOMDIR-nopatient:
+created from DICOMDIR by changing the type of the patient records to an invalid type
