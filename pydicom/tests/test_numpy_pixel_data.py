@@ -1096,6 +1096,20 @@ class TestNumpy_GetPixelData(object):
         with pytest.raises(AttributeError, match=msg):
             get_pixeldata(ds)
 
+    def test_missing_required_elem(self):
+        """Tet get_pixeldata raises if dataset missing required element."""
+        ds = dcmread(EXPL_16_1_1F)
+        del ds.BitsAllocated
+        del ds.Rows
+        del ds.SamplesPerPixel
+        msg = (
+            r"Unable to convert the pixel data as the following required "
+            r"elements are missing from the dataset: BitsAllocated, Rows, "
+            r"SamplesPerPixel"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            get_pixeldata(ds)
+
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if unsupported PixelRepresentation."""
         ds = dcmread(EXPL_16_1_1F)

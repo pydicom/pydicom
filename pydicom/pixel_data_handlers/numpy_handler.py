@@ -247,9 +247,9 @@ def get_pixeldata(ds, read_only=False):
         )
 
     # Check required elements
-    px_elements = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
-    px_elem = [elem for elem in px_elements if elem in ds]
-    if len(px_elem) != 1:
+    keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+    px_keyword = [kw for kw in keywords if kw in ds]
+    if len(px_keyword) != 1:
         raise AttributeError(
             "Unable to convert the pixel data: one of Pixel Data, Float "
             "Pixel Data or Double Float Pixel Data must be present in "
@@ -267,12 +267,12 @@ def get_pixeldata(ds, read_only=False):
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
+    # May be Pixel Data, FLoat Pixel Data or Double Float Pixel Data
+    pixel_data = getattr(ds, px_keyword[0])
+
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data
     expected_len = get_expected_length(ds)
-
-    # May be Pixel Data, FLoat Pixel Data or Double Float Pixel Data
-    pixel_data = getattr(ds, px_elem[0])
 
     # Check that the actual length of the pixel data is as expected
     actual_length = len(pixel_data)
@@ -323,9 +323,8 @@ def get_pixeldata(ds, read_only=False):
         arr = unpack_bits(pixel_data)[:nr_pixels]
     else:
         # Skip the trailing padding byte(s) if present
-        data = pixel_data[:expected_len]
-        dtype = pixel_dtype(ds, as_float=('Float' in px_elem[0]))
-        arr = np.frombuffer(data, dtype=dtype)
+        dtype = pixel_dtype(ds, as_float=('Float' in px_keyword[0]))
+        arr = np.frombuffer(pixel_data[:expected_len], dtype=dtype)
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
