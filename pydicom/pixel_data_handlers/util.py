@@ -751,9 +751,11 @@ def get_expected_length(ds, unit='bytes'):
 
 
 def pixel_dtype(ds, as_float=False):
-    """Return a :class:`numpy.dtype` for the *Pixel Data* in `ds`.
+    """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
-    Suitable for use with IODs containing the Image Pixel module.
+    Suitable for use with IODs containing the Image Pixel module (with
+    ``as_float=False``) and the Floating Point Image Pixel and Double Floating
+    Point Image Pixel modules (with ``as_float=True``).
 
     +------------------------------------------+------------------+
     | Element                                  | Supported        |
@@ -768,7 +770,7 @@ def pixel_dtype(ds, as_float=False):
     Parameters
     ----------
     ds : Dataset
-        The :class:`~pydicom.dataset.Dataset` containing the *Pixel Data* you
+        The :class:`~pydicom.dataset.Dataset` containing the pixel data you
         wish to get the data type for.
     as_float : bool, optional
         If ``True`` then return a float dtype, otherwise return an integer
@@ -778,7 +780,7 @@ def pixel_dtype(ds, as_float=False):
     Returns
     -------
     numpy.dtype
-        A :class:`numpy.dtype` suitable for containing the *Pixel Data*.
+        A :class:`numpy.dtype` suitable for containing the pixel data.
 
     Raises
     ------

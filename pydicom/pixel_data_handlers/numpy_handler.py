@@ -202,7 +202,7 @@ def unpack_bits(bytestream):
 
 
 def get_pixeldata(ds, read_only=False):
-    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
+    """Return a :class:`numpy.ndarray` of the pixel data.
 
     Parameters
     ----------
@@ -224,7 +224,8 @@ def get_pixeldata(ds, read_only=False):
     Returns
     -------
     np.ndarray
-        The contents of (7FE0,0010) *Pixel Data* as a 1D array.
+        The contents of (7FE0,0010) *Pixel Data*, (7FE0,0008) *Float Pixel
+        Data* or (7FE0,0009) *Double Float Pixel Data* as a 1D array.
 
     Raises
     ------
