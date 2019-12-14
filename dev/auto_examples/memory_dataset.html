@@ -205,9 +205,9 @@ datasets saved as blobs in a database.</p>
 <span class="k">def</span> <span class="nf">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="c1"># create a buffer</span>
     <span class="k">with</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
-        <span class="c1"># create a DicomLike object that has some properties of DataSet</span>
+        <span class="c1"># create a DicomFileLike object that has some properties of DataSet</span>
         <span class="n">memory_dataset</span> <span class="o">=</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="View documentation for pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
-        <span class="c1"># write the dataset to the DicomLike object</span>
+        <span class="c1"># write the dataset to the DicomFileLike object</span>
         <span class="n">dcmwrite</span><span class="p">(</span><span class="n">memory_dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
         <span class="c1"># to read from the object, you have to rewind it</span>
         <span class="n">memory_dataset</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
