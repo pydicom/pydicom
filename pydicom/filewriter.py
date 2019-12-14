@@ -3,7 +3,7 @@
 
 from __future__ import absolute_import
 
-import struct
+import warnings
 from struct import pack
 
 from pydicom import compat
@@ -134,20 +134,20 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the pydicom.values.convert_numbers() method.
+    using the :func:`~pydicom.values.convert_numbers` function.
 
     Parameters
     ----------
-    elem : pydicom.dataelem.DataElement
+    elem : dataelem.DataElement
         The element with an ambiguous VR.
-    ds : pydicom.dataset.Dataset
+    ds : dataset.Dataset
         The dataset containing `elem`.
     is_little_endian : bool
         The byte ordering of the values in the dataset.
 
     Returns
     -------
-    elem : pydicom.dataelem.DataElement
+    dataelem.DataElement
         The corrected element
     """
     if 'or' in elem.VR:
@@ -174,7 +174,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
     all retired or part of DICONDE.
 
     If the VR is corrected and is 'US' or 'SS' then the value will be updated
-    using the pydicom.values.convert_numbers() method.
+    using the :func:`~pydicom.values.convert_numbers` function.
 
     Parameters
     ----------
@@ -185,7 +185,7 @@ def correct_ambiguous_vr(ds, is_little_endian):
 
     Returns
     -------
-    ds : pydicom.dataset.Dataset
+    ds : dataset.Dataset
         The corrected dataset
 
     Raises
@@ -210,8 +210,14 @@ def write_numbers(fp, data_element, struct_format):
 
     "Value" can be more than one number.
 
-    struct_format -- the character format as used by the struct module.
-
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    data_element : dataelem.DataElement
+        The element to encode.
+    struct_format : str
+        The character format as used by the struct module.
     """
     endianChar = '><' [fp.is_little_endian]
     value = data_element.value
@@ -273,7 +279,7 @@ def write_PN(fp, data_element, encodings=None):
     else:
         val = data_element.value
 
-    if isinstance(val[0], compat.text_type) or not in_py2:
+    if val and isinstance(val[0], compat.text_type) or not in_py2:
         try:
             val = [elem.encode(encodings) for elem in val]
         except TypeError:
@@ -439,26 +445,18 @@ def write_data_element(fp, data_element, encodings=None):
     # Write element's tag
     fp.write_tag(data_element.tag)
 
-    # If explicit VR, write the VR
-    VR = data_element.VR
-    if not fp.is_implicit_VR:
-        if len(VR) != 2:
-            msg = ("Cannot write ambiguous VR of '{}' for data element with "
-                   "tag {}.\nSet the correct VR before writing, or use an "
-                   "implicit VR transfer syntax".format(
-                       VR, repr(data_element.tag)))
-            raise ValueError(msg)
-        if not in_py2:
-            fp.write(bytes(VR, default_encoding))
-        else:
-            fp.write(VR)
-        if VR in extra_length_VRs:
-            fp.write_US(0)  # reserved 2 bytes
-
     # write into a buffer to avoid seeking back which can be expansive
     buffer = DicomBytesIO()
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
+
+    VR = data_element.VR
+    if not fp.is_implicit_VR and len(VR) != 2:
+        msg = ("Cannot write ambiguous VR of '{}' for data element with "
+               "tag {}.\nSet the correct VR before writing, or use an "
+               "implicit VR transfer syntax".format(
+                   VR, repr(data_element.tag)))
+        raise ValueError(msg)
 
     if data_element.is_raw:
         # raw data element values can be written as they are
@@ -474,15 +472,16 @@ def write_data_element(fp, data_element, encodings=None):
         encodings = convert_encodings(encodings)
         writer_function, writer_param = writers[VR]
         is_undefined_length = data_element.is_undefined_length
-        if VR in text_VRs or VR in ('PN', 'SQ'):
-            writer_function(buffer, data_element, encodings=encodings)
-        else:
-            # Many numeric types use the same writer but with numeric format
-            # parameter
-            if writer_param is not None:
-                writer_function(buffer, data_element, writer_param)
+        if not data_element.is_empty:
+            if VR in text_VRs or VR in ('PN', 'SQ'):
+                writer_function(buffer, data_element, encodings=encodings)
             else:
-                writer_function(buffer, data_element)
+                # Many numeric types use the same writer but with
+                # numeric format parameter
+                if writer_param is not None:
+                    writer_function(buffer, data_element, writer_param)
+                else:
+                    writer_function(buffer, data_element)
 
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
@@ -497,17 +496,28 @@ def write_data_element(fp, data_element, encodings=None):
 
     value_length = buffer.tell()
     if (not fp.is_implicit_VR and VR not in extra_length_VRs and
+            not is_undefined_length and value_length > 0xffff):
+        # see PS 3.5, section 6.2.2 for handling of this case
+        msg = ('The value for the data element {} exceeds the size '
+               'of 64 kByte and cannot be written in an explicit transfer '
+               'syntax. The data element VR is changed from "{}" to "UN" '
+               'to allow saving the data.'
+               .format(data_element.tag, VR))
+        warnings.warn(msg)
+        VR = 'UN'
+
+    # write the VR for explicit transfer syntax
+    if not fp.is_implicit_VR:
+        if not in_py2:
+            fp.write(bytes(VR, default_encoding))
+        else:
+            fp.write(VR)
+        if VR in extra_length_VRs:
+            fp.write_US(0)  # reserved 2 bytes
+
+    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length):
-        try:
-            fp.write_US(value_length)  # Explicit VR length field is 2 bytes
-        except struct.error:
-            msg = ('The value for the data element {} exceeds the size '
-                   'of 64 kByte and cannot be written in an explicit transfer '
-                   'syntax. You can save it using Implicit Little Endian '
-                   'transfer syntax, or you have to truncate the value to not '
-                   'exceed the maximum size of 64 kByte.'
-                   .format(data_element.tag))
-            raise ValueError(msg)
+        fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
         # write the proper length of the data_element in the length slot,
         # unless is SQ with undefined length.
@@ -560,7 +570,17 @@ def _harmonize_properties(dataset, fp):
 
 
 def write_sequence(fp, data_element, encodings):
-    """Write a dicom Sequence contained in data_element to the file fp."""
+    """Write a sequence contained in `data_element` to the file-like `fp`.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    data_element : dataelem.DataElement
+        The sequence element to write to `fp`.
+    encodings : list of str
+        The character encodings to use on text values.
+    """
     # write_data_element has already written the VR='SQ' (if needed) and
     #    a placeholder for length"""
     sequence = data_element.value
@@ -569,12 +589,21 @@ def write_sequence(fp, data_element, encodings):
 
 
 def write_sequence_item(fp, dataset, encodings):
-    """Write an item (dataset) in a dicom Sequence to the dicom file fp.
+    """Write a `dataset` in a sequence to the file-like `fp`.
 
     This is similar to writing a data_element, but with a specific tag for
-    Sequence Item
+    Sequence Item.
 
-    see Dicom standard Part 5, p. 39 ('03 version)
+    See DICOM Standard, Part 5, :dcm:`Section 7.5<sect_7.5.html>`.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to write the encoded data to.
+    dataset : Dataset
+        The :class:`Dataset<pydicom.dataset.Dataset>` to write to `fp`.
+    encodings : list of str
+        The character encodings to use on text values.
     """
     fp.write_tag(ItemTag)  # marker for start of Sequence Item
     length_location = fp.tell()  # save location for later.
@@ -615,59 +644,63 @@ def write_ATvalue(fp, data_element):
 def write_file_meta_info(fp, file_meta, enforce_standard=True):
     """Write the File Meta Information elements in `file_meta` to `fp`.
 
-    If `enforce_standard` is True then the file-like `fp` should be positioned
-    past the 128 byte preamble + 4 byte prefix (which should already have been
-    written).
+    If `enforce_standard` is ``True`` then the file-like `fp` should be
+    positioned past the 128 byte preamble + 4 byte prefix (which should
+    already have been written).
 
-    DICOM File Meta Information Group Elements
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    From the DICOM standard, Part 10 Section 7.1, any DICOM file shall contain
-    a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a minimum) the
-    following Type 1 DICOM Elements (from Table 7.1-1):
-        * (0002,0000) FileMetaInformationGroupLength, UL, 4
-        * (0002,0001) FileMetaInformationVersion, OB, 2
-        * (0002,0002) MediaStorageSOPClassUID, UI, N
-        * (0002,0003) MediaStorageSOPInstanceUID, UI, N
-        * (0002,0010) TransferSyntaxUID, UI, N
-        * (0002,0012) ImplementationClassUID, UI, N
+    **DICOM File Meta Information Group Elements**
 
-    If `enforce_standard` is True then (0002,0000) will be added/updated,
+    From the DICOM standard, Part 10,
+    :dcm:`Section 7.1<part10/chapter_7.html#sect_7.1>`,  any DICOM file shall
+    contain a 128-byte preamble, a 4-byte DICOM prefix 'DICM' and (at a
+    minimum) the following Type 1 DICOM Elements (from
+    :dcm:`Table 7.1-1<part10/chapter_7.html#table_7.1-1>`):
+
+    * (0002,0000) *File Meta Information Group Length*, UL, 4
+    * (0002,0001) *File Meta Information Version*, OB, 2
+    * (0002,0002) *Media Storage SOP Class UID*, UI, N
+    * (0002,0003) *Media Storage SOP Instance UID*, UI, N
+    * (0002,0010) *Transfer Syntax UID*, UI, N
+    * (0002,0012) *Implementation Class UID*, UI, N
+
+    If `enforce_standard` is ``True`` then (0002,0000) will be added/updated,
     (0002,0001) and (0002,0012) will be added if not already present and the
     other required elements will be checked to see if they exist. If
-    `enforce_standard` is False then `file_meta` will be written as is after
-    minimal validation checking.
+    `enforce_standard` is ``False`` then `file_meta` will be written as is
+    after minimal validation checking.
 
     The following Type 3/1C Elements may also be present:
-        * (0002,0013) ImplementationVersionName, SH, N
-        * (0002,0016) SourceApplicationEntityTitle, AE, N
-        * (0002,0017) SendingApplicationEntityTitle, AE, N
-        * (0002,0018) ReceivingApplicationEntityTitle, AE, N
-        * (0002,0100) PrivateInformationCreatorUID, UI, N
-        * (0002,0102) PrivateInformation, OB, N
 
-    If `enforce_standard` is True then (0002,0013) will be added/updated.
+    * (0002,0013) *Implementation Version Name*, SH, N
+    * (0002,0016) *Source Application Entity Title*, AE, N
+    * (0002,0017) *Sending Application Entity Title*, AE, N
+    * (0002,0018) *Receiving Application Entity Title*, AE, N
+    * (0002,0102) *Private Information*, OB, N
+    * (0002,0100) *Private Information Creator UID*, UI, N
 
-    Encoding
-    ~~~~~~~~
-    The encoding of the File Meta Information shall be Explicit VR Little
-    Endian
+    If `enforce_standard` is ``True`` then (0002,0013) will be added/updated.
+
+    *Encoding*
+
+    The encoding of the *File Meta Information* shall be *Explicit VR Little
+    Endian*.
 
     Parameters
     ----------
     fp : file-like
         The file-like to write the File Meta Information to.
     file_meta : pydicom.dataset.Dataset
-        The File Meta Information DataElements.
+        The File Meta Information elements.
     enforce_standard : bool
-        If False, then only the File Meta Information elements already in
-        `file_meta` will be written to `fp`. If True (default) then a DICOM
+        If ``False``, then only the *File Meta Information* elements already in
+        `file_meta` will be written to `fp`. If ``True`` (default) then a DICOM
         Standards conformant File Meta will be written to `fp`.
 
     Raises
     ------
     ValueError
-        If `enforce_standard` is True and any of the required File Meta
-        Information elements are missing from `file_meta`, with the
+        If `enforce_standard` is ``True`` and any of the required *File Meta
+        Information* elements are missing from `file_meta`, with the
         exception of (0002,0000), (0002,0001) and (0002,0012).
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
@@ -705,28 +738,30 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
 def dcmwrite(filename, dataset, write_like_original=True):
     """Write `dataset` to the `filename` specified.
 
-    If `write_like_original` is True then `dataset` will be written as is
+    If `write_like_original` is ``True`` then `dataset` will be written as is
     (after minimal validation checking) and may or may not contain all or parts
     of the File Meta Information (and hence may or may not be conformant with
     the DICOM File Format).
-    If `write_like_original` is False, `dataset` will be stored in the DICOM
-    File Format in accordance with DICOM Standard Part 10 Section 7. The byte
-    stream of the `dataset` will be placed into the file after the DICOM File
-    Meta Information.
 
-    File Meta Information
-    ---------------------
-    The File Meta Information consists of a 128-byte preamble, followed by a 4
-    byte DICOM prefix, followed by the File Meta Information Group elements.
+    If `write_like_original` is ``False``, `dataset` will be stored in the
+    :dcm:`DICOM File Format <part10/chapter_7.html>`. The
+    byte stream of the `dataset` will be placed into the file after the
+    DICOM *File Meta Information*.
 
-    Preamble and Prefix
-    ~~~~~~~~~~~~~~~~~~~
-    The `dataset.preamble` attribute shall be 128-bytes long or None and is
-    available for use as defined by the Application Profile or specific
+    **File Meta Information**
+
+    The *File Meta Information* consists of a 128-byte preamble, followed by
+    a 4 byte ``b'DICM'`` prefix, followed by the *File Meta Information Group*
+    elements.
+
+    **Preamble and Prefix**
+
+    The ``dataset.preamble`` attribute shall be 128-bytes long or ``None`` and
+    is available for use as defined by the Application Profile or specific
     implementations. If the preamble is not used by an Application Profile or
-    specific implementation then all 128 bytes should be set to 0x00. The
+    specific implementation then all 128 bytes should be set to ``0x00``. The
     actual preamble written depends on `write_like_original` and
-    `dataset.preamble` (see the table below).
+    ``dataset.preamble`` (see the table below).
 
     +------------------+------------------------------+
     |                  | write_like_original          |
@@ -734,49 +769,53 @@ def dcmwrite(filename, dataset, write_like_original=True):
     | dataset.preamble | True        | False          |
     +==================+=============+================+
     | None             | no preamble | 128 0x00 bytes |
-    +------------------+------------------------------+
+    +------------------+-------------+----------------+
     | 128 bytes        | dataset.preamble             |
     +------------------+------------------------------+
 
-    The prefix shall be the string 'DICM' and will be written if and only if
-    the preamble is present.
+    The prefix shall be the bytestring ``b'DICM'`` and will be written if and
+    only if the preamble is present.
 
-    File Meta Information Group Elements
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    The preamble and prefix are followed by a set of DICOM Elements from the
+    **File Meta Information Group Elements**
+
+    The preamble and prefix are followed by a set of DICOM elements from the
     (0002,eeee) group. Some of these elements are required (Type 1) while
-    others are optional (Type 3/1C). If `write_like_original` is True then the
-    File Meta Information Group elements are all optional. See
-    pydicom.filewriter.write_file_meta_info for more information on which
-    elements are required.
+    others are optional (Type 3/1C). If `write_like_original` is ``True``
+    then the *File Meta Information Group* elements are all optional. See
+    :func:`~pydicom.filewriter.write_file_meta_info` for more information on
+    which elements are required.
 
-    The File Meta Information Group elements should be included within their
-    own Dataset in the `dataset.file_meta` attribute.
+    The *File Meta Information Group* elements should be included within their
+    own :class:`~pydicom.dataset.Dataset` in the ``dataset.file_meta``
+    attribute.
 
-    If (0002,0010) 'Transfer Syntax UID' is included then the user must ensure
-    it's value is compatible with the values for the `dataset.is_little_endian`
-    and `dataset.is_implicit_VR` attributes. For example, if is_little_endian
-    and is_implicit_VR are both True then the Transfer Syntax UID must be
-    1.2.840.10008.1.2 'Implicit VR Little Endian'. See the DICOM standard
-    Part 5 Section 10 for more information on Transfer Syntaxes.
+    If (0002,0010) *Transfer Syntax UID* is included then the user must ensure
+    its value is compatible with the values for the
+    ``dataset.is_little_endian`` and ``dataset.is_implicit_VR`` attributes.
+    For example, if ``is_little_endian`` and ``is_implicit_VR`` are both
+    ``True`` then the Transfer Syntax UID must be 1.2.840.10008.1.2 *Implicit
+    VR Little Endian*. See the DICOM Standard, Part 5,
+    :dcm:`Section 10<part05/chapter_10.html>` for more information on Transfer
+    Syntaxes.
 
-    Encoding
-    ~~~~~~~~
-    The preamble and prefix are encoding independent. The File Meta Elements
-    are encoded as Explicit VR Little Endian as required by the DICOM standard.
+    *Encoding*
 
-    Dataset
-    -------
+    The preamble and prefix are encoding independent. The File Meta elements
+    are encoded as *Explicit VR Little Endian* as required by the DICOM
+    Standard.
+
+    **Dataset**
+
     A DICOM Dataset representing a SOP Instance related to a DICOM Information
     Object Definition. It is up to the user to ensure the `dataset` conforms
-    to the DICOM standard.
+    to the DICOM Standard.
 
-    Encoding
-    ~~~~~~~~
-    The `dataset` is encoded as specified by the `dataset.is_little_endian`
-    and `dataset.is_implicit_VR` attributes. It's up to the user to ensure
-    these attributes are set correctly (as well as setting an appropriate value
-    for `dataset.file_meta.TransferSyntaxUID` if present).
+    *Encoding*
+
+    The `dataset` is encoded as specified by the ``dataset.is_little_endian``
+    and ``dataset.is_implicit_VR`` attributes. It's up to the user to ensure
+    these attributes are set correctly (as well as setting an appropriate
+    value for ``dataset.file_meta.TransferSyntaxUID`` if present).
 
     Parameters
     ----------
@@ -784,31 +823,34 @@ def dcmwrite(filename, dataset, write_like_original=True):
         Name of file or the file-like to write the new DICOM file to.
     dataset : pydicom.dataset.FileDataset
         Dataset holding the DICOM information; e.g. an object read with
-        pydicom.dcmread().
-    write_like_original : bool
-        If True (default), preserves the following information from
+        :func:`~pydicom.filereader.dcmread`.
+    write_like_original : bool, optional
+        If ``True`` (default), preserves the following information from
         the Dataset (and may result in a non-conformant file):
+
         - preamble -- if the original file has no preamble then none will be
-            written.
-        - file_meta -- if the original file was missing any required File Meta
-            Information Group elements then they will not be added or written.
-            If (0002,0000) 'File Meta Information Group Length' is present then
-            it may have its value updated.
+          written.
+        - file_meta -- if the original file was missing any required *File
+          Meta Information Group* elements then they will not be added or
+          written.
+          If (0002,0000) *File Meta Information Group Length* is present then
+          it may have its value updated.
         - seq.is_undefined_length -- if original had delimiters, write them now
-            too, instead of the more sensible length characters
+          too, instead of the more sensible length characters
         - is_undefined_length_sequence_item -- for datasets that belong to a
-            sequence, write the undefined length delimiters if that is
-            what the original had.
-        If False, produces a file conformant with the DICOM File Format, with
-        explicit lengths for all elements.
+          sequence, write the undefined length delimiters if that is
+          what the original had.
+
+        If ``False``, produces a file conformant with the DICOM File Format,
+        with explicit lengths for all elements.
 
     See Also
     --------
     pydicom.dataset.FileDataset
         Dataset class with relevant attributes and information.
     pydicom.dataset.Dataset.save_as
-        Write a DICOM file from a dataset that was read in with dcmread().
-        save_as wraps dcmwrite.
+        Write a DICOM file from a dataset that was read in with ``dcmread()``.
+        ``save_as()`` wraps ``dcmwrite()``.
     """
     # Check that dataset's group 0x0002 elements are only present in the
     #   `dataset.file_meta` Dataset - user may have added them to the wrong

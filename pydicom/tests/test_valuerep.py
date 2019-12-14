@@ -90,9 +90,8 @@ class TestDA(object):
 
 class TestDS(object):
     """Unit tests for DS values"""
-
     def test_empty_value(self):
-        assert '' == DS(None)
+        assert DS(None) is None
         assert '' == DS('')
 
     def test_float_values(self):
@@ -106,7 +105,6 @@ class TestDS(object):
 
 class TestDSfloat(object):
     """Unit tests for pickling DSfloat"""
-
     def test_pickling(self):
         # Check that a pickled DSFloat is read back properly
         x = pydicom.valuerep.DSfloat(9.0)
@@ -116,10 +114,25 @@ class TestDSfloat(object):
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
+    def test_str(self):
+        """Test DSfloat.__str__()."""
+        val = pydicom.valuerep.DSfloat(1.1)
+        assert '1.1' == str(val)
+
+        val = pydicom.valuerep.DSfloat('1.1')
+        assert '1.1' == str(val)
+
+    def test_repr(self):
+        """Test DSfloat.__repr__()."""
+        val = pydicom.valuerep.DSfloat(1.1)
+        assert '"1.1"' == repr(val)
+
+        val = pydicom.valuerep.DSfloat('1.1')
+        assert '"1.1"' == repr(val)
+
 
 class TestDSdecimal(object):
     """Unit tests for pickling DSdecimal"""
-
     def test_pickling(self):
         # Check that a pickled DSdecimal is read back properly
         # DSdecimal actually prefers original_string when
@@ -142,9 +155,8 @@ class TestDSdecimal(object):
 
 class TestIS(object):
     """Unit tests for IS"""
-
     def test_empty_value(self):
-        assert '' == IS(None)
+        assert IS(None) is None
         assert '' == IS('')
 
     def test_valid_value(self):
@@ -182,6 +194,22 @@ class TestIS(object):
             pydicom.valuerep.IS(3103050000)
         config.enforce_valid_values = original_flag
 
+    def test_str(self):
+        """Test IS.__str__()."""
+        val = pydicom.valuerep.IS(1)
+        assert '1' == str(val)
+
+        val = pydicom.valuerep.IS('1')
+        assert '1' == str(val)
+
+    def test_repr(self):
+        """Test IS.__repr__()."""
+        val = pydicom.valuerep.IS(1)
+        assert '"1"' == repr(val)
+
+        val = pydicom.valuerep.IS('1')
+        assert '"1"' == repr(val)
+
 
 class TestBadValueRead(object):
     """Unit tests for handling a bad value for a VR
@@ -196,6 +224,7 @@ class TestBadValueRead(object):
         self.tag.is_little_endian = True
         self.tag.is_implicit_VR = False
         self.tag.tag = Tag(0x0010, 0x0020)
+        self.tag.length = 2
         self.default_retry_order = pydicom.values.convert_retry_VR_order
 
     def teardown(self):

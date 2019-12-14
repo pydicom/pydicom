@@ -24,6 +24,7 @@ MR_small.dcm            : Expl VR Little Endian
 OBXXXX1A.dcm            : Expl VR Little Endian
 reportsi.dcm            : Expl VR Little Endian
 test-SR.dcm             : Expl VR Little Endian
+explicit_VR-UN.dcm      : Expl VR Little Endian
 
 MR_small_implicit.dcm   : Impl VR Little Endian
 nested_priv_SQ.dcm      : Impl VR Little Endian
@@ -38,6 +39,12 @@ rtstruct.dcm            : Impl VR Little Endian
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
+
+eCT_Supplemental.dcm
+  * Original filename CT0012
+  * Taken from ftp://medical.nema.org/medical/dicom/Multiframe/CT/nemamfct.images.tar.bz2
+  * 2 frames, 16 bits allocated/stored, MONOCHROME2
+  * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
 
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
@@ -59,6 +66,15 @@ image_dfl.dcm
   * Compressed (using "deflate" zlib compression) after FileMeta
   * 'image_dfl' from http://www.dclunie.com/images/compressed/
 
+gdcm-US-ALOKA-16.dcm (from GDCM)
+  * Little endian implicit
+  * Segmented 16-bit Palette Color LUT Data
+  * Modified to remove original patient name and ID from Pixel Data
+
+gdcm-US-ALOKA-16_big.dcm (from GDCM)
+  * Big endian implicit version of gdcm-US-ALOKA-16.dcm
+  * Converted to big endian using DCMTK's dcmodify +tb
+
 ExplVR_BigEnd.dcm
   * Big Endian test image
   * Also is Samples Per Pixel of 3 (RGB)
@@ -79,6 +95,11 @@ liver.dcm
   * Explicit VR big endian versions created using DCMTK's dcmconv and a script
     used to fix the pixel data for PR #714
   * Single frame versions created using a script for PR #714
+
+mlut_18.dcm
+  * Modality LUT Sequence
+  * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
+    images
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian
@@ -123,9 +144,30 @@ SC_rgb.dcm
   * 2 frame versions created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
+SC_ybr_full_uncompressed.dcm
+  * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
+  * PhotometricIntepretation is YBR_FULL
+
+SC_ybr_full_422_uncompressed.dcm
+    * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
+    * Converted to YBR_FULL_422 using a script by @scaramallion
+    * PhotometricIntepretation is YBR_FULL_422
+
+vlut_04.dcm
+    * VOI LUT Sequence
+    * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
+      images
+
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)
+  
+explicit_VR-UN.dcm
+  * taken from test data in issue #968
+  * original image taken from https://www.cancerimagingarchive.net,
+    (freely available de-identified datasets)
+  * image was compressed using "gdcmconv --j2k <original.dcm>"
+  * almost all tags have VR "UN" due to gdcmconv issue
 
 == DICOMDIR tests ==
 
@@ -199,3 +241,52 @@ Patient: 98890234: Doe^Peter
              './98892003/MR700/4618',
              './98892003/MR700/4678',
              './98892003/MR700/4648']
+
+
+== Overlay Data ==
+
+MR-SIEMENS-DICOM-WithOverlays.dcm (from GDCM)
+    * Little Endian Explicit VR
+    * Single frame, single channel Pixel Data
+    * Single frame Overlay Data in group 0x6000
+    * Icon Image Sequence
+    * 8-bit Palette Color LUT
+
+
+== Licenses ==
+
+The datasets from GDCM (github.com/malaterre/GDCM) are used under the following
+license:
+
+Program: GDCM (Grassroots DICOM). A DICOM library
+
+Copyright (c) 2006-2016 Mathieu Malaterre
+Copyright (c) 1993-2005 CREATIS
+(CREATIS = Centre de Recherche et d'Applications en Traitement de l'Image)
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither name of Mathieu Malaterre, or CREATIS, nor the names of any
+   contributors (CNRS, INSERM, UCB, Universite Lyon I), may be used to
+   endorse or promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

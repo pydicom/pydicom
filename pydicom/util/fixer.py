@@ -49,7 +49,7 @@ def fix_separator(invalid_separator,
         A list of VRs for which the replacement will be done.
         If the VR is unknown (for example, if a private element),
         then process_unknown_VR is used to determine whether to replace or not.
-    process_unknown_VRs: boolean, optional
+    process_unknown_VRs: bool, optional
         If True (default) then attempt the fix even if the VR is not known.
 
     Returns

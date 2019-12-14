@@ -23,13 +23,6 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
 
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.4" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
-
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
@@ -48,12 +41,19 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
     #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
     #- env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
 
+    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
+#    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
+    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
+#    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
+
     - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="3.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
+    - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
 
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
@@ -64,4 +64,6 @@ script:
   - py.test --cov=pydicom -r sx --pyargs pydicom
 
 after_success:
-  - codecov
+  # curl times out sometimes, so drop the connection timeout but retry more often
+  - bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash) ||
+    (sleep 30 && bash <(curl --connect-timeout 10 --retry 10 --retry-max-time 0 https://codecov.io/bash))

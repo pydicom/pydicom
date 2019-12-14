@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Use the numpy package to convert supported pixel data to an ndarray.
+"""Use the `numpy <https://numpy.org/>`_ package to convert supported *Pixel
+Data* to a :class:`numpy.ndarray`.
 
 **Supported transfer syntaxes**
 
@@ -11,8 +12,9 @@
 **Supported data**
 
 The numpy handler supports the conversion of data in the (7fe0,0010)
-*Pixel Data* element to a numpy ndarray provided the related Image Pixel module
-elements have values given in the table below.
+*Pixel Data* element to a :class:`~numpy.ndarray` provided the
+related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have
+values given in the table below.
 
 +------------------------------------------------+--------------+----------+
 | Element                                        | Supported    |          |
@@ -20,6 +22,12 @@ elements have values given in the table below.
 | Tag         | Keyword                   | Type |              |          |
 +=============+===========================+======+==============+==========+
 | (0028,0002) | SamplesPerPixel           | 1    | N            | Required |
++-------------+---------------------------+------+--------------+----------+
+| (0028,0004) | PhotometricInterpretation | 1    | MONOCHROME1  | Required |
+|             |                           |      | MONOCHROME2  |          |
+|             |                           |      | RGB          |          |
+|             |                           |      | YBR_FULL     |          |
+|             |                           |      | YBR_FULL_422 |          |
 +-------------+---------------------------+------+--------------+----------+
 | (0028,0006) | PlanarConfiguration       | 1C   | 0, 1         | Optional |
 +-------------+---------------------------+------+--------------+----------+
@@ -62,24 +70,25 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return True if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP
 
 
 def supports_transfer_syntax(transfer_syntax):
-    """Return True if the handler supports the `transfer_syntax`.
+    """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
     ----------
-    transfer_syntax : UID
-        The Transfer Syntax UID of the Pixel Data that is to be used with
+    transfer_syntax : uid.UID
+        The Transfer Syntax UID of the *Pixel Data* that is to be used with
         the handler.
     """
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
 def needs_to_convert_to_RGB(ds):
-    """Return True if the pixel data should to be converted from YCbCr to RGB.
+    """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
+    RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -87,7 +96,8 @@ def needs_to_convert_to_RGB(ds):
 
 
 def should_change_PhotometricInterpretation_to_RGB(ds):
-    """Return True if the PhotometricInterpretation should be changed to RGB.
+    """Return ``True`` if the *Photometric Interpretation* should be changed
+    to RGB.
 
     This affects JPEG transfer syntaxes.
     """
@@ -95,18 +105,18 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 
 
 def pack_bits(arr):
-    """Pack a binary numpy ndarray into bytes for use with Pixel Data.
+    """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
 
-    Should be used in conjunction with (0028,0100) *BitsAllocated* = 1.
+    Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
 
     Parameters
     ----------
     arr : numpy.ndarray
-        The ndarray containing 1-bit data as ints. The array must only contain
-        integer values of 0 and 1 and must have an 'uint' or 'int' dtype. For
-        the sake of efficiency its recommended that the array length be a
-        multiple of 8 (i.e. that any empty bit-padding to round out the byte
-        has already been added).
+        The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
+        only contain integer values of 0 and 1 and must have an 'uint'  or
+        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
+        that the length of `arr` be a multiple of 8 (i.e. that any empty
+        bit-padding to round out the byte has already been added).
 
     Returns
     -------
@@ -120,7 +130,9 @@ def pack_bits(arr):
 
     References
     ----------
-    DICOM Standard, Part 5, Section 8.1.1 and Annex D
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
     """
     if arr.shape == (0,):
         return bytes()
@@ -147,9 +159,11 @@ def pack_bits(arr):
 
 
 def unpack_bits(bytestream):
-    """Unpack bit packed pixel data into a numpy ndarray.
+    """Unpack bit packed *Pixel Data* or *Overlay Data* into a
+    :class:`numpy.ndarray`.
 
-    Suitable for use when (0028,0011) *Bits Allocated* is 1.
+    Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay
+    Bits Allocated* is 1.
 
     Parameters
     ----------
@@ -159,16 +173,13 @@ def unpack_bits(bytestream):
     Returns
     -------
     numpy.ndarray
-        The unpacked pixel data as a 1D array.
-
-    Notes
-    -----
-    The implementation for PyPy is roughly 100 times slower than the
-    standard ``numpy.unpackbits`` method.
+        The unpacked *Pixel Data* as a 1D array.
 
     References
     ----------
-    DICOM Standard, Part 5, Section 8.1.1 and Annex D
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
     """
     # Thanks to @sbrodehl (#643)
     # e.g. b'\xC0\x09' -> [192, 9]
@@ -188,31 +199,34 @@ def unpack_bits(bytestream):
 
 
 def get_pixeldata(ds, read_only=False):
-    """Return an ndarray of the Pixel Data.
+    """Return a :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
     ----------
-    ds : dataset.Dataset
-        The DICOM dataset containing an Image Pixel module and the Pixel Data
-        to be converted.
+    ds : Dataset
+        The :class:`Dataset` containing an Image Pixel module and the
+        *Pixel Data* to be converted. If (0028,0004) *Photometric
+        Interpretation* is `'YBR_FULL_422'` then the pixel data will be
+        resampled to 3 channel data as per Part 3, :dcm:`Annex C.7.6.3.1.2
+        <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of the DICOM Standard.
     read_only : bool, optional
-        If False (default) then returns a writeable array that no longer uses
-        the original memory. If True and the value of (0028,0100) *Bits
-        Allocated* > 1 then returns a read-only array that uses the original
-        memory buffer of the pixel data. If *Bits Allocated* = 1 then always
-        returns a writeable array.
+        If ``False`` (default) then returns a writeable array that no longer
+        uses the original memory. If ``True`` and the value of (0028,0100)
+        *Bits Allocated* > 1 then returns a read-only array that uses the
+        original memory buffer of the pixel data. If *Bits Allocated* = 1 then
+        always returns a writeable array.
 
     Returns
     -------
     np.ndarray
-        The contents of the Pixel Data element (7FE0,0010) as a 1D array.
+        The contents of (7FE0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------
     AttributeError
-        If the dataset is missing a required element.
+        If `ds` is missing a required element.
     NotImplementedError
-        If the dataset contains pixel data in an unsupported format.
+        If `ds` contains pixel data in an unsupported format.
     ValueError
         If the actual length of the pixel data doesn't match the expected
         length.
@@ -226,8 +240,10 @@ def get_pixeldata(ds, read_only=False):
         )
 
     # Check required elements
-    required_elements = ['PixelData', 'BitsAllocated', 'Rows', 'Columns',
-                         'PixelRepresentation', 'SamplesPerPixel']
+    required_elements = [
+        'PixelData', 'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
+        'SamplesPerPixel', 'PhotometricInterpretation'
+    ]
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
@@ -241,13 +257,14 @@ def get_pixeldata(ds, read_only=False):
 
     # Check that the actual length of the pixel data is as expected
     actual_length = len(ds.PixelData)
-    # Correct for the trailing NULL byte padding for odd length data
 
+    # Correct for the trailing NULL byte padding for odd length data
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
             warnings.warn(
-                "The pixel data length is odd and misses a padding byte.")
+                "The odd length pixel data is missing a trailing padding byte"
+            )
         else:
             raise ValueError(
                 "The length of the pixel data in the dataset ({} bytes) "
@@ -264,6 +281,20 @@ def get_pixeldata(ds, read_only=False):
             "end of the data"
             .format(actual_length, actual_length - expected_len)
         )
+        # PS 3.3, Annex C.7.6.3
+        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+            # Check to ensure we do have subsampled YBR 422 data
+            ybr_full_length = expected_len / 2 * 3 + expected_len / 2 * 3 % 2
+            # >= as may also include excess padding
+            if actual_length >= ybr_full_length:
+                msg = (
+                    "The Photometric Interpretation of the dataset is "
+                    "YBR_FULL_422, however the length of the pixel data "
+                    "({} bytes) is a third larger than expected ({} bytes) "
+                    "which indicates that this may be incorrect. You may "
+                    "need to change the Photometric Interpretation to "
+                    "the correct value.".format(actual_length, expected_len)
+                )
         warnings.warn(msg)
 
     # Unpack the pixel data into a 1D ndarray
@@ -272,9 +303,18 @@ def get_pixeldata(ds, read_only=False):
         nr_pixels = get_expected_length(ds, unit='pixels')
         arr = unpack_bits(ds.PixelData)[:nr_pixels]
     else:
-        # Skip the trailing padding byte if present
-        arr = np.frombuffer(ds.PixelData[:expected_len],
-                            dtype=pixel_dtype(ds))
+        # Skip the trailing padding byte(s) if present
+        data = ds.PixelData[:expected_len]
+        arr = np.frombuffer(data, dtype=pixel_dtype(ds))
+        if ds.PhotometricInterpretation == 'YBR_FULL_422':
+            # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
+            # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
+            out = np.zeros(expected_len // 2 * 3, dtype=pixel_dtype(ds))
+            out[::6] = arr[::4]  # Y1
+            out[3::6] = arr[1::4]  # Y2
+            out[1::6], out[4::6] = arr[2::4], arr[2::4]  # B
+            out[2::6], out[5::6] = arr[3::4], arr[3::4]  # R
+            arr = out
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"

@@ -27,6 +27,8 @@ EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
 EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
 # 8/8, 3 sample/pixel, 1 frame
 EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
+# 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
+EXPL_8_3_1F_YBR422 = get_testdata_files('SC_ybr_full_422_uncompressed.dcm')[0]
 # 8/8, 3 sample/pixel, 2 frame
 EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 # 16/16, 1 sample/pixel, 1 frame
@@ -128,6 +130,7 @@ class TimeGetPixelData(object):
         self.ds_32_1_15 = dcmread(IMPL_32_1_15F)
         self.ds_32_3_1 = dcmread(EXPL_32_3_1F)
         self.ds_32_3_2 = dcmread(EXPL_32_3_2F)
+        self.ds_ybr_422 = dcmread(EXPL_8_3_1F_YBR422)
 
     def time_1bit_1sample_1frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 1 frame."""
@@ -206,3 +209,8 @@ class TimeGetPixelData(object):
         """Time retrieval of 32-bit, 3 sample/pixel, 2 frame."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_32_3_2)
+
+    def time_ybr_422(self):
+        """Time retrieval of YBR_FULL_422 data."""
+        for ii in range(self.no_runs):
+            get_pixeldata(self.ds_ybr_422)

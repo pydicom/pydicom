@@ -32,8 +32,11 @@ if [[ "$DISTRIB" == "conda" ]]; then
     MINICONDA_PATH=/home/travis/miniconda
     chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
     export PATH=$MINICONDA_PATH/bin:$PATH
+    conda update --yes conda
     conda --version
-    # conda update --yes conda
+    # the free channel is needed for Python 3.4 and can probably be skipped
+    # after Python 3.4 is no longer used
+    conda config --set restore_free_channel true
 
     # Configure the conda environment and put it in the path using the
     # provided versions
@@ -46,12 +49,12 @@ if [[ "$DISTRIB" == "conda" ]]; then
     if [[ "$PILLOW" == "both" ]]; then
         conda install --yes -c conda-forge openjpeg jpeg
         pip install pillow --global-option="build_ext" --global-option="--enable-jpeg2000"
-        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
-        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
+        python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
+        python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
     elif [[ "$PILLOW" == "jpeg" ]]; then
         pip install pillow --global-option="build_ext" --global-option="--disable-jpeg2000"
-        python -c "from PIL import _imaging; print('JPEG plugin:', hasattr(_imaging, 'jpeg_decoder'))"
-        python -c "from PIL import _imaging; print('JPEG2k plugin:', hasattr(_imaging, 'jpeg2k_decoder'))"
+        python -c "from PIL.features import check_codec; print('JPEG plugin:', check_codec('jpg'))"
+        python -c "from PIL.features import check_codec; print('JPEG2k plugin:', check_codec('jpg_2000'))"
     fi
     if [[ "$JPEG_LS" == "true" ]]; then
         conda install --yes cython
@@ -64,7 +67,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
         conda install --yes -c conda-forge gdcm=2.8.4
     fi
     # Install nose-timer via pip
-    pip install nose-timer codecov
+    pip install nose-timer
 
 elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # At the time of writing numpy 1.9.1 is included in the travis
@@ -74,7 +77,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     # Create a new virtualenv using system site packages for python, numpy
     virtualenv --system-site-packages testvenv
     source testvenv/bin/activate
-    pip install nose nose-timer pytest pytest-cov codecov setuptools
+    pip install nose nose-timer pytest pytest-cov setuptools
     if [[ "$NUMPY" == "true" ]]; then
         pip install --upgrade --force-reinstall numpy
     fi
@@ -106,7 +109,7 @@ elif [[ "$DISTRIB" == "pypy" ]]; then
         # see #794 - avoid PyPy bug with newer NumPy versions
         python -m pip install cython numpy==1.15.4
     fi
-    python -m pip install nose nose-timer pytest pytest-cov codecov setuptools
+    python -m pip install nose nose-timer pytest pytest-cov setuptools
 fi
 
 python --version

@@ -73,7 +73,7 @@ class TestGenerateUID(object):
     def test_none_iterate(self):
         """Test generate_uid(None) generates valid UIDs."""
         # Generate random UIDs, if a bad method then should eventually fail
-        for ii in range(100000):
+        for ii in range(10000):
             uid = generate_uid(None)
             assert uid.is_valid
 

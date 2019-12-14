@@ -8,13 +8,16 @@ import sys
 
 import pytest
 
+from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
+from pydicom.data import get_testdata_files
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.uid import UID
@@ -32,6 +35,10 @@ class TestDataElement(object):
         self.data_elementCommand = DataElement(0x00000000, 'UL', 100)
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
         self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
+        config.use_none_as_empty_text_VR_value = False
+
+    def teardown(self):
+        config.use_none_as_empty_text_VR_value = False
 
     def test_VM_1(self):
         """DataElement: return correct value multiplicity for VM > 1"""
@@ -274,15 +281,15 @@ class TestDataElement(object):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    @pytest.mark.skipif(sys.version_info >= (3, ), reason='Python 2 behavior')
+    @pytest.mark.skipif(sys.version_info >= (3,), reason='Python 2 behavior')
     def test_unicode(self):
         """Test unicode representation of the DataElement"""
         elem = DataElement(0x00100010, 'PN', u'ANON')
         # Make sure elem.value is actually unicode
         assert isinstance(elem.value, unicode)
         assert (
-            u"(0010, 0010) Patient's Name                      PN: ANON"
-        ) == unicode(elem)
+                   u"(0010, 0010) Patient's Name                      PN: ANON"
+               ) == unicode(elem)
         assert isinstance(unicode(elem), unicode)
         assert not isinstance(unicode(elem), str)
         # Make sure elem.value is still unicode
@@ -292,8 +299,9 @@ class TestDataElement(object):
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
         assert (
-            u"(0010, 0010) Patient's Name                      LO: 12345"
-        ) == unicode(elem)
+                   u"(0010, 0010) Patient's Name"
+                   u"                      LO: 12345"
+               ) == unicode(elem)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
@@ -304,13 +312,13 @@ class TestDataElement(object):
     def test_repval_large_elem(self):
         """Test DataElement.repval doesn't return a huge string for a large
         value"""
-        elem = DataElement(0x00820003, 'UT', 'a'*1000)
+        elem = DataElement(0x00820003, 'UT', 'a' * 1000)
         assert len(elem.repval) < 100
 
     def test_repval_large_vm(self):
         """Test DataElement.repval doesn't return a huge string for a large
         vm"""
-        elem = DataElement(0x00080054, 'AE', 'a\\'*1000+'a')
+        elem = DataElement(0x00080054, 'AE', 'a\\' * 1000 + 'a')
         assert len(elem.repval) < 100
 
     def test_repval_strange_type(self):
@@ -374,6 +382,16 @@ class TestDataElement(object):
         assert 'PN' == ds[0x00100010].VR
         assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
 
+    def test_reading_ds_with_known_tags_with_UN_VR(self):
+        """Known tags with VR UN are correctly read."""
+        test_file = get_testdata_files('explicit_VR-UN.dcm')[0]
+        ds = dcmread(test_file)
+        assert 'CS' == ds[0x00080005].VR
+        assert 'TM' == ds[0x00080030].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert 'PN' == ds[0x00100010].VR
+        assert 'DA' == ds[0x00100030].VR
+
     def test_unknown_tags_with_UN_VR(self):
         """Unknown tags with VR UN are not decoded."""
         ds = Dataset()
@@ -397,22 +415,27 @@ class TestDataElement(object):
         ds.decode()
         assert 'UN' == ds[0x30040058].VR
 
-    def test_empty_text_values(self):
+    @pytest.mark.parametrize('use_none, empty_value',
+                             ((True, None), (False, '')))
+    def test_empty_text_values(self, use_none, empty_value):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
             setattr(ds, tag_name, value)
             elem = ds[tag_name]
             assert bool(elem.value) is False
+            assert 0 == elem.VM
+            assert elem.value == value
+            fp = DicomBytesIO()
+            filewriter.write_dataset(fp, ds)
+            ds_read = dcmread(fp, force=True)
+            assert empty_value == ds_read[tag_name].value
 
         text_vrs = {
-            'AE': 'Receiver',
+            'AE': 'RetrieveAETitle',
             'AS': 'PatientAge',
-            'AT': 'OffendingElement',
             'CS': 'QualityControlSubject',
             'DA': 'PatientBirthDate',
-            'DS': 'PatientWeight',
             'DT': 'AcquisitionDateTime',
-            'IS': 'BeamNumber',
             'LO': 'DataSetSubtype',
             'LT': 'ExtendedCodeMeaning',
             'PN': 'PatientName',
@@ -424,14 +447,14 @@ class TestDataElement(object):
             'UR': 'CodingSchemeURL',
             'UT': 'StrainAdditionalInformation',
         }
+        config.use_none_as_empty_text_VR_value = use_none
         ds = Dataset()
+        ds.is_little_endian = True
         # set value to new element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
             del ds[tag_name]
-            check_empty_text_element(b'')
-            del ds[tag_name]
-            check_empty_text_element(u'')
+            check_empty_text_element('')
             del ds[tag_name]
             check_empty_text_element([])
             del ds[tag_name]
@@ -439,8 +462,7 @@ class TestDataElement(object):
         # set value to existing element
         for tag_name in text_vrs.values():
             check_empty_text_element(None)
-            check_empty_text_element(b'')
-            check_empty_text_element(u'')
+            check_empty_text_element('')
             check_empty_text_element([])
             check_empty_text_element(None)
 
@@ -451,8 +473,17 @@ class TestDataElement(object):
             setattr(ds, tag_name, value)
             elem = ds[tag_name]
             assert bool(elem.value) is False
+            assert 0 == elem.VM
+            assert elem.value == value
+            fp = DicomBytesIO()
+            filewriter.write_dataset(fp, ds)
+            ds_read = dcmread(fp, force=True)
+            assert ds_read[tag_name].value is None
 
         non_text_vrs = {
+            'AT': 'OffendingElement',
+            'DS': 'PatientWeight',
+            'IS': 'BeamNumber',
             'SL': 'RationalNumeratorValue',
             'SS': 'SelectorSSValue',
             'UL': 'SimpleFrameList',
@@ -467,6 +498,7 @@ class TestDataElement(object):
             'UN': 'SelectorUNValue',
         }
         ds = Dataset()
+        ds.is_little_endian = True
         # set value to new element
         for tag_name in non_text_vrs.values():
             check_empty_binary_element(None)
@@ -482,6 +514,23 @@ class TestDataElement(object):
             check_empty_binary_element([])
             check_empty_binary_element(MultiValue(int, []))
             check_empty_binary_element(None)
+
+    def test_empty_sequence_is_handled_as_array(self):
+        ds = Dataset()
+        ds.AcquisitionContextSequence = []
+        elem = ds['AcquisitionContextSequence']
+        assert bool(elem.value) is False
+        assert 0 == elem.VM
+        assert elem.value == []
+
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = True
+        filewriter.write_dataset(fp, ds)
+        ds_read = dcmread(fp, force=True)
+        elem = ds_read['AcquisitionContextSequence']
+        assert 0 == elem.VM
+        assert elem.value == []
 
 
 class TestRawDataElement(object):

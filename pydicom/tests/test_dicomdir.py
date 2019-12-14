@@ -3,25 +3,37 @@
 
 import pytest
 
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
-from pydicom import read_file
+from pydicom import config, dcmread
 
+TEST_FILE = get_testdata_file('DICOMDIR')
+IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
+BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 
-TEST_FILE = get_testdata_files('DICOMDIR')[0]
+TEST_FILES = (
+    get_testdata_file('DICOMDIR'),
+    get_testdata_file('DICOMDIR-reordered'),
+    get_testdata_file('DICOMDIR-nooffset')
+)
 
 
 class TestDicomDir(object):
     """Test dicomdir.DicomDir class"""
-    def test_read_file(self):
+
+    def teardown(self):
+        config.enforce_valid_values = False
+
+    @pytest.mark.parametrize("testfile", TEST_FILES)
+    def test_read_file(self, testfile):
         """Test creation of DicomDir instance using filereader.read_file"""
-        ds = read_file(TEST_FILE)
+        ds = dcmread(testfile)
         assert isinstance(ds, DicomDir)
 
     def test_invalid_sop_file_meta(self):
         """Test exception raised if SOP Class is not Media Storage Directory"""
-        ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(InvalidDicomError,
                            match=r"SOP Class is not Media Storage "
                                  r"Directory \(DICOMDIR\)"):
@@ -29,17 +41,38 @@ class TestDicomDir(object):
 
     def test_invalid_sop_no_file_meta(self):
         """Test exception raised if invalid sop class but no file_meta"""
-        ds = read_file(get_testdata_files('CT_small.dcm')[0])
+        ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(AttributeError,
                            match="'DicomDir' object has no attribute "
                                  "'DirectoryRecordSequence'"):
             DicomDir("some_name", ds, b'\x00' * 128, None, True, True)
 
-    def test_parse_records(self):
+    @pytest.mark.parametrize("testfile", TEST_FILES)
+    def test_parse_records(self, testfile):
         """Test DicomDir.parse_records"""
-        ds = read_file(TEST_FILE)
+        ds = dcmread(testfile)
         assert hasattr(ds, 'patient_records')
         # There are two top level PATIENT records
         assert len(ds.patient_records) == 2
         assert ds.patient_records[0].PatientName == 'Doe^Archibald'
         assert ds.patient_records[1].PatientName == 'Doe^Peter'
+
+    def test_invalid_transfer_syntax(self):
+        with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
+            dcmread(IMPLICIT_TEST_FILE)
+        with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
+            dcmread(BIGENDIAN_TEST_FILE)
+
+    def test_missing_patient(self):
+        with pytest.raises(InvalidDicomError,
+                           match=r'Missing PATIENT record\(s\) in DICOMDIR'):
+            dcmread(get_testdata_file('DICOMDIR-nopatient'))
+
+    def test_invalid_transfer_syntax_strict_mode(self):
+        config.enforce_valid_values = True
+        with pytest.raises(InvalidDicomError,
+                           match='Invalid transfer syntax*'):
+            dcmread(IMPLICIT_TEST_FILE)
+        with pytest.raises(InvalidDicomError,
+                           match='Invalid transfer syntax*'):
+            dcmread(BIGENDIAN_TEST_FILE)

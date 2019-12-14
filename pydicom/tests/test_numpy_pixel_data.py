@@ -31,6 +31,7 @@ from sys import byteorder
 import pytest
 
 import pydicom
+from pydicom import config
 from pydicom.data import get_testdata_files
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
@@ -46,6 +47,7 @@ from pydicom.uid import (
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -60,7 +62,6 @@ try:
     )
 except ImportError:
     NP_HANDLER = None
-
 
 # Paths to the test datasets
 # IMPL: Implicit VR Little Endian
@@ -91,6 +92,10 @@ EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
 EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
 # 8/8, 3 samples/pixel, 1 frame, 3 x 3
 EXPL_8_3_1F_ODD = get_testdata_files('SC_rgb_small_odd.dcm')[0]
+# 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
+EXPL_8_3_1F_YBR422 = get_testdata_files('SC_ybr_full_422_uncompressed.dcm')[0]
+# 8/8, 3 sample/pixel, 1 frame, YBR_FULL
+EXPL_8_3_1F_YBR = get_testdata_files('SC_ybr_full_uncompressed.dcm')[0]
 # 8/8, 3 sample/pixel, 2 frame
 EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
 EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
@@ -172,11 +177,15 @@ REFERENCE_DATA_UNSUPPORTED = [
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
+SUPPORTED_HANDLER_NAMES = (
+    'numpy', 'NumPy', 'np', 'np_handler', 'numpy_handler'
+)
 
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -229,11 +238,19 @@ class TestNoNumpy_NoNumpyHandler(object):
                                match="UID of '{}'".format(uid)):
                 ds.pixel_array
 
+    def test_using_numpy_handler_raises(self):
+        ds = dcmread(EXPL_16_1_1F)
+        msg = ("The pixel data handler 'numpy' is not available on your "
+               "system. Please refer to the pydicom documentation*")
+        with pytest.raises(RuntimeError, match=msg):
+            ds.decompress('numpy')
+
 
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NumpyHandler(object):
     """Tests for handling datasets without numpy and the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -304,6 +321,7 @@ class TestNoNumpy_NumpyHandler(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
 class TestNumpy_NoNumpyHandler(object):
     """Tests for handling datasets without the handler."""
+
     def setup(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -383,6 +401,7 @@ REFERENCE_DATA_LITTLE = [
     (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8')),
     (EXPL_8_1_1F, (EXPL, 8, 1, 0, 1, (600, 800), 'uint8')),
     (EXPL_8_3_1F_ODD, (EXPL, 8, 3, 0, 1, (3, 3, 3), 'uint8')),
+    (EXPL_8_3_1F_YBR422, (EXPL, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (EXPL_8_1_2F, (EXPL, 8, 1, 0, 2, (2, 600, 800), 'uint8')),
     (EXPL_8_3_1F, (EXPL, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (EXPL_8_3_2F, (EXPL, 8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
@@ -400,6 +419,7 @@ REFERENCE_DATA_LITTLE = [
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NumpyHandler(object):
     """Tests for handling Pixel Data with the handler."""
+
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -473,6 +493,16 @@ class TestNumpy_NumpyHandler(object):
         assert (1, -10, 1) == tuple(arr[300, 491:494])
         assert 0 == arr[-1].min() == arr[-1].max()
 
+    @pytest.mark.parametrize("handler_name", SUPPORTED_HANDLER_NAMES)
+    def test_decompress_using_handler(self, handler_name):
+        """Test different possibilities for the numpy handler name."""
+        ds = dcmread(EXPL_8_1_1F)
+        ds.decompress(handler_name)
+        assert (600, 800) == ds.pixel_array.shape
+        assert 244 == ds.pixel_array[0].min() == ds.pixel_array[0].max()
+        assert (1, 246, 1) == tuple(ds.pixel_array[300, 491:494])
+        assert 0 == ds.pixel_array[-1].min() == ds.pixel_array[-1].max()
+
     def test_pixel_array_16bit_un_signed(self):
         """Test pixel_array for 16-bit unsigned -> signed."""
         ds = dcmread(EXPL_16_3_1F)
@@ -533,7 +563,7 @@ class TestNumpy_NumpyHandler(object):
             assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
             assert 0 == arr[0, -1].min() == arr[0, -1].max()
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_8bit_3sample_1frame_odd_size(self):
         """Test pixel_array for odd sized (3x3) pixel data."""
@@ -552,6 +582,31 @@ class TestNumpy_NumpyHandler(object):
             assert ds.pixel_array[2].tolist() == [
                 [158, 158, 158], [158, 158, 158], [158, 158, 158]
             ]
+
+    def test_8bit_3sample_1frame_ybr422(self):
+        """Test pixel_array for YBR_FULL_422 pixel data."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        arr = ds.pixel_array
+
+        # Check resampling
+        assert [
+                   [76, 85, 255],
+                   [76, 85, 255],
+                   [76, 85, 255],
+                   [76, 85, 255]
+               ] == arr[0:4, 0, :].tolist()
+        # Check values
+        assert (76, 85, 255) == tuple(arr[5, 50, :])
+        assert (166, 106, 193) == tuple(arr[15, 50, :])
+        assert (150, 46, 20) == tuple(arr[25, 50, :])
+        assert (203, 86, 75) == tuple(arr[35, 50, :])
+        assert (29, 255, 107) == tuple(arr[45, 50, :])
+        assert (142, 193, 118) == tuple(arr[55, 50, :])
+        assert (0, 128, 128) == tuple(arr[65, 50, :])
+        assert (64, 128, 128) == tuple(arr[75, 50, :])
+        assert (192, 128, 128) == tuple(arr[85, 50, :])
+        assert (255, 128, 128) == tuple(arr[95, 50, :])
 
     def test_8bit_3sample_1frame(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
@@ -597,7 +652,7 @@ class TestNumpy_NumpyHandler(object):
             assert (192, 192, 192) == tuple(frame[85, 50, :])
             assert (255, 255, 255) == tuple(frame[95, 50, :])
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
@@ -621,6 +676,9 @@ class TestNumpy_NumpyHandler(object):
             nr_frames = getattr(ds, 'NumberOfFrames', 1)
             # Odd sized data is padded by a final 0x00 byte
             size = ds.Rows * ds.Columns * nr_frames * data[1] / 8 * data[2]
+            # YBR_FULL_422 data is 2/3rds usual size
+            if ds.PhotometricInterpretation == 'YBR_FULL_422':
+                size = size // 3 * 2
             assert len(ds.PixelData) == size + size % 2
             if size % 2:
                 assert ds.PixelData[-1] == b'\x00'[0]
@@ -820,7 +878,7 @@ class TestNumpy_NumpyHandler(object):
             assert (49344, 49344, 49344) == tuple(arr[0, 85, 50, :])
             assert (65535, 65535, 65535) == tuple(arr[0, 95, 50, :])
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     def test_little_32bit_1sample_1frame(self):
         """Test pixel_array for little 32-bit, 1 sample/pixel, 1 frame."""
@@ -914,7 +972,7 @@ class TestNumpy_NumpyHandler(object):
                 arr[0, 95, 50, :]
             )
             # Frame 2 is frame 1 inverted
-            assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
+            assert np.array_equal((2 ** ds.BitsAllocated - 1) - arr[1], arr[0])
 
     # Big endian datasets
     @pytest.mark.parametrize('little, big', MATCHING_DATASETS)
@@ -937,6 +995,7 @@ class TestNumpy_NumpyHandler(object):
         ds.BitsAllocated = 16
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
+        ds.PhotometricInterpretation = 'MONOCHROME2'
         arr = np.ones((10, 10), dtype='uint16')
         ds.PixelData = arr.tobytes()
 
@@ -956,6 +1015,7 @@ class TestNumpy_NumpyHandler(object):
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_GetPixelData(object):
     """Tests for numpy_handler.get_pixeldata with numpy."""
+
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
         ds = dcmread(EXPL_16_1_1F)
@@ -999,12 +1059,13 @@ class TestNumpy_GetPixelData(object):
         ds = dcmread(EXPL_8_3_1F_ODD)
         # remove the padding byte
         ds.PixelData = ds.PixelData[:-1]
-        msg = "The pixel data length is odd and misses a padding byte."
+        msg = r"The odd length pixel data is missing a trailing padding byte"
         with pytest.warns(UserWarning, match=msg):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
         """Test get_pixeldata changes PhotometricInterpretation if required."""
+
         def to_rgb(ds):
             """Override the original function that returned False"""
             return True
@@ -1048,6 +1109,43 @@ class TestNumpy_GetPixelData(object):
         arr = get_pixeldata(ds, read_only=True)
         assert arr.flags.writeable
 
+    def test_ybr422_excess_padding(self):
+        """Test YBR data with excess padding."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        ds.PixelData += b'\x00\x00\x00\x00'
+        msg = (
+            r"The length of the pixel data in the dataset \(20004 bytes\) "
+            r"indicates it contains excess padding. 4 bytes will be removed "
+            r"from the end of the data"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        assert (76, 85, 255) == tuple(arr[5, 50, :])
+        assert (166, 106, 193) == tuple(arr[15, 50, :])
+        assert (150, 46, 20) == tuple(arr[25, 50, :])
+        assert (203, 86, 75) == tuple(arr[35, 50, :])
+        assert (29, 255, 107) == tuple(arr[45, 50, :])
+        assert (142, 193, 118) == tuple(arr[55, 50, :])
+        assert (0, 128, 128) == tuple(arr[65, 50, :])
+        assert (64, 128, 128) == tuple(arr[75, 50, :])
+        assert (192, 128, 128) == tuple(arr[85, 50, :])
+        assert (255, 128, 128) == tuple(arr[95, 50, :])
+
+    def test_ybr422_wrong_interpretation(self):
+        """Test YBR data with wrong Photometric Interpretation."""
+        ds = dcmread(EXPL_8_3_1F_YBR)
+        assert ds.PhotometricInterpretation == 'YBR_FULL'
+        assert len(ds.PixelData) == 30000
+        ds.PhotometricInterpretation = 'YBR_FULL_422'
+        msg = r"The Photometric Interpretation of the dataset is YBR_FULL_422"
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        # Resulting data will be nonsense but of correct shape
+        assert (100, 100, 3) == arr.shape
+
 
 REFERENCE_PACK_UNPACK = [
     (b'', []),
@@ -1078,6 +1176,7 @@ REFERENCE_PACK_UNPACK = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_UnpackBits(object):
     """Tests for numpy_handler.unpack_bits."""
+
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
     def test_unpack(self, input, output):
         """Test unpacking data."""
@@ -1108,6 +1207,7 @@ REFERENCE_PACK_PARTIAL = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PackBits(object):
     """Tests for numpy_handler.pack_bits."""
+
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""

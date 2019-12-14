@@ -90,7 +90,7 @@ class TestBuilds(object):
             raise RuntimeError("No 'PYTHON_VERSION' envar has been set")
 
         version = tuple([int(vv) for vv in version.split('.')])
-        assert version == sys.version_info[:2]
+        assert version[:2] == sys.version_info[:2]
 
     def test_numpy(self):
         """Test that numpy is absent/present."""
@@ -119,20 +119,20 @@ class TestBuilds(object):
 
         if have_pillow == 'both':
             try:
-                from PIL import _imaging
+                from PIL import features
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(_imaging, "jpeg_decoder", False)
-            assert getattr(_imaging, "jpeg2k_decoder", False)
+            assert features.check_codec("jpg")
+            assert features.check_codec("jpg_2000")
         elif have_pillow == 'jpeg':
             try:
-                from PIL import _imaging
+                from PIL import features
             except ImportError:
                 pytest.fail("PILLOW is both but PIL is not importable")
 
-            assert getattr(_imaging, "jpeg_decoder", False)
-            assert not getattr(_imaging, "jpeg2k_decoder", False)
+            assert features.check_codec("jpg")
+            assert not features.check_codec("jpg_2000")
         elif have_pillow == 'false':
             with pytest.raises(ImportError):
                 import PIL

@@ -3,14 +3,13 @@
 
 
 class InvalidDicomError(Exception):
-    """Exception that is raised when the the file does not seem
-    to be a valid dicom file, usually when the four characters
-    "DICM" are not present at position 128 in the file.
-    (According to the dicom specification, each dicom file should
-    have this.)
+    """Exception that is raised when the the file does not appear to be DICOM.
 
-    To force reading the file (because maybe it is a dicom file without
-    a header), use dcmread(..., force=True).
+    Usually raised when the "DICM" prefix is not present at position 128 in
+    the file.
+
+    To force reading the file (because maybe it is a DICOM file without
+    a header), use ``dcmread(..., force=True)``.
     """
 
     def __init__(self, *args):

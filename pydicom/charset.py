@@ -45,7 +45,7 @@ python_encoding = {
     'ISO 2022 IR 144': 'iso_ir_144',
     'ISO 2022 IR 148': 'iso_ir_148',
     'ISO 2022 IR 149': 'euc_kr',
-    'ISO 2022 IR 159': 'iso-2022-jp',
+    'ISO 2022 IR 159': 'iso2022_jp_2',
     'ISO 2022 IR 166': 'iso_ir_166',
     'ISO 2022 IR 58': 'iso_ir_58',
     'ISO_IR 192': 'UTF8',  # from Chinese example, 2008 PS3.5 Annex J p1-4
@@ -81,7 +81,7 @@ CODES_TO_ENCODINGS = {
     ESC + b'-M': 'iso_ir_148',
     ESC + b'-T': 'iso_ir_166',
     ESC + b'$)C': 'euc_kr',
-    ESC + b'$(D': 'iso-2022-jp',
+    ESC + b'$(D': 'iso2022_jp_2',
     ESC + b'$)A': 'iso_ir_58',
 }
 
@@ -92,7 +92,7 @@ ENCODINGS_TO_CODES['shift_jis'] = ESC + b')I'
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
 handled_encodings = ('iso2022_jp',
-                     'iso-2022-jp',
+                     'iso2022_jp_2',
                      'iso_ir_58')
 
 
@@ -165,10 +165,18 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     return encoded
 
-
 def _encode_to_jis_x_0208(value, errors='strict'):
-    """Convert a unicode string into JIS X 0208 byte string using iso2022_jp
-    encodings.
+    """Convert a unicode string into JIS X 0208 byte string."""
+    return _encode_to_given_charset(value, 'ISO 2022 IR 87', errors=errors)
+
+
+def _encode_to_jis_x_0212(value, errors='strict'):
+    """Convert a unicode string into JIS X 0212 byte string."""
+    return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
+
+
+def _encode_to_given_charset(value, character_set, errors='strict'):
+    """Convert a unicode string into given character set.
     The escape sequence which is located at the end of the encoded value has
     to vary depending on the value 1 of SpecificCharacterSet. So we have to
     trim it and append the correct escape sequence manually.
@@ -177,6 +185,8 @@ def _encode_to_jis_x_0208(value, errors='strict'):
     ----------
     value : text type
         The unicode string as presented to the user.
+    character_set: str:
+        Character set for result.
     errors : str
         The behavior of a character which could not be encoded. This value
         is passed to errors argument of str.encode().
@@ -185,28 +195,30 @@ def _encode_to_jis_x_0208(value, errors='strict'):
     -------
     byte string
         The encoded string. If some characters in value could not be encoded to
-        JIS X 0208, it depends on the behavior of iso2022_jp encoder.
+        given character_set, it depends on the behavior of corresponding python
+        encoder.
 
     Raises
     ------
     UnicodeEncodeError
         If errors is set to 'strict' and `value` could not be encoded with
-        JIS X 0208.
+        given character_set.
     """
 
+    encoding = python_encoding[character_set]
     # If errors is not strict, this function is used as fallback.
     # So keep the tail escape sequence of encoded for backward compatibility.
     if errors != 'strict':
-        return value.encode('iso2022_jp', errors=errors)
+        return value.encode(encoding, errors=errors)
 
-    Encoder = codecs.getincrementalencoder('iso2022-jp')
+    Encoder = codecs.getincrementalencoder(encoding)
     encoder = Encoder()
 
     encoded = encoder.encode(value[0])
-    if encoded[:3] != ENCODINGS_TO_CODES['iso2022_jp']:
+    if not encoded.startswith(ENCODINGS_TO_CODES[encoding]):
         raise UnicodeEncodeError(
-            'iso2022_jp', value, 0, len(value),
-            'Given character is out of ISO IR 87')
+            encoding, value, 0, len(value),
+            'Given character is out of {}'.format(character_set))
 
     for i, c in enumerate(value[1:], 1):
         try:
@@ -215,10 +227,10 @@ def _encode_to_jis_x_0208(value, errors='strict'):
             e.start = i
             e.end = len(value)
             raise e
-        if b[:3] == ENCODINGS_TO_CODES['iso8859']:
+        if b[:1] == ESC:
             raise UnicodeEncodeError(
-                'iso2022_jp', value, i, len(value),
-                'Given character is out of ISO IR 87')
+                encoding, value, i, len(value),
+                'Given character is out of {}'.format(character_set))
         encoded += b
     return encoded
 
@@ -232,10 +244,10 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
     ----------
     encoding : str
         An encoding is used to specify  an escape sequence.
-
     encoded : bytes or str
         The encoded value is used to chose an escape sequence if encoding is
-        'shift_jis'
+        'shift_jis'. Should be :class:`bytes` for Python 3 and :class:`str`
+        for Python 2.
 
     Returns
     -------
@@ -262,44 +274,46 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
 
 
 # These encodings need escape sequence to handle alphanumeric characters.
-need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso-2022-jp')
+need_tail_escape_sequence_encodings = ('iso2022_jp', 'iso2022_jp_2')
 
 
 custom_encoders = {
     'shift_jis': _encode_to_jis_x_0201,
     'iso2022_jp': _encode_to_jis_x_0208,
-    'iso-2022-jp': _encode_to_jis_x_0208
+    'iso2022_jp_2': _encode_to_jis_x_0212
 }
 
 
 def decode_string(value, encodings, delimiters):
-    """Convert a raw byte string into a unicode string using the given
-    list of encodings.
+    """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     Parameters
     ----------
-    value : byte string
-        The raw string as encoded in the DICOM tag value.
-    encodings : list
+    value : bytes or str
+        The encoded byte string in the DICOM element value. Should be
+        :class:`bytes` for Python 3 and :class:`str` for Python 2.
+    encodings : list of str
         The encodings needed to decode the string as a list of Python
-        encodings, converted from the encodings in Specific Character Set.
-    delimiters: set of int (Python 3) or characters (Python 2)
+        encodings, converted from the encodings in (0008,0005) *Specific
+        Character Set*.
+    delimiters : set of int (Python 3) or characters (Python 2)
         A set of characters or character codes, each of which resets the
-        encoding in `byte_str`.
+        encoding in `value`.
 
     Returns
     -------
-    text type
+    str or unicode
         The decoded unicode string. If the value could not be decoded,
-        and `config.enforce_valid_values` is not set, a warning is issued,
-        and the value is decoded using the first encoding with replacement
-        characters, resulting in data loss.
+        and :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``False``, a warning is issued, and `value` is decoded using the
+        first encoding with replacement characters, resulting in data loss.
+        Returns :class:`str` for Python 3 and :class:`unicode` for Python 2.
 
     Raises
     ------
     UnicodeDecodeError
-        If `config.enforce_valid_values` is set and `value` could not be
-        decoded with the given encodings.
+        If :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``True`` and `value` could not be decoded with the given encodings.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
@@ -373,10 +387,13 @@ def _decode_fragment(byte_str, encodings, delimiters):
         If `config.enforce_valid_values` is set and `value` could not be
         decoded with the given encodings.
 
-    Reference
-    ---------
-    * DICOM Standard Part 5, Sections 6.1.2.4 and 6.1.2.5
-    * DICOM Standard Part 3, Anex C.12.1.1.2
+    References
+    ----------
+    * DICOM Standard, Part 5,
+      :dcm:`Sections 6.1.2.4<part05/chapter_6.html#sect_6.1.2.4>` and
+      :dcm:`6.1.2.5<part05/chapter_6.html#sect_6.1.2.5>`
+    * DICOM Standard, Part 3,
+      :dcm:`Annex C.12.1.1.2<part03/sect_C.12.html#sect_C.12.1.1.2>`
     """
     try:
         if byte_str.startswith(ESC):
@@ -431,30 +448,34 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
 
 
 def encode_string(value, encodings):
-    """Convert a unicode string into a byte string using the given
-    list of encodings.
+    """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
     Parameters
     ----------
-    value : text type
-        The unicode string as presented to the user.
-    encodings : list
+    value : str or unicode
+        The unicode string as presented to the user. Should be :class:`str`
+        for Python 3 and :class:`unicode` for Python 2.
+    encodings : list of str
         The encodings needed to encode the string as a list of Python
-        encodings, converted from the encodings in Specific Character Set.
+        encodings, converted from the encodings in (0008,0005) *Specific
+        Character Set*.
 
     Returns
     -------
-    byte string
-        The encoded string. If the value could not be encoded with any of
-        the given encodings, and `config.enforce_valid_values` is not set, a
-        warning is issued, and the value is encoded using the first
-        encoding with replacement characters, resulting in data loss.
+    bytes or str
+        The encoded string. If `value` could not be encoded with any of
+        the given encodings, and
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``False``, a warning is issued, and `value` is encoded using the first
+        encoding with replacement characters, resulting in data loss. Should
+        be :class:`bytes` for Python 3 and :class:`str` for Python 2.
 
     Raises
     ------
     UnicodeEncodeError
-        If `config.enforce_valid_values` is set and `value` could not be
-        encoded with the given encodings.
+        If  :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
+        is ``True`` and `value` could not be encoded with the supplied
+        encodings.
     """
     for i, encoding in enumerate(encodings):
         try:
@@ -553,7 +574,7 @@ def _encode_string_parts(value, encodings):
     # unencoded_part is empty - we are done, return the encoded string
     if best_encoding in need_tail_escape_sequence_encodings:
         encoded += _get_escape_sequence_for_encoding(encodings[0])
-    return encoded
+    return bytes(encoded)
 
 
 def _encode_string_impl(value, encoding, errors='strict'):
@@ -581,34 +602,42 @@ def _encode_string_impl(value, encoding, errors='strict'):
 
 
 def convert_encodings(encodings):
-    """Converts DICOM encodings into corresponding python encodings.
+    """Convert DICOM `encodings` into corresponding Python encodings.
+
     Handles some common spelling mistakes and issues a warning in this case.
+
     Handles stand-alone encodings: if they are the first encodings,
     additional encodings are ignored, if they are not the first encoding,
     they are ignored. In both cases, a warning is issued.
+
     Invalid encodings are replaced with the default encoding with a
-    respective warning issued, if `config.enforce_valid_values` is `False`,
-    otherwise an exception is raised.
+    respective warning issued, if
+    :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+    ``False``, otherwise an exception is raised.
 
     Parameters
     ----------
     encodings : list of str
-        The list of encodings as read from Specific Character Set.
+        The list of encodings as read from (0008,0005) *Specific Character
+        Set*.
 
     Returns
     -------
     list of str
-        The list of Python encodings corresponding to the DICOM encodings.
-        If an encoding is already a Python encoding, it is returned unchanged.
-        Encodings with common spelling errors are replaced by the correct
-        encoding, and invalid encodings are replaced with the default
-        encoding if `config.enforce_valid_values` is `False`.
+        A :class:`list` of Python encodings corresponding to the DICOM
+        encodings. If an encoding is already a Python encoding, it is returned
+        unchanged. Encodings with common spelling errors are replaced by the
+        correct encoding, and invalid encodings are replaced with the default
+        encoding if
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``False``.
 
     Raises
     ------
     LookupError
-        In case of an invalid encoding that could not be corrected if
-        `config.enforce_valid_values` is set.
+        If `encodings` contains a value that could not be converted and
+        :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
+        ``True``.
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
@@ -712,17 +741,21 @@ def _handle_illegal_standalone_encodings(encodings, py_encodings):
     return py_encodings
 
 
-def decode(data_element, dicom_character_set):
-    """Apply the DICOM character encoding to the data element
+def decode_element(data_element, dicom_character_set):
+    """Apply the DICOM character encoding to a data element
 
-    data_element -- DataElement instance containing a value to convert
-    dicom_character_set -- the value of Specific Character Set (0008,0005),
-                    which may be a single value,
-                    a multiple value (code extension), or
-                    may also be '' or None.
-                    If blank or None, ISO_IR 6 is used.
-
+    Parameters
+    ----------
+    data_element : dataelem.DataElement
+        The :class:`DataElement<pydicom.dataelem.DataElement>` instance
+        containing an encoded byte string value to decode.
+    dicom_character_set : str or list of str or None
+        The value of (0008,0005) *Specific Character Set*, which may be a
+        single value, a multiple value (code extension), or may also be ``''``
+        or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
+    if data_element.is_empty:
+        return data_element.empty_value
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
 
@@ -732,14 +765,14 @@ def decode(data_element, dicom_character_set):
     # PN is special case as may have 3 components with different chr sets
     if data_element.VR == "PN":
         if not in_py2:
-            if data_element.VM == 1:
+            if data_element.VM <= 1:
                 data_element.value = data_element.value.decode(encodings)
             else:
                 data_element.value = [
                     val.decode(encodings) for val in data_element.value
                 ]
         else:
-            if data_element.VM == 1:
+            if data_element.VM <= 1:
                 data_element.value = PersonNameUnicode(data_element.value,
                                                        encodings)
             else:
@@ -766,3 +799,27 @@ def decode(data_element, dicom_character_set):
                                                 TEXT_VR_DELIMS))
 
             data_element.value = output
+
+
+def decode(data_element, dicom_character_set):
+    """Apply the DICOM character encoding to a data element
+
+    .. deprecated:: 1.4
+       This function is deprecated, use :func:`decode_element` instead.
+
+    Parameters
+    ----------
+    data_element : dataelem.DataElement
+        The :class:`DataElement<pydicom.dataelem.DataElement>` instance
+        containing an encoded byte string value to decode.
+    dicom_character_set : str or list of str or None
+        The value of (0008,0005) *Specific Character Set*, which may be a
+        single value, a multiple value (code extension), or may also be ``''``
+        or ``None``, in which case ``'ISO_IR 6'`` will be used.
+    """
+    warnings.warn(
+        "'charset.decode()' is deprecated and will be removed in "
+        "v1.5, use 'charset.decode_element()' instead",
+        DeprecationWarning
+    )
+    return decode_element(data_element, dicom_character_set)

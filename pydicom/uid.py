@@ -14,18 +14,26 @@ from pydicom import compat
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
 PYDICOM_ROOT_UID = '1.2.826.0.1.3680043.8.498.'
+"""pydicom's root UID ``'1.2.826.0.1.3680043.8.498.'``"""
 PYDICOM_IMPLEMENTATION_UID = PYDICOM_ROOT_UID + '1'
+"""
+pydicom's (0002,0012) *Implementation Class UID*
+``'1.2.826.0.1.3680043.8.498.1'``
+"""
 
 # Regexes for valid UIDs and valid UID prefixes
 RE_VALID_UID = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+"""Regex for a valid UID"""
 RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+"""Regex for a valid UID prefix"""
 
 
 class UID(str):
-    """Subclass python string so have human-friendly UIDs.
+    """Human friendly UIDs as a Python :class:`str` subclass.
 
-    Example
-    -------
+    Examples
+    --------
+
     >>> from pydicom.uid import UID
     >>> uid = UID('1.2.840.10008.1.2.4.50')
     >>> uid
@@ -64,7 +72,7 @@ class UID(str):
 
     @property
     def is_implicit_VR(self):
-        """Return True if an implicit VR transfer syntax UID."""
+        """Return ``True`` if an implicit VR transfer syntax UID."""
         if self.is_transfer_syntax:
             # Implicit VR Little Endian
             if self == '1.2.840.10008.1.2':
@@ -80,7 +88,7 @@ class UID(str):
 
     @property
     def is_little_endian(self):
-        """Return True if a little endian transfer syntax UID."""
+        """Return ``True`` if a little endian transfer syntax UID."""
         if self.is_transfer_syntax:
             # Explicit VR Big Endian
             if self == '1.2.840.10008.1.2.2':
@@ -96,7 +104,7 @@ class UID(str):
 
     @property
     def is_transfer_syntax(self):
-        """Return True if a transfer syntax UID."""
+        """Return ``True`` if a transfer syntax UID."""
         if not self.is_private:
             return self.type == "Transfer Syntax"
 
@@ -104,7 +112,7 @@ class UID(str):
 
     @property
     def is_deflated(self):
-        """Return True if a deflated transfer syntax UID."""
+        """Return ``True`` if a deflated transfer syntax UID."""
         if self.is_transfer_syntax:
             # Deflated Explicit VR Little Endian
             if self == '1.2.840.10008.1.2.1.99':
@@ -120,12 +128,12 @@ class UID(str):
 
     @property
     def is_encapsulated(self):
-        """Return True if an encasulated transfer syntax UID."""
+        """Return ``True`` if an encasulated transfer syntax UID."""
         return self.is_compressed
 
     @property
     def is_compressed(self):
-        """Return True if a compressed transfer syntax UID."""
+        """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
             # Explicit VR Little Endian
             # Implicit VR Little Endian
@@ -167,7 +175,9 @@ class UID(str):
 
     @property
     def is_retired(self):
-        """Return True if the UID is retired, False otherwise or if private."""
+        """Return ``True`` if the UID is retired, ``False`` otherwise or if
+        private.
+        """
         if str.__str__(self) in UID_dictionary:
             return bool(UID_dictionary[self][3])
 
@@ -175,7 +185,9 @@ class UID(str):
 
     @property
     def is_private(self):
-        """Return True if the UID isn't an officially registered DICOM UID."""
+        """Return ``True`` if the UID isn't an officially registered DICOM
+        UID.
+        """
         if self[:13] == '1.2.840.10008':
             return False
 
@@ -183,7 +195,7 @@ class UID(str):
 
     @property
     def is_valid(self):
-        """Return True if `self` is a valid UID, False otherwise."""
+        """Return ``True`` if `self` is a valid UID, ``False`` otherwise."""
         if len(self) <= 64 and re.match(RE_VALID_UID, self):
             return True
 
@@ -191,21 +203,36 @@ class UID(str):
 
 
 # Pre-defined Transfer Syntax UIDs (for convenience)
-ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
 ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
+"""1.2.840.10008.1.2"""
+ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
+"""1.2.840.10008.1.2.1"""
 DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
+"""1.2.840.10008.1.2.1.99"""
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
+"""1.2.840.10008.1.2.2"""
 JPEGBaseline = UID('1.2.840.10008.1.2.4.50')
+"""1.2.840.10008.1.2.4.50"""
 JPEGExtended = UID('1.2.840.10008.1.2.4.51')
+"""1.2.840.10008.1.2.4.51"""
 JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')
+"""1.2.840.10008.1.2.4.57"""
 JPEGLossless = UID('1.2.840.10008.1.2.4.70')
+"""1.2.840.10008.1.2.4.70"""
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
+"""1.2.840.10008.1.2.4.80"""
 JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
+"""1.2.840.10008.1.2.4.81"""
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
+"""1.2.840.10008.1.2.4.90"""
 JPEG2000 = UID('1.2.840.10008.1.2.4.91')
+"""1.2.840.10008.1.2.4.91"""
 JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
+"""1.2.840.10008.1.2.4.92"""
 JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
+"""1.2.840.10008.1.2.4.93"""
 RLELossless = UID('1.2.840.10008.1.2.5')
+"""1.2.840.10008.1.2.5"""
 
 UncompressedPixelTransferSyntaxes = [
     ExplicitVRLittleEndian,
@@ -249,15 +276,15 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     Parameters
     ----------
     prefix : str or None
-        The UID prefix to use when creating the UID. Default is the pydicom
-        root UID '1.2.826.0.1.3680043.8.498.'. If None then a prefix of '2.25.'
-        will be used with the integer form of a UUID generated using the
-        UUID4 algorithm.
+        The UID prefix to use when creating the UID. Default is the *pydicom*
+        root UID ``'1.2.826.0.1.3680043.8.498.'``. If ``None`` then a prefix of
+        ``'2.25.'`` will be used with the integer form of a UUID generated
+        using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str or None
-        If `prefix` is not None, then the prefix will be appended with a
-        SHA512 hash of the list which means the result is deterministic and
-        should make the original data unrecoverable. If None random data will
-        be used (default).
+        If `prefix` is not ``None``, then `prefix` will be appended with a
+        SHA512 hash of the :class:`list` which means the result is
+        deterministic and should make the original data unrecoverable. If
+        ``None`` random data will be used (default).
 
     Returns
     -------
@@ -269,8 +296,9 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     ValueError
         If `prefix` is invalid or greater than 63 characters.
 
-    Example
-    -------
+    Examples
+    --------
+
     >>> from pydicom.uid import generate_uid
     >>> generate_uid()
     1.2.826.0.1.3680043.8.498.22463838056059845879389038257786771680

@@ -13,13 +13,18 @@ def hex2bytes(hexstring):
 
     This is useful for creating specific byte sequences for testing, using
     python's implied concatenation for strings with comments allowed.
-    Example:
+
+    Examples
+    --------
+
+    ::
         hex_string = (
-         "08 00 32 10"     # (0008, 1032) SQ "Procedure Code Sequence"
-         " 08 00 00 00"    # length 8
-         " fe ff 00 e0"    # (fffe, e000) Item Tag
+            "08 00 32 10 "  # (0008, 1032) SQ "Procedure Code Sequence"
+            "08 00 00 00 "  # length 8
+            "fe ff 00 e0 "  # (fffe, e000) Item Tag
         )
         byte_string = hex2bytes(hex_string)
+
     Note in the example that all lines except the first must
     start with a space, alternatively the space could
     end the previous line.

@@ -11,30 +11,31 @@ except ImportError:
 
 
 class MultiValue(MutableSequence):
-    """Class to hold any multi-valued DICOM value,
-    or any list of items that are all of the same type.
+    """Class to hold any multi-valued DICOM value, or any list of items that
+    are all of the same type.
 
-    This class enforces that any items added to the list
-    are of the correct type, by calling the constructor on
-    any items that are added. Therefore, the constructor must
-    behave nicely if passed an object that is already its type.
-    The constructor should raise TypeError if the item
-    cannot be converted.
+    This class enforces that any items added to the list are of the correct
+    type, by calling the constructor on any items that are added. Therefore,
+    the constructor must behave nicely if passed an object that is already its
+    type. The constructor should raise :class:`TypeError` if the item cannot be
+    converted.
 
-    Note, however, that DS and IS types can be a blank string
-    '' rather than an instance of their classes.
+    Note, however, that DS and IS types can be a blank string ``''`` rather
+    than an instance of their classes.
     """
 
     def __init__(self, type_constructor, iterable):
         """Initialize the list of values
 
-        :param type_constructor: a constructor for the required
-                           type for all list items. Could be the
-                           class, or a factory function. For DICOM
-                           multi-value data elements, this will be the
-                           class or type corresponding to the VR.
-        :param iterable: an iterable (e.g. list, tuple) of items
-                        to initialize the MultiValue list
+        Parameters
+        ----------
+        type_constructor : type
+            A constructor for the required type for all list items. Could be
+            the class, or a factory function. For DICOM multi-value data
+            elements, this will be the class or type corresponding to the VR.
+        iterable : iterable
+            An iterable (e.g. :class:`list`, :class:`tuple`) of items to
+            initialize the :class:`MultiValue` list.
         """
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
@@ -47,6 +48,13 @@ class MultiValue(MutableSequence):
             type_constructor = number_string_type_constructor
         for x in iterable:
             self._list.append(type_constructor(x))
+
+    # TODO: Workaround for #951, to be removed when Python 2 not supported
+    if compat.in_py2:
+        def __getstate__(self):
+            state = self.__dict__.copy()
+            del state['type_constructor']
+            return state
 
     def insert(self, position, val):
         self._list.insert(position, self.type_constructor(val))
