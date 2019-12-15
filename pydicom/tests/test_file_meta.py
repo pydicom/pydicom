@@ -43,7 +43,7 @@ class TestFileMetaDataset1(object):
         assert self.ds[0x00020013].value == "Implem"
 
     def test_assign_file_meta_existing_tags(self):
-        """Dataset raises if assigning file_meta with tags already in dataset"""
+        """Dataset raises if assign file_meta with tags already in dataset"""
         # New in v1.4
         # Note: not using self.ds etc.
         meta = FileMetaDataset()
@@ -92,12 +92,12 @@ class TestFileMetaDataset1(object):
 
     def test_file_meta_del(self):
         del self.ds.file_meta.ImplementationVersionName
-        assert "ImplementationVersionName" not in self.ds    
+        assert "ImplementationVersionName" not in self.ds
         assert "ImplementationVersionName" not in self.meta
 
         self.ds.file_meta.ImplementationVersionName = "Implem2"
         del self.ds.ImplementationVersionName
-        assert "ImplementationVersionName" not in self.ds    
+        assert "ImplementationVersionName" not in self.ds
         assert "ImplementationVersionName" not in self.ds.file_meta
 
     def test_dir(self):
@@ -120,12 +120,13 @@ class TestFileMetaDataset1(object):
         # change same item in file meta
         ds2.file_meta.ImplementationVersionName = "other"
         assert not (self.ds == ds2)
-    
+
     def test_file_meta_through_data_element(self):
         data_elem = self.ds.data_element("ImplementationVersionName")
         assert data_elem.value == "Implem"
 
     def test_meta_keys_values_items(self):
+        "Test file meta .keys(), .values(), .items() work as expected"
         meta2 = FileMetaDataset()
         meta2.ImplementationVersionName = "Implem"
         expected_values = [meta2.data_element("ImplementationVersionName")]
@@ -150,6 +151,18 @@ class TestFileMetaDataset1(object):
 
         expected_items = list(zip(expected_keys, expected_values))
         assert expected_items == list(self.ds.items())
+
+    def test_slicing(self):
+        """Slicing includes file_meta if applicable"""
+        ds = Dataset()
+        meta = FileMetaDataset()
+        ds.file_meta = meta
+        ds.PatientName = "Test"
+        ds.file_meta.ImplementationVersionName = "Implem"
+        ds.MediaStorageSOPClassUID = "4.5.6"
+
+        assert 2 == len(ds[0x20000:0x30000])
+        assert 3 == len(ds[0x20000:])
 
 
 class TestFileMetaDataset2(object):
