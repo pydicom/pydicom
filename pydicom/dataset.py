@@ -1986,7 +1986,7 @@ class Dataset(dict):
         if stop is not None:
             stop = Tag(stop)
 
-        all_tags = sorted(self._dict.keys())
+        all_tags = sorted(self.keys())
         # If the Dataset is empty, return an empty list
         if not all_tags:
             return []
