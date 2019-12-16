@@ -1278,7 +1278,7 @@ class TestDataset(object):
         assert 'TestC' == ds2.PatientName
 
     def test_convert_pixel_data_no_px(self):
-        """Test convert_pixel_data() with not pixel data elements."""
+        """Test convert_pixel_data() with no pixel data elements."""
         ds = Dataset()
         msg = (
             r"Unable to convert the pixel data: one of Pixel Data, Float "

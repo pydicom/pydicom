@@ -89,7 +89,7 @@ they must be written back to the dataset's ``PixelData`` element.
 
 .. warning::
 
-    Converting data from an ``ndarray`` back to ``bytes`` may not
+    Converting data from an ``ndarray`` back to ``bytes`` may not be
     as straightforward as in the following example, particularly for
     multi-planar images or where compression is required.
 
@@ -188,7 +188,7 @@ return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by
 using the `index` keyword parameter.
 
-When a dataset requires multiple grayscale transformations, then its assumed
+When a dataset requires multiple grayscale transformations, then it's assumed
 that the modality LUT or rescale operation has already been applied.
 
 .. code-block:: python
