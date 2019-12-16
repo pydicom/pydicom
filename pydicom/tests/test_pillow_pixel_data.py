@@ -9,6 +9,7 @@ import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.tag import Tag
+from pydicom.pixel_data_handlers.util import convert_color_space
 
 # Python 3.4 pytest does not have pytest.param?
 have_pytest_param = hasattr(pytest, 'param')
@@ -324,6 +325,16 @@ class Test_JPEG2000Tests_with_pillow(object):
         with pytest.raises(NotImplementedError):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
+    def test_ybr_conversion_shape(self):
+        """Test RGB->YBR has correct size."""
+        ds = self.jpeg_2k_lossless
+        ds.PhotometricInterpretation = 'YBR_FULL'
+        ds.Rows = 32
+        ds.Columns = 128
+        ds.decompress(handler_name='pillow')
+        a = self.jpeg_2k_lossless.pixel_array
+        assert (32, 128) == a.shape
+
 
 @pytest.mark.skipif(
     not TEST_JPEG,
@@ -367,8 +378,8 @@ class Test_JPEGlossyTests_with_pillow(object):
         a = self.color_3d_jpeg.pixel_array
 
         assert a.flags.writeable
-
         assert (120, 480, 640, 3) == a.shape
+        a = convert_color_space(a, 'YBR_FULL_422', 'RGB')
         # this test points were manually identified in Osirix viewer
         assert (41, 41, 41) == tuple(a[3, 159, 290, :])
         assert (57, 57, 57) == tuple(a[3, 169, 290, :])
@@ -406,7 +417,7 @@ if have_pytest_param:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_RGB),
+         ], ground_truth_sc_rgb_jpeg_dcmtk_RGB, False),
         pytest.param(
             sc_rgb_jpeg_dcmtk_411_YBR_FULL,
             "YBR_FULL",
@@ -422,7 +433,7 @@ if have_pytest_param:
                 (192, 192, 192),
                 (255, 255, 255),
             ],
-            ground_truth_sc_rgb_jpeg_dcmtk_411_YBR_FULL,
+            ground_truth_sc_rgb_jpeg_dcmtk_411_YBR_FULL, True,
             marks=pytest.mark.xfail(
                 reason="Pillow does not support "
                 "non default jpeg lossy colorspaces")),
@@ -441,7 +452,7 @@ if have_pytest_param:
                 (192, 192, 192),
                 (255, 255, 255),
             ],
-            ground_truth_sc_rgb_jpeg_dcmtk_411_YBR_FULL_422,
+            ground_truth_sc_rgb_jpeg_dcmtk_411_YBR_FULL_422, True,
             marks=pytest.mark.xfail(
                 reason="Pillow does not support "
                 "non default jpeg lossy colorspaces")),
@@ -457,7 +468,7 @@ if have_pytest_param:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL),
+         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL, True),
         (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422",
          [
              (254, 0, 0),
@@ -470,7 +481,7 @@ if have_pytest_param:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL_422),
+         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, True),
         (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL",
          [
              (254, 0, 0),
@@ -483,7 +494,7 @@ if have_pytest_param:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_444_YBR_FULL), ]
+         ], ground_truth_sc_rgb_jpeg_dcmtk_444_YBR_FULL, True), ]
 else:
     test_ids = [
         "JPEG_RGB_RGB",
@@ -517,7 +528,7 @@ else:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL),
+         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL, True),
         (sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, "YBR_FULL_422",
          [
              (254, 0, 0),
@@ -530,7 +541,7 @@ else:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL_422),
+         ], ground_truth_sc_rgb_jpeg_dcmtk_422_YBR_FULL_422, True),
         (sc_rgb_jpeg_dcmtk_444_YBR_FULL, "YBR_FULL",
          [
              (254, 0, 0),
@@ -543,21 +554,22 @@ else:
              (64, 64, 64),
              (192, 192, 192),
              (255, 255, 255),
-         ], ground_truth_sc_rgb_jpeg_dcmtk_444_YBR_FULL), ]
+         ], ground_truth_sc_rgb_jpeg_dcmtk_444_YBR_FULL, True), ]
 
 
 @pytest.mark.skipif(
     not TEST_JPEG,
     reason=pillow_missing_message)
 @pytest.mark.parametrize(
-    "image,PhotometricInterpretation,results,ground_truth",
+    "image,PhotometricInterpretation,results,ground_truth,convert_yuv_to_rgb",
     testdata,
     ids=test_ids)
 def test_PI_RGB(test_with_pillow,
                 image,
                 PhotometricInterpretation,
                 results,
-                ground_truth):
+                ground_truth,
+                convert_yuv_to_rgb):
     t = dcmread(image)
     assert t.PhotometricInterpretation == PhotometricInterpretation
     a = t.pixel_array
@@ -574,6 +586,8 @@ def test_PI_RGB(test_with_pillow,
         for y in range(100):
             assert tuple(a[x, y]) == tuple(b[x, y])
     """
+    if convert_yuv_to_rgb:
+        a = convert_color_space(a, t.PhotometricInterpretation, 'RGB')
     # this test points are from the ImageComments tag
     assert tuple(a[5, 50, :]) == results[0]
     assert tuple(a[15, 50, :]) == results[1]
