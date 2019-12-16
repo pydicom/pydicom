@@ -96,16 +96,16 @@ data to graphics libraries for viewing. See :doc:`viewing_images` for details.
 .. _colorspace:
 
 Color space
-...........
+-----------
 
-When using :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`
+When using :attr:`~pydicom.dataset.Dataset.pixel_array`
 with *Pixel Data* that has an (0028,0002) *Samples per Pixel* value
 of ``3`` then the returned pixel data will be in the color space as given by
 (0028,0004) *Photometric Interpretation* (e.g. ``RGB``, ``YBR_FULL``,
 ``YBR_FULL_422``, etc).
 
-*pydicom* offers a limited ability to convert between 8-bits/channel RGB and
-YBR color spaces through the
+*pydicom* offers a limited ability to convert between 8-bits/channel YBR and
+RGB color spaces through the
 :func:`~pydicom.pixel_data_handlers.util.convert_color_space`
 function. When changing the color space you should also change the value
 of *Photometric Interpretation* to match.
