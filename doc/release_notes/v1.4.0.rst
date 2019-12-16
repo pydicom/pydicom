@@ -22,6 +22,9 @@ Fixes
 * Fixed propagation of bulk data handler in Dataset.from_json (:issue:`971`)
 * Correctly handle  DICOMDIR files with records in reverse-hierarchical order
   (:issue:`822`)
+* *Pixel Data* encoded using JPEG2000 and decoded using the Pillow handler no
+  longer returns RGB data when the (0028,0004) *Photometric Interpretation* is
+  YBR_FULL or YBR_FULL_422. (:issue:`263`, :issue:`273`, :issue:`826`)
 
 Enhancements
 ............
