@@ -325,6 +325,16 @@ class Test_JPEG2000Tests_with_pillow(object):
         with pytest.raises(NotImplementedError):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
+    def test_ybr_conversion_shape(self):
+        """Test RGB->YBR has correct size."""
+        ds = self.jpeg_2k_lossless
+        ds.PhotometricInterpretation = 'YBR_FULL'
+        ds.Rows = 32
+        ds.Columns = 128
+        ds.decompress(handler_name='pillow')
+        a = self.jpeg_2k_lossless.pixel_array
+        assert (32, 128) == a.shape
+
 
 @pytest.mark.skipif(
     not TEST_JPEG,
