@@ -169,8 +169,6 @@ def get_pixeldata(ds):
     if (transfer_syntax in PillowJPEG2000TransferSyntaxes and
             ds.BitsStored == 16):
         # WHY IS THIS EVEN NECESSARY??
-        # Pillow doesn't support 16-bit data types and instead uses a
-        #   32-bit signed int
         arr &= 0x7FFF
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
