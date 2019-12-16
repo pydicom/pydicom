@@ -225,7 +225,7 @@ This example shows how to read DICOM directory.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.080 seconds)
+   **Total running time of the script:** ( 0 minutes  0.046 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:

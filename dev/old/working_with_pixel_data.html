@@ -104,6 +104,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Pixel Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dataset-pixel-array"><code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#color-space">Color space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#palette-color">Palette Color</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#modality-lut-or-rescale-operation">Modality LUT or Rescale Operation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#voi-lut-or-windowing-operation">VOI LUT or Windowing Operation</a></li>
@@ -274,6 +275,25 @@ automatically.</p>
 an example.</p>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a> can also be used to pass image
 data to graphics libraries for viewing. See <a class="reference internal" href="viewing_images.html"><span class="doc">Viewing Images</span></a> for details.</p>
+</div>
+<div class="section" id="color-space">
+<span id="colorspace"></span><h2>Color space<a class="headerlink" href="#color-space" title="Permalink to this headline">¶</a></h2>
+<p>When using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
+with <em>Pixel Data</em> that has an (0028,0002) <em>Samples per Pixel</em> value
+of <code class="docutils literal notranslate"><span class="pre">3</span></code> then the returned pixel data will be in the color space as given by
+(0028,0004) <em>Photometric Interpretation</em> (e.g. <code class="docutils literal notranslate"><span class="pre">RGB</span></code>, <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code>, etc).</p>
+<p><em>pydicom</em> offers a limited ability to convert between 8-bits/channel YBR and
+RGB color spaces through the
+<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a>
+function. When changing the color space you should also change the value
+of <em>Photometric Interpretation</em> to match.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the DICOM Standard, Part 3,
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Section C.7.6.3.1</a> for more
+information about color spaces.</p>
+</div>
 </div>
 <div class="section" id="palette-color">
 <h2>Palette Color<a class="headerlink" href="#palette-color" title="Permalink to this headline">¶</a></h2>

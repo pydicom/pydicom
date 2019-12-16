@@ -194,6 +194,9 @@ Descriptor</em> elements (0028,1101-1103) and (0028,3002) (<a class="reference e
 <li><p>Fixed propagation of bulk data handler in Dataset.from_json (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/971">#971</a>)</p></li>
 <li><p>Correctly handle  DICOMDIR files with records in reverse-hierarchical order
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/822">#822</a>)</p></li>
+<li><p><em>Pixel Data</em> encoded using JPEG2000 and decoded using the Pillow handler no
+longer returns RGB data when the (0028,0004) <em>Photometric Interpretation</em> is
+YBR_FULL or YBR_FULL_422. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/263">#263</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/273">#273</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/826">#826</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="enhancements">
