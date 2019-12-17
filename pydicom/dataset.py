@@ -1270,8 +1270,7 @@ class Dataset(dict):
         return default
 
     def convert_pixel_data(self, handler_name=''):
-        """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
-        internally.
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
 
         Parameters
         ----------
@@ -1433,15 +1432,16 @@ class Dataset(dict):
         """Do the actual data conversion using the given handler."""
 
         # Use the handler to get a 1D numpy array of the pixel data
+        # Will raise an exception if no pixel data element
         arr = handler.get_pixeldata(self)
         self._pixel_array = reshape_pixel_array(self, arr)
 
         # Some handler/transfer syntax combinations may need to
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
-            self._pixel_array = convert_color_space(self._pixel_array,
-                                                    'YBR_FULL',
-                                                    'RGB')
+            self._pixel_array = convert_color_space(
+                self._pixel_array, 'YBR_FULL', 'RGB'
+            )
 
         self._pixel_id = get_pixel_id(self)
 
@@ -1584,12 +1584,14 @@ class Dataset(dict):
 
     @property
     def pixel_array(self):
-        """Return the *Pixel Data* as a :class:`numpy.ndarray`.
+        """Return the pixel data as a :class:`numpy.ndarray`.
 
         Returns
         -------
         numpy.ndarray
-            The (7fe0,0010) *Pixel Data* converted to a :class:`numpy.ndarray`.
+            The (7fe0,0008) *Float Pixel Data*, (7fe0,0009) *Double Float
+            Pixel Data* or (7fe0,0010) *Pixel Data* converted to a
+            :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
         return self._pixel_array

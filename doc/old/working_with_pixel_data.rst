@@ -11,8 +11,23 @@ Working with Pixel Data
 Introduction
 ------------
 
-pydicom tends to be "lazy" in interpreting DICOM data. For example, by default
-it doesn't do anything with pixel data except read in the raw bytes::
+Many DICOM SOP classes contain bulk pixel data, which is usually used to
+represent one or more image frames (although :dcm:`other types of data
+<part03/sect_A.18.3.html>` are possible). In these SOP classes the pixel
+data is (almost) always contained in the (7fe0,0010) *Pixel Data* element.
+The only exception to this is :dcm:`Parametric Map Storage
+<part03/sect_A.75.3.html>` which may instead contain data in the (7fe0,0008)
+*Float Pixel Data* or (7fe0,0009) *Double Float Pixel Data* elements.
+
+.. note::
+
+    In the following the term *pixel data* will be used to refer to
+    the bulk data from *Pixel Data*, *Float Pixel Data* and *Double Float
+    Pixel Data* elements. While the examples use ``PixelData``,
+    ``FloatPixelData`` or ``DoubleFloatPixelData`` could also be used
+    interchangeably provided the dataset contains the corresponding element.
+
+By default *pydicom* reads in pixel data as the raw bytes found in the file::
 
   >>> from pydicom import dcmread
   >>> from pydicom.data import get_testdata_file
@@ -21,11 +36,10 @@ it doesn't do anything with pixel data except read in the raw bytes::
   >>> ds.PixelData # doctest: +ELLIPSIS
   b'\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...
 
-``PixelData`` contains the ``bytes`` exactly as found in the file and is not
-typically in an immediately useful form as data may be stored in a variety
-of different ways:
+``PixelData`` is often not immediately useful as data may be
+stored in a variety of different ways:
 
- - The pixel values may be signed or unsigned
+ - The pixel values may be signed or unsigned integers, or floats
  - There may be multiple image frames
  - There may be :dcm:`multiple planes per frame
    <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1>` (i.e. RGB) and the :dcm:`order
@@ -36,8 +50,8 @@ of different ways:
    be :dcm:`encapsulated<part05/sect_A.4.html>` and each encapsulated image
    frame may be broken up into one or more fragments.
 
-Because of the complexity in getting the raw *Pixel Data* bytes into
-a usable form, *pydicom* provides a convenient way to get it:
+Because of the complexity in interpreting the pixel data, *pydicom* provides
+an easy way to get it in a convenient form:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 
@@ -50,7 +64,7 @@ a usable form, *pydicom* provides a convenient way to get it:
     requires `NumPy <http://numpy.org/>`_.
 
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` returns a
-:class:`numpy.ndarray` containing the *Pixel Data*::
+:class:`numpy.ndarray` containing the pixel data::
 
   >>> ds.pixel_array # doctest: +NORMALIZE_WHITESPACE
   array([[ 905, 1019, 1227, ...,  302,  304,  328],
@@ -63,14 +77,21 @@ a usable form, *pydicom* provides a convenient way to get it:
   >>> ds.pixel_array.shape
   (64, 64)
 
-If the *Pixel Data* is compressed then
+If the pixel data is compressed then
 :attr:`~pydicom.dataset.Dataset.pixel_array` will return the uncompressed data,
-provided the dependencies of the required pixel data handler are available. See
+provided the dependencies of the required :ref:`pixel data handler
+<api_handlers_pixeldata>` are available. See
 :doc:`handling compressed image data <image_data_handlers>` for more
 information.
 
-NumPy can be used to modify the pixel data, but if the changes are to be saved,
-they must be written back to the dataset's ``PixelData`` element:
+NumPy can be used to modify the data, but if the changes are to be saved,
+they must be written back to the dataset's ``PixelData`` element.
+
+.. warning::
+
+    Converting data from an ``ndarray`` back to ``bytes`` may not be
+    as straightforward as in the following example, particularly for
+    multi-planar images or where compression is required.
 
 .. code-block:: python
 
@@ -81,9 +102,9 @@ they must be written back to the dataset's ``PixelData`` element:
   ds.save_as("temp.dcm")
 
 Some changes may require other DICOM tags to be modified. For example, if the
-pixel data is reduced (e.g. a :math:`512 \times 512` image is collapsed to
+image size is reduced (e.g. a :math:`512 \times 512` image is shrunk to
 :math:`256 \times 256`) then ``Rows`` and ``Columns`` should be set
-appropriately. You must explicitly set these yourself; pydicom does not do so
+appropriately. You must explicitly set these yourself; *pydicom* does not do so
 automatically.
 
 See :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` for
@@ -191,7 +212,7 @@ return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by
 using the `index` keyword parameter.
 
-When a dataset requires multiple greyscale transformations, then its assumed
+When a dataset requires multiple grayscale transformations, then it's assumed
 that the modality LUT or rescale operation has already been applied.
 
 .. code-block:: python
