@@ -750,6 +750,70 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
+def get_pixel_id(ds):
+    """Return a dict of the elements :func:`id`s that affect the pixel data.
+
+    +------------------------------------------------+
+    | Element                                        |
+    +-------------+---------------------------+------+
+    | Tag         | Keyword                   | Type |
+    +=============+===========================+======+
+    | (0028,0002) | SamplesPerPixel           | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0004) | PhotometricInterpretation | 1    |
+    |             |                           |      |
+    |             |                           |      |
+    |             |                           |      |
+    |             |                           |      |
+    +-------------+---------------------------+------+
+    | (0028,0006) | PlanarConfiguration       | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0008) | NumberOfFrames            | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0010) | Rows                      | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0011) | Columns                   | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0100) | BitsAllocated             | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0103) | PixelRepresentation       | 1    |
+    +-------------+---------------------------+------+
+    | (7FE0,0008) | FloatPixelData            | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0009) | DoubleFloatPixelData      | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0010) | PixelData                 | 1C   |
+    +-------------+---------------------------+------+
+
+    Parameters
+    ----------
+    ds : Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the pixel data.
+
+    Returns
+    -------
+    dict
+        A dict containing the :func:`id` values for the elements that affect
+        the pixel data.
+
+    """
+    ids = {
+        'SamplesPerPixel': id(ds.SamplesPerPixel),
+        'PhotometricInterpretation': id(ds.PhotometricInterpretation),
+        'PlanarConfiguration': id(getattr(ds, 'PlanarConfiguration')),
+        'NumberOfFrames': id(getattr(ds, 'NumberOfFrames', 1)),
+        'Rows': id(ds.Rows),
+        'Columns': id(ds.Columns),
+        'BitsAllocated': id(ds.BitsAllocated),
+        'PixelRepresentation': id(ds.PixelRepresentation),
+        'FloatPixelData': id(getattr(ds, 'FloatPixelData'), None),
+        'DoubleFloatPixelData': id(getattr(ds, 'DoubleFloatPixelData'), None),
+        'PixelData': id(getattr(ds, 'PixelData'), None),
+    }
+
+    return ids
+
+
 def pixel_dtype(ds):
     """Return a :class:`numpy.dtype` for the *Pixel Data* in `ds`.
 
