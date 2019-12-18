@@ -70,8 +70,8 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         #   For references, see the list at
         #   https://github.com/darcymason/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
-        while 'PixelRepresentation' not in ds and ds.parent:
-            ds = ds.parent
+        while 'PixelRepresentation' not in ds and ds.parent and ds.parent():
+            ds = ds.parent()
         # if no pixel data is present, none if these tags is used,
         # so we can just ignore a missing PixelRepresentation in this case
         if ('PixelRepresentation' not in ds and 'PixelData' not in ds or

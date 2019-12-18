@@ -771,10 +771,6 @@ class Dataset(dict):
             if tag in self._dict:  # DICOM DataElement not in the Dataset
                 data_elem = self[tag]
                 value = data_elem.value
-                if data_elem.VR == 'SQ':
-                    # let a sequence know its parent dataset, as sequence items
-                    # may need parent dataset tags to resolve ambiguous tags
-                    value.parent = self
                 return value
 
         # no tag or tag not contained in the dataset
@@ -854,6 +850,10 @@ class Dataset(dict):
         data_elem = self._dict[tag]
 
         if isinstance(data_elem, DataElement):
+            if data_elem.VR == 'SQ' and data_elem.value:
+                # let a sequence know its parent dataset, as sequence items
+                # may need parent dataset tags to resolve ambiguous tags
+                data_elem.value.parent = self
             return data_elem
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
