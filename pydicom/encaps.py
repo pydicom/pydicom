@@ -175,7 +175,7 @@ def generate_pixel_data_fragment(fp):
                              .format(tag, fp.tell() - 4))
 
 
-def generate_pixel_data_frame(bytestream):
+def generate_pixel_data_frame(bytestream, nr_frames=None):
     """Yield an encapsulated pixel data frame.
 
     Parameters
@@ -184,6 +184,11 @@ def generate_pixel_data_frame(bytestream):
         The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        If `bytestream` contains multiple frames this is the value of
+        (0028,0008) *Number of Frames*. Required for multi-frame data when the
+        Basic Offset Table contains no offsets and there are multiple fragments
+        per frame.
 
     Yields
     ------
@@ -194,11 +199,11 @@ def generate_pixel_data_frame(bytestream):
     ----------
     DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
-    for fragmented_frame in generate_pixel_data(bytestream):
+    for fragmented_frame in generate_pixel_data(bytestream, nr_frames):
         yield b''.join(fragmented_frame)
 
 
-def generate_pixel_data(bytestream):
+def generate_pixel_data(bytestream, nr_frames=None):
     """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -230,6 +235,11 @@ def generate_pixel_data(bytestream):
         The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        If `bytestream` contains multiple frames this is the value of
+        (0028,0008) *Number of Frames*. Required for multi-frame data when the
+        Basic Offset Table contains no offsets and there are multiple fragments
+        per frame.
 
     Yields
     -------
@@ -250,23 +260,36 @@ def generate_pixel_data(bytestream):
     # greater than the total number of bytes in the fragments
     offsets.append(len(bytestream))
 
+    # Check ratio of fragments to frame
+    # If equal then can assume 1 fragment per frame (as req'd in RLE)
+    # If more fragments then frames the assume JPEG and search for EOI marker
+    eoi_marker = None
+    if nr_frames and len(offsets) - 1 > nr_frames:
+        # JPEG EOI/EOC marker - see ISO/IEC 10918-1 and 14495-1
+        # Should appear be the last two bytes of a frame
+        # JPEG2000 doesn't allow multiple fragments per frame
+        eoi_marker = b'\xff\xd9'
+
     frame = []
     frame_length = 0
     frame_number = 0
     for fragment in generate_pixel_data_fragment(fp):
-        if frame_length < offsets[frame_number + 1]:
-            frame.append(fragment)
-        else:
-            yield tuple(frame)
-            frame = [fragment]
-            frame_number += 1
-
+        frame.append(fragment)
         frame_length += len(fragment) + 8
+        if eoi_marker and eoi_marker in fragment[:-10]:
+            yield tuple(frame)
+            frame = []
+            frame_number += 1
+        elif frame_length >= offsets[frame_number + 1]:
+            yield tuple(frame)
+            frame = []
+            frame_number += 1
 
     # Yield the final frame - required here because the frame_length will
     # never be greater than offsets[-1] and thus never trigger the final yield
     # within the for block
-    yield tuple(frame)
+    if eoi_marker is None:
+        yield tuple(frame)
 
 
 def decode_data_sequence(data):
