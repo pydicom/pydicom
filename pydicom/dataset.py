@@ -1304,6 +1304,15 @@ class Dataset(dict):
         """
         # Check if already have converted to a NumPy array
         # Also check if self.PixelData has changed. If so, get new NumPy array
+        keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
+        px_keyword = [kw for kw in keywords if kw in self]
+        if len(px_keyword) != 1:
+            raise AttributeError(
+                "Unable to convert the pixel data: one of Pixel Data, Float "
+                "Pixel Data or Double Float Pixel Data must be present in "
+                "the dataset"
+            )
+
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
