@@ -201,8 +201,20 @@
 <p class="rubric">How to work with pixel data in pydicom.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>pydicom tends to be “lazy” in interpreting DICOM data. For example, by default
-it doesn’t do anything with pixel data except read in the raw bytes:</p>
+<p>Many DICOM SOP classes contain bulk pixel data, which is usually used to
+represent one or more image frames (although <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
+data is (almost) always contained in the (7fe0,0010) <em>Pixel Data</em> element.
+The only exception to this is <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.75.3.html">Parametric Map Storage</a> which may instead contain data in the (7fe0,0008)
+<em>Float Pixel Data</em> or (7fe0,0009) <em>Double Float Pixel Data</em> elements.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the following the term <em>pixel data</em> will be used to refer to
+the bulk data from <em>Pixel Data</em>, <em>Float Pixel Data</em> and <em>Double Float
+Pixel Data</em> elements. While the examples use <code class="docutils literal notranslate"><span class="pre">PixelData</span></code>,
+<code class="docutils literal notranslate"><span class="pre">FloatPixelData</span></code> or <code class="docutils literal notranslate"><span class="pre">DoubleFloatPixelData</span></code> could also be used
+interchangeably provided the dataset contains the corresponding element.</p>
+</div>
+<p>By default <em>pydicom</em> reads in pixel data as the raw bytes found in the file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
@@ -211,12 +223,11 @@ it doesn’t do anything with pixel data except read in the raw bytes:</p>
 <span class="go">b&#39;\x89\x03\xfb\x03\xcb\x04\xeb\x04\xf9\x02\x94\x01\x7f...</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">PixelData</span></code> contains the <code class="docutils literal notranslate"><span class="pre">bytes</span></code> exactly as found in the file and is not
-typically in an immediately useful form as data may be stored in a variety
-of different ways:</p>
+<p><code class="docutils literal notranslate"><span class="pre">PixelData</span></code> is often not immediately useful as data may be
+stored in a variety of different ways:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>The pixel values may be signed or unsigned</p></li>
+<li><p>The pixel values may be signed or unsigned integers, or floats</p></li>
 <li><p>There may be multiple image frames</p></li>
 <li><p>There may be <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.1">multiple planes per frame</a> (i.e. RGB) and the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.3">order
 of the pixels</a> may be different</p></li>
@@ -227,8 +238,8 @@ be <a class="reference external" href="http://dicom.nema.org/medical/dicom/curre
 frame may be broken up into one or more fragments.</p></li>
 </ul>
 </div></blockquote>
-<p>Because of the complexity in getting the raw <em>Pixel Data</em> bytes into
-a usable form, <em>pydicom</em> provides a convenient way to get it:
+<p>Because of the complexity in interpreting the pixel data, <em>pydicom</em> provides
+an easy way to get it in a convenient form:
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a>.</p>
 </div>
 <div class="section" id="dataset-pixel-array">
@@ -239,7 +250,7 @@ a usable form, <em>pydicom</em> provides a convenient way to get it:
 requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 </div>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> returns a
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing the <em>Pixel Data</em>:</p>
+<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing the pixel data:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span> 
 <span class="go">array([[ 905, 1019, 1227, ...,  302,  304,  328],</span>
 <span class="go">       [ 628,  770,  907, ...,  298,  331,  355],</span>
@@ -252,13 +263,19 @@ requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 <span class="go">(64, 64)</span>
 </pre></div>
 </div>
-<p>If the <em>Pixel Data</em> is compressed then
+<p>If the pixel data is compressed then
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a> will return the uncompressed data,
-provided the dependencies of the required pixel data handler are available. See
+provided the dependencies of the required <a class="reference internal" href="../reference/handlers.pixel_data.html#api-handlers-pixeldata"><span class="std std-ref">pixel data handler</span></a> are available. See
 <a class="reference internal" href="image_data_handlers.html"><span class="doc">handling compressed image data</span></a> for more
 information.</p>
-<p>NumPy can be used to modify the pixel data, but if the changes are to be saved,
-they must be written back to the dataset’s <code class="docutils literal notranslate"><span class="pre">PixelData</span></code> element:</p>
+<p>NumPy can be used to modify the data, but if the changes are to be saved,
+they must be written back to the dataset’s <code class="docutils literal notranslate"><span class="pre">PixelData</span></code> element.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Converting data from an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> back to <code class="docutils literal notranslate"><span class="pre">bytes</span></code> may not be
+as straightforward as in the following example, particularly for
+multi-planar images or where compression is required.</p>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># example: zero anything &lt; 300</span>
 <span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="n">arr</span><span class="p">[</span><span class="n">arr</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -267,9 +284,9 @@ they must be written back to the dataset’s <code class="docutils literal notra
 </pre></div>
 </div>
 <p>Some changes may require other DICOM tags to be modified. For example, if the
-pixel data is reduced (e.g. a <img class="math" src="../_images/math/7d9a4c31bd7e28259b65b267fd21a6311b05ca0f.png" alt="512 \times 512"/> image is collapsed to
+image size is reduced (e.g. a <img class="math" src="../_images/math/7d9a4c31bd7e28259b65b267fd21a6311b05ca0f.png" alt="512 \times 512"/> image is shrunk to
 <img class="math" src="../_images/math/343aa0d15ca79bd1c1b7837e6b3a5828812dbe77.png" alt="256 \times 256"/>) then <code class="docutils literal notranslate"><span class="pre">Rows</span></code> and <code class="docutils literal notranslate"><span class="pre">Columns</span></code> should be set
-appropriately. You must explicitly set these yourself; pydicom does not do so
+appropriately. You must explicitly set these yourself; <em>pydicom</em> does not do so
 automatically.</p>
 <p>See <a class="reference internal" href="../auto_examples/image_processing/plot_downsize_image.html#sphx-glr-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">Downsize MRI image using pydicom</span></a> for
 an example.</p>
@@ -358,7 +375,7 @@ can be used with an input array and a dataset containing a VOI LUT module to
 return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by
 using the <cite>index</cite> keyword parameter.</p>
-<p>When a dataset requires multiple greyscale transformations, then its assumed
+<p>When a dataset requires multiple grayscale transformations, then it’s assumed
 that the modality LUT or rescale operation has already been applied.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.util</span> <span class="kn">import</span> <span class="n">apply_voi_lut</span>
 
