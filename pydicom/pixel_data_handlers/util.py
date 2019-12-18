@@ -751,7 +751,7 @@ def get_expected_length(ds, unit='bytes'):
 
 
 def get_pixel_id(ds):
-    """Return a dict of the elements :func:`id`s that affect the pixel data.
+    """Return a dict of the pixel data affecting element's :func:`id` values.
 
     +------------------------------------------------+
     | Element                                        |
