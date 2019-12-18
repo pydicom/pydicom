@@ -1278,19 +1278,6 @@ class TestDataset(object):
         ds2.update(ds)
         assert 'TestC' == ds2.PatientName
 
-    def test_convert_pixel_data_no_px(self):
-        """Test convert_pixel_data() with no pixel data elements."""
-        ds = Dataset()
-        ds.file_meta = Dataset()
-        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        msg = (
-            r"Unable to convert the pixel data: one of Pixel Data, Float "
-            r"Pixel Data or Double Float Pixel Data must be present in "
-            r"the dataset"
-        )
-        with pytest.raises(AttributeError, match=msg):
-            ds.convert_pixel_data()
-
 
 class TestDatasetElements(object):
     """Test valid assignments of data elements"""
