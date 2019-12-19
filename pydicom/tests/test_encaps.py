@@ -57,7 +57,7 @@ class TestGetFrameOffsets(object):
                      b'\x00\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert [0] == get_frame_offsets(fp)
+        assert (False, [0]) == get_frame_offsets(fp)
 
     def test_multi_frame(self):
         """Test reading multi-frame BOT item"""
@@ -69,7 +69,7 @@ class TestGetFrameOffsets(object):
                      b'\xFE\x37\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert [0, 4966, 9716, 14334] == get_frame_offsets(fp)
+        assert (True, [0, 4966, 9716, 14334]) == get_frame_offsets(fp)
 
     def test_single_frame(self):
         """Test reading single-frame BOT item"""
@@ -78,7 +78,7 @@ class TestGetFrameOffsets(object):
                      b'\x00\x00\x00\x00'
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
-        assert [0] == get_frame_offsets(fp)
+        assert (True, [0]) == get_frame_offsets(fp)
 
     def test_not_little_endian(self):
         """Test reading big endian raises exception"""
@@ -242,7 +242,7 @@ class TestGeneratePixelDataFrames(object):
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x03\x00\x00\x00'
-        frames = generate_pixel_data_frame(bytestream)
+        frames = generate_pixel_data_frame(bytestream, 1)
         assert next(frames) == (
             b'\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00'
         )
@@ -362,6 +362,18 @@ class TestGeneratePixelDataFrames(object):
         assert next(frames) == b'\x03\x00\x00\x00\x02\x04'
         pytest.raises(StopIteration, next, frames)
 
+    def test_nobot_multi_fragments_per_frame(self):
+        """Test multi-frame where multiple frags per frame and no BOT."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        assert 10 == ds.NumberOfFrames
+        frame_gen = generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)
+        for ii in range(10):
+            print(ii)
+            next(frame_gen)
+
+        with pytest.raises(StopIteration):
+            next(frame_gen)
+
 
 class TestGeneratePixelData(object):
     """Test encaps.generate_pixel_data"""
@@ -373,7 +385,7 @@ class TestGeneratePixelData(object):
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x01\x00\x00\x00'
-        frames = generate_pixel_data(bytestream)
+        frames = generate_pixel_data(bytestream, 1)
         assert next(frames) == (b'\x01\x00\x00\x00', )
         pytest.raises(StopIteration, next, frames)
 
@@ -391,7 +403,7 @@ class TestGeneratePixelData(object):
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x03\x00\x00\x00'
-        frames = generate_pixel_data(bytestream)
+        frames = generate_pixel_data(bytestream, 1)
         assert next(frames) == (b'\x01\x00\x00\x00',
                                 b'\x02\x00\x00\x00',
                                 b'\x03\x00\x00\x00')
@@ -932,7 +944,7 @@ class TestEncapsulate(object):
 
         fp = DicomBytesIO(data)
         fp.is_little_endian = True
-        offsets = get_frame_offsets(fp)
+        length, offsets = get_frame_offsets(fp)
         assert offsets == [
             0x0000,  # 0
             0x0eee,  # 3822

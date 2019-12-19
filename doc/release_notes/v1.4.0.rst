@@ -55,3 +55,8 @@ Enhancements
 * Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
   Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
   (:issue:`452`)
+
+  Changes
+  .......
+  * :func:`encaps.get_frame_offsets` now returns the length of the basic offset
+    table and a list of the offsets.
