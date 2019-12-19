@@ -761,6 +761,10 @@ def get_pixel_id(ds):
     | (0028,0002) | SamplesPerPixel           | 1    |
     +-------------+---------------------------+------+
     | (0028,0004) | PhotometricInterpretation | 1    |
+    |             |                           |      |
+    |             |                           |      |
+    |             |                           |      |
+    |             |                           |      |
     +-------------+---------------------------+------+
     | (0028,0006) | PlanarConfiguration       | 1C   |
     +-------------+---------------------------+------+
@@ -793,19 +797,13 @@ def get_pixel_id(ds):
         the pixel data.
 
     """
-    ids = {
-        'SamplesPerPixel': id(ds.SamplesPerPixel),
-        'PhotometricInterpretation': id(ds.PhotometricInterpretation),
-        'PlanarConfiguration': id(getattr(ds, 'PlanarConfiguration', None)),
-        'NumberOfFrames': id(getattr(ds, 'NumberOfFrames', 1)),
-        'Rows': id(ds.Rows),
-        'Columns': id(ds.Columns),
-        'BitsAllocated': id(ds.BitsAllocated),
-        'PixelRepresentation': id(ds.PixelRepresentation),
-        'FloatPixelData': id(getattr(ds, 'FloatPixelData', None)),
-        'DoubleFloatPixelData': id(getattr(ds, 'DoubleFloatPixelData', None)),
-        'PixelData': id(getattr(ds, 'PixelData', None)),
-    }
+    keywords = [
+        'SamplesPerPixel', 'PhotometricInterpretation', 'PlanarConfiguration',
+        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated',
+        'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
+        'PixelData'
+    ]
+    ids = {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
     return ids
 
