@@ -25,7 +25,7 @@ Fixes
 * *Pixel Data* encoded using JPEG2000 and decoded using the Pillow handler no
   longer returns RGB data when the (0028,0004) *Photometric Interpretation* is
   YBR_FULL or YBR_FULL_422. (:issue:`263`, :issue:`273`, :issue:`826`)
-* Fixed :func:`encaps.generate_pixel_data` from not returning all available
+* Fixed :func:`~pydicom.encaps.generate_pixel_data` not returning all available
   frames when the Basic Offset Table was empty. This may still occur when
   multiple fragments per frame are present for non-JPEG transfer syntaxes or
   where no JPEG EOI/EOC marker is present (:issue:`685`)
@@ -44,7 +44,7 @@ Enhancements
   applying color palette LUTs (:issue:`205`)
 * Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
   for applying modality LUTs.
-* Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
+* Added :func:`~pydicom.data.data_manager.get_palette_files` for retrieving well-known
   palette color datasets.
 * Raise on end of file errors if `config.enforce_valid_values` is set
   (:issue:`277`)
@@ -60,7 +60,7 @@ Enhancements
   Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
   (:issue:`452`)
 
-  Changes
-  .......
-  * :func:`encaps.get_frame_offsets` now returns the length of the basic offset
-    table and a list of the offsets.
+Changes
+.......
+  
+* :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.
