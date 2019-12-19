@@ -8,6 +8,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import (
     generate_pixel_data_fragment,
     get_frame_offsets,
+    get_nr_fragments,
     generate_pixel_data_frame,
     generate_pixel_data,
     decode_data_sequence,
@@ -89,6 +90,113 @@ class TestGetFrameOffsets(object):
         with pytest.raises(ValueError,
                            match="'fp.is_little_endian' must be True"):
             get_frame_offsets(fp)
+
+
+class TestGetNrFragments(object):
+    """Test encaps.get_nr_fragments"""
+    def test_item_undefined_length(self):
+        """Test exception raised if item length undefined."""
+        bytestream = (
+            b'\xFE\xFF\x00\xE0'
+            b'\xFF\xFF\xFF\xFF'
+            b'\x00\x00\x00\x01'
+        )
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        with pytest.raises(ValueError):
+            get_nr_fragments(fp)
+
+    def test_item_sequence_delimiter(self):
+        """Test that the fragments are returned if seq delimiter hit."""
+        bytestream = (
+            b'\xFE\xFF\x00\xE0'
+            b'\x04\x00\x00\x00'
+            b'\x01\x00\x00\x00'
+            b'\xFE\xFF\xDD\xE0'
+            b'\x00\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0'
+            b'\x04\x00\x00\x00'
+            b'\x02\x00\x00\x00'
+        )
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        assert 1 == get_nr_fragments(fp)
+
+    def test_item_bad_tag(self):
+        """Test exception raised if item has unexpected tag"""
+        bytestream = (
+            b'\xFE\xFF\x00\xE0'
+            b'\x04\x00\x00\x00'
+            b'\x01\x00\x00\x00'
+            b'\x10\x00\x10\x00'
+            b'\x00\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0'
+            b'\x04\x00\x00\x00'
+            b'\x02\x00\x00\x00'
+        )
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        msg = (
+            r"Unexpected tag '\(0010, 0010\)' at offset 12 when parsing the "
+            r"encapsulated pixel data fragment items."
+        )
+        with pytest.raises(ValueError, match=msg):
+            get_nr_fragments(fp)
+
+    def test_single_fragment_no_delimiter(self):
+        """Test single fragment is returned OK"""
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00'
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        assert 1 == get_nr_fragments(fp)
+
+    def test_multi_fragments_no_delimiter(self):
+        """Test multi fragments are returned OK"""
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x06\x00\x00\x00' \
+                     b'\x01\x02\x03\x04\x05\x06'
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        assert 2 == get_nr_fragments(fp)
+
+    def test_single_fragment_delimiter(self):
+        """Test single fragment is returned OK with sequence delimiter item"""
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\xDD\xE0'
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        assert 1 == get_nr_fragments(fp)
+
+    def test_multi_fragments_delimiter(self):
+        """Test multi fragments are returned OK with sequence delimiter item"""
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x06\x00\x00\x00' \
+                     b'\x01\x02\x03\x04\x05\x06' \
+                     b'\xFE\xFF\xDD\xE0'
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = True
+        assert 2 == get_nr_fragments(fp)
+
+    def test_not_little_endian(self):
+        """Test reading big endian raises exception"""
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00'
+        fp = DicomBytesIO(bytestream)
+        fp.is_little_endian = False
+        with pytest.raises(ValueError,
+                           match="'fp.is_little_endian' must be True"):
+            get_nr_fragments(fp)
 
 
 class TestGeneratePixelDataFragment(object):
@@ -408,6 +516,90 @@ class TestGeneratePixelData(object):
                                 b'\x02\x00\x00\x00',
                                 b'\x03\x00\x00\x00')
         pytest.raises(StopIteration, next, frames)
+
+    def test_empty_bot_no_nr_frames_raises(self):
+        """Test parsing raises if not BOT and no nr_frames."""
+        # 1 frame, 3 fragments long
+        bytestream = b'\xFE\xFF\x00\xE0' \
+                     b'\x00\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x01\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x02\x00\x00\x00' \
+                     b'\xFE\xFF\x00\xE0' \
+                     b'\x04\x00\x00\x00' \
+                     b'\x03\x00\x00\x00'
+        msg = (
+            r"Unable to determine the frame boundaries for the "
+            r"encapsulated pixel data as the Basic Offset Table is empty "
+            r"and `nr_frames` parameter is None"
+        )
+        with pytest.raises(ValueError, match=msg):
+            next(generate_pixel_data(bytestream))
+
+    def test_empty_bot_too_few_fragments(self):
+        """Test parsing with too few fragments."""
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        assert 10 == ds.NumberOfFrames
+
+        msg = (
+            r"Unable to parse encapsulated pixel data as the Basic "
+            r"Offset Table is empty and there are fewer fragments then "
+            r"frames; the dataset may be corrupt"
+        )
+        with pytest.raises(ValueError, match=msg):
+            next(generate_pixel_data_frame(ds.PixelData, 20))
+
+    def test_empty_bot_multi_fragments_per_frame(self):
+        """Test parsing with multiple fragments per frame."""
+        # 4 frames in 6 fragments with JPEG EOI marker
+        bytestream = (
+            b'\xFE\xFF\x00\xE0\x00\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\xFF\xD9'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+        )
+
+        frames = generate_pixel_data(bytestream, 4)
+        for ii in range(4):
+            next(frames)
+
+        with pytest.raises(StopIteration):
+            next(frames)
+
+    def test_empty_bot_no_marker(self):
+        """Test parsing not BOT and no markers with multi fragments."""
+        # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
+        bytestream = (
+            b'\xFE\xFF\x00\xE0\x00\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00'
+        )
+
+        frames = generate_pixel_data(bytestream, 4)
+        for ii in range(3):
+            next(frames)
+
+        msg = (
+            r"The end of the encapsulated pixel data has been "
+            r"reached but one or more frame boundaries may have "
+            r"been missed; please confirm that the generated frame "
+            r"data is correct"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            next(frames)
+
+        with pytest.raises(StopIteration):
+            next(frames)
 
     def test_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
