@@ -769,9 +769,7 @@ class Dataset(dict):
         if tag is not None:  # `name` isn't a DICOM element keyword
             tag = Tag(tag)
             if tag in self._dict:  # DICOM DataElement not in the Dataset
-                data_elem = self[tag]
-                value = data_elem.value
-                return value
+                return self[tag].value
 
         # no tag or tag not contained in the dataset
         if name == '_dict':
@@ -1289,7 +1287,7 @@ class Dataset(dict):
         Raises
         ------
         ValueError
-            If `name` is not a valid handler name.
+            If `handler_name` is not a valid handler name.
         NotImplementedError
             If the given handler or any handler, if none given, is able to
             decompress pixel data with the current transfer syntax

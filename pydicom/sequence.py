@@ -58,7 +58,8 @@ class Sequence(MultiValue):
 
     @property
     def parent(self):
-        """Return the parent :class:`~pydicom.dataset.Dataset`."""
+        """Return a weak reference to the parent
+        :class:`~pydicom.dataset.Dataset`."""
         return self._parent
 
     @parent.setter
