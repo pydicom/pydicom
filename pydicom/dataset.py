@@ -35,7 +35,7 @@ from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, reshape_pixel_array, get_pixel_id
+    convert_color_space, reshape_pixel_array, get_image_pixel_ids
 )
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
@@ -1307,7 +1307,7 @@ class Dataset(dict):
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != get_pixel_id(self):
+        elif self._pixel_id != get_image_pixel_ids(self):
             already_have = False
 
         if already_have:
@@ -1443,7 +1443,7 @@ class Dataset(dict):
                 self._pixel_array, 'YBR_FULL', 'RGB'
             )
 
-        self._pixel_id = get_pixel_id(self)
+        self._pixel_id = get_image_pixel_ids(self)
 
     def decompress(self, handler_name=''):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`

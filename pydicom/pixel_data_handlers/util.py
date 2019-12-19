@@ -750,7 +750,7 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
-def get_pixel_id(ds):
+def get_image_pixel_ids(ds):
     """Return a dict of the pixel data affecting element's :func:`id` values.
 
     +------------------------------------------------+
@@ -761,10 +761,6 @@ def get_pixel_id(ds):
     | (0028,0002) | SamplesPerPixel           | 1    |
     +-------------+---------------------------+------+
     | (0028,0004) | PhotometricInterpretation | 1    |
-    |             |                           |      |
-    |             |                           |      |
-    |             |                           |      |
-    |             |                           |      |
     +-------------+---------------------------+------+
     | (0028,0006) | PlanarConfiguration       | 1C   |
     +-------------+---------------------------+------+
@@ -803,9 +799,8 @@ def get_pixel_id(ds):
         'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
         'PixelData'
     ]
-    ids = {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
-    return ids
+    return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
 def pixel_dtype(ds, as_float=False):

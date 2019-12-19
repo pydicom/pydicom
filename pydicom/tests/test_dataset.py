@@ -11,7 +11,7 @@ from pydicom.dataset import Dataset, FileDataset, validate_file_meta
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
-from pydicom.pixel_data_handlers.util import get_pixel_id
+from pydicom.pixel_data_handlers.util import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import (
@@ -1143,10 +1143,10 @@ class TestDataset(object):
         # Test that _pixel_array is returned unchanged unless required
         fpath = get_testdata_files("CT_small.dcm")[0]
         ds = dcmread(fpath)
-        ds._pixel_id = get_pixel_id(ds)
+        ds._pixel_id = get_image_pixel_ids(ds)
         ds._pixel_array = 'Test Value'
         ds.convert_pixel_data()
-        assert get_pixel_id(ds) == ds._pixel_id
+        assert get_image_pixel_ids(ds) == ds._pixel_id
         assert 'Test Value' == ds._pixel_array
 
     def test_pixel_array_id_changed(self):
