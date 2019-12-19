@@ -34,8 +34,9 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.pixel_data_handlers.util import (convert_color_space,
-                                              reshape_pixel_array)
+from pydicom.pixel_data_handlers.util import (
+    convert_color_space, reshape_pixel_array, get_image_pixel_ids
+)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
@@ -1300,20 +1301,11 @@ class Dataset(dict):
         decompressed and any related data elements are changed accordingly.
         """
         # Check if already have converted to a NumPy array
-        # Also check if self.PixelData has changed. If so, get new NumPy array
-        keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
-        px_keyword = [kw for kw in keywords if kw in self]
-        if len(px_keyword) != 1:
-            raise AttributeError(
-                "Unable to convert the pixel data: one of Pixel Data, Float "
-                "Pixel Data or Double Float Pixel Data must be present in "
-                "the dataset"
-            )
-
+        # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != id(getattr(self, px_keyword[0])):
+        elif self._pixel_id != get_image_pixel_ids(self):
             already_have = False
 
         if already_have:
@@ -1449,9 +1441,7 @@ class Dataset(dict):
                 self._pixel_array, 'YBR_FULL', 'RGB'
             )
 
-        keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
-        px_keyword = [kw for kw in keywords if kw in self]
-        self._pixel_id = id(getattr(self, px_keyword[0]))
+        self._pixel_id = get_image_pixel_ids(self)
 
     def decompress(self, handler_name=''):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`

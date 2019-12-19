@@ -11,6 +11,7 @@ from pydicom.dataset import Dataset, FileDataset, validate_file_meta
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
+from pydicom.pixel_data_handlers.util import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
 from pydicom.uid import (
@@ -1142,10 +1143,10 @@ class TestDataset(object):
         # Test that _pixel_array is returned unchanged unless required
         fpath = get_testdata_files("CT_small.dcm")[0]
         ds = dcmread(fpath)
-        ds._pixel_id = id(ds.PixelData)
+        ds._pixel_id = get_image_pixel_ids(ds)
         ds._pixel_array = 'Test Value'
         ds.convert_pixel_data()
-        assert id(ds.PixelData) == ds._pixel_id
+        assert get_image_pixel_ids(ds) == ds._pixel_id
         assert 'Test Value' == ds._pixel_array
 
     def test_pixel_array_id_changed(self):
@@ -1276,17 +1277,6 @@ class TestDataset(object):
         ds.PatientName = 'TestC'
         ds2.update(ds)
         assert 'TestC' == ds2.PatientName
-
-    def test_convert_pixel_data_no_px(self):
-        """Test convert_pixel_data() with no pixel data elements."""
-        ds = Dataset()
-        msg = (
-            r"Unable to convert the pixel data: one of Pixel Data, Float "
-            r"Pixel Data or Double Float Pixel Data must be present in "
-            r"the dataset"
-        )
-        with pytest.raises(AttributeError, match=msg):
-            ds.convert_pixel_data()
 
 
 class TestDatasetElements(object):

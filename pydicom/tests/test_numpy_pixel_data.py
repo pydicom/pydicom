@@ -146,6 +146,9 @@ JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
 JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
 # RLE Lossless
 RLE = get_testdata_files("MR_small_RLE.dcm")[0]
+# No Image Pixel module
+NO_PIXEL = get_testdata_files("rtplan.dcm")[0]
+
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [
@@ -470,6 +473,17 @@ class TestNumpy_NumpyHandler(object):
 
         # Reset
         NP_HANDLER.needs_to_convert_to_RGB = orig_fn
+
+    def test_dataset_pixel_array_no_pixels(self):
+        """Test good exception message if no pixel data in dataset."""
+        ds = dcmread(NO_PIXEL)
+        msg = (
+            r"Unable to convert the pixel data: one of Pixel Data, Float "
+            r"Pixel Data or Double Float Pixel Data must be present in the "
+            r"dataset"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            ds.pixel_array
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):

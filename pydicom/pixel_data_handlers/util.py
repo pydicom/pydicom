@@ -750,6 +750,59 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
+def get_image_pixel_ids(ds):
+    """Return a dict of the pixel data affecting element's :func:`id` values.
+
+    +------------------------------------------------+
+    | Element                                        |
+    +-------------+---------------------------+------+
+    | Tag         | Keyword                   | Type |
+    +=============+===========================+======+
+    | (0028,0002) | SamplesPerPixel           | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0004) | PhotometricInterpretation | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0006) | PlanarConfiguration       | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0008) | NumberOfFrames            | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0010) | Rows                      | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0011) | Columns                   | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0100) | BitsAllocated             | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0103) | PixelRepresentation       | 1    |
+    +-------------+---------------------------+------+
+    | (7FE0,0008) | FloatPixelData            | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0009) | DoubleFloatPixelData      | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0010) | PixelData                 | 1C   |
+    +-------------+---------------------------+------+
+
+    Parameters
+    ----------
+    ds : Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the pixel data.
+
+    Returns
+    -------
+    dict
+        A dict containing the :func:`id` values for the elements that affect
+        the pixel data.
+
+    """
+    keywords = [
+        'SamplesPerPixel', 'PhotometricInterpretation', 'PlanarConfiguration',
+        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated',
+        'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
+        'PixelData'
+    ]
+
+    return {kw: id(getattr(ds, kw, None)) for kw in keywords}
+
+
 def pixel_dtype(ds, as_float=False):
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
