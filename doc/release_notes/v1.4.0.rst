@@ -20,11 +20,12 @@ Fixes
   Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
 * Fixed handling of ISO IR 159 encoding (:issue: `917`)
 * Fixed propagation of bulk data handler in Dataset.from_json (:issue:`971`)
-* Correctly handle  DICOMDIR files with records in reverse-hierarchical order
+* Correctly handle DICOMDIR files with records in reverse-hierarchical order
   (:issue:`822`)
 * *Pixel Data* encoded using JPEG2000 and decoded using the Pillow handler no
   longer returns RGB data when the (0028,0004) *Photometric Interpretation* is
   YBR_FULL or YBR_FULL_422. (:issue:`263`, :issue:`273`, :issue:`826`)
+* Avoid possible high memory usage while reading sequences (:issue:`994`)
 * Fixed :func:`~pydicom.encaps.generate_pixel_data` not returning all available
   frames when the Basic Offset Table was empty. This may still occur when
   multiple fragments per frame are present for non-JPEG transfer syntaxes or

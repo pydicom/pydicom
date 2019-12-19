@@ -3,6 +3,7 @@
 
 Sequence is a list of pydicom Dataset objects.
 """
+import weakref
 
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
@@ -57,7 +58,8 @@ class Sequence(MultiValue):
 
     @property
     def parent(self):
-        """Return the parent :class:`~pydicom.dataset.Dataset`."""
+        """Return a weak reference to the parent
+        :class:`~pydicom.dataset.Dataset`."""
         return self._parent
 
     @parent.setter
@@ -66,7 +68,7 @@ class Sequence(MultiValue):
         :class:`Sequence` items.
         """
         if value != self._parent:
-            self._parent = value
+            self._parent = weakref.ref(value)
             for item in self._list:
                 item.parent = self._parent
 
