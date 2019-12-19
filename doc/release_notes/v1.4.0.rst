@@ -25,6 +25,10 @@ Fixes
 * *Pixel Data* encoded using JPEG2000 and decoded using the Pillow handler no
   longer returns RGB data when the (0028,0004) *Photometric Interpretation* is
   YBR_FULL or YBR_FULL_422. (:issue:`263`, :issue:`273`, :issue:`826`)
+* Fixed :func:`encaps.generate_pixel_data` from not returning all available
+  frames when the Basic Offset Table was empty. This may still occur when
+  multiple fragments per frame are present for non-JPEG transfer syntaxes or
+  where no JPEG EOI/EOC marker is present (:issue:`685`)
 
 Enhancements
 ............

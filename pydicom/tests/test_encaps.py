@@ -4,7 +4,7 @@
 import pytest
 
 from pydicom import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.encaps import (
     generate_pixel_data_fragment,
     get_frame_offsets,
@@ -20,7 +20,7 @@ from pydicom.encaps import (
 from pydicom.filebase import DicomBytesIO
 
 
-JP2K_10FRAME_NOBOT = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
+JP2K_10FRAME_NOBOT = get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
 
 
 class TestGetFrameOffsets(object):
@@ -362,13 +362,13 @@ class TestGeneratePixelDataFrames(object):
         assert next(frames) == b'\x03\x00\x00\x00\x02\x04'
         pytest.raises(StopIteration, next, frames)
 
-    def test_nobot_multi_fragments_per_frame(self):
+    def test_empty_bot_multi_fragments_per_frame(self):
         """Test multi-frame where multiple frags per frame and no BOT."""
+        # Regression test for #685
         ds = dcmread(JP2K_10FRAME_NOBOT)
         assert 10 == ds.NumberOfFrames
         frame_gen = generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)
         for ii in range(10):
-            print(ii)
             next(frame_gen)
 
         with pytest.raises(StopIteration):
@@ -385,7 +385,7 @@ class TestGeneratePixelData(object):
                      b'\xFE\xFF\x00\xE0' \
                      b'\x04\x00\x00\x00' \
                      b'\x01\x00\x00\x00'
-        frames = generate_pixel_data(bytestream, 1)
+        frames = generate_pixel_data(bytestream)
         assert next(frames) == (b'\x01\x00\x00\x00', )
         pytest.raises(StopIteration, next, frames)
 
