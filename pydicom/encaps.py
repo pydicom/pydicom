@@ -115,8 +115,6 @@ def get_nr_fragments(fp):
             nr_fragments += 1
         elif tag == 0xFFFEE0DD:
             # Sequence Delimiter
-            # Behave nicely and rewind back to the end of the items
-            fp.seek(-4, 1)
             break
         else:
             raise ValueError("Unexpected tag '{}' at offset {} when parsing "
@@ -349,22 +347,26 @@ def generate_pixel_data(bytestream, nr_frames=None):
                 # May fail if no EOI/EOC marker or not JPEG
                 eoi_marker = b'\xff\xd9'
                 frame = []
-                frame_length = 0
+                frame_nr = 0
                 for fragment in generate_pixel_data_fragment(fp):
                     frame.append(fragment)
                     if eoi_marker in fragment[-10:]:
                         yield tuple(frame)
+                        frame_nr += 1
                         frame = []
 
-                if frame:
-                    # If data in `frame` then we must've missed an EOI marker
+                if frame or frame_nr != nr_frames:
+                    # If data in `frame` or fewer frames yielded then we
+                    #   must've missed a frame boundary
                     warnings.warn(
                         "The end of the encapsulated pixel data has been "
                         "reached but one or more frame boundaries may have "
                         "been missed; please confirm that the generated frame "
                         "data is correct"
                     )
-                    yield tuple(frame)
+                    if frame:
+                        yield tuple(frame)
+
             else:
                 # Fewer fragments than frames
                 raise ValueError(

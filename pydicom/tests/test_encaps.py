@@ -573,7 +573,7 @@ class TestGeneratePixelData(object):
             next(frames)
 
     def test_empty_bot_no_marker(self):
-        """Test parsing not BOT and no markers with multi fragments."""
+        """Test parsing not BOT and no final marker with multi fragments."""
         # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
         bytestream = (
             b'\xFE\xFF\x00\xE0\x00\x00\x00\x00'
@@ -600,6 +600,32 @@ class TestGeneratePixelData(object):
 
         with pytest.raises(StopIteration):
             next(frames)
+
+    def test_empty_bot_missing_marker(self):
+        """Test parsing not BOT and missing marker with multi fragments."""
+        # 4 frames in 6 fragments with JPEG EOI marker (1 missing EOI)
+        bytestream = (
+            b'\xFE\xFF\x00\xE0\x00\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\x00\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\x00\x00'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xFF\xD9'
+            b'\xFE\xFF\x00\xE0\x04\x00\x00\x00\x01\xFF\xD9\x00'
+        )
+
+        msg = (
+            r"The end of the encapsulated pixel data has been "
+            r"reached but one or more frame boundaries may have "
+            r"been missed; please confirm that the generated frame "
+            r"data is correct"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ii = 0
+            for frames in generate_pixel_data(bytestream, 4):
+                ii += 1
+
+        assert 3 == ii
 
     def test_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragment"""
