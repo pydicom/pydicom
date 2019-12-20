@@ -2,6 +2,7 @@
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from struct import pack
+import warnings
 
 import pydicom.config
 from pydicom.filebase import DicomBytesIO
@@ -50,9 +51,10 @@ def get_frame_offsets(fp):
 
     Returns
     -------
-    list of int
-        The byte offsets to the first fragment of each frame, as measured from
-        the start of the first item following the Basic Offset Table item.
+    bool, list of int
+        Whether or not the BOT is empty, and a list of the byte offsets
+        to the first fragment of each frame, as measured from the start of the
+        first item following the Basic Offset Table item.
 
     Raises
     ------
@@ -86,7 +88,41 @@ def get_frame_offsets(fp):
     for ii in range(length // 4):
         offsets.append(fp.read_UL())
 
-    return offsets
+    return bool(length), offsets
+
+
+def get_nr_fragments(fp):
+    """Return the number of fragments in `fp`."""
+    if not fp.is_little_endian:
+        raise ValueError("'fp.is_little_endian' must be True")
+
+    nr_fragments = 0
+    start = fp.tell()
+    while True:
+        try:
+            tag = Tag(fp.read_tag())
+        except EOFError:
+            break
+
+        if tag == 0xFFFEE000:
+            # Item
+            length = fp.read_UL()
+            if length == 0xFFFFFFFF:
+                raise ValueError("Undefined item length at offset {} when "
+                                 "parsing the encapsulated pixel data "
+                                 "fragments.".format(fp.tell() - 4))
+            fp.seek(length, 1)
+            nr_fragments += 1
+        elif tag == 0xFFFEE0DD:
+            # Sequence Delimiter
+            break
+        else:
+            raise ValueError("Unexpected tag '{}' at offset {} when parsing "
+                             "the encapsulated pixel data fragment items."
+                             .format(tag, fp.tell() - 4))
+
+    fp.seek(start)
+    return nr_fragments
 
 
 def generate_pixel_data_fragment(fp):
@@ -175,7 +211,7 @@ def generate_pixel_data_fragment(fp):
                              .format(tag, fp.tell() - 4))
 
 
-def generate_pixel_data_frame(bytestream):
+def generate_pixel_data_frame(bytestream, nr_frames=None):
     """Yield an encapsulated pixel data frame.
 
     Parameters
@@ -184,6 +220,10 @@ def generate_pixel_data_frame(bytestream):
         The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty
+        and there are multiple frames. This should be the value of (0028,0008)
+        *Number of Frames*.
 
     Yields
     ------
@@ -194,11 +234,11 @@ def generate_pixel_data_frame(bytestream):
     ----------
     DICOM Standard Part 5, :dcm:`Annex A <part05/chapter_A.html>`
     """
-    for fragmented_frame in generate_pixel_data(bytestream):
+    for fragmented_frame in generate_pixel_data(bytestream, nr_frames):
         yield b''.join(fragmented_frame)
 
 
-def generate_pixel_data(bytestream):
+def generate_pixel_data(bytestream, nr_frames=None):
     """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -230,12 +270,24 @@ def generate_pixel_data(bytestream):
         The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
+    nr_frames : int, optional
+        Required for multi-frame data when the Basic Offset Table is empty
+        and there are multiple frames. This should be the value of (0028,0008)
+        *Number of Frames*.
 
     Yields
     -------
     tuple of bytes
         An encapsulated pixel data frame, with the contents of the
         :class:`tuple` the frame's fragmented data.
+
+    Notes
+    -----
+    If the Basic Offset Table is empty and there are multiple fragments per
+    frame then an attempt will be made to locate the frame boundaries by
+    searching for the JPEG/JPEG-LS/JPEG2000 EOI/EOC marker (``0xFFD9``). If the
+    marker is not present or the pixel data hasn't been compressed using one of
+    the JPEG standards then the generated pixel data may be incorrect.
 
     References
     ----------
@@ -245,28 +297,90 @@ def generate_pixel_data(bytestream):
     fp.is_little_endian = True
 
     # `offsets` is a list of the offsets to the first fragment in each frame
-    offsets = get_frame_offsets(fp)
+    has_bot, offsets = get_frame_offsets(fp)
     # Doesn't actually matter what the last offset value is, as long as its
     # greater than the total number of bytes in the fragments
     offsets.append(len(bytestream))
 
-    frame = []
-    frame_length = 0
-    frame_number = 0
-    for fragment in generate_pixel_data_fragment(fp):
-        if frame_length < offsets[frame_number + 1]:
-            frame.append(fragment)
+    if has_bot:
+        # Use the BOT to determine the frame boundaries
+        frame = []
+        frame_length = 0
+        frame_number = 0
+        for fragment in generate_pixel_data_fragment(fp):
+            if frame_length < offsets[frame_number + 1]:
+                frame.append(fragment)
+            else:
+                yield tuple(frame)
+                frame = [fragment]
+                frame_number += 1
+
+            frame_length += len(fragment) + 8
+
+        # Yield the final frame - required here because the frame_length will
+        # never be greater than offsets[-1] and thus never trigger the final
+        # yield within the for block
+        yield tuple(frame)
+    else:
+        nr_fragments = get_nr_fragments(fp)
+        if nr_fragments == 1:
+            # Single fragment: 1 frame
+            for fragment in generate_pixel_data_fragment(fp):
+                yield tuple([fragment])
+        elif nr_frames:
+            # Multiple fragments: 1 or more frames
+            if nr_fragments == nr_frames:
+                # 1 fragment per frame
+                # Covers RLE and others if 1:1 ratio
+                for fragment in generate_pixel_data_fragment(fp):
+                    yield tuple([fragment])
+            elif nr_frames == 1:
+                # Multiple fragments: 1 frame
+                frame = []
+                for fragment in generate_pixel_data_fragment(fp):
+                    frame.append(fragment)
+                yield tuple(frame)
+            elif nr_fragments > nr_frames:
+                # More fragments then frames
+                # Search for JPEG/JPEG-LS/JPEG2K EOI/EOC marker
+                # Should be the last two bytes of a frame
+                # May fail if no EOI/EOC marker or not JPEG
+                eoi_marker = b'\xff\xd9'
+                frame = []
+                frame_nr = 0
+                for fragment in generate_pixel_data_fragment(fp):
+                    frame.append(fragment)
+                    if eoi_marker in fragment[-10:]:
+                        yield tuple(frame)
+                        frame_nr += 1
+                        frame = []
+
+                if frame or frame_nr != nr_frames:
+                    # If data in `frame` or fewer frames yielded then we
+                    #   must've missed a frame boundary
+                    warnings.warn(
+                        "The end of the encapsulated pixel data has been "
+                        "reached but one or more frame boundaries may have "
+                        "been missed; please confirm that the generated frame "
+                        "data is correct"
+                    )
+                    if frame:
+                        yield tuple(frame)
+
+            else:
+                # Fewer fragments than frames
+                raise ValueError(
+                    "Unable to parse encapsulated pixel data as the Basic "
+                    "Offset Table is empty and there are fewer fragments then "
+                    "frames; the dataset may be corrupt"
+                )
         else:
-            yield tuple(frame)
-            frame = [fragment]
-            frame_number += 1
-
-        frame_length += len(fragment) + 8
-
-    # Yield the final frame - required here because the frame_length will
-    # never be greater than offsets[-1] and thus never trigger the final yield
-    # within the for block
-    yield tuple(frame)
+            # Multiple fragments but unknown number of frames
+            raise ValueError(
+                "Unable to determine the frame boundaries for the "
+                "encapsulated pixel data as the Basic Offset Table is empty "
+                "and `nr_frames` parameter is None"
+            )
 
 
 def decode_data_sequence(data):
