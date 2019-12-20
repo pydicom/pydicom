@@ -208,13 +208,18 @@
 <h1>pydicom.encaps.generate_pixel_data_frame<a class="headerlink" href="#pydicom-encaps-generate-pixel-data-frame" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.encaps.generate_pixel_data_frame">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_frame</code><span class="sig-paren">(</span><em class="sig-param">bytestream</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c94a7a19/pydicom/encaps.py#L178"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_frame</code><span class="sig-paren">(</span><em class="sig-param">bytestream</em>, <em class="sig-param">nr_frames=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/14acdd4d/pydicom/encaps.py#L214"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield an encapsulated pixel data frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>bytestream</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – The value of the (7fe0, 0010) <em>Pixel Data</em> element from an encapsulated
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytestream</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – The value of the (7fe0, 0010) <em>Pixel Data</em> element from an encapsulated
 dataset. The Basic Offset Table item should be present and the
-Sequence Delimiter item may or may not be present.</p>
+Sequence Delimiter item may or may not be present.</p></li>
+<li><p><strong>nr_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Required for multi-frame data when the Basic Offset Table is empty
+and there are multiple frames. This should be the value of (0028,0008)
+<em>Number of Frames</em>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Yields</dt>
 <dd class="field-even"><p><em>bytes</em> – A frame contained in the encapsulated pixel data.</p>

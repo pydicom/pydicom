@@ -198,6 +198,10 @@ Descriptor</em> elements (0028,1101-1103) and (0028,3002) (<a class="reference e
 longer returns RGB data when the (0028,0004) <em>Photometric Interpretation</em> is
 YBR_FULL or YBR_FULL_422. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/263">#263</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/273">#273</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/826">#826</a>)</p></li>
 <li><p>Avoid possible high memory usage while reading sequences (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/994">#994</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.encaps.generate_pixel_data.html#pydicom.encaps.generate_pixel_data" title="pydicom.encaps.generate_pixel_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_pixel_data()</span></code></a> not returning all available
+frames when the Basic Offset Table was empty. This may still occur when
+multiple fragments per frame are present for non-JPEG transfer syntaxes or
+where no JPEG EOI/EOC marker is present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/685">#685</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="enhancements">
@@ -228,6 +232,12 @@ applying VOI LUTs or windowing operations.</p></li>
 <li><p>Added support for (7fe0,0008) <em>Float Pixel Data</em> and (7fe0,0009) <em>Double
 Float Pixel Data</em> to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/452">#452</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets" title="pydicom.encaps.get_frame_offsets"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame_offsets()</span></code></a> now returns whether the Basic Offset Table is empty and a list of the offsets.</p></li>
 </ul>
 </div>
 </div>
