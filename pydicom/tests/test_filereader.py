@@ -729,8 +729,10 @@ class TestIncorrectVR(object):
             read_dataset(
                 self.ds_implicit, is_implicit_VR=False, is_little_endian=True
             )
-    
+
     def test_seq_item_looks_like_explicit_VR(self):
+        # For issue 999.
+
         # Set up an implicit VR dataset with a "normal" group 8 tag,
         # followed by a sequence with an item (dataset) having
         # a data element length that looks like a potential valid VR
@@ -740,7 +742,7 @@ class TestIncorrectVR(object):
         ds.file_meta.MediaStorageSOPInstanceUID = "2.2.2"
         ds.is_implicit_VR = True
         ds.is_little_endian = True
-        ds.SOPClassUID = '9.9.9' # First item group 8 in top-level dataset
+        ds.SOPClassUID = '9.9.9'  # First item group 8 in top-level dataset
         seq = Sequence()
         seq_ds = Dataset()
         seq_ds.BadPixelImage = b"\3" * 0x5244  # length looks like "DR"
