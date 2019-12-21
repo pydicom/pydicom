@@ -350,7 +350,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
     at_top_level: bool
-        If dataset is top level (not within a sequence). 
+        If dataset is top level (not within a sequence).
         Used to turn off explicit VR heuristic within sequences
 
     Returns
