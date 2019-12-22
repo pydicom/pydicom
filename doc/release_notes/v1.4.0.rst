@@ -36,6 +36,7 @@ Fixes
   pixel data containing signed ints with bit depth range 9-16 not producing
   the correct values with the Pillow handler (:issue:`693`)
 
+
 Enhancements
 ............
 
