@@ -185,11 +185,11 @@ def get_pixeldata(ds):
 
         if j2k_precision and j2k_precision != ds.BitsStored:
             warnings.warn(
-                "The sample bit depth of the JPEG 2000 pixel data doesn't "
-                "match the (0028,0101) 'Bits Stored' value ({} vs {} bit). "
-                "You may have to update the 'Bits Stored' value with "
-                "the sample bit depth in order to get the correct pixel data"
-                .format(j2k_precision, ds.BitsStored)
+                "The (0028,0101) 'Bits Stored' value doesn't match the "
+                "sample bit depth of the JPEG2000 pixel data ({} vs {} bit). "
+                "It's recommended that you first change the 'Bits Stored' "
+                "value to match the JPEG2000 bit depth in order to get the "
+                "correct pixel data".format(ds.BitsStored, j2k_precision)
             )
 
         shift = ds.BitsAllocated - ds.BitsStored

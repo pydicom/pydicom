@@ -30,6 +30,9 @@ Fixes
   frames when the Basic Offset Table was empty. This may still occur when
   multiple fragments per frame are present for non-JPEG transfer syntaxes or
   where no JPEG EOI/EOC marker is present (:issue:`685`)
+* Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
+  pixel data containing signed ints with bit depth range 9-16 not producing
+  the correct values with the Pillow handler (:issue:`693`)
 
 Enhancements
 ............
@@ -60,8 +63,10 @@ Enhancements
 * Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
   Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
   (:issue:`452`)
+* JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
+  with bit depth > 8 with the Pillow pixel data handler
 
 Changes
 .......
-  
+
 * :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.
