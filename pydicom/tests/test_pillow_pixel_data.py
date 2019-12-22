@@ -211,12 +211,12 @@ J2KI = JPEG2000
 J2KR = JPEG2000Lossless
 REFERENCE_DATA = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)
-    (JPGB_08_08_3_0_120F_YBR_FULL_422, (JPGB, 8, 3, 0, 120, (120, 480, 640, 3), 'uint8')),
-    (JPGB_08_08_3_0_1F_YBR_FULL_422_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
-    (JPGB_08_08_3_0_1F_YBR_FULL_422_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
-    (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
-    (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
-    (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
+    (JPGB_08_08_3_0_120F_YBR_FULL_422, (JPGB, 8, 3, 0, 120, (120, 480, 640, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
     (J2KR_08_08_3_0_1F_YBR_ICT, (J2KR, 8, 3, 0, 1, (480, 640, 3), 'uint8')),
     (J2KR_16_10_1_0_1F_M1, (J2KR, 16, 1, 0, 1, (1760, 1760), 'uint16')),
@@ -579,7 +579,42 @@ class TestPillowHandler_JPEG(object):
         assert pixel_data.shape == (3, 3, 3)
 
 
-@pytest.mark.skip("Not yet")
 class TestPillow_GetJ2KPrecision(object):
     """Tests for _get_j2k_precision."""
-    pass
+    def test_precision(self):
+        """Test getting the precision for a JPEG2K bytestream."""
+        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
+        # Signed
+        assert 16 == _get_j2k_precision(base + b'\x8F')
+        assert 15 == _get_j2k_precision(base + b'\x8E')
+        assert 14 == _get_j2k_precision(base + b'\x8D')
+        assert 13 == _get_j2k_precision(base + b'\x8C')
+        assert 12 == _get_j2k_precision(base + b'\x8B')
+        assert 11 == _get_j2k_precision(base + b'\x8A')
+        assert 10 == _get_j2k_precision(base + b'\x89')
+        assert 9 == _get_j2k_precision(base + b'\x88')
+        assert 8 == _get_j2k_precision(base + b'\x87')
+        # Unsigned
+        assert 16 == _get_j2k_precision(base + b'\x0F')
+        assert 15 == _get_j2k_precision(base + b'\x0E')
+        assert 14 == _get_j2k_precision(base + b'\x0D')
+        assert 13 == _get_j2k_precision(base + b'\x0C')
+        assert 12 == _get_j2k_precision(base + b'\x0B')
+        assert 11 == _get_j2k_precision(base + b'\x0A')
+        assert 10 == _get_j2k_precision(base + b'\x09')
+        assert 9 == _get_j2k_precision(base + b'\x08')
+        assert 8 == _get_j2k_precision(base + b'\x07')
+
+    def test_not_j2k(self):
+        """Test result when no JPEG2K SOF marker present"""
+        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
+        assert _get_j2k_precision(base + b'\x8F') is None
+
+    def test_no_siz(self):
+        """Test result when no SIZ box present"""
+        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
+        assert _get_j2k_precision(base + b'\x8F') is None
+
+    def test_short_bytestream(self):
+        """Test result when no SIZ box present"""
+        assert _get_j2k_precision(b'') is None

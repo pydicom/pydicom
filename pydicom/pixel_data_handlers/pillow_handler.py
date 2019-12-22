@@ -226,12 +226,12 @@ def _get_j2k_precision(bs):
             return
 
         # See 15444-1 A.5.1 for format of the SIZ box and contents
-        ssiz = bs[42:43]
-        if ssiz[0:1] & (1 << 7):
+        ssiz = ord(bs[42:43])
+        if ssiz & (1 << 7):
             # Signed
-            return (ssiz[0:1] & 0x7F) + 1
+            return (ssiz & 0x7F) + 1
         else:
             # Unsigned
-            return ssiz[0:1] + 1
+            return ssiz + 1
     except IndexError:
         return
