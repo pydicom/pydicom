@@ -618,3 +618,4 @@ class TestPillow_GetJ2KPrecision(object):
     def test_short_bytestream(self):
         """Test result when no SIZ box present"""
         assert _get_j2k_precision(b'') is None
+        assert _get_j2k_precision(b'\xff\x4f\xff\x51' + b'\x00' * 20) is None

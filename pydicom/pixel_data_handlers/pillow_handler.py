@@ -233,5 +233,5 @@ def _get_j2k_precision(bs):
         else:
             # Unsigned
             return ssiz + 1
-    except IndexError:
+    except (IndexError, TypeError):
         return
