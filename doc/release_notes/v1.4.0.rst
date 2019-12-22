@@ -33,8 +33,8 @@ Fixes
 * Fixed possible incorrect switch to explicit VR in sequence items
   (:issue:`999`)
 * Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
-  pixel data containing signed ints with bit depth range 9-16 not producing
-  the correct values with the Pillow handler (:issue:`693`)
+  pixel data with bit depth range 9-16 not producing the correct values with
+  the Pillow handler (:issue:`693`)
 
 
 Enhancements

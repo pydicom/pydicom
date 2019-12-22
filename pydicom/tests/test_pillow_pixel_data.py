@@ -568,7 +568,7 @@ class TestPillowHandler_JPEG(object):
         """Test decoding JPEG lossless with pillow handler fails."""
         ds = dcmread(JPGL_16_16_1_1_1F_M2)
         msg = r"cannot identify image file"
-        with pytest.raises(OSError, match=msg):
+        with pytest.raises((IOError, OSError), match=msg):
             ds.pixel_array
 
     def test_JPGB_odd_data_size(self):
