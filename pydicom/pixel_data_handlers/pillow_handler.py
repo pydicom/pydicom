@@ -5,7 +5,6 @@ to decode *Pixel Data*.
 
 import io
 import logging
-from struct import unpack
 import warnings
 
 try:
@@ -208,7 +207,7 @@ def _get_j2k_precision(bs):
     Parameters
     ----------
     bs : bytes
-        The JPEG 2000 (ISO/IEC 154444) data to be parsed.
+        The JPEG 2000 (ISO/IEC 15444) data to be parsed.
 
     Returns
     -------
@@ -227,7 +226,7 @@ def _get_j2k_precision(bs):
 
         # See 15444-1 A.5.1 for format of the SIZ box and contents
         ssiz = ord(bs[42:43])
-        if ssiz & (1 << 7):
+        if ssiz & 0x80:
             # Signed
             return (ssiz & 0x7F) + 1
         else:

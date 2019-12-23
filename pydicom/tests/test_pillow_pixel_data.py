@@ -465,6 +465,17 @@ class TestPillowHandler_JPEG2K(object):
         ref = ds.pixel_array
         assert np.array_equal(arr, ref)
 
+    def test_changing_bits_stored(self):
+        """Test changing BitsStored affects the pixel data."""
+        ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        assert 16 == ds.BitsStored
+        with pytest.warns(UserWarning):
+            arr = ds.pixel_array
+
+        ds.BitsStored = 14
+        arr_14 = ds.pixel_array
+        assert not np.array_equal(arr, arr_14)
+
 
 @pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
 class TestPillowHandler_JPEG(object):
