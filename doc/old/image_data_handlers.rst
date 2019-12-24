@@ -1,3 +1,5 @@
+.. _guide_compressed:
+
 Handling of compressed image data
 ---------------------------------
 
@@ -32,6 +34,14 @@ to handle image data.
 
 Supported Transfer Syntaxes
 ...........................
+
+To get the transfer syntax of a dataset you can do::
+
+  >>> from pydicom import dcmread
+  >>> ds = dcmread('CT_small.dcm')
+  >>> ds.file_meta.TransferSyntaxUID
+  '1.2.840.10008.1.2.1'
+
 As far as we have been able to verify, the following transfer syntaxes are
 handled by the given packages:
 

@@ -5,8 +5,8 @@ FAQ: Installation
 What are pydicom's prerequisites?
 ---------------------------------
 
-*pydicom* requires Python. Other Python libraries may be required when dealing
-with pixel data.
+*pydicom* requires Python. Other Python libraries are be required when dealing
+with JPEG compressed pixel data.
 
 
 What Python version can I use?

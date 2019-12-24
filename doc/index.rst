@@ -8,7 +8,16 @@ pydicom documentation
    :hidden:
    :caption: Getting started
 
+   tutorials/installation.rst
    old/getting_started.rst
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Tutorials
+
+
+   tutorials/contributing.rst
 
 .. toctree::
    :maxdepth: 2
@@ -34,10 +43,11 @@ pydicom documentation
    release_notes/index
 
 
-`Getting started <old/getting_started.html>`_
----------------------------------------------
+`Tutorials <tutorials/index.html>`_
+-----------------------------------
 
-Information to install, test, and contribute to the package.
+Tutorials for new users that take you step-by-step through installing and
+using *pydicom*.
 
 `User Guide <old/pydicom_user_guide.html>`_
 -------------------------------------------

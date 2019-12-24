@@ -1,44 +1,31 @@
 
-Contribution to pydicom
-=======================
+Contributing a patch to pydicom
+===============================
 
+Download the current source code
+--------------------------------
 
-Get the development version
----------------------------
+1. Install Git if required
+2. Sign up to `GitHub <https://github.com>`_
+3. `Fork the project <https://github.com/pydicom/pydicom/fork>`_
+4. Using the command line, ``cd`` to the directory where you want your
+local copy of *pydicom* to live
 
-  1. Sign up to `github <https://github.com>`_
-  2. `Fork the project <https://github.com/pydicom/pydicom/fork>`_
-  3. Using the command line, ``cd`` to the directory where you want your
-    local copy of *pydicom* to live.
-  4. Download the source code::
+Clone the source code (you may wish to use ``--depth=1`` to save on
+bandwidth)::
 
-    $ git clone https://github.com/YourGithubUsername/pydicom.git
+     $ git clone https://github.com/YourUsername/pydicom.git
 
-Its recommended that you install *pydicom* in a virtual environment. This
-allows you to work on *pydicom* without having to worry about breaking other
-applications that may depend on the package. The most convenient way to manage
-virtual environments is with
-`virtualenv <https://pypi.org/project/virtualenv/>`_ and
-`virtualenvwrapper <https://pypi.org/project/virtualenvwrapper/>`_
+Its recommended that you install *pydicom* in a
+:doc:`virtual environment<virtualenvs>` as this allows you to test different
+combinations of Python and installed packages. Where ``X.Y`` is the Python
+version to use::
 
-  $ pip install virtualenv virtualenvwrapper
-
-A new virtual environment can then be created with::
-
-  $ mkvirtualenv -p /path/to/python name-of-env
-
-Virtual environments can be activated with::
-
-  $ workon name-of-env
-  (name-of-env) $
-
-And deactivated using::
-
-  (name-of-env) $ deactivate
+  $ mkvirtualenv -p /path/to/pythonX.Y pydX.Y
 
 You can now install the cloned copy of *pydicom* (``-e`` for editable mode)::
 
-  $ pip install -e /path/to/local/pydicom/
+  (pydX.Y) $ pip install -e /path/to/local/pydicom/
 
 
 Running the unit tests
