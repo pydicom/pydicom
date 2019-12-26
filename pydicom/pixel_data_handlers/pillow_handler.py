@@ -176,11 +176,12 @@ def get_pixeldata(ds):
     arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
     if transfer_syntax in PillowJPEG2000TransferSyntaxes:
-        # See #693 for justification of flipping MSB and bit shifting
-        if ds.BitsAllocated == 16 and ds.PixelRepresentation == 1:
-            # WHY IS THIS EVEN NECESSARY??
-            # Flip MSb: b10000000 00000000
-            arr ^= 0x8000
+        # Pillow converts N-bit data to 8- or 16-bit unsigned data
+        # See Pillow src/libImaging/Jpeg2KDecode.c##::j2ku_gray_i
+        if ds.PixelRepresentation == 1:
+            # Pillow converts signed data to unsigned
+            #   so we need to undo this conversion
+            arr -= 2**(ds.BitsAllocated - 1)
 
         if j2k_precision and j2k_precision != ds.BitsStored:
             warnings.warn(

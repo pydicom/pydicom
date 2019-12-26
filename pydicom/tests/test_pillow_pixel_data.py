@@ -7,6 +7,7 @@ import pytest
 
 import pydicom
 from pydicom.data import get_testdata_file
+from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import convert_color_space
 from pydicom.tag import Tag
@@ -423,7 +424,13 @@ class TestPillowHandler_JPEG2K(object):
         assert ds.PixelRepresentation == data[3]
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
-        arr = ds.pixel_array
+        bs = defragment_data(ds.PixelData)
+        if _get_j2k_precision(bs) != ds.BitsStored:
+            with pytest.warns(UserWarning, match=r"doesn't match the sample"):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
+
         assert arr.flags.writeable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
