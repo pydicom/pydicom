@@ -107,6 +107,9 @@ class DicomDir(FileDataset):
 
         # Build the mapping from file offsets to records
         records = self.DirectoryRecordSequence
+        if not records:
+            return
+
         map_offset_to_record = {}
         for record in records:
             offset = record.seq_item_tell
@@ -127,5 +130,3 @@ class DicomDir(FileDataset):
             record for record in records
             if getattr(record, 'DirectoryRecordType') == 'PATIENT'
         ]
-        if not self.patient_records:
-            raise InvalidDicomError('Missing PATIENT record(s) in DICOMDIR')
