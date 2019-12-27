@@ -35,7 +35,8 @@ Fixes
 * Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
   pixel data with bit depth range 9-16 not producing the correct values with
   the Pillow handler (:issue:`693`)
-
+* Fixed parsing a DICOMDIR file with no records raising an exception
+  (:issue:`1004`)
 
 Enhancements
 ............
