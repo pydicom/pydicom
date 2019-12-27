@@ -34,8 +34,9 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
-from pydicom.pixel_data_handlers.util import (convert_color_space,
-                                              reshape_pixel_array)
+from pydicom.pixel_data_handlers.util import (
+    convert_color_space, reshape_pixel_array, get_image_pixel_ids
+)
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
@@ -786,13 +787,7 @@ class Dataset(dict):
         if tag is not None:  # `name` isn't a DICOM element keyword
             tag = Tag(tag)
             if tag in self._dict:  # DICOM DataElement not in the Dataset
-                data_elem = self[tag]
-                value = data_elem.value
-                if data_elem.VR == 'SQ':
-                    # let a sequence know its parent dataset, as sequence items
-                    # may need parent dataset tags to resolve ambiguous tags
-                    value.parent = self
-                return value
+                return self[tag].value
 
         # no tag or tag not contained in the dataset
         if name == '_dict':
@@ -891,6 +886,10 @@ class Dataset(dict):
         data_elem = self._dict[tag]
 
         if isinstance(data_elem, DataElement):
+            if data_elem.VR == 'SQ' and data_elem.value:
+                # let a sequence know its parent dataset, as sequence items
+                # may need parent dataset tags to resolve ambiguous tags
+                data_elem.value.parent = self
             return data_elem
         elif isinstance(data_elem, tuple):
             # If a deferred read, then go get the value now
@@ -1306,8 +1305,7 @@ class Dataset(dict):
         return default
 
     def convert_pixel_data(self, handler_name=''):
-        """Convert the (7fe0,0010) *Pixel Data* to a :class:`numpy.ndarray`
-        internally.
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
 
         Parameters
         ----------
@@ -1326,7 +1324,7 @@ class Dataset(dict):
         Raises
         ------
         ValueError
-            If `name` is not a valid handler name.
+            If `handler_name` is not a valid handler name.
         NotImplementedError
             If the given handler or any handler, if none given, is able to
             decompress pixel data with the current transfer syntax
@@ -1340,11 +1338,11 @@ class Dataset(dict):
         decompressed and any related data elements are changed accordingly.
         """
         # Check if already have converted to a NumPy array
-        # Also check if self.PixelData has changed. If so, get new NumPy array
+        # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
         if not hasattr(self, "_pixel_array"):
             already_have = False
-        elif self._pixel_id != id(self.PixelData):
+        elif self._pixel_id != get_image_pixel_ids(self):
             already_have = False
 
         if already_have:
@@ -1469,17 +1467,18 @@ class Dataset(dict):
         """Do the actual data conversion using the given handler."""
 
         # Use the handler to get a 1D numpy array of the pixel data
+        # Will raise an exception if no pixel data element
         arr = handler.get_pixeldata(self)
         self._pixel_array = reshape_pixel_array(self, arr)
 
         # Some handler/transfer syntax combinations may need to
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
-            self._pixel_array = convert_color_space(self._pixel_array,
-                                                    'YBR_FULL',
-                                                    'RGB')
+            self._pixel_array = convert_color_space(
+                self._pixel_array, 'YBR_FULL', 'RGB'
+            )
 
-        self._pixel_id = id(self.PixelData)
+        self._pixel_id = get_image_pixel_ids(self)
 
     def decompress(self, handler_name=''):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
@@ -1498,6 +1497,7 @@ class Dataset(dict):
 
         Parameters
         ----------
+        handler_name : str, optional
             The (optional) name of the pixel handler that shall be used to
             decode the data. Currently supported handler names are: 'gdcm',
             'pillow', 'jpeg_ls', 'rle' and 'numpy'.
@@ -1619,12 +1619,14 @@ class Dataset(dict):
 
     @property
     def pixel_array(self):
-        """Return the *Pixel Data* as a :class:`numpy.ndarray`.
+        """Return the pixel data as a :class:`numpy.ndarray`.
 
         Returns
         -------
         numpy.ndarray
-            The (7fe0,0010) *Pixel Data* converted to a :class:`numpy.ndarray`.
+            The (7fe0,0008) *Float Pixel Data*, (7fe0,0009) *Double Float
+            Pixel Data* or (7fe0,0010) *Pixel Data* converted to a
+            :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
         return self._pixel_array

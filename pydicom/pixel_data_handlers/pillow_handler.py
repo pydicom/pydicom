@@ -150,13 +150,17 @@ def get_pixeldata(ds):
     if getattr(ds, 'NumberOfFrames', 1) > 1:
         # multiple compressed frames
         for frame in decode_data_sequence(ds.PixelData):
-            decompressed_image = Image.open(io.BytesIO(frame))
-            pixel_bytes.extend(decompressed_image.tobytes())
+            im = Image.open(io.BytesIO(frame))
+            if 'YBR' in ds.PhotometricInterpretation:
+                im.draft('YCbCr', (ds.Rows, ds.Columns))
+            pixel_bytes.extend(im.tobytes())
     else:
         # single compressed frame
         pixel_data = defragment_data(ds.PixelData)
-        decompressed_image = Image.open(io.BytesIO(pixel_data))
-        pixel_bytes.extend(decompressed_image.tobytes())
+        im = Image.open(io.BytesIO(pixel_data))
+        if 'YBR' in ds.PhotometricInterpretation:
+            im.draft('YCbCr', (ds.Rows, ds.Columns))
+        pixel_bytes.extend(im.tobytes())
 
     logger.debug("Successfully read %s pixel bytes", len(pixel_bytes))
 

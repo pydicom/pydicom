@@ -165,7 +165,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     if not all(ii == lut_lengths[0] for ii in lut_lengths[1:]):
         raise ValueError("LUT data must be the same length")
 
-    # IVs < `first_map` get set to first LUT entry (i.e. 0)
+    # IVs < `first_map` get set to first LUT entry (i.e. index 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
     # IVs >= `first_map` are mapped by the Palette Color LUTs
     # `first_map` may be negative, positive or 0
@@ -197,12 +197,21 @@ def apply_modality_lut(arr, ds):
     Returns
     -------
     numpy.ndarray
-        An array with applied modality LUT. If (0028,3000) *Modality LUT
-        Sequence* is present then returns an array of ``np.uint8`` or
-        ``np.uint16``, depending on the 3rd value of (0028,3002) *LUT
-        Descriptor*. If (0028,1052) *Rescale Intercept* and (0028,1053)
-        *Rescale Slope* are present then returns an array of ``np.float64``.
-        If neither are present then `arr` will be returned unchanged.
+        An array with applied modality LUT or rescale operation. If
+        (0028,3000) *Modality LUT Sequence* is present then returns an array
+        of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
+        (0028,3002) *LUT Descriptor*. If (0028,1052) *Rescale Intercept* and
+        (0028,1053) *Rescale Slope* are present then returns an array of
+        ``np.float64``. If neither are present then `arr` will be returned
+        unchanged.
+
+    Notes
+    -----
+    When *Rescale Slope* and *Rescale Intercept* are used, the output range
+    is from (min. pixel value * Rescale Slope + Rescale Intercept) to
+    (max. pixel value * Rescale Slope + Rescale Intercept), where min. and
+    max. pixel value are determined from (0028,0101) *Bits Stored* and
+    (0028,0103) *Pixel Representation*.
 
     References
     ----------
@@ -211,7 +220,7 @@ def apply_modality_lut(arr, ds):
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if hasattr(ds, 'ModalityLUTSequence'):
+    if 'ModalityLUTSequence' in ds:
         item = ds.ModalityLUTSequence[0]
         nr_entries = item.LUTDescriptor[0] or 2**16
         first_map = item.LUTDescriptor[1]
@@ -220,9 +229,9 @@ def apply_modality_lut(arr, ds):
         dtype = 'uint{}'.format(nominal_depth)
         lut_data = np.asarray(item.LUTData, dtype=dtype)
 
-        # IVs < `first_map` get set to first LUT entry (i.e. 0)
+        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
-        # IVs >= `first_map` are mapped by the Palette Color LUTs
+        # IVs >= `first_map` are mapped by the Modality LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
         clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
@@ -230,9 +239,167 @@ def apply_modality_lut(arr, ds):
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
         return lut_data[clipped_iv]
-    elif hasattr(ds, 'RescaleSlope'):
+    elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
         arr = arr.astype(np.float64) * ds.RescaleSlope
         arr += ds.RescaleIntercept
+
+    return arr
+
+
+def apply_voi_lut(arr, ds, index=0):
+    """Apply a VOI lookup table or windowing operation to `arr`.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the VOI LUT or windowing operation
+        to.
+    ds : dataset.Dataset
+        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
+        If (0028,3010) *VOI LUT Sequence* is present then returns an array
+        of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
+        (0028,3002) *LUT Descriptor*. If (0028,1050) *Window Center* and
+        (0028,1051) *Window Width* are present then returns an array of
+        ``np.float64``. If neither are present then `arr` will be returned
+        unchanged.
+    index : int, optional
+        Where the VOI LUT Module contains multiple possible views, this is
+        the index of the view to return (default ``0``).
+
+    Returns
+    -------
+    numpy.ndarray
+        An array with applied VOI LUT or windowing operation.
+
+    Notes
+    -----
+    When the dataset requires a modality LUT or rescale operation as part of
+    the Modality LUT module then that must be applied before any windowing
+    operation.
+
+    See Also
+    --------
+    :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut`
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
+      <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
+      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
+    """
+    if 'VOILUTSequence' in ds:
+        # VOI LUT Sequence contains one or more items
+        item = ds.VOILUTSequence[index]
+        nr_entries = item.LUTDescriptor[0] or 2**16
+        first_map = item.LUTDescriptor[1]
+
+        # PS3.3 C.8.11.3.1.5: may be 8, 10-16
+        nominal_depth = item.LUTDescriptor[2]
+        if nominal_depth in list(range(10, 17)):
+            dtype = 'uint16'
+        elif nominal_depth == 8:
+            dtype = 'uint8'
+        else:
+            raise NotImplementedError(
+                "'{}' bits per LUT entry is not supported"
+                .format(nominal_depth)
+            )
+
+        lut_data = np.asarray(item.LUTData, dtype=dtype)
+
+        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
+        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        # IVs >= `first_map` are mapped by the VOI LUT
+        # `first_map` may be negative, positive or 0
+        mapped_pixels = arr >= first_map
+        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+        # IVs > number of entries get set to last entry
+        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+
+        return lut_data[clipped_iv]
+    elif 'WindowCenter' in ds and 'WindowWidth' in ds:
+        if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
+            raise ValueError(
+                "When performing a windowing operation only 'MONOCHROME1' and "
+                "'MONOCHROME2' are allowed for (0028,0004) Photometric "
+                "Interpretation"
+            )
+
+        # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
+        voi_func = getattr(ds, 'VOILUTFunction', 'LINEAR').upper()
+        # VR DS, VM 1-n
+        elem = ds['WindowCenter']
+        center = elem.value[index] if elem.VM > 1 else elem.value
+        elem = ds['WindowWidth']
+        width = elem.value[index] if elem.VM > 1 else elem.value
+
+        # The output range depends on whether or not a modality LUT or rescale
+        #   operation has been applied
+        if 'ModalityLUTSequence' in ds:
+            # Unsigned - see PS3.3 C.11.1.1.1
+            y_min = 0
+            bit_depth = ds.ModalityLUTSequence[0].LUTDescriptor[2]
+            y_max = 2**bit_depth - 1
+        elif ds.PixelRepresentation == 0:
+            # Unsigned
+            y_min = 0
+            y_max = 2**ds.BitsStored - 1
+        else:
+            # Signed
+            y_min = -2**(ds.BitsStored - 1)
+            y_max = 2**(ds.BitsStored - 1) - 1
+
+        if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
+            # Otherwise its the actual data range
+            y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
+            y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
+
+        y_range = y_max - y_min
+        arr = arr.astype('float64')
+
+        if voi_func in ['LINEAR', 'LINEAR_EXACT']:
+            # PS3.3 C.11.2.1.2.1 and C.11.2.1.3.2
+            if voi_func == 'LINEAR':
+                if width < 1:
+                    raise ValueError(
+                        "The (0028,1051) Window Width must be greater than or "
+                        "equal to 1 for a 'LINEAR' windowing operation"
+                    )
+                center -= 0.5
+                width -= 1
+            elif width <= 0:
+                raise ValueError(
+                    "The (0028,1051) Window Width must be greater than 0 "
+                    "for a 'LINEAR_EXACT' windowing operation"
+                )
+
+            below = arr <= (center - width / 2)
+            above = arr > (center + width / 2)
+            between = np.logical_and(~below, ~above)
+
+            arr[below] = y_min
+            arr[above] = y_max
+            if between.any():
+                arr[between] = (
+                    ((arr[between] - center) / width + 0.5) * y_range + y_min
+                )
+        elif voi_func == 'SIGMOID':
+            # PS3.3 C.11.2.1.3.1
+            if width <= 0:
+                raise ValueError(
+                    "The (0028,1051) Window Width must be greater than 0 "
+                    "for a 'SIGMOID' windowing operation"
+                )
+
+            arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
+        else:
+            raise ValueError(
+                "Unsupported (0028,1056) VOI LUT Function value '{}'"
+                .format(voi_func)
+            )
 
     return arr
 
@@ -583,31 +750,90 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
-def pixel_dtype(ds):
-    """Return a :class:`numpy.dtype` for the *Pixel Data* in `ds`.
+def get_image_pixel_ids(ds):
+    """Return a dict of the pixel data affecting element's :func:`id` values.
 
-    Suitable for use with IODs containing the Image Pixel module.
-
-    +------------------------------------------+--------------+
-    | Element                                  | Supported    |
-    +-------------+---------------------+------+ values       |
-    | Tag         | Keyword             | Type |              |
-    +=============+=====================+======+==============+
-    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32 |
-    +-------------+---------------------+------+--------------+
-    | (0028,0103) | PixelRepresentation | 1    | 0, 1         |
-    +-------------+---------------------+------+--------------+
+    +------------------------------------------------+
+    | Element                                        |
+    +-------------+---------------------------+------+
+    | Tag         | Keyword                   | Type |
+    +=============+===========================+======+
+    | (0028,0002) | SamplesPerPixel           | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0004) | PhotometricInterpretation | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0006) | PlanarConfiguration       | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0008) | NumberOfFrames            | 1C   |
+    +-------------+---------------------------+------+
+    | (0028,0010) | Rows                      | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0011) | Columns                   | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0100) | BitsAllocated             | 1    |
+    +-------------+---------------------------+------+
+    | (0028,0103) | PixelRepresentation       | 1    |
+    +-------------+---------------------------+------+
+    | (7FE0,0008) | FloatPixelData            | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0009) | DoubleFloatPixelData      | 1C   |
+    +-------------+---------------------------+------+
+    | (7FE0,0010) | PixelData                 | 1C   |
+    +-------------+---------------------------+------+
 
     Parameters
     ----------
     ds : Dataset
-        The :class:`~pydicom.dataset.Dataset` containing the *Pixel Data* you
+        The :class:`~pydicom.dataset.Dataset` containing the pixel data.
+
+    Returns
+    -------
+    dict
+        A dict containing the :func:`id` values for the elements that affect
+        the pixel data.
+
+    """
+    keywords = [
+        'SamplesPerPixel', 'PhotometricInterpretation', 'PlanarConfiguration',
+        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated',
+        'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
+        'PixelData'
+    ]
+
+    return {kw: id(getattr(ds, kw, None)) for kw in keywords}
+
+
+def pixel_dtype(ds, as_float=False):
+    """Return a :class:`numpy.dtype` for the pixel data in `ds`.
+
+    Suitable for use with IODs containing the Image Pixel module (with
+    ``as_float=False``) and the Floating Point Image Pixel and Double Floating
+    Point Image Pixel modules (with ``as_float=True``).
+
+    +------------------------------------------+------------------+
+    | Element                                  | Supported        |
+    +-------------+---------------------+------+ values           |
+    | Tag         | Keyword             | Type |                  |
+    +=============+=====================+======+==================+
+    | (0028,0101) | BitsAllocated       | 1    | 1, 8, 16, 32, 64 |
+    +-------------+---------------------+------+------------------+
+    | (0028,0103) | PixelRepresentation | 1    | 0, 1             |
+    +-------------+---------------------+------+------------------+
+
+    Parameters
+    ----------
+    ds : Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the pixel data you
         wish to get the data type for.
+    as_float : bool, optional
+        If ``True`` then return a float dtype, otherwise return an integer
+        dtype (default ``False``). Float dtypes are only supported when
+        (0028,0101) *Bits Allocated* is 32 or 64.
 
     Returns
     -------
     numpy.dtype
-        A :class:`numpy.dtype` suitable for containing the *Pixel Data*.
+        A :class:`numpy.dtype` suitable for containing the pixel data.
 
     Raises
     ------
@@ -621,21 +847,24 @@ def pixel_dtype(ds):
     if ds.is_little_endian is None:
         ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
 
-    # (0028,0103) Pixel Representation, US, 1
-    #   Data representation of the pixel samples
-    #   0x0000 - unsigned int
-    #   0x0001 - 2's complement (signed int)
-    pixel_repr = ds.PixelRepresentation
-    if pixel_repr == 0:
-        dtype_str = 'uint'
-    elif pixel_repr == 1:
-        dtype_str = 'int'
+    if not as_float:
+        # (0028,0103) Pixel Representation, US, 1
+        #   Data representation of the pixel samples
+        #   0x0000 - unsigned int
+        #   0x0001 - 2's complement (signed int)
+        pixel_repr = ds.PixelRepresentation
+        if pixel_repr == 0:
+            dtype_str = 'uint'
+        elif pixel_repr == 1:
+            dtype_str = 'int'
+        else:
+            raise ValueError(
+                "Unable to determine the data type to use to contain the "
+                "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
+                "Representation' is invalid".format(pixel_repr)
+            )
     else:
-        raise ValueError(
-            "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-            "Representation' is invalid".format(pixel_repr)
-        )
+        dtype_str = 'float'
 
     # (0028,0100) Bits Allocated, US, 1
     #   The number of bits allocated for each pixel sample

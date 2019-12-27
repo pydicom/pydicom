@@ -25,9 +25,9 @@ usage = "Usage: python memory_dataset.py dicom_filename"
 def write_dataset_to_bytes(dataset):
     # create a buffer
     with BytesIO() as buffer:
-        # create a DicomLike object that has some properties of DataSet
+        # create a DicomFileLike object that has some properties of DataSet
         memory_dataset = DicomFileLike(buffer)
-        # write the dataset to the DicomLike object
+        # write the dataset to the DicomFileLike object
         dcmwrite(memory_dataset, dataset)
         # to read from the object, you have to rewind it
         memory_dataset.seek(0)
