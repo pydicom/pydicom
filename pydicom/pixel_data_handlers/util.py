@@ -772,6 +772,8 @@ def get_image_pixel_ids(ds):
     +-------------+---------------------------+------+
     | (0028,0100) | BitsAllocated             | 1    |
     +-------------+---------------------------+------+
+    | (0028,0101) | BitsStored                | 1    |
+    +-------------+---------------------------+------+
     | (0028,0103) | PixelRepresentation       | 1    |
     +-------------+---------------------------+------+
     | (7FE0,0008) | FloatPixelData            | 1C   |
@@ -795,7 +797,7 @@ def get_image_pixel_ids(ds):
     """
     keywords = [
         'SamplesPerPixel', 'PhotometricInterpretation', 'PlanarConfiguration',
-        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated',
+        'NumberOfFrames', 'Rows', 'Columns', 'BitsAllocated', 'BitsStored',
         'PixelRepresentation', 'FloatPixelData', 'DoubleFloatPixelData',
         'PixelData'
     ]
