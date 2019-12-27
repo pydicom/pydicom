@@ -15,7 +15,7 @@ BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 TEST_FILES = (
     get_testdata_file('DICOMDIR'),
     get_testdata_file('DICOMDIR-reordered'),
-    get_testdata_file('DICOMDIR-nooffset'),
+    get_testdata_file('DICOMDIR-nooffset')
 )
 
 
@@ -66,6 +66,7 @@ class TestDicomDir(object):
     def test_empty(self):
         """Test that an empty DICOMDIR can be read."""
         ds = dcmread(get_testdata_file('DICOMDIR-empty.dcm'))
+        assert [] == ds.DirectoryRecordSequence
 
     def test_invalid_transfer_syntax_strict_mode(self):
         config.enforce_valid_values = True
