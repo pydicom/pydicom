@@ -331,6 +331,9 @@ multiple fragments per frame are present for non-JPEG transfer syntaxes or
 where no JPEG EOI/EOC marker is present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/685">#685</a>)</p></li>
 <li><p>Fixed possible incorrect switch to explicit VR in sequence items
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/999">#999</a>)</p></li>
+<li><p>Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
+pixel data with bit depth range 9-16 not producing the correct values with
+the Pillow handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/693">#693</a>)</p></li>
 <li><p>Fixed parsing a DICOMDIR file with no records raising an exception
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1004">#1004</a>)</p></li>
 </ul>
@@ -363,6 +366,8 @@ applying VOI LUTs or windowing operations.</p></li>
 <li><p>Added support for (7fe0,0008) <em>Float Pixel Data</em> and (7fe0,0009) <em>Double
 Float Pixel Data</em> to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/452">#452</a>)</p></li>
+<li><p>JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
+with bit depth &gt; 8 with the Pillow pixel data handler</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
