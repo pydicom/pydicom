@@ -32,6 +32,8 @@ Fixes
   where no JPEG EOI/EOC marker is present (:issue:`685`)
 * Fixed possible incorrect switch to explicit VR in sequence items
   (:issue:`999`)
+* Fixed parsing a DICOMDIR file with no records raising an exception
+  (:issue:`1004`)
 
 Enhancements
 ............
@@ -65,5 +67,5 @@ Enhancements
 
 Changes
 .......
-  
+
 * :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.
