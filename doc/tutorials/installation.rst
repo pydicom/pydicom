@@ -14,6 +14,10 @@ How to install pydicom
 Install the official release
 ----------------------------
 
+*pydicom*, being a Python library, requires `Python
+<https://www.python.org/>`_. If you're not sure whether or not your version of
+Python is supported, check :ref:`this table<faq_install_version>`.
+
 Install using pip
 .................
 
@@ -26,6 +30,12 @@ from PyPi is using `pip <https://pip.pypa.io/>`_ with the command::
 You may need to use this instead, depending on your operating system::
 
   $ python -m pip install pydicom
+
+You can also perform an offline installation by
+`downloading <https://github.com/pydicom/pydicom/releases>`_ and installing
+one of the release ``*.whl`` files. For example, with the v1.3 release::
+
+  $ pip install pydicom-1.3.0-py2.py3-none-any.whl
 
 
 Install using conda
@@ -51,7 +61,7 @@ Through conda::
 
   $ conda install numpy
 
-To decode JPEG compressed pixel data, one or more additional libraries will
+To decode JPEG compressed pixel data one or more additional libraries will
 need to be installed. See :ref:`this page <guide_compressed>` for a list of
 which library is needed to handle a given JPEG format, as specified by
 the (0002,0010) *Transfer Syntax UID* value.

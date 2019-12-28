@@ -14,14 +14,6 @@ pydicom documentation
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Tutorials
-
-
-   tutorials/contributing.rst
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
    :caption: Documentation
 
    old/pydicom_user_guide.rst
@@ -40,26 +32,26 @@ pydicom documentation
    :hidden:
    :caption: Additional Information
 
+   tutorials/contributing.rst
+   faq/index
    release_notes/index
 
-
-`Tutorials <tutorials/index.html>`_
------------------------------------
-
-Tutorials for new users that take you step-by-step through installing and
-using *pydicom*.
 
 `User Guide <old/pydicom_user_guide.html>`_
 -------------------------------------------
 
 The main documentation. This contains an in-depth description of all
-core elements of pydicom and how to apply them.
+core elements of pydicom and how to use them.
 
 `Reading and writing DICOM files <old/ref_guide.html>`_
 -------------------------------------------------------
 
 A short introduction to the two most commonly used functions for reading
 and writing DICOM files.
+
+`Tutorials <tutorials/index.html>`_
+------------------------------------
+
 
 `Examples <auto_examples/index.html>`_
 --------------------------------------

@@ -1,50 +1,27 @@
 
-Contributing a patch to pydicom
-===============================
+Contributing to pydicom
+=======================
 
-Download the current source code
---------------------------------
+If you're interested in contributing to *pydicom* there are many ways to help
+out:
 
-1. Install Git if required
-2. Sign up to `GitHub <https://github.com>`_
-3. `Fork the project <https://github.com/pydicom/pydicom/fork>`_
-4. Using the command line, ``cd`` to the directory where you want your
-local copy of *pydicom* to live
-
-Clone the source code (you may wish to use ``--depth=1`` to save on
-bandwidth)::
-
-     $ git clone https://github.com/YourUsername/pydicom.git
-
-Its recommended that you install *pydicom* in a
-:doc:`virtual environment<virtualenvs>` as this allows you to test different
-combinations of Python and installed packages. Where ``X.Y`` is the Python
-version to use::
-
-  $ mkvirtualenv -p /path/to/pythonX.Y pydX.Y
-
-You can now install the cloned copy of *pydicom* (``-e`` for editable mode)::
-
-  (pydX.Y) $ pip install -e /path/to/local/pydicom/
+* Adding new features, improving existing ones or submitting bug fixes for
+  the source code
+* Reporting bugs, suggesting improvements or requesting features on the
+  `issue tracker <https://github.com/pydicom/pydicom/issues>`_.
+* Reviewing `existing pull requests
+  <https://github.com/pydicom/pydicom/pulls>`_ on GitHub.
+* Improving the documentation, whether by fixing typos, contributing
+  new tutorials or adding code examples. No change is too small.
+* Answering (or asking!) questions on
+  `stackoverflow <https://stackoverflow.com/questions/tagged/pydicom>`_,
+  the `Google groups page <https://groups.google.com/forum/#!forum/pydicom>`_,
+  or `GitHub <https://github.com/pydicom/pydicom/issues>`_.
+* Submitting useful scripts, tutorials or plugins to the
+  `contrib-pydicom <https://github.com/pydicom/contrib-pydicom>`_ project
 
 
-Running the unit tests
-----------------------
+If it's your first time contributing to *pydicom* then we have tutorials for:
 
-  pip install pytest
-
-``cd`` into the ``pydicom/tests`` directory and run::
-
-  $ pytest
-
-
-Create a new branch for your patch
-----------------------------------
-
-  $ git checkout -b name-of-patch
-
-
-Writing documentation
----------------------
-
-  # pip install sphinx numpy matplotlib sphinx_rtd_theme sphinx_gallery
+* :doc:`Contributing a source code patch <contributing_code>`
+* :doc:`Contributing a documentation change <contributing_docs>`

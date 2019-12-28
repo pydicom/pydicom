@@ -79,7 +79,7 @@ You can switch between environments without needing to deactivate them first::
 Deleting environments
 .....................
 
-To delete an environment in ``WORKON_HOME`` (must be deactivate first)::
+To delete an environment in ``WORKON_HOME`` (must be deactivated first)::
 
   $ rmvirtualenv pyd37-env
 

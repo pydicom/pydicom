@@ -2,9 +2,12 @@
 Tutorials
 =========
 
-New to *pydicom* or `DICOM <https://www.dicomstandard.org/current/>`_? Then
-these tutorials should get you up and running.
+New to *pydicom*? Then these tutorials should get you up and running.
 
-* :doc:`Installing pydicom<installation>`
-* :doc:`Creating and managing virtual environments<virtualenvs>`
-* :doc:`Contributing to pydicom<contributing>`
+.. toctree::
+   :maxdepth: 1
+
+   installation
+   virtualenvs
+   contributing_code
+   contributing_docs
