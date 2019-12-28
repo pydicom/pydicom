@@ -1135,10 +1135,10 @@ class TestDataset(object):
         ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
         ds['PixelData'].VR = 'OB'
         msg = (
-            r"The dataset uses a compressed Transfer Syntax UID but the "
-            r"Pixel Data hasn't been encapsulated"
+            r"Pixel Data has an undefined length indicating "
+            r"that it's compressed but the data isn't encapsulated"
         )
-        with pytest.warns(UserWarning, match=msg):
+        with pytest.raises(ValueError, match=msg):
             ds.save_as(fp)
 
     def test_save_as_compressed_encaps(self):

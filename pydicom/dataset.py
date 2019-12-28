@@ -1777,10 +1777,6 @@ class Dataset(dict):
             tsyntax = self.file_meta.TransferSyntaxUID
             if not tsyntax.is_private:
                 self['PixelData'].is_undefined_length = tsyntax.is_compressed
-                if tsyntax.is_compressed:
-                    # Check for Basic Offset Table item tag
-                    # Must always be little endian - PS3.5 Annex A.4
-                    assert self.PixelData[:4] == b'\xFE\xFF\x00\xE0'
         except (AttributeError, KeyError):
             pass
         except AssertionError:
