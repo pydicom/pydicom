@@ -1758,8 +1758,8 @@ class Dataset(dict):
             try:
                 tsyntax = self.file_meta.TransferSyntaxUID
                 if not tsyntax.is_private:
-                    self.is_little_endian = transfer_syntax.is_little_endian
-                    self.is_implicit_VR = transfer_syntax.is_implicit_VR
+                    self.is_little_endian = tsyntax.is_little_endian
+                    self.is_implicit_VR = tsyntax.is_implicit_VR
                     has_tsyntax = True
             except AttributeError:
                 pass

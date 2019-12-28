@@ -1185,6 +1185,96 @@ class TestDataset(object):
         ds.file_meta.TransferSyntaxUID = '1.2.3.4.5.6'
         ds.save_as(fp)
 
+    def test_save_as_set_little_implicit_with_tsyntax(self):
+        """Test setting is_implicit_VR and is_little_endian from tsyntax"""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN'
+        # Raise if is_implicit_VR or is_little_endian missing with no tsyntax
+        msg = (
+            r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must be "
+            r"set appropriately before saving."
+        )
+        with pytest.raises(AttributeError, match=msg):
+            ds.save_as(fp)
+
+        # Test private transfer syntax raises
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = '1.2'
+        with pytest.raises(AttributeError, match=msg):
+            ds.save_as(fp)
+
+        # Test public transfer syntax OK
+        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1'
+        ds.save_as(fp)
+
+    def test_save_as_undefined(self):
+        """Test settting is_undefined_length correctly."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
+        elem = ds['PixelData']
+        elem.VR = 'OB'
+        # Compressed
+        # False to True
+        assert not elem.is_undefined_length
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+        # True to True
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+
+        # Uncompressed
+        ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+        # True to False
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+        # False to False
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+
+    def test_save_as_undefined_private(self):
+        """Test is_undefined_length unchanged with private tsyntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = '1.2.3.4.5'
+        ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
+        elem = ds['PixelData']
+        elem.VR = 'OB'
+        # Unchanged - False
+        assert not elem.is_undefined_length
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+        # Unchanged - True
+        elem.is_undefined_length = True
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+
+    def test_save_as_undefined_no_tsyntax(self):
+        """Test is_undefined_length unchanged with no tsyntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
+        elem = ds['PixelData']
+        elem.VR = 'OB'
+        # Unchanged - False
+        assert not elem.is_undefined_length
+        ds.save_as(fp)
+        assert not elem.is_undefined_length
+        # Unchanged - True
+        elem.is_undefined_length = True
+        ds.save_as(fp)
+        assert elem.is_undefined_length
+
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
         test_file = get_testdata_files('CT_small.dcm')[0]
