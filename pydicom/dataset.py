@@ -15,13 +15,14 @@ Dataset (dict subclass)
             contains its own DataElements, and so on in a recursive manner.
 """
 
-import inspect  # for __dir__
+from bisect import bisect_left
 import io
+import inspect  # for __dir__
+from itertools import takewhile
 import json
 import os
 import os.path
-from bisect import bisect_left
-from itertools import takewhile
+import warnings
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -1757,6 +1758,23 @@ class Dataset(dict):
                 "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
                 "set appropriately before saving.".format(
                     self.__class__.__name__))
+
+        # If compressed transfer syntax check that Pixel Data is encapsulated
+        try:
+            tsyntax = self.file_meta.TransferSyntaxUID
+            if not tsyntax.is_private and tsyntax.is_compressed:
+                # Must always be little endian
+                encap_tag = b'\xFE\xFF\x00\xE0'
+                # Check for Basic Offset Table item tag
+                assert self.PixelData[:4] == encap_tag
+        except AttributeError:
+            pass
+        except AssertionError:
+            warnings.warn(
+                "The dataset uses a compressed Transfer Syntax UID but the "
+                "Pixel Data hasn't been encapsulated. See the "
+                "pydicom.encaps.encapsulate() function for more information"
+            )
 
         pydicom.dcmwrite(filename, self, write_like_original)
 
