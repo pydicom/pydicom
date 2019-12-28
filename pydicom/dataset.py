@@ -1753,20 +1753,35 @@ class Dataset(dict):
             Write a DICOM file from a :class:`FileDataset` instance.
         """
         # Ensure is_little_endian and is_implicit_VR are set
-        if self.is_little_endian is None or self.is_implicit_VR is None:
-            raise AttributeError(
-                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
-                "set appropriately before saving.".format(
-                    self.__class__.__name__))
+        if None in (self.is_little_endian, self.is_implicit_VR):
+            has_tsyntax = False
+            try:
+                tsyntax = self.file_meta.TransferSyntaxUID
+                if not tsyntax.is_private:
+                    self.is_little_endian = transfer_syntax.is_little_endian
+                    self.is_implicit_VR = transfer_syntax.is_implicit_VR
+                    has_tsyntax = True
+            except AttributeError:
+                pass
+
+            if not has_tsyntax:
+                raise AttributeError(
+                    "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
+                    "set appropriately before saving."
+                    .format(self.__class__.__name__)
+                )
 
         # If compressed transfer syntax check that Pixel Data is encapsulated
+        #   and `is_undefined_length` set correctly
         try:
             tsyntax = self.file_meta.TransferSyntaxUID
-            if not tsyntax.is_private and tsyntax.is_compressed:
-                # Check for Basic Offset Table item tag
-                # Must always be little endian - PS3.5 Annex A.4
-                assert self.PixelData[:4] == b'\xFE\xFF\x00\xE0'
-        except AttributeError:
+            if not tsyntax.is_private:
+                self['PixelData'].is_undefined_length = tsyntax.is_compressed
+                if tsyntax.is_compressed:
+                    # Check for Basic Offset Table item tag
+                    # Must always be little endian - PS3.5 Annex A.4
+                    assert self.PixelData[:4] == b'\xFE\xFF\x00\xE0'
+        except (AttributeError, KeyError):
             pass
         except AssertionError:
             warnings.warn(
