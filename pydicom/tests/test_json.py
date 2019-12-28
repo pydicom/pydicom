@@ -316,7 +316,7 @@ class TestBinary(object):
         with pytest.warns(UserWarning, match=msg):
             ds = Dataset.from_json(ds_json)
         assert 0x00091002 in ds
-        
+
         ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
                    '["http://example.com/bulkdatahandler"]}}')
         with pytest.warns(UserWarning, match=msg):

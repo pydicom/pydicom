@@ -1771,20 +1771,13 @@ class Dataset(dict):
                     .format(self.__class__.__name__)
                 )
 
-        # If compressed transfer syntax check that Pixel Data is encapsulated
-        #   and `is_undefined_length` set correctly
+        # Try and ensure that `is_undefined_length` is set correctly
         try:
             tsyntax = self.file_meta.TransferSyntaxUID
             if not tsyntax.is_private:
                 self['PixelData'].is_undefined_length = tsyntax.is_compressed
         except (AttributeError, KeyError):
             pass
-        except AssertionError:
-            warnings.warn(
-                "The dataset uses a compressed Transfer Syntax UID but the "
-                "Pixel Data hasn't been encapsulated. See the "
-                "pydicom.encaps.encapsulate() function for more information"
-            )
 
         pydicom.dcmwrite(filename, self, write_like_original)
 

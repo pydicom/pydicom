@@ -633,7 +633,8 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
       # using the corresponding compression method to Transfer Syntax UID
       ds.PixelData = encapsulate([frame1, frame2, ...])
 
-    For multi-frame data each frame must be encoded separately.
+    For multi-frame data each frame must be encoded separately and then all
+    encoded frames encapsulated together.
 
     Data will be encapsulated with a Basic Offset Table Item at the beginning,
     then one or more fragment items. Each item will be of even length and the
