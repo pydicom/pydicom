@@ -8,6 +8,7 @@ from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta
+from pydicom.encaps import encapsulate
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
@@ -17,6 +18,7 @@ from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    JPEGBaseline,
     PYDICOM_IMPLEMENTATION_UID
 )
 
@@ -1121,6 +1123,67 @@ class TestDataset(object):
         ds.file_meta.TransferSyntaxUID = '1.3'
         ds.file_meta.ImplementationClassUID = '1.4'
         ds.save_as(fp, write_like_original=False)
+
+    def test_save_as_compressed_no_encaps(self):
+        """Test saving a compressed dataset with no encapsulation."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
+        ds['PixelData'].VR = 'OB'
+        msg = (
+            r"The dataset uses a compressed Transfer Syntax UID but the "
+            r"Pixel Data hasn't been encapsulated"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.save_as(fp)
+
+    def test_save_as_compressed_encaps(self):
+        """Test saving a compressed dataset with encapsulation."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
+        ds['PixelData'].VR = 'OB'
+        ds.save_as(fp)
+
+    def test_save_as_no_pixel_data(self):
+        """Test saving with no Pixel Data."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.save_as(fp)
+
+    def test_save_as_no_file_meta(self):
+        """Test saving with no Transfer Syntax or file_meta."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.save_as(fp)
+
+        del ds.file_meta
+        ds.save_as(fp)
+
+    def test_save_as_private_transfer_syntax(self):
+        """Test saving with a private transfer syntax."""
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.file_meta = Dataset()
+        ds.file_meta.TransferSyntaxUID = '1.2.3.4.5.6'
+        ds.save_as(fp)
 
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
