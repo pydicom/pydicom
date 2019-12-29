@@ -1,9 +1,9 @@
-
+==========================================
 Creating and managing virtual environments
 ==========================================
 
 Using pip
----------
+=========
 
 .. note::
 
@@ -12,7 +12,7 @@ Using pip
    <https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html>`_.
 
 Install packages
-................
+----------------
 
 Install the `virtualenv <https://pypi.org/project/virtualenv/>`_ and
 `virtualenvwrapper <https://pypi.org/project/virtualenvwrapper/>`_ packages::
@@ -20,7 +20,7 @@ Install the `virtualenv <https://pypi.org/project/virtualenv/>`_ and
   $ pip install virtualenv virtualenvwrapper
 
 Create a new virtual environment
-................................
+--------------------------------
 
 To create a new environment run::
 
@@ -58,7 +58,7 @@ the ``-p path`` option, where ``path`` is the path to a Python executable::
   Python 3.7.5
 
 Activating and deactivating environments
-........................................
+----------------------------------------
 
 You can exit the environment by using ``deactivate``::
 
@@ -77,7 +77,7 @@ You can switch between environments without needing to deactivate them first::
 
 
 Deleting environments
-.....................
+---------------------
 
 To delete an environment in ``WORKON_HOME`` (must be deactivated first)::
 
@@ -85,7 +85,7 @@ To delete an environment in ``WORKON_HOME`` (must be deactivated first)::
 
 
 Managing installed packages
-...........................
+---------------------------
 
 Packages can be installed and uninstalled using pip::
 
@@ -105,7 +105,7 @@ installed::
   1.2.0
 
 Using conda
------------
+===========
 
 .. note::
 
@@ -115,7 +115,7 @@ Using conda
 
 
 Create a new virtual environment
-................................
+--------------------------------
 
 ::
 
@@ -131,7 +131,7 @@ version ``X.Y``, you can use the ``python=X.Y`` option::
 
 
 Activating and deactivating environments
-........................................
+----------------------------------------
 
 Environments can be activated with::
 
@@ -149,7 +149,7 @@ You can switch between environments without needing to deactivate them first::
   (py37-env) $
 
 Deleting environments
-.....................
+---------------------
 
 Environments can be deleting with::
 
@@ -159,7 +159,7 @@ If deleting a currently active environment you will have to deactivate it
 first.
 
 Managing installed packages
-...........................
+---------------------------
 
 Packages can be installed and uninstalled using pip or conda::
 

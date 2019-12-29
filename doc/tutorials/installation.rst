@@ -1,4 +1,4 @@
-
+======================
 How to install pydicom
 ======================
 
@@ -12,14 +12,14 @@ How to install pydicom
    manage virtual environments.
 
 Install the official release
-----------------------------
+============================
 
 *pydicom*, being a Python library, requires `Python
 <https://www.python.org/>`_. If you're not sure whether or not your version of
 Python is supported, check :ref:`this table<faq_install_version>`.
 
 Install using pip
-.................
+-----------------
 
 *pydicom* is available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_, the
 official third-party Python software repository. The simplest way to install
@@ -39,7 +39,7 @@ one of the release ``*.whl`` files. For example, with the v1.3 release::
 
 
 Install using conda
-...................
+-------------------
 
 *pydicom* is also available for `conda <https://docs.conda.io/>`_ at
 `conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
@@ -68,7 +68,7 @@ the (0002,0010) *Transfer Syntax UID* value.
 
 
 Installing Pillow
-.................
+-----------------
 
 Using pip; you may need to make sure that the `libjpeg <http://libjpeg.sourceforge.net/>`_
 (for JPEG) and  `openjpeg <http://www.openjpeg.org/>`_ (for JPEG2000) libraries
@@ -83,7 +83,7 @@ Through conda::
 
 
 Installing CharPyLS
-...................
+-------------------
 
 Using pip::
 
@@ -97,7 +97,7 @@ Through conda::
 
 
 Installing GDCM
-...............
+---------------
 
 Unfortunately there's no easy way to install the Python
 `GDCM <http://gdcm.sourceforge.net/>`_ bindings using pip.
@@ -111,7 +111,7 @@ Through conda::
 
 
 Install the development version
--------------------------------
+===============================
 
 To install a snapshot of the latest code (the ``master`` branch) from
 `GitHub <https://github.com/pydicom/pydicom>`_::

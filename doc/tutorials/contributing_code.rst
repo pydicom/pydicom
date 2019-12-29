@@ -1,4 +1,4 @@
-
+=================================
 Contributing a source code change
 =================================
 
@@ -13,15 +13,15 @@ This tutorial will take you through the process of:
 * Committing the changes and making a pull request
 
 Download the current source code
---------------------------------
+================================
 
-1. Install `Git <https://git-scm.com/downloads>`_. If you're new to Git,
+1. Sign up to `GitHub <https://github.com>`_ and
+   `fork pydicom <https://github.com/pydicom/pydicom/fork>`_
+2. Install `Git <https://git-scm.com/downloads>`_. If you're new to Git,
    the Django project has a good introduction on `working with Git and GitHub
    <https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/>`_.
    You can also take a look at the `GitHub branch-based workflow
    <https://guides.github.com/introduction/flow/>`_
-2. Sign up to `GitHub <https://github.com>`_ and
-   `fork pydicom <https://github.com/pydicom/pydicom/fork>`_
 3. Using the command line, ``cd`` to the directory where you want your
    local copy of *pydicom* to live. The source code can then be downloaded
    using::
@@ -45,7 +45,7 @@ Download the current source code
 
 
 (Optional) Install required libraries
--------------------------------------
+=====================================
 If you're going to be making changes to one of the pixel data
 handlers you'll need to install `NumPy <https://numpy.org/>`_ as well as
 the library the handler is based on.
@@ -61,7 +61,7 @@ the optional libraries.
 
 
 Install pytest and run the test suite
--------------------------------------
+=====================================
 When making changes to *pydicom* it's important that your changes don't
 accidentally introduce bugs into other areas of the code. In order to
 check that everything still works afterwards, you should run our test suite,
@@ -87,7 +87,7 @@ relevant issues or create a new one if there are none.
 
 
 Create a new branch
--------------------
+===================
 Create a new branch ``new-uid`` for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
 it and won't affect the main copy (the ``master`` branch) of the code::
@@ -96,15 +96,16 @@ it and won't affect the main copy (the ``master`` branch) of the code::
 
 
 Write tests for your changes
-----------------------------
+============================
 If a change is to be accepted into *pydicom* it usually has to include tests.
-For bug fixes you should write a regression test that reproduces the original
-issue. For new features you'll need to include tests that ensure the features
+For bug fixes you should write a regression test that reproduces the bug.
+For new features you'll need to include tests that ensure the features
 work as intended.
 
 Let's say we wanted to add a new `pre-defined UID
 <https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids>`_
-to *pydicom*. We'd first add a new test at the bottom of `test_uid.py
+to *pydicom* with a value of ``1.2.3.4.500``. We'd first add a new test at the
+bottom of `test_uid.py
 <https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py>`_::
 
   def test_new_uid():
@@ -135,8 +136,8 @@ to *pydicom*. We'd first add a new test at the bottom of `test_uid.py
      may also be helpful
 
    In the worst-case scenario, if you can't figure out how to write a test
-   for something, then once you've created a pull-request add a comment
-   asking for help.
+   for something, then once you've created a pull-request (to be discussed
+   a bit later) add a comment asking for help.
 
 Since we haven't made any modification to the actual source code, when we
 run the tests we should get a failure::
@@ -157,7 +158,7 @@ file and that the test itself is written correctly.
 
 
 Making a code change and documenting it
----------------------------------------
+=======================================
 Next we'll make changes to the actual source code. Open
 `uid.py <https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py>`_ in
 a text editor and around
@@ -199,7 +200,7 @@ should make sure the entire test suite passes::
 
 
 Previewing your changes
------------------------
+=======================
 It's a good idea to go through all the changes you've made by first staging
 and then displaying the difference between the current copy and the initial
 version we first checked out with::
@@ -213,7 +214,7 @@ added. If everything looks good then its time to commit the changes.
 
 
 Committing your changes and making a pull request
--------------------------------------------------
+=================================================
 To commit the changes::
 
   $ git commit
@@ -245,3 +246,10 @@ If all the checks pass and you're happy with your changes, change the PR title
 prefix to ``[MRG]``. This indicates that you consider the PR ready to be
 reviewed and merged into the main branch. You can also ask for a review or help
 at any point after creating the PR.
+
+What happens next?
+==================
+One or more reviewers will look at your pull-request and may make suggestions,
+ask for clarification or request changes. Once the reviewers are happy then the
+pull request will be approved and your changes will be merged into the
+``master`` branch and become part of *pydicom*. Congratulations!

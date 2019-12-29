@@ -45,7 +45,7 @@ Enhancements
   applying color palette LUTs (:issue:`205`)
 * Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
   for applying modality LUTs.
-* Added :func:`~pydicom.data.data_manager.get_palette_files` for retrieving well-known
+* Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
   palette color datasets.
 * Raise on end of file errors if `config.enforce_valid_values` is set
   (:issue:`277`)
@@ -63,5 +63,5 @@ Enhancements
 
 Changes
 .......
-  
+
 * :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.
