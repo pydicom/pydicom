@@ -53,6 +53,10 @@ def Tag(arg, arg2=None):
     * ``Tag('0xFE', '0x0010')``
     * ``Tag("PatientName")``
 
+    .. versionchanged:: 1.3
+
+        Added support for creating a Tag using an element keyword
+
     Parameters
     ----------
     arg : int or str or 2-tuple/list

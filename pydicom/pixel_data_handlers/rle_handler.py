@@ -380,6 +380,8 @@ def rle_encode_frame(arr):
     """Return an :class:`numpy.ndarray` image frame as RLE encoded
     :class:`bytearray`.
 
+    .. versionadded:: 1.3
+
     Parameters
     ----------
     arr : numpy.ndarray

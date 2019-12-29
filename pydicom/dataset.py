@@ -57,6 +57,8 @@ except ImportError:
 class PrivateBlock(object):
     """Helper class for a private block in the :class:`Dataset`.
 
+    .. versionadded:: 1.3
+
     See the DICOM Standard, Part 5,
     :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
     Element Tags
@@ -1778,6 +1780,8 @@ class Dataset(dict):
         """Ensure the file meta info exists and has the correct values
         for transfer syntax and media storage UIDs.
 
+        .. versionadded:: 1.2
+
         .. warning::
 
             The transfer syntax for ``is_implicit_VR = False`` and
@@ -2044,6 +2048,8 @@ class Dataset(dict):
     def from_json(cls, json_dataset, bulk_data_uri_handler=None):
         """Add elements to the :class:`Dataset` from DICOM JSON format.
 
+        .. versionadded:: 1.3
+
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
@@ -2086,6 +2092,8 @@ class Dataset(dict):
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
 
+        .. versionadded:: 1.4
+
         Parameters
         ----------
         bulk_data_threshold : int, optional
@@ -2116,6 +2124,8 @@ class Dataset(dict):
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
                 dump_handler=None):
         """Return a JSON representation of the :class:`Dataset`.
+
+        .. versionadded:: 1.3
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 

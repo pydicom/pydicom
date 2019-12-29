@@ -105,6 +105,8 @@ overlay_data_handlers = [
 ]
 """Handlers for converting (60xx,3000) *Overlay Data*
 
+.. versionadded:: 1.4
+
 .. currentmodule:: pydicom.dataset
 
 This is an ordered list of *Overlay Data* handlers that the
@@ -151,6 +153,8 @@ pixel_data_handlers = [
     jpegls_handler,
 ]
 """Handlers for converting (7FE0,0010) *Pixel Data*.
+
+.. versionadded:: 1.2
 
 .. currentmodule:: pydicom.dataset
 

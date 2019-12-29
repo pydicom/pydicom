@@ -502,6 +502,8 @@ def read_item(fp):
 def fragment_frame(frame, nr_fragments=1):
     """Yield one or more fragments from `frame`.
 
+    .. versionadded:: 1.2
+
     Parameters
     ----------
     frame : bytes
@@ -562,6 +564,8 @@ def fragment_frame(frame, nr_fragments=1):
 def itemise_fragment(fragment):
     """Return an itemised `fragment`.
 
+    .. versionadded:: 1.2
+
     Parameters
     ----------
     fragment : bytes
@@ -594,6 +598,8 @@ itemize_fragment = itemise_fragment
 
 def itemise_frame(frame, nr_fragments=1):
     """Yield items generated from `frame`.
+
+    .. versionadded:: 1.2
 
     Parameters
     ----------
@@ -628,6 +634,8 @@ itemize_frame = itemise_frame
 
 def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     """Return encapsulated `frames`.
+
+    .. versionadded:: 1.2
 
     Data will be encapsulated with a Basic Offset Table Item at the beginning,
     then one or more fragment Items. Each item will be of even length and the

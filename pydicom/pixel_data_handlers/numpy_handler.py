@@ -111,6 +111,8 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 def pack_bits(arr):
     """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
 
+    .. versionadded:: 1.2
+
     Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
 
     Parameters
