@@ -2517,7 +2517,7 @@ class TestWriteUndefinedLengthPixelData(object):
                                  is_undefined_length=True)
         msg = (
             r"Pixel Data has an undefined length indicating "
-            r"that it's compressed but the data isn't encapsulated"
+            r"that it's compressed, but the data isn't encapsulated"
         )
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
@@ -2533,7 +2533,7 @@ class TestWriteUndefinedLengthPixelData(object):
                                  is_undefined_length=True)
         msg = (
             r"Pixel Data has an undefined length indicating "
-            r"that it's compressed but the data isn't encapsulated"
+            r"that it's compressed, but the data isn't encapsulated"
         )
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)

@@ -1136,7 +1136,7 @@ class TestDataset(object):
         ds['PixelData'].VR = 'OB'
         msg = (
             r"Pixel Data has an undefined length indicating "
-            r"that it's compressed but the data isn't encapsulated"
+            r"that it's compressed, but the data isn't encapsulated"
         )
         with pytest.raises(ValueError, match=msg):
             ds.save_as(fp)
@@ -1209,7 +1209,7 @@ class TestDataset(object):
         ds.save_as(fp)
 
     def test_save_as_undefined(self):
-        """Test settting is_undefined_length correctly."""
+        """Test setting is_undefined_length correctly."""
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_little_endian = True

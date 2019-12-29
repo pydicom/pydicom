@@ -493,8 +493,9 @@ def write_data_element(fp, data_element, encodings=None):
         if not data_element.value.startswith(encap_item):
             raise ValueError(
                 "(7FE0,0010) Pixel Data has an undefined length indicating "
-                "that it's compressed but the data isn't encapsulated. See "
-                "the pydicom.encaps.encapsulate() for more information"
+                "that it's compressed, but the data isn't encapsulated as "
+                "required. See pydicom.encaps.encapsulate() for more "
+                "information"
             )
 
     value_length = buffer.tell()
