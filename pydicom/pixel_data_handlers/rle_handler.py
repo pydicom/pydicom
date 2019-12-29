@@ -8,7 +8,7 @@ Data* to a :class:`numpy.ndarray`.
 
 **Supported data**
 
-The RLE handler supports the conversion of data in the (7fe0,0010)
+The RLE handler supports the conversion of data in the (7FE0,0010)
 *Pixel Data* element to a numpy ndarray provided the related
 :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have values given
 in the table below.
@@ -116,7 +116,7 @@ def get_pixeldata(ds, rle_segment_order='>'):
     Returns
     -------
     numpy.ndarray
-        The decoded contents of (7fe0,0010) *Pixel Data* as a 1D array.
+        The decoded contents of (7FE0,0010) *Pixel Data* as a 1D array.
 
     Raises
     ------

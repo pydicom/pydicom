@@ -156,8 +156,8 @@ If all the tests passed then make sure you've added the test to the correct
 file and that the test itself is written correctly.
 
 
-Making a code change and documenting it
-=======================================
+Make a code change and document it
+==================================
 Next we'll make changes to the actual source code. Open
 `uid.py <https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py>`_ in
 a text editor and around
@@ -198,8 +198,8 @@ should make sure the entire test suite passes::
   $ pytest
 
 
-Previewing your changes
-=======================
+Preview your changes
+====================
 It's a good idea to go through all the changes you've made by first staging
 and then displaying the difference between the current copy and the initial
 version we first checked out with::
@@ -212,8 +212,8 @@ You can scroll through the output using the up and down keys and quit with
 added. If everything looks good then its time to commit the changes.
 
 
-Committing your changes and making a pull request
-=================================================
+Commit your changes and make a pull request
+===========================================
 To commit the changes::
 
   $ git commit

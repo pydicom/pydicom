@@ -14,10 +14,10 @@ Introduction
 Many DICOM SOP classes contain bulk pixel data, which is usually used to
 represent one or more image frames (although :dcm:`other types of data
 <part03/sect_A.18.3.html>` are possible). In these SOP classes the pixel
-data is (almost) always contained in the (7fe0,0010) *Pixel Data* element.
+data is (almost) always contained in the (7FE0,0010) *Pixel Data* element.
 The only exception to this is :dcm:`Parametric Map Storage
-<part03/sect_A.75.3.html>` which may instead contain data in the (7fe0,0008)
-*Float Pixel Data* or (7fe0,0009) *Double Float Pixel Data* elements.
+<part03/sect_A.75.3.html>` which may instead contain data in the (7FE0,0008)
+*Float Pixel Data* or (7FE0,0009) *Double Float Pixel Data* elements.
 
 .. note::
 

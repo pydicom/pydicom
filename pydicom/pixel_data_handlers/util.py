@@ -702,10 +702,6 @@ def get_expected_length(ds, unit='bytes'):
     """Return the expected length (in terms of bytes or pixels) of the *Pixel
     Data*.
 
-    .. versionchanged:: 1.4
-
-        Added support for a *Photometric Interpretation* of  ``YBR_FULL_422``
-
     +------------------------------------------------+-------------+
     | Element                                        | Required or |
     +-------------+---------------------------+------+ optional    |
@@ -723,6 +719,10 @@ def get_expected_length(ds, unit='bytes'):
     +-------------+---------------------------+------+-------------+
     | (0028,0100) | BitsAllocated             | 1    | Required    |
     +-------------+---------------------------+------+-------------+
+
+    .. versionchanged:: 1.4
+
+        Added support for a *Photometric Interpretation* of  ``YBR_FULL_422``
 
     Parameters
     ----------
@@ -822,11 +822,6 @@ def get_image_pixel_ids(ds):
 def pixel_dtype(ds, as_float=False):
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
-    .. versionchanged:: 1.4
-
-        Added `as_float` keyword parameter and support for float dtypes.
-
-
     Suitable for use with IODs containing the Image Pixel module (with
     ``as_float=False``) and the Floating Point Image Pixel and Double Floating
     Point Image Pixel modules (with ``as_float=True``).
@@ -840,6 +835,11 @@ def pixel_dtype(ds, as_float=False):
     +-------------+---------------------+------+------------------+
     | (0028,0103) | PixelRepresentation | 1    | 0, 1             |
     +-------------+---------------------+------+------------------+
+
+    .. versionchanged:: 1.4
+
+        Added `as_float` keyword parameter and support for float dtypes.
+
 
     Parameters
     ----------

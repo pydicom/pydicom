@@ -1460,7 +1460,7 @@ class Dataset(dict):
         - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
           form
         - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
-          is ``False`` for the (7fe0,0010) *Pixel Data* element.
+          is ``False`` for the (7FE0,0010) *Pixel Data* element.
 
         Parameters
         ----------
@@ -1597,8 +1597,8 @@ class Dataset(dict):
         Returns
         -------
         numpy.ndarray
-            The (7fe0,0008) *Float Pixel Data*, (7fe0,0009) *Double Float
-            Pixel Data* or (7fe0,0010) *Pixel Data* converted to a
+            The (7FE0,0008) *Float Pixel Data*, (7FE0,0009) *Double Float
+            Pixel Data* or (7FE0,0010) *Pixel Data* converted to a
             :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()

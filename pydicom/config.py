@@ -150,7 +150,7 @@ pixel_data_handlers = [
     pillow_handler,
     jpegls_handler,
 ]
-"""Handlers for converting (7fe0,0010) *Pixel Data*.
+"""Handlers for converting (7FE0,0010) *Pixel Data*.
 
 .. currentmodule:: pydicom.dataset
 

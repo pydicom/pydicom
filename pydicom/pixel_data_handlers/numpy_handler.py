@@ -11,8 +11,8 @@ data to a :class:`numpy.ndarray`.
 
 **Supported data**
 
-The numpy handler supports the conversion of data in the (7fe0,0008) *Float
-Pixel Data*, (7fe0,0009) *Double Float Pixel Data* and (7fe0,0010)
+The numpy handler supports the conversion of data in the (7FE0,0008) *Float
+Pixel Data*, (7FE0,0009) *Double Float Pixel Data* and (7FE0,0010)
 *Pixel Data* elements to a :class:`~numpy.ndarray` provided the
 related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>`, :dcm:`Floating Point
 Image Pixel<part03/sect_C.7.6.24.html>` or  :dcm:`Double Floating Point Image

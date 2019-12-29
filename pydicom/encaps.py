@@ -13,11 +13,6 @@ from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 def get_frame_offsets(fp):
     """Return a list of the fragment offsets from the Basic Offset Table.
 
-    .. versionchanged:: 1.4
-
-        Changed to return (is BOT empty, list of offsets).
-
-
     **Basic Offset Table**
 
     The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
@@ -47,6 +42,10 @@ def get_frame_offsets(fp):
 
     All decoders, both for single and multi-frame images should accept both
     an empty Basic Offset Table and one containing offset values.
+
+    .. versionchanged:: 1.4
+
+        Changed to return (is BOT empty, list of offsets).
 
     Parameters
     ----------
@@ -133,7 +132,7 @@ def get_nr_fragments(fp):
 def generate_pixel_data_fragment(fp):
     """Yield the encapsulated pixel data fragments.
 
-    For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) *Pixel
+    For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
     Data* element is encoded in an encapsulated format.
 
     **Encapsulation**
@@ -167,7 +166,7 @@ def generate_pixel_data_fragment(fp):
     Parameters
     ----------
     fp : filebase.DicomBytesIO
-        The encoded (7fe0,0010) *Pixel Data* element value, positioned at the
+        The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -222,7 +221,7 @@ def generate_pixel_data_frame(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional
@@ -272,7 +271,7 @@ def generate_pixel_data(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0, 0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional

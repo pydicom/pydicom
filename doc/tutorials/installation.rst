@@ -11,6 +11,9 @@ How to install pydicom
    :doc:`virtual environments tutorial<virtualenvs>` on how to create and
    manage virtual environments.
 
+
+.. _tut_install:
+
 Install the official release
 ============================
 
@@ -46,6 +49,8 @@ Install using conda
 
   $ conda install -c conda-forge pydicom
 
+
+.. _tut_install_libs:
 
 Install the optional libraries
 ------------------------------
@@ -109,6 +114,8 @@ Through conda::
 
   $ conda install gdcm -c conda-forge
 
+
+.. _tut_install_dev:
 
 Install the development version
 ===============================

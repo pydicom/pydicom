@@ -21,6 +21,7 @@ Predefined UIDs
    JPEGLossless
    JPEGLSLossless
    JPEGLSLossy
+   JPEG2000Lossless
    JPEG2000
    JPEG2000MultiComponentLossless
    JPEG2000MultiComponent

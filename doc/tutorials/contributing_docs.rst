@@ -2,10 +2,10 @@
 Contributing a documentation change
 ===================================
 
-*pydicom's* documentation consists of a series of `ReStructuredText
-<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_ file located
-in the project's ``pydicom/doc`` directory which are converted to HTML using
-`Sphinx <http://www.sphinx-doc.org>`_.
+*pydicom's* documentation consists of a series of `reStructuredText
+<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_ files
+located in the project's ``pydicom/doc`` directory which are converted to
+HTML using `Sphinx <http://www.sphinx-doc.org>`_.
 
 Changes to the documentation generally come in two forms:
 
@@ -17,9 +17,9 @@ This tutorial will take you through the process of:
 
 * Downloading the current documentation
 * Installing required libraries
+* Building and previewing the documentation
 * Creating a new git branch
 * Making a change to the documentation
-* Building and previewing your changes
 * Committing the changes and making a pull request
 
 Download the documentation
@@ -60,6 +60,29 @@ Install required libraries
   $ pip install sphinx sphinx-rtd-theme sphinx-gallery
 
 
+Build and preview the documentation
+===================================
+
+To build the documentation locally, navigate to the ``doc`` directory and
+build the HTML::
+
+  $ cd pydicom/doc
+  $ make html
+
+Occasionally you may need to clean up the generated files before a change
+gets applied::
+
+  $ make clean && make html
+
+The built HTML can be viewed by opening ``_build/html/index.html`` in a
+web browser or by doing::
+
+  $ cd _build/html
+  $ python -m http.server 9999
+
+And then going to http://localhost:9999
+
+
 Create a new branch
 ===================
 Create a new branch ``doc-tut`` for your changes (you can choose any name
@@ -70,26 +93,36 @@ the documentation::
   $ git checkout -b doc-tut
 
 
-Building and previewing
-=======================
+Make a change to the documentation
+==================================
 
-::
+Let's add a new guide on how to read a DICOM file. Create a new ``reading.rst``
+file in ``doc/guides``, open it in a text editor and add in a title and some
+text::
 
-  $ cd pydicom/doc
-  $ make html
+  ===================
+  Reading DICOM files
+  ===================
 
-::
+  In this guide we will be reading a DICOM file using *pydicom*.
 
-  $ make clean && make html
+Save it and build the documentation (``make html``). You should see a warning
+in the build output, which we'll ignore for now:
+
+.. code-block:: text
+
+  checking consistency... [/path/to]/pydicom/doc/guides/reading.rst: WARNING: document isn't included in any toctree
+
+Open your browser and go to ``_build/html/guides/reading.html`` (if you're not
+using the Python ``http.server`` command) or
+http://localhost:9999/guides/reading.html (if you are).
+
+:doc:`Style guide</guides/writing_documentation>`
 
 
-Making a change to the documentation
-====================================
 
-
-
-Committing your changes and making a pull request
-=================================================
+Commit your changes and make a pull request
+===========================================
 To commit the changes::
 
   $ git commit
