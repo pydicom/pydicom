@@ -102,8 +102,8 @@ they must be written back to the dataset's ``PixelData`` element.
   ds.save_as("temp.dcm")
 
 Some changes may require other DICOM tags to be modified. For example, if the
-image size is reduced (e.g. a :math:`512 \times 512` image is shrunk to
-:math:`256 \times 256`) then ``Rows`` and ``Columns`` should be set
+image size is reduced (e.g. a 512x512 image is shrunk to 256x256) then
+``Rows`` and ``Columns`` should be set
 appropriately. You must explicitly set these yourself; *pydicom* does not do so
 automatically.
 

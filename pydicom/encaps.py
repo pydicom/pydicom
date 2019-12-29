@@ -13,6 +13,11 @@ from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 def get_frame_offsets(fp):
     """Return a list of the fragment offsets from the Basic Offset Table.
 
+    .. versionchanged:: 1.4
+
+        Changed to return (is BOT empty, list of offsets).
+
+
     **Basic Offset Table**
 
     The Basic Offset Table Item must be present and have a tag (FFFE,E000) and

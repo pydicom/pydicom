@@ -1447,6 +1447,10 @@ class Dataset(dict):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
+        .. versionadded:: 1.4
+
+            The `handler_name` keyword argument was added
+
         If not a compressed transfer syntax, then pixel data is converted
         to a :class:`numpy.ndarray` internally, but not returned.
 
@@ -1501,6 +1505,8 @@ class Dataset(dict):
 
     def overlay_array(self, group):
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
+
+        .. versionadded:: 1.4
 
         Returns
         -------
@@ -1583,6 +1589,10 @@ class Dataset(dict):
     @property
     def pixel_array(self):
         """Return the pixel data as a :class:`numpy.ndarray`.
+
+        .. versionchanged:: 1.4
+
+            Added support for *Float Pixel Data* and *Double Float Pixel Data*
 
         Returns
         -------

@@ -205,6 +205,13 @@ def unpack_bits(bytestream):
 def get_pixeldata(ds, read_only=False):
     """Return a :class:`numpy.ndarray` of the pixel data.
 
+    .. versionchanged:: 1.4
+
+        * Added support for uncompressed pixel data with a *Photometric
+          Interpretation* of ``YBR_FULL_422``.
+        * Added support for *Float Pixel Data* and *Double Float Pixel Data*
+
+
     Parameters
     ----------
     ds : Dataset

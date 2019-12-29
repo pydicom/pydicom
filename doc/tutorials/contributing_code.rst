@@ -43,7 +43,6 @@ Download the current source code
    $ pip install -e pydicom/
 
 
-
 (Optional) Install required libraries
 =====================================
 If you're going to be making changes to one of the pixel data

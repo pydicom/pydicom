@@ -43,6 +43,8 @@ def get_files(base, pattern):
 def get_palette_files(pattern="*"):
     """Return palette data files from pydicom data root.
 
+    .. versionadded:: 1.4
+
     Parameters
     ----------
     pattern : str, optional (default="*")
