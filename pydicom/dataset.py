@@ -1274,11 +1274,11 @@ class Dataset(dict):
 
         Parameters
         ----------
-        handler_name: str
-            The (optional) name of the pixel handler that shall be used to
-            decode the data. Currently supported handler names are: 'gdcm',
-            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
-            If empty (the default), a matching handler is used from the
+        handler_name : str, optional
+            The name of the pixel handler that shall be used to
+            decode the data. Supported names are: ``'gdcm'``,
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
@@ -1291,7 +1291,7 @@ class Dataset(dict):
         ValueError
             If `handler_name` is not a valid handler name.
         NotImplementedError
-            If the given handler or any handler, if none given, is able to
+            If the given handler or any handler, if none given, is unable to
             decompress pixel data with the current transfer syntax
         RuntimeError
             If the given handler, or the handler that has been selected if
@@ -1467,10 +1467,10 @@ class Dataset(dict):
         Parameters
         ----------
         handler_name : str, optional
-            The (optional) name of the pixel handler that shall be used to
-            decode the data. Currently supported handler names are: 'gdcm',
-            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
-            If empty (the default), a matching handler is used from the
+            The name of the pixel handler that shall be used to
+            decode the data. Supported names are: ``'gdcm'``,
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns

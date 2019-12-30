@@ -238,17 +238,17 @@ main entry window.
 To submit the pull request (PR) for real - **please don't do this for
 this example!** - then on the next page you would click *"Create pull
 request"*.
-Creating the PR will automatically start our checks; that the tests pass and
+Creating the PR would automatically start our checks; that the tests pass and
 the test coverage is good, that the documentation builds OK, etc.
 
-If all the checks pass and you're happy with your changes, change the PR title
-prefix to ``[MRG]``. This indicates that you consider the PR ready to be
-reviewed and merged into the main branch. You can also ask for a review or help
-at any point after creating the PR.
+If all the checks passed and you were happy with your changes, you'd change
+the PR title prefix to ``[MRG]``. This would indicate that you considered the
+PR ready to be reviewed and merged into the main branch. You could also ask
+for a review or help at any point after creating the PR.
 
 What happens next?
 ==================
-One or more reviewers will look at your pull-request and may make suggestions,
-ask for clarification or request changes. Once the reviewers are happy then the
-pull request will be approved and your changes will be merged into the
-``master`` branch and become part of *pydicom*. Congratulations!
+One or more reviewers would look at your pull-request and may make suggestions,
+ask for clarification or request changes. Once the reviewers were happy then
+the pull request would be approved and your changes merged into the
+``master`` branch where they would become part of *pydicom*. Congratulations!

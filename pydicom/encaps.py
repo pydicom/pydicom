@@ -140,7 +140,7 @@ def generate_pixel_data_fragment(fp):
     The encoded pixel data stream is fragmented into one or more Items. The
     stream may represent a single or multi-frame image.
 
-    Each *Data Stream Fragment* shall have tag of (fffe,e000), followed by a 4
+    Each *Data Stream Fragment* shall have tag of (FFFE,E000), followed by a 4
     byte *Item Length* field encoding the explicit number of bytes in the Item.
     All Items containing an encoded fragment shall have an even number of bytes
     greater than or equal to 2, with the last fragment being padded if
@@ -154,7 +154,7 @@ def generate_pixel_data_fragment(fp):
     The remaining items in the Sequence of Items are the pixel data fragments
     and it is these items that will be read and returned by this function.
 
-    The Sequence of Items is terminated by a (fffe,e0dd) *Sequence Delimiter
+    The Sequence of Items is terminated by a (FFFE,E0DD) *Sequence Delimiter
     Item* with an Item Length field of value ``0x00000000``. The presence
     or absence of the *Sequence Delimiter Item* in `fp` has no effect on the
     returned fragments.
@@ -527,7 +527,7 @@ def fragment_frame(frame, nr_fragments=1):
     * Any necessary padding may be appended after the end of image marker.
     * Encapsulated Pixel Data has the Value Representation OB.
     * Values with a VR of OB shall be padded with a single trailing NULL byte
-      value (0x00) to achieve even length.
+      value (``0x00``) to achieve even length.
 
     References
     ----------
@@ -639,7 +639,7 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
 
     Data will be encapsulated with a Basic Offset Table Item at the beginning,
     then one or more fragment Items. Each item will be of even length and the
-    final fragment of each frame may be padded with 0x00 if required.
+    final fragment of each frame may be padded with ``0x00`` if required.
 
     Parameters
     ----------

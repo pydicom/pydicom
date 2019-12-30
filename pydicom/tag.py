@@ -55,7 +55,7 @@ def Tag(arg, arg2=None):
 
     .. versionchanged:: 1.3
 
-        Added support for creating a Tag using an element keyword
+        Added support for creating a ``BaseTag`` using an element keyword
 
     Parameters
     ----------

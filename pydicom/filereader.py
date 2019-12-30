@@ -72,9 +72,9 @@ def data_element_generator(fp,
         ``None`` if implicit VR, otherwise the VR read from the file.
     length : int
         The length of the DICOM data element (could be DICOM "undefined
-        length" ``0xffffffffL``)
+        length" ``0xFFFFFFFFL``)
     value_bytes : bytes or str
-        The raw bytes from the DICOM file (not parsed into python types)
+        The raw bytes from the DICOM file (not parsed into Python types)
     is_little_endian : bool
         ``True`` if transfer syntax is little endian; else ``False``.
     """
@@ -356,8 +356,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     See Also
     --------
-    dataset.Dataset
-        A collection (dictionary) of DICOM ``DataElement`` instances.
+    :class:`~pydicom.dataset.Dataset`
+        A collection (dictionary) of DICOM
+        :class:`~pydicom.dataelem.DataElement` instances.
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
@@ -398,8 +399,8 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
 def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
                   offset=0):
-    """Read and return a Sequence -- i.e. a :class:`list` of
-    :class:`Datasets<pydicom.dataset.Dataset>`.
+    """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
+    :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
     """
 
     seq = []  # use builtin list to start for speed, convert to Sequence at end
@@ -425,8 +426,8 @@ def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
 
 def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
                        offset=0):
-    """Read and return a single sequence item, i.e. a
-    :class:`~pydicom.dataset.Dataset`.
+    """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
+    a :class:`~pydicom.dataset.Dataset`.
     """
     seq_item_tell = fp.tell() + offset
     if is_little_endian:
@@ -790,7 +791,8 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         ``True`` to stop before reading (7FE0,0010) *Pixel Data* (and all
         subsequent elements).
     force : bool, optional
-        If ``False`` (default), raises an ``InvalidDicomError`` if the file is
+        If ``False`` (default), raises an
+        :class:`~pydicom.errors.InvalidDicomError` if the file is
         missing the *File Meta Information* header. Set to ``True`` to force
         reading even if no *File Meta Information* header is found.
     specific_tags : list or None, optional

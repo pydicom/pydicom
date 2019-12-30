@@ -472,7 +472,7 @@ class DataElement(object):
 
     @property
     def is_empty(self):
-        """Return `True` if the element has no value."""
+        """Return ``True`` if the element has no value."""
         return self.VM == 0
 
     @property

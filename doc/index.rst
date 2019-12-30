@@ -8,16 +8,17 @@ pydicom documentation
    :hidden:
    :caption: Getting started
 
-   tutorials/installation.rst
-   old/getting_started.rst
+   tutorials/installation
+   old/getting_started
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Documentation
 
-   old/pydicom_user_guide.rst
-   old/ref_guide.rst
+   old/pydicom_user_guide
+   old/ref_guide
+   tutorials/index
    reference/index
 
 .. toctree::
@@ -32,7 +33,7 @@ pydicom documentation
    :hidden:
    :caption: Additional Information
 
-   tutorials/contributing.rst
+   tutorials/contributing
    faq/index
    release_notes/index
 
