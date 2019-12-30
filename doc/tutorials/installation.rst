@@ -69,7 +69,7 @@ Through conda::
 To decode JPEG compressed pixel data one or more additional libraries will
 need to be installed. See :ref:`this page <guide_compressed>` for a list of
 which library is needed to handle a given JPEG format, as specified by
-the (0002,0010) *Transfer Syntax UID* value.
+the dataset's (0002,0010) *Transfer Syntax UID* value.
 
 
 Installing Pillow

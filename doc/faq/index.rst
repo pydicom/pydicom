@@ -12,7 +12,7 @@ General
 What happened to import dicom?
 ------------------------------
 Starting in version 1.0, *pydicom* changed the library import from
-``import dicom`` to ``import pydicom``. If you're used to using the early
+``import dicom`` to ``import pydicom``. If you're used to using the earlier
 versions of *pydicom* see the :doc:`transitioning guide
 <../old/transition_to_pydicom1>` on how to make the change.
 
@@ -24,10 +24,11 @@ The easiest method is probably to `find the Zenodo DOI
 for the version you are using and then entering your required citation style
 in the *Cite as* box.
 
-Alternatively, you can use something along the lines of::
+Alternatively, you can use something along the lines of:
 
-  Mason, D. L. et al, Pydicom: An Open Source DICOM Library, 2008-,
-  https://github.com/pydicom/pydicom [Online; accessed YYYY-MM-DD].
+.. code-block:: text
+
+  Mason, D. L., et al, pydicom: An open source DICOM library, https://github.com/pydicom/pydicom [Online; accessed YYYY-MM-DD].
 
 
 .. _faq_install:
@@ -46,8 +47,8 @@ Optional
 ~~~~~~~~
 When manipulating *Pixel Data* it's recommended that you install
 `NumPy <https://numpy.org/>`_. When dealing with JPEG
-compressed *Pixel Data* see :ref:`this table<guide_compressed>` for what
-Python libraries are required.
+compressed *Pixel Data* see :ref:`this table<guide_compressed>` for which
+libraries are required.
 
 .. _faq_install_version:
 
@@ -77,4 +78,5 @@ What about support for Python 2.7?
 
 Python 2.7 reached `end of life <https://www.python.org/doc/sunset-python-2/>`_
 on 1st January, 2020 and will no longer be supported by *pydicom* starting
-from v2.0 (expected release date is April 2020).
+from v2.0 (expected release date is April 2020). More information is available
+:doc:`here</old/python2_support>`.

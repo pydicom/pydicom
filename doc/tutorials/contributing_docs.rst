@@ -207,7 +207,7 @@ There are also a number of directives that tell Sphinx to do certain things
 these `here <https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html>`_.
 
 For more information on writing documentation for *pydicom*, see
-:doc:`Writing documentation</guides/writing_documentation>`.
+:doc:`writing documentation</guides/writing_documentation>`.
 
 Just like before, you should build and preview the updated page. When you're
 happy with the results move on to the next section.
@@ -256,3 +256,16 @@ One or more reviewers would look at your pull-request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy then
 the pull request would be approved and your changes merged into the
 ``master`` branch where they would become part of *pydicom*.
+
+However, because this is just an example, all we're going to do is clean up the
+changes we've made. First we switch back to the ``master`` branch::
+
+  $ git checkout master
+
+We delete the local copy of the branch we created::
+
+  $ git branch -d doc-tut
+
+And lastly we delete the remote copy on GitHub. Go to
+``https://github.com/YourUsername/pydicom/branches``, find the ``doc-tut``
+branch and click the corresponding red bin icon. All done!

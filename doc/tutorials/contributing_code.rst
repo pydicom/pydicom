@@ -33,8 +33,9 @@ Download the current source code
    of Python and installed packages. See the
    :doc:`virtual environments<virtualenvs>` tutorial for more information.
 
-   Create a new virtualenv ``pydX.Y``, where ``X.Y`` is a Python version such
-   as 3.7::
+   Create a new virtualenv ``pydX.Y``, where ``X.Y`` is an installed Python
+   version such as 3.7 and ``/path/to/pythonX.Y`` is the path to the
+   corresponding Python executable::
 
    $ mkvirtualenv -p /path/to/pythonX.Y pydX.Y
 
@@ -184,7 +185,7 @@ When making changes, and especially when adding new features, its important
 that they're documented. It's very difficult for users to find and
 understand how to use code that hasn't been documented, or whose documentation
 contains errors. For more information on how to properly document *pydicom*
-see **contributing documentation**
+see :doc:`writing documentation</guides/writing_documentation>`.
 
 Now we run the tests again so we can see whether or not the code we added is
 working::
@@ -251,4 +252,17 @@ What happens next?
 One or more reviewers would look at your pull-request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy then
 the pull request would be approved and your changes merged into the
-``master`` branch where they would become part of *pydicom*. Congratulations!
+``master`` branch where they would become part of *pydicom*.
+
+However, because this is just an example, all we're going to do is clean up the
+changes we've made. First we switch back to the ``master`` branch::
+
+  $ git checkout master
+
+We delete the local copy of the branch we created::
+
+  $ git branch -d new-uid
+
+  And lastly we delete the remote copy on GitHub. Go to
+  ``https://github.com/YourUsername/pydicom/branches``, find the ``doc-tut``
+  branch and click the corresponding red bin icon. All done!
