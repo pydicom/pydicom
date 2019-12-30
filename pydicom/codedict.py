@@ -45,10 +45,18 @@ class _CID_Dict(object):
         # Force zip object into a list in case of python3. Also backwards
         # compatible
         meths = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[0]
+            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
+                0
+            ]
         )
         props = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0]
+            list(
+                zip(
+                    *inspect.getmembers(
+                        self.__class__, inspect.isdatadescriptor
+                    )
+                )
+            )[0]
         )
         sr_names = set(self.dir())
         alldir = sorted(props | meths | sr_names)
@@ -75,11 +83,15 @@ class _CID_Dict(object):
                 code, val = list(concept.items())[0]
             else:
                 matches = [
-                    (code, val) for code, val in concept.items() if self.cid in val[1]
+                    (code, val)
+                    for code, val in concept.items()
+                    if self.cid in val[1]
                 ]
                 if len(matches) > 1:
                     # Should never happen, but check in case
-                    msg = "{} had multiple code matches for cid{}".format(name, cid)
+                    msg = "{} had multiple code matches for cid{}".format(
+                        name, cid
+                    )
                     raise AssertionError(msg)
                 code, val = matches[0]
             return Code(value=code, meaning=val[0], scheme_designator=scheme)
@@ -101,9 +113,12 @@ class _CID_Dict(object):
     def __str__(self):
         heading = "CID{}\n".format(self.cid)
         fmt = self.str_format
-        line2 = self.str_format.format("Business name", "value", "scheme", "meaning")
+        line2 = self.str_format.format(
+            "Business name", "value", "scheme", "meaning"
+        )
         lines = "".join(
-            fmt.format(name, *concept) for name, concept in self.concepts.items()
+            fmt.format(name, *concept)
+            for name, concept in self.concepts.items()
         )
         return heading + line2 + lines
 
@@ -171,10 +186,18 @@ class _CodesDict(object):
         # Force zip object into a list in case of python3. Also backwards
         # compatible
         meths = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[0]
+            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
+                0
+            ]
         )
         props = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0]
+            list(
+                zip(
+                    *inspect.getmembers(
+                        self.__class__, inspect.isdatadescriptor
+                    )
+                )
+            )[0]
         )
         sr_names = set(self.dir())
         alldir = sorted(props | meths | sr_names)
