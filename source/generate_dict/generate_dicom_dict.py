@@ -263,12 +263,17 @@ for attr in attrs:
     # replace micro symbol
     attr["Name"] = attr["Name"].replace(u"µ", "u")
 
+    # some new tags don't have the retired entry (2019)
+    if 'Retired' not in attr:
+        attr['Retired'] = ''
     # e.g. (0014,0023) and (0018,9445)
-    if attr['Retired'] in ['RET', 'RET - See Note']:
+    elif attr['Retired'] in ['RET', 'RET - See Note']:
         attr['Retired'] = 'Retired'
-
+    # since 2019 the year is added, e.g. RET(2007)
+    elif attr['Retired'].startswith('RET ('):
+        attr['Retired'] = 'Retired'
     # e.g. (0008,0102), (0014,0025), (0040, A170)
-    if attr['Retired'] in ['DICOS', 'DICONDE', 'See Note']:
+    elif attr['Retired'] in ['DICOS', 'DICONDE', 'See Note']:
         attr['Retired'] = ''
 
     # e.g. (0028,1200)

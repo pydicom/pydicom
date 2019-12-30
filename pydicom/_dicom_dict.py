@@ -59,6 +59,16 @@ DicomDictionary = {
     0x00020016: ('AE', '1', "Source Application Entity Title", '', 'SourceApplicationEntityTitle'),  # noqa
     0x00020017: ('AE', '1', "Sending Application Entity Title", '', 'SendingApplicationEntityTitle'),  # noqa
     0x00020018: ('AE', '1', "Receiving Application Entity Title", '', 'ReceivingApplicationEntityTitle'),  # noqa
+    0x00020026: ('UR', '1', "Source Presentation Address", '', 'SourcePresentationAddress'),  # noqa
+    0x00020027: ('UR', '1', "Sending Presentation Address", '', 'SendingPresentationAddress'),  # noqa
+    0x00020028: ('UR', '1', "Receiving Presentation Address", '', 'ReceivingPresentationAddress'),  # noqa
+    0x00020031: ('OB', '1', "RTV Meta Information Version", '', 'RTVMetaInformationVersion'),  # noqa
+    0x00020032: ('UI', '1', "RTV Communication SOP Class UID", '', 'RTVCommunicationSOPClassUID'),  # noqa
+    0x00020033: ('UI', '1', "RTV Communication SOP Instance UID", '', 'RTVCommunicationSOPInstanceUID'),  # noqa
+    0x00020035: ('OB', '1', "RTV Source Identifier", '', 'RTVSourceIdentifier'),  # noqa
+    0x00020036: ('OB', '1', "RTV Flow Identifier", '', 'RTVFlowIdentifier'),  # noqa
+    0x00020037: ('UL', '1', "RTV Flow RTP Sampling Rate", '', 'RTVFlowRTPSamplingRate'),  # noqa
+    0x00020038: ('FD', '1', "RTV Flow Actual Frame Duration", '', 'RTVFlowActualFrameDuration'),  # noqa
     0x00020100: ('UI', '1', "Private Information Creator UID", '', 'PrivateInformationCreatorUID'),  # noqa
     0x00020102: ('OB', '1', "Private Information", '', 'PrivateInformation'),  # noqa
     0x00041130: ('CS', '1', "File-set ID", '', 'FileSetID'),  # noqa
@@ -190,6 +200,7 @@ DicomDictionary = {
     0x0008103E: ('LO', '1', "Series Description", '', 'SeriesDescription'),  # noqa
     0x0008103F: ('SQ', '1', "Series Description Code Sequence", '', 'SeriesDescriptionCodeSequence'),  # noqa
     0x00081040: ('LO', '1', "Institutional Department Name", '', 'InstitutionalDepartmentName'),  # noqa
+    0x00081041: ('SQ', '1', "Institutional Department Type Code Sequence", '', 'InstitutionalDepartmentTypeCodeSequence'),  # noqa
     0x00081048: ('PN', '1-n', "Physician(s) of Record", '', 'PhysiciansOfRecord'),  # noqa
     0x00081049: ('SQ', '1', "Physician(s) of Record Identification Sequence", '', 'PhysiciansOfRecordIdentificationSequence'),  # noqa
     0x00081050: ('PN', '1-n', "Performing Physician's Name", '', 'PerformingPhysicianName'),  # noqa
@@ -273,6 +284,7 @@ DicomDictionary = {
     0x0008225A: ('SQ', '1', "Anatomic Structure Space Or Region Modifier Code Sequence (Trial)", 'Retired', 'AnatomicStructureSpaceOrRegionModifierCodeSequenceTrial'),  # noqa
     0x0008225C: ('SQ', '1', "On Axis Background Anatomic Structure Code Sequence (Trial)", 'Retired', 'OnAxisBackgroundAnatomicStructureCodeSequenceTrial'),  # noqa
     0x00083001: ('SQ', '1', "Alternate Representation Sequence", '', 'AlternateRepresentationSequence'),  # noqa
+    0x00083002: ('UI', '1-n', "Available Transfer Syntax UID", '', 'AvailableTransferSyntaxUID'),  # noqa
     0x00083010: ('UI', '1-n', "Irradiation Event UID", '', 'IrradiationEventUID'),  # noqa
     0x00083011: ('SQ', '1', "Source Irradiation Event Sequence", '', 'SourceIrradiationEventSequence'),  # noqa
     0x00083012: ('UI', '1', "Radiopharmaceutical Administration Event UID", '', 'RadiopharmaceuticalAdministrationEventUID'),  # noqa
@@ -586,6 +598,111 @@ DicomDictionary = {
     0x0014511D: ('DS', '1', "Wedge Chamfer Height", '', 'WedgeChamferHeight'),  # noqa
     0x0014511E: ('CS', '1', "Wedge Curve", '', 'WedgeCurve'),  # noqa
     0x0014511F: ('DS', '1', "Radius Along the Wedge", '', 'RadiusAlongWedge'),  # noqa
+    0x00160001: ('DS', '1', "White Point", '', 'WhitePoint'),  # noqa
+    0x00160002: ('DS', '3', "Primary Chromaticities", '', 'PrimaryChromaticities'),  # noqa
+    0x00160003: ('UT', '1', "Battery Level", '', 'BatteryLevel'),  # noqa
+    0x00160004: ('DS', '1', "Exposure Time in Seconds", '', 'ExposureTimeInSeconds'),  # noqa
+    0x00160005: ('DS', '1', "F-Number", '', 'FNumber'),  # noqa
+    0x00160006: ('IS', '1', "OECF Rows", '', 'OECFRows'),  # noqa
+    0x00160007: ('IS', '1', "OECF Columns", '', 'OECFColumns'),  # noqa
+    0x00160008: ('UC', '1-n', "OECF Column Names", '', 'OECFColumnNames'),  # noqa
+    0x00160009: ('DS', '1-n', "OECF Values", '', 'OECFValues'),  # noqa
+    0x0016000A: ('IS', '1', "Spatial Frequency Response Rows", '', 'SpatialFrequencyResponseRows'),  # noqa
+    0x0016000B: ('IS', '1', "Spatial Frequency Response Columns", '', 'SpatialFrequencyResponseColumns'),  # noqa
+    0x0016000C: ('UC', '1-n', "Spatial Frequency Response Column Names", '', 'SpatialFrequencyResponseColumnNames'),  # noqa
+    0x0016000D: ('DS', '1-n', "Spatial Frequency Response Values", '', 'SpatialFrequencyResponseValues'),  # noqa
+    0x0016000E: ('IS', '1', "Color Filter Array Pattern Rows", '', 'ColorFilterArrayPatternRows'),  # noqa
+    0x0016000F: ('IS', '1', "Color Filter Array Pattern Columns", '', 'ColorFilterArrayPatternColumns'),  # noqa
+    0x00160010: ('DS', '1-n', "Color Filter Array Pattern Values", '', 'ColorFilterArrayPatternValues'),  # noqa
+    0x00160011: ('US', '1', "Flash Firing Status", '', 'FlashFiringStatus'),  # noqa
+    0x00160012: ('US', '1', "Flash Return Status", '', 'FlashReturnStatus'),  # noqa
+    0x00160013: ('US', '1', "Flash Mode", '', 'FlashMode'),  # noqa
+    0x00160014: ('US', '1', "Flash Function Present", '', 'FlashFunctionPresent'),  # noqa
+    0x00160015: ('US', '1', "Flash Red Eye Mode", '', 'FlashRedEyeMode'),  # noqa
+    0x00160016: ('US', '1', "Exposure Program", '', 'ExposureProgram'),  # noqa
+    0x00160017: ('UT', '1', "Spectral Sensitivity", '', 'SpectralSensitivity'),  # noqa
+    0x00160018: ('IS', '1', "Photographic Sensitivity", '', 'PhotographicSensitivity'),  # noqa
+    0x00160019: ('IS', '1', "Self Timer Mode", '', 'SelfTimerMode'),  # noqa
+    0x0016001A: ('US', '1', "Sensitivity Type", '', 'SensitivityType'),  # noqa
+    0x0016001B: ('IS', '1', "Standard Output Sensitivity", '', 'StandardOutputSensitivity'),  # noqa
+    0x0016001C: ('IS', '1', "Recommended Exposure Index", '', 'RecommendedExposureIndex'),  # noqa
+    0x0016001D: ('IS', '1', "ISO Speed", '', 'ISOSpeed'),  # noqa
+    0x0016001E: ('IS', '1', "ISO Speed Latitude yyy", '', 'ISOSpeedLatitudeyyy'),  # noqa
+    0x0016001F: ('IS', '1', "ISO Speed Latitude zzz", '', 'ISOSpeedLatitudezzz'),  # noqa
+    0x00160020: ('UT', '1', "EXIF Version", '', 'EXIFVersion'),  # noqa
+    0x00160021: ('DS', '1', "Shutter Speed Value", '', 'ShutterSpeedValue'),  # noqa
+    0x00160022: ('DS', '1', "Aperture Value", '', 'ApertureValue'),  # noqa
+    0x00160023: ('DS', '1', "Brightness Value", '', 'BrightnessValue'),  # noqa
+    0x00160024: ('DS', '1', "Exposure Bias Value", '', 'ExposureBiasValue'),  # noqa
+    0x00160025: ('DS', '1', "Max Aperture Value", '', 'MaxApertureValue'),  # noqa
+    0x00160026: ('DS', '1', "Subject Distance", '', 'SubjectDistance'),  # noqa
+    0x00160027: ('US', '1', "Metering Mode", '', 'MeteringMode'),  # noqa
+    0x00160028: ('US', '1', "Light Source", '', 'LightSource'),  # noqa
+    0x00160029: ('DS', '1', "Focal Length", '', 'FocalLength'),  # noqa
+    0x0016002A: ('IS', '2-4', "Subject Area", '', 'SubjectArea'),  # noqa
+    0x0016002B: ('OB', '1', "Maker Note", '', 'MakerNote'),  # noqa
+    0x00160030: ('DS', '1', "Temperature", '', 'Temperature'),  # noqa
+    0x00160031: ('DS', '1', "Humidity", '', 'Humidity'),  # noqa
+    0x00160032: ('DS', '1', "Pressure", '', 'Pressure'),  # noqa
+    0x00160033: ('DS', '1', "Water Depth", '', 'WaterDepth'),  # noqa
+    0x00160034: ('DS', '1', "Acceleration", '', 'Acceleration'),  # noqa
+    0x00160035: ('DS', '1', "Camera Elevation Angle", '', 'CameraElevationAngle'),  # noqa
+    0x00160036: ('DS', '1-2', "Flash Energy", '', 'FlashEnergy'),  # noqa
+    0x00160037: ('IS', '2', "Subject Location", '', 'SubjectLocation'),  # noqa
+    0x00160038: ('DS', '1', "Photographic Exposure Index", '', 'PhotographicExposureIndex'),  # noqa
+    0x00160039: ('US', '1', "Sensing Method", '', 'SensingMethod'),  # noqa
+    0x0016003A: ('US', '1', "File Source", '', 'FileSource'),  # noqa
+    0x0016003B: ('US', '1', "Scene Type", '', 'SceneType'),  # noqa
+    0x00160041: ('US', '1', "Custom Rendered", '', 'CustomRendered'),  # noqa
+    0x00160042: ('US', '1', "Exposure Mode", '', 'ExposureMode'),  # noqa
+    0x00160043: ('US', '1', "White Balance", '', 'WhiteBalance'),  # noqa
+    0x00160044: ('DS', '1', "Digital Zoom Ratio", '', 'DigitalZoomRatio'),  # noqa
+    0x00160045: ('IS', '1', "Focal Length In 35mm Film", '', 'FocalLengthIn35mmFilm'),  # noqa
+    0x00160046: ('US', '1', "Scene Capture Type", '', 'SceneCaptureType'),  # noqa
+    0x00160047: ('US', '1', "Gain Control", '', 'GainControl'),  # noqa
+    0x00160048: ('US', '1', "Contrast", '', 'Contrast'),  # noqa
+    0x00160049: ('US', '1', "Saturation", '', 'Saturation'),  # noqa
+    0x0016004A: ('US', '1', "Sharpness", '', 'Sharpness'),  # noqa
+    0x0016004B: ('OB', '1', "Device Setting Description", '', 'DeviceSettingDescription'),  # noqa
+    0x0016004C: ('US', '1', "Subject Distance Range", '', 'SubjectDistanceRange'),  # noqa
+    0x0016004D: ('UT', '1', "Camera Owner Name", '', 'CameraOwnerName'),  # noqa
+    0x0016004E: ('DS', '4', "Lens Specification", '', 'LensSpecification'),  # noqa
+    0x0016004F: ('UT', '1', "Lens Make", '', 'LensMake'),  # noqa
+    0x00160050: ('UT', '1', "Lens Model", '', 'LensModel'),  # noqa
+    0x00160051: ('UT', '1', "Lens Serial Number", '', 'LensSerialNumber'),  # noqa
+    0x00160061: ('CS', '1', "Interoperability Index", '', 'InteroperabilityIndex'),  # noqa
+    0x00160062: ('OB', '1', "Interoperability Version", '', 'InteroperabilityVersion'),  # noqa
+    0x00160070: ('OB', '1', "GPS Version ID", '', 'GPSVersionID'),  # noqa
+    0x00160071: ('CS', '1', "GPS Latitude Ref", '', 'GPSLatitudeRef'),  # noqa
+    0x00160072: ('DS', '3', "GPS Latitude", '', 'GPSLatitude'),  # noqa
+    0x00160073: ('CS', '1', "GPS Longitude Ref", '', 'GPSLongitudeRef'),  # noqa
+    0x00160074: ('DS', '3', "GPS Longitude", '', 'GPSLongitude'),  # noqa
+    0x00160075: ('US', '1', "GPS Altitude Ref", '', 'GPSAltitudeRef'),  # noqa
+    0x00160076: ('DS', '1', "GPS Altitude", '', 'GPSAltitude'),  # noqa
+    0x00160077: ('DT', '1', "GPS Time Stamp", '', 'GPSTimeStamp'),  # noqa
+    0x00160078: ('UT', '1', "GPS Satellites", '', 'GPSSatellites'),  # noqa
+    0x00160079: ('CS', '1', "GPS Status", '', 'GPSStatus'),  # noqa
+    0x0016007A: ('CS', '1', "GPS Measure Mode", '', 'GPSMeasureMode'),  # noqa
+    0x0016007B: ('DS', '1', "GPS DOP", '', 'GPSDOP'),  # noqa
+    0x0016007C: ('CS', '1', "GPS Speed Ref", '', 'GPSSpeedRef'),  # noqa
+    0x0016007D: ('DS', '1', "GPS Speed", '', 'GPSSpeed'),  # noqa
+    0x0016007E: ('CS', '1', "GPS Track Ref", '', 'GPSTrackRef'),  # noqa
+    0x0016007F: ('DS', '1', "GPS Track", '', 'GPSTrack'),  # noqa
+    0x00160080: ('CS', '1', "GPS Img Direction Ref", '', 'GPSImgDirectionRef'),  # noqa
+    0x00160081: ('DS', '1', "GPS Img Direction", '', 'GPSImgDirection'),  # noqa
+    0x00160082: ('UT', '1', "GPS Map Datum", '', 'GPSMapDatum'),  # noqa
+    0x00160083: ('CS', '1', "GPS Dest Latitude Ref", '', 'GPSDestLatitudeRef'),  # noqa
+    0x00160084: ('DS', '3', "GPS Dest Latitude", '', 'GPSDestLatitude'),  # noqa
+    0x00160085: ('CS', '1', "GPS Dest Longitude Ref", '', 'GPSDestLongitudeRef'),  # noqa
+    0x00160086: ('DS', '3', "GPS Dest Longitude", '', 'GPSDestLongitude'),  # noqa
+    0x00160087: ('CS', '1', "GPS Dest Bearing Ref", '', 'GPSDestBearingRef'),  # noqa
+    0x00160088: ('DS', '1', "GPS Dest Bearing", '', 'GPSDestBearing'),  # noqa
+    0x00160089: ('CS', '1', "GPS Dest Distance Ref", '', 'GPSDestDistanceRef'),  # noqa
+    0x0016008A: ('DS', '1', "GPS Dest Distance", '', 'GPSDestDistance'),  # noqa
+    0x0016008B: ('OB', '1', "GPS Processing Method", '', 'GPSProcessingMethod'),  # noqa
+    0x0016008C: ('OB', '1', "GPS Area Information", '', 'GPSAreaInformation'),  # noqa
+    0x0016008D: ('DT', '1', "GPS Date Stamp", '', 'GPSDateStamp'),  # noqa
+    0x0016008E: ('IS', '1', "GPS Differential", '', 'GPSDifferential'),  # noqa
     0x00180010: ('LO', '1', "Contrast/Bolus Agent", '', 'ContrastBolusAgent'),  # noqa
     0x00180012: ('SQ', '1', "Contrast/Bolus Agent Sequence", '', 'ContrastBolusAgentSequence'),  # noqa
     0x00180013: ('FL', '1', "Contrast/Bolus T1 Relaxivity", '', 'ContrastBolusT1Relaxivity'),  # noqa
@@ -649,6 +766,7 @@ DicomDictionary = {
     0x00181008: ('LO', '1', "Gantry ID", '', 'GantryID'),  # noqa
     0x00181009: ('UT', '1', "Unique Device Identifier", '', 'UniqueDeviceIdentifier'),  # noqa
     0x0018100A: ('SQ', '1', "UDI Sequence", '', 'UDISequence'),  # noqa
+    0x0018100B: ('UI', '1-n', "Manufacturer's Device Class UID", '', 'ManufacturerDeviceClassUID'),  # noqa
     0x00181010: ('LO', '1', "Secondary Capture Device ID", '', 'SecondaryCaptureDeviceID'),  # noqa
     0x00181011: ('LO', '1', "Hardcopy Creation Device ID", 'Retired', 'HardcopyCreationDeviceID'),  # noqa
     0x00181012: ('DA', '1', "Date of Secondary Capture", '', 'DateOfSecondaryCapture'),  # noqa
@@ -659,7 +777,7 @@ DicomDictionary = {
     0x00181019: ('LO', '1-n', "Secondary Capture Device Software Versions", '', 'SecondaryCaptureDeviceSoftwareVersions'),  # noqa
     0x0018101A: ('LO', '1-n', "Hardcopy Device Software Version", 'Retired', 'HardcopyDeviceSoftwareVersion'),  # noqa
     0x0018101B: ('LO', '1', "Hardcopy Device Manufacturer's Model Name", 'Retired', 'HardcopyDeviceManufacturerModelName'),  # noqa
-    0x00181020: ('LO', '1-n', "Software Version(s)", '', 'SoftwareVersions'),  # noqa
+    0x00181020: ('LO', '1-n', "Software Versions", '', 'SoftwareVersions'),  # noqa
     0x00181022: ('SH', '1', "Video Image Format Acquired", '', 'VideoImageFormatAcquired'),  # noqa
     0x00181023: ('LO', '1', "Digital Image Format Acquired", '', 'DigitalImageFormatAcquired'),  # noqa
     0x00181030: ('LO', '1', "Protocol Name", '', 'ProtocolName'),  # noqa
@@ -816,6 +934,15 @@ DicomDictionary = {
     0x00181622: ('US', '1', "Shutter Presentation Value", '', 'ShutterPresentationValue'),  # noqa
     0x00181623: ('US', '1', "Shutter Overlay Group", '', 'ShutterOverlayGroup'),  # noqa
     0x00181624: ('US', '3', "Shutter Presentation Color CIELab Value", '', 'ShutterPresentationColorCIELabValue'),  # noqa
+    0x00181630: ('CS', '1', "Outline Shape Type", '', 'OutlineShapeType'),  # noqa
+    0x00181631: ('FD', '1', "Outline Left Vertical Edge", '', 'OutlineLeftVerticalEdge'),  # noqa
+    0x00181632: ('FD', '1', "Outline Right Vertical Edge", '', 'OutlineRightVerticalEdge'),  # noqa
+    0x00181633: ('FD', '1', "Outline Upper Horizontal Edge", '', 'OutlineUpperHorizontalEdge'),  # noqa
+    0x00181634: ('FD', '1', "Outline Lower Horizontal Edge", '', 'OutlineLowerHorizontalEdge'),  # noqa
+    0x00181635: ('FD', '2', "Center of Circular Outline", '', 'CenterOfCircularOutline'),  # noqa
+    0x00181636: ('FD', '1', "Diameter of Circular Outline", '', 'DiameterOfCircularOutline'),  # noqa
+    0x00181637: ('UL', '1', "Number of Polygonal Vertices", '', 'NumberOfPolygonalVertices'),  # noqa
+    0x00181638: ('OF', '1', "Vertices of the Polygonal Outline", '', 'VerticesOfThePolygonalOutline'),  # noqa
     0x00181700: ('CS', '1-3', "Collimator Shape", '', 'CollimatorShape'),  # noqa
     0x00181702: ('IS', '1', "Collimator Left Vertical Edge", '', 'CollimatorLeftVerticalEdge'),  # noqa
     0x00181704: ('IS', '1', "Collimator Right Vertical Edge", '', 'CollimatorRightVerticalEdge'),  # noqa
@@ -1169,6 +1296,42 @@ DicomDictionary = {
     0x00189352: ('FL', '3', "Calcium Scoring Mass Factor Device", '', 'CalciumScoringMassFactorDevice'),  # noqa
     0x00189353: ('FL', '1', "Energy Weighting Factor", '', 'EnergyWeightingFactor'),  # noqa
     0x00189360: ('SQ', '1', "CT Additional X-Ray Source Sequence", '', 'CTAdditionalXRaySourceSequence'),  # noqa
+    0x00189361: ('CS', '1', "Multi-energy CT Acquisition", '', 'MultienergyCTAcquisition'),  # noqa
+    0x00189362: ('SQ', '1', "Multi-energy CT Acquisition Sequence", '', 'MultienergyCTAcquisitionSequence'),  # noqa
+    0x00189363: ('SQ', '1', "Multi-energy CT Processing Sequence", '', 'MultienergyCTProcessingSequence'),  # noqa
+    0x00189364: ('SQ', '1', "Multi-energy CT Characteristics Sequence", '', 'MultienergyCTCharacteristicsSequence'),  # noqa
+    0x00189365: ('SQ', '1', "Multi-energy CT X-Ray Source Sequence", '', 'MultienergyCTXRaySourceSequence'),  # noqa
+    0x00189366: ('US', '1', "X-Ray Source Index", '', 'XRaySourceIndex'),  # noqa
+    0x00189367: ('UC', '1', "X-Ray Source ID", '', 'XRaySourceID'),  # noqa
+    0x00189368: ('CS', '1', "Multi-energy Source Technique", '', 'MultienergySourceTechnique'),  # noqa
+    0x00189369: ('DT', '1', "Source Start DateTime", '', 'SourceStartDateTime'),  # noqa
+    0x0018936A: ('DT', '1', "Source End DateTime", '', 'SourceEndDateTime'),  # noqa
+    0x0018936B: ('US', '1', "Switching Phase Number", '', 'SwitchingPhaseNumber'),  # noqa
+    0x0018936C: ('DS', '1', "Switching Phase Nominal Duration", '', 'SwitchingPhaseNominalDuration'),  # noqa
+    0x0018936D: ('DS', '1', "Switching Phase Transition Duration", '', 'SwitchingPhaseTransitionDuration'),  # noqa
+    0x0018936E: ('DS', '1', "Effective Bin Energy", '', 'EffectiveBinEnergy'),  # noqa
+    0x0018936F: ('SQ', '1', "Multi-energy CT X-Ray Detector Sequence", '', 'MultienergyCTXRayDetectorSequence'),  # noqa
+    0x00189370: ('US', '1', "X-Ray Detector Index", '', 'XRayDetectorIndex'),  # noqa
+    0x00189371: ('UC', '1', "X-Ray Detector ID", '', 'XRayDetectorID'),  # noqa
+    0x00189372: ('CS', '1', "Multi-energy Detector Type", '', 'MultienergyDetectorType'),  # noqa
+    0x00189373: ('ST', '1', "X-Ray Detector Label", '', 'XRayDetectorLabel'),  # noqa
+    0x00189374: ('DS', '1', "Nominal Max Energy", '', 'NominalMaxEnergy'),  # noqa
+    0x00189375: ('DS', '1', "Nominal Min Energy", '', 'NominalMinEnergy'),  # noqa
+    0x00189376: ('US', '1-n', "Referenced X-Ray Detector Index", '', 'ReferencedXRayDetectorIndex'),  # noqa
+    0x00189377: ('US', '1-n', "Referenced X-Ray Source Index", '', 'ReferencedXRaySourceIndex'),  # noqa
+    0x00189378: ('US', '1-n', "Referenced Path Index", '', 'ReferencedPathIndex'),  # noqa
+    0x00189379: ('SQ', '1', "Multi-energy CT Path Sequence", '', 'MultienergyCTPathSequence'),  # noqa
+    0x0018937A: ('US', '1', "Multi-energy CT Path Index", '', 'MultienergyCTPathIndex'),  # noqa
+    0x0018937B: ('UT', '1', "Multi-energy Acquisition Description", '', 'MultienergyAcquisitionDescription'),  # noqa
+    0x0018937C: ('FD', '1', "Monoenergetic Energy Equivalent", '', 'MonoenergeticEnergyEquivalent'),  # noqa
+    0x0018937D: ('SQ', '1', "Material Code Sequence", '', 'MaterialCodeSequence'),  # noqa
+    0x0018937E: ('CS', '1', "Decomposition Method", '', 'DecompositionMethod'),  # noqa
+    0x0018937F: ('UT', '1', "Decomposition Description", '', 'DecompositionDescription'),  # noqa
+    0x00189380: ('SQ', '1', "Decomposition Algorithm Identification Sequence", '', 'DecompositionAlgorithmIdentificationSequence'),  # noqa
+    0x00189381: ('SQ', '1', "Decomposition Material Sequence", '', 'DecompositionMaterialSequence'),  # noqa
+    0x00189382: ('SQ', '1', "Material Attenuation Sequence", '', 'MaterialAttenuationSequence'),  # noqa
+    0x00189383: ('DS', '1', "Photon Energy", '', 'PhotonEnergy'),  # noqa
+    0x00189384: ('DS', '1', "X-Ray Mass Attenuation Coefficient", '', 'XRayMassAttenuationCoefficient'),  # noqa
     0x00189401: ('SQ', '1', "Projection Pixel Calibration Sequence", '', 'ProjectionPixelCalibrationSequence'),  # noqa
     0x00189402: ('FL', '1', "Distance Source to Isocenter", '', 'DistanceSourceToIsocenter'),  # noqa
     0x00189403: ('FL', '1', "Distance Object to Table Top", '', 'DistanceObjectToTableTop'),  # noqa
@@ -1576,10 +1739,18 @@ DicomDictionary = {
     0x00221029: ('LO', '1', "IOL Formula Detail", '', 'IOLFormulaDetail'),  # noqa
     0x00221033: ('FL', '1', "Keratometer Index", '', 'KeratometerIndex'),  # noqa
     0x00221035: ('SQ', '1', "Source of Ophthalmic Axial Length Code Sequence", '', 'SourceOfOphthalmicAxialLengthCodeSequence'),  # noqa
+    0x00221036: ('SQ', '1', "Source of Corneal Size Data Code Sequence", '', 'SourceOfCornealSizeDataCodeSequence'),  # noqa
     0x00221037: ('FL', '1', "Target Refraction", '', 'TargetRefraction'),  # noqa
     0x00221039: ('CS', '1', "Refractive Procedure Occurred", '', 'RefractiveProcedureOccurred'),  # noqa
     0x00221040: ('SQ', '1', "Refractive Surgery Type Code Sequence", '', 'RefractiveSurgeryTypeCodeSequence'),  # noqa
     0x00221044: ('SQ', '1', "Ophthalmic Ultrasound Method Code Sequence", '', 'OphthalmicUltrasoundMethodCodeSequence'),  # noqa
+    0x00221045: ('SQ', '1', "Surgically Induced Astigmatism Sequence", '', 'SurgicallyInducedAstigmatismSequence'),  # noqa
+    0x00221046: ('CS', '1', "Type of Optical Correction", '', 'TypeOfOpticalCorrection'),  # noqa
+    0x00221047: ('SQ', '1', "Toric IOL Power Sequence", '', 'ToricIOLPowerSequence'),  # noqa
+    0x00221048: ('SQ', '1', "Predicted Toric Error Sequence", '', 'PredictedToricErrorSequence'),  # noqa
+    0x00221049: ('CS', '1', "Pre-Selected for Implantation", '', 'PreSelectedForImplantation'),  # noqa
+    0x0022104A: ('SQ', '1', "Toric IOL Power for Exact Emmetropia Sequence", '', 'ToricIOLPowerForExactEmmetropiaSequence'),  # noqa
+    0x0022104B: ('SQ', '1', "Toric IOL Power for Exact Target Refraction Sequence", '', 'ToricIOLPowerForExactTargetRefractionSequence'),  # noqa
     0x00221050: ('SQ', '1', "Ophthalmic Axial Length Measurements Sequence", '', 'OphthalmicAxialLengthMeasurementsSequence'),  # noqa
     0x00221053: ('FL', '1', "IOL Power", '', 'IOLPower'),  # noqa
     0x00221054: ('FL', '1', "Predicted Refractive Error", '', 'PredictedRefractiveError'),  # noqa
@@ -1601,6 +1772,9 @@ DicomDictionary = {
     0x00221125: ('SQ', '1', "Anterior Chamber Depth Definition Code Sequence", '', 'AnteriorChamberDepthDefinitionCodeSequence'),  # noqa
     0x00221127: ('SQ', '1', "Lens Thickness Sequence", '', 'LensThicknessSequence'),  # noqa
     0x00221128: ('SQ', '1', "Anterior Chamber Depth Sequence", '', 'AnteriorChamberDepthSequence'),  # noqa
+    0x0022112A: ('SQ', '1', "Calculation Comment Sequence", '', 'CalculationCommentSequence'),  # noqa
+    0x0022112B: ('CS', '1', "Calculation Comment Type", '', 'CalculationCommentType'),  # noqa
+    0x0022112C: ('LT', '1', "Calculation Comment", '', 'CalculationComment'),  # noqa
     0x00221130: ('FL', '1', "Lens Thickness", '', 'LensThickness'),  # noqa
     0x00221131: ('FL', '1', "Anterior Chamber Depth", '', 'AnteriorChamberDepth'),  # noqa
     0x00221132: ('SQ', '1', "Source of Lens Thickness Data Code Sequence", '', 'SourceOfLensThicknessDataCodeSequence'),  # noqa
@@ -2041,8 +2215,22 @@ DicomDictionary = {
     0x00321055: ('CS', '1', "Study Component Status ID", 'Retired', 'StudyComponentStatusID'),  # noqa
     0x00321060: ('LO', '1', "Requested Procedure Description", '', 'RequestedProcedureDescription'),  # noqa
     0x00321064: ('SQ', '1', "Requested Procedure Code Sequence", '', 'RequestedProcedureCodeSequence'),  # noqa
+    0x00321066: ('UT', '1', "Reason for Visit", '', 'ReasonForVisit'),  # noqa
+    0x00321067: ('SQ', '1', "Reason for Visit Code Sequence", '', 'ReasonForVisitCodeSequence'),  # noqa
     0x00321070: ('LO', '1', "Requested Contrast Agent", '', 'RequestedContrastAgent'),  # noqa
     0x00324000: ('LT', '1', "Study Comments", 'Retired', 'StudyComments'),  # noqa
+    0x00340001: ('SQ', '1', "Flow Identifier Sequence", '', 'FlowIdentifierSequence'),  # noqa
+    0x00340002: ('OB', '1', "Flow Identifier", '', 'FlowIdentifier'),  # noqa
+    0x00340003: ('UI', '1', "Flow Transfer Syntax UID", '', 'FlowTransferSyntaxUID'),  # noqa
+    0x00340004: ('UL', '1', "Flow RTP Sampling Rate", '', 'FlowRTPSamplingRate'),  # noqa
+    0x00340005: ('OB', '1', "Source Identifier", '', 'SourceIdentifier'),  # noqa
+    0x00340007: ('OB', '1', "Frame Origin Timestamp", '', 'FrameOriginTimestamp'),  # noqa
+    0x00340008: ('CS', '1', "Includes Imaging Subject", '', 'IncludesImagingSubject'),  # noqa
+    0x00340009: ('SQ', '1', "Frame Usefulness Group Sequence", '', 'FrameUsefulnessGroupSequence'),  # noqa
+    0x0034000A: ('SQ', '1', "Real-Time Bulk Data Flow Sequence", '', 'RealTimeBulkDataFlowSequence'),  # noqa
+    0x0034000B: ('SQ', '1', "Camera Position Group Sequence", '', 'CameraPositionGroupSequence'),  # noqa
+    0x0034000C: ('CS', '1', "Includes Information", '', 'IncludesInformation'),  # noqa
+    0x0034000D: ('SQ', '1', "Time of Frame Group Sequence", '', 'TimeOfFrameGroupSequence'),  # noqa
     0x00380004: ('SQ', '1', "Referenced Patient Alias Sequence", '', 'ReferencedPatientAliasSequence'),  # noqa
     0x00380008: ('CS', '1', "Visit Status ID", '', 'VisitStatusID'),  # noqa
     0x00380010: ('LO', '1', "Admission ID", '', 'AdmissionID'),  # noqa
@@ -2347,7 +2535,7 @@ DicomDictionary = {
     0x0040A125: ('CS', '2', "Report Status ID (Trial)", 'Retired', 'ReportStatusIDTrial'),  # noqa
     0x0040A130: ('CS', '1', "Temporal Range Type", '', 'TemporalRangeType'),  # noqa
     0x0040A132: ('UL', '1-n', "Referenced Sample Positions", '', 'ReferencedSamplePositions'),  # noqa
-    0x0040A136: ('US', '1-n', "Referenced Frame Numbers", '', 'ReferencedFrameNumbers'),  # noqa
+    0x0040A136: ('US', '1-n', "Referenced Frame Numbers", 'Retired', 'ReferencedFrameNumbers'),  # noqa
     0x0040A138: ('DS', '1-n', "Referenced Time Offsets", '', 'ReferencedTimeOffsets'),  # noqa
     0x0040A13A: ('DT', '1-n', "Referenced DateTime", '', 'ReferencedDateTime'),  # noqa
     0x0040A160: ('UT', '1', "Text Value", '', 'TextValue'),  # noqa
@@ -2435,6 +2623,7 @@ DicomDictionary = {
     0x00420012: ('LO', '1', "MIME Type of Encapsulated Document", '', 'MIMETypeOfEncapsulatedDocument'),  # noqa
     0x00420013: ('SQ', '1', "Source Instance Sequence", '', 'SourceInstanceSequence'),  # noqa
     0x00420014: ('LO', '1-n', "List of MIME Types", '', 'ListOfMIMETypes'),  # noqa
+    0x00420015: ('UL', '1', "Encapsulated Document Length", '', 'EncapsulatedDocumentLength'),  # noqa
     0x00440001: ('ST', '1', "Product Package Identifier", '', 'ProductPackageIdentifier'),  # noqa
     0x00440002: ('CS', '1', "Substance Administration Approval", '', 'SubstanceAdministrationApproval'),  # noqa
     0x00440003: ('LT', '1', "Approval Status Further Description", '', 'ApprovalStatusFurtherDescription'),  # noqa
@@ -2475,6 +2664,7 @@ DicomDictionary = {
     0x00460042: ('FD', '1', "Channel Width", '', 'ChannelWidth'),  # noqa
     0x00460044: ('FD', '1', "Pupil Size", '', 'PupilSize'),  # noqa
     0x00460046: ('FD', '1', "Corneal Size", '', 'CornealSize'),  # noqa
+    0x00460047: ('SQ', '1', "Corneal Size Sequence", '', 'CornealSizeSequence'),  # noqa
     0x00460050: ('SQ', '1', "Autorefraction Right Eye Sequence", '', 'AutorefractionRightEyeSequence'),  # noqa
     0x00460052: ('SQ', '1', "Autorefraction Left Eye Sequence", '', 'AutorefractionLeftEyeSequence'),  # noqa
     0x00460060: ('FD', '1', "Distance Pupillary Distance", '', 'DistancePupillaryDistance'),  # noqa
@@ -2498,6 +2688,15 @@ DicomDictionary = {
     0x00460102: ('SQ', '1', "Add Other Sequence", '', 'AddOtherSequence'),  # noqa
     0x00460104: ('FD', '1', "Add Power", '', 'AddPower'),  # noqa
     0x00460106: ('FD', '1', "Viewing Distance", '', 'ViewingDistance'),  # noqa
+    0x00460110: ('SQ', '1', "Cornea Measurements Sequence", '', 'CorneaMeasurementsSequence'),  # noqa
+    0x00460111: ('SQ', '1', "Source of Cornea Measurement Data Code Sequence", '', 'SourceOfCorneaMeasurementDataCodeSequence'),  # noqa
+    0x00460112: ('SQ', '1', "Steep Corneal Axis Sequence", '', 'SteepCornealAxisSequence'),  # noqa
+    0x00460113: ('SQ', '1', "Flat Corneal Axis Sequence", '', 'FlatCornealAxisSequence'),  # noqa
+    0x00460114: ('FD', '1', "Corneal Power", '', 'CornealPower'),  # noqa
+    0x00460115: ('FD', '1', "Corneal Axis", '', 'CornealAxis'),  # noqa
+    0x00460116: ('SQ', '1', "Cornea Measurement Method Code Sequence", '', 'CorneaMeasurementMethodCodeSequence'),  # noqa
+    0x00460117: ('FL', '1', "Refractive Index of Cornea", '', 'RefractiveIndexOfCornea'),  # noqa
+    0x00460118: ('FL', '1', "Refractive Index of Aqueous Humor", '', 'RefractiveIndexOfAqueousHumor'),  # noqa
     0x00460121: ('SQ', '1', "Visual Acuity Type Code Sequence", '', 'VisualAcuityTypeCodeSequence'),  # noqa
     0x00460122: ('SQ', '1', "Visual Acuity Right Eye Sequence", '', 'VisualAcuityRightEyeSequence'),  # noqa
     0x00460123: ('SQ', '1', "Visual Acuity Left Eye Sequence", '', 'VisualAcuityLeftEyeSequence'),  # noqa
@@ -2588,6 +2787,7 @@ DicomDictionary = {
     0x0050001D: ('FD', '1', "Container Component Diameter", '', 'ContainerComponentDiameter'),  # noqa
     0x0050001E: ('LO', '1', "Container Component Description", '', 'ContainerComponentDescription'),  # noqa
     0x00500020: ('LO', '1', "Device Description", '', 'DeviceDescription'),  # noqa
+    0x00500021: ('ST', '1', "Long Device Description", '', 'LongDeviceDescription'),  # noqa
     0x00520001: ('FL', '1', "Contrast/Bolus Ingredient Percent by Volume", '', 'ContrastBolusIngredientPercentByVolume'),  # noqa
     0x00520002: ('FD', '1', "OCT Focal Distance", '', 'OCTFocalDistance'),  # noqa
     0x00520003: ('FD', '1', "Beam Spot Size", '', 'BeamSpotSize'),  # noqa
@@ -2720,6 +2920,7 @@ DicomDictionary = {
     0x00620010: ('CS', '1', "Segmentation Fractional Type", '', 'SegmentationFractionalType'),  # noqa
     0x00620011: ('SQ', '1', "Segmented Property Type Modifier Code Sequence", '', 'SegmentedPropertyTypeModifierCodeSequence'),  # noqa
     0x00620012: ('SQ', '1', "Used Segments Sequence", '', 'UsedSegmentsSequence'),  # noqa
+    0x00620013: ('CS', '1', "Segments Overlap", '', 'SegmentsOverlap'),  # noqa
     0x00620020: ('UT', '1', "Tracking ID", '', 'TrackingID'),  # noqa
     0x00620021: ('UI', '1', "Tracking UID", '', 'TrackingUID'),  # noqa
     0x00640002: ('SQ', '1', "Deformable Registration Sequence", '', 'DeformableRegistrationSequence'),  # noqa
@@ -3361,6 +3562,8 @@ DicomDictionary = {
     0x04000510: ('UI', '1', "Encrypted Content Transfer Syntax UID", '', 'EncryptedContentTransferSyntaxUID'),  # noqa
     0x04000520: ('OB', '1', "Encrypted Content", '', 'EncryptedContent'),  # noqa
     0x04000550: ('SQ', '1', "Modified Attributes Sequence", '', 'ModifiedAttributesSequence'),  # noqa
+    0x04000551: ('SQ', '1', "Nonconforming Modified Attributes Sequence", '', 'NonconformingModifiedAttributesSequence'),  # noqa
+    0x04000552: ('OB', '1', "Nonconforming Data Element Value", '', 'NonconformingDataElementValue'),  # noqa
     0x04000561: ('SQ', '1', "Original Attributes Sequence", '', 'OriginalAttributesSequence'),  # noqa
     0x04000562: ('DT', '1', "Attribute Modification DateTime", '', 'AttributeModificationDateTime'),  # noqa
     0x04000563: ('LO', '1', "Modifying System", '', 'ModifyingSystem'),  # noqa
@@ -3553,6 +3756,7 @@ DicomDictionary = {
     0x30060030: ('SQ', '1', "RT Related ROI Sequence", '', 'RTRelatedROISequence'),  # noqa
     0x30060033: ('CS', '1', "RT ROI Relationship", '', 'RTROIRelationship'),  # noqa
     0x30060036: ('CS', '1', "ROI Generation Algorithm", '', 'ROIGenerationAlgorithm'),  # noqa
+    0x30060037: ('SQ', '1', "ROI Derivation Algorithm Identification Sequence", '', 'ROIDerivationAlgorithmIdentificationSequence'),  # noqa
     0x30060038: ('LO', '1', "ROI Generation Description", '', 'ROIGenerationDescription'),  # noqa
     0x30060039: ('SQ', '1', "ROI Contour Sequence", '', 'ROIContourSequence'),  # noqa
     0x30060040: ('SQ', '1', "Contour Sequence", '', 'ContourSequence'),  # noqa
@@ -3584,6 +3788,9 @@ DicomDictionary = {
     0x300600C4: ('CS', '1', "Frame of Reference Transformation Type", 'Retired', 'FrameOfReferenceTransformationType'),  # noqa
     0x300600C6: ('DS', '16', "Frame of Reference Transformation Matrix", '', 'FrameOfReferenceTransformationMatrix'),  # noqa
     0x300600C8: ('LO', '1', "Frame of Reference Transformation Comment", '', 'FrameOfReferenceTransformationComment'),  # noqa
+    0x300600C9: ('SQ', '1', "Patient Location Coordinates Sequence", '', 'PatientLocationCoordinatesSequence'),  # noqa
+    0x300600CA: ('SQ', '1', "Patient Location Coordinates Code Sequence", '', 'PatientLocationCoordinatesCodeSequence'),  # noqa
+    0x300600CB: ('SQ', '1', "Patient Support Position Sequence", '', 'PatientSupportPositionSequence'),  # noqa
     0x30080010: ('SQ', '1', "Measured Dose Reference Sequence", '', 'MeasuredDoseReferenceSequence'),  # noqa
     0x30080012: ('ST', '1', "Measured Dose Description", '', 'MeasuredDoseDescription'),  # noqa
     0x30080014: ('CS', '1', "Measured Dose Type", '', 'MeasuredDoseType'),  # noqa
@@ -3733,7 +3940,7 @@ DicomDictionary = {
     0x300A007A: ('IS', '1', "Repeat Fraction Cycle Length", '', 'RepeatFractionCycleLength'),  # noqa
     0x300A007B: ('LT', '1', "Fraction Pattern", '', 'FractionPattern'),  # noqa
     0x300A0080: ('IS', '1', "Number of Beams", '', 'NumberOfBeams'),  # noqa
-    0x300A0082: ('DS', '3', "Beam Dose Specification Point", '', 'BeamDoseSpecificationPoint'),  # noqa
+    0x300A0082: ('DS', '3', "Beam Dose Specification Point", 'Retired', 'BeamDoseSpecificationPoint'),  # noqa
     0x300A0083: ('UI', '1', "Referenced Dose Reference UID", '', 'ReferencedDoseReferenceUID'),  # noqa
     0x300A0084: ('DS', '1', "Beam Dose", '', 'BeamDose'),  # noqa
     0x300A0086: ('DS', '1', "Beam Meterset", '', 'BeamMeterset'),  # noqa
@@ -4053,6 +4260,7 @@ DicomDictionary = {
     0x300A0423: ('CS', '1', "General Accessory Type", '', 'GeneralAccessoryType'),  # noqa
     0x300A0424: ('IS', '1', "General Accessory Number", '', 'GeneralAccessoryNumber'),  # noqa
     0x300A0425: ('FL', '1', "Source to General Accessory Distance", '', 'SourceToGeneralAccessoryDistance'),  # noqa
+    0x300A0426: ('DS', '1', "Isocenter to General Accessory Distance", '', 'IsocenterToGeneralAccessoryDistance'),  # noqa
     0x300A0431: ('SQ', '1', "Applicator Geometry Sequence", '', 'ApplicatorGeometrySequence'),  # noqa
     0x300A0432: ('CS', '1', "Applicator Aperture Shape", '', 'ApplicatorApertureShape'),  # noqa
     0x300A0433: ('FL', '1', "Applicator Opening", '', 'ApplicatorOpening'),  # noqa
@@ -4079,6 +4287,144 @@ DicomDictionary = {
     0x300A0510: ('FL', '2', "Delivered Nominal Range Modulated Region Depths", '', 'DeliveredNominalRangeModulatedRegionDepths'),  # noqa
     0x300A0511: ('CS', '1', "Delivered Reference Dose Definition", '', 'DeliveredReferenceDoseDefinition'),  # noqa
     0x300A0512: ('CS', '1', "Reference Dose Definition", '', 'ReferenceDoseDefinition'),  # noqa
+    0x300A0600: ('US', '1', "RT Control Point Index", '', 'RTControlPointIndex'),  # noqa
+    0x300A0601: ('US', '1', "Radiation Generation Mode Index", '', 'RadiationGenerationModeIndex'),  # noqa
+    0x300A0602: ('US', '1', "Referenced Defined Device Index", '', 'ReferencedDefinedDeviceIndex'),  # noqa
+    0x300A0603: ('US', '1', "Radiation Dose Identification Index", '', 'RadiationDoseIdentificationIndex'),  # noqa
+    0x300A0604: ('US', '1', "Number of RT Control Points", '', 'NumberOfRTControlPoints'),  # noqa
+    0x300A0605: ('US', '1', "Referenced Radiation Generation Mode Index", '', 'ReferencedRadiationGenerationModeIndex'),  # noqa
+    0x300A0606: ('US', '1', "Treatment Position Index", '', 'TreatmentPositionIndex'),  # noqa
+    0x300A0607: ('US', '1', "Referenced Device Index", '', 'ReferencedDeviceIndex'),  # noqa
+    0x300A0608: ('LO', '1', "Treatment Position Group Label", '', 'TreatmentPositionGroupLabel'),  # noqa
+    0x300A0609: ('UI', '1', "Treatment Position Group UID", '', 'TreatmentPositionGroupUID'),  # noqa
+    0x300A060A: ('SQ', '1', "Treatment Position Group Sequence", '', 'TreatmentPositionGroupSequence'),  # noqa
+    0x300A060B: ('US', '1', "Referenced Treatment Position Index", '', 'ReferencedTreatmentPositionIndex'),  # noqa
+    0x300A060C: ('US', '1', "Referenced Radiation Dose Identification Index", '', 'ReferencedRadiationDoseIdentificationIndex'),  # noqa
+    0x300A060D: ('FD', '1', "RT Accessory Holder Water-Equivalent Thickness", '', 'RTAccessoryHolderWaterEquivalentThickness'),  # noqa
+    0x300A060E: ('US', '1', "Referenced RT Accessory Holder Device Index", '', 'ReferencedRTAccessoryHolderDeviceIndex'),  # noqa
+    0x300A060F: ('CS', '1', "RT Accessory Holder Slot Existence Flag", '', 'RTAccessoryHolderSlotExistenceFlag'),  # noqa
+    0x300A0610: ('SQ', '1', "RT Accessory Holder Slot Sequence", '', 'RTAccessoryHolderSlotSequence'),  # noqa
+    0x300A0611: ('LO', '1', "RT Accessory Holder Slot ID", '', 'RTAccessoryHolderSlotID'),  # noqa
+    0x300A0612: ('FD', '1', "RT Accessory Holder Slot Distance", '', 'RTAccessoryHolderSlotDistance'),  # noqa
+    0x300A0613: ('FD', '1', "RT Accessory Slot Distance", '', 'RTAccessorySlotDistance'),  # noqa
+    0x300A0614: ('SQ', '1', "RT Accessory Holder Definition Sequence", '', 'RTAccessoryHolderDefinitionSequence'),  # noqa
+    0x300A0615: ('LO', '1', "RT Accessory Device Slot ID", '', 'RTAccessoryDeviceSlotID'),  # noqa
+    0x300A0616: ('SQ', '1', "RT Radiation Sequence", '', 'RTRadiationSequence'),  # noqa
+    0x300A0617: ('SQ', '1', "Radiation Dose Sequence", '', 'RadiationDoseSequence'),  # noqa
+    0x300A0618: ('SQ', '1', "Radiation Dose Identification Sequence", '', 'RadiationDoseIdentificationSequence'),  # noqa
+    0x300A0619: ('LO', '1', "Radiation Dose Identification Label", '', 'RadiationDoseIdentificationLabel'),  # noqa
+    0x300A061A: ('CS', '1', "Reference Dose Type", '', 'ReferenceDoseType'),  # noqa
+    0x300A061B: ('CS', '1', "Primary Dose Value Indicator", '', 'PrimaryDoseValueIndicator'),  # noqa
+    0x300A061C: ('SQ', '1', "Dose Values Sequence", '', 'DoseValuesSequence'),  # noqa
+    0x300A061D: ('CS', '1-n', "Dose Value Purpose", '', 'DoseValuePurpose'),  # noqa
+    0x300A061E: ('FD', '3', "Reference Dose Point Coordinates", '', 'ReferenceDosePointCoordinates'),  # noqa
+    0x300A061F: ('SQ', '1', "Radiation Dose Values Parameters Sequence", '', 'RadiationDoseValuesParametersSequence'),  # noqa
+    0x300A0620: ('SQ', '1', "Meterset to Dose Mapping Sequence", '', 'MetersetToDoseMappingSequence'),  # noqa
+    0x300A0621: ('SQ', '1', "Expected In-Vivo Measurement Values Sequence", '', 'ExpectedInVivoMeasurementValuesSequence'),  # noqa
+    0x300A0622: ('US', '1', "Expected In-Vivo Measurement Value Index", '', 'ExpectedInVivoMeasurementValueIndex'),  # noqa
+    0x300A0623: ('LO', '1', "Radiation Dose In-Vivo Measurement Label", '', 'RadiationDoseInVivoMeasurementLabel'),  # noqa
+    0x300A0624: ('FD', '2', "Radiation Dose Central Axis Displacement", '', 'RadiationDoseCentralAxisDisplacement'),  # noqa
+    0x300A0625: ('FD', '1', "Radiation Dose Value", '', 'RadiationDoseValue'),  # noqa
+    0x300A0626: ('FD', '1', "Radiation Dose Source to Skin Distance", '', 'RadiationDoseSourceToSkinDistance'),  # noqa
+    0x300A0627: ('FD', '3', "Radiation Dose Measurement Point Coordinates", '', 'RadiationDoseMeasurementPointCoordinates'),  # noqa
+    0x300A0628: ('FD', '1', "Radiation Dose Source to External Contour Distance", '', 'RadiationDoseSourceToExternalContourDistance'),  # noqa
+    0x300A0629: ('SQ', '1', "RT Tolerance Set Sequence", '', 'RTToleranceSetSequence'),  # noqa
+    0x300A062A: ('LO', '1', "RT Tolerance Set Label", '', 'RTToleranceSetLabel'),  # noqa
+    0x300A062B: ('SQ', '1', "Attribute Tolerance Values Sequence", '', 'AttributeToleranceValuesSequence'),  # noqa
+    0x300A062C: ('FD', '1', "Tolerance Value", '', 'ToleranceValue'),  # noqa
+    0x300A062D: ('SQ', '1', "Patient Support Position Tolerance Sequence", '', 'PatientSupportPositionToleranceSequence'),  # noqa
+    0x300A062E: ('FD', '1', "Treatment Time Limit", '', 'TreatmentTimeLimit'),  # noqa
+    0x300A062F: ('SQ', '1', "C-Arm Photon-Electron Control Point Sequence", '', 'CArmPhotonElectronControlPointSequence'),  # noqa
+    0x300A0630: ('SQ', '1', "Referenced RT Radiation Sequence", '', 'ReferencedRTRadiationSequence'),  # noqa
+    0x300A0631: ('SQ', '1', "Referenced RT Instance Sequence", '', 'ReferencedRTInstanceSequence'),  # noqa
+    0x300A0632: ('SQ', '1', "Referenced RT Patient Setup Sequence", '', 'ReferencedRTPatientSetupSequence'),  # noqa
+    0x300A0634: ('FD', '1', "Source to Patient Surface Distance", '', 'SourceToPatientSurfaceDistance'),  # noqa
+    0x300A0635: ('SQ', '1', "Treatment Machine Special Mode Code Sequence", '', 'TreatmentMachineSpecialModeCodeSequence'),  # noqa
+    0x300A0636: ('US', '1', "Intended Number of Fractions", '', 'IntendedNumberOfFractions'),  # noqa
+    0x300A0637: ('CS', '1', "RT Radiation Set Intent", '', 'RTRadiationSetIntent'),  # noqa
+    0x300A0638: ('CS', '1', "RT Radiation Physical and Geometric Content Detail Flag", '', 'RTRadiationPhysicalAndGeometricContentDetailFlag'),  # noqa
+    0x300A0639: ('CS', '1', "RT Record Flag", '', 'RTRecordFlag'),  # noqa
+    0x300A063A: ('SQ', '1', "Treatment Device Identification Sequence", '', 'TreatmentDeviceIdentificationSequence'),  # noqa
+    0x300A063B: ('SQ', '1', "Referenced RT Physician Intent Sequence", '', 'ReferencedRTPhysicianIntentSequence'),  # noqa
+    0x300A063C: ('FD', '1', "Cumulative Meterset", '', 'CumulativeMeterset'),  # noqa
+    0x300A063D: ('FD', '1', "Delivery Rate", '', 'DeliveryRate'),  # noqa
+    0x300A063E: ('SQ', '1', "Delivery Rate Unit Sequence", '', 'DeliveryRateUnitSequence'),  # noqa
+    0x300A063F: ('SQ', '1', "Treatment Position Sequence", '', 'TreatmentPositionSequence'),  # noqa
+    0x300A0640: ('FD', '1', "Radiation Source-Axis Distance", '', 'RadiationSourceAxisDistance'),  # noqa
+    0x300A0641: ('US', '1', "Number of RT Beam Limiting Devices", '', 'NumberOfRTBeamLimitingDevices'),  # noqa
+    0x300A0642: ('FD', '1', "RT Beam Limiting Device Proximal Distance", '', 'RTBeamLimitingDeviceProximalDistance'),  # noqa
+    0x300A0643: ('FD', '1', "RT Beam Limiting Device Distal Distance", '', 'RTBeamLimitingDeviceDistalDistance'),  # noqa
+    0x300A0644: ('SQ', '1', "Parallel RT Beam Delimiter Device Orientation Label Code Sequence", '', 'ParallelRTBeamDelimiterDeviceOrientationLabelCodeSequence'),  # noqa
+    0x300A0645: ('FD', '1', "Beam Modifier Orientation Angle", '', 'BeamModifierOrientationAngle'),  # noqa
+    0x300A0646: ('SQ', '1', "Fixed RT Beam Delimiter Device Sequence", '', 'FixedRTBeamDelimiterDeviceSequence'),  # noqa
+    0x300A0647: ('SQ', '1', "Parallel RT Beam Delimiter Device Sequence", '', 'ParallelRTBeamDelimiterDeviceSequence'),  # noqa
+    0x300A0648: ('US', '1', "Number of Parallel RT Beam Delimiters", '', 'NumberOfParallelRTBeamDelimiters'),  # noqa
+    0x300A0649: ('FD', '2-n', "Parallel RT Beam Delimiter Boundaries", '', 'ParallelRTBeamDelimiterBoundaries'),  # noqa
+    0x300A064A: ('FD', '2-n', "Parallel RT Beam Delimiter Positions", '', 'ParallelRTBeamDelimiterPositions'),  # noqa
+    0x300A064B: ('FD', '2', "RT Beam Limiting Device Offset", '', 'RTBeamLimitingDeviceOffset'),  # noqa
+    0x300A064C: ('SQ', '1', "RT Beam Delimiter Geometry Sequence", '', 'RTBeamDelimiterGeometrySequence'),  # noqa
+    0x300A064D: ('SQ', '1', "RT Beam Limiting Device Definition Sequence", '', 'RTBeamLimitingDeviceDefinitionSequence'),  # noqa
+    0x300A064E: ('CS', '1', "Parallel RT Beam Delimiter Opening Mode", '', 'ParallelRTBeamDelimiterOpeningMode'),  # noqa
+    0x300A064F: ('CS', '1-n', "Parallel RT Beam Delimiter Leaf Mounting Side", '', 'ParallelRTBeamDelimiterLeafMountingSide'),  # noqa
+    0x300A0650: ('UI', '1', "Patient Setup UID", '', 'PatientSetupUID'),  # noqa
+    0x300A0651: ('SQ', '1', "Wedge Definition Sequence", '', 'WedgeDefinitionSequence'),  # noqa
+    0x300A0652: ('FD', '1', "Radiation Beam Wedge Angle", '', 'RadiationBeamWedgeAngle'),  # noqa
+    0x300A0653: ('FD', '1', "Radiation Beam Wedge Thin Edge Distance", '', 'RadiationBeamWedgeThinEdgeDistance'),  # noqa
+    0x300A0654: ('FD', '1', "Radiation Beam Effective Wedge Angle", '', 'RadiationBeamEffectiveWedgeAngle'),  # noqa
+    0x300A0655: ('US', '1', "Number of Wedge Positions", '', 'NumberOfWedgePositions'),  # noqa
+    0x300A0656: ('SQ', '1', "RT Beam Limiting Device Opening Sequence", '', 'RTBeamLimitingDeviceOpeningSequence'),  # noqa
+    0x300A0657: ('US', '1', "Number of RT Beam Limiting Device Openings", '', 'NumberOfRTBeamLimitingDeviceOpenings'),  # noqa
+    0x300A0658: ('SQ', '1', "Radiation Dosimeter Unit Sequence", '', 'RadiationDosimeterUnitSequence'),  # noqa
+    0x300A0659: ('SQ', '1', "RT Device Distance Reference Location Code Sequence", '', 'RTDeviceDistanceReferenceLocationCodeSequence'),  # noqa
+    0x300A065A: ('SQ', '1', "Radiation Device Configuration and Commissioning Key Sequence", '', 'RadiationDeviceConfigurationAndCommissioningKeySequence'),  # noqa
+    0x300A065B: ('SQ', '1', "Patient Support Position Parameter Sequence", '', 'PatientSupportPositionParameterSequence'),  # noqa
+    0x300A065C: ('CS', '1', "Patient Support Position Specification Method", '', 'PatientSupportPositionSpecificationMethod'),  # noqa
+    0x300A065D: ('SQ', '1', "Patient Support Position Device Parameter Sequence", '', 'PatientSupportPositionDeviceParameterSequence'),  # noqa
+    0x300A065E: ('US', '1', "Device Order Index", '', 'DeviceOrderIndex'),  # noqa
+    0x300A065F: ('US', '1', "Patient Support Position Parameter Order Index", '', 'PatientSupportPositionParameterOrderIndex'),  # noqa
+    0x300A0660: ('SQ', '1', "Patient Support Position Device Tolerance Sequence", '', 'PatientSupportPositionDeviceToleranceSequence'),  # noqa
+    0x300A0661: ('US', '1', "Patient Support Position Tolerance Order Index", '', 'PatientSupportPositionToleranceOrderIndex'),  # noqa
+    0x300A0662: ('SQ', '1', "Compensator Definition Sequence", '', 'CompensatorDefinitionSequence'),  # noqa
+    0x300A0663: ('CS', '1', "Compensator Map Orientation", '', 'CompensatorMapOrientation'),  # noqa
+    0x300A0664: ('OF', '1', "Compensator Proximal Thickness Map", '', 'CompensatorProximalThicknessMap'),  # noqa
+    0x300A0665: ('OF', '1', "Compensator Distal Thickness Map", '', 'CompensatorDistalThicknessMap'),  # noqa
+    0x300A0666: ('FD', '1', "Compensator Base Plane Offset", '', 'CompensatorBasePlaneOffset'),  # noqa
+    0x300A0667: ('SQ', '1', "Compensator Shape Fabrication Code Sequence", '', 'CompensatorShapeFabricationCodeSequence'),  # noqa
+    0x300A0668: ('SQ', '1', "Compensator Shape Sequence", '', 'CompensatorShapeSequence'),  # noqa
+    0x300A0669: ('FD', '1', "Radiation Beam Compensator Milling Tool Diameter", '', 'RadiationBeamCompensatorMillingToolDiameter'),  # noqa
+    0x300A066A: ('SQ', '1', "Block Definition Sequence", '', 'BlockDefinitionSequence'),  # noqa
+    0x300A066B: ('OF', '1', "Block Edge Data", '', 'BlockEdgeData'),  # noqa
+    0x300A066C: ('CS', '1', "Block Orientation", '', 'BlockOrientation'),  # noqa
+    0x300A066D: ('FD', '1', "Radiation Beam Block Thickness", '', 'RadiationBeamBlockThickness'),  # noqa
+    0x300A066E: ('FD', '1', "Radiation Beam Block Slab Thickness", '', 'RadiationBeamBlockSlabThickness'),  # noqa
+    0x300A066F: ('SQ', '1', "Block Edge Data Sequence", '', 'BlockEdgeDataSequence'),  # noqa
+    0x300A0670: ('US', '1', "Number of RT Accessory Holders", '', 'NumberOfRTAccessoryHolders'),  # noqa
+    0x300A0671: ('SQ', '1', "General Accessory Definition Sequence", '', 'GeneralAccessoryDefinitionSequence'),  # noqa
+    0x300A0672: ('US', '1', "Number of General Accessories", '', 'NumberOfGeneralAccessories'),  # noqa
+    0x300A0673: ('SQ', '1', "Bolus Definition Sequence", '', 'BolusDefinitionSequence'),  # noqa
+    0x300A0674: ('US', '1', "Number of Boluses", '', 'NumberOfBoluses'),  # noqa
+    0x300A0675: ('UI', '1', "Equipment Frame of Reference UID", '', 'EquipmentFrameOfReferenceUID'),  # noqa
+    0x300A0676: ('ST', '1', "Equipment Frame of Reference Description", '', 'EquipmentFrameOfReferenceDescription'),  # noqa
+    0x300A0677: ('SQ', '1', "Equipment Reference Point Coordinates Sequence", '', 'EquipmentReferencePointCoordinatesSequence'),  # noqa
+    0x300A0678: ('SQ', '1', "Equipment Reference Point Code Sequence", '', 'EquipmentReferencePointCodeSequence'),  # noqa
+    0x300A0679: ('FD', '1', "RT Beam Limiting Device Angle", '', 'RTBeamLimitingDeviceAngle'),  # noqa
+    0x300A067A: ('FD', '1', "Source Roll Angle", '', 'SourceRollAngle'),  # noqa
+    0x300A067B: ('SQ', '1', "Radiation GenerationMode Sequence", '', 'RadiationGenerationModeSequence'),  # noqa
+    0x300A067C: ('SH', '1', "Radiation GenerationMode Label", '', 'RadiationGenerationModeLabel'),  # noqa
+    0x300A067D: ('ST', '1', "Radiation GenerationMode Description", '', 'RadiationGenerationModeDescription'),  # noqa
+    0x300A067E: ('SQ', '1', "Radiation GenerationMode Machine Code Sequence", '', 'RadiationGenerationModeMachineCodeSequence'),  # noqa
+    0x300A067F: ('SQ', '1', "Radiation Type Code Sequence", '', 'RadiationTypeCodeSequence'),  # noqa
+    0x300A0680: ('DS', '1', "Nominal Energy", '', 'NominalEnergy'),  # noqa
+    0x300A0681: ('DS', '1', "Minimum Nominal Energy", '', 'MinimumNominalEnergy'),  # noqa
+    0x300A0682: ('DS', '1', "Maximum Nominal Energy", '', 'MaximumNominalEnergy'),  # noqa
+    0x300A0683: ('SQ', '1', "Radiation Fluence Modifier Code Sequence", '', 'RadiationFluenceModifierCodeSequence'),  # noqa
+    0x300A0684: ('SQ', '1', "Energy Unit Code Sequence", '', 'EnergyUnitCodeSequence'),  # noqa
+    0x300A0685: ('US', '1', "Number of Radiation GenerationModes", '', 'NumberOfRadiationGenerationModes'),  # noqa
+    0x300A0686: ('SQ', '1', "Patient Support Devices Sequence", '', 'PatientSupportDevicesSequence'),  # noqa
+    0x300A0687: ('US', '1', "Number of Patient Support Devices", '', 'NumberOfPatientSupportDevices'),  # noqa
+    0x300A0688: ('FD', '1', "RT Beam Modifier Definition Distance", '', 'RTBeamModifierDefinitionDistance'),  # noqa
+    0x300A0689: ('SQ', '1', "Beam Area Limit Sequence", '', 'BeamAreaLimitSequence'),  # noqa
+    0x300A068A: ('SQ', '1', "Referenced RT Prescription Sequence", '', 'ReferencedRTPrescriptionSequence'),  # noqa
     0x300C0002: ('SQ', '1', "Referenced RT Plan Sequence", '', 'ReferencedRTPlanSequence'),  # noqa
     0x300C0004: ('SQ', '1', "Referenced Beam Sequence", '', 'ReferencedBeamSequence'),  # noqa
     0x300C0006: ('IS', '1', "Referenced Beam Number", '', 'ReferencedBeamNumber'),  # noqa
@@ -4117,6 +4463,142 @@ DicomDictionary = {
     0x300E0004: ('DA', '1', "Review Date", '', 'ReviewDate'),  # noqa
     0x300E0005: ('TM', '1', "Review Time", '', 'ReviewTime'),  # noqa
     0x300E0008: ('PN', '1', "Reviewer Name", '', 'ReviewerName'),  # noqa
+    0x30100001: ('SQ', '1', "Radiobiological Dose Effect Sequence", '', 'RadiobiologicalDoseEffectSequence'),  # noqa
+    0x30100002: ('CS', '1', "Radiobiological Dose Effect Flag", '', 'RadiobiologicalDoseEffectFlag'),  # noqa
+    0x30100003: ('SQ', '1', "Effective Dose Calculation Method Category Code Sequence", '', 'EffectiveDoseCalculationMethodCategoryCodeSequence'),  # noqa
+    0x30100004: ('SQ', '1', "Effective Dose Calculation Method Code Sequence", '', 'EffectiveDoseCalculationMethodCodeSequence'),  # noqa
+    0x30100005: ('LO', '1', "Effective Dose Calculation Method Description", '', 'EffectiveDoseCalculationMethodDescription'),  # noqa
+    0x30100006: ('UI', '1', "Conceptual Volume UID", '', 'ConceptualVolumeUID'),  # noqa
+    0x30100007: ('SQ', '1', "Originating SOP Instance Reference Sequence", '', 'OriginatingSOPInstanceReferenceSequence'),  # noqa
+    0x30100008: ('SQ', '1', "Conceptual Volume Constituent Sequence", '', 'ConceptualVolumeConstituentSequence'),  # noqa
+    0x30100009: ('SQ', '1', "Equivalent Conceptual Volume Instance Reference Sequence", '', 'EquivalentConceptualVolumeInstanceReferenceSequence'),  # noqa
+    0x3010000A: ('SQ', '1', "Equivalent Conceptual Volumes Sequence", '', 'EquivalentConceptualVolumesSequence'),  # noqa
+    0x3010000B: ('UI', '1', "Referenced Conceptual Volume UID", '', 'ReferencedConceptualVolumeUID'),  # noqa
+    0x3010000C: ('UT', '1', "Conceptual Volume Combination Expression", '', 'ConceptualVolumeCombinationExpression'),  # noqa
+    0x3010000D: ('US', '1', "Conceptual Volume Constituent Index", '', 'ConceptualVolumeConstituentIndex'),  # noqa
+    0x3010000E: ('CS', '1', "Conceptual Volume Combination Flag", '', 'ConceptualVolumeCombinationFlag'),  # noqa
+    0x3010000F: ('ST', '1', "Conceptual Volume Combination Description", '', 'ConceptualVolumeCombinationDescription'),  # noqa
+    0x30100010: ('CS', '1', "Conceptual Volume Segmentation Defined Flag", '', 'ConceptualVolumeSegmentationDefinedFlag'),  # noqa
+    0x30100011: ('SQ', '1', "Conceptual Volume Segmentation Reference Sequence", '', 'ConceptualVolumeSegmentationReferenceSequence'),  # noqa
+    0x30100012: ('SQ', '1', "Conceptual Volume Constituent Segmentation Reference Sequence", '', 'ConceptualVolumeConstituentSegmentationReferenceSequence'),  # noqa
+    0x30100013: ('UI', '1', "Constituent Conceptual Volume UID", '', 'ConstituentConceptualVolumeUID'),  # noqa
+    0x30100014: ('SQ', '1', "Derivation Conceptual Volume Sequence", '', 'DerivationConceptualVolumeSequence'),  # noqa
+    0x30100015: ('UI', '1', "Source Conceptual Volume UID", '', 'SourceConceptualVolumeUID'),  # noqa
+    0x30100016: ('SQ', '1', "Conceptual Volume Derivation Algorithm Sequence", '', 'ConceptualVolumeDerivationAlgorithmSequence'),  # noqa
+    0x30100017: ('ST', '1', "Conceptual Volume Description", '', 'ConceptualVolumeDescription'),  # noqa
+    0x30100018: ('SQ', '1', "Source Conceptual Volume Sequence", '', 'SourceConceptualVolumeSequence'),  # noqa
+    0x30100019: ('SQ', '1', "Author Identification Sequence", '', 'AuthorIdentificationSequence'),  # noqa
+    0x3010001A: ('LO', '1', "Manufacturer's Model Version", '', 'ManufacturerModelVersion'),  # noqa
+    0x3010001B: ('UC', '1', "Device Alternate Identifier", '', 'DeviceAlternateIdentifier'),  # noqa
+    0x3010001C: ('CS', '1', "Device Alternate Identifier Type", '', 'DeviceAlternateIdentifierType'),  # noqa
+    0x3010001D: ('LT', '1', "Device Alternate Identifier Format", '', 'DeviceAlternateIdentifierFormat'),  # noqa
+    0x3010001E: ('LO', '1', "Segmentation Creation Template Label", '', 'SegmentationCreationTemplateLabel'),  # noqa
+    0x3010001F: ('UI', '1', "Segmentation Template UID", '', 'SegmentationTemplateUID'),  # noqa
+    0x30100020: ('US', '1', "Referenced Segment Reference Index", '', 'ReferencedSegmentReferenceIndex'),  # noqa
+    0x30100021: ('SQ', '1', "Segment Reference Sequence", '', 'SegmentReferenceSequence'),  # noqa
+    0x30100022: ('US', '1', "Segment Reference Index", '', 'SegmentReferenceIndex'),  # noqa
+    0x30100023: ('SQ', '1', "Direct Segment Reference Sequence", '', 'DirectSegmentReferenceSequence'),  # noqa
+    0x30100024: ('SQ', '1', "Combination Segment Reference Sequence", '', 'CombinationSegmentReferenceSequence'),  # noqa
+    0x30100025: ('SQ', '1', "Conceptual Volume Sequence", '', 'ConceptualVolumeSequence'),  # noqa
+    0x30100026: ('SQ', '1', "Segmented RT Accessory Device Sequence", '', 'SegmentedRTAccessoryDeviceSequence'),  # noqa
+    0x30100027: ('SQ', '1', "Segment Characteristics Sequence", '', 'SegmentCharacteristicsSequence'),  # noqa
+    0x30100028: ('SQ', '1', "Related Segment Characteristics Sequence", '', 'RelatedSegmentCharacteristicsSequence'),  # noqa
+    0x30100029: ('US', '1', "Segment Characteristics Precedence", '', 'SegmentCharacteristicsPrecedence'),  # noqa
+    0x3010002A: ('SQ', '1', "RT Segment Annotation Sequence", '', 'RTSegmentAnnotationSequence'),  # noqa
+    0x3010002B: ('SQ', '1', "Segment Annotation Category Code Sequence", '', 'SegmentAnnotationCategoryCodeSequence'),  # noqa
+    0x3010002C: ('SQ', '1', "Segment Annotation Type Code Sequence", '', 'SegmentAnnotationTypeCodeSequence'),  # noqa
+    0x3010002D: ('LO', '1', "Device Label", '', 'DeviceLabel'),  # noqa
+    0x3010002E: ('SQ', '1', "Device Type Code Sequence", '', 'DeviceTypeCodeSequence'),  # noqa
+    0x3010002F: ('SQ', '1', "Segment Annotation Type Modifier Code Sequence", '', 'SegmentAnnotationTypeModifierCodeSequence'),  # noqa
+    0x30100030: ('SQ', '1', "Patient Equipment Relationship Code Sequence", '', 'PatientEquipmentRelationshipCodeSequence'),  # noqa
+    0x30100031: ('UI', '1', "Referenced Fiducials UID", '', 'ReferencedFiducialsUID'),  # noqa
+    0x30100032: ('SQ', '1', "Patient Treatment Orientation Sequence", '', 'PatientTreatmentOrientationSequence'),  # noqa
+    0x30100033: ('SH', '1', "User Content Label", '', 'UserContentLabel'),  # noqa
+    0x30100034: ('LO', '1', "User Content Long Label", '', 'UserContentLongLabel'),  # noqa
+    0x30100035: ('SH', '1', "Entity Label", '', 'EntityLabel'),  # noqa
+    0x30100036: ('LO', '1', "Entity Name", '', 'EntityName'),  # noqa
+    0x30100037: ('ST', '1', "Entity Description", '', 'EntityDescription'),  # noqa
+    0x30100038: ('LO', '1', "Entity Long Label", '', 'EntityLongLabel'),  # noqa
+    0x30100039: ('US', '1', "Device Index", '', 'DeviceIndex'),  # noqa
+    0x3010003A: ('US', '1', "RT Treatment Phase Index", '', 'RTTreatmentPhaseIndex'),  # noqa
+    0x3010003B: ('UI', '1', "RT Treatment Phase UID", '', 'RTTreatmentPhaseUID'),  # noqa
+    0x3010003C: ('US', '1', "RT Prescription Index", '', 'RTPrescriptionIndex'),  # noqa
+    0x3010003D: ('US', '1', "RT Segment Annotation Index", '', 'RTSegmentAnnotationIndex'),  # noqa
+    0x3010003E: ('US', '1', "Basis RT Treatment Phase Index", '', 'BasisRTTreatmentPhaseIndex'),  # noqa
+    0x3010003F: ('US', '1', "Related RT Treatment Phase Index", '', 'RelatedRTTreatmentPhaseIndex'),  # noqa
+    0x30100040: ('US', '1', "Referenced RT Treatment Phase Index", '', 'ReferencedRTTreatmentPhaseIndex'),  # noqa
+    0x30100041: ('US', '1', "Referenced RT Prescription Index", '', 'ReferencedRTPrescriptionIndex'),  # noqa
+    0x30100042: ('US', '1', "Referenced Parent RT Prescription Index", '', 'ReferencedParentRTPrescriptionIndex'),  # noqa
+    0x30100043: ('ST', '1', "Manufacturer's Device Identifier", '', 'ManufacturerDeviceIdentifier'),  # noqa
+    0x30100044: ('SQ', '1', "Instance-Level Referenced Performed Procedure Step Sequence", '', 'InstanceLevelReferencedPerformedProcedureStepSequence'),  # noqa
+    0x30100045: ('CS', '1', "RT Treatment Phase Intent Presence Flag", '', 'RTTreatmentPhaseIntentPresenceFlag'),  # noqa
+    0x30100046: ('CS', '1', "Radiotherapy Treatment Type", '', 'RadiotherapyTreatmentType'),  # noqa
+    0x30100047: ('CS', '1-n', "Teletherapy Radiation Type", '', 'TeletherapyRadiationType'),  # noqa
+    0x30100048: ('CS', '1-n', "Brachytherapy Source Type", '', 'BrachytherapySourceType'),  # noqa
+    0x30100049: ('SQ', '1', "Referenced RT Treatment Phase Sequence", '', 'ReferencedRTTreatmentPhaseSequence'),  # noqa
+    0x3010004A: ('SQ', '1', "Referenced Direct Segment Instance Sequence", '', 'ReferencedDirectSegmentInstanceSequence'),  # noqa
+    0x3010004B: ('SQ', '1', "Intended RT Treatment Phase Sequence", '', 'IntendedRTTreatmentPhaseSequence'),  # noqa
+    0x3010004C: ('DA', '1', "Intended Phase Start Date", '', 'IntendedPhaseStartDate'),  # noqa
+    0x3010004D: ('DA', '1', "Intended Phase End Date", '', 'IntendedPhaseEndDate'),  # noqa
+    0x3010004E: ('SQ', '1', "RT Treatment Phase Interval Sequence", '', 'RTTreatmentPhaseIntervalSequence'),  # noqa
+    0x3010004F: ('CS', '1', "Temporal Relationship Interval Anchor", '', 'TemporalRelationshipIntervalAnchor'),  # noqa
+    0x30100050: ('FD', '1', "Minimum Number of Interval Days", '', 'MinimumNumberOfIntervalDays'),  # noqa
+    0x30100051: ('FD', '1', "Maximum Number of Interval Days", '', 'MaximumNumberOfIntervalDays'),  # noqa
+    0x30100052: ('UI', '1-n', "Pertinent SOP Classes in Study", '', 'PertinentSOPClassesInStudy'),  # noqa
+    0x30100053: ('UI', '1-n', "Pertinent SOP Classes in Series", '', 'PertinentSOPClassesInSeries'),  # noqa
+    0x30100054: ('LO', '1', "RT Prescription Label", '', 'RTPrescriptionLabel'),  # noqa
+    0x30100055: ('SQ', '1', "RT Physician Intent Predecessor Sequence", '', 'RTPhysicianIntentPredecessorSequence'),  # noqa
+    0x30100056: ('LO', '1', "RT Treatment Approach Label", '', 'RTTreatmentApproachLabel'),  # noqa
+    0x30100057: ('SQ', '1', "RT Physician Intent Sequence", '', 'RTPhysicianIntentSequence'),  # noqa
+    0x30100058: ('US', '1', "RT Physician Intent Index", '', 'RTPhysicianIntentIndex'),  # noqa
+    0x30100059: ('CS', '1', "RT Treatment Intent Type", '', 'RTTreatmentIntentType'),  # noqa
+    0x3010005A: ('UT', '1', "RT Physician Intent Narrative", '', 'RTPhysicianIntentNarrative'),  # noqa
+    0x3010005B: ('SQ', '1', "RT Protocol Code Sequence", '', 'RTProtocolCodeSequence'),  # noqa
+    0x3010005C: ('ST', '1', "Reason for Superseding", '', 'ReasonForSuperseding'),  # noqa
+    0x3010005D: ('SQ', '1', "RT Diagnosis Code Sequence", '', 'RTDiagnosisCodeSequence'),  # noqa
+    0x3010005E: ('US', '1', "Referenced RT Physician Intent Index", '', 'ReferencedRTPhysicianIntentIndex'),  # noqa
+    0x3010005F: ('SQ', '1', "RT Physician Intent Input Instance Sequence", '', 'RTPhysicianIntentInputInstanceSequence'),  # noqa
+    0x30100060: ('SQ', '1', "RT Anatomic Prescription Sequence", '', 'RTAnatomicPrescriptionSequence'),  # noqa
+    0x30100061: ('UT', '1', "Prior Treatment Dose Description", '', 'PriorTreatmentDoseDescription'),  # noqa
+    0x30100062: ('SQ', '1', "Prior Treatment Reference Sequence", '', 'PriorTreatmentReferenceSequence'),  # noqa
+    0x30100063: ('CS', '1', "Dosimetric Objective Evaluation Scope", '', 'DosimetricObjectiveEvaluationScope'),  # noqa
+    0x30100064: ('SQ', '1', "Therapeutic Role Category Code Sequence", '', 'TherapeuticRoleCategoryCodeSequence'),  # noqa
+    0x30100065: ('SQ', '1', "Therapeutic Role Type Code Sequence", '', 'TherapeuticRoleTypeCodeSequence'),  # noqa
+    0x30100066: ('US', '1', "Conceptual Volume Optimization Precedence", '', 'ConceptualVolumeOptimizationPrecedence'),  # noqa
+    0x30100067: ('SQ', '1', "Conceptual Volume Category Code Sequence", '', 'ConceptualVolumeCategoryCodeSequence'),  # noqa
+    0x30100068: ('CS', '1', "Conceptual Volume Blocking Constraint", '', 'ConceptualVolumeBlockingConstraint'),  # noqa
+    0x30100069: ('SQ', '1', "Conceptual Volume Type Code Sequence", '', 'ConceptualVolumeTypeCodeSequence'),  # noqa
+    0x3010006A: ('SQ', '1', "Conceptual Volume Type Modifier Code Sequence", '', 'ConceptualVolumeTypeModifierCodeSequence'),  # noqa
+    0x3010006B: ('SQ', '1', "RT Prescription Sequence", '', 'RTPrescriptionSequence'),  # noqa
+    0x3010006C: ('SQ', '1', "Dosimetric Objective Sequence", '', 'DosimetricObjectiveSequence'),  # noqa
+    0x3010006D: ('SQ', '1', "Dosimetric Objective Type Code Sequence", '', 'DosimetricObjectiveTypeCodeSequence'),  # noqa
+    0x3010006E: ('UI', '1', "Dosimetric Objective UID", '', 'DosimetricObjectiveUID'),  # noqa
+    0x3010006F: ('UI', '1', "Referenced Dosimetric Objective UID", '', 'ReferencedDosimetricObjectiveUID'),  # noqa
+    0x30100070: ('SQ', '1', "Dosimetric Objective Parameter Sequence", '', 'DosimetricObjectiveParameterSequence'),  # noqa
+    0x30100071: ('SQ', '1', "Referenced Dosimetric Objectives Sequence", '', 'ReferencedDosimetricObjectivesSequence'),  # noqa
+    0x30100073: ('CS', '1', "Absolute Dosimetric Objective Flag", '', 'AbsoluteDosimetricObjectiveFlag'),  # noqa
+    0x30100074: ('FD', '1', "Dosimetric Objective Weight", '', 'DosimetricObjectiveWeight'),  # noqa
+    0x30100075: ('CS', '1', "Dosimetric Objective Purpose", '', 'DosimetricObjectivePurpose'),  # noqa
+    0x30100076: ('SQ', '1', "Planning Input Information Sequence", '', 'PlanningInputInformationSequence'),  # noqa
+    0x30100077: ('LO', '1', "Treatment Site", '', 'TreatmentSite'),  # noqa
+    0x30100078: ('SQ', '1', "Treatment Site Code Sequence", '', 'TreatmentSiteCodeSequence'),  # noqa
+    0x30100079: ('SQ', '1', "Fraction Pattern Sequence", '', 'FractionPatternSequence'),  # noqa
+    0x3010007A: ('UT', '1', "Treatment Technique Notes", '', 'TreatmentTechniqueNotes'),  # noqa
+    0x3010007B: ('UT', '1', "Prescription Notes", '', 'PrescriptionNotes'),  # noqa
+    0x3010007C: ('IS', '1', "Number of Interval Fractions", '', 'NumberOfIntervalFractions'),  # noqa
+    0x3010007D: ('US', '1', "Number of Fractions", '', 'NumberOfFractions'),  # noqa
+    0x3010007E: ('US', '1', "Intended Delivery Duration", '', 'IntendedDeliveryDuration'),  # noqa
+    0x3010007F: ('UT', '1', "Fractionation Notes", '', 'FractionationNotes'),  # noqa
+    0x30100080: ('SQ', '1', "RT Treatment Technique Code Sequence", '', 'RTTreatmentTechniqueCodeSequence'),  # noqa
+    0x30100081: ('SQ', '1', "Prescription Notes Sequence", '', 'PrescriptionNotesSequence'),  # noqa
+    0x30100082: ('SQ', '1', "Fraction-Based Relationship Sequence", '', 'FractionBasedRelationshipSequence'),  # noqa
+    0x30100083: ('CS', '1', "Fraction-Based Relationship Interval Anchor", '', 'FractionBasedRelationshipIntervalAnchor'),  # noqa
+    0x30100084: ('FD', '1', "Minimum Hours between Fractions", '', 'MinimumHoursBetweenFractions'),  # noqa
+    0x30100085: ('TM', '1-n', "Intended Fraction Start Time", '', 'IntendedFractionStartTime'),  # noqa
+    0x30100086: ('LT', '1', "Intended Start Day of Week", '', 'IntendedStartDayOfWeek'),  # noqa
+    0x30100087: ('SQ', '1', "Weekday Fraction Pattern Sequence", '', 'WeekdayFractionPatternSequence'),  # noqa
+    0x30100088: ('SQ', '1', "Delivery Time Structure Code Sequence", '', 'DeliveryTimeStructureCodeSequence'),  # noqa
+    0x30100089: ('SQ', '1', "Treatment Site Modifier Code Sequence", '', 'TreatmentSiteModifierCodeSequence'),  # noqa
     0x40000010: ('LT', '1', "Arbitrary", 'Retired', 'Arbitrary'),  # noqa
     0x40004000: ('LT', '1', "Text Comments", 'Retired', 'TextComments'),  # noqa
     0x40080040: ('SH', '1', "Results ID", 'Retired', 'ResultsID'),  # noqa
@@ -4245,6 +4727,8 @@ DicomDictionary = {
     0x54001010: ('OB or OW', '1', "Waveform Data", '', 'WaveformData'),  # noqa
     0x56000010: ('OF', '1', "First Order Phase Correction Angle", '', 'FirstOrderPhaseCorrectionAngle'),  # noqa
     0x56000020: ('OF', '1', "Spectroscopy Data", '', 'SpectroscopyData'),  # noqa
+    0x7FE00001: ('OV', '1', "Extended Offset Table", '', 'ExtendedOffsetTable'),  # noqa
+    0x7FE00002: ('OV', '1', "Extended Offset Table Lengths", '', 'ExtendedOffsetTableLengths'),  # noqa
     0x7FE00008: ('OF', '1', "Float Pixel Data", '', 'FloatPixelData'),  # noqa
     0x7FE00009: ('OD', '1', "Double Float Pixel Data", '', 'DoubleFloatPixelData'),  # noqa
     0x7FE00010: ('OB or OW', '1', "Pixel Data", '', 'PixelData'),  # noqa
