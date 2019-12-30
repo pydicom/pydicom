@@ -2515,8 +2515,11 @@ class TestWriteUndefinedLengthPixelData(object):
                                  b'\x00\x01\x02\x03'
                                  b'\xfe\xff\xdd\xe0',
                                  is_undefined_length=True)
-        with pytest.raises(ValueError, match='Pixel Data .* must '
-                                             'start with an item tag'):
+        msg = (
+            r"Pixel Data has an undefined length indicating "
+            r"that it's compressed, but the data isn't encapsulated"
+        )
+        with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
 
     def test_big_endian_incorrect_data(self):
@@ -2528,8 +2531,11 @@ class TestWriteUndefinedLengthPixelData(object):
                                  b'\x00\x01\x02\x03'
                                  b'\xff\xfe\xe0\xdd',
                                  is_undefined_length=True)
-        with pytest.raises(ValueError, match='Pixel Data .+ must '
-                                             'start with an item tag'):
+        msg = (
+            r"Pixel Data has an undefined length indicating "
+            r"that it's compressed, but the data isn't encapsulated"
+        )
+        with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
 
     def test_writing_to_gzip(self):

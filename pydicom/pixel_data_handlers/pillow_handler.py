@@ -177,7 +177,7 @@ def get_pixeldata(ds):
 
     if transfer_syntax in PillowJPEG2000TransferSyntaxes:
         # Pillow converts N-bit data to 8- or 16-bit unsigned data
-        # See Pillow src/libImaging/Jpeg2KDecode.c##::j2ku_gray_i
+        # See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
         if ds.PixelRepresentation == 1:
             # Pillow converts signed data to unsigned
             #   so we need to undo this conversion
@@ -193,8 +193,9 @@ def get_pixeldata(ds):
             )
 
         shift = ds.BitsAllocated - ds.BitsStored
-        logger.debug("Shifting right by {} bits".format(shift))
-        numpy.right_shift(arr, shift, out=arr)
+        if shift:
+            logger.debug("Shifting right by {} bits".format(shift))
+            numpy.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"

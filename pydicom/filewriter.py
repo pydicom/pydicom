@@ -486,13 +486,17 @@ def write_data_element(fp, data_element, encodings=None):
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
     if is_undefined_length and data_element.tag == 0x7fe00010:
-        val = data_element.value
-        if (fp.is_little_endian and not
-                val.startswith(b'\xfe\xff\x00\xe0') or
-                not fp.is_little_endian and
-                not val.startswith(b'\xff\xfe\xe0\x00')):
-            raise ValueError('Pixel Data with undefined length must '
-                             'start with an item tag')
+        encap_item = b'\xfe\xff\x00\xe0'
+        if not fp.is_little_endian:
+            # Non-conformant endianness
+            encap_item = b'\xff\xfe\xe0\x00'
+        if not data_element.value.startswith(encap_item):
+            raise ValueError(
+                "(7FE0,0010) Pixel Data has an undefined length indicating "
+                "that it's compressed, but the data isn't encapsulated as "
+                "required. See pydicom.encaps.encapsulate() for more "
+                "information"
+            )
 
     value_length = buffer.tell()
     if (not fp.is_implicit_VR and VR not in extra_length_VRs and

@@ -34,9 +34,8 @@ class TestDicomDir(object):
     def test_invalid_sop_file_meta(self):
         """Test exception raised if SOP Class is not Media Storage Directory"""
         ds = dcmread(get_testdata_file('CT_small.dcm'))
-        with pytest.raises(InvalidDicomError,
-                           match=r"SOP Class is not Media Storage "
-                                 r"Directory \(DICOMDIR\)"):
+        msg = r"SOP Class is not Media Storage Directory \(DICOMDIR\)"
+        with pytest.raises(InvalidDicomError, match=msg):
             DicomDir("some_name", ds, b'\x00' * 128, ds.file_meta, True, True)
 
     def test_invalid_sop_no_file_meta(self):
@@ -45,7 +44,8 @@ class TestDicomDir(object):
         with pytest.raises(AttributeError,
                            match="'DicomDir' object has no attribute "
                                  "'DirectoryRecordSequence'"):
-            DicomDir("some_name", ds, b'\x00' * 128, None, True, True)
+            with pytest.warns(UserWarning, match=r"Invalid transfer syntax"):
+                DicomDir("some_name", ds, b'\x00' * 128, None, True, True)
 
     @pytest.mark.parametrize("testfile", TEST_FILES)
     def test_parse_records(self, testfile):
