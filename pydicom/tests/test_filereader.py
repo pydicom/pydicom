@@ -22,6 +22,7 @@ from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import data_element_generator
+from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
@@ -728,6 +729,35 @@ class TestIncorrectVR(object):
             read_dataset(
                 self.ds_implicit, is_implicit_VR=False, is_little_endian=True
             )
+
+    def test_seq_item_looks_like_explicit_VR(self):
+        # For issue 999.
+
+        # Set up an implicit VR dataset with a "normal" group 8 tag,
+        # followed by a sequence with an item (dataset) having
+        # a data element length that looks like a potential valid VR
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        ds.file_meta.MediaStorageSOPClassUID = "1.1.1"
+        ds.file_meta.MediaStorageSOPInstanceUID = "2.2.2"
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SOPClassUID = '9.9.9'  # First item group 8 in top-level dataset
+        seq = Sequence()
+        seq_ds = Dataset()
+        seq_ds.BadPixelImage = b"\3" * 0x5244  # length looks like "DR"
+        seq.append(seq_ds)
+        ds.ReferencedImageSequence = seq
+
+        dbio = DicomBytesIO()
+        ds.save_as(dbio, write_like_original=False)
+
+        # Now read the constructed dataset back in
+        # In original issue, shows warning that has detected what appears
+        # to be Explicit VR, then throws NotImplemented for the unknown VR
+        dbio.seek(0)
+        ds = dcmread(dbio)
+        ds.remove_private_tags()  # forces it to actually parse SQ
 
 
 class TestUnknownVR(object):

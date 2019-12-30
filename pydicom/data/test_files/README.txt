@@ -36,6 +36,11 @@ rtplan.dcm              : Impl VR Little Endian
 rtplan_truncated.dcm    : Impl VR Little Endian
 rtstruct.dcm            : Impl VR Little Endian
 
+693_*.dcm
+  * Regression datasets for issue #693
+  * JPEG2000, JPEG2000Lossless and uncompressed versions
+  * Mismatch between BitsStored and sample bit depth
+
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
@@ -57,7 +62,12 @@ MR_small_implicit.dcm
 MR_small_bigendian.dcm
   * The same dataset as MR_small, saved as Big Endian using dcmodify
 
-JPEG2000.dcm
+MR2_*.dcm
+  * JPEG2000, JPEG2000Lossless and uncompressed versions
+  * unsigned 16-bit/12-bit with rescale and windowing
+  * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
+JPEG2000.dcm and JPEG2000_UNC.dcm (uncompressed version)
   * JPEG 2000 small image
   * to test JPEG transfer syntax, eventually JPEG decompression
   * Edited 'NM1_J2KI' from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
@@ -137,6 +147,16 @@ OT-PAL-8-face.dcm
   * used to check if to pixel_array is interpreted correctly for such a case
   * taken from http://www.barre.nom.fr/medical/samples/
 
+RG1_*.dcm
+  * JPEG2000, JPEG2000Lossless and uncompressed versions
+  * unsigned 16-bit/15-bit with windowing
+  * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
+RG3_*.dcm
+  * JPEG2000, JPEG2000Lossless and uncompressed versions
+  * unsigned 16-bit/10-bit with windowing
+  * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
 SC_rgb.dcm
   * 16 and 32 bit versions created using a script for PR #714
   * Explicit VR big endian version created using DCMTK's dcmconv and the
@@ -153,6 +173,11 @@ SC_ybr_full_422_uncompressed.dcm
     * Converted to YBR_FULL_422 using a script by @scaramallion
     * PhotometricIntepretation is YBR_FULL_422
 
+US1_*.dcm
+  * JPEG2000, JPEG2000Lossless and uncompressed versions
+  * unsigned 3 channel 8-bit/8-bit
+  * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
 vlut_04.dcm
     * VOI LUT Sequence
     * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
@@ -161,7 +186,7 @@ vlut_04.dcm
 zipMR.gz
   * a gzipped version of MR_small.dcm
   * used for checking that deferred read reopens as zip again (issue 103)
-  
+
 explicit_VR-UN.dcm
   * taken from test data in issue #968
   * original image taken from https://www.cancerimagingarchive.net,

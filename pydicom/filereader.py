@@ -23,6 +23,8 @@ from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
 from pydicom.fileutil import read_undefined_length_value
+from pydicom.media_storage import (ImageStorage, SRDocumentStorage,
+                                   WaveformStorage)
 from pydicom.misc import size_in_bytes
 from pydicom.sequence import Sequence
 from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
@@ -322,7 +324,8 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
 
 def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
                  stop_when=None, defer_size=None,
-                 parent_encoding=default_encoding, specific_tags=None):
+                 parent_encoding=default_encoding, specific_tags=None,
+                 at_top_level=True):
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
 
@@ -348,6 +351,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         Character Set* isn't specified.
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
+    at_top_level: bool
+        If dataset is top level (not within a sequence).
+        Used to turn off explicit VR heuristic within sequences
 
     Returns
     -------
@@ -362,8 +368,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
-    is_implicit_VR = _is_implicit_vr(
-        fp, is_implicit_VR, is_little_endian, stop_when)
+    if at_top_level:
+        is_implicit_VR = _is_implicit_vr(
+            fp, is_implicit_VR, is_little_endian, stop_when)
     fp.seek(fp_start)
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
                                     stop_when, defer_size, parent_encoding,
@@ -457,11 +464,13 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
             fp.tell() - 4 + offset, bytes2hex(bytes_read)))
     if length == 0xFFFFFFFF:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
-                          bytelength=None, parent_encoding=encoding)
+                          bytelength=None, parent_encoding=encoding,
+                          at_top_level=False)
         ds.is_undefined_length_sequence_item = True
     else:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian, length,
-                          parent_encoding=encoding)
+                          parent_encoding=encoding,
+                          at_top_level=False)
         ds.is_undefined_length_sequence_item = False
         logger.debug("%08x: Finished sequence item" % (fp.tell() + offset,))
     ds.seq_item_tell = seq_item_tell
@@ -755,6 +764,12 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
         dataset_class = DicomDir
+    elif class_uid and class_uid.name.endswith("SR Storage"):
+        dataset_class = SRDocumentStorage
+    elif class_uid and class_uid.name.endswith("Image Storage"):
+        dataset_class = ImageStorage
+    elif class_uid and class_uid.name.endswith("Waveform Storage"):
+        dataset_class = WaveformStorage
     else:
         dataset_class = FileDataset
     new_dataset = dataset_class(fileobj, dataset, preamble, file_meta_dataset,

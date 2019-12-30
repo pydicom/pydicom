@@ -59,6 +59,9 @@ class MultiValue(MutableSequence):
     def insert(self, position, val):
         self._list.insert(position, self.type_constructor(val))
 
+    def append(self, val):
+        self._list.append(self.type_constructor(val))
+
     def __setitem__(self, i, val):
         """Set an item of the list, making sure it is of the right VR type"""
         if isinstance(i, slice):

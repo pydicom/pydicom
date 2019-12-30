@@ -312,11 +312,15 @@ class TestBinary(object):
     def test_valid_bulkdata_uri(self):
         ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
                    '"http://example.com/bulkdatahandler"}}')
-        ds = Dataset.from_json(ds_json)
+        msg = r"no bulk data URI handler provided"
+        with pytest.warns(UserWarning, match=msg):
+            ds = Dataset.from_json(ds_json)
         assert 0x00091002 in ds
+
         ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
                    '["http://example.com/bulkdatahandler"]}}')
-        ds = Dataset.from_json(ds_json)
+        with pytest.warns(UserWarning, match=msg):
+            ds = Dataset.from_json(ds_json)
         assert 0x00091002 in ds
 
     def test_invalid_bulkdata_uri(self):

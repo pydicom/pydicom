@@ -637,14 +637,25 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
 
     .. versionadded:: 1.2
 
+    When using a compressed transfer syntax (such as RLE Lossless or one of
+    JPEG formats) then any *Pixel Data* must be :dcm:`encapsulated
+    <part05/sect_A.4.html>`::
+
+      # Where `frame1`, `frame2` are single frames that have been encoded
+      # using the corresponding compression method to Transfer Syntax UID
+      ds.PixelData = encapsulate([frame1, frame2, ...])
+
+    For multi-frame data each frame must be encoded separately and then all
+    encoded frames encapsulated together.
+
     Data will be encapsulated with a Basic Offset Table Item at the beginning,
-    then one or more fragment Items. Each item will be of even length and the
+    then one or more fragment items. Each item will be of even length and the
     final fragment of each frame may be padded with ``0x00`` if required.
 
     Parameters
     ----------
     frames : list of bytes
-        The frame data to encapsulate.
+        The frame data to encapsulate, one frame per item.
     fragments_per_frame : int, optional
         The number of fragments to use for each frame (default ``1``).
     has_bot : bool, optional
@@ -655,21 +666,7 @@ def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     Returns
     -------
     bytes
-        The encapsulated data.
-
-    Notes
-    -----
-
-    * The encoding shall be in Little Endian.
-    * Each fragment is encapsulated as a DICOM Item with tag (FFFE,E000), then
-      a 4 byte length.
-    * The first item shall be a Basic Offset Table item.
-    * The Basic Offset Table item, however, is not required to have a value.
-    * If no value is present, the Basic Offset Table length is 0.
-    * If the value is present, it shall contain concatenated 32-bit
-      unsigned integer values that are byte offsets to the first byte of the
-      Item tag of the first fragment in each frame as measured from the first
-      byte of the first Item tag following the Basic Offset Table Item.
+        The encapsulated pixel data.
 
     References
     ----------

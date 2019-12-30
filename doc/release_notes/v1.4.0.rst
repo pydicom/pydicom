@@ -18,7 +18,7 @@ Fixes
 * Fixed error in pickling modified datasets (:issue:`951`)
 * Fixed improper conversion of the first value of the *LUT
   Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
-* Fixed handling of ISO IR 159 encoding (:issue: `917`)
+* Fixed handling of ISO IR 159 encoding (:issue:`917`)
 * Fixed propagation of bulk data handler in Dataset.from_json (:issue:`971`)
 * Correctly handle DICOMDIR files with records in reverse-hierarchical order
   (:issue:`822`)
@@ -30,6 +30,13 @@ Fixes
   frames when the Basic Offset Table was empty. This may still occur when
   multiple fragments per frame are present for non-JPEG transfer syntaxes or
   where no JPEG EOI/EOC marker is present (:issue:`685`)
+* Fixed possible incorrect switch to explicit VR in sequence items
+  (:issue:`999`)
+* Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
+  pixel data with bit depth range 9-16 not producing the correct values with
+  the Pillow handler (:issue:`693`)
+* Fixed parsing a DICOMDIR file with no records raising an exception
+  (:issue:`1004`)
 
 Enhancements
 ............
@@ -60,6 +67,11 @@ Enhancements
 * Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
   Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
   (:issue:`452`)
+* JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
+  with bit depth > 8 with the Pillow pixel data handler
+* :attr:`PixelData.is_undefined_length
+  <pydicom.dataelem.DataElement.is_undefined_length>` is now set automatically
+  based on whether the Dataset's Transfer Syntax is compressed (:issue:`1006`)
 
 Changes
 .......

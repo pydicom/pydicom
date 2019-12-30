@@ -15,13 +15,14 @@ Dataset (dict subclass)
             contains its own DataElements, and so on in a recursive manner.
 """
 
-import inspect  # for __dir__
+from bisect import bisect_left
 import io
+import inspect  # for __dir__
+from itertools import takewhile
 import json
 import os
 import os.path
-from bisect import bisect_left
-from itertools import takewhile
+import warnings
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -1764,11 +1765,31 @@ class Dataset(dict):
             Write a DICOM file from a :class:`FileDataset` instance.
         """
         # Ensure is_little_endian and is_implicit_VR are set
-        if self.is_little_endian is None or self.is_implicit_VR is None:
-            raise AttributeError(
-                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
-                "set appropriately before saving.".format(
-                    self.__class__.__name__))
+        if None in (self.is_little_endian, self.is_implicit_VR):
+            has_tsyntax = False
+            try:
+                tsyntax = self.file_meta.TransferSyntaxUID
+                if not tsyntax.is_private:
+                    self.is_little_endian = tsyntax.is_little_endian
+                    self.is_implicit_VR = tsyntax.is_implicit_VR
+                    has_tsyntax = True
+            except AttributeError:
+                pass
+
+            if not has_tsyntax:
+                raise AttributeError(
+                    "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
+                    "set appropriately before saving."
+                    .format(self.__class__.__name__)
+                )
+
+        # Try and ensure that `is_undefined_length` is set correctly
+        try:
+            tsyntax = self.file_meta.TransferSyntaxUID
+            if not tsyntax.is_private:
+                self['PixelData'].is_undefined_length = tsyntax.is_compressed
+        except (AttributeError, KeyError):
+            pass
 
         pydicom.dcmwrite(filename, self, write_like_original)
 

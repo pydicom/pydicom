@@ -5,6 +5,7 @@ to decode *Pixel Data*.
 
 import io
 import logging
+import warnings
 
 try:
     import numpy
@@ -34,9 +35,11 @@ PillowSupportedTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGLossless,
     pydicom.uid.JPEGExtended,
+    pydicom.uid.JPEG2000,
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEG2000TransferSyntaxes = [
+    pydicom.uid.JPEG2000,
     pydicom.uid.JPEG2000Lossless,
 ]
 PillowJPEGTransferSyntaxes = [
@@ -148,12 +151,16 @@ def get_pixeldata(ds):
 
     pixel_bytes = bytearray()
     if getattr(ds, 'NumberOfFrames', 1) > 1:
+        j2k_precision = None
         # multiple compressed frames
         for frame in decode_data_sequence(ds.PixelData):
             im = Image.open(io.BytesIO(frame))
             if 'YBR' in ds.PhotometricInterpretation:
                 im.draft('YCbCr', (ds.Rows, ds.Columns))
             pixel_bytes.extend(im.tobytes())
+
+            if not j2k_precision:
+                j2k_precision = _get_j2k_precision(frame)
     else:
         # single compressed frame
         pixel_data = defragment_data(ds.PixelData)
@@ -162,16 +169,70 @@ def get_pixeldata(ds):
             im.draft('YCbCr', (ds.Rows, ds.Columns))
         pixel_bytes.extend(im.tobytes())
 
+        j2k_precision = _get_j2k_precision(pixel_data)
+
     logger.debug("Successfully read %s pixel bytes", len(pixel_bytes))
 
     arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
-    if (transfer_syntax in PillowJPEG2000TransferSyntaxes and
-            ds.BitsStored == 16):
-        # WHY IS THIS EVEN NECESSARY??
-        arr &= 0x7FFF
+    if transfer_syntax in PillowJPEG2000TransferSyntaxes:
+        # Pillow converts N-bit data to 8- or 16-bit unsigned data
+        # See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
+        if ds.PixelRepresentation == 1:
+            # Pillow converts signed data to unsigned
+            #   so we need to undo this conversion
+            arr -= 2**(ds.BitsAllocated - 1)
+
+        if j2k_precision and j2k_precision != ds.BitsStored:
+            warnings.warn(
+                "The (0028,0101) 'Bits Stored' value doesn't match the "
+                "sample bit depth of the JPEG2000 pixel data ({} vs {} bit). "
+                "It's recommended that you first change the 'Bits Stored' "
+                "value to match the JPEG2000 bit depth in order to get the "
+                "correct pixel data".format(ds.BitsStored, j2k_precision)
+            )
+
+        shift = ds.BitsAllocated - ds.BitsStored
+        if shift:
+            logger.debug("Shifting right by {} bits".format(shift))
+            numpy.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
     return arr
+
+
+def _get_j2k_precision(bs):
+    """Parse `bs` and return the bit depth of the JPEG2K component samples.
+
+    Parameters
+    ----------
+    bs : bytes
+        The JPEG 2000 (ISO/IEC 15444) data to be parsed.
+
+    Returns
+    -------
+    int or None
+        The bit depth (precision) of the component samples if available,
+        ``None`` otherwise.
+    """
+    try:
+        # First 2 bytes must be the SOC marker - if not then wrong format
+        if bs[0:2] != b'\xff\x4f':
+            return
+
+        # SIZ is required to be the second marker - Figure A-3 in 15444-1
+        if bs[2:4] != b'\xff\x51':
+            return
+
+        # See 15444-1 A.5.1 for format of the SIZ box and contents
+        ssiz = ord(bs[42:43])
+        if ssiz & 0x80:
+            # Signed
+            return (ssiz & 0x7F) + 1
+        else:
+            # Unsigned
+            return ssiz + 1
+    except (IndexError, TypeError):
+        return
