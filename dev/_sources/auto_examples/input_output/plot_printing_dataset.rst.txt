@@ -65,7 +65,7 @@ This example illustrates how to print the data set in your own format.
      Echo Number(s) = "1"
      Echo Train Length = None
      Device Serial Number = '-0000200'
-     Software Version(s) = 'V3.51*P25'
+     Software Versions = 'V3.51*P25'
      Flip Angle = "90.0"
      Patient Position = 'HFS'
      Study Instance UID = '1.3.6.1.4.1.5962.1.2.4.20040826185059.5457'

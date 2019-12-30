@@ -197,9 +197,9 @@ This examples illustrates how to find the differences between two DICOM files.
 
     - (0018, 1000) Device Serial Number                LO: '-0000200'
 
-    - (0018, 1020) Software Version(s)                 LO: 'V3.51*P25'
+    - (0018, 1020) Software Versions                   LO: 'V3.51*P25'
 
-    + (0018, 1020) Software Version(s)                 LO: '05'
+    + (0018, 1020) Software Versions                   LO: '05'
 
     + (0018, 1040) Contrast/Bolus Route                LO: 'IV'
 
@@ -699,7 +699,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.093 seconds)
+   **Total running time of the script:** ( 0 minutes  0.091 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:
