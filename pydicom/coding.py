@@ -4,10 +4,9 @@ from pydicom.dataset import Dataset
 from pydicom._snomed_dict import mapping as snomed_mapping
 
 _CodeBase = namedtuple(
-    'Code',
-    ('value', 'scheme_designator', 'meaning', 'scheme_version')
+    "Code", ("value", "scheme_designator", "meaning", "scheme_version")
 )
-_CodeBase.__new__.__defaults__ = (None, )
+_CodeBase.__new__.__defaults__ = (None,)
 
 
 class Code(_CodeBase):
@@ -19,39 +18,39 @@ class Code(_CodeBase):
     """
 
     def __eq__(self, other):
-        if self.scheme_designator == 'SRT':
+        if self.scheme_designator == "SRT":
             self_mapped = Code(
-                value=snomed_mapping['SRT'][self.value],
-                meaning='',
-                scheme_designator='SCT',
-                scheme_version=self.scheme_version
+                value=snomed_mapping["SRT"][self.value],
+                meaning="",
+                scheme_designator="SCT",
+                scheme_version=self.scheme_version,
             )
         else:
             self_mapped = Code(
                 value=self.value,
-                meaning='',
+                meaning="",
                 scheme_designator=self.scheme_designator,
-                scheme_version=self.scheme_version
+                scheme_version=self.scheme_version,
             )
-        if other.scheme_designator == 'SRT':
+        if other.scheme_designator == "SRT":
             other_mapped = Code(
-                value=snomed_mapping['SRT'][other.value],
-                meaning='',
-                scheme_designator='SCT',
-                scheme_version=other.scheme_version
+                value=snomed_mapping["SRT"][other.value],
+                meaning="",
+                scheme_designator="SCT",
+                scheme_version=other.scheme_version,
             )
         else:
             other_mapped = Code(
                 value=other.value,
-                meaning='',
+                meaning="",
                 scheme_designator=other.scheme_designator,
-                scheme_version=other.scheme_version
+                scheme_version=other.scheme_version,
             )
         return (
-            self_mapped.value == other_mapped.value and
-            self_mapped.scheme_designator == other_mapped.scheme_designator and
-            self_mapped.scheme_version == other_mapped.scheme_version
+            self_mapped.value == other_mapped.value
+            and self_mapped.scheme_designator == other_mapped.scheme_designator
+            and self_mapped.scheme_version == other_mapped.scheme_version
         )
 
     def __ne__(self, other):
-        return not(self == other)
+        return not (self == other)

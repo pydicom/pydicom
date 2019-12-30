@@ -11,7 +11,7 @@ from pydicom._cid_dict import name_for_cid, cid_concepts
 
 
 # Reverse lookup for cid names
-cid_for_name = {v:k for k,v in name_for_cid.items()}
+cid_for_name = {v: k for k, v in name_for_cid.items()}
 
 
 def _filtered(allnames, filters):
@@ -44,17 +44,22 @@ class _CID_Dict(object):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
-        props = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0])
+        meths = set(
+            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[0]
+        )
+        props = set(
+            list(zip(*inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0]
+        )
         sr_names = set(self.dir())
         alldir = sorted(props | meths | sr_names)
         return alldir
 
     def __getattr__(self, name):
-        matches = [scheme for scheme, keywords in cid_concepts[self.cid].items()
-                    if name in keywords]
+        matches = [
+            scheme
+            for scheme, keywords in cid_concepts[self.cid].items()
+            if name in keywords
+        ]
         if not matches:
             msg = "Identifier '{}' not found for cid{}".format(name, self.cid)
             raise AttributeError(msg)
@@ -69,18 +74,15 @@ class _CID_Dict(object):
             if len(concept) == 1:
                 code, val = list(concept.items())[0]
             else:
-                matches = [(code, val) for code, val in concept.items()
-                           if self.cid in val[1]]
+                matches = [
+                    (code, val) for code, val in concept.items() if self.cid in val[1]
+                ]
                 if len(matches) > 1:
                     # Should never happen, but check in case
                     msg = "{} had multiple code matches for cid{}".format(name, cid)
                     raise AssertionError(msg)
                 code, val = matches[0]
-            return Code(
-                value=code,
-                meaning=val[0],
-                scheme_designator=scheme
-            )
+            return Code(value=code, meaning=val[0], scheme_designator=scheme)
 
     @property
     def concepts(self):
@@ -90,17 +92,19 @@ class _CID_Dict(object):
 
     def __repr__(self):
         heading = "CID{}\n".format(self.cid)
-        concepts = [self.repr_format.format(name, concept)
-                    for name, concept in self.concepts.items()]
+        concepts = [
+            self.repr_format.format(name, concept)
+            for name, concept in self.concepts.items()
+        ]
         return heading + "\n".join(concepts)
 
     def __str__(self):
         heading = "CID{}\n".format(self.cid)
         fmt = self.str_format
-        line2 = self.str_format.format("Business name", "value",
-                                       "scheme", "meaning")
-        lines = "".join(fmt.format(name, *concept)
-                        for name, concept in self.concepts.items())
+        line2 = self.str_format.format("Business name", "value", "scheme", "meaning")
+        lines = "".join(
+            fmt.format(name, *concept) for name, concept in self.concepts.items()
+        )
         return heading + line2 + lines
 
     def dir(self, *filters):
@@ -166,10 +170,12 @@ class _CodesDict(object):
         """
         # Force zip object into a list in case of python3. Also backwards
         # compatible
-        meths = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
-        props = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0])
+        meths = set(
+            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[0]
+        )
+        props = set(
+            list(zip(*inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0]
+        )
         sr_names = set(self.dir())
         alldir = sorted(props | meths | sr_names)
         return alldir
@@ -197,16 +203,12 @@ class _CodesDict(object):
             msg = "Unknown code name '{}' for scheme '{}'"
             raise AttributeError(msg.format(name, scheme))
         # val is like {code1: (meaning, cid_list}, code2: ...}
-        if len(val) > 1: # more than one code for this name 
+        if len(val) > 1:  # more than one code for this name
             raise NotImplementedError("Need cid to disambiguate")
         else:
-            code = list(val.keys())[0] # get first and only
+            code = list(val.keys())[0]  # get first and only
             meaning, cids = val[code]
-            return Code(
-                value=code,
-                meaning=meaning,
-                scheme_designator=scheme
-            )
+            return Code(value=code, meaning=meaning, scheme_designator=scheme)
 
     def dir(self, *filters):
         """Returns an alphabetical list of SR identifiers based on a partial
@@ -244,4 +246,3 @@ class _CodesDict(object):
 
 
 codes = _CodesDict()
-
