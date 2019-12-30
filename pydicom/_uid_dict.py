@@ -44,6 +44,9 @@ UID_dictionary = {
     '1.2.840.10008.1.2.5': ('RLE Lossless', 'Transfer Syntax', '', ''),  # noqa
     '1.2.840.10008.1.2.6.1': ('RFC 2557 MIME encapsulation', 'Transfer Syntax', '', 'Retired'),  # noqa
     '1.2.840.10008.1.2.6.2': ('XML Encoding', 'Transfer Syntax', '', 'Retired'),  # noqa
+    '1.2.840.10008.1.2.7.1': ('SMPTE ST 2110-20 Uncompressed Progressive Active Video', 'Transfer Syntax', '', ''),  # noqa
+    '1.2.840.10008.1.2.7.2': ('SMPTE ST 2110-20 Uncompressed Interlaced Active Video', 'Transfer Syntax', '', ''),  # noqa
+    '1.2.840.10008.1.2.7.3': ('SMPTE ST 2110-30 PCM Digital Audio', 'Transfer Syntax', '', ''),  # noqa
     '1.2.840.10008.1.3.10': ('Media Storage Directory Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.1.4.1.1': ('Talairach Brain Atlas Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.1.2': ('SPM2 T1 Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
@@ -65,6 +68,7 @@ UID_dictionary = {
     '1.2.840.10008.1.4.1.18': ('SPM2 SINGLESUBJT1 Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.2.1': ('ICBM 452 T1 Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
+    '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.5.1': ('Hot Iron Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
     '1.2.840.10008.1.5.2': ('PET Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
     '1.2.840.10008.1.5.3': ('Hot Metal Blue Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
@@ -90,6 +94,11 @@ UID_dictionary = {
     '1.2.840.10008.2.16.7': ('Integrated Taxonomic Information System (ITIS) Taxonomic Serial Number (TSN)', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.2.16.8': ('Mouse Genome Initiative (MGI)', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.2.16.9': ('PubChem Compound CID', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.10': ('ICD-11', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.11': ('New York University Melanoma Clinical Cooperative Group', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.12': ('Mayo Clinic Non-radiological Images Specific Body Structure Anatomical Surface Region Guide', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.13': ('Image Biomarker Standardisation Initiative', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.14': ('Radiomics Ontology', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.3.1.1.1': ('DICOM Application Context Name', 'Application Context Name', '', ''),  # noqa
     '1.2.840.10008.3.1.2.1.1': ('Detached Patient Management SOP Class', 'SOP Class', '', 'Retired'),  # noqa
     '1.2.840.10008.3.1.2.1.4': ('Detached Patient Management Meta SOP Class', 'Meta SOP Class', '', 'Retired'),  # noqa
@@ -260,6 +269,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.88.71': ('Acquisition Context SR Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.88.72': ('Simplified Adult Echo SR Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.88.73': ('Patient Radiation Dose SR Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.88.74': ('Planned Imaging Agent Administration SR Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.88.75': ('Performed Imaging Agent Administration SR Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.90.1': ('Content Assessment Results Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.1': ('Encapsulated PDF Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', ''),  # noqa
@@ -284,6 +295,10 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.481.7': ('RT Treatment Summary Record Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.8': ('RT Ion Plan Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.9': ('RT Ion Beams Treatment Record Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.10': ('RT Physician Intent Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.11': ('RT Segment Annotation Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.12': ('RT Radiation Set Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.13': ('C-Arm Photon-Electron Radiation Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.1': ('DICOS CT Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.1': ('DICOS Digital X-Ray Image Storage - For Presentation', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.2': ('DICOS Digital X-Ray Image Storage - For Processing', 'SOP Class', '', ''),  # noqa
@@ -329,6 +344,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.34.6.2': ('Unified Procedure Step - Watch SOP Class', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.34.6.3': ('Unified Procedure Step - Pull SOP Class', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.34.6.4': ('Unified Procedure Step - Event SOP Class', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.34.6.5': ('Unified Procedure Step - Query SOP Class', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.34.7': ('RT Beams Delivery Instruction Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.34.8': ('RT Conventional Machine Verification', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.34.9': ('RT Ion Machine Verification', 'SOP Class', '', ''),  # noqa
@@ -361,6 +377,10 @@ UID_dictionary = {
     '1.2.840.10008.7.1.1': ('Native DICOM Model', 'Application Hosting Model', '', ''),  # noqa
     '1.2.840.10008.7.1.2': ('Abstract Multi-Dimensional Image Model', 'Application Hosting Model', '', ''),  # noqa
     '1.2.840.10008.8.1.1': ('DICOM Content Mapping Resource', 'Mapping Resource', '', ''),  # noqa
+    '1.2.840.10008.10.1': ('Video Endoscopic Image Real-Time Communication', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.10.2': ('Video Photographic Image Real-Time Communication', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.10.3': ('Audio Waveform Real-Time Communication', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.10.4': ('Rendition Selection Document Real-Time Communication', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.15.0.3.1': ('dicomDeviceName', 'LDAP OID', '', ''),  # noqa
     '1.2.840.10008.15.0.3.2': ('dicomDescription', 'LDAP OID', '', ''),  # noqa
     '1.2.840.10008.15.0.3.3': ('dicomManufacturer', 'LDAP OID', '', ''),  # noqa
