@@ -18,7 +18,7 @@ Fixes
 * Fixed error in pickling modified datasets (:issue:`951`)
 * Fixed improper conversion of the first value of the *LUT
   Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
-* Fixed handling of ISO IR 159 encoding (:issue: `917`)
+* Fixed handling of ISO IR 159 encoding (:issue:`917`)
 * Fixed propagation of bulk data handler in Dataset.from_json (:issue:`971`)
 * Correctly handle DICOMDIR files with records in reverse-hierarchical order
   (:issue:`822`)
@@ -69,8 +69,9 @@ Enhancements
   (:issue:`452`)
 * JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
   with bit depth > 8 with the Pillow pixel data handler
-* A warning has been added when attempting to save a dataset with compressed
-  transfer syntax but no encapsulation of the pixel data. (:issue:`1007`)
+* :attr:`PixelData.is_undefined_length
+  <pydicom.dataelem.DataElement.is_undefined_length>` is now set automatically
+  based on whether the Dataset's Transfer Syntax is compressed (:issue:`1006`)
 
 Changes
 .......

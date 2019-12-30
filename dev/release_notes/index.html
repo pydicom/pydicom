@@ -317,7 +317,7 @@
 <li><p>Fixed error in pickling modified datasets (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/951">#951</a>)</p></li>
 <li><p>Fixed improper conversion of the first value of the <em>LUT
 Descriptor</em> elements (0028,1101-1103) and (0028,3002) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/942">#942</a>)</p></li>
-<li><p>Fixed handling of ISO IR 159 encoding (:issue: <cite>917</cite>)</p></li>
+<li><p>Fixed handling of ISO IR 159 encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/917">#917</a>)</p></li>
 <li><p>Fixed propagation of bulk data handler in Dataset.from_json (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/971">#971</a>)</p></li>
 <li><p>Correctly handle DICOMDIR files with records in reverse-hierarchical order
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/822">#822</a>)</p></li>
@@ -368,8 +368,8 @@ Float Pixel Data</em> to <a class="reference internal" href="../reference/genera
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/452">#452</a>)</p></li>
 <li><p>JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
 with bit depth &gt; 8 with the Pillow pixel data handler</p></li>
-<li><p>A warning has been added when attempting to save a dataset with compressed
-transfer syntax but no encapsulation of the pixel data. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1007">#1007</a>)</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.is_undefined_length" title="pydicom.dataelem.DataElement.is_undefined_length"><code class="xref py py-attr docutils literal notranslate"><span class="pre">PixelData.is_undefined_length</span></code></a> is now set automatically
+based on whether the Dataset’s Transfer Syntax is compressed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1006">#1006</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
