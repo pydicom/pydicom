@@ -17,12 +17,16 @@ class TestCodeDict(unittest.TestCase):
 
     def test_dcm_2(self):
         assert codes.DCM.ProcedureReported == Code(
-            value="121058", scheme_designator="DCM", meaning="Procedure Reported"
+            value="121058",
+            scheme_designator="DCM",
+            meaning="Procedure Reported",
         )
 
     def test_dcm_3(self):
         assert codes.DCM.ImagingStartDatetime == Code(
-            value="122712", scheme_designator="DCM", meaning="Imaging Start DateTime"
+            value="122712",
+            scheme_designator="DCM",
+            meaning="Imaging Start DateTime",
         )
 
     def test_sct_1(self):
@@ -44,7 +48,9 @@ class TestCodeDict(unittest.TestCase):
 
     def test_cid300(self):
         assert codes.cid300.NickelCobaltChromium == Code(
-            value="261249004", scheme_designator="SCT", meaning="Nickel cobalt chromium"
+            value="261249004",
+            scheme_designator="SCT",
+            meaning="Nickel cobalt chromium",
         )
 
     def test_cid301(self):
@@ -54,7 +60,9 @@ class TestCodeDict(unittest.TestCase):
 
     def test_cid402(self):
         assert codes.cid402.DestinationRoleID == Code(
-            value="110152", scheme_designator="DCM", meaning="Destination Role ID"
+            value="110152",
+            scheme_designator="DCM",
+            meaning="Destination Role ID",
         )
 
     def test_cid405(self):
@@ -85,17 +93,23 @@ class TestCodeDict(unittest.TestCase):
 
     def test_cid630(self):
         assert codes.cid630.LidocainePrilocaine == Code(
-            value="346553009", scheme_designator="SCT", meaning="Lidocaine + Prilocaine"
+            value="346553009",
+            scheme_designator="SCT",
+            meaning="Lidocaine + Prilocaine",
         )
 
     def test_cid643(self):
         assert codes.cid643._6Hydroxydopamine == Code(
-            value="4624", scheme_designator="PUBCHEM_CID", meaning="6-Hydroxydopamine"
+            value="4624",
+            scheme_designator="PUBCHEM_CID",
+            meaning="6-Hydroxydopamine",
         )
 
     def test_cid646(self):
         assert codes.cid646.SPECTCTOfWholeBody == Code(
-            value="127902", scheme_designator="DCM", meaning="SPECT CT of Whole Body"
+            value="127902",
+            scheme_designator="DCM",
+            meaning="SPECT CT of Whole Body",
         )
 
     def test_cid1003(self):
@@ -107,7 +121,9 @@ class TestCodeDict(unittest.TestCase):
 
     def test_cid3000(self):
         assert codes.cid3000.OperatorNarrative == Code(
-            value="109111", scheme_designator="DCM", meaning="Operator's Narrative"
+            value="109111",
+            scheme_designator="DCM",
+            meaning="Operator's Narrative",
         )
 
     def test_cid3001_1(self):
@@ -129,7 +145,9 @@ class TestCodeDict(unittest.TestCase):
 
     def test_cid3111(self):
         assert codes.cid3111.Tc99mTetrofosmin == Code(
-            value="404707004", scheme_designator="SCT", meaning="Tc-99m tetrofosmin"
+            value="404707004",
+            scheme_designator="SCT",
+            meaning="Tc-99m tetrofosmin",
         )
 
     def test_cid3263(self):
