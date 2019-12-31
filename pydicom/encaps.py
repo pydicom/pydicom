@@ -221,7 +221,7 @@ def generate_pixel_data_frame(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7FE0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional
@@ -271,7 +271,7 @@ def generate_pixel_data(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7FE0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional

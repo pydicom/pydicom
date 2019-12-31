@@ -46,9 +46,9 @@ Download the current source code
 
 (Optional) Install required libraries
 =====================================
-If you're going to be making changes to one of the pixel data
-handlers you'll need to install `NumPy <https://numpy.org/>`_ as well as
-the library the handler is based on.
+If you're making changes to one of the pixel data handlers you'll need to
+install `NumPy <https://numpy.org/>`_ as well as the library the handler is
+based on.
 
 For example, if you're working on the
 :mod:`~pydicom.pixel_data_handlers.pillow_handler`
@@ -102,17 +102,6 @@ For bug fixes you should write a regression test that reproduces the bug.
 For new features you'll need to include tests that ensure the features
 work as intended.
 
-Let's say we wanted to add a new `pre-defined UID
-<https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids>`_
-to *pydicom* with a value of ``1.2.3.4.500``. We'd first add a new test at the
-bottom of `test_uid.py
-<https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py>`_::
-
-  def test_new_uid():
-      """Test uid.NewDefinedUID."""
-      from pydicom.uid import NewDefinedUID
-      assert '1.2.3.4.500' == NewDefinedUID
-
 .. note::
 
    If you've never had to write tests before they can seem pretty daunting,
@@ -120,7 +109,7 @@ bottom of `test_uid.py
    find the following resources useful:
 
    * Take a look at the
-     `existing test suite <https://github.com/pydicom/pydicom/tree/master/pydicom/tests>`_
+     `existing pydicom test suite <https://github.com/pydicom/pydicom/tree/master/pydicom/tests>`_
      and see how the tests are written. There are examples for writing
      `a single test <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137>`_,
      `a group of related tests <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27>`_,
@@ -135,9 +124,20 @@ bottom of `test_uid.py
    * The `pytest documentation <https://docs.pytest.org/en/latest/example/index.html>`_
      may also be helpful
 
-   In the worst-case scenario, if you can't figure out how to write a test
-   for something, then once you've created a pull-request (to be discussed
-   a bit later) add a comment asking for help.
+   If you're still having trouble writing a test for something, once
+   you've created a pull request (to be discussed a bit later) add a comment
+   asking for help.
+
+Let's say we wanted to add a new `pre-defined UID
+<https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids>`_
+to *pydicom* with a value of ``1.2.3.4.500``. We'd first add a new test at the
+bottom of `test_uid.py
+<https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py>`_::
+
+  def test_new_uid():
+      """Test uid.NewDefinedUID."""
+      from pydicom.uid import NewDefinedUID
+      assert '1.2.3.4.500' == NewDefinedUID
 
 Since we haven't made any modification to the actual source code, when we
 run the tests we should get a failure::
@@ -249,8 +249,8 @@ for a review or help at any point after creating the PR.
 
 What happens next?
 ==================
-One or more reviewers would look at your pull-request and may make suggestions,
-ask for clarification or request changes. Once the reviewers were happy then
+One or more reviewers would look at your pull request and may make suggestions,
+ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
 ``master`` branch where they would become part of *pydicom*.
 
@@ -263,6 +263,6 @@ We delete the local copy of the branch we created::
 
   $ git branch -d new-uid
 
-  And lastly we delete the remote copy on GitHub. Go to
-  ``https://github.com/YourUsername/pydicom/branches``, find the ``doc-tut``
-  branch and click the corresponding red bin icon. All done!
+And lastly we delete the remote copy on GitHub. Go to
+``https://github.com/YourUsername/pydicom/branches``, find the ``new-uid``
+branch and click the corresponding red bin icon. All done!

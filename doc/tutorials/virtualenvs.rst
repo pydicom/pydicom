@@ -17,12 +17,13 @@ This means:
 * If you have two projects that depend on different version of the same
   package then it becomes impossible for both to function simultaneously.
 
-In order to deal with these problems (and others) its recommended that you
+In order to deal with these problems (and others) it's recommended that you
 work within a Python `virtual environment
-<https://docs.python.org/3/tutorial/venv.html>`_, which is an
-isolated environment with its own set of installed system and third-party
-packages that are maintained separately from both the system installation of
-Python and other virtual environments.
+<https://virtualenv.pypa.io>`_, which is an
+isolated environment with it's own set of installed system and third-party
+packages. Because these are maintained separately from both the system
+installation of Python and other virtual environments we no longer have to
+worry about the issues mentioned above.
 
 In this tutorial you will:
 
@@ -144,13 +145,13 @@ You can switch between environments without needing to deactivate them first::
 Managing packages
 -----------------
 
-Packages within the environment can be managed in exactly the same way as
-normal, just remember to activate the environment first::
+Packages within the environment can be managed normally, just remember to
+activate the environment first::
 
   (py37-env) $ pip install antigravity
   (py37-env) $ pip uninstall antigravity
 
-And given it's one of the reasons we're using virtual environments, its
+And given it's one of the reasons we're using virtual environments, it's
 not surprising that different environments can have different versions of the
 same package installed::
 
@@ -191,6 +192,10 @@ If you want more information on using the ``virtualenvwrapper`` package, take a
 look at the `command reference
 <https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html>`_.
 
+If you're using Python 3.3 or higher you may also be interested in the Python
+`venv <https://docs.python.org/3/library/venv.html>`_ module which also allows
+the creation virtual environments, but without the need for extra packages.
+
 .. _tut_venv_conda:
 
 Using conda
@@ -229,7 +234,7 @@ Deactivating the environment will return you to the previous environment::
   (test-env) $ conda deactivate
   (py37-env) $
 
-To return to the base conda environment its recommended you just use ``conda
+To return to the base conda environment it's recommended you just use ``conda
 activate``::
 
   (py35-env) $ conda activate

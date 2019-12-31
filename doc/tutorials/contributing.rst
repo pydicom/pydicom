@@ -12,7 +12,7 @@ out:
 * Reviewing `existing pull requests
   <https://github.com/pydicom/pydicom/pulls>`_ on GitHub.
 * Improving the documentation, whether by fixing typos, contributing
-  new tutorials or adding code examples. No change is too small.
+  new material or adding code examples. No change is too small.
 * Answering (or asking!) questions on
   `stackoverflow <https://stackoverflow.com/questions/tagged/pydicom>`_,
   the `Google groups page <https://groups.google.com/forum/#!forum/pydicom>`_,

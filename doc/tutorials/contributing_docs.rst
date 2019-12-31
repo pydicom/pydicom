@@ -53,7 +53,7 @@ Build and preview the documentation
 ===================================
 
 *pydicom's* documentation consists of a series of `reStructuredText
-<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_ (rST) files
+<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_ (reST) files
 located in the project's ``pydicom/doc`` directory which are converted to
 HTML using `Sphinx <http://www.sphinx-doc.org>`_ during our build process.
 To build the documentation locally, navigate to the ``doc`` directory and
@@ -114,7 +114,7 @@ page should be visible.
 The reason we got the warning above is because the page itself hasn't been
 included in Sphinx's table of contents (the ``toctree``), which Sphinx
 uses to map the relationship between pages in the documentation. It's not
-a requirement that a page be included in the ``toctree``, but its a good idea.
+a requirement that a page be included in the ``toctree``, but it's a good idea.
 
 To make our new page a bit easier to find we'll include a link to it in
 ``tutorials/index.rst``, which will also include it in the ``toctree``::
@@ -134,7 +134,7 @@ If you rebuild the HTML you should find that the warning is gone and that
 your new page is reachable from the main documentation page
 (on the left under "Documentation": Tutorials |rarr| Reading DICOM files).
 
-Next we'll expand our page a bit to show off how to use some of the rST
+Next we'll expand our page a bit to show off how to use some of the reST
 markup::
 
   ===================
@@ -196,7 +196,7 @@ markup::
     >>> print(ds['PatientName'])
     (0010, 0010) Patient's Name                      PN: 'CompressedSamples^CT1'
 
-If you need help with the rST markup then you can:
+If you need help with the reST markup then you can:
 
 * Take a look at the existing documentation to see how it was created
 * Check out Sphinx's `reStructuredText primer
@@ -237,7 +237,7 @@ To submit the pull request (PR) for real - **please don't do this for
 this example!** - then on the next page you would click *"Create pull
 request"*. Creating the PR would automatically start the documentation build
 checks which would be visible at the bottom of the PR as the
-`CircleCI <https://circleci.com/>`_ check. Depending on when you viewer it,
+`CircleCI <https://circleci.com/>`_ check. Depending on when you view it,
 the check would either be in progress, have passed or failed. The details of
 the CircleCI build could be seen by clicking on "Details"
 
@@ -252,8 +252,8 @@ PR ready to be reviewed and merged into the main branch.
 
 What happens next?
 ==================
-One or more reviewers would look at your pull-request and may make suggestions,
-ask for clarification or request changes. Once the reviewers were happy then
+One or more reviewers would look at your pull request and may make suggestions,
+ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
 ``master`` branch where they would become part of *pydicom*.
 

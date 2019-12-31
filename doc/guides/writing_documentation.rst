@@ -7,14 +7,14 @@ Writing documentation
 Types of documentation
 ======================
 
-* Tutorials: take a reader unfamiliar with *pydicom* through a series of steps
-  to achieve something useful
-* How-to/examples: more advanced versions of tutorials, for readers that
+* **Tutorials**: take a reader unfamiliar with *pydicom* through a series of
+  steps to achieve something useful
+* **How-to/examples**: more advanced versions of tutorials, for readers that
   already have some understanding of how *pydicom* works
-* Guides: aim to explain a subject at a fairly high level
-* Reference: contain technical reference information for the *pydicom* API for
-  a reader that has some familiarity with *pydicom* but needs to learn or be
-  reminded about a specific part of it
+* **Guides**: aim to explain a subject at a fairly high level
+* **Reference**: contain technical reference information for the *pydicom* API
+  for a reader that has some familiarity with *pydicom* but needs to learn or
+  be reminded about a specific part of it
 
 General style guidelines
 ========================
@@ -22,10 +22,11 @@ General style guidelines
 * **pydicom** - italicized lowercase: *pydicom*
 * **DICOM**, **DICOM Standard** - uppercase DICOM, and S on Standard
 * **Python** - capitalize Python
-* **itemize**, etc - use the North American "-ize" spelling
-* **(7FE0,0010) Pixel Data** - use uppercase hex and italicize the element
-  name, e.g. (7FE0, 0010) *Pixel Data*. When referring to an element name by
-  itself then use italics: *Bits Allocated*
+* **itemize**, etc - use the American English spelling
+* **(7FE0,0010) Pixel Data** - use uppercase hex, no space between the comma
+  and element number, and italicize the element name, e.g. (7FE0,0010) *Pixel
+  Data*. When referring to an element name by itself then use italics: *Bits
+  Allocated*
 * **ds**, **elem**, **seq**, **arr** - when writing examples try to use ``ds``
   as the variable name for :class:`~pydicom.dataset.Dataset`, ``elem`` for
   :class:`~pydicom.dataelem.DataElement`, ``seq`` for sequences and ``arr``
@@ -43,12 +44,13 @@ General style guidelines
     :class:`~pydicom.dataset.Dataset`
 * Use a single back-tick \`italics\` for parameter names: If
   `fragments_per_frame` is not...
-
-Guidelines for ReStructuredText
-===============================
-
 * For the API reference documentation, follow the `NumPy docstring guide
   <https://numpydoc.readthedocs.io/en/latest/format.html>`_
+
+
+Guidelines for reStructuredText
+===============================
+
 * In section titles, capitalize only initial words and proper nouns
 * Documentation should be wrapped at 80 characters unless there's a good reason
   not to
