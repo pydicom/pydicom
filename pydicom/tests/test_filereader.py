@@ -17,6 +17,7 @@ import pydicom.config
 from pydicom import config
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.data import get_testdata_files
+from pydicom.datadict import add_dict_entries
 from pydicom.filereader import dcmread, read_dataset
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
@@ -837,6 +838,31 @@ class TestReadDataElement(object):
         ds.URNCodeValue = 'http://test.com'  # VR of UR
         ds.RetrieveURL = 'ftp://test.com  '  # Test trailing spaces ignored
         ds.DestinationAE = '    TEST  12    '  # 16 characters max for AE
+        # 8-byte values
+        ds.ExtendedOffsetTable = (  # VR of OV
+            b'\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x01\x02\x03\x04\x05\x06\x07\x08'
+        )
+
+        # No public elements with VR of SV or UV yet...
+        add_dict_entries({
+            0xFFFE0001: (
+                'SV', '1', 'SV Element Minimum', '', 'SVElementMinimum'
+            ),
+            0xFFFE0002: (
+                'SV', '1', 'SV Element Maximum', '', 'SVElementMaximum'
+            ),
+            0xFFFE0003: (
+                'UV', '1', 'UV Element Minimum', '', 'UVElementMinimum'
+            ),
+            0xFFFE0004: (
+                'UV', '1', 'UV Element Maximum', '', 'UVElementMaximum'
+            ),
+        })
+        ds.SVElementMinimum = -2**63
+        ds.SVElementMaximum = 2**63 - 1
+        ds.UVElementMinimum = 0
+        ds.UVElementMaximum = 2**64 - 1
 
         self.fp = BytesIO()  # Implicit little
         file_ds = FileDataset(self.fp, ds)
@@ -938,6 +964,113 @@ class TestReadDataElement(object):
         """Check creation of AE DataElement from byte data works correctly."""
         ds = dcmread(self.fp, force=True)
         assert 'TEST  12' == ds.DestinationAE
+
+    def test_read_OV_implicit_little(self):
+        """Check reading element with VR of OV encoded as implicit"""
+        ds = dcmread(self.fp, force=True)
+        val = (
+            b'\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x01\x02\x03\x04\x05\x06\x07\x08'
+        )
+        elem = ds['ExtendedOffsetTable']
+        assert 'OV' == elem.VR
+        assert 0x7FE00001 == elem.tag
+        assert val == elem.value
+
+        new = DataElement(0x7FE00001, 'OV', val)
+        assert elem == new
+
+    def test_read_OV_explicit_little(self):
+        """Check reading element with VR of OV encoded as explicit"""
+        ds = dcmread(self.fp_ex, force=True)
+        val = (
+            b'\x00\x00\x00\x00\x00\x00\x00\x00'
+            b'\x01\x02\x03\x04\x05\x06\x07\x08'
+        )
+        elem = ds['ExtendedOffsetTable']
+        assert 'OV' == elem.VR
+        assert 0x7FE00001 == elem.tag
+        assert val == elem.value
+
+        new = DataElement(0x7FE00001, 'OV', val)
+        assert elem == new
+
+    def test_read_SV_implicit_little(self):
+        """Check reading element with VR of SV encoded as implicit"""
+        ds = dcmread(self.fp, force=True)
+        elem = ds['SVElementMinimum']
+        assert 'SV' == elem.VR
+        assert 0xFFFE0001 == elem.tag
+        assert -2**63 == elem.value
+
+        new = DataElement(0xFFFE0001, 'SV', -2**63)
+        assert elem == new
+
+        elem = ds['SVElementMaximum']
+        assert 'SV' == elem.VR
+        assert 0xFFFE0002 == elem.tag
+        assert 2**63 - 1 == elem.value
+
+        new = DataElement(0xFFFE0002, 'SV', 2**63 - 1)
+        assert elem == new
+
+    @pytest.mark.skip("No public elements with VR of SV")
+    def test_read_SV_explicit_little(self):
+        """Check reading element with VR of SV encoded as explicit"""
+        ds = dcmread(self.fp_ex, force=True)
+        elem = ds['SVElementMinimum']
+        assert 'SV' == elem.VR
+        assert 0xFFFE0001 == elem.tag
+        assert -2**63 == elem.value
+
+        new = DataElement(0xFFFE0001, 'SV', -2**63)
+        assert elem == new
+
+        elem = ds['SVElementMaximum']
+        assert 'SV' == elem.VR
+        assert 0xFFFE0002 == elem.tag
+        assert 2**63 - 1 == elem.value
+
+        new = DataElement(0xFFFE0002, 'SV', 2**63 - 1)
+        assert elem == new
+
+    def test_read_UV_implicit_little(self):
+        """Check reading element with VR of UV encoded as implicit"""
+        ds = dcmread(self.fp, force=True)
+        elem = ds['UVElementMinimum']
+        assert 'UV' == elem.VR
+        assert 0xFFFE0003 == elem.tag
+        assert 0 == elem.value
+
+        new = DataElement(0xFFFE0003, 'UV', 0)
+        assert elem == new
+
+        elem = ds['UVElementMaximum']
+        assert 'UV' == elem.VR
+        assert 0xFFFE0004 == elem.tag
+        assert 2**64 - 1 == elem.value
+
+        new = DataElement(0xFFFE0004, 'UV', 2**64 - 1)
+        assert elem == new
+
+    def test_read_UV_explicit_little(self):
+        """Check reading element with VR of UV encoded as explicit"""
+        ds = dcmread(self.fp_ex, force=True)
+        elem = ds['UVElementMinimum']
+        assert 'UV' == elem.VR
+        assert 0xFFFE0003 == elem.tag
+        assert 0 == elem.value
+
+        new = DataElement(0xFFFE0003, 'UV', 0)
+        assert elem == new
+
+        elem = ds['UVElementMaximum']
+        assert 'UV' == elem.VR
+        assert 0xFFFE0004 == elem.tag
+        assert 2**64 - 1 == elem.value
+
+        new = DataElement(0xFFFE0004, 'UV', 2**64 - 1)
+        assert elem == new
 
 
 class TestDeferredRead(object):

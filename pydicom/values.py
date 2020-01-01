@@ -300,6 +300,15 @@ def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
     return convert_OBvalue(byte_string, is_little_endian)
 
 
+def convert_OVvalue(byte_string, is_little_endian, struct_format=None):
+    """Return the encoded 'OV' value as :class:`bytes` or :class:`str`.
+
+    No byte swapping will be performed.
+    """
+    # for now, Maybe later will have own routine
+    return convert_OBvalue(byte_string, is_little_endian)
+
+
 def convert_PN(byte_string, encodings=None):
     """Return a decoded 'PN' value.
 
@@ -635,35 +644,40 @@ convert_retry_VR_order = [
 # (function, struct_format)
 # (struct_format in python struct module style)
 converters = {
-    'UL': (convert_numbers, 'L'),
-    'SL': (convert_numbers, 'l'),
-    'US': (convert_numbers, 'H'),
-    'SS': (convert_numbers, 'h'),
-    'FL': (convert_numbers, 'f'),
-    'FD': (convert_numbers, 'd'),
-    'OF': (convert_numbers, 'f'),
-    'OB': convert_OBvalue,
-    'OD': convert_OBvalue,
-    'OL': convert_OBvalue,
-    'UI': convert_UI,
-    'SH': convert_text,
-    'DA': convert_DA_string,
-    'TM': convert_TM_string,
-    'CS': convert_string,
-    'PN': convert_PN,
-    'LO': convert_text,
-    'IS': convert_IS_string,
-    'DS': convert_DS_string,
     'AE': convert_AE_string,
     'AS': convert_string,
+    'AT': convert_ATvalue,
+    'CS': convert_string,
+    'DA': convert_DA_string,
+    'DS': convert_DS_string,
+    'DT': convert_DT_string,
+    'FD': (convert_numbers, 'd'),
+    'FL': (convert_numbers, 'f'),
+    'IS': convert_IS_string,
+    'LO': convert_text,
     'LT': convert_single_string,
+    'OB': convert_OBvalue,
+    'OD': convert_OBvalue,
+    'OF': (convert_numbers, 'f'),
+    'OL': convert_OBvalue,
+    'OW': convert_OWvalue,
+    'OV': convert_OVvalue,
+    'PN': convert_PN,
+    'SH': convert_text,
+    'SL': (convert_numbers, 'l'),
     'SQ': convert_SQ,
+    'SS': (convert_numbers, 'h'),
+    'ST': convert_single_string,
+    'SV': (convert_numbers, 'q'),
+    'TM': convert_TM_string,
     'UC': convert_text,
+    'UI': convert_UI,
+    'UL': (convert_numbers, 'L'),
     'UN': convert_UN,
     'UR': convert_UR_string,
-    'AT': convert_ATvalue,
-    'ST': convert_single_string,
-    'OW': convert_OWvalue,
+    'US': (convert_numbers, 'H'),
+    'UT': convert_single_string,
+    'UV': (convert_numbers, 'Q'),
     'OW/OB': convert_OBvalue,  # note OW/OB depends on other items,
     'OB/OW': convert_OBvalue,  # which we don't know at read time
     'OW or OB': convert_OBvalue,
@@ -672,6 +686,4 @@ converters = {
     'US or OW': convert_OWvalue,
     'US or SS or OW': convert_OWvalue,
     'US\\US or SS\\US': convert_OWvalue,
-    'DT': convert_DT_string,
-    'UT': convert_single_string,
 }
