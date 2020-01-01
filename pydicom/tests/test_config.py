@@ -52,7 +52,7 @@ class TestDebug(object):
             assert "Reading File Meta Information prefix..." in caplog.text
             assert "00000080: 'DICM' prefix found" in caplog.text
             msg = (
-                "00009848: fc ff fc ff 4f 42 00 00 7e 00 00 00    "
+                "00009890: fc ff fc ff 4f 42 00 00 7e 00 00 00    "
                 "(fffc, fffc) OB Length: 126"
             )
             assert msg in caplog.text
@@ -86,7 +86,7 @@ class TestDebug(object):
             assert "Reading File Meta Information prefix..." in caplog.text
             assert "00000080: 'DICM' prefix found" in caplog.text
             msg = (
-                "00009848: fc ff fc ff 4f 42 00 00 7e 00 00 00    "
+                "00009890: fc ff fc ff 4f 42 00 00 7e 00 00 00    "
                 "(fffc, fffc) OB Length: 126"
             )
             assert msg in caplog.text
