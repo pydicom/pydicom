@@ -17,7 +17,7 @@ This means:
 * If you have two projects that depend on different version of the same
   package then it becomes impossible for both to function simultaneously.
 
-In order to deal with these problems (and others) it's recommended that you
+In order to deal with these problems (and others) its recommended that you
 work within a Python `virtual environment
 <https://virtualenv.pypa.io>`_, which is an
 isolated environment with it's own set of installed system and third-party
@@ -263,8 +263,8 @@ However environments must be deactivate first::
 Managing installed packages
 ---------------------------
 
-Packages within the environment can be managed in exactly the same way as
-normal, just remember to activate the environment first::
+Packages within the environment can be managed normally, just remember to
+activate the environment first::
 
   (py37-env) $ pip install antigravity
   (py37-env) $ pip uninstall antigravity
