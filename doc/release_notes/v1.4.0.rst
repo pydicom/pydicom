@@ -73,6 +73,7 @@ Enhancements
   <pydicom.dataelem.DataElement.is_undefined_length>` is now set automatically
   based on whether the Dataset's Transfer Syntax is compressed (:issue:`1006`)
 * Updated DICOM dictionary to 2019e edition (:issue:`1013`)
+* Added support for new VRs OV, SV, UV (:issue:`1016`)
 
 Changes
 .......
