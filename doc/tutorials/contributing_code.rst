@@ -181,7 +181,7 @@ it to be included in the API reference documentation we'll also need to update
   RLELossless
   NewDefinedUID
 
-When making changes, and especially when adding new features, its important
+When making changes, and especially when adding new features, it's important
 that they're documented. It's very difficult for users to find and
 understand how to use code that hasn't been documented, or whose documentation
 contains errors. For more information on how to properly document *pydicom*
@@ -210,7 +210,7 @@ version we first checked out with::
 
 You can scroll through the output using the up and down keys and quit with
 **q**. Lines with a **-** in front will be removed and lines with a **+**
-added. If everything looks good then its time to commit the changes.
+added. If everything looks good then it's time to commit the changes.
 
 
 Commit your changes and make a pull request

@@ -17,10 +17,10 @@ This means:
 * If you have two projects that depend on different version of the same
   package then it becomes impossible for both to function simultaneously.
 
-In order to deal with these problems (and others) its recommended that you
+In order to deal with these problems (and others) it's recommended that you
 work within a Python `virtual environment
 <https://virtualenv.pypa.io>`_, which is an
-isolated environment with it's own set of installed system and third-party
+isolated environment with its own set of installed system and third-party
 packages. Because these are maintained separately from both the system
 installation of Python and other virtual environments we no longer have to
 worry about the issues mentioned above.
