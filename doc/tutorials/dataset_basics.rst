@@ -190,7 +190,7 @@ There are three categories of elements:
   we know the element name is *Duration of X-ray on* with a VR of **FL**.
 
 For all element categories we can access a particular element in the dataset
-through it's tag, which returns a :class:`~pydicom.dataelem.DataElement`
+through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
 instance::
 
     >>> elem = ds[0x0008, 0x0016]
@@ -221,7 +221,7 @@ for repeating group elements (because there may be multiple elements with the
 same keyword at a given dataset level). So for those elements stick to the
 ``Dataset[group, element]`` method.
 
-In most cases, the important thing about an element is it's value::
+In most cases, the important thing about an element is its value::
 
     >>> elem.value
     '1.2.840.10008.5.1.4.1.1.2'
@@ -351,7 +351,7 @@ value::
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'Citizen^Jan'
 
-But for standard elements its simpler to use the keyword::
+But for standard elements it's simpler to use the keyword::
 
     >>> ds.PatientName = 'Citizen^Snips'
     >>> elem

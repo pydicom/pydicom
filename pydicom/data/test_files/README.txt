@@ -110,6 +110,9 @@ mlut_18.dcm
   * Modality LUT Sequence
   * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
     images
+    
+no_meta.dcm
+    * Same as CT_small.dcm with no File Meta Information header
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian

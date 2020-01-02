@@ -6,11 +6,11 @@ Element VRs and Python types
 
 DICOM elements can contain anything from strings to unicode text, decimals,
 floats, signed and unsigned integers of different byte-depth and even raw
-bytes. The format of the value of an element is given by its **Value
+data. The format of the value of an element is given by its **Value
 Representation** or VR. A list of VRs is given in the DICOM Standard in Part 5,
 :dcm:`Table 6.2-1 <part05/sect_6.2.html#table_6.2-1>`.
 
-The question, then, is what Python type should be used with a given VR? When
+So what Python type should be used with a given VR? When
 using pydicom, all element values can be set using a standard Python built-in
 type, which is either retained as-is or converted to a pydicom type as given
 in the table below.
