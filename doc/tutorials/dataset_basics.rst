@@ -432,7 +432,8 @@ available :doc:`here</guides/element_value_types>`.
 
 Standard elements
 ~~~~~~~~~~~~~~~~~
-But that's a lot of work, so for standard elements you can just use the keyword
+Adding elements with :meth:`~pydicom.dataset.Dataset.add_new` is a lot of
+work, so for standard elements you can just use the keyword
 and pydicom will do the lookup for you::
 
     >>> 'WindowCenter' in ds
