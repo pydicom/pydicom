@@ -226,8 +226,7 @@ In most cases, the important thing about an element is its value::
     >>> elem.value
     '1.2.840.10008.5.1.4.1.1.2'
 
-So for standard elements, which are the ones you're most likely going to be
-interested in, pydicom has a quick way of getting the value by
+So for standard elements, pydicom has a quick way of getting the value; by
 using the Python dot notation with the keyword::
 
     >>> ds.SOPClassUID
@@ -235,7 +234,7 @@ using the Python dot notation with the keyword::
 
 This is the recommended method of accessing the value of standard elements.
 It's simpler and more human-friendly then dealing with element tags and later
-on you'll see how you can use the keyword to do more than just getting the
+on you'll see how you can use the keyword to do more than just accessing the
 value.
 
 Sequences
@@ -248,8 +247,10 @@ elements are indented::
     ...
     (0010, 1002)  Other Patient IDs Sequence   2 item(s) ----
         (0010, 0020) Patient ID                          LO: 'ABCD1234'
+        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
         ---------
         (0010, 0020) Patient ID                          LO: '1234ABCD'
+        (0010, 0022) Type of Patient ID                  CS: 'TEXT'
         ---------
     ...
 
@@ -366,8 +367,9 @@ For sequence elements you can use the standard Python :class:`list` methods::
     3
 
 This appends a new empty :class:`~pydicom.dataset.Dataset` item to the
-sequence. As mentioned before, the items in sequence are ``Dataset`` instances.
-If you try to add any other type to a sequence you'll get an exception::
+sequence. As mentioned before, the items in a sequence are ``Dataset``
+instances. If you try to add any other type to a sequence you'll get an
+exception::
 
     >>> seq.append('Hello world?')
     Traceback (most recent call last):
@@ -378,7 +380,8 @@ If you try to add any other type to a sequence you'll get an exception::
         raise TypeError('Sequence contents must be Dataset instances.')
       TypeError: Sequence contents must be Dataset instances.
 
-You can set any element value to null by using ``None``::
+You can set any element value to null by using ``None`` (sequence elements
+will automatically be converted to an empty list when you do so)::
 
     >>> ds.PatientName = None
     >>> elem
@@ -387,7 +390,6 @@ You can set any element value to null by using ``None``::
     >>> len(seq)
     0
 
-Sequence elements will automatically be converted to an empty list instead.
 Elements with a value of ``None``, ``b''``, ``''`` or ``[]`` will still be
 written to file, but will have an empty value.
 
