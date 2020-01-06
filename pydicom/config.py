@@ -92,6 +92,8 @@ a text VR is ``None``, otherwise (the default), it is is an empty string.
 For all other VRs the behavior does not change - the value is en empty
 list for VR 'SQ' and ``None`` for all other VRs.
 Note that the default of this value will change to ``True`` in version 2.0.
+
+.. versionadded:: 1.4
 """
 
 # Logging system and debug function to change logging level
@@ -201,6 +203,10 @@ def debug(debug_on=True, default_handler=True):
     that location are logged to the 'pydicom' logger using Python's
     :mod:`logging`
     module.
+
+    .. versionchanged:1.4
+
+        Added `default_handler` keyword parameter.
 
     Parameters
     ----------

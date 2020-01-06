@@ -11,10 +11,11 @@ _CodeBase.__new__.__defaults__ = (None, )
 
 
 class Code(_CodeBase):
-
     """Namedtuple for representation of a coded concept consiting of the
     actual code *value*, the coding *scheme designator*, the code *meaning*
     (and optionally the coding *scheme version*).
+
+    ..versionadded: 1.4
     """
 
     def __eq__(self, other):
@@ -54,4 +55,3 @@ class Code(_CodeBase):
 
     def __ne__(self, other):
         return not(self == other)
-

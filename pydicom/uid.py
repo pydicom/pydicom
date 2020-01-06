@@ -273,6 +273,11 @@ RLECompressedLosslessSyntaxes = [
 def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
     """Return a 64 character UID which starts with `prefix`.
 
+    .. versionchanged:: 1.3
+
+       When `prefix` is ``None`` a conformant UUID suffix of up to
+       39 characters will be used instead of a hashed value.
+
     Parameters
     ----------
     prefix : str or None

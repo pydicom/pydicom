@@ -59,13 +59,22 @@ class Sequence(MultiValue):
     @property
     def parent(self):
         """Return a weak reference to the parent
-        :class:`~pydicom.dataset.Dataset`."""
+        :class:`~pydicom.dataset.Dataset`.
+
+        .. versionadded:: 1.3
+
+        .. versionchanged:: 1.4
+
+            Returned value is a weak reference to the parent ``Dataset``.
+        """
         return self._parent
 
     @parent.setter
     def parent(self, value):
         """Set the parent :class:`~pydicom.dataset.Dataset` and pass it to all
         :class:`Sequence` items.
+
+        .. versionadded:: 1.3
         """
         if value != self._parent:
             self._parent = weakref.ref(value)

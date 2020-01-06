@@ -883,6 +883,8 @@ class Dataset(dict):
     def private_block(self, group, private_creator, create=False):
         """Return the block for the given tag `group` and `private_creator`.
 
+        .. versionadded:: 1.3
+
         If `create` is ``True`` and the `private_creator` does not exist,
         the private creator tag is added.
 
@@ -951,6 +953,8 @@ class Dataset(dict):
     def private_creators(self, group):
         """Return a list of private creator names in the given group.
 
+        .. versionadded:: 1.3
+
         Examples
         --------
         This can be used to check if a given private creator exists in
@@ -988,6 +992,8 @@ class Dataset(dict):
 
     def get_private_item(self, group, element_offset, private_creator):
         """Return the data element for the given private tag `group`.
+
+        .. versionadded:: 1.3
 
         This is analogous to ``Dataset.__getitem__()``, but only for private
         tags. This allows to find the private tag for the correct private
@@ -1075,6 +1081,8 @@ class Dataset(dict):
         """Return ``True`` if the encoding to be used for writing is set and
         is the same as that used to originally encode the  :class:`Dataset`.
 
+        .. versionadded:: 1.1
+
         This includes properties related to endianess, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
@@ -1087,6 +1095,8 @@ class Dataset(dict):
     def set_original_encoding(self, is_implicit_vr, is_little_endian,
                               character_encoding):
         """Set the values for the original transfer syntax and encoding.
+
+        .. versionadded:: 1.2
 
         Can be used for a :class:`Dataset` with raw data elements to enable
         optimized writing (e.g. without decoding the data elements).
@@ -1142,6 +1152,8 @@ class Dataset(dict):
 
     def elements(self):
         """Yield the top-level elements of the :class:`Dataset`.
+
+        .. versionadded:: 1.1
 
         Examples
         --------
@@ -1450,10 +1462,6 @@ class Dataset(dict):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
-        .. versionadded:: 1.4
-
-            The `handler_name` keyword argument was added
-
         If not a compressed transfer syntax, then pixel data is converted
         to a :class:`numpy.ndarray` internally, but not returned.
 
@@ -1464,6 +1472,10 @@ class Dataset(dict):
           form
         - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7FE0,0010) *Pixel Data* element.
+
+        .. versionchanged::
+
+            The `handler_name` keyword argument was added
 
         Parameters
         ----------
@@ -1794,7 +1806,10 @@ class Dataset(dict):
         pydicom.dcmwrite(filename, self, write_like_original)
 
     def ensure_file_meta(self):
-        """Create an empty ``Dataset.file_meta`` if none exists."""
+        """Create an empty ``Dataset.file_meta`` if none exists.
+
+        .. versionadded:: 1.2
+        """
         self.file_meta = getattr(self, 'file_meta', Dataset())
 
     def fix_meta_info(self, enforce_standard=True):
@@ -2314,6 +2329,10 @@ class FileDataset(Dataset):
 
 def validate_file_meta(file_meta, enforce_standard=True):
     """Validate the *File Meta Information* elements in `file_meta`.
+
+    .. versionchanged:: 1.2
+
+        Moved from :mod:`pydicom.filewriter`.
 
     Parameters
     ----------

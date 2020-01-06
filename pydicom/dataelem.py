@@ -46,6 +46,8 @@ BINARY_VR_VALUES = [
 def empty_value_for_VR(VR, raw=False):
     """Return the value for an empty element for `VR`.
 
+    .. versionadded:: 1.4
+
     The behavior of this property depends on the setting of
     :attr:`config.use_none_as_empty_value`. If that is set to ``True``,
     an empty value is represented by ``None`` (except for VR 'SQ'), otherwise
@@ -261,6 +263,8 @@ class DataElement(object):
                   bulk_data_uri_handler=None):
         """Return a :class:`DataElement` from JSON.
 
+        .. versionadded:: 1.3
+
         Parameters
         ----------
         dataset_class : dataset.Dataset derived class
@@ -300,6 +304,8 @@ class DataElement(object):
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
+
+        .. versionadded:: 1.4
 
         Parameters
         ----------
@@ -396,6 +402,8 @@ class DataElement(object):
                 dump_handler=None):
         """Return a JSON representation of the :class:`DataElement`.
 
+        .. versionadded:: 1.3
+
         Parameters
         ----------
         bulk_data_element_handler: callable or None
@@ -472,12 +480,17 @@ class DataElement(object):
 
     @property
     def is_empty(self):
-        """Return ``True`` if the element has no value."""
+        """Return ``True`` if the element has no value.
+
+        .. versionadded:: 1.4
+        """
         return self.VM == 0
 
     @property
     def empty_value(self):
         """Return the value for an empty element.
+
+        .. versionadded:: 1.4
 
         See :func:`empty_value_for_VR` for more information.
 
@@ -490,6 +503,8 @@ class DataElement(object):
 
     def clear(self):
         """Clears the value, e.g. sets it to the configured empty value.
+
+        .. versionadded:: 1.4
 
         See :func:`empty_value_for_VR`.
         """
