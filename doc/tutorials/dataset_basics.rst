@@ -123,15 +123,14 @@ You'll only run into problems when trying to use the dataset::
           raise KeyError(msg)
       KeyError: "Unknown DICOM tag (6854, 7369) can't look up VR"
 
-Before we go on to the next section, let's go back to our ``CT_small.dcm``
-dataset::
-
-    >>> fpath = get_testdata_file("CT_small.dcm")
-    >>> ds = dcmread(fpath)
-
 
 Viewing and accessing
 =====================
+
+Let's go back to our ``CT_small.dcm`` dataset::
+
+    >>> fpath = get_testdata_file("CT_small.dcm")
+    >>> ds = dcmread(fpath)
 
 You can view the contents of the entire dataset by using :func:`print`::
 
@@ -156,8 +155,8 @@ You can view the contents of the entire dataset by using :func:`print`::
     (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 elements
 
 The print output shows a list of the :dcm:`data elements
-<part05/chapter_7.html#sect_7.1>` present in the dataset, one element per
-line. The format of each line is:
+<part05/chapter_7.html#sect_7.1>` (or *elements* for short) present in the
+dataset, one element per line. The format of each line is:
 
 * **(0008, 0005)**: The element's :dcm:`tag<part05/chapter_7.html#sect_7.1.1>`,
   as (group number, element number) in hexadecimal
@@ -172,7 +171,7 @@ Elements
 There are three categories of elements:
 
 * **Standard elements** such as (0008,0016) *SOP Class UID*. These elements
-  are registered in the official DICOM Standard. They have an even group
+  are registered in the official DICOM Standard, have an even group
   number and are unique at each level of the dataset.
 * **Repeating group elements** such as (60xx,3000) *Overlay Data* (not found
   in this dataset). :dcm:`Repeating group<part05/sect_7.6.html>` elements are
@@ -189,7 +188,7 @@ There are three categories of elements:
   aren't known. However, in this case the details have been made public and
   we know the element name is *Duration of X-ray on* with a VR of **FL**.
 
-For all element categories we can access a particular element in the dataset
+For all element categories, we can access a particular element in the dataset
 through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
 instance::
 
@@ -216,32 +215,44 @@ exceptions - such as (0010,0010) *Patient's Name* having a keyword of
     >>> elem
     (0008, 0016) SOP Class UID                       UI: CT Image Storage
 
-This won't work for private elements (they have no keyword) nor
-for repeating group elements (because there may be multiple elements with the
-same keyword at a given dataset level). So for those elements stick to the
-``Dataset[group, element]`` method.
+Because of the lack of a unique keyword, this won't work for private or
+repeating group elements. So for those elements stick to the
+``Dataset[group number, element number]`` method.
 
 In most cases, the important thing about an element is its value::
 
     >>> elem.value
     '1.2.840.10008.5.1.4.1.1.2'
 
-So for standard elements, pydicom has a quick way of getting the value; by
-using the Python dot notation with the keyword::
+For standard elements, you can use the Python dot notation with the keyword to
+get the value::
 
     >>> ds.SOPClassUID
     '1.2.840.10008.5.1.4.1.1.2'
 
 This is the recommended method of accessing the value of standard elements.
 It's simpler and more human-friendly then dealing with element tags and later
-on you'll see how you can use the keyword to do more than just accessing the
-value.
+on you'll see how you can use the keyword to do more than accessing the value.
+
+Elements may also be multi-valued (have a :dcm:`Value Multiplicity
+<part05/sect_6.4.html>` (VM) > 1)::
+
+    >>> ds.ImageType
+    ['ORIGINAL', 'PRIMARY', 'AXIAL']
+    >>> ds['ImageType'].VM
+    3
+
+The items for multi-valued elements can be accessed using the standard Python
+:class:`~list` methods::
+
+    >>> ds.ImageType[1]
+    'PRIMARY'
+
 
 Sequences
 ---------
 
-When you view some datasets (such as this one), you may see that some of the
-elements are indented::
+When viewing a dataset, you may see that some of the elements are indented::
 
     >>> print(ds)
     ...
@@ -254,16 +265,19 @@ elements are indented::
         ---------
     ...
 
-This indicates that those elements are part of a sequence (in this
-case part of the (0010,1002) *Other Patient IDs Sequence* element). The
-structure of a DICOM dataset can be thought of as similar to XML or other
-tree-like formats.
+This indicates that those elements are part of a sequence, in this case
+part of the *Other Patient IDs Sequence* element. Sequence elements have a
+VR of **SQ** and they usually have the word *Sequence* in their name.
+DICOM datasets use the `tree data structure
+<https://en.wikipedia.org/wiki/Tree_(data_structure)>`_, with non-sequence
+elements acting as leaves and sequence elements acting as the nodes where
+branches start.
 
-* The top-level dataset contains 0 or more elements:
+* The top-level (root) dataset contains 0 or more elements (leaves):
 
   * An element may be non-sequence type (VR is not **SQ**), or
   * An element may be a sequence type (VR is **SQ**), contains 0 or
-    more items:
+    more items (branches):
 
     * Each item in the sequence is another dataset, containing 0 or more
       elements:
@@ -276,9 +290,9 @@ Sequence elements can be accessed in the same manner as non-sequence ones::
     >>> seq = ds['0x0010, 0x1002']
     >>> seq = ds['OtherPatientIDsSequence']
 
-The main difference with sequence elements is their value is a list of zero
-or more  :class:`~pydicom.dataset.Dataset` objects, which can be accessed using
-Python list indexing::
+The main difference between sequence and non-sequence elements is their value
+is a list of zero or more  :class:`~pydicom.dataset.Dataset` objects, which
+can be accessed using the standard Python :class:`list` methods::
 
     >>> len(ds.OtherPatientIDsSequence)
     2
@@ -358,18 +372,27 @@ But for standard elements it's simpler to use the keyword::
     >>> elem
     (0010, 0010) Patient's Name                      PN: 'Citizen^Snips'
 
-For sequence elements you can use the standard Python :class:`list` methods::
+Multi-valued elements can be set using a :class:`list` or modified using the
+:class:`list` methods::
+
+    >>> ds.ImageType = ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
+    >>> ds.ImageType
+    ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
+    >>> ds.ImageType[1] = 'SECONDARY'
+    >>> ds.ImageType
+    ['ORIGINAL', 'SECONDARY', 'LOCALIZER']
+
+Similarly, for sequence elements::
 
     >>> from pydicom.dataset import Dataset
-    >>> seq = ds.OtherPatientIDsSequence
-    >>> seq.append(Dataset())
-    >>> len(seq)
+    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]
+    >>> ds.OtherPatientIDsSequence.append(Dataset())
+    >>> len(ds.OtherPatientIDsSequence)
     3
 
-This appends a new empty :class:`~pydicom.dataset.Dataset` item to the
-sequence. As mentioned before, the items in a sequence are ``Dataset``
-instances. If you try to add any other type to a sequence you'll get an
-exception::
+As mentioned before, the items in a sequence are
+:class:`~pydicom.dataset.Dataset` instances. If you try to add any other type
+to a sequence you'll get an exception::
 
     >>> seq.append('Hello world?')
     Traceback (most recent call last):
@@ -380,18 +403,18 @@ exception::
         raise TypeError('Sequence contents must be Dataset instances.')
       TypeError: Sequence contents must be Dataset instances.
 
-You can set any element value to null by using ``None`` (sequence elements
+You can set any element value as empty by using ``None`` (sequence elements
 will automatically be converted to an empty list when you do so)::
 
     >>> ds.PatientName = None
     >>> elem
     (0010, 0010) Patient's Name                      PN: None
     >>> ds.OtherPatientIDsSequence = None
-    >>> len(seq)
+    >>> len(ds.OtherPatientIDsSequence)
     0
 
 Elements with a value of ``None``, ``b''``, ``''`` or ``[]`` will still be
-written to file, but will have an empty value.
+written to file, but will have an empty value and zero length.
 
 
 Adding elements
@@ -405,7 +428,9 @@ value to use for the new element.
 
 Let's say we wanted to add the (0028,1050) *Window Width* standard element. We
 already know the tag is (0028,1050), but how we get the VR and how do we
-know the :class:`type` to use for the value? To get the VR:
+know the Python :class:`type` to use for the value?
+
+There are two ways to get an element's VR:
 
 * You can use :dcm:`Part 6 of the DICOM Standard<part06/chapter_6.html>`
   and search for the element
@@ -418,19 +443,15 @@ know the :class:`type` to use for the value? To get the VR:
     >>> dictionary_VR([0x0028, 0x1050])
     'DS'
 
-From the DICOM Standard, the :dcm:`VR<part05/sect_6.2.html#table_6.2-1>`
-**DS** is *"[a] string of characters representing either a fixed point or a
-floating point number."* In pydicom, for this VR, we can either use a
-:class:`str`, :class:`int` or :class:`float` for the value. So to add the
-new element::
+The Python type to use for a given VR is given by :doc:`this table
+</guides/element_value_types>`. For **DS** we can use a :class:`str`,
+:class:`int` or :class:`float`, so to add the new element::
 
     >>> ds.add_new([0x0028, 0x1050], 'DS', "100.0")
     >>> elem = ds[0x0028, 0x1050]
     >>> elem
     (0028, 1051) Window Width                        DS: "100.0"
 
-A table containing which Python types should be used with a given VR is
-available :doc:`here</guides/element_value_types>`.
 
 Standard elements
 ~~~~~~~~~~~~~~~~~
@@ -454,13 +475,8 @@ elements are also covered::
 
 Sequences
 ~~~~~~~~~
-Because sequence items are also ``Dataset`` instances, you can use the same
-methods on them as well. We emptied out our sequence earlier, so first we'll
-create a new value with a couple of items::
-
-    >>> ds.OtherPatientIDsSequence = [Dataset(), Dataset()]
-
-Then we can add elements to each item::
+Because sequence items are also :class:`~pydicom.dataset.Dataset` instances,
+you can use the same methods on them as well.
 
     >>> seq = ds.OtherPatientIDsSequence
     >>> seq[0].PatientID = 'Citizen^Jan'
@@ -485,27 +501,29 @@ operator in combination with the element tag::
     >>> [0x0043, 0x104E] in ds
     False
 
-For standard elements you can (once again) use the keyword instead::
+For standard elements you can use the keyword instead::
 
     >>> del ds.WindowCenter
     >>> 'WindowCenter' in ds
     False
 
-And you can remove items from sequences using your preferred :class:`list`
-method::
+And you can remove items from sequences and multi-valued elements using your
+preferred :class:`list` method::
 
-    >>> del ds.OtherPatientIDsSequence[1]
+    >>> del ds.OtherPatientIDsSequence[2]
     >>> len(seq)
-    1
+    2
+    >>> del ds.ImageType[1]
+    >>> ds.ImageType
+    ['ORIGINAL', 'LOCALIZER']
 
 
 Writing
 =======
 
 After changing the dataset, the final step is to write the modifications back
-to file. The easiest method is to use
-:meth:`~pydicom.dataset.Dataset.save_as` to write the dataset to the supplied
-path::
+to file. This can be done by using :meth:`~pydicom.dataset.Dataset.save_as` to
+write the dataset to the supplied path::
 
     >>> ds.save_as('out.dcm')
 
@@ -532,7 +550,9 @@ parameter::
 
 This will attempt to automatically add in any missing required group
 ``0x0002`` File Meta Information elements and set a blank 128 byte preamble (if
-required). If it's unable to do so then an exception will be raised::
+required). If it's unable to do so then an exception will be raised:
+
+.. code-block:: pycon
 
     >>> del ds.file_meta
     >>> ds.save_as('out.dcm', write_like_original=False)
@@ -553,7 +573,8 @@ The exception message contains the required element(s) that need to be added,
 usually this will only be the *Transfer Syntax UID*. It's an important element,
 so get in the habit of making sure it's there and correct.
 
-Because we deleted the ``file_meta`` dataset we need to add it back::
+Because we deleted the :attr:`~pydicom.dataset.FileDataset.file_meta` dataset
+we need to add it back::
 
     >>> ds.file_meta = Dataset()
 

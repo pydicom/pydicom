@@ -1473,7 +1473,7 @@ class Dataset(dict):
         - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
           is ``False`` for the (7FE0,0010) *Pixel Data* element.
 
-        .. versionchanged::
+        .. versionchanged:: 1.4
 
             The `handler_name` keyword argument was added
 
