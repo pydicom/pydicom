@@ -5,9 +5,9 @@
 from itertools import chain
 import inspect
 
-from pydicom.coding import Code
-from pydicom._concepts_dict import concepts
-from pydicom._cid_dict import name_for_cid, cid_concepts
+from pydicom.sr.coding import Code
+from pydicom.sr._concepts_dict import concepts
+from pydicom.sr._cid_dict import name_for_cid, cid_concepts
 
 
 # Reverse lookup for cid names

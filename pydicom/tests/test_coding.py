@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from pydicom.coding import Code
+from pydicom.sr.coding import Code
 from pydicom.uid import UID
 
 

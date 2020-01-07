@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from pydicom.dataset import Dataset
-from pydicom._snomed_dict import mapping as snomed_mapping
+from pydicom.sr._snomed_dict import mapping as snomed_mapping
 
 _CodeBase = namedtuple(
     "Code", ("value", "scheme_designator", "meaning", "scheme_version")

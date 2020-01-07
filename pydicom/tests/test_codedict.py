@@ -2,8 +2,8 @@ import unittest
 
 import pytest
 
-from pydicom import codes
-from pydicom.coding import Code
+from pydicom.sr.codedict import codes
+from pydicom.sr.coding import Code
 
 
 class TestCodeDict(unittest.TestCase):
