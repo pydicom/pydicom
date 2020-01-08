@@ -430,7 +430,7 @@ New elements of any category can be added to the dataset with the
 :meth:`~pydicom.dataset.Dataset.add_new` method, which takes the tag, VR and
 value to use for the new element.
 
-Let's say we wanted to add the (0028,1050) *Window Width* standard element. We
+Let's say we wanted to add the (0028,1050) *Window Center* standard element. We
 already know the tag is (0028,1050), but how we get the VR and how do we
 know the Python :class:`type` to use for the value?
 
