@@ -93,12 +93,12 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="warn_transition_to_pydicom1.html">For users of pydicom &lt; 1.0</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Pixel Data</a><ul>
@@ -114,12 +114,11 @@
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -131,7 +130,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -177,7 +178,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="pydicom_user_guide.html">Pydicom User Guide</a> &raquo;</li>
+          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
         
       <li>Working with Pixel Data</li>
     
@@ -203,9 +204,9 @@
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Many DICOM SOP classes contain bulk pixel data, which is usually used to
 represent one or more image frames (although <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
-data is (almost) always contained in the (7fe0,0010) <em>Pixel Data</em> element.
-The only exception to this is <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.75.3.html">Parametric Map Storage</a> which may instead contain data in the (7fe0,0008)
-<em>Float Pixel Data</em> or (7fe0,0009) <em>Double Float Pixel Data</em> elements.</p>
+data is (almost) always contained in the (7FE0,0010) <em>Pixel Data</em> element.
+The only exception to this is <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.75.3.html">Parametric Map Storage</a> which may instead contain data in the (7FE0,0008)
+<em>Float Pixel Data</em> or (7FE0,0009) <em>Double Float Pixel Data</em> elements.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>In the following the term <em>pixel data</em> will be used to refer to
@@ -284,8 +285,8 @@ multi-planar images or where compression is required.</p>
 </pre></div>
 </div>
 <p>Some changes may require other DICOM tags to be modified. For example, if the
-image size is reduced (e.g. a <img class="math" src="../_images/math/7d9a4c31bd7e28259b65b267fd21a6311b05ca0f.png" alt="512 \times 512"/> image is shrunk to
-<img class="math" src="../_images/math/343aa0d15ca79bd1c1b7837e6b3a5828812dbe77.png" alt="256 \times 256"/>) then <code class="docutils literal notranslate"><span class="pre">Rows</span></code> and <code class="docutils literal notranslate"><span class="pre">Columns</span></code> should be set
+image size is reduced (e.g. a 512x512 image is shrunk to 256x256) then
+<code class="docutils literal notranslate"><span class="pre">Rows</span></code> and <code class="docutils literal notranslate"><span class="pre">Columns</span></code> should be set
 appropriately. You must explicitly set these yourself; <em>pydicom</em> does not do so
 automatically.</p>
 <p>See <a class="reference internal" href="../auto_examples/image_processing/plot_downsize_image.html#sphx-glr-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">Downsize MRI image using pydicom</span></a> for

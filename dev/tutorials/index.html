@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>For users of pydicom &lt; 1.0 &mdash; pydicom 1.4.0.dev0 documentation</title>
+  <title>Tutorials &mdash; pydicom 1.4.0.dev0 documentation</title>
   
 
   
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core elements in pydicom" href="base_element.html" />
-    <link rel="prev" title="Pydicom User Guide" href="pydicom_user_guide.html" /> 
+    <link rel="next" title="Creating and managing virtual environments" href="virtualenvs.html" />
+    <link rel="prev" title="Reading and writing DICOM files" href="../old/ref_guide.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,28 +93,20 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">For users of pydicom &lt; 1.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pydicom-1">Pydicom &lt; 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html">Transition to pydicom 1.x</a></li>
-<li class="toctree-l2"><a class="reference internal" href="transition_to_pydicom1.html#api-changes-in-version-1-0">API Changes in version 1.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -126,7 +118,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -172,9 +166,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="pydicom_user_guide.html">Pydicom User Guide</a> &raquo;</li>
-        
-      <li>For users of pydicom &lt; 1.0</li>
+      <li>Tutorials</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -191,18 +183,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="for-users-of-pydicom-1-0">
-<h1>For users of pydicom &lt; 1.0<a class="headerlink" href="#for-users-of-pydicom-1-0" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">Warning about pydicom &lt; 1.0 and reference to Transition to
-Pydicom 1 section</p>
-<div class="section" id="pydicom-1">
-<h2>Pydicom &lt; 1<a class="headerlink" href="#pydicom-1" title="Permalink to this headline">¶</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Pydicom versions 1.0 and higher introduce backwards-incompatible
-changes. If you have used earlier versions of pydicom, see
-<a class="reference internal" href="transition_to_pydicom1.html"><span class="doc">Transition to pydicom 1.x</span></a> for details.</p>
-</div>
+  <div class="section" id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<p>New to <em>pydicom</em>? Then these tutorials should get you up and running.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
 </div>
 </div>
 
@@ -214,10 +204,10 @@ changes. If you have used earlier versions of pydicom, see
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="base_element.html" class="btn btn-neutral float-right" title="Core elements in pydicom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="virtualenvs.html" class="btn btn-neutral float-right" title="Creating and managing virtual environments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom_user_guide.html" class="btn btn-neutral float-left" title="Pydicom User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../old/ref_guide.html" class="btn btn-neutral float-left" title="Reading and writing DICOM files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

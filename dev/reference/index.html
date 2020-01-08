@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Character Encoding and Decoding (pydicom.charset)" href="charset.html" />
-    <link rel="prev" title="Reading and writing DICOM files" href="../old/ref_guide.html" /> 
+    <link rel="prev" title="Contributing a documentation change" href="../tutorials/contributing_docs.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,15 +93,18 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
@@ -124,7 +127,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -194,7 +199,7 @@
 <dd class="field-odd"><p>1.4.0.dev0</p>
 </dd>
 <dt class="field-even">Date</dt>
-<dd class="field-even"><p>Jan 01, 2020</p>
+<dd class="field-even"><p>Jan 08, 2020</p>
 </dd>
 </dl>
 <span class="target" id="module-pydicom"></span><p>This API reference guide details the functions, modules and objects included in
@@ -219,6 +224,13 @@
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.data.get_charset_files.html">pydicom.data.get_charset_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.data.get_palette_files.html">pydicom.data.get_palette_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.data.get_testdata_file.html">pydicom.data.get_testdata_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generated/pydicom.data.get_testdata_files.html">pydicom.data.get_testdata_files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a><ul>
@@ -292,7 +304,7 @@
         <a href="charset.html" class="btn btn-neutral float-right" title="Character Encoding and Decoding (pydicom.charset)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../old/ref_guide.html" class="btn btn-neutral float-left" title="Reading and writing DICOM files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../tutorials/contributing_docs.html" class="btn btn-neutral float-left" title="Contributing a documentation change" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

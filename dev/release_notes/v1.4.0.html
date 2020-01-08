@@ -91,12 +91,14 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -108,7 +110,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release notes</a></li>
 </ul>
 
             
@@ -224,7 +228,7 @@ Interpretation</em> of <cite>YBR_FULL_422</cite> to the numpy pixel data handler
 applying color palette LUTs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/205">#205</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function
 for applying modality LUTs.</p></li>
-<li><p>Added <code class="xref py py-func docutils literal notranslate"><span class="pre">get_palette_files()</span></code> for retrieving well-known
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.data.get_palette_files.html#pydicom.data.get_palette_files" title="pydicom.data.get_palette_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_palette_files()</span></code></a> for retrieving well-known
 palette color datasets.</p></li>
 <li><p>Raise on end of file errors if <cite>config.enforce_valid_values</cite> is set
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/277">#277</a>)</p></li>

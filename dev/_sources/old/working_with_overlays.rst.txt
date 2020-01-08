@@ -89,7 +89,7 @@ they must be bit-packed and written back to the correct element:
   ds.save_as("temp.dcm")
 
 Some changes may require other DICOM elements to be modified. For example, if
-the overlay data is reduced (e.g. a :math:`512 \times 512` image is collapsed
-to :math:`256 \times 256`) then the corresponding (60xx,0010) *Overlay Rows*
+the overlay data is reduced (e.g. a 512x512 image is collapsed
+to 256x256) then the corresponding (60xx,0010) *Overlay Rows*
 and (60xx,0011) *Overlay Columns* should be set appropriately. You must
 explicitly set these yourself; pydicom does not do so automatically.

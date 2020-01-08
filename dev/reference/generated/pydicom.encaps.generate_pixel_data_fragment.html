@@ -93,15 +93,18 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
@@ -137,7 +140,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -208,14 +213,14 @@
 <h1>pydicom.encaps.generate_pixel_data_fragment<a class="headerlink" href="#pydicom-encaps-generate-pixel-data-fragment" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.encaps.generate_pixel_data_fragment">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/cb1480da/pydicom/encaps.py#L128"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/encaps.py#L132"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield the encapsulated pixel data fragments.</p>
-<p>For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) <em>Pixel
+<p>For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) <em>Pixel
 Data</em> element is encoded in an encapsulated format.</p>
 <p><strong>Encapsulation</strong></p>
 <p>The encoded pixel data stream is fragmented into one or more Items. The
 stream may represent a single or multi-frame image.</p>
-<p>Each <em>Data Stream Fragment</em> shall have tag of (fffe,e000), followed by a 4
+<p>Each <em>Data Stream Fragment</em> shall have tag of (FFFE,E000), followed by a 4
 byte <em>Item Length</em> field encoding the explicit number of bytes in the Item.
 All Items containing an encoded fragment shall have an even number of bytes
 greater than or equal to 2, with the last fragment being padded if
@@ -226,7 +231,7 @@ It is assumed that the Basic Offset Table item has already been read prior
 to calling this function (and that <cite>fp</cite> is positioned past this item).</p>
 <p>The remaining items in the Sequence of Items are the pixel data fragments
 and it is these items that will be read and returned by this function.</p>
-<p>The Sequence of Items is terminated by a (fffe,e0dd) <em>Sequence Delimiter
+<p>The Sequence of Items is terminated by a (FFFE,E0DD) <em>Sequence Delimiter
 Item</em> with an Item Length field of value <code class="docutils literal notranslate"><span class="pre">0x00000000</span></code>. The presence
 or absence of the <em>Sequence Delimiter Item</em> in <cite>fp</cite> has no effect on the
 returned fragments.</p>
@@ -234,7 +239,7 @@ returned fragments.</p>
 <p>The encoding of the data shall be little endian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><em>filebase.DicomBytesIO</em></a>) – The encoded (7fe0,0010) <em>Pixel Data</em> element value, positioned at the
+<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><em>filebase.DicomBytesIO</em></a>) – The encoded (7FE0,0010) <em>Pixel Data</em> element value, positioned at the
 start of the item tag for the first item after the Basic Offset Table
 item. <code class="docutils literal notranslate"><span class="pre">fp.is_little_endian</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>

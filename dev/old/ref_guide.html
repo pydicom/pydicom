@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API Reference" href="../reference/index.html" />
+    <link rel="next" title="Tutorials" href="../tutorials/index.html" />
     <link rel="prev" title="Python 2 Support Plan for Pydicom" href="python2_support.html" /> 
 </head>
 
@@ -93,16 +93,18 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">Pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Reading and writing DICOM files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#file-reading-parsing">File Reading/Parsing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#file-writing">File Writing</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -114,7 +116,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -183,12 +187,13 @@
 <div class="section" id="file-reading-parsing">
 <h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this headline">¶</a></h2>
 <p>The main function to read and parse DICOM files using <em>pydicom</em> is
-<a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>. It is coded in the module
-<code class="docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>, but is also imported when the <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> package is
+<a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>. It’s part of the
+<a class="reference internal" href="../reference/fileio.read.html#api-fileio-filereader"><span class="std std-ref">pydicom.filereader</span></a>
+module, but is also imported when the <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> package is
 imported</p>
 <blockquote>
 <div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s1">&#39;path/to/file&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="s1">&#39;path/to/file&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -205,8 +210,6 @@ imported</p>
 <li><p>The second is to use the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.save_as()</span></code></a>
 method on a <code class="docutils literal notranslate"><span class="pre">FileDataset</span></code> or <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> instance.</p></li>
 </ul>
-<p>You can find the complete API documentation for <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> and other
-classes <a class="reference internal" href="../reference/index.html#api-reference"><span class="std std-ref">here</span></a></p>
 </div>
 </div>
 
@@ -218,7 +221,7 @@ classes <a class="reference internal" href="../reference/index.html#api-referenc
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../reference/index.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../tutorials/index.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="python2_support.html" class="btn btn-neutral float-left" title="Python 2 Support Plan for Pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
