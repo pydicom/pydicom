@@ -8,15 +8,17 @@ pydicom documentation
    :hidden:
    :caption: Getting started
 
-   old/getting_started.rst
+   tutorials/installation
+   old/getting_started
 
 .. toctree::
    :maxdepth: 2
    :hidden:
    :caption: Documentation
 
-   old/pydicom_user_guide.rst
-   old/ref_guide.rst
+   old/pydicom_user_guide
+   old/ref_guide
+   tutorials/index
    reference/index
 
 .. toctree::
@@ -31,42 +33,35 @@ pydicom documentation
    :hidden:
    :caption: Additional Information
 
+   tutorials/contributing
+   faq/index
    release_notes/index
 
 
-`Getting started <old/getting_started.html>`_
----------------------------------------------
+Getting Started
+===============
+If you're new to *pydicom* then start here:
 
-Information to install, test, and contribute to the package.
+* :doc:`Installation<tutorials/installation>` |
+  :doc:`Introduction to pydicom<old/getting_started>`
 
-`User Guide <old/pydicom_user_guide.html>`_
--------------------------------------------
+
+:doc:`User Guide <old/pydicom_user_guide>`
+==========================================
 
 The main documentation. This contains an in-depth description of all
-core elements of pydicom and how to apply them.
+core elements of *pydicom* and how to use them.
 
-`Reading and writing DICOM files <old/ref_guide.html>`_
--------------------------------------------------------
 
-A short introduction to the two most commonly used functions for reading
-and writing DICOM files.
-
-`Examples <auto_examples/index.html>`_
---------------------------------------
+:doc:`Examples <auto_examples/index>`
+=====================================
 
 A set of examples illustrating the use of the different core elements. It
-complements the `User Guide <old/pydicom_user_guide.html>`_.
+complements the :doc:`User Guide <old/pydicom_user_guide>`.
 
 
-`API Reference <reference/index.html>`_
----------------------------------------
+:doc:`API Reference <reference/index>`
+======================================
 
-The API documentation of all functions and classes, as given in the
-docstring. The API documents expected types and allowed features for
-all functions, and all parameters available for the core elements.
-
-
-`Release Notes <release_notes/index.html>`_
--------------------------------------------
-
-Log of the pydicom history.
+The API Reference provides technical documentation for the *pydicom* API's
+functions, variables and classes.

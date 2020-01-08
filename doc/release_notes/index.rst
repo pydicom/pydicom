@@ -1,6 +1,6 @@
-===============
-Release history
-===============
+=============
+Release notes
+=============
 
 .. include:: v1.4.0.rst
 .. include:: v1.3.0.rst

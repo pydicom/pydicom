@@ -43,6 +43,10 @@ def get_frame_offsets(fp):
     All decoders, both for single and multi-frame images should accept both
     an empty Basic Offset Table and one containing offset values.
 
+    .. versionchanged:: 1.4
+
+        Changed to return (is BOT empty, list of offsets).
+
     Parameters
     ----------
     fp : filebase.DicomBytesIO
@@ -128,7 +132,7 @@ def get_nr_fragments(fp):
 def generate_pixel_data_fragment(fp):
     """Yield the encapsulated pixel data fragments.
 
-    For compressed (encapsulated) Transfer Syntaxes, the (7fe0,0010) *Pixel
+    For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
     Data* element is encoded in an encapsulated format.
 
     **Encapsulation**
@@ -136,7 +140,7 @@ def generate_pixel_data_fragment(fp):
     The encoded pixel data stream is fragmented into one or more Items. The
     stream may represent a single or multi-frame image.
 
-    Each *Data Stream Fragment* shall have tag of (fffe,e000), followed by a 4
+    Each *Data Stream Fragment* shall have tag of (FFFE,E000), followed by a 4
     byte *Item Length* field encoding the explicit number of bytes in the Item.
     All Items containing an encoded fragment shall have an even number of bytes
     greater than or equal to 2, with the last fragment being padded if
@@ -150,7 +154,7 @@ def generate_pixel_data_fragment(fp):
     The remaining items in the Sequence of Items are the pixel data fragments
     and it is these items that will be read and returned by this function.
 
-    The Sequence of Items is terminated by a (fffe,e0dd) *Sequence Delimiter
+    The Sequence of Items is terminated by a (FFFE,E0DD) *Sequence Delimiter
     Item* with an Item Length field of value ``0x00000000``. The presence
     or absence of the *Sequence Delimiter Item* in `fp` has no effect on the
     returned fragments.
@@ -162,7 +166,7 @@ def generate_pixel_data_fragment(fp):
     Parameters
     ----------
     fp : filebase.DicomBytesIO
-        The encoded (7fe0,0010) *Pixel Data* element value, positioned at the
+        The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -217,7 +221,7 @@ def generate_pixel_data_frame(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional
@@ -267,7 +271,7 @@ def generate_pixel_data(bytestream, nr_frames=None):
     Parameters
     ----------
     bytestream : bytes
-        The value of the (7fe0, 0010) *Pixel Data* element from an encapsulated
+        The value of the (7FE0,0010) *Pixel Data* element from an encapsulated
         dataset. The Basic Offset Table item should be present and the
         Sequence Delimiter item may or may not be present.
     nr_frames : int, optional
@@ -498,6 +502,8 @@ def read_item(fp):
 def fragment_frame(frame, nr_fragments=1):
     """Yield one or more fragments from `frame`.
 
+    .. versionadded:: 1.2
+
     Parameters
     ----------
     frame : bytes
@@ -521,7 +527,7 @@ def fragment_frame(frame, nr_fragments=1):
     * Any necessary padding may be appended after the end of image marker.
     * Encapsulated Pixel Data has the Value Representation OB.
     * Values with a VR of OB shall be padded with a single trailing NULL byte
-      value (0x00) to achieve even length.
+      value (``0x00``) to achieve even length.
 
     References
     ----------
@@ -558,6 +564,8 @@ def fragment_frame(frame, nr_fragments=1):
 def itemise_fragment(fragment):
     """Return an itemised `fragment`.
 
+    .. versionadded:: 1.2
+
     Parameters
     ----------
     fragment : bytes
@@ -590,6 +598,8 @@ itemize_fragment = itemise_fragment
 
 def itemise_frame(frame, nr_fragments=1):
     """Yield items generated from `frame`.
+
+    .. versionadded:: 1.2
 
     Parameters
     ----------
@@ -624,6 +634,8 @@ itemize_frame = itemise_frame
 
 def encapsulate(frames, fragments_per_frame=1, has_bot=True):
     """Return encapsulated `frames`.
+
+    .. versionadded:: 1.2
 
     When using a compressed transfer syntax (such as RLE Lossless or one of
     JPEG formats) then any *Pixel Data* must be :dcm:`encapsulated

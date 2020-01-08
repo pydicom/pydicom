@@ -62,12 +62,17 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 
 
 def is_available():
-    """Return ``True`` if the handler has its dependencies met."""
+    """Return ``True`` if the handler has its dependencies met.
+
+    .. versionadded:: 1.4
+    """
     return HAVE_NP
 
 
 def supports_transfer_syntax(transfer_syntax):
     """Return ``True`` if the handler supports the `transfer_syntax`.
+
+    .. versionadded:: 1.4
 
     Parameters
     ----------
@@ -81,6 +86,8 @@ def supports_transfer_syntax(transfer_syntax):
 def get_expected_length(elem, unit='bytes'):
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
+
+    .. versionadded:: 1.4
 
     +------------------------------------------------+-------------+
     | Element                                        | Required or |
@@ -126,6 +133,8 @@ def get_expected_length(elem, unit='bytes'):
 
 def reshape_overlay_array(elem, arr):
     """Return a reshaped :class:`numpy.ndarray` `arr`.
+
+    .. versionadded:: 1.4
 
     +------------------------------------------------+--------------+
     | Element                                        | Supported    |
@@ -186,6 +195,8 @@ def reshape_overlay_array(elem, arr):
 
 def get_overlay_array(ds, group):
     """Return a :class:`numpy.ndarray` of the *Overlay Data*.
+
+    .. versionadded:: 1.4
 
     Parameters
     ----------

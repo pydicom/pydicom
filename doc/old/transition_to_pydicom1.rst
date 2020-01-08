@@ -1,3 +1,5 @@
+:orphan:
+
 .. _transition_to_pydicom1:
 
 Transition to pydicom 1.x

@@ -43,6 +43,8 @@ def get_files(base, pattern):
 def get_palette_files(pattern="*"):
     """Return palette data files from pydicom data root.
 
+    .. versionadded:: 1.4
+
     Parameters
     ----------
     pattern : str, optional (default="*")
@@ -74,7 +76,7 @@ def get_testdata_file(name):
     Returns
     -------
     str, None
-        The full path of the file if found, or None.
+        The full path of the file if found, or ``None``.
 
     """
     data_path = join(DATA_ROOT, 'test_files')

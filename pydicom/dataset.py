@@ -58,6 +58,8 @@ except ImportError:
 class PrivateBlock(object):
     """Helper class for a private block in the :class:`Dataset`.
 
+    .. versionadded:: 1.3
+
     See the DICOM Standard, Part 5,
     :dcm:`Section 7.8.1<part05/sect_7.8.html#sect_7.8.1>` - Private Data
     Element Tags
@@ -1273,11 +1275,11 @@ class Dataset(dict):
 
         Parameters
         ----------
-        handler_name: str
-            The (optional) name of the pixel handler that shall be used to
-            decode the data. Currently supported handler names are: 'gdcm',
-            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
-            If empty (the default), a matching handler is used from the
+        handler_name : str, optional
+            The name of the pixel handler that shall be used to
+            decode the data. Supported names are: ``'gdcm'``,
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
@@ -1290,7 +1292,7 @@ class Dataset(dict):
         ValueError
             If `handler_name` is not a valid handler name.
         NotImplementedError
-            If the given handler or any handler, if none given, is able to
+            If the given handler or any handler, if none given, is unable to
             decompress pixel data with the current transfer syntax
         RuntimeError
             If the given handler, or the handler that has been selected if
@@ -1448,6 +1450,10 @@ class Dataset(dict):
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
 
+        .. versionadded:: 1.4
+
+            The `handler_name` keyword argument was added
+
         If not a compressed transfer syntax, then pixel data is converted
         to a :class:`numpy.ndarray` internally, but not returned.
 
@@ -1457,15 +1463,15 @@ class Dataset(dict):
         - ``Dataset.file_meta.TransferSyntaxUID`` is updated to non-compressed
           form
         - :attr:`~pydicom.dataelem.DataElement.is_undefined_length`
-          is ``False`` for the (7fe0,0010) *Pixel Data* element.
+          is ``False`` for the (7FE0,0010) *Pixel Data* element.
 
         Parameters
         ----------
         handler_name : str, optional
-            The (optional) name of the pixel handler that shall be used to
-            decode the data. Currently supported handler names are: 'gdcm',
-            'pillow', 'jpeg_ls', 'rle' and 'numpy'.
-            If empty (the default), a matching handler is used from the
+            The name of the pixel handler that shall be used to
+            decode the data. Supported names are: ``'gdcm'``,
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
         Returns
@@ -1502,6 +1508,8 @@ class Dataset(dict):
 
     def overlay_array(self, group):
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
+
+        .. versionadded:: 1.4
 
         Returns
         -------
@@ -1585,11 +1593,15 @@ class Dataset(dict):
     def pixel_array(self):
         """Return the pixel data as a :class:`numpy.ndarray`.
 
+        .. versionchanged:: 1.4
+
+            Added support for *Float Pixel Data* and *Double Float Pixel Data*
+
         Returns
         -------
         numpy.ndarray
-            The (7fe0,0008) *Float Pixel Data*, (7fe0,0009) *Double Float
-            Pixel Data* or (7fe0,0010) *Pixel Data* converted to a
+            The (7FE0,0008) *Float Pixel Data*, (7FE0,0009) *Double Float
+            Pixel Data* or (7FE0,0010) *Pixel Data* converted to a
             :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
@@ -1788,6 +1800,8 @@ class Dataset(dict):
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
         for transfer syntax and media storage UIDs.
+
+        .. versionadded:: 1.2
 
         .. warning::
 
@@ -2055,6 +2069,8 @@ class Dataset(dict):
     def from_json(cls, json_dataset, bulk_data_uri_handler=None):
         """Add elements to the :class:`Dataset` from DICOM JSON format.
 
+        .. versionadded:: 1.3
+
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         Parameters
@@ -2097,6 +2113,8 @@ class Dataset(dict):
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
 
+        .. versionadded:: 1.4
+
         Parameters
         ----------
         bulk_data_threshold : int, optional
@@ -2127,6 +2145,8 @@ class Dataset(dict):
     def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
                 dump_handler=None):
         """Return a JSON representation of the :class:`Dataset`.
+
+        .. versionadded:: 1.3
 
         See the DICOM Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
