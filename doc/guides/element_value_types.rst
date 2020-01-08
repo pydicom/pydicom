@@ -4,27 +4,33 @@ Element VRs and Python types
 
 .. currentmodule:: pydicom
 
-DICOM elements can contain anything from strings to unicode text, decimals,
-floats, signed and unsigned integers of different byte-depth and even raw
-data. The format of the value of an element is given by its **Value
-Representation** or VR. A list of VRs is given in the DICOM Standard in Part 5,
+DICOM elements can contain anything from ASCII strings to unicode text,
+decimals, floats, signed and unsigned integers of different byte-depth and
+even encoded data. The format of the value of an element is given by its
+:dcm:`Value Representation<part05/sect_6.2.html>` or VR, and a list of VRs is
+given in the DICOM Standard in Part 5,
 :dcm:`Table 6.2-1 <part05/sect_6.2.html#table_6.2-1>`.
 
-So what Python type should be used with a given VR? When
-using pydicom, all element values can be set using a standard Python built-in
-type, which is either retained as-is or converted to a pydicom type as given
-in the table below.
+So when using *pydicom*, what Python type should be used with a given VR to
+ensure that the value gets written correctly?
 
-**Notes**
+* Elements of any VR:
 
-* All element values can be set empty by using ``None``
-* All element values can also be set using their *stored as* type
-* All non-**SQ** element values can also be set using a :class:`list` of
-  their *set using* type
-* All non-**SQ** elements with a Value Multiplicity (VM) > 1 store their values
-  as a :class:`~multival.MultiValue` of their *stored as* type
-* **AT** element values should be set using the 8-byte integer form of the tag
-  such as ``0x00100010`` or a list of 8-byte integers for VM > 1.
+  * Can be set as empty by using ``None``
+  * Can have their values set using their *set using* or *stored as* type from
+    the table below
+
+* Non-**SQ** element values:
+
+  * Can also be set using a :class:`list` of their *set using* type - for
+    Value Multiplicity (VM) > 1, the value will be stored as a
+    :class:`~multival.MultiValue` of their *stored as* type
+
+* **SQ** element values should be set using a :class:`list` of zero or more
+  :class:`~dataset.Dataset` instances.
+* To ensure **AT** elements are encoded correctly, their values should be set
+  using either the 8-byte integer form of the tag - such as ``0x00100010`` for
+  (0010,0010) - or a :class:`~tag.BaseTag` and not as a 2-tuple or 2-list.
 
 +----+------------------+-----------------+-------------------------------------------------+
 | VR | Name             | Set using       | Stored as                                       |
@@ -41,8 +47,8 @@ in the table below.
 | DA | Date             | :class:`str`    | :class:`str` or :class:`~valuerep.DA`\ :sup:`1` |
 +----+------------------+-----------------+-------------------------------------------------+
 | DS | Decimal String   | :class:`str`,   | :class:`~valuerep.DSfloat` or                   |
-|    |                  | :class:`float`, | :class:`~valuerep.DSdecimal`\ :sup:`2`          |
-|    |                  | :class:`int`    |                                                 |
+|    |                  | :class:`float`  | :class:`~valuerep.DSdecimal`\ :sup:`2`          |
+|    |                  | or :class:`int` |                                                 |
 +----+------------------+-----------------+-------------------------------------------------+
 | DT | Date Time        | :class:`str`    | :class:`str` or :class:`~valuerep.DT`\ :sup:`1` |
 +----+------------------+-----------------+-------------------------------------------------+
@@ -52,8 +58,8 @@ in the table below.
 | FD | Floating Point   | :class:`float`  | :class:`float`                                  |
 |    | Double           |                 |                                                 |
 +----+------------------+-----------------+-------------------------------------------------+
-| IS | Integer String   | :class:`str`,   | :class:`~valuerep.IS`                           |
-|    |                  | :class:`int`    |                                                 |
+| IS | Integer String   | :class:`str`    | :class:`~valuerep.IS`                           |
+|    |                  | or :class:`int` |                                                 |
 +----+------------------+-----------------+-------------------------------------------------+
 | LO | Long String      | :class:`str`    | :class:`str`                                    |
 +----+------------------+-----------------+-------------------------------------------------+

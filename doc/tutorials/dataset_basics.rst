@@ -2,22 +2,23 @@
 Dataset basics: read, access, modify, write
 ===========================================
 
-In this tutorial we're going to cover the basics of using pydicom:
+In this tutorial we're going to cover the basics of using *pydicom*:
 
 * Reading a DICOM dataset from file
 * Viewing and accessing the contents of the dataset
 * Modifying the dataset by adding, changing and deleting elements
 * Writing our modifications back to file
 
-If you haven't installed pydicom yet, follow the instructions in our
+If you haven't installed *pydicom* yet, follow the instructions in our
 :doc:`installation guide</tutorials/installation>`.
 
 
 Getting our example dataset
 ===========================
 
-In the tutorial we're going to be using a DICOM dataset included with pydicom:
-:gh:`CT_small.dcm<pydicom/blob/master/pydicom/data/test_files/CT_small.dcm>`.
+In the tutorial we're going to be using a DICOM dataset included with
+*pydicom*: :gh:`CT_small.dcm
+<pydicom/blob/master/pydicom/data/test_files/CT_small.dcm>`.
 Starting with pydicom v1.4 you can get the path to the file
 by using the :func:`~pydicom.data.get_testdata_file` function to return the
 path as a :class:`str` (your path may vary)::
@@ -36,7 +37,7 @@ containing matching paths::
     >>> fpath
     '/home/user/env/pyd/lib/python3.7/site-packages/pydicom/data/test_files/CT_small.dcm'
 
-To get the version of pydicom you're using you can do the following::
+To get the version of *pydicom* you're using you can do the following::
 
     >>> import pydicom
     >>> pydicom.__version__
@@ -96,7 +97,7 @@ parameter to force reading::
 
   >>> ds = dcmread(no_meta, force=True)
 
-A note of caution about using ``force=True``; because pydicom uses a
+A note of caution about using ``force=True``; because *pydicom* uses a
 deferred-read system, **no exceptions** will raised at the time of reading,
 no matter what the contents of the file are:
 
@@ -287,7 +288,7 @@ branches start.
 
 Sequence elements can be accessed in the same manner as non-sequence ones::
 
-    >>> seq = ds['0x0010, 0x1002']
+    >>> seq = ds[0x0010, 0x1002]
     >>> seq = ds['OtherPatientIDsSequence']
 
 The main difference between sequence and non-sequence elements is their value
@@ -320,7 +321,7 @@ The answer is a file header containing:
 
 * Followed by a 4 byte ``DICM`` prefix
 * Followed by the required DICOM :dcm:`File Meta Information
-  <part10/chapter_7.html#table_7.1-1>` elements, which in pydicom are
+  <part10/chapter_7.html#table_7.1-1>` elements, which in *pydicom* are
   stored in a :class:`~pydicom.dataset.Dataset` instance in the
   :attr:`~pydicom.dataset.FileDataset.file_meta` attribute::
 
@@ -378,9 +379,12 @@ Multi-valued elements can be set using a :class:`list` or modified using the
     >>> ds.ImageType = ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
     >>> ds.ImageType
     ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
-    >>> ds.ImageType[1] = 'SECONDARY'
+    >>> ds.ImageType[1] = 'DERIVED'
     >>> ds.ImageType
-    ['ORIGINAL', 'SECONDARY', 'LOCALIZER']
+    ['ORIGINAL', 'DERIVED', 'LOCALIZER']
+    >>> ds.ImageType.insert(1, 'PRIMARY')
+    >>> ds.ImageType
+    ['ORIGINAL', 'PRIMARY', 'DERIVED', 'LOCALIZER']
 
 Similarly, for sequence elements::
 
@@ -394,7 +398,7 @@ As mentioned before, the items in a sequence are
 :class:`~pydicom.dataset.Dataset` instances. If you try to add any other type
 to a sequence you'll get an exception::
 
-    >>> seq.append('Hello world?')
+    >>> ds.OtherPatientIDsSequence.append('Hello world?')
     Traceback (most recent call last):
       File "<stdin>", line 1, in <module>
       File ".../pydicom/multival.py", line 63, in append
@@ -450,20 +454,20 @@ The Python type to use for a given VR is given by :doc:`this table
     >>> ds.add_new([0x0028, 0x1050], 'DS', "100.0")
     >>> elem = ds[0x0028, 0x1050]
     >>> elem
-    (0028, 1051) Window Width                        DS: "100.0"
+    (0028, 1050) Window Center                       DS: "100.0"
 
 
 Standard elements
 ~~~~~~~~~~~~~~~~~
 Adding elements with :meth:`~pydicom.dataset.Dataset.add_new` is a lot of
 work, so for standard elements you can just use the keyword
-and pydicom will do the lookup for you::
+and *pydicom* will do the lookup for you::
 
-    >>> 'WindowCenter' in ds
+    >>> 'WindowWidth' in ds
     False
-    >>> ds.WindowCenter = 500
-    >>> ds['WindowCenter']
-    (0028, 1050) Window Center                       DS: "500.0"
+    >>> ds.WindowWidth = 500
+    >>> ds['WindowWidth']
+    (0028, 1051) Window Width                        DS: "500.0"
 
 Notice how we can also use the element keyword with the Python
 :func:`in<operator.__contains__>` operator to see if a standard element is in
@@ -479,6 +483,7 @@ Because sequence items are also :class:`~pydicom.dataset.Dataset` instances,
 you can use the same methods on them as well.
 
     >>> seq = ds.OtherPatientIDsSequence
+    >>> seq += [Dataset(), Dataset(), Dataset()]
     >>> seq[0].PatientID = 'Citizen^Jan'
     >>> seq[0].TypeOfPatientID = 'TEXT'
     >>> seq[1].PatientID = 'CompressedSamples^CT1'
@@ -513,9 +518,9 @@ preferred :class:`list` method::
     >>> del ds.OtherPatientIDsSequence[2]
     >>> len(seq)
     2
-    >>> del ds.ImageType[1]
+    >>> del ds.ImageType[2]
     >>> ds.ImageType
-    ['ORIGINAL', 'LOCALIZER']
+    ['ORIGINAL', 'PRIMARY', 'LOCALIZER']
 
 
 Writing
@@ -589,7 +594,7 @@ And we're done.
 Next steps
 ==========
 
-Congratulations, you're now familiar with the basics of using pydicom to read,
-access, modify and write DICOM datasets. Next up you may be interested in
-looking at our :doc:`User Guide</old/pydicom_user_guide>` or some of our
+Congratulations, you're now familiar with the basics of using *pydicom* to
+read, access, modify and write DICOM datasets. Next up you may be interested
+in looking at our :doc:`User Guide</old/pydicom_user_guide>` or some of our
 :doc:`examples</auto_examples/index>`.
