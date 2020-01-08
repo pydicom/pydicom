@@ -53,7 +53,7 @@ Install using conda
 .. _tut_install_libs:
 
 Install the optional libraries
-------------------------------
+==============================
 
 If you're going to be manipulating pixel data then
 `NumPy <https://numpy.org/>`_ is required.
