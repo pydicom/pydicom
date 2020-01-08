@@ -29,8 +29,8 @@ ensure that the value gets written correctly?
 * **SQ** element values should be set using a :class:`list` of zero or more
   :class:`~dataset.Dataset` instances.
 * To ensure **AT** elements are encoded correctly, their values should be set
-  using either the 8-byte integer form of the tag - such as ``0x00100020`` for
-  (0010,0020) - or a :class:`~tag.BaseTag` and not as a 2-tuple or 2-list.
+  using the 8-byte integer form of the tag - such as ``0x00100020`` for the tag
+  (0010,0020) - and not as a 2-tuple or 2-list.
 
 +----+------------------+-----------------+-----------------------------------+
 | VR | Name             | Set using       | Stored as                         |
