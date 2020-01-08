@@ -55,8 +55,8 @@ Install using conda
 Install the optional libraries
 ------------------------------
 
-If you're going to be manipulating pixel data then we recommend you install
-`NumPy <https://numpy.org/>`_.
+If you're going to be manipulating pixel data then
+`NumPy <https://numpy.org/>`_ is required.
 
 Using pip::
 
@@ -75,9 +75,13 @@ the dataset's (0002,0010) *Transfer Syntax UID* value.
 Installing Pillow
 -----------------
 
-Using pip; you may need to make sure that the `libjpeg <http://libjpeg.sourceforge.net/>`_
-(for JPEG) and  `openjpeg <http://www.openjpeg.org/>`_ (for JPEG2000) libraries
-are  installed first::
+`Pillow <https://pillow.readthedocs.io/>`_ is a popular Python imaging library
+that can handle the decompression of some JPEG and JPEG2000 images.
+
+Using pip; you may need to make sure that the
+`libjpeg <http://libjpeg.sourceforge.net/>`_ (for JPEG) and
+`openjpeg <http://www.openjpeg.org/>`_ (for JPEG2000) libraries are installed
+beforehand::
 
   $ pip install pillow
 
@@ -89,6 +93,10 @@ Through conda::
 
 Installing CharPyLS
 -------------------
+
+`CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_ is a Python interface to
+the `CharLS <https://github.com/team-charls/charls>`_ C++ library and can
+decompress JPEG-LS images.
 
 Using pip::
 
@@ -104,9 +112,12 @@ Through conda::
 Installing GDCM
 ---------------
 
-Unfortunately there's no easy way to install the Python
-`GDCM <http://gdcm.sourceforge.net/>`_ bindings using pip.
-`This page <https://github.com/pydicom/pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda>`_
+`GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
+DICOM datasets that can decompress JPEG, JPEG-LS and JPEG2000 images.
+
+Unfortunately there's no easy way to install the Python GDCM bindings
+using pip. :gh:`This page
+<pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda>`
 has instructions for installing in a virtual environment in Ubuntu
 19.04+ or Debian Buster+ using the ``python3-gdcm`` package.
 
