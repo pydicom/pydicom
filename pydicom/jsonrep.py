@@ -21,6 +21,8 @@ def convert_to_python_number(value, vr):
     """Makes sure that values are either ints or floats
     based on their value representation.
 
+    .. versionadded:: 1.4
+
     Parameters
     ----------
     value: Union[Union[str, int, float], List[Union[str, int, float]]]
@@ -49,7 +51,10 @@ def convert_to_python_number(value, vr):
 
 
 class JsonDataElementConverter(object):
-    """Handles conversion between JSON struct and :class:`DataElement`."""
+    """Handles conversion between JSON struct and :class:`DataElement`.
+
+    .. versionadded:: 1.4
+    """
 
     def __init__(self, dataset_class, tag, vr, value, value_key,
                  bulk_data_uri_handler):

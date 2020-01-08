@@ -96,7 +96,10 @@ def get_frame_offsets(fp):
 
 
 def get_nr_fragments(fp):
-    """Return the number of fragments in `fp`."""
+    """Return the number of fragments in `fp`.
+
+    .. versionadded:: 1.4
+    """
     if not fp.is_little_endian:
         raise ValueError("'fp.is_little_endian' must be True")
 

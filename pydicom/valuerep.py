@@ -676,6 +676,8 @@ class PersonName3(object):
     def components(self):
         """Returns up to three decoded person name components.
 
+        .. versionadded:: 1.2
+
         The returned components represent the alphabetic, ideographic and
         phonetic representations as a list of unicode strings.
         """
@@ -695,37 +697,55 @@ class PersonName3(object):
     @property
     def family_name(self):
         """Return the first (family name) group of the alphabetic person name
-        representation as a unicode string"""
+        representation as a unicode string
+
+        .. versionadded:: 1.2
+        """
         return self._name_part(0)
 
     @property
     def given_name(self):
         """Return the second (given name) group of the alphabetic person name
-        representation as a unicode string"""
+        representation as a unicode string
+
+        .. versionadded:: 1.2
+        """
         return self._name_part(1)
 
     @property
     def middle_name(self):
         """Return the third (middle name) group of the alphabetic person name
-        representation as a unicode string"""
+        representation as a unicode string
+
+        .. versionadded:: 1.2
+        """
         return self._name_part(2)
 
     @property
     def name_prefix(self):
         """Return the fourth (name prefix) group of the alphabetic person name
-        representation as a unicode string"""
+        representation as a unicode string
+
+        .. versionadded:: 1.2
+        """
         return self._name_part(3)
 
     @property
     def name_suffix(self):
         """Return the fifth (name suffix) group of the alphabetic person name
-        representation as a unicode string"""
+        representation as a unicode string
+
+        .. versionadded:: 1.2
+        """
         return self._name_part(4)
 
     @property
     def ideographic(self):
         """Return the second (ideographic) person name component as a
-        unicode string"""
+        unicode string
+
+        .. versionadded:: 1.2
+        """
         try:
             return self.components[1]
         except IndexError:
@@ -734,7 +754,10 @@ class PersonName3(object):
     @property
     def phonetic(self):
         """Return the third (phonetic) person name component as a
-        unicode string"""
+        unicode string
+
+        .. versionadded:: 1.2
+        """
         try:
             return self.components[2]
         except IndexError:

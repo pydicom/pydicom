@@ -302,8 +302,9 @@ def convert_OWvalue(byte_string, is_little_endian, struct_format=None):
 
 def convert_OVvalue(byte_string, is_little_endian, struct_format=None):
     """Return the encoded 'OV' value as :class:`bytes` or :class:`str`.
-
     No byte swapping will be performed.
+
+    .. versionadded:: 1.4
     """
     # for now, Maybe later will have own routine
     return convert_OBvalue(byte_string, is_little_endian)
