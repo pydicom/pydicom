@@ -68,6 +68,8 @@ def get_testdata_file(name):
     """Return the first test data file path with the given name found under
     the pydicom test data root.
 
+    .. versionadded:: 1.4
+
     Parameters
     ----------
     name : str
