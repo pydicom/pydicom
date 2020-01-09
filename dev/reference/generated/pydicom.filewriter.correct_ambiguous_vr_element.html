@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
@@ -232,7 +233,7 @@
 <h1>pydicom.filewriter.correct_ambiguous_vr_element<a class="headerlink" href="#pydicom-filewriter-correct-ambiguous-vr-element" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.filewriter.correct_ambiguous_vr_element">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param">elem</em>, <em class="sig-param">ds</em>, <em class="sig-param">is_little_endian</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/filewriter.py#L129"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param">elem</em>, <em class="sig-param">ds</em>, <em class="sig-param">is_little_endian</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/filewriter.py#L129"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempt to correct the ambiguous VR element <cite>elem</cite>.</p>
 <p>When it’s not possible to correct the VR, the element will be returned
 unchanged. Currently the only ambiguous VR elements not corrected for are

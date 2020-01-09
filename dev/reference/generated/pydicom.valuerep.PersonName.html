@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
@@ -224,7 +225,7 @@
 <h1>pydicom.valuerep.PersonName<a class="headerlink" href="#pydicom-valuerep-personname" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.valuerep.PersonName">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L887"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L910"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human-friendly class to hold the value of elements with VR  of ‘PN’.</p>
 <p>The value is parsed into the following properties:</p>
 <ul class="simple">
@@ -234,7 +235,7 @@
 </ul>
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L832"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L855"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the PN properties</p>
 </dd></dl>
 
@@ -384,13 +385,13 @@
 </table>
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L904"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.encode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L927"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dummy method to mimic py2 str behavior in py3 bytes subclass</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName.family_comma_given">
-<code class="sig-name descname">family_comma_given</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L910"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.family_comma_given" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">family_comma_given</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L933"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName.family_comma_given" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return name as ‘Family-name, Given-name’</p>
 </dd></dl>
 

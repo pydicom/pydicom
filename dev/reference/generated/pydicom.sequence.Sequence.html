@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
@@ -214,7 +215,7 @@
 <h1>pydicom.sequence.Sequence<a class="headerlink" href="#pydicom-sequence-sequence" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.sequence.Sequence">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.sequence.</code><code class="sig-name descname">Sequence</code><span class="sig-paren">(</span><em class="sig-param">iterable=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/sequence.py#L20"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.sequence.Sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.sequence.</code><code class="sig-name descname">Sequence</code><span class="sig-paren">(</span><em class="sig-param">iterable=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/sequence.py#L20"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.sequence.Sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to hold multiple <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in a
 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>.</p>
 <p>This class is derived from <a class="reference internal" href="pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a>
@@ -224,7 +225,7 @@ a validator is substituted for <cite>type_constructor</cite> when constructing t
 <a class="reference internal" href="pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> super class.</p>
 <dl class="method">
 <dt id="pydicom.sequence.Sequence.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">iterable=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/sequence.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.sequence.Sequence.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">iterable=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/sequence.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.sequence.Sequence.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a list of <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,6 +295,12 @@ a validator is substituted for <cite>type_constructor</cite> when constructing t
 <em class="property">property </em><code class="sig-name descname">parent</code><a class="headerlink" href="#pydicom.sequence.Sequence.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a weak reference to the parent
 <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 1.4: </span>Returned value is a weak reference to the parent <code class="docutils literal notranslate"><span class="pre">Dataset</span></code>.</p>
+</div>
 </dd></dl>
 
 </dd></dl>

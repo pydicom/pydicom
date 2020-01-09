@@ -19,6 +19,7 @@ pydicom documentation
    old/pydicom_user_guide
    old/ref_guide
    tutorials/index
+   guides/index
    reference/index
 
 .. toctree::
@@ -44,6 +45,7 @@ If you're new to *pydicom* then start here:
 
 * :doc:`Installation<tutorials/installation>` |
   :doc:`Introduction to pydicom<old/getting_started>`
+* **Basics**: :doc:`Read, access, modify, write</tutorials/dataset_basics>`
 
 
 :doc:`User Guide <old/pydicom_user_guide>`

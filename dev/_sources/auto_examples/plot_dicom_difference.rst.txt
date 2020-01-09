@@ -143,6 +143,20 @@ This examples illustrates how to find the differences between two DICOM files.
 
     + (0010, 0040) Patient's Sex                       CS: 'O'
 
+    + (0010, 1002)  Other Patient IDs Sequence   2 item(s) ---- 
+
+    +    (0010, 0020) Patient ID                          LO: 'ABCD1234'
+
+    +    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+
+    +    ---------
+
+    +    (0010, 0020) Patient ID                          LO: '1234ABCD'
+
+    +    (0010, 0022) Type of Patient ID                  CS: 'TEXT'
+
+    +    ---------
+
     - (0010, 1020) Patient's Size                      DS: None
 
     + (0010, 1010) Patient's Age                       AS: '000Y'
@@ -699,7 +713,7 @@ This examples illustrates how to find the differences between two DICOM files.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.093 seconds)
+   **Total running time of the script:** ( 0 minutes  0.114 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_dicom_difference.py:

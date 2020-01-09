@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
@@ -224,10 +225,10 @@
 <h1>pydicom.valuerep.PersonName3<a class="headerlink" href="#pydicom-valuerep-personname3" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.valuerep.PersonName3">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName3</code><span class="sig-paren">(</span><em class="sig-param">val</em>, <em class="sig-param">encodings=None</em>, <em class="sig-param">original_string=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L631"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">PersonName3</code><span class="sig-paren">(</span><em class="sig-param">val</em>, <em class="sig-param">encodings=None</em>, <em class="sig-param">original_string=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L631"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="pydicom.valuerep.PersonName3.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em>, <em class="sig-param">encodings=None</em>, <em class="sig-param">original_string=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L638"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em>, <em class="sig-param">encodings=None</em>, <em class="sig-param">original_string=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L638"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -292,13 +293,16 @@
 <dt id="pydicom.valuerep.PersonName3.components">
 <em class="property">property </em><code class="sig-name descname">components</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.components" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns up to three decoded person name components.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 <p>The returned components represent the alphabetic, ideographic and
 phonetic representations as a list of unicode strings.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName3.decode">
-<code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L758"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.decode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L781"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the patient name decoded by the given <cite>encodings</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -318,7 +322,7 @@ the current object is returned.</p>
 
 <dl class="method">
 <dt id="pydicom.valuerep.PersonName3.encode">
-<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6c2b39fb/pydicom/valuerep.py#L786"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.encode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4de2076b/pydicom/valuerep.py#L809"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.PersonName3.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the patient name decoded by the given <cite>encodings</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -342,6 +346,9 @@ with the first matching of the given encodings.</p>
 <em class="property">property </em><code class="sig-name descname">family_name</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.family_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the first (family name) group of the alphabetic person name
 representation as a unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -349,6 +356,9 @@ representation as a unicode string</p>
 <em class="property">property </em><code class="sig-name descname">given_name</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.given_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the second (given name) group of the alphabetic person name
 representation as a unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -356,6 +366,9 @@ representation as a unicode string</p>
 <em class="property">property </em><code class="sig-name descname">ideographic</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.ideographic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the second (ideographic) person name component as a
 unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -363,6 +376,9 @@ unicode string</p>
 <em class="property">property </em><code class="sig-name descname">middle_name</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.middle_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the third (middle name) group of the alphabetic person name
 representation as a unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -370,6 +386,9 @@ representation as a unicode string</p>
 <em class="property">property </em><code class="sig-name descname">name_prefix</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.name_prefix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the fourth (name prefix) group of the alphabetic person name
 representation as a unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -377,6 +396,9 @@ representation as a unicode string</p>
 <em class="property">property </em><code class="sig-name descname">name_suffix</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.name_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the fifth (name suffix) group of the alphabetic person name
 representation as a unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -384,6 +406,9 @@ representation as a unicode string</p>
 <em class="property">property </em><code class="sig-name descname">phonetic</code><a class="headerlink" href="#pydicom.valuerep.PersonName3.phonetic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the third (phonetic) person name component as a
 unicode string</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.2.</span></p>
+</div>
 </dd></dl>
 
 </dd></dl>

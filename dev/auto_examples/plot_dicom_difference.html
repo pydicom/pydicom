@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
@@ -312,6 +313,20 @@
 - (0010, 0040) Patient&#39;s Sex                       CS: &#39;F&#39;
 
 + (0010, 0040) Patient&#39;s Sex                       CS: &#39;O&#39;
+
++ (0010, 1002)  Other Patient IDs Sequence   2 item(s) ----
+
++    (0010, 0020) Patient ID                          LO: &#39;ABCD1234&#39;
+
++    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;
+
++    ---------
+
++    (0010, 0020) Patient ID                          LO: &#39;1234ABCD&#39;
+
++    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;
+
++    ---------
 
 - (0010, 1020) Patient&#39;s Size                      DS: None
 
@@ -859,7 +874,7 @@
         <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.093 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.114 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a3b4852d291f27302d2926716393406e/plot_dicom_difference.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></p>
