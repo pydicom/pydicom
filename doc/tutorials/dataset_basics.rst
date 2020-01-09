@@ -90,15 +90,15 @@ exception:
 This indicates that either:
 
 * The file isn't a DICOM file, or
-* The file isn't in the DICOM File Format
+* The file isn't in the DICOM File Format but contains DICOM data
 
-If you're sure that the file is DICOM then you can use the `force` keyword
-parameter to force reading::
+If you're sure that the file contains DICOM data then you can use the `force`
+keyword parameter to force reading::
 
   >>> ds = dcmread(no_meta, force=True)
 
 A note of caution about using ``force=True``; because *pydicom* uses a
-deferred-read system, **no exceptions** will raised at the time of reading,
+deferred-read system, **no exceptions** will be raised at the time of reading,
 no matter what the contents of the file are:
 
 .. code-block:: pycon
@@ -184,10 +184,13 @@ There are three categories of elements:
 * **Private elements** such as (0043,104E) *[Duration of X-ray on]*.
   :dcm:`Private elements<part05/sect_7.8.html>` have an odd group number,
   aren't registered in the official DICOM Standard, and are instead created
-  privately, usually by a manufacturer. In general, unless the manufacturer
-  publishes the details of their private elements, the element name and VR
-  aren't known. However, in this case the details have been made public and
-  we know the element name is *Duration of X-ray on* with a VR of **FL**.
+  privately, as specified by the (gggg,0010) *Private Creator* element.
+
+  * If the private creator is unknown then the element name will be *Private
+    tag data* and the VR **UN**.
+  * If the private creator is known then the element name will be surrounded
+    by square brackets, e.g. *[Duration of X-ray on]* and the VR will be as
+    shown.
 
 For all element categories, we can access a particular element in the dataset
 through its tag, which returns a :class:`~pydicom.dataelem.DataElement`
@@ -291,9 +294,9 @@ Sequence elements can be accessed in the same manner as non-sequence ones::
     >>> seq = ds[0x0010, 0x1002]
     >>> seq = ds['OtherPatientIDsSequence']
 
-The main difference between sequence and non-sequence elements is their value
-is a list of zero or more  :class:`~pydicom.dataset.Dataset` objects, which
-can be accessed using the standard Python :class:`list` methods::
+The main difference between sequence and non-sequence elements is that their
+value is a list of zero or more  :class:`~pydicom.dataset.Dataset` objects,
+which can be accessed using the standard Python :class:`list` methods::
 
     >>> len(ds.OtherPatientIDsSequence)
     2
