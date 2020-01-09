@@ -1,5 +1,5 @@
 # .gitignore file
- 
+
 # Backup files
 *~
 
@@ -30,6 +30,9 @@ py3source
 # Docs build
 docs/_build/*
 doc/_build/*
+doc/auto_examples/*
+doc/generated/*
+doc/reference/generated/*
 
 # coverage.py files
 .coverage
