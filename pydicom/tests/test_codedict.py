@@ -151,12 +151,14 @@ class TestCodeDict(unittest.TestCase):
         )
 
     def test_cid3263(self):
+        meaning = (
+            "12-lead from EASI leads (ES, AS, AI)"
+            " by Dower/EASI transformation"
+        )
         assert (
             codes.cid3263._12LeadFromEASILeadsESASAIByDowerEASITransformation
             == Code(
-                value="10:11284",
-                scheme_designator="MDC",
-                meaning="12-lead from EASI leads (ES, AS, AI) by Dower/EASI transformation",
+                value="10:11284", scheme_designator="MDC", meaning=meaning,
             )
         )
 

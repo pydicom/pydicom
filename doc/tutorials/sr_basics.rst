@@ -16,7 +16,7 @@ with a ``dir()`` method on a particular scheme designator ('DCM' here) or CID (s
     >>> codes.DCM.dir("Modality")
     ['IncorrectModalityWorklistEntry', 'MixedModality3DCAMModel', 'Modality', 'ModalityToRead', 'OtherModality']
 
-Once a name is known, the Code instance can be created using that name::
+Once a name is known, the ``Code`` instance can be created using that name::
 
     >>> codes.DCM.ModalityToRead
     Code(value='128002', scheme_designator='DCM', meaning='Modality to Read', scheme_version=None)
@@ -46,5 +46,5 @@ The following Scheme Designators are available in ``codes``:
 SCT, DCM, LN, FMA, MDC, UMLS, BARI, NCIt,
 NEU, UCUM, RADLEX, NDC, ITIS_TSN, PUBCHEM_CID, MSH
 
-As noted, these steps do not yet directly provide SR capabilities in pydicom, but provide some access
+As noted, these steps do not yet directly provide SR capabilities in *pydicom*, but provide some access
 to codes and CIDs in a similar way to DICOM keywords for the DICOM dictionary.
