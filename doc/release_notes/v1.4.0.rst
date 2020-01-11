@@ -74,7 +74,10 @@ Enhancements
   based on whether the Dataset's Transfer Syntax is compressed (:issue:`1006`)
 * Updated DICOM dictionary to 2019e edition (:issue:`1013`)
 * Added support for new VRs OV, SV, UV (:issue:`1016`)
-* Code dictionaries and :class:`~pydicom.sr.coding.Code` class for structured reporting added (alpha release only)
+* Code dictionaries and ``Code`` class for structured reporting added
+  (alpha release only).  See the 
+  :doc:`Structured Reporting tutorial <../tutorials/sr_basics>` for more
+  information
 
 Changes
 .......

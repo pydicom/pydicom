@@ -17,6 +17,7 @@ with a ``dir()`` method on a particular scheme designator ('DCM' here) or CID (s
     ['IncorrectModalityWorklistEntry', 'MixedModality3DCAMModel', 'Modality', 'ModalityToRead', 'OtherModality']
 
 Once a name is known, the ``Code`` instance can be created using that name::
+Once a name is known, the ``Code`` instance can be created using that name::
 
     >>> codes.DCM.ModalityToRead
     Code(value='128002', scheme_designator='DCM', meaning='Modality to Read', scheme_version=None)
