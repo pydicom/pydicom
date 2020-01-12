@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tutorials &mdash; pydicom 1.4.0.dev0 documentation</title>
+  <title>Structured Reporting &mdash; pydicom 1.4.0.dev0 documentation</title>
   
 
   
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Creating and managing virtual environments" href="virtualenvs.html" />
-    <link rel="prev" title="Reading and writing DICOM files" href="../old/ref_guide.html" /> 
+    <link rel="next" title="Contributing a source code change" href="contributing_code.html" />
+    <link rel="prev" title="Dataset basics: read, access, modify, write" href="dataset_basics.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -100,11 +100,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Structured Reporting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
 </ul>
@@ -169,7 +169,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Tutorials</li>
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Structured Reporting</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -186,19 +188,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="tutorials">
-<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<p>New to <em>pydicom</em>? Then these tutorials should get you up and running.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
-<li class="toctree-l1"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
-</ul>
+  <div class="section" id="structured-reporting">
+<h1>Structured Reporting<a class="headerlink" href="#structured-reporting" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.4.</span></p>
 </div>
+<p>Starting in <em>pydicom</em> version 1.4, some support for DICOM Structured Reporting (SR) began to be added,
+as alpha code; the API for this is subject to change in future <em>pydicom</em> versions. At this point the
+code is limited to code dictionaries and one class <code class="xref py py-class docutils literal notranslate"><span class="pre">Code</span></code>
+as a foundational step for future work.</p>
+<p>Most access is through a <code class="docutils literal notranslate"><span class="pre">codes</span></code> class instance provided in <code class="docutils literal notranslate"><span class="pre">pydicom.sr.codedict</span></code>. This can be used
+with a <code class="docutils literal notranslate"><span class="pre">dir()</span></code> method on a particular scheme designator (‘DCM’ here) or CID (see further below):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.sr.codedict</span> <span class="kn">import</span> <span class="n">codes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">codes</span><span class="o">.</span><span class="n">DCM</span><span class="o">.</span><span class="n">dir</span><span class="p">(</span><span class="s2">&quot;Modality&quot;</span><span class="p">)</span>
+<span class="go">[&#39;IncorrectModalityWorklistEntry&#39;, &#39;MixedModality3DCAMModel&#39;, &#39;Modality&#39;, &#39;ModalityToRead&#39;, &#39;OtherModality&#39;]</span>
+</pre></div>
+</div>
+<p>Once a name is known, the <code class="docutils literal notranslate"><span class="pre">Code</span></code> instance can be created using that name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">codes</span><span class="o">.</span><span class="n">DCM</span><span class="o">.</span><span class="n">ModalityToRead</span>
+<span class="go">Code(value=&#39;128002&#39;, scheme_designator=&#39;DCM&#39;, meaning=&#39;Modality to Read&#39;, scheme_version=None)</span>
+</pre></div>
+</div>
+<p>Codes with keywords that start with a number are prefixed with an underscore:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">codes</span><span class="o">.</span><span class="n">SCT</span><span class="o">.</span><span class="n">_1SigmaLowerValueOfPopulation</span>
+<span class="go">Code(value=&#39;371919006&#39;, scheme_designator=&#39;SCT&#39;, meaning=&#39;1 Sigma Lower Value of population&#39;, scheme_version=None)</span>
+</pre></div>
+</div>
+<p>Codes can also be accessed by CID:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">codes</span><span class="o">.</span><span class="n">cid270</span><span class="o">.</span><span class="n">Person</span>
+<span class="go">Code(value=&#39;121006&#39;, scheme_designator=&#39;DCM&#39;, meaning=&#39;Person&#39;, scheme_version=None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">codes</span><span class="o">.</span><span class="n">cid270</span><span class="o">.</span><span class="n">dir</span><span class="p">()</span>
+<span class="go">[&#39;Device&#39;, &#39;Person&#39;]</span>
+</pre></div>
+</div>
+<p>If the CID number is unknown, it is possible to find it through a CID name dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.sr.codedict</span> <span class="kn">import</span> <span class="n">cid_for_name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cid_for_name</span> <span class="k">if</span> <span class="s1">&#39;Observ&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+<span class="go">[&#39;ObservationSubjectClass&#39;, &#39;ObserverType&#39;, &#39;EchoFindingObservationTypes&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cid_for_name</span><span class="p">[</span><span class="s1">&#39;ObserverType&#39;</span><span class="p">]</span>
+<span class="go">270</span>
+</pre></div>
+</div>
+<p>The following Scheme Designators are available in <code class="docutils literal notranslate"><span class="pre">codes</span></code>:
+SCT, DCM, LN, FMA, MDC, UMLS, BARI, NCIt,
+NEU, UCUM, RADLEX, NDC, ITIS_TSN, PUBCHEM_CID, MSH</p>
+<p>As noted, these steps do not yet directly provide SR capabilities in <em>pydicom</em>, but provide some access
+to codes and CIDs in a similar way to DICOM keywords for the DICOM dictionary.</p>
 </div>
 
 
@@ -209,10 +244,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="virtualenvs.html" class="btn btn-neutral float-right" title="Creating and managing virtual environments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="contributing_code.html" class="btn btn-neutral float-right" title="Contributing a source code change" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../old/ref_guide.html" class="btn btn-neutral float-left" title="Reading and writing DICOM files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="dataset_basics.html" class="btn btn-neutral float-left" title="Dataset basics: read, access, modify, write" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

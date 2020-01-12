@@ -12,5 +12,6 @@ New to *pydicom*? Then these tutorials should get you up and running.
    installation
    virtualenvs
    dataset_basics
+   sr_basics
    contributing_code
    contributing_docs
