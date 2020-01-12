@@ -1,0 +1,6 @@
+pydicom.values.convert\_OBvalue
+===============================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_OBvalue

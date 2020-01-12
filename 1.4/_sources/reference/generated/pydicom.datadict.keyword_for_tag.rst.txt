@@ -1,0 +1,6 @@
+pydicom.datadict.keyword\_for\_tag
+==================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: keyword_for_tag

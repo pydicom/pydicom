@@ -1,0 +1,6 @@
+pydicom.charset.decode\_string
+==============================
+
+.. currentmodule:: pydicom.charset
+
+.. autofunction:: decode_string

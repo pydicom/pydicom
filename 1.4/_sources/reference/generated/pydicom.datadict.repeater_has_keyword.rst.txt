@@ -1,0 +1,6 @@
+pydicom.datadict.repeater\_has\_keyword
+=======================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: repeater_has_keyword

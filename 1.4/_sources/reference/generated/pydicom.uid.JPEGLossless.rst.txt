@@ -1,0 +1,6 @@
+pydicom.uid.JPEGLossless
+========================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGLossless

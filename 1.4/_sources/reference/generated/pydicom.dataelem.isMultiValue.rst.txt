@@ -1,0 +1,6 @@
+pydicom.dataelem.isMultiValue
+=============================
+
+.. currentmodule:: pydicom.dataelem
+
+.. autofunction:: isMultiValue

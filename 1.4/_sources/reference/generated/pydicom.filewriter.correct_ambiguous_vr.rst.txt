@@ -1,0 +1,6 @@
+pydicom.filewriter.correct\_ambiguous\_vr
+=========================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: correct_ambiguous_vr

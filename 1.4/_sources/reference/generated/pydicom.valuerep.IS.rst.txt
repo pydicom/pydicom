@@ -1,0 +1,36 @@
+pydicom.valuerep.IS
+===================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: IS
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~IS.__init__
+      ~IS.as_integer_ratio
+      ~IS.bit_length
+      ~IS.conjugate
+      ~IS.from_bytes
+      ~IS.to_bytes
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~IS.denominator
+      ~IS.imag
+      ~IS.numerator
+      ~IS.real
+   
+   

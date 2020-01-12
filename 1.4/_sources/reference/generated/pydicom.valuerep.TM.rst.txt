@@ -1,0 +1,44 @@
+pydicom.valuerep.TM
+===================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: TM
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TM.__init__
+      ~TM.dst
+      ~TM.fromisoformat
+      ~TM.isoformat
+      ~TM.replace
+      ~TM.strftime
+      ~TM.tzname
+      ~TM.utcoffset
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TM.fold
+      ~TM.hour
+      ~TM.max
+      ~TM.microsecond
+      ~TM.min
+      ~TM.minute
+      ~TM.original_string
+      ~TM.resolution
+      ~TM.second
+      ~TM.tzinfo
+   
+   

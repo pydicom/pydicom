@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dataset Reading (pydicom.filereader) &mdash; pydicom 1.4.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pydicom.filereader.data_element_generator" href="generated/pydicom.filereader.data_element_generator.html" />
+    <link rel="prev" title="Dataset IO" href="fileio.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="fileio.html">Dataset IO</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.data_element_generator.html">pydicom.filereader.data_element_generator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.data_element_offset_to_value.html">pydicom.filereader.data_element_offset_to_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.dcmread.html">pydicom.filereader.dcmread</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_dataset.html">pydicom.filereader.read_dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_deferred_data_element.html">pydicom.filereader.read_deferred_data_element</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_dicomdir.html">pydicom.filereader.read_dicomdir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_file_meta_info.html">pydicom.filereader.read_file_meta_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_partial.html">pydicom.filereader.read_partial</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_preamble.html">pydicom.filereader.read_preamble</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_sequence.html">pydicom.filereader.read_sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.filereader.read_sequence_item.html">pydicom.filereader.read_sequence_item</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="fileio.html">Dataset IO</a> &raquo;</li>
+        
+      <li>Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dataset-reading-pydicom-filereader">
+<span id="api-fileio-filereader"></span><h1>Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)<a class="headerlink" href="#dataset-reading-pydicom-filereader" title="Permalink to this headline">¶</a></h1>
+<p>Functions for reading DICOM datasets from file-likes.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.data_element_generator.html#pydicom.filereader.data_element_generator" title="pydicom.filereader.data_element_generator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_element_generator</span></code></a>(fp, is_implicit_VR, …)</p></td>
+<td><p>Create a generator to efficiently return the raw data elements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.data_element_offset_to_value.html#pydicom.filereader.data_element_offset_to_value" title="pydicom.filereader.data_element_offset_to_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_element_offset_to_value</span></code></a>(is_implicit_VR, VR)</p></td>
+<td><p>Return number of bytes from start of data element to start of value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcmread</span></code></a>(fp[, defer_size, …])</p></td>
+<td><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_dataset.html#pydicom.filereader.read_dataset" title="pydicom.filereader.read_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dataset</span></code></a>(fp, is_implicit_VR, …[, …])</p></td>
+<td><p>Return a <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance containing the next dataset in the file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_deferred_data_element.html#pydicom.filereader.read_deferred_data_element" title="pydicom.filereader.read_deferred_data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_deferred_data_element</span></code></a>(fileobj_type, …)</p></td>
+<td><p>Read the previously deferred value from the file into memory and return a raw data element.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_dicomdir.html#pydicom.filereader.read_dicomdir" title="pydicom.filereader.read_dicomdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dicomdir</span></code></a>([filename])</p></td>
+<td><p>Read a DICOMDIR file and return a <a class="reference internal" href="generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir" title="pydicom.dicomdir.DicomDir"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomDir</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_file_meta_info.html#pydicom.filereader.read_file_meta_info" title="pydicom.filereader.read_file_meta_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_file_meta_info</span></code></a>(filename)</p></td>
+<td><p>Read and return the DICOM file meta information only.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_partial.html#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_partial</span></code></a>(fileobj[, stop_when, …])</p></td>
+<td><p>Parse a DICOM file until a condition is met.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_preamble.html#pydicom.filereader.read_preamble" title="pydicom.filereader.read_preamble"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_preamble</span></code></a>(fp, force)</p></td>
+<td><p>Return the 128-byte DICOM preamble in <cite>fp</cite> if present.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_sequence.html#pydicom.filereader.read_sequence" title="pydicom.filereader.read_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sequence</span></code></a>(fp, is_implicit_VR, …[, offset])</p></td>
+<td><p>Read and return a <a class="reference internal" href="generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> – i.e.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_sequence_item.html#pydicom.filereader.read_sequence_item" title="pydicom.filereader.read_sequence_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sequence_item</span></code></a>(fp, is_implicit_VR, …)</p></td>
+<td><p>Read and return a single <a class="reference internal" href="generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> item, i.e.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/pydicom.filereader.data_element_generator.html" class="btn btn-neutral float-right" title="pydicom.filereader.data_element_generator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="fileio.html" class="btn btn-neutral float-left" title="Dataset IO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+pydicom.misc.is\_dicom
+======================
+
+.. currentmodule:: pydicom.misc
+
+.. autofunction:: is_dicom

@@ -1,0 +1,38 @@
+pydicom.sequence.Sequence
+=========================
+
+.. currentmodule:: pydicom.sequence
+
+.. autoclass:: Sequence
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Sequence.__init__
+      ~Sequence.append
+      ~Sequence.clear
+      ~Sequence.count
+      ~Sequence.extend
+      ~Sequence.index
+      ~Sequence.insert
+      ~Sequence.pop
+      ~Sequence.remove
+      ~Sequence.reverse
+      ~Sequence.sort
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Sequence.parent
+   
+   

@@ -1,0 +1,6 @@
+pydicom.uid.ExplicitVRBigEndian
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ExplicitVRBigEndian

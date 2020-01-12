@@ -1,0 +1,6 @@
+pydicom.datadict.add\_dict\_entry
+=================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: add_dict_entry

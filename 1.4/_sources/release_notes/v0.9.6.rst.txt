@@ -1,0 +1,30 @@
+Version 0.9.6
+=============
+
+Changelog
+---------
+
+pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a
+number of bug fixes
+
+Major changes
+.............
+
+* updated the dictionary to the DICOM 2011 standard's dictionary.
+
+Bug fixes
+.........
+
+* Fixed bug in Dataset.file_metadata() and deprecated in favor of FileDataset
+  (issue 93)
+* Fixed UID comparisons against non-string values (issue 96)
+* catch exceptions on reading undefined length private data elements (issue 91,
+  issue 97)
+* Fixed bug in raising exception for unknown tag
+
+Other
+.....
+
+* added example file write_new.py to show how to create DICOM files from scratch
+* updated other example files
+* more PEP-8 style changes
