@@ -10,7 +10,7 @@ _CodeBase.__new__.__defaults__ = (None,)
 
 
 class Code(_CodeBase):
-    """Namedtuple for representation of a coded concept consiting of the
+    """Namedtuple for representation of a coded concept consisting of the
     actual code *value*, the coding *scheme designator*, the code *meaning*
     (and optionally the coding *scheme version*).
 
