@@ -9,6 +9,7 @@
 [![PyPI version](https://badge.fury.io/py/pydicom.svg)](https://badge.fury.io/py/pydicom)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3333768.svg)](https://doi.org/10.5281/zenodo.3333768)
 [![Gitter](https://badges.gitter.im/pydicom/Lobby.svg)](https://gitter.im/pydicom/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 *pydicom* is a pure python package for working with [DICOM](http://medical.nema.org/) files.
 It was made for inspecting and modifying DICOM data in an easy "pythonic" way.
 The modifications can be written again to a new file.
