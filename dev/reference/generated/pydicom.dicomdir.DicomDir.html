@@ -204,13 +204,13 @@
 <h1>pydicom.dicomdir.DicomDir<a class="headerlink" href="#pydicom-dicomdir-dicomdir" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pydicom.dicomdir.DicomDir">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dicomdir.</code><code class="sig-name descname">DicomDir</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">dataset</em>, <em class="sig-param">preamble=None</em>, <em class="sig-param">file_meta=None</em>, <em class="sig-param">is_implicit_VR=True</em>, <em class="sig-param">is_little_endian=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1a2b61ea/pydicom/dicomdir.py#L10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dicomdir.</code><code class="sig-name descname">DicomDir</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">dataset</em>, <em class="sig-param">preamble=None</em>, <em class="sig-param">file_meta=None</em>, <em class="sig-param">is_implicit_VR=True</em>, <em class="sig-param">is_little_endian=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/64f5b8da/pydicom/dicomdir.py#L10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hold a DICOMDIR dataset read from file.</p>
 <p>Derived from <a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>, but additional methods
 are available, specific to the Directory structure</p>
 <dl class="method">
 <dt id="pydicom.dicomdir.DicomDir.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">dataset</em>, <em class="sig-param">preamble=None</em>, <em class="sig-param">file_meta=None</em>, <em class="sig-param">is_implicit_VR=True</em>, <em class="sig-param">is_little_endian=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1a2b61ea/pydicom/dicomdir.py#L17"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">filename_or_obj</em>, <em class="sig-param">dataset</em>, <em class="sig-param">preamble=None</em>, <em class="sig-param">file_meta=None</em>, <em class="sig-param">is_implicit_VR=True</em>, <em class="sig-param">is_little_endian=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/64f5b8da/pydicom/dicomdir.py#L17"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a DICOMDIR dataset read from a DICOM file.</p>
 <p>Carries forward all the initialization from
 <a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a></p>
@@ -397,7 +397,7 @@ if big endian.</p></li>
 </table>
 <dl class="method">
 <dt id="pydicom.dicomdir.DicomDir.parse_records">
-<code class="sig-name descname">parse_records</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1a2b61ea/pydicom/dicomdir.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.parse_records" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse_records</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/64f5b8da/pydicom/dicomdir.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.parse_records" title="Permalink to this definition">¶</a></dt>
 <dd><p>Build the hierarchy of given directory records, and structure
 into Patient, Studies, Series, Images hierarchy.</p>
 <p>This is intended for initial read of file only,
