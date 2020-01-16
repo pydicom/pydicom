@@ -76,7 +76,7 @@ def empty_value_for_VR(VR, raw=False):
         if it is empty.
     """
     if VR == 'SQ':
-        return []
+        return b'' if raw else []
     if config.use_none_as_empty_text_VR_value:
         return None
     if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
