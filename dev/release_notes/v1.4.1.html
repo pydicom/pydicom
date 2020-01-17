@@ -186,6 +186,14 @@
 <li><p>Fixed writing of empty sequences (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1030">#1030</a>)</p></li>
 </ul>
 </div>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>In <cite>Dataset.to_json</cite> and <cite>Dataset.to_json_dict</cite>, the default of the
+<cite>bulk_data_threshold</cite> argument has changed to 1024, and is now ignored if
+no bulk data handler is set (see <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1029">#1029</a>)</p></li>
+</ul>
+</div>
 </div>
 </div>
 
