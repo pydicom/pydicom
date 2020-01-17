@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
-import sys
 
 import pytest
 
 from pydicom import dcmread, compat
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag, BaseTag
@@ -15,7 +14,7 @@ from pydicom.valuerep import PersonNameUnicode, PersonName3
 
 class TestPersonName(object):
     def test_json_pn_from_file(self):
-        with open(get_testdata_files("test_PN.json")[0]) as s:
+        with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
         assert isinstance(ds[0x00080090].value,
                           (PersonNameUnicode, PersonName3))
@@ -144,7 +143,7 @@ class TestAT(object):
         assert 0x000910AF == ds[0x00091001].value
         assert [0x00100010, 0x00100020, 0x00100030] == ds[0x00091002].value
 
-    def test_invalid_json(self):
+    def test_invalid_value_in_json(self):
         ds_json = ('{"00091001": {"vr": "AT", "Value": ["000910AG"]}, '
                    '"00091002": {"vr": "AT", "Value": ["00100010"]}}')
         with pytest.warns(UserWarning, match='Invalid value "000910AG" for '
@@ -153,15 +152,24 @@ class TestAT(object):
             assert ds[0x00091001].value is None
             assert 0x00100010 == ds[0x00091002].value
 
+    def test_invalid_tag_in_json(self):
+        ds_json = ('{"000910AG": {"vr": "AT", "Value": ["00091000"]}, '
+                   '"00091002": {"vr": "AT", "Value": ["00100010"]}}')
+        with pytest.raises(ValueError, match='Data element "000910AG" could '
+                                             'not be loaded from JSON:'):
+            ds = Dataset.from_json(ds_json)
+            assert ds[0x00091001].value is None
+            assert 0x00100010 == ds[0x00091002].value
+
 
 class TestDataSetToJson(object):
     def test_json_from_dicom_file(self):
-        ds1 = Dataset(dcmread(get_testdata_files("CT_small.dcm")[0]))
-        ds_json = ds1.to_json(bulk_data_threshold=100000)
+        ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
+        ds_json = ds1.to_json()
         ds2 = Dataset.from_json(ds_json)
         assert ds1 == ds2
 
-        ds_json = ds1.to_json_dict(bulk_data_threshold=100000)
+        ds_json = ds1.to_json_dict()
         ds2 = Dataset.from_json(ds_json)
         assert ds1 == ds2
 
@@ -205,7 +213,7 @@ class TestDataSetToJson(object):
         ds.add_new(0x00091101, 'SH', 'Version2')
         ds.add_new(0x00091102, 'US', 2)
 
-        json_string = ds.to_json(bulk_data_threshold=100)
+        json_string = ds.to_json()
         json_model = json.loads(json_string)
 
         assert json_model['00080005']['Value'] == ['ISO_IR 100']
@@ -223,7 +231,7 @@ class TestDataSetToJson(object):
         ds2 = Dataset.from_json(json_model)
         assert ds == ds2
 
-        json_model2 = ds.to_json_dict(bulk_data_threshold=100)
+        json_model2 = ds.to_json_dict()
         if compat.in_py2:
             # in Python 2, the encoding of this is slightly different
             # (single vs double quotation marks)
@@ -274,7 +282,7 @@ class TestDataSetToJson(object):
 
 class TestSequence(object):
     def test_nested_sequences(self):
-        test1_json = get_testdata_files("test1.json")[0]
+        test1_json = get_testdata_file("test1.json")
         with open(test1_json) as f:
             with pytest.warns(UserWarning,
                               match='no bulk data URI handler provided '):
@@ -288,7 +296,7 @@ class TestBinary(object):
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, 'OB', b'BinaryContent')
-        ds_json = ds.to_json_dict(bulk_data_threshold=20)
+        ds_json = ds.to_json_dict()
         assert "00091002" in ds_json
         assert "QmluYXJ5Q29udGVudA==" == ds_json["00091002"]["InlineBinary"]
         ds1 = Dataset.from_json(ds_json)
