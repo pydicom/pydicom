@@ -20,7 +20,7 @@ and into a deserialized JSON dictionary:
 
   >>> import pydicom
   >>> from pydicom.data import get_testdata_file
-  >>> filename = get_testdata_files("CT_small.dcm")
+  >>> filename = get_testdata_file("CT_small.dcm")
   >>> ds = pydicom.dcmread(filename)
   >>> ds.to_json()
   '{"00080005": {"Value": ["ISO_IR 100"], "vr": "CS"}, "00080008": {"Value":...
@@ -49,7 +49,7 @@ dictionary. There is only a single function to handle both cases:
 The conversion in both directions is symmetric:
 
   >>> import pydicom
-  >>> filename = pydicom.data.get_testdata_files("CT_small.dcm")
+  >>> filename = pydicom.data.get_testdata_file("CT_small.dcm")
   >>> ds = pydicom.dcmread(filename)
   >>> ds_json = ds.to_json()
   >>> ds1 = pydicom.dataset.Dataset.from_json(ds_json)
@@ -81,7 +81,7 @@ handler - smaller data is encoded inline.
   >>>     uri = store_data_and_return_uri(data_element)
   >>>     return uri
   >>>
-  >>> filename = pydicom.data.get_testdata_files("CT_small.dcm")
+  >>> filename = pydicom.data.get_testdata_file("CT_small.dcm")
   >>> ds = pydicom.dcmread(filename)
   >>> ds_json = ds.to_json(bulk_data_element_handler=bulk_data_handler)
 
