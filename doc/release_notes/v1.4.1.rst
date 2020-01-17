@@ -1,0 +1,9 @@
+Version 1.4.1
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+* Fixed writing of empty sequences (regression, :issue:`1030`)
