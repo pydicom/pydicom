@@ -2126,11 +2126,11 @@ class Dataset(dict):
             dataset.add(data_element)
         return dataset
 
-    def to_json_dict(self, bulk_data_threshold=1,
+    def to_json_dict(self, bulk_data_threshold=1024,
                      bulk_data_element_handler=None):
         """Return a dictionary representation of the :class:`Dataset`
         conforming to the DICOM JSON Model as described in the DICOM
-        Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
+        Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
 
         .. versionadded:: 1.4
 
@@ -2140,7 +2140,7 @@ class Dataset(dict):
             Threshold for the length of a base64-encoded binary data element
             above which the element should be considered bulk data and the
             value provided as a URI rather than included inline (default:
-            ``1``).
+            ``1024``). Ignored if no bulk data handler is given.
         bulk_data_element_handler : callable, optional
             Callable function that accepts a bulk data element and returns a
             JSON representation of the data element (dictionary including the
@@ -2161,7 +2161,7 @@ class Dataset(dict):
             )
         return json_dataset
 
-    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
+    def to_json(self, bulk_data_threshold=1024, bulk_data_element_handler=None,
                 dump_handler=None):
         """Return a JSON representation of the :class:`Dataset`.
 
@@ -2175,7 +2175,7 @@ class Dataset(dict):
             Threshold for the length of a base64-encoded binary data element
             above which the element should be considered bulk data and the
             value provided as a URI rather than included inline (default:
-            ``1``).
+            ``1024``). Ignored if no bulk data handler is given.
         bulk_data_element_handler : callable, optional
             Callable function that accepts a bulk data element and returns a
             JSON representation of the data element (dictionary including the
