@@ -352,4 +352,3 @@ class TestBinary(object):
         ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
 
         assert b'xyzzy' == ds[0x00091002].value
-
