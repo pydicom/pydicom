@@ -72,9 +72,8 @@ WADO-RS, you have to provide a bulk data handler.
 
 On writing JSON data, the bulk data handler is responsible to store the data
 so it can be retrieved via the ``BulkDataURI`` saved in the JSON dataset.
-Note that only data which length exceeds the size given by
-``bulk_data_threshold`` (by default set to 1024) is handled by the bulk data
-handler - smaller data is encoded inline.
+Note that only data greater than ``bulk_data_threshold`` (by default set to
+1024) is handled by the bulk data handler - smaller data is encoded inline.
 
   >>> import pydicom
   >>> def bulk_data_handler(data_element):
