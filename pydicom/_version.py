@@ -2,6 +2,6 @@
 import re
 
 
-__version__ = '1.4.0rc1'
+__version__ = '1.4.1'
 __version_info__ = tuple(
     re.match(r'(\d+\.\d+\.\d+).*', __version__).group(1).split('.'))
