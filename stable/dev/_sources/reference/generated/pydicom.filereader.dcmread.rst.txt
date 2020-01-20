@@ -1,0 +1,6 @@
+pydicom.filereader.dcmread
+==========================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: dcmread

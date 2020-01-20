@@ -1,0 +1,6 @@
+pydicom.encaps.fragment\_frame
+==============================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: fragment_frame

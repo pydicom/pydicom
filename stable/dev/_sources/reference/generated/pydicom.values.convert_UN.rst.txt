@@ -1,0 +1,6 @@
+pydicom.values.convert\_UN
+==========================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_UN

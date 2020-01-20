@@ -1,0 +1,6 @@
+pydicom.values.convert\_ATvalue
+===============================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_ATvalue

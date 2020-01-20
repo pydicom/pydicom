@@ -1,0 +1,6 @@
+pydicom.values.convert\_SQ
+==========================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_SQ

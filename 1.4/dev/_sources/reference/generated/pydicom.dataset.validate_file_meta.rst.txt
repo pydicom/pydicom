@@ -1,0 +1,6 @@
+pydicom.dataset.validate\_file\_meta
+====================================
+
+.. currentmodule:: pydicom.dataset
+
+.. autofunction:: validate_file_meta

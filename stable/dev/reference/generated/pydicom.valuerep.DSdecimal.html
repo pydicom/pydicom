@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.valuerep.DSdecimal &mdash; pydicom 1.4.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.valuerep.DSfloat" href="pydicom.valuerep.DSfloat.html" />
+    <link rel="prev" title="pydicom.valuerep.DS" href="pydicom.valuerep.DS.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DA.html">pydicom.valuerep.DA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DS.html">pydicom.valuerep.DS</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.valuerep.DSdecimal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DT.html">pydicom.valuerep.DT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName3.html">pydicom.valuerep.PersonName3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameBase.html">pydicom.valuerep.PersonNameBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
+        
+          <li><a href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.valuerep.DSdecimal</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-valuerep-dsdecimal">
+<h1>pydicom.valuerep.DSdecimal<a class="headerlink" href="#pydicom-valuerep-dsdecimal" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pydicom.valuerep.DSdecimal">
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DSdecimal</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/valuerep.py#L357"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store value for an element with VR ‘DS’ as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p>
+<p class="rubric">Notes</p>
+<p>If constructed from an empty string, returns the empty string, not an
+instance of this class.</p>
+<dl class="method">
+<dt id="pydicom.valuerep.DSdecimal.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/valuerep.py#L416"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the original string if one given, for exact write-out of same
+value later. E.g. if set <code class="docutils literal notranslate"><span class="pre">'1.23e2'</span></code>, <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> would
+write <code class="docutils literal notranslate"><span class="pre">'123'</span></code>, but <a class="reference internal" href="pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-class docutils literal notranslate"><span class="pre">DS</span></code></a> will use the original.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.valuerep.DSdecimal.__init__" title="pydicom.valuerep.DSdecimal.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(val)</p></td>
+<td><p>Store the original string if one given, for exact write-out of same value later.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjusted</span></code></p></td>
+<td><p>Return the adjusted exponent of the number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_integer_ratio</span></code>()</p></td>
+<td><p>Return a pair of integers, whose ratio is exactly equal to the original Decimal and with a positive denominator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_tuple</span></code></p></td>
+<td><p>Return a tuple representation of the number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">canonical</span></code></p></td>
+<td><p>Return the canonical encoding of the argument.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare</span></code></p></td>
+<td><p>Compare self to other.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_signal</span></code></p></td>
+<td><p>Identical to compare, except that all NaNs signal.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_total</span></code></p></td>
+<td><p>Compare two operands using their abstract representation rather than their numerical value.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_total_mag</span></code></p></td>
+<td><p>Compare two operands using their abstract representation rather than their value as in compare_total(), but ignoring the sign of each operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conjugate</span></code></p></td>
+<td><p>Return self.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_abs</span></code></p></td>
+<td><p>Return the absolute value of the argument.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_negate</span></code></p></td>
+<td><p>Return the negation of the argument.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy_sign</span></code></p></td>
+<td><p>Return a copy of the first operand with the sign set to be the same as the sign of the second operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">exp</span></code></p></td>
+<td><p>Return the value of the (natural) exponential function e**x at the given number.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fma</span></code></p></td>
+<td><p>Fused multiply-add.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_float</span></code></p></td>
+<td><p>Class method that converts a float to a decimal number, exactly.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_canonical</span></code></p></td>
+<td><p>Return True if the argument is canonical and False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_finite</span></code></p></td>
+<td><p>Return True if the argument is a finite number, and False if the argument is infinite or a NaN.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_infinite</span></code></p></td>
+<td><p>Return True if the argument is either positive or negative infinity and False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_nan</span></code></p></td>
+<td><p>Return True if the argument is a (quiet or signaling) NaN and False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_normal</span></code></p></td>
+<td><p>Return True if the argument is a normal finite non-zero number with an adjusted exponent greater than or equal to Emin.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_qnan</span></code></p></td>
+<td><p>Return True if the argument is a quiet NaN, and False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_signed</span></code></p></td>
+<td><p>Return True if the argument has a negative sign and False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_snan</span></code></p></td>
+<td><p>Return True if the argument is a signaling NaN and False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_subnormal</span></code></p></td>
+<td><p>Return True if the argument is subnormal, and False otherwise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_zero</span></code></p></td>
+<td><p>Return True if the argument is a (positive or negative) zero and False otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ln</span></code></p></td>
+<td><p>Return the natural (base e) logarithm of the operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">log10</span></code></p></td>
+<td><p>Return the base ten logarithm of the operand.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logb</span></code></p></td>
+<td><p>For a non-zero number, return the adjusted exponent of the operand as a Decimal instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logical_and</span></code></p></td>
+<td><p>Return the digit-wise ‘and’ of the two (logical) operands.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logical_invert</span></code></p></td>
+<td><p>Return the digit-wise inversion of the (logical) operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logical_or</span></code></p></td>
+<td><p>Return the digit-wise ‘or’ of the two (logical) operands.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logical_xor</span></code></p></td>
+<td><p>Return the digit-wise ‘exclusive or’ of the two (logical) operands.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></p></td>
+<td><p>Maximum of self and other.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_mag</span></code></p></td>
+<td><p>Similar to the max() method, but the comparison is done using the absolute values of the operands.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code></p></td>
+<td><p>Minimum of self and other.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">min_mag</span></code></p></td>
+<td><p>Similar to the min() method, but the comparison is done using the absolute values of the operands.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">next_minus</span></code></p></td>
+<td><p>Return the largest number representable in the given context (or in the current default context if no context is given) that is smaller than the given operand.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">next_plus</span></code></p></td>
+<td><p>Return the smallest number representable in the given context (or in the current default context if no context is given) that is larger than the given operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">next_toward</span></code></p></td>
+<td><p>If the two operands are unequal, return the number closest to the first operand in the direction of the second operand.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></p></td>
+<td><p>Normalize the number by stripping the rightmost trailing zeros and converting any result equal to Decimal(‘0’) to Decimal(‘0e0’).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">number_class</span></code></p></td>
+<td><p>Return a string describing the class of the operand.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantize</span></code></p></td>
+<td><p>Return a value equal to the first operand after rounding and having the exponent of the second operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">radix</span></code></p></td>
+<td><p>Return Decimal(10), the radix (base) in which the Decimal class does all its arithmetic.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remainder_near</span></code></p></td>
+<td><p>Return the remainder from dividing self by other.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate</span></code></p></td>
+<td><p>Return the result of rotating the digits of the first operand by an amount specified by the second operand.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">same_quantum</span></code></p></td>
+<td><p>Test whether self and other have the same exponent or whether both are NaN.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaleb</span></code></p></td>
+<td><p>Return the first operand with the exponent adjusted the second.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift</span></code></p></td>
+<td><p>Return the result of shifting the digits of the first operand by an amount specified by the second operand.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqrt</span></code></p></td>
+<td><p>Return the square root of the argument to full precision.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_eng_string</span></code></p></td>
+<td><p>Convert to an engineering-type string.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_integral</span></code></p></td>
+<td><p>Identical to the to_integral_value() method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_integral_exact</span></code></p></td>
+<td><p>Round to the nearest integer, signaling Inexact or Rounded as appropriate if rounding occurs.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_integral_value</span></code></p></td>
+<td><p>Round to the nearest integer without signaling Inexact or Rounded.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">imag</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">original_string</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">real</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom.valuerep.DSfloat.html" class="btn btn-neutral float-right" title="pydicom.valuerep.DSfloat" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.valuerep.DS.html" class="btn btn-neutral float-left" title="pydicom.valuerep.DS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

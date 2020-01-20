@@ -1,0 +1,6 @@
+pydicom.uid.RLELossless
+=======================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RLELossless

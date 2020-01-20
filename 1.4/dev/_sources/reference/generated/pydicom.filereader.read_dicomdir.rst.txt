@@ -1,0 +1,6 @@
+pydicom.filereader.read\_dicomdir
+=================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: read_dicomdir

@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.filebase.DicomIO &mdash; pydicom 1.4.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="IO Utilities (pydicom.fileutil)" href="../fileio.util.html" />
+    <link rel="prev" title="pydicom.filebase.DicomFileLike" href="pydicom.filebase.DicomFileLike.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filebase.DicomBytesIO.html">pydicom.filebase.DicomBytesIO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filebase.DicomFile.html">pydicom.filebase.DicomFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.filebase.DicomFileLike.html">pydicom.filebase.DicomFileLike</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.filebase.DicomIO</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../fileio.html">Dataset IO</a> &raquo;</li>
+        
+          <li><a href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.filebase.DicomIO</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-filebase-dicomio">
+<h1>pydicom.filebase.DicomIO<a class="headerlink" href="#pydicom-filebase-dicomio" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pydicom.filebase.DicomIO">
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.filebase.</code><code class="sig-name descname">DicomIO</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L12"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>File object which holds transfer syntax info and anything else we need.</p>
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L22"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.__init__" title="pydicom.filebase.DicomIO.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read" title="pydicom.filebase.DicomIO.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>([length, need_exact_length])</p></td>
+<td><p>Reads the required length, returns EOFError if gets less</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_beUL" title="pydicom.filebase.DicomIO.read_beUL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_beUL</span></code></a>()</p></td>
+<td><p>Return an unsigned long read with big endian byte order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_beUS" title="pydicom.filebase.DicomIO.read_beUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_beUS</span></code></a>()</p></td>
+<td><p>Return an unsigned short from the file with big endian byte order</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_be_tag" title="pydicom.filebase.DicomIO.read_be_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_be_tag</span></code></a>()</p></td>
+<td><p>Read and return two unsigned shorts (big endian) from the file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_leUL" title="pydicom.filebase.DicomIO.read_leUL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_leUL</span></code></a>()</p></td>
+<td><p>Return an unsigned long read with little endian byte order</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_leUS" title="pydicom.filebase.DicomIO.read_leUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_leUS</span></code></a>()</p></td>
+<td><p>Return an unsigned short from the file with little endian byte order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.read_le_tag" title="pydicom.filebase.DicomIO.read_le_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_le_tag</span></code></a>()</p></td>
+<td><p>Read and return two unsigned shorts (little endian) from the file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_UL" title="pydicom.filebase.DicomIO.write_UL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_UL</span></code></a>(val)</p></td>
+<td><p>Write an unsigned long with little endian byte order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_US" title="pydicom.filebase.DicomIO.write_US"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_US</span></code></a>(val)</p></td>
+<td><p>Write an unsigned short with little endian byte order</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_beUL" title="pydicom.filebase.DicomIO.write_beUL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_beUL</span></code></a>(val)</p></td>
+<td><p>Write an unsigned long with big endian byte order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_beUS" title="pydicom.filebase.DicomIO.write_beUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_beUS</span></code></a>(val)</p></td>
+<td><p>Write an unsigned short with big endian byte order</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_leUL" title="pydicom.filebase.DicomIO.write_leUL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_leUL</span></code></a>(val)</p></td>
+<td><p>Write an unsigned long with little endian byte order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_leUS" title="pydicom.filebase.DicomIO.write_leUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_leUS</span></code></a>(val)</p></td>
+<td><p>Write an unsigned short with little endian byte order</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.filebase.DicomIO.write_tag" title="pydicom.filebase.DicomIO.write_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_tag</span></code></a>(tag)</p></td>
+<td><p>Write a dicom tag (two unsigned shorts) to the file.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defer_size</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_implicit_VR</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_read_attempts</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read">
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param">length=None</em>, <em class="sig-param">need_exact_length=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L58"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the required length, returns EOFError if gets less</p>
+<p>If length is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then read all bytes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_beUL">
+<code class="sig-name descname">read_beUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L103"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an unsigned long read with big endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_beUS">
+<code class="sig-name descname">read_beUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L50"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an unsigned short from the file with big endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_be_tag">
+<code class="sig-name descname">read_be_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L32"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_be_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read and return two unsigned shorts (big endian) from the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_leUL">
+<code class="sig-name descname">read_leUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an unsigned long read with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_leUS">
+<code class="sig-name descname">read_leUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L45"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an unsigned short from the file with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.read_le_tag">
+<code class="sig-name descname">read_le_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L26"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_le_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read and return two unsigned shorts (little endian) from the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_UL">
+<code class="sig-name descname">write_UL</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_UL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned long with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_US">
+<code class="sig-name descname">write_US</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_US" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned short with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_beUL">
+<code class="sig-name descname">write_beUL</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L96"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned long with big endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_beUS">
+<code class="sig-name descname">write_beUS</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned short with big endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_leUL">
+<code class="sig-name descname">write_leUL</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned long with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_leUS">
+<code class="sig-name descname">write_leUS</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an unsigned short with little endian byte order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pydicom.filebase.DicomIO.write_tag">
+<code class="sig-name descname">write_tag</code><span class="sig-paren">(</span><em class="sig-param">tag</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/84a11fde/pydicom/filebase.py#L37"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a dicom tag (two unsigned shorts) to the file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../fileio.util.html" class="btn btn-neutral float-right" title="IO Utilities (pydicom.fileutil)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.filebase.DicomFileLike.html" class="btn btn-neutral float-left" title="pydicom.filebase.DicomFileLike" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

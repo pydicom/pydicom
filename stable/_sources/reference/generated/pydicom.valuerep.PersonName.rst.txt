@@ -1,0 +1,66 @@
+pydicom.valuerep.PersonName
+===========================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: PersonName
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PersonName.__init__
+      ~PersonName.capitalize
+      ~PersonName.center
+      ~PersonName.count
+      ~PersonName.decode
+      ~PersonName.encode
+      ~PersonName.endswith
+      ~PersonName.expandtabs
+      ~PersonName.family_comma_given
+      ~PersonName.find
+      ~PersonName.formatted
+      ~PersonName.fromhex
+      ~PersonName.hex
+      ~PersonName.index
+      ~PersonName.isalnum
+      ~PersonName.isalpha
+      ~PersonName.isascii
+      ~PersonName.isdigit
+      ~PersonName.islower
+      ~PersonName.isspace
+      ~PersonName.istitle
+      ~PersonName.isupper
+      ~PersonName.join
+      ~PersonName.ljust
+      ~PersonName.lower
+      ~PersonName.lstrip
+      ~PersonName.maketrans
+      ~PersonName.parse
+      ~PersonName.partition
+      ~PersonName.replace
+      ~PersonName.rfind
+      ~PersonName.rindex
+      ~PersonName.rjust
+      ~PersonName.rpartition
+      ~PersonName.rsplit
+      ~PersonName.rstrip
+      ~PersonName.split
+      ~PersonName.splitlines
+      ~PersonName.startswith
+      ~PersonName.strip
+      ~PersonName.swapcase
+      ~PersonName.title
+      ~PersonName.translate
+      ~PersonName.upper
+      ~PersonName.zfill
+   
+   
+
+   
+   
+   

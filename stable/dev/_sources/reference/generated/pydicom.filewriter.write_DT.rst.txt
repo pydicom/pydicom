@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_DT
+============================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_DT

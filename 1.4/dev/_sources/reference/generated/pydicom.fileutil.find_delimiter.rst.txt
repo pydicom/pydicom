@@ -1,0 +1,6 @@
+pydicom.fileutil.find\_delimiter
+================================
+
+.. currentmodule:: pydicom.fileutil
+
+.. autofunction:: find_delimiter

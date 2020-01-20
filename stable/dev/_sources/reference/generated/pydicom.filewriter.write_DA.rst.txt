@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_DA
+============================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_DA

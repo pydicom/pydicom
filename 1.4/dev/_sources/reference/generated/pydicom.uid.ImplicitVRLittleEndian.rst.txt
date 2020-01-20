@@ -1,0 +1,6 @@
+pydicom.uid.ImplicitVRLittleEndian
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ImplicitVRLittleEndian

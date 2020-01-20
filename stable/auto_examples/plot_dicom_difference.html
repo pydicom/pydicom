@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Analyse differences between DICOM files &mdash; pydicom 1.3.0 documentation</title>
+  <title>Analyse differences between DICOM files &mdash; pydicom 1.4.1 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                1.3.0
+                1.4.1
               </div>
             
           
@@ -93,19 +93,23 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref_guide.html">Reading and writing DICOM files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">Pydicom Complete API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Analyse differences between DICOM files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="show_charset_name.html">Display unicode person names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="memory_dataset.html">Show working with memory-based dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
 </ul>
 </li>
@@ -115,7 +119,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../release-notes.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -169,8 +175,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/auto_examples/plot_dicom_difference.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -310,13 +314,27 @@
 
 + (0010, 0040) Patient&#39;s Sex                       CS: &#39;O&#39;
 
-- (0010, 1020) Patient&#39;s Size                      DS: &#39;&#39;
++ (0010, 1002)  Other Patient IDs Sequence   2 item(s) ----
+
++    (0010, 0020) Patient ID                          LO: &#39;ABCD1234&#39;
+
++    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;
+
++    ---------
+
++    (0010, 0020) Patient ID                          LO: &#39;1234ABCD&#39;
+
++    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;
+
++    ---------
+
+- (0010, 1020) Patient&#39;s Size                      DS: None
 
 + (0010, 1010) Patient&#39;s Age                       AS: &#39;000Y&#39;
 
-- (0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0000&quot;
+- (0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0&quot;
 
-+ (0010, 1030) Patient&#39;s Weight                    DS: &quot;0.000000&quot;
++ (0010, 1030) Patient&#39;s Weight                    DS: &quot;0.0&quot;
 
 + (0010, 21b0) Additional Patient History          LT: &#39;&#39;
 
@@ -338,45 +356,45 @@
 
 - (0018, 0023) MR Acquisition Type                 CS: &#39;3D&#39;
 
-- (0018, 0050) Slice Thickness                     DS: &quot;0.8000&quot;
+- (0018, 0050) Slice Thickness                     DS: &quot;0.8&quot;
 
-+ (0018, 0050) Slice Thickness                     DS: &quot;5.000000&quot;
++ (0018, 0050) Slice Thickness                     DS: &quot;5.0&quot;
 
-- (0018, 0080) Repetition Time                     DS: &quot;4000.0000&quot;
+- (0018, 0080) Repetition Time                     DS: &quot;4000.0&quot;
 
-- (0018, 0081) Echo Time                           DS: &quot;240.0000&quot;
+- (0018, 0081) Echo Time                           DS: &quot;240.0&quot;
 
-+ (0018, 0060) KVP                                 DS: &quot;120&quot;
++ (0018, 0060) KVP                                 DS: &quot;120.0&quot;
 
-+ (0018, 0088) Spacing Between Slices              DS: &quot;5.000000&quot;
++ (0018, 0088) Spacing Between Slices              DS: &quot;5.0&quot;
 
-+ (0018, 0090) Data Collection Diameter            DS: &quot;480.000000&quot;
++ (0018, 0090) Data Collection Diameter            DS: &quot;480.0&quot;
 
-- (0018, 0083) Number of Averages                  DS: &quot;1.0000&quot;
+- (0018, 0083) Number of Averages                  DS: &quot;1.0&quot;
 
-- (0018, 0084) Imaging Frequency                   DS: &quot;63.92433900&quot;
+- (0018, 0084) Imaging Frequency                   DS: &quot;63.924339&quot;
 
 - (0018, 0085) Imaged Nucleus                      SH: &#39;H&#39;
 
 - (0018, 0086) Echo Number(s)                      IS: &quot;1&quot;
 
-- (0018, 0091) Echo Train Length                   IS: &#39;&#39;
+- (0018, 0091) Echo Train Length                   IS: None
 
 - (0018, 1000) Device Serial Number                LO: &#39;-0000200&#39;
 
-- (0018, 1020) Software Version(s)                 LO: &#39;V3.51*P25&#39;
+- (0018, 1020) Software Versions                   LO: &#39;V3.51*P25&#39;
 
-+ (0018, 1020) Software Version(s)                 LO: &#39;05&#39;
++ (0018, 1020) Software Versions                   LO: &#39;05&#39;
 
 + (0018, 1040) Contrast/Bolus Route                LO: &#39;IV&#39;
 
-+ (0018, 1100) Reconstruction Diameter             DS: &quot;338.671600&quot;
++ (0018, 1100) Reconstruction Diameter             DS: &quot;338.6716&quot;
 
 + (0018, 1110) Distance Source to Detector         DS: &quot;1099.3100585938&quot;
 
-+ (0018, 1111) Distance Source to Patient          DS: &quot;630.000000&quot;
++ (0018, 1111) Distance Source to Patient          DS: &quot;630.0&quot;
 
-+ (0018, 1120) Gantry/Detector Tilt                DS: &quot;0.000000&quot;
++ (0018, 1120) Gantry/Detector Tilt                DS: &quot;0.0&quot;
 
 + (0018, 1130) Table Height                        DS: &quot;133.699997&quot;
 
@@ -384,13 +402,13 @@
 
 + (0018, 1151) X-Ray Tube Current                  IS: &quot;170&quot;
 
-- (0018, 1314) Flip Angle                          DS: &quot;90&quot;
+- (0018, 1314) Flip Angle                          DS: &quot;90.0&quot;
 
 + (0018, 1152) Exposure                            IS: &quot;170&quot;
 
 + (0018, 1160) Filter Type                         SH: &#39;LARGE BOWTIE FIL&#39;
 
-+ (0018, 1190) Focal Spot(s)                       DS: &quot;0.700000&quot;
++ (0018, 1190) Focal Spot(s)                       DS: &quot;0.7&quot;
 
 + (0018, 1210) Convolution Kernel                  SH: &#39;STANDARD&#39;
 
@@ -402,9 +420,9 @@
 
 + (0019, 1002) [Detector Channel]                  SL: 912
 
-+ (0019, 1003) [Cell number at Theta]              DS: &quot;373.750000&quot;
++ (0019, 1003) [Cell number at Theta]              DS: &quot;373.75&quot;
 
-+ (0019, 1004) [Cell spacing]                      DS: &quot;1.016600&quot;
++ (0019, 1004) [Cell spacing]                      DS: &quot;1.0166&quot;
 
 + (0019, 100f) [Horiz. Frame of ref.]              DS: &quot;955.799988&quot;
 
@@ -422,15 +440,15 @@
 
 + (0019, 1018) [First scan ras]                    LO: &#39;S&#39;
 
-+ (0019, 1019) [First scan location]               DS: &quot;7.791870&quot;
++ (0019, 1019) [First scan location]               DS: &quot;7.79187&quot;
 
 + (0019, 101a) [Last scan ras]                     LO: &#39;I&#39;
 
 + (0019, 101b) [Last scan loc]                     DS: &quot;-320.197968&quot;
 
-+ (0019, 101e) [Display field of view]             DS: &quot;0.000000&quot;
++ (0019, 101e) [Display field of view]             DS: &quot;0.0&quot;
 
-+ (0019, 1023) [Table Speed [mm/rotation]]         DS: &quot;5.000000&quot;
++ (0019, 1023) [Table Speed [mm/rotation]]         DS: &quot;5.0&quot;
 
 + (0019, 1024) [Mid Scan Time [sec]]               DS: &quot;17.784578&quot;
 
@@ -438,7 +456,7 @@
 
 + (0019, 1026) [Tube Azimuth [degree]]             SL: 0
 
-+ (0019, 1027) [Rotation Speed [msec]]             DS: &quot;1.000000&quot;
++ (0019, 1027) [Rotation Speed [msec]]             DS: &quot;1.0&quot;
 
 + (0019, 102a) [x-ray On position]                 DS: &quot;178.079926&quot;
 
@@ -448,7 +466,7 @@
 
 + (0019, 102e) [Angle of first view]               DS: &quot;-718.079956&quot;
 
-+ (0019, 102f) [Trigger frequency]                 DS: &quot;984.000000&quot;
++ (0019, 102f) [Trigger frequency]                 DS: &quot;984.0&quot;
 
 + (0019, 1039) [SFOV Type]                         SS: 16
 
@@ -460,7 +478,7 @@
 
 + (0019, 1043) [Total Segments Required]           SS: 0
 
-+ (0019, 1044) [Interscan delay]                   DS: &quot;1.000000&quot;
++ (0019, 1044) [Interscan delay]                   DS: &quot;1.0&quot;
 
 + (0019, 1047) [View compression factor]           SS: 1
 
@@ -492,25 +510,25 @@
 
 + (0019, 1071) [Set if fatq estimates were used]   SS: 0
 
-+ (0019, 1072) [Z chan avg over views]             DS: &quot;0.000000&quot;
++ (0019, 1072) [Z chan avg over views]             DS: &quot;0.0&quot;
 
-+ (0019, 1073) [Avg of left ref chans over views]  DS: &quot;0.000000&quot;
++ (0019, 1073) [Avg of left ref chans over views]  DS: &quot;0.0&quot;
 
-+ (0019, 1074) [Max left chan over views]          DS: &quot;0.000000&quot;
++ (0019, 1074) [Max left chan over views]          DS: &quot;0.0&quot;
 
-+ (0019, 1075) [Avg of right ref chans over views] DS: &quot;0.000000&quot;
++ (0019, 1075) [Avg of right ref chans over views] DS: &quot;0.0&quot;
 
-+ (0019, 1076) [Max right chan over views]         DS: &quot;0.000000&quot;
++ (0019, 1076) [Max right chan over views]         DS: &quot;0.0&quot;
 
 + (0019, 10da) [Reference channel used]            SS: 0
 
-+ (0019, 10db) [Back projector coefficient]        DS: &quot;0.000000&quot;
++ (0019, 10db) [Back projector coefficient]        DS: &quot;0.0&quot;
 
 + (0019, 10dc) [Primary speed correction used]     SS: 1
 
 + (0019, 10dd) [Overrange correction used]         SS: 1
 
-+ (0019, 10de) [Dynamic Z alpha value]             DS: &quot;0.000000&quot;
++ (0019, 10de) [Dynamic Z alpha value]             DS: &quot;0.0&quot;
 
 - (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
 
@@ -532,13 +550,13 @@
 
   (0020, 0013) Instance Number                     IS: &quot;1&quot;
 
-- (0020, 0032) Image Position (Patient)            DS: [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
+- (0020, 0032) Image Position (Patient)            DS: [-83.9063, -91.2000, 6.6406]
 
-+ (0020, 0032) Image Position (Patient)            DS: [&#39;-158.135803&#39;, &#39;-179.035797&#39;, &#39;-75.699997&#39;]
++ (0020, 0032) Image Position (Patient)            DS: [-158.135803, -179.035797, -75.699997]
 
-- (0020, 0037) Image Orientation (Patient)         DS: [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;, &#39;0.0000&#39;]
+- (0020, 0037) Image Orientation (Patient)         DS: [1.0000, 0.0000, 0.0000, 0.0000, 1.0000, 0.0000]
 
-+ (0020, 0037) Image Orientation (Patient)         DS: [&#39;1.000000&#39;, &#39;0.000000&#39;, &#39;0.000000&#39;, &#39;0.000000&#39;, &#39;1.000000&#39;, &#39;0.000000&#39;]
++ (0020, 0037) Image Orientation (Patient)         DS: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]
 
 - (0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457
 
@@ -550,7 +568,7 @@
 
 + (0020, 1040) Position Reference Indicator        LO: &#39;SN&#39;
 
-- (0020, 1041) Slice Location                      DS: &quot;0.0000&quot;
+- (0020, 1041) Slice Location                      DS: &quot;0.0&quot;
 
 + (0020, 1041) Slice Location                      DS: &quot;-77.2040634155&quot;
 
@@ -682,9 +700,9 @@
 
 + (0028, 0011) Columns                             US: 128
 
-- (0028, 0030) Pixel Spacing                       DS: [&#39;0.3125&#39;, &#39;0.3125&#39;]
+- (0028, 0030) Pixel Spacing                       DS: [0.3125, 0.3125]
 
-+ (0028, 0030) Pixel Spacing                       DS: [&#39;0.661468&#39;, &#39;0.661468&#39;]
++ (0028, 0030) Pixel Spacing                       DS: [0.661468, 0.661468]
 
   (0028, 0100) Bits Allocated                      US: 16
 
@@ -700,17 +718,17 @@
 
 + (0028, 0120) Pixel Padding Value                 SS: -2000
 
-+ (0028, 1052) Rescale Intercept                   DS: &quot;-1024&quot;
++ (0028, 1052) Rescale Intercept                   DS: &quot;-1024.0&quot;
 
-+ (0028, 1053) Rescale Slope                       DS: &quot;1&quot;
++ (0028, 1053) Rescale Slope                       DS: &quot;1.0&quot;
 
 + (0029, 0010) Private Creator                     LO: &#39;GEMS_IMPS_01&#39;
 
 + (0029, 1004) [Lower range of Pixels1]            SL: 0
 
-+ (0029, 1005) [Lower range of Pixels1]            DS: &quot;0.000000&quot;
++ (0029, 1005) [Lower range of Pixels1]            DS: &quot;0.0&quot;
 
-+ (0029, 1006) [Lower range of Pixels1]            DS: &quot;0.000000&quot;
++ (0029, 1006) [Lower range of Pixels1]            DS: &quot;0.0&quot;
 
 + (0029, 1007) [Lower range of Pixels1]            SL: 87
 
@@ -728,11 +746,11 @@
 
 + (0043, 0010) Private Creator                     LO: &#39;GEMS_PARM_01&#39;
 
-- (0028, 1050) Window Center                       DS: &quot;600&quot;
+- (0028, 1050) Window Center                       DS: &quot;600.0&quot;
 
 + (0043, 1010) [Window value]                      US: 400
 
-- (0028, 1051) Window Width                        DS: &quot;1600&quot;
+- (0028, 1051) Window Width                        DS: &quot;1600.0&quot;
 
 + (0043, 1011) [Total input views]                 US: 10431
 
@@ -746,9 +764,9 @@
 
 + (0043, 1016) [Number of overranges]              SS: 0
 
-+ (0043, 1017) [IBH image scale factors]           DS: &quot;0.095000&quot;
++ (0043, 1017) [IBH image scale factors]           DS: &quot;0.095&quot;
 
-+ (0043, 1018) [BBH coefficients]                  DS: [&#39;0.085000&#39;, &#39;1.102000&#39;, &#39;0.095000&#39;]
++ (0043, 1018) [BBH coefficients]                  DS: [0.085000, 1.102000, 0.095000]
 
 + (0043, 1019) [Number of BBH chains to blend]     SS: 350
 
@@ -760,11 +778,11 @@
 
 + (0043, 101d) [Level value]                       SS: 40
 
-+ (0043, 101e) [Delta Start Time [msec]]           DS: &quot;2.000000&quot;
++ (0043, 101e) [Delta Start Time [msec]]           DS: &quot;2.0&quot;
 
 + (0043, 101f) [Max overranges in a view]          SL: 0
 
-+ (0043, 1020) [Avg overranges all views]          DS: &quot;0.000000&quot;
++ (0043, 1020) [Avg overranges all views]          DS: &quot;0.0&quot;
 
 + (0043, 1021) [Corrected after glow terms]        SS: 0
 
@@ -782,7 +800,7 @@
 
 + (0043, 102b) [Private Scan Options]              SS: [4, 4, 0, 0]
 
-+ (0043, 1031) [Recon Center Coordinates]          DS: [&#39;-11.200000&#39;, &#39;9.700000&#39;]
++ (0043, 1031) [Recon Center Coordinates]          DS: [-11.200000, 9.700000]
 
 + (0043, 1040) [Trigger on position]               FL: 178.07992553710938
 
@@ -830,39 +848,39 @@
 <span class="kn">import</span> <span class="nn">difflib</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="View documentation for pydicom.data.get_testdata_files"><span class="n">get_testdata_files</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
-<span class="n">filename_mr</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">filename_ct</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_mr</span></a> <span class="o">=</span> <a href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="View documentation for pydicom.data.get_testdata_files"><span class="n">get_testdata_files</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_ct</span></a> <span class="o">=</span> <a href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="View documentation for pydicom.data.get_testdata_files"><span class="n">get_testdata_files</span></a><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="n">datasets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                  <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><span class="n">filename_mr</span><span class="p">,</span> <span class="n">filename_ct</span><span class="p">)])</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">datasets</span></a> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_mr</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_ct</span></a><span class="p">)])</span>
 
 <span class="c1"># difflib compare functions require a list of lines, each terminated with</span>
 <span class="c1"># newline character massage the string representation of each dicom dataset</span>
 <span class="c1"># into this form:</span>
-<span class="n">rep</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>  <span class="c1"># add the newline to end</span>
-    <span class="n">rep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">rep</span></a> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">datasets</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">lines</span></a> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">lines</span></a> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">lines</span></a><span class="p">]</span>  <span class="c1"># add the newline to end</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">rep</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">lines</span></a><span class="p">)</span>
 
 
-<span class="n">diff</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">Differ</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">diff</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">rep</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/difflib.html#difflib.Differ" title="View documentation for difflib.Differ"><span class="n">diff</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/difflib.html#difflib.Differ" title="View documentation for difflib.Differ"><span class="n">difflib</span><span class="o">.</span><span class="n">Differ</span></a><span class="p">()</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/difflib.html#difflib.Differ.compare" title="View documentation for difflib.Differ.compare"><span class="n">diff</span><span class="o">.</span><span class="n">compare</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">rep</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">rep</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.156 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.111 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/9e99a025aad8d4338c3aa70a381866e4/plot_dicom_difference.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/a3b4852d291f27302d2926716393406e/plot_dicom_difference.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/eacd609f713b88dd1b8d2803ef1d05f6/plot_dicom_difference.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dicom_difference.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../_downloads/41ba38a2ae2d88170db68a78dcabe080/plot_dicom_difference.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_dicom_difference.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

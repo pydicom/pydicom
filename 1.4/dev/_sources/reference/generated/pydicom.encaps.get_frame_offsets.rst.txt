@@ -1,0 +1,6 @@
+pydicom.encaps.get\_frame\_offsets
+==================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: get_frame_offsets

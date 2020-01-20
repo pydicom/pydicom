@@ -1,0 +1,6 @@
+pydicom.values.convert\_TM\_string
+==================================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_TM_string

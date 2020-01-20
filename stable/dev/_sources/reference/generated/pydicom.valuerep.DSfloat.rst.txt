@@ -1,0 +1,35 @@
+pydicom.valuerep.DSfloat
+========================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: DSfloat
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DSfloat.__init__
+      ~DSfloat.as_integer_ratio
+      ~DSfloat.conjugate
+      ~DSfloat.fromhex
+      ~DSfloat.hex
+      ~DSfloat.is_integer
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DSfloat.imag
+      ~DSfloat.original_string
+      ~DSfloat.real
+   
+   

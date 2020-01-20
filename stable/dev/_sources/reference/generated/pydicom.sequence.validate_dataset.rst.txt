@@ -1,0 +1,6 @@
+pydicom.sequence.validate\_dataset
+==================================
+
+.. currentmodule:: pydicom.sequence
+
+.. autofunction:: validate_dataset

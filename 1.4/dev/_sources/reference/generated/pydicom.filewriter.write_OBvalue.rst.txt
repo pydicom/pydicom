@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_OBvalue
+=================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_OBvalue

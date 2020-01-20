@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Format the output of the data set printing &mdash; pydicom 1.3.0.dev0 documentation</title>
+  <title>Format the output of the data set printing &mdash; pydicom 1.4.1 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                1.3.0.dev0
+                1.4.1
               </div>
             
           
@@ -93,13 +93,16 @@
             
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../pydicom_user_guide.html">Pydicom User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../ref_guide.html">Reading and writing DICOM files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">Pydicom Complete API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul class="current">
@@ -117,7 +120,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../release-notes.html">Release history</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
 </ul>
 
             
@@ -171,8 +176,6 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/auto_examples/input_output/plot_printing_dataset.rst.txt" rel="nofollow"> View page source</a>
-          
         
       </li>
     
@@ -218,24 +221,24 @@
  Patient ID = &#39;4MR1&#39;
  Patient&#39;s Birth Date = &#39;&#39;
  Patient&#39;s Sex = &#39;F&#39;
- Patient&#39;s Size = &#39;&#39;
- Patient&#39;s Weight = &quot;80.0000&quot;
+ Patient&#39;s Size = None
+ Patient&#39;s Weight = &quot;80.0&quot;
  Contrast/Bolus Agent = &#39;&#39;
  Scanning Sequence = &#39;SE&#39;
  Sequence Variant = &#39;NONE&#39;
  Scan Options = &#39;&#39;
  MR Acquisition Type = &#39;3D&#39;
- Slice Thickness = &quot;0.8000&quot;
- Repetition Time = &quot;4000.0000&quot;
- Echo Time = &quot;240.0000&quot;
- Number of Averages = &quot;1.0000&quot;
- Imaging Frequency = &quot;63.92433900&quot;
+ Slice Thickness = &quot;0.8&quot;
+ Repetition Time = &quot;4000.0&quot;
+ Echo Time = &quot;240.0&quot;
+ Number of Averages = &quot;1.0&quot;
+ Imaging Frequency = &quot;63.924339&quot;
  Imaged Nucleus = &#39;H&#39;
  Echo Number(s) = &quot;1&quot;
- Echo Train Length = &#39;&#39;
+ Echo Train Length = None
  Device Serial Number = &#39;-0000200&#39;
- Software Version(s) = &#39;V3.51*P25&#39;
- Flip Angle = &quot;90&quot;
+ Software Versions = &#39;V3.51*P25&#39;
+ Flip Angle = &quot;90.0&quot;
  Patient Position = &#39;HFS&#39;
  Study Instance UID = &#39;1.3.6.1.4.1.5962.1.2.4.20040826185059.5457&#39;
  Series Instance UID = &#39;1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457&#39;
@@ -243,26 +246,26 @@
  Series Number = &quot;1&quot;
  Acquisition Number = &quot;0&quot;
  Instance Number = &quot;1&quot;
- Image Position (Patient) = [&#39;-83.9063&#39;, &#39;-91.2000&#39;, &#39;6.6406&#39;]
- Image Orientation (Patient) = [&#39;1.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;0.0000&#39;, &#39;1.0000&#39;,...
+ Image Position (Patient) = [-83.9063, -91.2000, 6.6406]
+ Image Orientation (Patient) = [1.0000, 0.0000, 0.0000, 0.0000, 1.0000, 0.0000]
  Frame of Reference UID = &#39;1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457&#39;
  Laterality = &#39;&#39;
  Position Reference Indicator = &#39;&#39;
- Slice Location = &quot;0.0000&quot;
+ Slice Location = &quot;0.0&quot;
  Image Comments = &#39;Uncompressed&#39;
  Samples per Pixel = 1
  Photometric Interpretation = &#39;MONOCHROME2&#39;
  Rows = 64
  Columns = 64
- Pixel Spacing = [&#39;0.3125&#39;, &#39;0.3125&#39;]
+ Pixel Spacing = [0.3125, 0.3125]
  Bits Allocated = 16
  Bits Stored = 16
  High Bit = 15
  Pixel Representation = 1
  Smallest Image Pixel Value = 0
  Largest Image Pixel Value = 4000
- Window Center = &quot;600&quot;
- Window Width = &quot;1600&quot;
+ Window Center = &quot;600.0&quot;
+ Window Width = &quot;1600.0&quot;
 &lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;
  Data Set Trailing Padding = b&#39;\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00\x...
 </pre></div>
@@ -273,10 +276,10 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="k">import</span> <span class="n">get_testdata_files</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="View documentation for pydicom.data.get_testdata_files"><span class="n">get_testdata_files</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
@@ -295,7 +298,7 @@
         <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>   <span class="c1"># a sequence</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-                <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">myprint</span></a><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">next_indent_string</span> <span class="o">+</span> <span class="s2">&quot;---------&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">dont_print</span><span class="p">:</span>
@@ -309,19 +312,19 @@
                                                    <span class="n">repr_value</span><span class="p">))</span>
 
 
-<span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="View documentation for pydicom.data.get_testdata_files"><span class="n">get_testdata_files</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
 
-<span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">myprint</span></a><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.040 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/5e72d065ba444186bca97bca3a66e74d/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/7d5fde14cbfb9e9d3e3df4c27eff8500/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/2d703d7c09b673bc43ff1a7a53b4c9dc/plot_printing_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_printing_dataset.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/9fa22b5ea7bc00014f45bd48ae63d3ca/plot_printing_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_printing_dataset.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

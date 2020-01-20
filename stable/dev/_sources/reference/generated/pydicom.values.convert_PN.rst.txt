@@ -1,0 +1,6 @@
+pydicom.values.convert\_PN
+==========================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_PN

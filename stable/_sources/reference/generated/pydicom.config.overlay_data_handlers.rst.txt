@@ -1,0 +1,6 @@
+pydicom.config.overlay\_data\_handlers
+======================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: overlay_data_handlers

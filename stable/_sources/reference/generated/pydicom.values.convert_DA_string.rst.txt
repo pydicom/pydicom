@@ -1,0 +1,6 @@
+pydicom.values.convert\_DA\_string
+==================================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_DA_string

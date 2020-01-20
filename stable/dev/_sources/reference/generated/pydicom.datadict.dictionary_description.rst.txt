@@ -1,0 +1,6 @@
+pydicom.datadict.dictionary\_description
+========================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: dictionary_description

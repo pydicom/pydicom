@@ -1,0 +1,6 @@
+pydicom.datadict.get\_entry
+===========================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: get_entry

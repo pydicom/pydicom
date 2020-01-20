@@ -1,0 +1,6 @@
+pydicom.tag.Tag
+===============
+
+.. currentmodule:: pydicom.tag
+
+.. autofunction:: Tag

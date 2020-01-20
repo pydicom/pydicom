@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_UN
+============================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_UN

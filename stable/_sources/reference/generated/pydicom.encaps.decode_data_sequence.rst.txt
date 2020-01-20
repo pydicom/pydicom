@@ -1,0 +1,6 @@
+pydicom.encaps.decode\_data\_sequence
+=====================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: decode_data_sequence

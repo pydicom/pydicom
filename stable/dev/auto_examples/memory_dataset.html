@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Show working with memory-based dataset &mdash; pydicom 1.4.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Show a dicom file using hierarchical tree" href="dicomtree.html" />
+    <link rel="prev" title="Display unicode person names" href="show_charset_name.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_dicom_difference.html">Analyse differences between DICOM files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="show_charset_name.html">Display unicode person names</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Show working with memory-based dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">General examples</a> &raquo;</li>
+        
+      <li>Show working with memory-based dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-memory-dataset-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="show-working-with-memory-based-dataset">
+<span id="sphx-glr-auto-examples-memory-dataset-py"></span><h1>Show working with memory-based dataset<a class="headerlink" href="#show-working-with-memory-based-dataset" title="Permalink to this headline">¶</a></h1>
+<p>Show how to write a DICOM dataset into a byte array and to read
+it back from a byte array. This can be helpful for example if working with
+datasets saved as blobs in a database.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">dcmwrite</span>
+<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="View documentation for pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a>
+
+<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+
+<span class="n">usage</span> <span class="o">=</span> <span class="s2">&quot;Usage: python memory_dataset.py dicom_filename&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+    <span class="c1"># create a buffer</span>
+    <span class="k">with</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
+        <span class="c1"># create a DicomFileLike object that has some properties of DataSet</span>
+        <span class="n">memory_dataset</span> <span class="o">=</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="View documentation for pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="c1"># write the dataset to the DicomFileLike object</span>
+        <span class="n">dcmwrite</span><span class="p">(</span><span class="n">memory_dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
+        <span class="c1"># to read from the object, you have to rewind it</span>
+        <span class="n">memory_dataset</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># read the contents as bytes</span>
+        <span class="k">return</span> <span class="n">memory_dataset</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
+    <span class="c1"># you can just read the dataset from the byte array</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a><span class="p">(</span><span class="n">blob</span><span class="p">))</span>
+    <span class="c1"># do some interesting stuff</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s1">&#39;Bond^James&#39;</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s1">&#39;007&#39;</span>
+    <span class="k">return</span> <span class="n">dataset</span>
+
+
+<span class="k">class</span> <span class="nc">DummyDataBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">blob</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">blob</span>
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please supply a dicom file name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
+        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="View documentation for sys.exit"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">DummyDataBase</span><span class="p">()</span>
+
+    <span class="c1"># Convert a dataset to a byte array:</span>
+    <span class="c1"># - read the dataset from a file</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="c1"># - convert the dataset to bytes</span>
+    <span class="n">ds_bytes</span> <span class="o">=</span> <span class="n">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="c1"># - save the bytes in some storage</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="n">ds_bytes</span><span class="p">)</span>
+
+    <span class="c1"># Convert a byte array to a dataset:</span>
+    <span class="c1"># - get the bytes from storage</span>
+    <span class="n">read_bytes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;dataset&#39;</span><span class="p">)</span>
+    <span class="c1"># - convert the bytes into a dataset and do something interesting with it</span>
+    <span class="n">read_dataset</span> <span class="o">=</span> <span class="n">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">read_bytes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">read_dataset</span><span class="p">)</span>
+    <span class="c1"># - you can write your dataset to a file if wanted</span>
+    <span class="n">dcmwrite</span><span class="p">(</span><span class="n">file_path</span> <span class="o">+</span> <span class="s1">&#39;_new&#39;</span><span class="p">,</span> <span class="n">read_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-memory-dataset-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/05d71e1cbcf560951075b4ea1c14b1b7/memory_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">memory_dataset.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/db21a1451d697e3d74e5f18e170717b7/memory_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">memory_dataset.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dicomtree.html" class="btn btn-neutral float-right" title="Show a dicom file using hierarchical tree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="show_charset_name.html" class="btn btn-neutral float-left" title="Display unicode person names" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

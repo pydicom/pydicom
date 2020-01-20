@@ -1,0 +1,6 @@
+pydicom.config.enforce\_valid\_values
+=====================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: enforce_valid_values

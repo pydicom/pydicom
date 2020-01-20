@@ -1,0 +1,37 @@
+pydicom.dataelem.RawDataElement
+===============================
+
+.. currentmodule:: pydicom.dataelem
+
+.. autoclass:: RawDataElement
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RawDataElement.__init__
+      ~RawDataElement.count
+      ~RawDataElement.index
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RawDataElement.VR
+      ~RawDataElement.is_implicit_VR
+      ~RawDataElement.is_little_endian
+      ~RawDataElement.is_raw
+      ~RawDataElement.length
+      ~RawDataElement.tag
+      ~RawDataElement.value
+      ~RawDataElement.value_tell
+   
+   

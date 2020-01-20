@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_text
+==============================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_text

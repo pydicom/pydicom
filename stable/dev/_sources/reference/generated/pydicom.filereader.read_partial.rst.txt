@@ -1,0 +1,6 @@
+pydicom.filereader.read\_partial
+================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: read_partial

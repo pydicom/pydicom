@@ -1,0 +1,6 @@
+pydicom.values.convert\_DS\_string
+==================================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_DS_string

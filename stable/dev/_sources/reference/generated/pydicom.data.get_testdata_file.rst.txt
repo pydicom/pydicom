@@ -1,0 +1,6 @@
+pydicom.data.get\_testdata\_file
+================================
+
+.. currentmodule:: pydicom.data
+
+.. autofunction:: get_testdata_file

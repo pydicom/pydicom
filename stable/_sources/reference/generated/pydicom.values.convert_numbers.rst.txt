@@ -1,0 +1,6 @@
+pydicom.values.convert\_numbers
+===============================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_numbers

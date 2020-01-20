@@ -1,0 +1,6 @@
+pydicom.values.convert\_single\_string
+======================================
+
+.. currentmodule:: pydicom.values
+
+.. autofunction:: convert_single_string

@@ -1,0 +1,68 @@
+pydicom.valuerep.DT
+===================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: DT
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DT.__init__
+      ~DT.astimezone
+      ~DT.combine
+      ~DT.ctime
+      ~DT.date
+      ~DT.dst
+      ~DT.fromisocalendar
+      ~DT.fromisoformat
+      ~DT.fromordinal
+      ~DT.fromtimestamp
+      ~DT.isocalendar
+      ~DT.isoformat
+      ~DT.isoweekday
+      ~DT.now
+      ~DT.replace
+      ~DT.strftime
+      ~DT.strptime
+      ~DT.time
+      ~DT.timestamp
+      ~DT.timetuple
+      ~DT.timetz
+      ~DT.today
+      ~DT.toordinal
+      ~DT.tzname
+      ~DT.utcfromtimestamp
+      ~DT.utcnow
+      ~DT.utcoffset
+      ~DT.utctimetuple
+      ~DT.weekday
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DT.day
+      ~DT.fold
+      ~DT.hour
+      ~DT.max
+      ~DT.microsecond
+      ~DT.min
+      ~DT.minute
+      ~DT.month
+      ~DT.original_string
+      ~DT.resolution
+      ~DT.second
+      ~DT.tzinfo
+      ~DT.year
+   
+   

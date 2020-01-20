@@ -1,0 +1,6 @@
+pydicom.config.pixel\_data\_handlers
+====================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: pixel_data_handlers

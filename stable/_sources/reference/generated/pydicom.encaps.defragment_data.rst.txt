@@ -1,0 +1,6 @@
+pydicom.encaps.defragment\_data
+===============================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: defragment_data

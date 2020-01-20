@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Creating and managing virtual environments &mdash; pydicom 1.4.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataset basics: read, access, modify, write" href="dataset_basics.html" />
+    <link rel="prev" title="Tutorials" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating and managing virtual environments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-pip">Using pip</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-packages">Install packages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-new-virtual-environments">Create new virtual environments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deleting-environments">Deleting environments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activating-and-deactivating">Activating and deactivating</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#managing-packages">Managing packages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#final-steps">Final steps</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#using-conda">Using conda</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-new-virtual-environment">Create a new virtual environment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#activating-and-deactivating-environments">Activating and deactivating environments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Deleting environments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#managing-installed-packages">Managing installed packages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Final steps</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Creating and managing virtual environments</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="creating-and-managing-virtual-environments">
+<h1>Creating and managing virtual environments<a class="headerlink" href="#creating-and-managing-virtual-environments" title="Permalink to this headline">¶</a></h1>
+<p>When it comes to the management of third-party packages, Python
+has some complications:</p>
+<ul class="simple">
+<li><p>By default, every third-party package will be installed to same directory.</p></li>
+<li><p>Python is unable to differentiate between different versions of the same
+package installed to that directory</p></li>
+</ul>
+<p>This means:</p>
+<ul class="simple">
+<li><p>If you’re working on a project and you make a backwards incompatible
+change, then other projects that depend on it may be broken until you go
+through and update them all with the necessary changes.</p></li>
+<li><p>If you have two projects that depend on different version of the same
+package then it becomes impossible for both to function simultaneously.</p></li>
+</ul>
+<p>In order to deal with these problems (and others) it’s recommended that you
+work within a Python <a class="reference external" href="https://virtualenv.pypa.io">virtual environment</a>, which is an
+isolated environment with its own set of installed system and third-party
+packages. Because these are maintained separately from both the system
+installation of Python and other virtual environments we no longer have to
+worry about the issues mentioned above.</p>
+<p>In this tutorial you will:</p>
+<ul class="simple">
+<li><p>(pip only) Install a couple of packages that make using virtual environments
+easier</p></li>
+<li><p>Create new virtual environments and learn how to delete them</p></li>
+<li><p>Learn how to activate, deactivate and switch between environments</p></li>
+<li><p>Learn how to manage packages in a virtual environment</p></li>
+</ul>
+<p>By the end of the tutorial you should have a fully functioning virtual
+environment ready for installing <em>pydicom</em>.</p>
+<p>If you’re using pip as your package manager then continue reading. If you’re
+using conda then <a class="reference internal" href="#tut-venv-conda"><span class="std std-ref">start here</span></a></p>
+<div class="section" id="using-pip">
+<span id="tut-venv-pip"></span><h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install-packages">
+<h3>Install packages<a class="headerlink" href="#install-packages" title="Permalink to this headline">¶</a></h3>
+<p>First up, we’re going to install a couple of packages that make managing
+virtual environments a lot easier:
+<a class="reference external" href="https://pypi.org/project/virtualenv/">virtualenv</a> and
+<a class="reference external" href="https://pypi.org/project/virtualenvwrapper/">virtualenvwrapper</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install virtualenv virtualenvwrapper
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-new-virtual-environments">
+<h3>Create new virtual environments<a class="headerlink" href="#create-new-virtual-environments" title="Permalink to this headline">¶</a></h3>
+<p>To create a new environment run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv test-env
+</pre></div>
+</div>
+<p>This should produce output similar to the following:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Using base prefix &#39;/usr/local&#39;
+New python executable in /home/user/env/test-env/bin/python3.5
+Also creating executable in /home/user/env/test-env/bin/python
+Installing setuptools, pip, wheel...done.
+virtualenvwrapper.user_scripts creating /home/user/env/test-env/bin/predeactivate
+virtualenvwrapper.user_scripts creating /home/user/env/test-env/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /home/user/env/test-env/bin/preactivate
+virtualenvwrapper.user_scripts creating /home/user/env/test-env/bin/postactivate
+virtualenvwrapper.user_scripts creating /home/user/env/test-env/bin/get_env_details
+</pre></div>
+</div>
+<p>The output includes the location where the new environment will
+be created, in this case at <code class="docutils literal notranslate"><span class="pre">/home/user/env/test-env</span></code>. By default, new
+environments will be created in the location specified by the <code class="docutils literal notranslate"><span class="pre">WORKON_HOME</span></code>
+environmental variable.</p>
+<p>After creation, the new environment will be activated and ready to use, as
+shown by the <code class="docutils literal notranslate"><span class="pre">(test-env)</span></code> before the prompt:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(test-env) $
+</pre></div>
+</div>
+<p>By default, a new virtual environment will be creating using the version of
+Python you get from running the system’s (not the virtual environment’s)
+<code class="docutils literal notranslate"><span class="pre">python</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python --version  # system Python
+Python 2.7.17
+$ mkvirtualenv default-env  # environment Python
+(default-env) $ python --version
+Python 2.7.17
+</pre></div>
+</div>
+<p>You can use a different version of Python (as long as one’s installed)
+by passing the <code class="docutils literal notranslate"><span class="pre">-p</span> <span class="pre">path</span></code> option, where <code class="docutils literal notranslate"><span class="pre">path</span></code> is the path to a Python
+executable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv -p /usr/bin/python3.7 py37-env
+(py37-env) $ python --version
+Python 3.7.5
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-environments">
+<h3>Deleting environments<a class="headerlink" href="#deleting-environments" title="Permalink to this headline">¶</a></h3>
+<p>Environments can be deleted from the <code class="docutils literal notranslate"><span class="pre">WORKON_HOME</span></code> directory by using
+<code class="docutils literal notranslate"><span class="pre">rmvirtualenv</span> <span class="pre">[env</span> <span class="pre">name]</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ rmvirtualenv default-env
+</pre></div>
+</div>
+<p>However environments must be deactivated first:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>(py37-env) $ rmvirtualenv py37-env
+Removing py37-env...
+ERROR: You cannot remove the active environment (&#39;py37-env&#39;).
+Either switch to another environment, or run &#39;deactivate&#39;.
+</pre></div>
+</div>
+</div>
+<div class="section" id="activating-and-deactivating">
+<h3>Activating and deactivating<a class="headerlink" href="#activating-and-deactivating" title="Permalink to this headline">¶</a></h3>
+<p>Environments can be deactivated with the <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> command, which will
+return you to the system:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ deactivate
+$ python --version
+Python 2.7.17
+</pre></div>
+</div>
+<p>And activated with the <code class="docutils literal notranslate"><span class="pre">workon</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ workon test-env
+(test-env) $
+</pre></div>
+</div>
+<p>You can switch between environments without needing to deactivate them first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(test-env) $ workon py37-env
+(py37-env) $
+</pre></div>
+</div>
+</div>
+<div class="section" id="managing-packages">
+<h3>Managing packages<a class="headerlink" href="#managing-packages" title="Permalink to this headline">¶</a></h3>
+<p>Packages within the environment can be managed normally, just remember to
+activate the environment first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ pip install antigravity
+(py37-env) $ pip uninstall antigravity
+</pre></div>
+</div>
+<p>And given it’s one of the reasons we’re using virtual environments, it’s
+not surprising that different environments can have different versions of the
+same package installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ mkvirtualenv old
+(old) $ pip install pydicom==1.2
+(old) $ python -c &quot;import pydicom; print(pydicom.__version__)&quot;
+1.2.0
+(old) $ mkvirtualenv current
+(current) $ pip install pydicom
+(current) $ python -c &quot;import pydicom; print(pydicom.__version__)&quot;
+1.4.0
+</pre></div>
+</div>
+</div>
+<div class="section" id="final-steps">
+<h3>Final steps<a class="headerlink" href="#final-steps" title="Permalink to this headline">¶</a></h3>
+<p>Let’s clean up the environments we created. First we’ll take a look to
+see what environments are available, then we’ll delete them all:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(current) $ deactivate
+$ lsvirtualenv -b
+current
+old
+py37-env
+test-env
+$ rmvirtualenv current
+$ rmvirtualenv old
+$ rmvirtualenv py37-env
+$ rmvirtualenv test-env
+</pre></div>
+</div>
+<p>And finally, let’s create a fresh virtual environment ready for installing
+<em>pydicom</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv pydicom
+(pydicom) $
+</pre></div>
+</div>
+<p>If you want more information on using the <code class="docutils literal notranslate"><span class="pre">virtualenvwrapper</span></code> package, take a
+look at the <a class="reference external" href="https://virtualenvwrapper.readthedocs.io/en/latest/command_ref.html">command reference</a>.</p>
+<p>If you’re using Python 3.3 or higher you may also be interested in the Python
+<a class="reference external" href="https://docs.python.org/3/library/venv.html">venv</a> module which also allows
+the creation virtual environments, but without the need for extra packages.</p>
+</div>
+</div>
+<div class="section" id="using-conda">
+<span id="tut-venv-conda"></span><h2>Using conda<a class="headerlink" href="#using-conda" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="create-a-new-virtual-environment">
+<h3>Create a new virtual environment<a class="headerlink" href="#create-a-new-virtual-environment" title="Permalink to this headline">¶</a></h3>
+<p>To create a new virtual environment we use the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span></code> command with
+the <code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">[env</span> <span class="pre">name]</span></code> flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n test-env
+</pre></div>
+</div>
+<p>When asked if you want to proceed, enter <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
+<p>This creates a new environment <code class="docutils literal notranslate"><span class="pre">test-env</span></code> in <code class="docutils literal notranslate"><span class="pre">[path/to/conda]/envs/</span></code> with
+the default version of Python used by the system. To use Python
+version <code class="docutils literal notranslate"><span class="pre">X.Y</span></code>, you can use the <code class="docutils literal notranslate"><span class="pre">python=X.Y</span></code> option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n py37-env python=3.7
+</pre></div>
+</div>
+</div>
+<div class="section" id="activating-and-deactivating-environments">
+<h3>Activating and deactivating environments<a class="headerlink" href="#activating-and-deactivating-environments" title="Permalink to this headline">¶</a></h3>
+<p>Environments must be activated before they can be used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate py37-env
+(py37-env) $ python --version
+Python 3.7.5
+(py37-env) $ conda activate test-env
+(test-env) $
+</pre></div>
+</div>
+<p>Deactivating the environment will return you to the previous environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(test-env) $ conda deactivate
+(py37-env) $
+</pre></div>
+</div>
+<p>To return to the base conda environment it’s recommended you just use <code class="docutils literal notranslate"><span class="pre">conda</span>
+<span class="pre">activate</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py35-env) $ conda activate
+$
+</pre></div>
+</div>
+<p>You can switch between environments without needing to deactivate them first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate test-env
+(test-env) $ conda activate py37-env
+(py37-env) $
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Deleting environments<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Environments can be deleted with the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">remove</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda remove -n test-env --all
+</pre></div>
+</div>
+<p>However environments must be deactivate first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ conda remove -n py37-env --all
+CondaEnvironmentError: cannot remove current environment. deactivate and run conda remove again
+</pre></div>
+</div>
+</div>
+<div class="section" id="managing-installed-packages">
+<h3>Managing installed packages<a class="headerlink" href="#managing-installed-packages" title="Permalink to this headline">¶</a></h3>
+<p>Packages within the environment can be managed normally, just remember to
+activate the environment first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ pip install antigravity
+(py37-env) $ pip uninstall antigravity
+(py37-env) $ conda install numpy
+(py37-env) $ conda uninstall numpy
+</pre></div>
+</div>
+<p>Different virtual environments can have different versions of the same package
+installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ conda create -n old &amp;&amp; conda activate old
+(old) $ pip install pydicom==1.2
+(old) $ python -c &quot;import pydicom; print(pydicom.__version__)&quot;
+1.2.0
+(old) $ conda create -n current &amp;&amp; conda activate current
+(current) $ pip install pydicom==1.4
+(current) $ python -c &quot;import pydicom; print(pydicom.__version__)&quot;
+1.4.0
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>Final steps<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Let’s clean up the environments we created. First we’ll take a look to
+see what environments are available, then we’ll delete them all:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(current) $ conda activate
+$ conda env list
+# conda environments:
+#
+base               *  /home/user/conda
+current               /home/user/conda/envs/current
+old                   /home/user/conda/envs/old
+py37-env              /home/user/conda/envs/py37-env
+$ conda remove -n current --all
+$ conda remove -n old --all
+$ conda remove -n py37-env --all
+</pre></div>
+</div>
+<p>And finally, let’s create a fresh virtual environment ready for installing
+<em>pydicom</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n pydicom
+$ conda activate pydicom
+(pydicom) $
+</pre></div>
+</div>
+<p>If you want more information on using virtual environments in conda, take a
+look at <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">managing conda environments</a>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataset_basics.html" class="btn btn-neutral float-right" title="Dataset basics: read, access, modify, write" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

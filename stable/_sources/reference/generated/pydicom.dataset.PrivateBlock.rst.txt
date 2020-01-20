@@ -1,0 +1,24 @@
+pydicom.dataset.PrivateBlock
+============================
+
+.. currentmodule:: pydicom.dataset
+
+.. autoclass:: PrivateBlock
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PrivateBlock.__init__
+      ~PrivateBlock.add_new
+      ~PrivateBlock.get_tag
+   
+   
+
+   
+   
+   

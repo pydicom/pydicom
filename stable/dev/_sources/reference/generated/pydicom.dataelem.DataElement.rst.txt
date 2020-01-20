@@ -1,0 +1,44 @@
+pydicom.dataelem.DataElement
+============================
+
+.. currentmodule:: pydicom.dataelem
+
+.. autoclass:: DataElement
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DataElement.__init__
+      ~DataElement.clear
+      ~DataElement.description
+      ~DataElement.from_json
+      ~DataElement.to_json
+      ~DataElement.to_json_dict
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DataElement.VM
+      ~DataElement.descripWidth
+      ~DataElement.empty_value
+      ~DataElement.is_empty
+      ~DataElement.is_raw
+      ~DataElement.is_retired
+      ~DataElement.keyword
+      ~DataElement.maxBytesToDisplay
+      ~DataElement.name
+      ~DataElement.repval
+      ~DataElement.showVR
+      ~DataElement.value
+   
+   

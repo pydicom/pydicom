@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Contributing a source code change &mdash; pydicom 1.4.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing a documentation change" href="contributing_docs.html" />
+    <link rel="prev" title="Introduction to JSON support" href="dicom_json.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.4.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Contributing a source code change</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#download-the-current-source-code">Download the current source code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-install-required-libraries">(Optional) Install required libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-pytest-and-run-the-test-suite">Install pytest and run the test suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-new-branch">Create a new branch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-tests-for-your-changes">Write tests for your changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#make-a-code-change-and-document-it">Make a code change and document it</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#preview-your-changes">Preview your changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#commit-your-changes-and-make-a-pull-request">Commit your changes and make a pull request</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-happens-next">What happens next?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Contributing a source code change</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contributing-a-source-code-change">
+<h1>Contributing a source code change<a class="headerlink" href="#contributing-a-source-code-change" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial will take you through the process of:</p>
+<ul class="simple">
+<li><p>Downloading the current source code</p></li>
+<li><p>Installing required libraries (if any)</p></li>
+<li><p>Running the test suite</p></li>
+<li><p>Creating a new git branch</p></li>
+<li><p>Making a change and documenting it</p></li>
+<li><p>Previewing your changes</p></li>
+<li><p>Committing the changes and making a pull request</p></li>
+</ul>
+<div class="section" id="download-the-current-source-code">
+<h2>Download the current source code<a class="headerlink" href="#download-the-current-source-code" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and
+<a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
+<li><p>Install <a class="reference external" href="https://git-scm.com/downloads">Git</a>. If you’re new to Git,
+the Django project has a good introduction on <a class="reference external" href="https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/">working with Git and GitHub</a>.
+You can also take a look at the <a class="reference external" href="https://guides.github.com/introduction/flow/">GitHub branch-based workflow</a></p></li>
+<li><p>Using the command line, <code class="docutils literal notranslate"><span class="pre">cd</span></code> to the directory where you want your
+local copy of <em>pydicom</em> to live. The source code can then be downloaded
+using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YourUsername/pydicom.git
+</pre></div>
+</div>
+</li>
+<li><p>(Optional) We recommend that you install your development copy of <em>pydicom</em>
+in a virtual environment as this allows you to test different combinations
+of Python and installed packages. See the
+<a class="reference internal" href="virtualenvs.html"><span class="doc">virtual environments</span></a> tutorial for more information.</p>
+<p>Create a new virtualenv <code class="docutils literal notranslate"><span class="pre">pydX.Y</span></code>, where <code class="docutils literal notranslate"><span class="pre">X.Y</span></code> is an installed Python
+version such as 3.7 and <code class="docutils literal notranslate"><span class="pre">/path/to/pythonX.Y</span></code> is the path to the
+corresponding Python executable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv -p /path/to/pythonX.Y pydX.Y
+</pre></div>
+</div>
+</li>
+<li><p>Install the cloned copy of <em>pydicom</em> (<code class="docutils literal notranslate"><span class="pre">-e</span></code> for editable mode):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e pydicom/
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="optional-install-required-libraries">
+<h2>(Optional) Install required libraries<a class="headerlink" href="#optional-install-required-libraries" title="Permalink to this headline">¶</a></h2>
+<p>If you’re making changes to one of the pixel data handlers you’ll need to
+install <a class="reference external" href="https://numpy.org/">NumPy</a> as well as the library the handler is
+based on.</p>
+<p>For example, if you’re working on the
+<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.pillow_handler.html#module-pydicom.pixel_data_handlers.pillow_handler" title="pydicom.pixel_data_handlers.pillow_handler"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pillow_handler</span></code></a>
+you’ll also need to install <a class="reference external" href="https://pillow.readthedocs.io/">Pillow</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install numpy pillow
+</pre></div>
+</div>
+<p>See the <a class="reference internal" href="installation.html"><span class="doc">installation page</span></a> for details on installing
+the optional libraries.</p>
+</div>
+<div class="section" id="install-pytest-and-run-the-test-suite">
+<h2>Install pytest and run the test suite<a class="headerlink" href="#install-pytest-and-run-the-test-suite" title="Permalink to this headline">¶</a></h2>
+<p>When making changes to <em>pydicom</em> it’s important that your changes don’t
+accidentally introduce bugs into other areas of the code. In order to
+check that everything still works afterwards, you should run our test suite,
+which is based on <a class="reference external" href="https://docs.pytest.org/">pytest</a>.</p>
+<p>Install and run pytest:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install pytest
+$ cd pydicom/pydicom/tests
+$ pytest
+</pre></div>
+</div>
+<p>While the tests are running you’ll see a filename followed by a stream of
+characters that represent the result of each test. A dot means the test
+passed, <strong>F</strong> indicates a failure, <strong>E</strong> that an error occurred during
+the test, <strong>s</strong> that the test was skipped (usually due to a missing
+optional library) and <strong>x</strong> that the test failed as expected.</p>
+<p>Once the tests are complete you should get a short summary of the results.
+At this stage the entire test suite <em>should</em> pass. If you get any failures
+or errors you should check the
+<a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
+relevant issues or create a new one if there are none.</p>
+</div>
+<div class="section" id="create-a-new-branch">
+<h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h2>
+<p>Create a new branch <code class="docutils literal notranslate"><span class="pre">new-uid</span></code> for your changes (you can choose any name
+that you want instead). Any changes made in this branch will be specific to
+it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) of the code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b new-uid
+</pre></div>
+</div>
+</div>
+<div class="section" id="write-tests-for-your-changes">
+<h2>Write tests for your changes<a class="headerlink" href="#write-tests-for-your-changes" title="Permalink to this headline">¶</a></h2>
+<p>If a change is to be accepted into <em>pydicom</em> it usually has to include tests.
+For bug fixes you should write a regression test that reproduces the bug.
+For new features you’ll need to include tests that ensure the features
+work as intended.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’ve never had to write tests before they can seem pretty daunting,
+especially if you’re also learning how to use pytest from scratch. You may
+find the following resources useful:</p>
+<ul class="simple">
+<li><p>Take a look at the
+<a class="reference external" href="https://github.com/pydicom/pydicom/tree/master/pydicom/tests">existing pydicom test suite</a>
+and see how the tests are written. There are examples for writing
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137">a single test</a>,
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27">a group of related tests</a>,
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_handler_util.py#L834">testing for exceptions</a>,
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_config.py#L28">capturing log output</a>,
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_pillow_pixel_data.py#L452">testing for warnings</a>,
+and running
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L215">parametrized tests</a>.</p></li>
+<li><p>Dive Into Python has a very nice <a class="reference external" href="https://diveinto.org/python3/unit-testing.html">section on unit testing</a> (however it uses
+<code class="docutils literal notranslate"><span class="pre">unittest</span></code> instead of pytest).</p></li>
+<li><p>The <a class="reference external" href="https://docs.pytest.org/en/latest/example/index.html">pytest documentation</a>
+may also be helpful</p></li>
+</ul>
+<p>If you’re still having trouble writing a test for something, once
+you’ve created a pull request (to be discussed a bit later) add a comment
+asking for help.</p>
+</div>
+<p>Let’s say we wanted to add a new <a class="reference external" href="https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids">pre-defined UID</a>
+to <em>pydicom</em> with a value of <code class="docutils literal notranslate"><span class="pre">1.2.3.4.500</span></code>. We’d first add a new test at the
+bottom of <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py">test_uid.py</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
+    <span class="k">assert</span> <span class="s1">&#39;1.2.3.4.500&#39;</span> <span class="o">==</span> <span class="n">NewDefinedUID</span>
+</pre></div>
+</div>
+<p>Since we haven’t made any modification to the actual source code, when we
+run the tests we should get a failure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest test_uid.py
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span> <span class="nf">test_new_uid</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Test uid.NewDefinedUID.&quot;&quot;&quot;</span>
+<span class="o">&gt;</span>       <span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">NewDefinedUID</span>
+<span class="n">E</span>       <span class="ne">ImportError</span><span class="p">:</span> <span class="n">cannot</span> <span class="kn">import</span> <span class="nn">name</span> <span class="s1">&#39;NewDefinedUID&#39;</span>
+
+<span class="n">test_uid</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">380</span><span class="p">:</span> <span class="ne">ImportError</span>
+</pre></div>
+</div>
+<p>If all the tests passed then make sure you’ve added the test to the correct
+file and that the test itself is written correctly.</p>
+</div>
+<div class="section" id="make-a-code-change-and-document-it">
+<h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Permalink to this headline">¶</a></h2>
+<p>Next we’ll make changes to the actual source code. Open
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in
+a text editor and around
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
+make the following changes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RLELossless</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.5&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;1.2.840.10008.1.2.5&quot;&quot;&quot;</span>
+<span class="c1"># **Add this**</span>
+<span class="n">NewDefinedUID</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.3.4.500&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;1.2.3.4.500&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>The line <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;1.2.3.4.500&quot;&quot;&quot;</span></code> is the <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">docstring</a> for our new UID. In order for
+it to be included in the API reference documentation we’ll also need to update
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/doc/reference/uid.rst">uid.rst</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">JPEG2000MultiComponentLossless</span>
+<span class="n">JPEG2000MultiComponent</span>
+<span class="n">RLELossless</span>
+<span class="n">NewDefinedUID</span>
+</pre></div>
+</div>
+<p>When making changes, and especially when adding new features, it’s important
+that they’re documented. It’s very difficult for users to find and
+understand how to use code that hasn’t been documented, or whose documentation
+contains errors. For more information on how to properly document <em>pydicom</em>
+see <a class="reference internal" href="../guides/writing_documentation.html"><span class="doc">writing documentation</span></a>.</p>
+<p>Now we run the tests again so we can see whether or not the code we added is
+working:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest test_uid.py
+</pre></div>
+</div>
+<p>Everything should pass. If it doesn’t, make sure you’ve correctly added the
+new UID. Once you’re happy that the tests in <code class="docutils literal notranslate"><span class="pre">test_uid.py</span></code> are working you
+should make sure the entire test suite passes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
+</pre></div>
+</div>
+</div>
+<div class="section" id="preview-your-changes">
+<h2>Preview your changes<a class="headerlink" href="#preview-your-changes" title="Permalink to this headline">¶</a></h2>
+<p>It’s a good idea to go through all the changes you’ve made by first staging
+and then displaying the difference between the current copy and the initial
+version we first checked out with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add --all
+$ git diff --cached
+</pre></div>
+</div>
+<p>You can scroll through the output using the up and down keys and quit with
+<strong>q</strong>. Lines with a <strong>-</strong> in front will be removed and lines with a <strong>+</strong>
+added. If everything looks good then it’s time to commit the changes.</p>
+</div>
+<div class="section" id="commit-your-changes-and-make-a-pull-request">
+<h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<p>To commit the changes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit
+</pre></div>
+</div>
+<p>This will open a text editor so you can add the commit message. Alternatively,
+if you only want a short commit message you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -m &quot;Add NewDefinedUID&quot;
+</pre></div>
+</div>
+<p>Which will commit with the message <em>“Add NewDefinedUID”</em>. After committing the
+patch, send it to your fork:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin new-uid
+</pre></div>
+</div>
+<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you
+should see your branch under <em>“Your recently push branches”</em>. Click <em>“Compare &amp;
+pull request”</em> and fill out the title (with a <code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e.
+<code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">NewDefinedUID</span> <span class="pre">to</span> <span class="pre">uid.py</span></code>) and follow the  instructions in the
+main entry window.</p>
+<p>To submit the pull request (PR) for real - <strong>please don’t do this for
+this example!</strong> - then on the next page you would click <em>“Create pull
+request”</em>.
+Creating the PR would automatically start our checks; that the tests pass and
+the test coverage is good, that the documentation builds OK, etc.</p>
+<p>If all the checks passed and you were happy with your changes, you’d change
+the PR title prefix to <code class="docutils literal notranslate"><span class="pre">[MRG]</span></code>. This would indicate that you considered the
+PR ready to be reviewed and merged into the main branch. You could also ask
+for a review or help at any point after creating the PR.</p>
+</div>
+<div class="section" id="what-happens-next">
+<h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this headline">¶</a></h2>
+<p>One or more reviewers would look at your pull request and may make suggestions,
+ask for clarification or request changes. Once the reviewers were happy,
+the pull request would be approved and your changes merged into the
+<code class="docutils literal notranslate"><span class="pre">master</span></code> branch where they would become part of <em>pydicom</em>.</p>
+<p>However, because this is just an example, all we’re going to do is clean up the
+changes we’ve made. First we switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
+</pre></div>
+</div>
+<p>We delete the local copy of the branch we created:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch -d new-uid
+</pre></div>
+</div>
+<p>And lastly we delete the remote copy on GitHub. Go to
+<code class="docutils literal notranslate"><span class="pre">https://github.com/YourUsername/pydicom/branches</span></code>, find the <code class="docutils literal notranslate"><span class="pre">new-uid</span></code>
+branch and click the corresponding red bin icon. All done!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributing_docs.html" class="btn btn-neutral float-right" title="Contributing a documentation change" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dicom_json.html" class="btn btn-neutral float-left" title="Introduction to JSON support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

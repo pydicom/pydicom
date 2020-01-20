@@ -1,0 +1,71 @@
+pydicom.dicomdir.DicomDir
+=========================
+
+.. currentmodule:: pydicom.dicomdir
+
+.. autoclass:: DicomDir
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DicomDir.__init__
+      ~DicomDir.add
+      ~DicomDir.add_new
+      ~DicomDir.clear
+      ~DicomDir.convert_pixel_data
+      ~DicomDir.copy
+      ~DicomDir.data_element
+      ~DicomDir.decode
+      ~DicomDir.decompress
+      ~DicomDir.dir
+      ~DicomDir.elements
+      ~DicomDir.ensure_file_meta
+      ~DicomDir.fix_meta_info
+      ~DicomDir.formatted_lines
+      ~DicomDir.from_json
+      ~DicomDir.fromkeys
+      ~DicomDir.get
+      ~DicomDir.get_item
+      ~DicomDir.get_private_item
+      ~DicomDir.group_dataset
+      ~DicomDir.items
+      ~DicomDir.iterall
+      ~DicomDir.keys
+      ~DicomDir.overlay_array
+      ~DicomDir.parse_records
+      ~DicomDir.pop
+      ~DicomDir.popitem
+      ~DicomDir.private_block
+      ~DicomDir.private_creators
+      ~DicomDir.remove_private_tags
+      ~DicomDir.save_as
+      ~DicomDir.set_original_encoding
+      ~DicomDir.setdefault
+      ~DicomDir.to_json
+      ~DicomDir.to_json_dict
+      ~DicomDir.top
+      ~DicomDir.trait_names
+      ~DicomDir.update
+      ~DicomDir.values
+      ~DicomDir.walk
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DicomDir.default_element_format
+      ~DicomDir.default_sequence_element_format
+      ~DicomDir.indent_chars
+      ~DicomDir.is_original_encoding
+      ~DicomDir.pixel_array
+   
+   
