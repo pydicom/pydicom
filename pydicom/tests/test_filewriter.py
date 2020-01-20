@@ -15,11 +15,11 @@ import pytest
 
 from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version_info__, uid
-from pydicom.data import get_testdata_files, get_charset_files
+from pydicom.data import get_testdata_file, get_charset_files
 from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import dcmread, read_dataset
+from pydicom.filereader import dcmread, read_dataset, read_file
 from pydicom.filewriter import (write_data_element, write_dataset,
                                 correct_ambiguous_vr, write_file_meta_info,
                                 correct_ambiguous_vr_element, write_numbers,
@@ -34,16 +34,16 @@ from pydicom.valuerep import DA, DT, TM
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
-rtplan_name = get_testdata_files("rtplan.dcm")[0]
-rtdose_name = get_testdata_files("rtdose.dcm")[0]
-ct_name = get_testdata_files("CT_small.dcm")[0]
-mr_name = get_testdata_files("MR_small.dcm")[0]
-mr_implicit_name = get_testdata_files("MR_small_implicit.dcm")[0]
-mr_bigendian_name = get_testdata_files("MR_small_bigendian.dcm")[0]
-jpeg_name = get_testdata_files("JPEG2000.dcm")[0]
-no_ts = get_testdata_files("meta_missing_tsyntax.dcm")[0]
-color_pl_name = get_testdata_files("color-pl.dcm")[0]
-sc_rgb_name = get_testdata_files("SC_rgb.dcm")[0]
+rtplan_name = get_testdata_file("rtplan.dcm")
+rtdose_name = get_testdata_file("rtdose.dcm")
+ct_name = get_testdata_file("CT_small.dcm")
+mr_name = get_testdata_file("MR_small.dcm")
+mr_implicit_name = get_testdata_file("MR_small_implicit.dcm")
+mr_bigendian_name = get_testdata_file("MR_small_bigendian.dcm")
+jpeg_name = get_testdata_file("JPEG2000.dcm")
+no_ts = get_testdata_file("meta_missing_tsyntax.dcm")
+color_pl_name = get_testdata_file("color-pl.dcm")
+sc_rgb_name = get_testdata_file("SC_rgb.dcm")
 datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
@@ -203,6 +203,15 @@ class TestWriteFile(object):
         ds = dcmread(self.file_out)
         # group length has been removed
         assert 0x00080000 not in ds
+
+    def test_write_empty_sequence(self):
+        """Make sure that empty sequence is correctly written."""
+        # regression test for #1030
+        ds = read_file(get_testdata_file('test-SR.dcm'))
+        ds.save_as(self.file_out)
+        self.file_out.seek(0)
+        ds = read_file(self.file_out)
+        assert ds.PerformedProcedureCodeSequence == []
 
 
 class TestScratchWriteDateTime(TestWriteFile):

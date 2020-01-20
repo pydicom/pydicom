@@ -76,7 +76,7 @@ def empty_value_for_VR(VR, raw=False):
         if it is empty.
     """
     if VR == 'SQ':
-        return []
+        return b'' if raw else []
     if config.use_none_as_empty_text_VR_value:
         return None
     if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
@@ -315,32 +315,21 @@ class DataElement(object):
             via DICOMweb WADO-RS
         bulk_data_threshold: int
             Size of base64 encoded data element above which a value will be
-            provided in form of a "BulkDataURI" rather than "InlineBinary"
+            provided in form of a "BulkDataURI" rather than "InlineBinary".
+            Ignored if no bulk data handler is given.
 
         Returns
         -------
         dict
             Mapping representing a JSON encoded data element
-
-        Raises
-        ------
-        TypeError
-            When size of encoded data element exceeds `bulk_data_threshold`
-            but `bulk_data_element_handler` is ``None`` and hence not callable
-
         """
         json_element = {'vr': self.VR, }
         if self.VR in jsonrep.BINARY_VR_VALUES:
             if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
-                if len(encoded_value) > bulk_data_threshold:
-                    if bulk_data_element_handler is None:
-                        raise TypeError(
-                            'No bulk data element handler provided to '
-                            'generate URL for value of data element "{}".'
-                            .format(self.name)
-                        )
+                if (bulk_data_element_handler is not None and
+                        len(encoded_value) > bulk_data_threshold):
                     json_element['BulkDataURI'] = bulk_data_element_handler(
                         self
                     )
@@ -398,7 +387,7 @@ class DataElement(object):
             )
         return json_element
 
-    def to_json(self, bulk_data_threshold=1, bulk_data_element_handler=None,
+    def to_json(self, bulk_data_threshold=1024, bulk_data_element_handler=None,
                 dump_handler=None):
         """Return a JSON representation of the :class:`DataElement`.
 
@@ -412,7 +401,8 @@ class DataElement(object):
             via DICOMweb WADO-RS
         bulk_data_threshold: int
             Size of base64 encoded data element above which a value will be
-            provided in form of a "BulkDataURI" rather than "InlineBinary"
+            provided in form of a "BulkDataURI" rather than "InlineBinary".
+            Ignored if no bulk data handler is given.
         dump_handler : callable, optional
             Callable function that accepts a :class:`dict` and returns the
             serialized (dumped) JSON string (by default uses
@@ -422,12 +412,6 @@ class DataElement(object):
         -------
         dict
             Mapping representing a JSON encoded data element
-
-        Raises
-        ------
-        TypeError
-            When size of encoded data element exceeds `bulk_data_threshold`
-            but `bulk_data_element_handler` is ``None`` and hence not callable
 
         See also
         --------
