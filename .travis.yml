@@ -11,17 +11,8 @@ cache:
 
 matrix:
   include:
-    - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="pypy" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="pypy" PYTHON_VERSION="3.5" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
-
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=true
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=false GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
 
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.5" NUMPY=true  PILLOW=false JPEG_LS=false GDCM=false
@@ -52,11 +43,7 @@ matrix:
     - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=false
 #    - env: DISTRIB="conda" PYTHON_VERSION="3.8" NUMPY=true  PILLOW=both JPEG_LS=true  GDCM=true
 
-    - env: DISTRIB="conda" PYTHON_VERSION="2.7" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
     - env: DISTRIB="conda" PYTHON_VERSION="3.7.3" NUMPY=true  PILLOW=jpeg JPEG_LS=false GDCM=false
-
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=false PILLOW=false JPEG_LS=false GDCM=false
-    - env: DISTRIB="ubuntu" PYTHON_VERSION="2.7" NUMPY=true PILLOW=false JPEG_LS=false GDCM=false
 
 install: source build_tools/travis/install.sh
 
