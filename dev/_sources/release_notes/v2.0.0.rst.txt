@@ -1,0 +1,10 @@
+Version 2.0.0
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+* Fixed reading of datasets with an empty `Specific Character Set` tag
+  (regression, :issue:`1038`)
