@@ -127,6 +127,10 @@ chr*.dcm
   * from http://www.dclunie.com/images/charset/SCS*
   * downsized to 32x32 since pixel data is irrelevant for these (test pattern only)
 
+empty_charset_LEI.dcm
+  * Dataset with empty Specific Character Set, regression dataset for #1038
+  * provided by @micjuel
+
 test-SR.dcm
   * from ftp://ftp.dcmtk.org/pub/dicom/offis/software/dscope/dscope360/support/srdoc103.zip, file "test.dcm"
   * Structured Reporting example, many levels of nesting

@@ -16,7 +16,7 @@ import pytest
 import pydicom.config
 from pydicom import config
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
 from pydicom.filereader import dcmread, read_dataset
 from pydicom.dataelem import DataElement, DataElement_from_raw
@@ -56,43 +56,37 @@ have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
-empty_number_tags_name = get_testdata_files(
-    "reportsi_with_empty_number_tags.dcm")[0]
-rtplan_name = get_testdata_files("rtplan.dcm")[0]
-rtdose_name = get_testdata_files("rtdose.dcm")[0]
-ct_name = get_testdata_files("CT_small.dcm")[0]
-mr_name = get_testdata_files("MR_small.dcm")[0]
-truncated_mr_name = get_testdata_files("MR_truncated.dcm")[0]
-jpeg2000_name = get_testdata_files("JPEG2000.dcm")[0]
-jpeg2000_lossless_name = get_testdata_files("MR_small_jp2klossless.dcm")[0]
-jpeg_ls_lossless_name = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
-jpeg_lossy_name = get_testdata_files("JPEG-lossy.dcm")[0]
-jpeg_lossless_name = get_testdata_files("JPEG-LL.dcm")[0]
-deflate_name = get_testdata_files("image_dfl.dcm")[0]
-rtstruct_name = get_testdata_files("rtstruct.dcm")[0]
-priv_SQ_name = get_testdata_files("priv_SQ.dcm")
-# be sure that we don't pick up the nested_priv_sq
-priv_SQ_name = [filename
-                for filename in priv_SQ_name
-                if 'nested' not in filename]
-priv_SQ_name = priv_SQ_name[0]
-nested_priv_SQ_name = get_testdata_files("nested_priv_SQ.dcm")[0]
-meta_missing_tsyntax_name = get_testdata_files("meta_missing_tsyntax.dcm")[0]
-no_meta_group_length = get_testdata_files("no_meta_group_length.dcm")[0]
-gzip_name = get_testdata_files("zipMR.gz")[0]
-color_px_name = get_testdata_files("color-px.dcm")[0]
-color_pl_name = get_testdata_files("color-pl.dcm")[0]
-explicit_vr_le_no_meta = get_testdata_files("ExplVR_LitEndNoMeta.dcm")[0]
-explicit_vr_be_no_meta = get_testdata_files("ExplVR_BigEndNoMeta.dcm")[0]
-emri_name = get_testdata_files("emri_small.dcm")[0]
-emri_big_endian_name = get_testdata_files("emri_small_big_endian.dcm")[0]
-emri_jpeg_ls_lossless = get_testdata_files(
-    "emri_small_jpeg_ls_lossless.dcm")[0]
-emri_jpeg_2k_lossless = get_testdata_files(
-    "emri_small_jpeg_2k_lossless.dcm")[0]
-emri_jpeg_2k_lossless_too_short = get_testdata_files(
-    "emri_small_jpeg_2k_lossless_too_short.dcm")[0]
-color_3d_jpeg_baseline = get_testdata_files("color3d_jpeg_baseline.dcm")[0]
+empty_number_tags_name = get_testdata_file(
+    "reportsi_with_empty_number_tags.dcm")
+rtplan_name = get_testdata_file("rtplan.dcm")
+rtdose_name = get_testdata_file("rtdose.dcm")
+ct_name = get_testdata_file("CT_small.dcm")
+mr_name = get_testdata_file("MR_small.dcm")
+truncated_mr_name = get_testdata_file("MR_truncated.dcm")
+jpeg2000_name = get_testdata_file("JPEG2000.dcm")
+jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
+jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
+jpeg_lossless_name = get_testdata_file("JPEG-LL.dcm")
+deflate_name = get_testdata_file("image_dfl.dcm")
+rtstruct_name = get_testdata_file("rtstruct.dcm")
+priv_SQ_name = get_testdata_file("priv_SQ.dcm")
+nested_priv_SQ_name = get_testdata_file("nested_priv_SQ.dcm")
+meta_missing_tsyntax_name = get_testdata_file("meta_missing_tsyntax.dcm")
+no_meta_group_length = get_testdata_file("no_meta_group_length.dcm")
+gzip_name = get_testdata_file("zipMR.gz")
+color_px_name = get_testdata_file("color-px.dcm")
+color_pl_name = get_testdata_file("color-pl.dcm")
+explicit_vr_le_no_meta = get_testdata_file("ExplVR_LitEndNoMeta.dcm")
+explicit_vr_be_no_meta = get_testdata_file("ExplVR_BigEndNoMeta.dcm")
+emri_name = get_testdata_file("emri_small.dcm")
+emri_big_endian_name = get_testdata_file("emri_small_big_endian.dcm")
+emri_jpeg_ls_lossless = get_testdata_file(
+    "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
+emri_jpeg_2k_lossless_too_short = get_testdata_file(
+    "emri_small_jpeg_2k_lossless_too_short.dcm")
+color_3d_jpeg_baseline = get_testdata_file("color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -636,6 +630,12 @@ class TestReader(object):
             assert ds.preamble is None
             assert Dataset() == ds.file_meta
             assert Dataset() == ds[:]
+
+    def test_empty_specific_character_set(self):
+        """Test that an empty Specific Character Set is handled correctly.
+        Regression test for #1038"""
+        ds = dcmread(get_testdata_file("empty_charset_LEI.dcm"))
+        assert ds.read_encoding == ['iso8859']
 
     def test_dcmread_does_not_raise(self):
         """Test that reading from DicomBytesIO does not raise on EOF.
