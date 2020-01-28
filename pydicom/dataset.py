@@ -355,6 +355,12 @@ class Dataset(dict):
     # Python 2: Classes defining __eq__ should flag themselves as unhashable
     __hash__ = None
 
+    # Dataset extension tag handlers.
+    # Format {tag: handler class, ...},
+    # where handler class defines get_item and set_item,
+    #   possibly, get_attr and set_attr if desired
+    _handler_classes = {}
+
     def __init__(self, *args, **kwargs):
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
@@ -385,13 +391,20 @@ class Dataset(dict):
         # known private creator blocks
         self._private_blocks = {}
 
+        # Instances of handler classes for this Dataset instance
+        # The instance is created if a matching tag is found
+        self._handlers = {}
+        self.handlers_on = True
+
     def __enter__(self):
         """Method invoked on entry to a with statement."""
+        self.handlers_on = False
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Method invoked on exit from a with statement."""
         # Returning False will re-raise any exceptions that occur
+        self.handlers_on = True
         return False
 
     def add(self, data_element):
@@ -431,6 +444,10 @@ class Dataset(dict):
         data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
+
+    @classmethod
+    def clear_handler_classes(cls):
+        cls._handler_classes = {}
 
     def data_element(self, name):
         """Return the element corresponding to the element keyword `name`.
@@ -794,6 +811,21 @@ class Dataset(dict):
 
         return char_set
 
+    def _call_handler(self, tag, method):
+        """
+        tag:Tag
+                tag to handle
+        method: str
+                name of class method to call
+        """
+        if tag not in self._handlers:
+            # Create handler instance for the dataset instance
+            # Pass it a reference to this Dataset instance
+            self._handlers[tag] = self._handler_classes[tag](self)
+        with self as ds:  # handlers turned off in context to avoid inf loop
+            handler_method = getattr(ds._handlers[tag], method)
+            return handler_method(tag)
+
     def __getitem__(self, key):
         """Operator for ``Dataset[key]`` request.
 
@@ -849,6 +881,11 @@ class Dataset(dict):
             tag = key
         else:
             tag = Tag(key)
+
+        if self._handler_classes and self.handlers_on:
+            if tag in self._handler_classes:
+                return self._call_handler(tag, "get_item")
+
         data_elem = self._dict[tag]
 
         if isinstance(data_elem, DataElement):
