@@ -7,7 +7,8 @@ from datetime import (
     datetime,
     date,
     time,
-    timedelta
+    timedelta,
+    timezone
 )
 
 from pydicom.tag import Tag
@@ -17,7 +18,6 @@ import pydicom
 import platform
 from pydicom import config
 from pydicom import valuerep
-from pydicom.util.fixes import timezone
 from pydicom.data import get_testdata_files
 from pydicom.valuerep import DS, IS
 import pytest
