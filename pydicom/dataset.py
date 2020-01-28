@@ -43,10 +43,7 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 
 
-if compat.in_py2:
-    from pkgutil import find_loader as have_package
-else:
-    from importlib.util import find_spec as have_package
+from importlib.util import find_spec as have_package
 
 have_numpy = True
 try:
@@ -740,16 +737,6 @@ class Dataset(dict):
             up the values of the :class:`Dataset`.
         """
         return self._dict.values()
-
-    if compat.in_py2:
-        def iterkeys(self):
-            return self._dict.iterkeys()
-
-        def itervalues(self):
-            return self._dict.itervalues()
-
-        def iteritems(self):
-            return self._dict.iteritems()
 
     def __getattr__(self, name):
         """Intercept requests for :class:`Dataset` attribute names.

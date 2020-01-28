@@ -84,8 +84,6 @@ class TestPersonName(object):
                    u'"00091007": {"vr": "PN", "Value": '
                    u'[{"Alphabetic": "Yamada^Tarou", '
                    u'"Ideographic": "山田^太郎"}]}}')
-        if compat.in_py2:
-            ds_json = ds_json.encode('UTF8')
 
         ds = Dataset.from_json(ds_json)
         assert u'Yamada^Tarou=山田^太郎=やまだ^たろう' == ds.PatientName
@@ -232,11 +230,6 @@ class TestDataSetToJson(object):
         assert ds == ds2
 
         json_model2 = ds.to_json_dict()
-        if compat.in_py2:
-            # in Python 2, the encoding of this is slightly different
-            # (single vs double quotation marks)
-            del json_model['00091015']
-            del json_model2['00091015']
 
         assert json_model == json_model2
 

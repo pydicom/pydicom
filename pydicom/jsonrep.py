@@ -248,6 +248,4 @@ class JsonDataElementConverter(object):
             if 'Phonetic' in value:
                 comps[2] = value['Phonetic']
             elem_value = '='.join(comps)
-            if compat.in_py2:
-                elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return elem_value

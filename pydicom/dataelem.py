@@ -17,7 +17,6 @@ from collections import namedtuple
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom import compat
 from pydicom.charset import default_encoding
-from pydicom.compat import in_py2
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
@@ -32,8 +31,7 @@ import pydicom.valuerep  # don't import DS directly as can be changed by config
 
 from pydicom.valuerep import PersonNameUnicode
 
-if not in_py2:
-    from pydicom.valuerep import PersonName3 as PersonNameUnicode
+from pydicom.valuerep import PersonName3 as PersonNameUnicode
 
 PersonName = PersonNameUnicode
 
@@ -104,8 +102,8 @@ def isMultiValue(value):
 
 
 def _is_bytes(val):
-    """Return True only in Python 3 if `val` is of type `bytes`."""
-    return False if in_py2 else isinstance(val, bytes)
+    """Return True only if `val` is of type `bytes`."""
+    return isinstance(val, bytes)
 
 
 # double '\' because it is used as escape chr in Python
@@ -359,8 +357,6 @@ class DataElement(object):
                 else:
                     value = [self.value]
                 for v in value:
-                    if compat.in_py2:
-                        v = PersonNameUnicode(v, 'UTF8')
                     comps = {'Alphabetic': v.components[0]}
                     if len(v.components) > 1:
                         comps['Ideographic'] = v.components[1]
@@ -536,7 +532,7 @@ class DataElement(object):
             return pydicom.valuerep.TM(val)
         elif self.VR == "UI":
             return UID(val) if val is not None else None
-        elif not in_py2 and self.VR == "PN":
+        elif self.VR == "PN":
             return PersonName(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought
@@ -714,8 +710,6 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     # filereader->Dataset->convert_value->filereader
     # (for SQ parsing)
 
-    if in_py2:
-        encoding = encoding or default_encoding
     from pydicom.values import convert_value
     raw = raw_data_element
 

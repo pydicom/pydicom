@@ -107,16 +107,9 @@ save_dir = os.getcwd()
 
 class TestGDCM_JPEG_LS_no_gdcm(object):
     def setup(self):
-        if compat.in_py2:
-            self.utf8_filename = os.path.join(
-                tempfile.gettempdir(), "ДИКОМ.dcm")
-            self.unicode_filename = self.utf8_filename.decode("utf8")
-            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
-                            self.unicode_filename)
-        else:
-            self.unicode_filename = os.path.join(
-                tempfile.gettempdir(), "ДИКОМ.dcm")
-            shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
+        self.unicode_filename = os.path.join(
+            tempfile.gettempdir(), "ДИКОМ.dcm")
+        shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
         self.jpeg_ls_lossless = dcmread(self.unicode_filename)
         self.mr_small = dcmread(mr_name)
         self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
@@ -396,15 +389,9 @@ class TestsWithGDCM(object):
 
     @pytest.fixture(scope='class')
     def unicode_filename(self):
-        if compat.in_py2:
-            utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
-            unicode_filename = utf8_filename.decode("utf8")
-            shutil.copyfile(jpeg_ls_lossless_name.decode("utf8"),
-                            unicode_filename)
-        else:
-            unicode_filename = os.path.join(
-                tempfile.gettempdir(), "ДИКОМ.dcm")
-            shutil.copyfile(jpeg_ls_lossless_name, unicode_filename)
+        unicode_filename = os.path.join(
+            tempfile.gettempdir(), "ДИКОМ.dcm")
+        shutil.copyfile(jpeg_ls_lossless_name, unicode_filename)
         yield unicode_filename
         os.remove(unicode_filename)
 
@@ -683,13 +670,5 @@ class TestSupportFunctions(object):
     @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
     def test_create_image_reader_with_string(self):
         image_reader = gdcm_handler.create_image_reader(mr_name)
-        assert image_reader is not None
-        assert image_reader.Read()
-
-    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    @pytest.mark.skipif(not compat.in_py2, reason='Python2 specific')
-    def test_create_image_reader_with_py2_unicode_string(self):
-        filename = mr_name.decode('utf-8')
-        image_reader = gdcm_handler.create_image_reader(filename)
         assert image_reader is not None
         assert image_reader.Read()

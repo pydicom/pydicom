@@ -7,7 +7,6 @@ import warnings
 from struct import pack
 
 from pydicom import compat
-from pydicom.compat import in_py2
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
 )
@@ -279,13 +278,12 @@ def write_PN(fp, data_element, encodings=None):
     else:
         val = data_element.value
 
-    if val and isinstance(val[0], compat.text_type) or not in_py2:
-        try:
-            val = [elem.encode(encodings) for elem in val]
-        except TypeError:
-            # we get here in Python 2 if val is a unicode string
-            val = [PersonNameUnicode(elem, encodings) for elem in val]
-            val = [elem.encode(encodings) for elem in val]
+    try:
+        val = [elem.encode(encodings) for elem in val]
+    except TypeError:
+        # we get here in Python 2 if val is a unicode string
+        val = [PersonNameUnicode(elem, encodings) for elem in val]
+        val = [elem.encode(encodings) for elem in val]
 
     val = b'\\'.join(val)
 
@@ -346,8 +344,7 @@ def write_number_string(fp, data_element):
     if len(val) % 2 != 0:
         val = val + ' '  # pad to even length
 
-    if not in_py2:
-        val = bytes(val, default_encoding)
+    val = bytes(val, default_encoding)
 
     fp.write(val)
 
@@ -512,10 +509,8 @@ def write_data_element(fp, data_element, encodings=None):
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
-        if not in_py2:
-            fp.write(bytes(VR, default_encoding))
-        else:
-            fp.write(VR)
+        fp.write(bytes(VR, default_encoding))
+
         if VR in extra_length_VRs:
             fp.write_US(0)  # reserved 2 bytes
 

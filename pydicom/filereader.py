@@ -13,7 +13,6 @@ import zlib
 from pydicom import compat  # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import (default_encoding, convert_encodings)
-from pydicom.compat import in_py2
 from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
@@ -143,8 +142,7 @@ def data_element_generator(fp,
             group, elem, length = element_struct_unpack(bytes_read)
         else:  # explicit VR
             group, elem, VR, length = element_struct_unpack(bytes_read)
-            if not in_py2:
-                VR = VR.decode(default_encoding)
+            VR = VR.decode(default_encoding)
             if VR in extra_length_VRs:
                 bytes_read = fp_read(4)
                 length = extra_length_unpack(bytes_read)[0]
@@ -288,9 +286,7 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
     # extremely unlikely that the tag length accidentally has such a
     # representation - this would need the first tag to be longer than 16kB
     # (e.g. it should be > 0x4141 = 16705 bytes)
-    vr1 = ord(vr[0]) if in_py2 else vr[0]
-    vr2 = ord(vr[1]) if in_py2 else vr[1]
-    found_implicit = not (0x40 < vr1 < 0x5B and 0x40 < vr2 < 0x5B)
+    found_implicit = not (0x40 < vr[0] < 0x5B and 0x40 < vr[1] < 0x5B)
 
     if found_implicit != implicit_vr_is_assumed:
         # first check if the tag still belongs to the dataset if stop_when
@@ -697,8 +693,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
         # Test the VR to see if it's valid, and if so then assume explicit VR
         from pydicom.values import converters
-        if not in_py2:
-            VR = VR.decode(default_encoding)
+        VR = VR.decode(default_encoding)
         if VR in converters.keys():
             is_implicit_VR = False
             # Big endian encoding can only be explicit VR

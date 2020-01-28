@@ -4,7 +4,6 @@
 from binascii import (a2b_hex, b2a_hex)
 
 from pydicom import compat
-from pydicom.compat import in_py2
 from pydicom.charset import default_encoding
 
 
@@ -41,6 +40,5 @@ def hex2bytes(hexstring):
 
 def bytes2hex(byte_string):
     s = b2a_hex(byte_string)
-    if not in_py2:
-        s = s.decode()
+    s = s.decode()
     return " ".join(s[i:i + 2] for i in range(0, len(s), 2))

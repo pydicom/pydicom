@@ -32,12 +32,11 @@ text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 # because these are the types yielded if iterating over a byte string.
 
 # Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
-TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
-                  else {0x0d, 0x0a, 0x09, 0x0c})
+TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 
 # Character/Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
-PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
+PN_DELIMS = {0xe5}
 
 
 class DA(date):
@@ -466,20 +465,6 @@ class IS(int):
     Stores original integer string for exact rewriting of the string
     originally read or stored.
     """
-    if compat.in_py2:
-        __slots__ = ['original_string']
-
-        # Unlikely that str(int) will not be the
-        # same as the original, but could happen
-        # with leading zeros.
-
-        def __getstate__(self):
-            return dict((slot, getattr(self, slot)) for slot in self.__slots__
-                        if hasattr(self, slot))
-
-        def __setstate__(self, state):
-            for slot, value in state.items():
-                setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create instance if new integer string"""

@@ -175,14 +175,7 @@ def create_image_reader(filename):
     gdcm.ImageReader
     """
     image_reader = gdcm.ImageReader()
-    if compat.in_py2:
-        if isinstance(filename, unicode):
-            image_reader.SetFileName(
-                filename.encode(sys.getfilesystemencoding()))
-        else:
-            image_reader.SetFileName(filename)
-    else:
-        image_reader.SetFileName(filename)
+    image_reader.SetFileName(filename)
     return image_reader
 
 
@@ -219,19 +212,16 @@ def get_pixeldata(dicom_dataset):
             raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
 
-    # GDCM returns char* as type str. Under Python 2 `str` are
-    # byte arrays by default. Python 3 decodes this to
+    # GDCM returns char* as type str. Python 3 decodes this to
     # unicode strings by default.
     # The SWIG docs mention that they always decode byte streams
     # as utf-8 strings for Python 3, with the `surrogateescape`
     # error handler configured.
     # Therefore, we can encode them back to their original bytearray
     # representation on Python 3 by using the same parameters.
-    if compat.in_py2:
-        pixel_bytearray = gdcm_image.GetBuffer()
-    else:
-        pixel_bytearray = gdcm_image.GetBuffer().encode(
-            "utf-8", "surrogateescape")
+
+    pixel_bytearray = gdcm_image.GetBuffer().encode(
+        "utf-8", "surrogateescape")
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include

@@ -3,7 +3,6 @@
 
 import pytest
 
-from pydicom.compat import in_py2
 from pydicom.tag import BaseTag, Tag, TupleTag, tag_in_exception
 
 
@@ -241,16 +240,6 @@ class TestBaseTag(object):
         assert BaseTag(0x000900FF).is_private_creator
         assert not BaseTag(0x00090100).is_private_creator
 
-    def test_base_class(self):
-        """Test the class BaseTag inherits from."""
-        if in_py2:
-            # Test for overflow of int
-            tag = Tag(0xFFFFFFFF)
-            assert isinstance(tag, long)
-        else:
-            tag = Tag(0xFFFFFFFF)
-            assert isinstance(tag, int)
-
 
 class TestTag(object):
     """Test the Tag method."""
@@ -322,12 +311,6 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, [0x01, 0x02], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], '0x01')
         pytest.raises(ValueError, Tag, ['0x01', '0x02'], 0x01)
-
-    @pytest.mark.skipif(not in_py2, reason='Long type only exists in Python 2')
-    def test_mixed_long_int(self):
-        assert Tag([0x1000, long(0x2000)]) == BaseTag(0x10002000)
-        assert Tag([long(0x1000), 0x2000]) == BaseTag(0x10002000)
-        assert Tag([long(0x1000), long(0x2000)]) == BaseTag(0x10002000)
 
     def test_tag_single_str(self):
         """Test creating a Tag from a single str."""

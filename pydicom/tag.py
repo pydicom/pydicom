@@ -127,11 +127,7 @@ def Tag(arg, arg2=None):
     return BaseTag(long_value)
 
 
-if compat.in_py2:
-    # May get an overflow error with int if sys.maxsize < 0xFFFFFFFF
-    BaseTag_base_class = long
-else:
-    BaseTag_base_class = int
+BaseTag_base_class = int
 
 
 class BaseTag(BaseTag_base_class):

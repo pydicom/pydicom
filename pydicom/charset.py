@@ -5,7 +5,6 @@ import re
 import warnings
 
 from pydicom import compat, config
-from pydicom.compat import in_py2
 from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
@@ -262,10 +261,7 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
         if encoded is None:
             return ESC_ISO_IR_14
 
-        if not in_py2:
-            first_byte = encoded[0]
-        else:
-            first_byte = ord(encoded[0])
+        first_byte = encoded[0]
         if 0x80 <= first_byte:
             return ESC_ISO_IR_13
 
@@ -768,22 +764,13 @@ def decode_element(data_element, dicom_character_set):
     # decode the string value to unicode
     # PN is special case as may have 3 components with different chr sets
     if data_element.VR == "PN":
-        if not in_py2:
-            if data_element.VM <= 1:
-                data_element.value = data_element.value.decode(encodings)
-            else:
-                data_element.value = [
-                    val.decode(encodings) for val in data_element.value
-                ]
+        if data_element.VM <= 1:
+            data_element.value = data_element.value.decode(encodings)
         else:
-            if data_element.VM <= 1:
-                data_element.value = PersonNameUnicode(data_element.value,
-                                                       encodings)
-            else:
-                data_element.value = [
-                    PersonNameUnicode(value, encodings)
-                    for value in data_element.value
-                ]
+            data_element.value = [
+                val.decode(encodings) for val in data_element.value
+            ]
+
     if data_element.VR in text_VRs:
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
