@@ -2,6 +2,7 @@
 Release notes
 =============
 
+.. include:: v2.0.0.rst
 .. include:: v1.4.1.rst
 .. include:: v1.4.0.rst
 .. include:: v1.3.0.rst
@@ -16,4 +17,3 @@ Release notes
 .. include:: v0.9.4.rst
 .. include:: v0.9.3.rst
 .. include:: v0.9.2.rst
-.. include:: v2.0.0.rst

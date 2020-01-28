@@ -15,7 +15,3 @@ string_types = (str, )
 char_types = (str, bytes)
 number_types = (int, )
 int_type = int
-
-
-def reraise(tp, value, tb):
-    raise value.with_traceback(tb)

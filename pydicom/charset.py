@@ -5,7 +5,7 @@ import re
 import warnings
 
 from pydicom import compat, config
-from pydicom.valuerep import PersonNameUnicode, text_VRs, TEXT_VR_DELIMS
+from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
 default_encoding = "iso8859"

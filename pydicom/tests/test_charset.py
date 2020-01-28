@@ -136,7 +136,6 @@ class TestCharset(object):
         # Python 3: elem.value is PersonName3, Python 2: elem.value is str
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         pydicom.charset.decode_element(elem, ['ISO 2022 IR 126'])
-        # After decode Python 2: elem.value is PersonNameUnicode
         assert 'iso_ir_126' in elem.value.encodings
         assert 'iso8859' not in elem.value.encodings
         # default encoding is iso8859

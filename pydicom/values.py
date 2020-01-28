@@ -314,9 +314,7 @@ def convert_PN(byte_string, encodings=None):
     Returns
     -------
     valuerep.PersonName3 or list of PersonName3
-        The decoded 'PN' value(s) if using Python 3.
-    valuerep.PersonNameUnicode or list of PersonNameUnicode
-        The decoded 'PN' value(s) if using Python 2.
+        The decoded 'PN' value(s).
     """
     def get_valtype(x):
         return PersonName(x, encodings).decode()
