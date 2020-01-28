@@ -3,6 +3,7 @@ Version 2.0.0
 
 Changelog
 ---------
+* Dropped support for Python 2 (only Python 3.5+ supported)
 
 Fixes
 .....

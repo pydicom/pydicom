@@ -132,7 +132,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pydicom'
-copyright = u'2008-2019, Darcy Mason and pydicom contributors'
+copyright = u'2008-2020, Darcy Mason and pydicom contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
