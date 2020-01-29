@@ -33,7 +33,7 @@ def hex2bytes(hexstring):
     # true in 2.x so the difference in bytes constructor doesn't matter
     if isinstance(hexstring, bytes):
         return a2b_hex(hexstring.replace(b" ", b""))
-    elif isinstance(hexstring, compat.string_types):
+    elif isinstance(hexstring, str):
         return a2b_hex(bytes(hexstring.replace(" ", ""), default_encoding))
     raise TypeError('argument shall be bytes or string type')
 

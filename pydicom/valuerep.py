@@ -71,7 +71,7 @@ class DA(date):
             A string conformant to the DA definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             if len(val) == 8:
                 year = int(val[0:4])
                 month = int(val[4:6])
@@ -99,7 +99,7 @@ class DA(date):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DA) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -152,7 +152,7 @@ class DT(datetime):
             A string conformant to the DT definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             match = DT._regex_dt.match(val)
             if match and len(val) <= 26:
                 dt_match = match.group(2)
@@ -211,7 +211,7 @@ class DT(datetime):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -260,7 +260,7 @@ class TM(time):
             A string conformant to the TM definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             match = TM._regex_tm.match(val)
             if match and len(val) <= 16:
                 tm_match = match.group(1)
@@ -296,7 +296,7 @@ class TM(time):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -336,7 +336,7 @@ class DSfloat(float):
         # a different object, because float is immutable.
 
         has_attribute = hasattr(val, 'original_string')
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
@@ -385,7 +385,7 @@ class DSdecimal(Decimal):
         enforce_length = config.enforce_valid_values
         # DICOM allows spaces around the string,
         # but python doesn't, so clean it
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             val = val.strip()
             # If the input string is actually invalid that we relax the valid
             # value constraint for this particular instance
@@ -418,7 +418,7 @@ class DSdecimal(Decimal):
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):  # noqa
             self.original_string = val.original_string
@@ -451,7 +451,7 @@ def DS(val):
     Similarly the string clean and check can be avoided and :class:`DSfloat`
     called directly if a string has already been processed.
     """
-    if isinstance(val, (str, compat.text_type)):
+    if isinstance(val, str):
         val = val.strip()
     if val == '' or val is None:
         return val
@@ -469,7 +469,7 @@ class IS(int):
         """Create instance if new integer string"""
         if val is None:
             return val
-        if isinstance(val, (str, compat.text_type)) and val.strip() == '':
+        if isinstance(val, str) and val.strip() == '':
             return ''
         # Overflow error in Python 2 for integers too large
         # while calling super(IS). Fall back on the regular int
@@ -493,7 +493,7 @@ class IS(int):
 
     def __init__(self, val):
         # If a string passed, then store it
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -569,7 +569,7 @@ def _decode_personname(components, encodings):
     """
     from pydicom.charset import decode_string
 
-    if isinstance(components[0], compat.text_type):
+    if isinstance(components[0], str):
         comps = components
     else:
         comps = [decode_string(comp, encodings, PN_DELIMS)

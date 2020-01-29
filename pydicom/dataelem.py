@@ -87,7 +87,7 @@ def isMultiValue(value):
     """
     msg = 'isMultiValue is deprecated, use DataElement.VM instead'
     warnings.warn(msg, DeprecationWarning)
-    if isinstance(value, compat.char_types):
+    if isinstance(value, (str, bytes)):
         return False
     try:
         iter(value)
@@ -428,7 +428,7 @@ class DataElement(object):
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         #  Last condition covers 'US or SS' etc
-        if isinstance(val, compat.char_types) and self.VR not in \
+        if isinstance(val, (str, bytes)) and self.VR not in \
                 ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL',
                  'SQ', 'SS', 'UL', 'OB/OW', 'OW/OB', 'OB or OW',
                  'OW or OB', 'UN'] and 'US' not in self.VR:
@@ -445,7 +445,7 @@ class DataElement(object):
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
-        if isinstance(self.value, (compat.char_types, PersonName3)):
+        if isinstance(self.value, (str, bytes, PersonName3)):
             return 1 if self.value else 0
         try:
             iter(self.value)
@@ -602,15 +602,15 @@ class DataElement(object):
 
     def __unicode__(self):
         """Return unicode representation of the element."""
-        if isinstance(self.value, compat.text_type):
+        if isinstance(self.value, str):
             # start with the string rep then replace the value part
             #   with the unicode
             strVal = str(self)
             strVal = strVal.replace(self.repval, "")
-            uniVal = compat.text_type(strVal) + self.value
+            uniVal = str(strVal) + self.value
             return uniVal
         else:
-            return compat.text_type(str(self))
+            return str(self)
 
     def __getitem__(self, key):
         """Return the item at `key` if the element's value is indexable."""

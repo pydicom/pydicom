@@ -120,7 +120,7 @@ def data_element_generator(fp,
     tag_set = set()
     if specific_tags is not None:
         for tag in specific_tags:
-            if isinstance(tag, (str, compat.text_type)):
+            if isinstance(tag, str):
                 tag = Tag(tag_for_keyword(tag))
             if isinstance(tag, BaseTag):
                 tag_set.add(tag)
@@ -831,7 +831,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     """
     # Open file if not already a file object
     caller_owns_file = True
-    if isinstance(fp, compat.string_types):
+    if isinstance(fp, str):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
         try:
@@ -958,7 +958,7 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
     if filename_or_obj is None:
         raise IOError("Deferred read -- original filename not stored. "
                       "Cannot re-open")
-    is_filename = isinstance(filename_or_obj, compat.string_types)
+    is_filename = isinstance(filename_or_obj, str)
 
     # Check that the file is the same as when originally read
     if is_filename and not os.path.exists(filename_or_obj):

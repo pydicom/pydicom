@@ -295,7 +295,7 @@ class TestDataElement(object):
         # Make sure elem.value is still unicode
         assert isinstance(elem.value, unicode)
 
-        # When value is not in compat.text_type
+        # When value is not str
         elem = DataElement(0x00100010, 'LO', 12345)
         assert isinstance(unicode(elem), unicode)
         assert (

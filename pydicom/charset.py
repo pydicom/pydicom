@@ -643,7 +643,7 @@ def convert_encodings(encodings):
     # If a list if passed, we don't want to modify the list in place so copy it
     encodings = encodings[:]
 
-    if isinstance(encodings, compat.string_types):
+    if isinstance(encodings, str):
         encodings = [encodings]
     elif not encodings[0]:
         encodings[0] = 'ISO_IR 6'
@@ -774,7 +774,7 @@ def decode_element(data_element, dicom_character_set):
     if data_element.VR in text_VRs:
         # You can't re-decode unicode (string literals in py3)
         if data_element.VM == 1:
-            if isinstance(data_element.value, compat.text_type):
+            if isinstance(data_element.value, str):
                 return
             data_element.value = decode_string(data_element.value, encodings,
                                                TEXT_VR_DELIMS)
@@ -783,7 +783,7 @@ def decode_element(data_element, dicom_character_set):
             output = list()
 
             for value in data_element.value:
-                if isinstance(value, compat.text_type):
+                if isinstance(value, str):
                     output.append(value)
                 else:
                     output.append(decode_string(value, encodings,

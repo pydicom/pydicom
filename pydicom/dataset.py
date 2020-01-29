@@ -686,7 +686,7 @@ class Dataset(dict):
         value
             If `key` is a class attribute then return its value.
         """
-        if isinstance(key, (str, compat.text_type)):
+        if isinstance(key, str):
             try:
                 return getattr(self, key)
             except AttributeError:
@@ -2005,7 +2005,7 @@ class Dataset(dict):
             current object.
         """
         for key, value in list(dictionary.items()):
-            if isinstance(key, (str, compat.text_type)):
+            if isinstance(key, str):
                 setattr(self, key, value)
             else:
                 self[Tag(key)] = value
@@ -2266,7 +2266,7 @@ class FileDataset(Dataset):
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
         filename = None
-        if isinstance(filename_or_obj, compat.string_types):
+        if isinstance(filename_or_obj, str):
             filename = filename_or_obj
             self.fileobj_type = open
         elif isinstance(filename_or_obj, io.BufferedReader):

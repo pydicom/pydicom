@@ -117,13 +117,13 @@ class JsonDataElementConverter(object):
             value = value[0]
 
         if self.value_key == 'InlineBinary':
-            if not isinstance(value, compat.char_types):
+            if not isinstance(value, (str, bytes)):
                 fmt = '"{}" of data element "{}" must be a bytes-like object.'
                 raise TypeError(fmt.format(self.value_key, self.tag))
             return base64.b64decode(value)
 
         if self.value_key == 'BulkDataURI':
-            if not isinstance(value, compat.string_types):
+            if not isinstance(value, str):
                 fmt = '"{}" of data element "{}" must be a string.'
                 raise TypeError(fmt.format(self.value_key, self.tag))
             if self.bulk_data_uri_handler is None:

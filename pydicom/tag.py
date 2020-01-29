@@ -83,8 +83,8 @@ def Tag(arg, arg2=None):
             raise ValueError("Tag must be an int or a 2-tuple")
 
         valid = False
-        if isinstance(arg[0], compat.string_types):
-            valid = isinstance(arg[1], (str, compat.string_types))
+        if isinstance(arg[0], str):
+            valid = isinstance(arg[1], str)
             if valid:
                 arg = (int(arg[0], 16), int(arg[1], 16))
         elif isinstance(arg[0], compat.number_types):
@@ -100,7 +100,7 @@ def Tag(arg, arg2=None):
         long_value = (arg[0] << 16) | arg[1]
 
     # Single str parameter
-    elif isinstance(arg, (str, compat.text_type)):
+    elif isinstance(arg, str):
         try:
             long_value = int(arg, 16)
             if long_value > 0xFFFFFFFF:

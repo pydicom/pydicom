@@ -66,7 +66,7 @@ class MultiValue(MutableSequence):
     def __str__(self):
         if not self:
             return ''
-        lines = ["'{}'".format(x) if isinstance(x, compat.char_types)
+        lines = ["'{}'".format(x) if isinstance(x, (str, bytes))
                  else str(x) for x in self]
         return "[" + ", ".join(lines) + "]"
 

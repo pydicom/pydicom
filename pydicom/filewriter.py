@@ -293,7 +293,7 @@ def write_string(fp, data_element, padding=' '):
     if val is not None:
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
-        if isinstance(val, compat.text_type):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
         fp.write(val)
 
@@ -304,13 +304,13 @@ def write_text(fp, data_element, encodings=None):
     if val is not None:
         encodings = encodings or [default_encoding]
         if _is_multi_value(val):
-            if val and isinstance(val[0], compat.text_type):
+            if val and isinstance(val[0], str):
                 val = b'\\'.join([encode_string(val, encodings)
                                   for val in val])
             else:
                 val = b'\\'.join([val for val in val])
         else:
-            if isinstance(val, compat.text_type):
+            if isinstance(val, str):
                 val = encode_string(val, encodings)
 
         if len(val) % 2 != 0:
@@ -354,18 +354,18 @@ def _format_DA(val):
 
 def write_DA(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_DA(x) for x in val))
         else:
             val = _format_DA(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -382,18 +382,18 @@ def _format_DT(val):
 
 def write_DT(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_DT(x) for x in val))
         else:
             val = _format_DT(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -412,18 +412,18 @@ def _format_TM(val):
 
 def write_TM(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_TM(x) for x in val))
         else:
             val = _format_TM(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -885,7 +885,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     caller_owns_file = True
     # Open file if not already a file object
-    if isinstance(filename, compat.string_types):
+    if isinstance(filename, str):
         fp = DicomFile(filename, 'wb')
         # caller provided a file name; we own the file handle
         caller_owns_file = False

@@ -319,9 +319,6 @@ def convert_PN(byte_string, encodings=None):
     def get_valtype(x):
         return PersonName(x, encodings).decode()
 
-    # XXX - We have to replicate MultiString functionality
-    # here because we can't decode easily here since that
-    # is performed in PersonNameUnicode
     if byte_string.endswith((b' ', b'\x00')):
         byte_string = byte_string[:-1]
 
@@ -381,7 +378,7 @@ def convert_text(byte_string, encodings=None):
     if len(values) == 1:
         return values[0]
     else:
-        return MultiValue(compat.text_type, values)
+        return MultiValue(str, values)
 
 
 def convert_single_string(byte_string, encodings=None):
@@ -571,7 +568,7 @@ def convert_value(VR, raw_data_element, encodings=None):
 
     # Ensure that encodings is a list
     encodings = encodings or [default_encoding]
-    if isinstance(encodings, compat.string_types):
+    if isinstance(encodings, str):
         encodings = [encodings]
 
     byte_string = raw_data_element.value
