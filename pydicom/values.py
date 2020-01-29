@@ -367,10 +367,8 @@ def convert_text(byte_string, encodings=None):
 
     Returns
     -------
-    unicode or list of unicode
-        The decoded value(s) if in Python 2.
     str or list of str
-        The decoded value(s) if in Python 3.
+        The decoded value(s).
     """
     values = byte_string.split(b'\\')
     values = [convert_single_string(value, encodings) for value in values]
@@ -392,10 +390,8 @@ def convert_single_string(byte_string, encodings=None):
 
     Returns
     -------
-    unicode or list of unicode
-        The decoded text if in Python 2.
     str or list of str
-        The decoded text if in Python 3.
+        The decoded text.
     """
     encodings = encodings or [default_encoding]
     value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)

@@ -25,7 +25,7 @@ class TestPersonName(object):
     def test_pn_components_to_json(self):
         def check_name(tag, components):
             # we cannot directly compare the dictionaries, as they are not
-            # ordered in Python 2
+            # guaranteed insertion-ordered in Python < 3.7
             value = ds_json[tag]['Value']
             assert 1 == len(value)
             value = value[0]

@@ -281,28 +281,6 @@ class TestDataElement(object):
         elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
-    @pytest.mark.skipif(sys.version_info >= (3,), reason='Python 2 behavior')
-    def test_unicode(self):
-        """Test unicode representation of the DataElement"""
-        elem = DataElement(0x00100010, 'PN', u'ANON')
-        # Make sure elem.value is actually unicode
-        assert isinstance(elem.value, unicode)
-        assert (
-                   u"(0010, 0010) Patient's Name                      PN: ANON"
-               ) == unicode(elem)
-        assert isinstance(unicode(elem), unicode)
-        assert not isinstance(unicode(elem), str)
-        # Make sure elem.value is still unicode
-        assert isinstance(elem.value, unicode)
-
-        # When value is not str
-        elem = DataElement(0x00100010, 'LO', 12345)
-        assert isinstance(unicode(elem), unicode)
-        assert (
-                   u"(0010, 0010) Patient's Name"
-                   u"                      LO: 12345"
-               ) == unicode(elem)
-
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
         elem = DataElement(0x00100010, 'LO', 12345)

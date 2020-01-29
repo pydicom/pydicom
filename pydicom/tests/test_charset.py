@@ -133,7 +133,7 @@ class TestCharset(object):
 
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
-        # Python 3: elem.value is PersonName3, Python 2: elem.value is str
+        # elem.value is PersonName3
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         pydicom.charset.decode_element(elem, ['ISO 2022 IR 126'])
         assert 'iso_ir_126' in elem.value.encodings
@@ -467,7 +467,7 @@ class TestCharset(object):
 
     def test_deprecated_decode(self):
         """Test we get a deprecation warning when using charset.decode()."""
-        # Python 3: elem.value is PersonName3, Python 2: elem.value is str
+        # elem.value is PersonName3
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         msg = r"'charset.decode\(\)' is deprecated"
         with pytest.warns(DeprecationWarning, match=msg):

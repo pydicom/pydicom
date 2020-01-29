@@ -186,10 +186,6 @@ class DataElement(object):
     showVR = True
     is_raw = False
 
-    # Python 2: Classes which define __eq__
-    # should flag themselves as unhashable
-    __hash__ = None
-
     def __init__(self,
                  tag,
                  VR,

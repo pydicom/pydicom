@@ -62,14 +62,8 @@ def sop_class_name(description):
 
 def replace_bad_characters(name):
     bad_chars = r'!@#$%^&*(),;:.?\|{}[]+-=/ '
-    if not in_py2:
-        translate_table = dict((ord(char), None) for char in bad_chars)
-        name = name.translate(translate_table)
-    else:
-        import string
-        translate_table = string.maketrans('', '')
-        name = name.translate(translate_table, bad_chars)
-    return name
+    translate_table = dict((ord(char), None) for char in bad_chars)
+    return name.translate(translate_table)
 
 
 def uid_line(uid, name):

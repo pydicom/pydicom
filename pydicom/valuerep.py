@@ -26,8 +26,8 @@ text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-# Note: We use characters for Python 2 and character codes for Python 3
-# because these are the types yielded if iterating over a byte string.
+# Note: We use character codes for Python 3
+# because those are the types yielded if iterating over a byte string.
 
 # Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
 TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
@@ -470,14 +470,9 @@ class IS(int):
             return val
         if isinstance(val, str) and val.strip() == '':
             return ''
-        # Overflow error in Python 2 for integers too large
-        # while calling super(IS). Fall back on the regular int
-        # casting that will automatically convert the val to long
-        # if needed.
-        try:
-            newval = super(IS, cls).__new__(cls, val)
-        except OverflowError:
-            newval = int(val)
+
+        newval = super(IS, cls).__new__(cls, val)
+
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:

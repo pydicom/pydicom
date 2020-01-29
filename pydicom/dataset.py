@@ -349,9 +349,6 @@ class Dataset(dict):
     """
     indent_chars = "   "
 
-    # Python 2: Classes defining __eq__ should flag themselves as unhashable
-    __hash__ = None
-
     def __init__(self, *args, **kwargs):
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)

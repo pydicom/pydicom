@@ -19,8 +19,6 @@ python_encoding = {
     # alias for latin_1 too (iso_ir_6 exists as an alias to 'ascii')
     'ISO_IR 6': default_encoding,
     'ISO_IR 13': 'shift_jis',
-
-    # these also have iso_ir_1XX aliases in python 2.7
     'ISO_IR 100': 'latin_1',
     'ISO_IR 101': 'iso8859_2',
     'ISO_IR 109': 'iso8859_3',
@@ -243,10 +241,9 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
     ----------
     encoding : str
         An encoding is used to specify  an escape sequence.
-    encoded : bytes or str
-        The encoded value is used to chose an escape sequence if encoding is
-        'shift_jis'. Should be :class:`bytes` for Python 3 and :class:`str`
-        for Python 2.
+    encoded : bytes
+        The encoded value is used to choose an escape sequence if encoding is
+        'shift_jis'.
 
     Returns
     -------
@@ -287,25 +284,24 @@ def decode_string(value, encodings, delimiters):
 
     Parameters
     ----------
-    value : bytes or str
+    value : bytes
         The encoded byte string in the DICOM element value. Should be
-        :class:`bytes` for Python 3 and :class:`str` for Python 2.
+        :class:`bytes` for Python 3.
     encodings : list of str
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific
         Character Set*.
-    delimiters : set of int (Python 3) or characters (Python 2)
+    delimiters : set of int
         A set of characters or character codes, each of which resets the
         encoding in `value`.
 
     Returns
     -------
-    str or unicode
+    str
         The decoded unicode string. If the value could not be decoded,
         and :func:`enforce_valid_values<pydicom.config.enforce_valid_values>`
         is ``False``, a warning is issued, and `value` is decoded using the
         first encoding with replacement characters, resulting in data loss.
-        Returns :class:`str` for Python 3 and :class:`unicode` for Python 2.
 
     Raises
     ------
@@ -367,7 +363,7 @@ def _decode_fragment(byte_str, encodings, delimiters):
     encodings: list of str
         The list of Python encodings as converted from the values in the
         Specific Character Set tag.
-    delimiters: set of int (Python 3) or characters (Python 2)
+    delimiters: set of int
         A set of characters or character codes, each of which resets the
         encoding in `byte_str`.
 
@@ -452,9 +448,8 @@ def encode_string(value, encodings):
 
     Parameters
     ----------
-    value : str or unicode
-        The unicode string as presented to the user. Should be :class:`str`
-        for Python 3 and :class:`unicode` for Python 2.
+    value : str
+        The unicode string as presented to the user.
     encodings : list of str
         The encodings needed to encode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific
@@ -462,13 +457,12 @@ def encode_string(value, encodings):
 
     Returns
     -------
-    bytes or str
+    bytes
         The encoded string. If `value` could not be encoded with any of
         the given encodings, and
         :func:`enforce_valid_values<pydicom.config.enforce_valid_values>` is
         ``False``, a warning is issued, and `value` is encoded using the first
-        encoding with replacement characters, resulting in data loss. Should
-        be :class:`bytes` for Python 3 and :class:`str` for Python 2.
+        encoding with replacement characters, resulting in data loss.
 
     Raises
     ------

@@ -392,7 +392,7 @@ class TestPersonName(object):
 
     def test_hash(self):
         """Test that the same name creates the same hash."""
-        # Regression test for #785 in Python 3
+        # Regression test for #785
         pn1 = PersonName3("John^Doe^^Dr", encodings=default_encoding)
         pn2 = PersonName3("John^Doe^^Dr", encodings=default_encoding)
         assert hash(pn1) == hash(pn2)
