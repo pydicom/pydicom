@@ -12,14 +12,8 @@ Or in file browser, right click on file.dcm, open with custom command:
 python3 dicomtree.py
 """
 
-from __future__ import print_function
 
-from pydicom import compat
-
-if compat.in_py2:
-    import Tix as tkinter_tix
-else:
-    import tkinter.tix as tkinter_tix
+import tkinter.tix as tkinter_tix
 
 print(__doc__)
 

@@ -4,7 +4,6 @@
 import pytest
 
 import pydicom
-from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta

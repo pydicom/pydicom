@@ -4,8 +4,6 @@
 import base64
 import warnings
 
-from pydicom import compat
-from pydicom.compat import int_type
 from pydicom.valuerep import PersonName3
 
 # Order of keys is significant!
@@ -39,7 +37,7 @@ def convert_to_python_number(value, vr):
         return None
     number_type = None
     if vr in VRs_TO_BE_INTS:
-        number_type = int_type
+        number_type = int
     if vr in VRs_TO_BE_FLOATS:
         number_type = float
     if number_type is not None:

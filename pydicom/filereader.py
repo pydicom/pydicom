@@ -10,7 +10,6 @@ from struct import (Struct, unpack)
 import warnings
 import zlib
 
-from pydicom import compat  # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import (default_encoding, convert_encodings)
 from pydicom.config import logger

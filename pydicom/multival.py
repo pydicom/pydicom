@@ -2,7 +2,6 @@
 """Code for multi-value data elements values,
 or any list of items that must all be the same type.
 """
-from pydicom import compat
 
 try:
     from collections.abc import MutableSequence

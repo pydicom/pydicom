@@ -4,7 +4,7 @@ import codecs
 import re
 import warnings
 
-from pydicom import compat, config
+from pydicom import config
 from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII

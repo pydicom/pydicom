@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import warnings
 from struct import pack
 
-from pydicom import compat
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
 )

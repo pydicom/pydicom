@@ -27,7 +27,7 @@ import warnings
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import compat, datadict, jsonrep
+from pydicom import datadict, jsonrep
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger

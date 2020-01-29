@@ -8,7 +8,6 @@ import hashlib
 import re
 
 from pydicom._uid_dict import UID_dictionary
-from pydicom import compat
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)

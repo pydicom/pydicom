@@ -14,7 +14,6 @@ from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_files
 from pydicom.pixel_data_handlers.util import _convert_YBR_FULL_to_RGB
 from pydicom.tag import Tag
-from pydicom import compat
 
 gdcm_missing_message = "GDCM is not available in this test environment"
 gdcm_im_missing_message = "GDCM is not available or in-memory decoding"\

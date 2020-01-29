@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from pydicom import dcmread, compat
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset

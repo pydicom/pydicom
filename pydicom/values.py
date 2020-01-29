@@ -8,7 +8,6 @@ from struct import (unpack, calcsize)
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom import compat
 from pydicom.charset import (default_encoding, text_VRs, decode_string)
 from pydicom.config import logger
 from pydicom.dataelem import empty_value_for_VR

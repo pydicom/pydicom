@@ -18,7 +18,6 @@ import sys
 import os.path
 import pydicom
 from pydicom.datadict import dictionary_keyword
-from pydicom.compat import int_type
 
 import re
 
@@ -323,7 +322,7 @@ def main(default_exclude_size, args=None):
     parser.add_argument(
         '-e',
         '--exclude-size',
-        type=int_type,
+        type=int,
         default=default_exclude_size,
         help=help_exclude_size)
     parser.add_argument(

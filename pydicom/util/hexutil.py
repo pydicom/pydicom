@@ -3,7 +3,6 @@
 
 from binascii import (a2b_hex, b2a_hex)
 
-from pydicom import compat
 from pydicom.charset import default_encoding
 
 

@@ -10,7 +10,6 @@ datasets saved as blobs in a database.
 
 """
 
-from __future__ import print_function
 
 from io import BytesIO
 

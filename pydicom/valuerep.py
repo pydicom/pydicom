@@ -8,7 +8,6 @@ from datetime import (date, datetime, time, timedelta, timezone)
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom import compat
 from pydicom.multival import MultiValue
 
 # can't import from charset or get circular import

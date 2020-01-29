@@ -6,10 +6,7 @@ import os
 import re
 import tokenize
 
-from pydicom.compat import in_py2
-
 import pydicom
-
 from pydicom._uid_dict import UID_dictionary
 
 STORAGE_REGEX = re.compile('.*(Storage|Storage SOP Class|Storage - '

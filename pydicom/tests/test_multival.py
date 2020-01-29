@@ -4,7 +4,7 @@
 import pytest
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
-from pydicom import config, compat
+from pydicom import config
 from copy import deepcopy
 
 import sys

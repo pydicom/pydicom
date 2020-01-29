@@ -11,8 +11,6 @@ separated to (group, element) as required.
 import traceback
 from contextlib import contextmanager
 
-from pydicom import compat
-
 
 @contextmanager
 def tag_in_exception(tag):
@@ -87,8 +85,8 @@ def Tag(arg, arg2=None):
             valid = isinstance(arg[1], str)
             if valid:
                 arg = (int(arg[0], 16), int(arg[1], 16))
-        elif isinstance(arg[0], compat.number_types):
-            valid = isinstance(arg[1], compat.number_types)
+        elif isinstance(arg[0], int):
+            valid = isinstance(arg[1], int)
         if not valid:
             raise ValueError("Both arguments for Tag must be the same type, "
                              "either string or int.")
