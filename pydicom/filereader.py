@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-from __future__ import absolute_import
 
 # Need zlib and io.BytesIO for deflate-compressed file
 from io import BytesIO

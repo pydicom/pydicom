@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Hold DicomFile class, which does basic I/O for a dicom file."""
 
-from __future__ import absolute_import
 
 from pydicom.tag import Tag, BaseTag
 from struct import (unpack, pack)

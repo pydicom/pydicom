@@ -7,7 +7,6 @@ A DataElement has a tag,
               and a value.
 """
 
-from __future__ import absolute_import
 
 import base64
 import json

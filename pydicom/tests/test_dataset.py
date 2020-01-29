@@ -1356,7 +1356,7 @@ class TestDataset(object):
     def test_walk(self):
         """Test Dataset.walk iterates through sequences"""
         def test_callback(dataset, elem):
-            if elem.keyword is 'PatientID':
+            if elem.keyword == 'PatientID':
                 dataset.PatientID = 'FIXED'
 
         ds = Dataset()
