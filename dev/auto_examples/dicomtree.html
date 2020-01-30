@@ -198,14 +198,7 @@ sudo pip install -U pydicom
 python3 dicomtree.py file.dcm
 Or in file browser, right click on file.dcm, open with custom command:
 python3 dicomtree.py</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
-
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">compat</span>
-
-<span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">Tix</span> <span class="k">as</span> <span class="nn">tkinter_tix</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">tkinter.tix</span> <span class="k">as</span> <span class="nn">tkinter_tix</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tkinter.tix</span> <span class="k">as</span> <span class="nn">tkinter_tix</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
@@ -250,8 +243,8 @@ python3 dicomtree.py</p>
     <span class="c1"># order the dicom tags</span>
     <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
         <span class="n">node_id</span> <span class="o">=</span> <span class="n">parent</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">data_element</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">):</span>
-            <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">compat</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">data_element</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_element</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_element</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">hide</span><span class="p">:</span>
@@ -315,7 +308,7 @@ python3 dicomtree.py</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

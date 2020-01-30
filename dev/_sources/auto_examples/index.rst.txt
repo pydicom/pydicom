@@ -285,26 +285,6 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
-
-.. only:: html
-
- .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
-
-     :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/metadata_processing/plot_sequences
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynami...">
 
 .. only:: html
@@ -322,6 +302,26 @@ metadata of DICOM data.
    :hidden:
 
    /auto_examples/metadata_processing/plot_add_dict_entries
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
+
+     :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/metadata_processing/plot_sequences
 
 .. raw:: html
 

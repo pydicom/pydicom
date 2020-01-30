@@ -26,21 +26,21 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpkmumds19.dcm
+    Writing test file /tmp/tmph7j9sgta.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpewuyns14.dcm
-    Load file /tmp/tmpkmumds19.dcm ...
-    (0008, 0023) Content Date                        DA: '20200121'
-    (0008, 0033) Content Time                        TM: '222910.739090'
+    Writing test file as Big Endian Explicit VR /tmp/tmpr7kxa6lh.dcm
+    Load file /tmp/tmph7j9sgta.dcm ...
+    (0008, 0023) Content Date                        DA: '20200130'
+    (0008, 0033) Content Time                        TM: '163753.326112'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpkmumds19.dcm ...
-    Load file /tmp/tmpewuyns14.dcm ...
-    (0008, 0023) Content Date                        DA: '20200121'
-    (0008, 0033) Content Time                        TM: '222910.739090'
+    Remove file /tmp/tmph7j9sgta.dcm ...
+    Load file /tmp/tmpr7kxa6lh.dcm ...
+    (0008, 0023) Content Date                        DA: '20200130'
+    (0008, 0033) Content Time                        TM: '163753.326112'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpewuyns14.dcm ...
+    Remove file /tmp/tmpr7kxa6lh.dcm ...
 
 
 
@@ -122,7 +122,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.006 seconds)
+   **Total running time of the script:** ( 0 minutes  0.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:

@@ -34,9 +34,7 @@ ensure that the value gets written correctly?
 * To ensure **AT** elements are encoded correctly, their values should be set
   using the 8-byte integer form of the tag - such as ``0x00100020`` for the tag
   (0010,0020) - and not as a 2-tuple or 2-list.
-* **LO**, **LT**, **PN**, **SH**, **ST**, **UC** and **UT** elements may also
-  be set and stored using
-  `unicode <https://docs.python.org/2/howto/unicode.html>`_ in Python 2.
+
 
 +----+------------------+-----------------+-----------------------------------+
 | VR | Name             | Set using       | Stored as                         |
@@ -86,10 +84,7 @@ ensure that the value gets written correctly?
 +----+------------------+-----------------+-----------------------------------+
 | OW | Other Word       | :class:`bytes`  | :class:`bytes`                    |
 +----+------------------+-----------------+-----------------------------------+
-| PN | Person Name      | :class:`str`    | :class:`str`\ :sup:`3`            |
-|    |                  |                 | (Python 2) or                     |
-|    |                  |                 | :class:`~valuerep.PersonName3`    |
-|    |                  |                 | (Python 3)                        |
+| PN | Person Name      | :class:`str`    | :class:`~valuerep.PersonName`     |
 +----+------------------+-----------------+-----------------------------------+
 | SH | Short String     | :class:`str`    | :class:`str`                      |
 +----+------------------+-----------------+-----------------------------------+
@@ -132,5 +127,3 @@ ensure that the value gets written correctly?
   = ``True`` (default ``False``)
 | :sup:`2` If :attr:`config.use_DS_decimal<config.use_DS_decimal>`
   = ``True`` (default ``False``)
-| :sup:`3` **PN** element values read from file will be stored as
-  :class:`~valuerep.PersonNameUnicode` in Python 2

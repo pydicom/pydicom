@@ -217,9 +217,6 @@ never have a VM greater than 1.</p></li>
 <li><p>To ensure <strong>AT</strong> elements are encoded correctly, their values should be set
 using the 8-byte integer form of the tag - such as <code class="docutils literal notranslate"><span class="pre">0x00100020</span></code> for the tag
 (0010,0020) - and not as a 2-tuple or 2-list.</p></li>
-<li><p><strong>LO</strong>, <strong>LT</strong>, <strong>PN</strong>, <strong>SH</strong>, <strong>ST</strong>, <strong>UC</strong> and <strong>UT</strong> elements may also
-be set and stored using
-<a class="reference external" href="https://docs.python.org/2/howto/unicode.html">unicode</a> in Python 2.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -339,10 +336,7 @@ Very Long</p></td>
 <tr class="row-even"><td><p>PN</p></td>
 <td><p>Person Name</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><sup>3</sup>
-(Python 2) or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName3.html#pydicom.valuerep.PersonName3" title="pydicom.valuerep.PersonName3"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName3</span></code></a>
-(Python 3)</p></td>
+<td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>SH</p></td>
 <td><p>Short String</p></td>
@@ -432,8 +426,6 @@ Very Long</p></td>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
 <div class="line"><sup>2</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
-<div class="line"><sup>3</sup> <strong>PN</strong> element values read from file will be stored as
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonNameUnicode</span></code></a> in Python 2</div>
 </div>
 </div>
 
@@ -457,7 +449,7 @@ Very Long</p></td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

@@ -122,8 +122,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName3.html">pydicom.valuerep.PersonName3</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameBase.html">pydicom.valuerep.PersonNameBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
 </ul>
@@ -225,7 +223,7 @@
 <h1>pydicom.valuerep.DS<a class="headerlink" href="#pydicom-valuerep-ds" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.valuerep.DS">
-<code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DS</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e9a89e5f/pydicom/valuerep.py#L445"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DS</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8b0bbaf9/pydicom/valuerep.py#L442"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory function for creating DS class instances.</p>
 <p>Checks for blank string; if so, returns that, else calls <a class="reference internal" href="pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a>
 or <a class="reference internal" href="pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a> to create the class instance. This avoids overriding
@@ -257,7 +255,7 @@ called directly if a string has already been processed.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

@@ -233,7 +233,7 @@
 <h1>pydicom.values.convert_PN<a class="headerlink" href="#pydicom-values-convert-pn" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.values.convert_PN">
-<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_PN</code><span class="sig-paren">(</span><em class="sig-param">byte_string</em>, <em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e9a89e5f/pydicom/values.py#L313"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_PN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_PN</code><span class="sig-paren">(</span><em class="sig-param">byte_string</em>, <em class="sig-param">encodings=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8b0bbaf9/pydicom/values.py#L303"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_PN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a decoded ‘PN’ value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -243,11 +243,10 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>valuerep.PersonName3 or list of PersonName3</em> – The decoded ‘PN’ value(s) if using Python 3.</p></li>
-<li><p><em>valuerep.PersonNameUnicode or list of PersonNameUnicode</em> – The decoded ‘PN’ value(s) if using Python 2.</p></li>
-</ul>
-</p>
+<dd class="field-even"><p>The decoded ‘PN’ value(s).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName">valuerep.PersonName</a> or list of PersonName</p>
 </dd>
 </dl>
 </dd></dl>
@@ -274,7 +273,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

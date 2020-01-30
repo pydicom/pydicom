@@ -13,7 +13,6 @@ optionally remove curves and private tags, and write the results in a new file.
 # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
 # license : MIT
 
-from __future__ import print_function
 
 import tempfile
 
