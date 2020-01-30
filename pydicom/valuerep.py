@@ -828,4 +828,4 @@ class PersonName:
 
 
 # Alias old class names for backwards compat in user code
-PersonNameUnicode = PersonName = PersonName  
+PersonNameUnicode = PersonName = PersonName
