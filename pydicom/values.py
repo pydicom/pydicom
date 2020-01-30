@@ -8,8 +8,6 @@ from struct import (unpack, calcsize)
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom import compat
-from pydicom.compat import in_py2
 from pydicom.charset import (default_encoding, text_VRs, decode_string)
 from pydicom.config import logger
 from pydicom.dataelem import empty_value_for_VR
@@ -20,10 +18,7 @@ import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (MultiString, DA, DT, TM, TEXT_VR_DELIMS)
 
-if not in_py2:
-    from pydicom.valuerep import PersonName3 as PersonName
-else:
-    from pydicom.valuerep import PersonNameUnicode as PersonName
+from pydicom.valuerep import PersonName
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
@@ -70,8 +65,7 @@ def convert_AE_string(byte_string, is_little_endian, struct_format=None):
     str
         The decoded 'AE' value without non-significant spaces.
     """
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     byte_string = byte_string.strip()
     return byte_string
 
@@ -132,8 +126,7 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
         otherwise returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
-        if not in_py2:
-            byte_string = byte_string.decode(default_encoding)
+        byte_string = byte_string.decode(default_encoding)
         splitup = byte_string.split("\\")
         if len(splitup) == 1:
             return _DA_from_byte_string(splitup[0])
@@ -163,8 +156,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
         ``DSdecimal``, otherwise returns :class:`~pydicom.valuerep.DSfloat` or
         a ``list`` of ``DSfloat``.
     """
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
     # rather than factory DS, but need to
     # ensure last string doesn't have
@@ -201,8 +193,7 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
         returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
-        if not in_py2:
-            byte_string = byte_string.decode(default_encoding)
+        byte_string = byte_string.decode(default_encoding)
         splitup = byte_string.split("\\")
         if len(splitup) == 1:
             return _DT_from_byte_string(splitup[0])
@@ -229,8 +220,7 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     valuerep.IS or list of IS
         The decoded value(s).
     """
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string, valtype=pydicom.valuerep.IS)
 
 
@@ -322,19 +312,12 @@ def convert_PN(byte_string, encodings=None):
 
     Returns
     -------
-    valuerep.PersonName3 or list of PersonName3
-        The decoded 'PN' value(s) if using Python 3.
-    valuerep.PersonNameUnicode or list of PersonNameUnicode
-        The decoded 'PN' value(s) if using Python 2.
+    valuerep.PersonName or list of PersonName
+        The decoded 'PN' value(s).
     """
     def get_valtype(x):
-        if not in_py2:
-            return PersonName(x, encodings).decode()
-        return PersonName(x, encodings)
+        return PersonName(x, encodings).decode()
 
-    # XXX - We have to replicate MultiString functionality
-    # here because we can't decode easily here since that
-    # is performed in PersonNameUnicode
     if byte_string.endswith((b' ', b'\x00')):
         byte_string = byte_string[:-1]
 
@@ -366,8 +349,7 @@ def convert_string(byte_string, is_little_endian, struct_format=None):
     str or list of str
         The decoded value(s).
     """
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     return MultiString(byte_string)
 
 
@@ -385,17 +367,15 @@ def convert_text(byte_string, encodings=None):
 
     Returns
     -------
-    unicode or list of unicode
-        The decoded value(s) if in Python 2.
     str or list of str
-        The decoded value(s) if in Python 3.
+        The decoded value(s).
     """
     values = byte_string.split(b'\\')
     values = [convert_single_string(value, encodings) for value in values]
     if len(values) == 1:
         return values[0]
     else:
-        return MultiValue(compat.text_type, values)
+        return MultiValue(str, values)
 
 
 def convert_single_string(byte_string, encodings=None):
@@ -410,10 +390,8 @@ def convert_single_string(byte_string, encodings=None):
 
     Returns
     -------
-    unicode or list of unicode
-        The decoded text if in Python 2.
     str or list of str
-        The decoded text if in Python 3.
+        The decoded text.
     """
     encodings = encodings or [default_encoding]
     value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)
@@ -480,8 +458,7 @@ def convert_TM_string(byte_string, is_little_endian, struct_format=None):
         otherwise returns :class:`str` or ``list`` of ``str``.
     """
     if config.datetime_conversion:
-        if not in_py2:
-            byte_string = byte_string.decode(default_encoding)
+        byte_string = byte_string.decode(default_encoding)
         splitup = byte_string.split("\\")
         if len(splitup) == 1:
             return _TM_from_byte_string(splitup[0])
@@ -511,8 +488,7 @@ def convert_UI(byte_string, is_little_endian, struct_format=None):
         The decoded 'UI' element value without a trailing null.
     """
     # Strip off 0-byte padding for even length (if there)
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     if byte_string and byte_string.endswith('\0'):
         byte_string = byte_string[:-1]
     return MultiString(byte_string, pydicom.uid.UID)
@@ -543,8 +519,7 @@ def convert_UR_string(byte_string, is_little_endian, struct_format=None):
     bytes or str
         The encoded 'UR' element value without any trailing spaces.
     """
-    if not in_py2:
-        byte_string = byte_string.decode(default_encoding)
+    byte_string = byte_string.decode(default_encoding)
     byte_string = byte_string.rstrip()
     return byte_string
 
@@ -588,7 +563,7 @@ def convert_value(VR, raw_data_element, encodings=None):
 
     # Ensure that encodings is a list
     encodings = encodings or [default_encoding]
-    if isinstance(encodings, compat.string_types):
+    if isinstance(encodings, str):
         encodings = [encodings]
 
     byte_string = raw_data_element.value

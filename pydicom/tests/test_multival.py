@@ -4,7 +4,7 @@
 import pytest
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
-from pydicom import config, compat
+from pydicom import config
 from copy import deepcopy
 
 import sys
@@ -131,7 +131,7 @@ class TestMultiValue(object):
         """MultiValue: test print output"""
         multival = MultiValue(IS, [])
         assert '' == str(multival)
-        multival = MultiValue(compat.text_type, [1, 2, 3])
+        multival = MultiValue(str, [1, 2, 3])
         assert "['1', '2', '3']" == str(multival)
         multival = MultiValue(int, [1, 2, 3])
         assert '[1, 2, 3]' == str(multival)

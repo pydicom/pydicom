@@ -3,6 +3,10 @@ Version 2.0.0
 
 Changelog
 ---------
+* Dropped support for Python 2 (only Python 3.5+ supported)
+* Old `PersonName` class removed; `PersonName3` renamed to `PersonName`.
+  Classes `PersonNameUnicode` and `PersonName3` are aliased to `PersonName` but
+  are deprecated and will be removed in version 2.1
 
 Fixes
 .....

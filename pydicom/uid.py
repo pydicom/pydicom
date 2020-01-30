@@ -8,7 +8,6 @@ import hashlib
 import re
 
 from pydicom._uid_dict import UID_dictionary
-from pydicom import compat
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
@@ -65,7 +64,7 @@ class UID(str):
         if isinstance(val, UID):
             return val
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             return super(UID, cls).__new__(cls, val.strip())
 
         raise TypeError("UID must be a string")

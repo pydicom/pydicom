@@ -18,7 +18,6 @@ dictionary dynamically.
 #           Guillaume Lemaitre <g.lemaitre58@gmail.com>
 # license : MIT
 
-from __future__ import print_function
 
 from pydicom.datadict import DicomDictionary, keyword_dict
 from pydicom.dataset import Dataset

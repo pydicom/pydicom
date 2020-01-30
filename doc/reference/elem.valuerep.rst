@@ -19,7 +19,5 @@ or TM and utilities.
    IS
    MultiString
    PersonName
-   PersonName3
-   PersonNameBase
    PersonNameUnicode
    TM

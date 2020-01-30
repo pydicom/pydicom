@@ -232,8 +232,7 @@ Tag
 :func:`BaseTags<tag.BaseTag>` are automatically created when you assign or read
 elements using their keywords as illustrated in sections above.
 
-The :class:`~tag.BaseTag` class is derived from :class:`int` in Python 3 and
-`long <https://docs.python.org/2/library/functions.html#long>`_ in Python 2,
+The :class:`~tag.BaseTag` class is derived from :class:`int`,
 so in effect, it is just a number with some extra behaviour:
 
   * :func:`~tag.Tag` is used to create instances of :class:`~tag.BaseTag` and

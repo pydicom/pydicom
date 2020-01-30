@@ -4,30 +4,28 @@ import json
 
 import pytest
 
-from pydicom import dcmread, compat
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag, BaseTag
-from pydicom.valuerep import PersonNameUnicode, PersonName3
+from pydicom.valuerep import PersonName
 
 
 class TestPersonName(object):
     def test_json_pn_from_file(self):
         with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
-        assert isinstance(ds[0x00080090].value,
-                          (PersonNameUnicode, PersonName3))
-        assert isinstance(ds[0x00100010].value,
-                          (PersonNameUnicode, PersonName3))
+        assert isinstance(ds[0x00080090].value, PersonName)
+        assert isinstance(ds[0x00100010].value, PersonName)
         inner_seq = ds[0x04000561].value[0][0x04000550]
         dataelem = inner_seq[0][0x00100010]
-        assert isinstance(dataelem.value, (PersonNameUnicode, PersonName3))
+        assert isinstance(dataelem.value, PersonName)
 
     def test_pn_components_to_json(self):
         def check_name(tag, components):
             # we cannot directly compare the dictionaries, as they are not
-            # ordered in Python 2
+            # guaranteed insertion-ordered in Python < 3.7
             value = ds_json[tag]['Value']
             assert 1 == len(value)
             value = value[0]
@@ -84,8 +82,6 @@ class TestPersonName(object):
                    u'"00091007": {"vr": "PN", "Value": '
                    u'[{"Alphabetic": "Yamada^Tarou", '
                    u'"Ideographic": "山田^太郎"}]}}')
-        if compat.in_py2:
-            ds_json = ds_json.encode('UTF8')
 
         ds = Dataset.from_json(ds_json)
         assert u'Yamada^Tarou=山田^太郎=やまだ^たろう' == ds.PatientName
@@ -118,7 +114,7 @@ class TestPersonName(object):
         vr = "PN"
         value = [{"Alphabetic": ""}]
         dataelem = DataElement.from_json(Dataset, tag, vr, value, "Value")
-        assert isinstance(dataelem.value, (PersonNameUnicode, PersonName3))
+        assert isinstance(dataelem.value, PersonName)
 
 
 class TestAT(object):
@@ -232,11 +228,6 @@ class TestDataSetToJson(object):
         assert ds == ds2
 
         json_model2 = ds.to_json_dict()
-        if compat.in_py2:
-            # in Python 2, the encoding of this is slightly different
-            # (single vs double quotation marks)
-            del json_model['00091015']
-            del json_model2['00091015']
 
         assert json_model == json_model2
 

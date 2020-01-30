@@ -4,7 +4,6 @@
 import pytest
 
 import pydicom
-from pydicom import compat
 from pydicom.data import get_testdata_files
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta
@@ -751,39 +750,6 @@ class TestDataset(object):
         assert 0x00090010 not in ds
         assert 'PatientName' in ds
 
-    @pytest.mark.skipif(not compat.in_py2, reason='Python 2 only iterators')
-    def test_iteritems(self):
-        ds = Dataset()
-        ds.Overlays = 12  # 0000,51B0
-        ds.LengthToEnd = 12  # 0008,0001
-        ds.SOPInstanceUID = '1.2.3.4'  # 0008,0018
-        ds.SkipFrameRangeFlag = 'TEST'  # 0008,9460
-
-        keys = []
-        for key in ds.iterkeys():
-            keys.append(key)
-        assert 4 == len(keys)
-        assert 0x000051B0 in keys
-        assert 0x00089460 in keys
-
-        values = []
-        for value in ds.itervalues():
-            values.append(value)
-
-        assert 4 == len(values)
-        assert DataElement(0x00080018, 'UI', '1.2.3.4') in values
-        assert DataElement(0x00089460, 'CS', 'TEST') in values
-
-        items = {}
-        for key, value in ds.iteritems():
-            items[key] = value
-
-        assert 4 == len(items)
-        assert 0x000051B0 in items
-        assert 0x00080018 in items
-        assert '1.2.3.4' == items[0x00080018].value
-        assert 12 == items[0x00080001].value
-
     def test_group_dataset(self):
         """Test Dataset.group_dataset"""
         ds = Dataset()
@@ -1390,7 +1356,7 @@ class TestDataset(object):
     def test_walk(self):
         """Test Dataset.walk iterates through sequences"""
         def test_callback(dataset, elem):
-            if elem.keyword is 'PatientID':
+            if elem.keyword == 'PatientID':
                 dataset.PatientID = 'FIXED'
 
         ds = Dataset()
@@ -1553,10 +1519,6 @@ class TestFileDataset(object):
         ds1 = pickle.loads(s)['ds']
         assert ds == ds1
         assert ds1.PixelSpacing == [1.0, 1.0]
-
-        # Test workaround for python 2
-        if compat.in_py2:
-            ds1.PixelSpacing = ds1.PixelSpacing
 
         ds1.PixelSpacing.insert(1, 2)
         assert [1, 2, 1] == ds1.PixelSpacing

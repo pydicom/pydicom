@@ -3,7 +3,7 @@
 """test cases for pydicom.filewriter module"""
 import tempfile
 from copy import deepcopy
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
 from platform import python_implementation
@@ -29,7 +29,6 @@ from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
 from pydicom.util.hexutil import hex2bytes
-from pydicom.util.fixes import timezone
 from pydicom.valuerep import DA, DT, TM
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
@@ -2275,7 +2274,7 @@ class TestWritePN(object):
         assert encoded == fp.getvalue()
 
         # regression test: make sure no warning is issued, e.g. the
-        # PersonName3 value has not saved the default encoding
+        # PersonName value has not saved the default encoding
         fp = DicomBytesIO()
         fp.is_little_endian = True
         with pytest.warns(None) as warnings:

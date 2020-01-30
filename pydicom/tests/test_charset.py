@@ -9,7 +9,7 @@ from pydicom import dcmread, config
 from pydicom.data import get_charset_files, get_testdata_files
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.valuerep import PersonName3
+from pydicom.valuerep import PersonName
 
 # The file names (without '.dcm' extension) of most of the character test
 # files, together with the respective decoded PatientName tag values.
@@ -133,10 +133,9 @@ class TestCharset(object):
 
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
-        # Python 3: elem.value is PersonName3, Python 2: elem.value is str
+        # elem.value is PersonName
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         pydicom.charset.decode_element(elem, ['ISO 2022 IR 126'])
-        # After decode Python 2: elem.value is PersonNameUnicode
         assert 'iso_ir_126' in elem.value.encodings
         assert 'iso8859' not in elem.value.encodings
         # default encoding is iso8859
@@ -385,7 +384,7 @@ class TestCharset(object):
         assert patient_name == ds.PatientName
 
         # check that patient names are correctly written back
-        # without original byte string (PersonName3 only)
+        # without original byte string (PersonName only)
         if hasattr(ds.PatientName, 'original_string'):
             ds.PatientName.original_string = None
             fp = DicomBytesIO()
@@ -436,7 +435,7 @@ class TestCharset(object):
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
 
-        japanese_pn = PersonName3(u"Mori^Ogai=森^鷗外=もり^おうがい")
+        japanese_pn = PersonName(u"Mori^Ogai=森^鷗外=もり^おうがい")
         pyencs = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
                                                     "ISO 2022 IR 87",
                                                     "ISO 2022 IR 159"])
@@ -468,7 +467,7 @@ class TestCharset(object):
 
     def test_deprecated_decode(self):
         """Test we get a deprecation warning when using charset.decode()."""
-        # Python 3: elem.value is PersonName3, Python 2: elem.value is str
+        # elem.value is PersonName
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         msg = r"'charset.decode\(\)' is deprecated"
         with pytest.warns(DeprecationWarning, match=msg):

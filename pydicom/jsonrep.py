@@ -4,9 +4,7 @@
 import base64
 import warnings
 
-from pydicom import compat
-from pydicom.compat import int_type
-from pydicom.valuerep import PersonNameUnicode
+from pydicom.valuerep import PersonName
 
 # Order of keys is significant!
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
@@ -39,7 +37,7 @@ def convert_to_python_number(value, vr):
         return None
     number_type = None
     if vr in VRs_TO_BE_INTS:
-        number_type = int_type
+        number_type = int
     if vr in VRs_TO_BE_FLOATS:
         number_type = float
     if number_type is not None:
@@ -91,7 +89,7 @@ class JsonDataElementConverter(object):
         Returns
         -------
         str or bytes or int or float or dataset_class
-        or PersonName3 or PersonNameUnicode or list of any of these types
+        or PersonName or list of any of these types
             The value or value list of the newly created data element.
         """
         from pydicom.dataelem import empty_value_for_VR
@@ -117,13 +115,13 @@ class JsonDataElementConverter(object):
             value = value[0]
 
         if self.value_key == 'InlineBinary':
-            if not isinstance(value, compat.char_types):
+            if not isinstance(value, (str, bytes)):
                 fmt = '"{}" of data element "{}" must be a bytes-like object.'
                 raise TypeError(fmt.format(self.value_key, self.tag))
             return base64.b64decode(value)
 
         if self.value_key == 'BulkDataURI':
-            if not isinstance(value, compat.string_types):
+            if not isinstance(value, str):
                 fmt = '"{}" of data element "{}" must be a string.'
                 raise TypeError(fmt.format(self.value_key, self.tag))
             if self.bulk_data_uri_handler is None:
@@ -145,7 +143,7 @@ class JsonDataElementConverter(object):
 
         Returns
         -------
-        dataset_class or PersonName3 or PersonNameUnicode
+        dataset_class or PersonName
         or str or int or float
             A single value of the corresponding :class:`DataElement`.
         """
@@ -222,7 +220,7 @@ class JsonDataElementConverter(object):
 
         Returns
         -------
-        PersonName3 or PersonNameUnicode or str
+        PersonName or str
             The decoded PersonName object or an empty string.
         """
         if not isinstance(value, dict):
@@ -248,6 +246,4 @@ class JsonDataElementConverter(object):
             if 'Phonetic' in value:
                 comps[2] = value['Phonetic']
             elem_value = '='.join(comps)
-            if compat.in_py2:
-                elem_value = PersonNameUnicode(elem_value, 'UTF8')
             return elem_value

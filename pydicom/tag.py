@@ -1,17 +1,14 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Define Tag class to hold a DICOM (group, element) tag and related functions.
 
-The 4 bytes of the DICOM tag are stored as an arbitrary length 'long' for
-Python 2 and as an 'int' for Python 3. Tags are stored as a single number and
-separated to (group, element) as required.
+The 4 bytes of the DICOM tag are stored as an 'int'. Tags are
+stored as a single number and separated to (group, element) as required.
 """
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
 #       element
 import traceback
 from contextlib import contextmanager
-
-from pydicom import compat
 
 
 @contextmanager
@@ -83,12 +80,12 @@ def Tag(arg, arg2=None):
             raise ValueError("Tag must be an int or a 2-tuple")
 
         valid = False
-        if isinstance(arg[0], compat.string_types):
-            valid = isinstance(arg[1], (str, compat.string_types))
+        if isinstance(arg[0], str):
+            valid = isinstance(arg[1], str)
             if valid:
                 arg = (int(arg[0], 16), int(arg[1], 16))
-        elif isinstance(arg[0], compat.number_types):
-            valid = isinstance(arg[1], compat.number_types)
+        elif isinstance(arg[0], int):
+            valid = isinstance(arg[1], int)
         if not valid:
             raise ValueError("Both arguments for Tag must be the same type, "
                              "either string or int.")
@@ -100,7 +97,7 @@ def Tag(arg, arg2=None):
         long_value = (arg[0] << 16) | arg[1]
 
     # Single str parameter
-    elif isinstance(arg, (str, compat.text_type)):
+    elif isinstance(arg, str):
         try:
             long_value = int(arg, 16)
             if long_value > 0xFFFFFFFF:
@@ -127,18 +124,10 @@ def Tag(arg, arg2=None):
     return BaseTag(long_value)
 
 
-if compat.in_py2:
-    # May get an overflow error with int if sys.maxsize < 0xFFFFFFFF
-    BaseTag_base_class = long
-else:
-    BaseTag_base_class = int
-
-
-class BaseTag(BaseTag_base_class):
+class BaseTag(int):
     """Represents a DICOM element (group, element) tag.
 
-    If using Python 2.7 then tags are represented as a :class:`long`, while for
-    Python 3 they are represented as an :class:`int`.
+    Tags are represented as an :class:`int`.
 
     Attributes
     ----------
@@ -166,7 +155,7 @@ class BaseTag(BaseTag_base_class):
             except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
 
-        return BaseTag_base_class(self) < BaseTag_base_class(other)
+        return int(self) < int(other)
 
     def __ge__(self, other):
         """Return ``True`` if `self` is greater than or equal to `other`."""
@@ -179,13 +168,13 @@ class BaseTag(BaseTag_base_class):
     def __eq__(self, other):
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag_base_class):
+        if not isinstance(other, int):
             try:
                 other = Tag(other)
             except Exception:
                 raise TypeError("Cannot compare Tag with non-Tag item")
 
-        return BaseTag_base_class(self) == BaseTag_base_class(other)
+        return int(self) == int(other)
 
     def __ne__(self, other):
         """Return ``True`` if `self` does not equal `other`."""
@@ -196,7 +185,7 @@ class BaseTag(BaseTag_base_class):
     # to the parent class
     #   See http://docs.python.org/dev/3.0/reference/
     #              datamodel.html#object.__hash__
-    __hash__ = BaseTag_base_class.__hash__
+    __hash__ = int.__hash__
 
     def __str__(self):
         """Return the tag value as a hex string '(gggg, eeee)'."""

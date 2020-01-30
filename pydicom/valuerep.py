@@ -4,13 +4,11 @@ from copy import deepcopy
 from decimal import Decimal
 import re
 
-from datetime import (date, datetime, time, timedelta)
+from datetime import (date, datetime, time, timedelta, timezone)
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom import compat
 from pydicom.multival import MultiValue
-from pydicom.util.fixes import timezone
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"
@@ -28,16 +26,15 @@ text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-# Note: We use characters for Python 2 and character codes for Python 3
-# because these are the types yielded if iterating over a byte string.
+# Note: We use character codes for Python 3
+# because those are the types yielded if iterating over a byte string.
 
 # Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
-TEXT_VR_DELIMS = ({'\n', '\r', '\t', '\f'} if compat.in_py2
-                  else {0x0d, 0x0a, 0x09, 0x0c})
+TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 
 # Character/Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
-PN_DELIMS = {'^'} if compat.in_py2 else {0xe5}
+PN_DELIMS = {0xe5}
 
 
 class DA(date):
@@ -73,7 +70,7 @@ class DA(date):
             A string conformant to the DA definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             if len(val) == 8:
                 year = int(val[0:4])
                 month = int(val[4:6])
@@ -101,7 +98,7 @@ class DA(date):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DA) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -154,7 +151,7 @@ class DT(datetime):
             A string conformant to the DT definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             match = DT._regex_dt.match(val)
             if match and len(val) <= 26:
                 dt_match = match.group(2)
@@ -213,7 +210,7 @@ class DT(datetime):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -262,7 +259,7 @@ class TM(time):
             A string conformant to the TM definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             match = TM._regex_tm.match(val)
             if match and len(val) <= 16:
                 tm_match = match.group(1)
@@ -298,7 +295,7 @@ class TM(time):
         return val
 
     def __init__(self, val):
-        if isinstance(val, (str, compat.string_types)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -338,7 +335,7 @@ class DSfloat(float):
         # a different object, because float is immutable.
 
         has_attribute = hasattr(val, 'original_string')
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
@@ -387,7 +384,7 @@ class DSdecimal(Decimal):
         enforce_length = config.enforce_valid_values
         # DICOM allows spaces around the string,
         # but python doesn't, so clean it
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             val = val.strip()
             # If the input string is actually invalid that we relax the valid
             # value constraint for this particular instance
@@ -420,7 +417,7 @@ class DSdecimal(Decimal):
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and hasattr(val, 'original_string'):  # noqa
             self.original_string = val.original_string
@@ -453,7 +450,7 @@ def DS(val):
     Similarly the string clean and check can be avoided and :class:`DSfloat`
     called directly if a string has already been processed.
     """
-    if isinstance(val, (str, compat.text_type)):
+    if isinstance(val, str):
         val = val.strip()
     if val == '' or val is None:
         return val
@@ -466,35 +463,16 @@ class IS(int):
     Stores original integer string for exact rewriting of the string
     originally read or stored.
     """
-    if compat.in_py2:
-        __slots__ = ['original_string']
-
-        # Unlikely that str(int) will not be the
-        # same as the original, but could happen
-        # with leading zeros.
-
-        def __getstate__(self):
-            return dict((slot, getattr(self, slot)) for slot in self.__slots__
-                        if hasattr(self, slot))
-
-        def __setstate__(self, state):
-            for slot, value in state.items():
-                setattr(self, slot, value)
 
     def __new__(cls, val):
         """Create instance if new integer string"""
         if val is None:
             return val
-        if isinstance(val, (str, compat.text_type)) and val.strip() == '':
+        if isinstance(val, str) and val.strip() == '':
             return ''
-        # Overflow error in Python 2 for integers too large
-        # while calling super(IS). Fall back on the regular int
-        # casting that will automatically convert the val to long
-        # if needed.
-        try:
-            newval = super(IS, cls).__new__(cls, val)
-        except OverflowError:
-            newval = int(val)
+
+        newval = super(IS, cls).__new__(cls, val)
+
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         if isinstance(val, (float, Decimal)) and newval != val:
@@ -509,7 +487,7 @@ class IS(int):
 
     def __init__(self, val):
         # If a string passed, then store it
-        if isinstance(val, (str, compat.text_type)):
+        if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -585,7 +563,7 @@ def _decode_personname(components, encodings):
     """
     from pydicom.charset import decode_string
 
-    if isinstance(components[0], compat.text_type):
+    if isinstance(components[0], str):
         comps = components
     else:
         comps = [decode_string(comp, encodings, PN_DELIMS)
@@ -628,15 +606,15 @@ def _encode_personname(components, encodings):
     return b'='.join(encoded_comps)
 
 
-class PersonName3(object):
+class PersonName:
     def __new__(cls, *args, **kwargs):
-        # Handle None value by returning None instead of a PersonName3 object
+        # Handle None value by returning None instead of a PersonName object
         if len(args) and args[0] is None:
             return None
-        return super(PersonName3, cls).__new__(cls)
+        return super(PersonName, cls).__new__(cls)
 
     def __init__(self, val, encodings=None, original_string=None):
-        if isinstance(val, PersonName3):
+        if isinstance(val, PersonName):
             encodings = val.encodings
             self.original_string = val.original_string
             self._components = tuple(str(val).split('='))
@@ -789,7 +767,7 @@ class PersonName3(object):
 
         Returns
         -------
-        valuerep.PersonName3
+        valuerep.PersonName
             A person name object that will return the decoded string with
             the given encodings on demand. If the encodings are not given,
             the current object is returned.
@@ -804,7 +782,7 @@ class PersonName3(object):
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
                 self.components, self.encodings or [default_encoding])
-        return PersonName3(self.original_string, encodings)
+        return PersonName(self.original_string, encodings)
 
     def encode(self, encodings=None):
         """Return the patient name decoded by the given `encodings`.
@@ -849,151 +827,5 @@ class PersonName3(object):
         return bool(self.original_string)
 
 
-class PersonNameBase(object):
-    """Base class for Person Name classes"""
-
-    def __init__(self, val):
-        """Initialize the PN properties"""
-        # Note normally use __new__ on subclassing an immutable,
-        # but here we just want to do some pre-processing
-        # for properties PS 3.5-2008 section 6.2 (p.28)
-        # and 6.2.1 describes PN. Briefly:
-        # single-byte-characters=ideographic
-        # characters=phonetic-characters
-        # (each with?):
-        #   family-name-complex
-        #  ^Given-name-complex
-        #  ^Middle-name^name-prefix^name-suffix
-        self.parse()
-
-    def formatted(self, format_str):
-        """Return a formatted string according to the format pattern
-
-        Parameters
-        ----------
-        format_str : str
-            The string to use for formatting the PN element value. Use
-            "...%(property)...%(property)..." where property is one of
-            `family_name`, `given_name`, `middle_name`, `name_prefix`, or
-            `name_suffix`.
-
-        Returns
-        -------
-        str
-            The formatted PN element value.
-        """
-        return format_str % self.__dict__
-
-    def parse(self):
-        """Break down the components and name parts"""
-        self.components = tuple(self.split("="))
-        nComponents = len(self.components)
-        self.single_byte = self.components[0]
-        self.ideographic = ''
-        self.phonetic = ''
-        if nComponents > 1:
-            self.ideographic = self.components[1]
-        if nComponents > 2:
-            self.phonetic = self.components[2]
-
-        if self.single_byte:
-            # in case missing trailing items are left out
-            name_string = self.single_byte + "^^^^"
-            parts = name_string.split("^")[:5]
-            self.family_name, self.given_name, self.middle_name = parts[:3]
-            self.name_prefix, self.name_suffix = parts[3:]
-        else:
-            (self.family_name, self.given_name, self.middle_name,
-             self.name_prefix, self.name_suffix) = ('', '', '', '', '')
-
-
-class PersonName(PersonNameBase, bytes):
-    """Human-friendly class to hold the value of elements with VR  of 'PN'.
-
-    The value is parsed into the following properties:
-
-    * single-byte, ideographic, and phonetic components (DICOM Standard, Part
-      5, :dcm:`Section 6.2.1<part05/sect_6.2.html#sect_6.2.1>`)
-    * family_name, given_name, middle_name, name_prefix, name_suffix
-    """
-
-    def __new__(cls, val):
-        """Return instance of the new class"""
-        # Check if trying to convert a string that has already been converted
-        if isinstance(val, PersonName):
-            return val
-        return super(PersonName, cls).__new__(cls, val)
-
-    def encode(self, *args):
-        """Dummy method to mimic py2 str behavior in py3 bytes subclass"""
-        # This greatly simplifies the write process so all objects have the
-        # "encode" method
-        return self
-
-    def family_comma_given(self):
-        """Return name as 'Family-name, Given-name'"""
-        return self.formatted("%(family_name)s, %(given_name)s")
-
-    # def __str__(self):
-    # return str(self.byte_string)
-    # XXX need to process the ideographic or phonetic components?
-    # def __len__(self):
-    # return len(self.byte_string)
-
-
-class PersonNameUnicode(PersonNameBase, compat.text_type):
-    """Unicode version of Person Name"""
-
-    def __new__(cls, val, encodings):
-        """Return unicode string after conversion of each part
-
-        Parameters
-        ----------
-        val : bytes or str
-            The PN value to store
-        encodings : list of str
-            A list of python encodings, generally found from
-            ``pydicom.charset.python_encodings`` mapping of values in DICOM
-            data element (0008,0005) *Specific Character Set*.
-        """
-        encodings = _verify_encodings(encodings)
-        comps = _decode_personname(val.split(b"="), encodings)
-        new_val = u"=".join(comps)
-        return compat.text_type.__new__(cls, new_val)
-
-    def __init__(self, val, encodings):
-        self.encodings = _verify_encodings(encodings)
-        PersonNameBase.__init__(self, val)
-
-    def __copy__(self):
-        """Correctly copy object.
-
-        Needed because of the overwritten __new__.
-        """
-        # no need to use the original encoding here - we just encode and
-        # decode in utf-8 and set the original encoding later
-        name = compat.text_type(self).encode('utf8')
-        new_person = PersonNameUnicode(name, 'utf8')
-        new_person.__dict__.update(self.__dict__)
-        return new_person
-
-    def __deepcopy__(self, memo):
-        """Make correctly a deep copy of the object.
-
-        Needed because of the overwritten __new__.
-        """
-        name = compat.text_type(self).encode('utf8')
-        new_person = PersonNameUnicode(name, 'utf8')
-        memo[id(self)] = new_person
-        # no need for deepcopy call - all attributes are immutable
-        new_person.__dict__.update(self.__dict__)
-        return new_person
-
-    def encode(self, encodings):
-        """Encode the unicode using the specified encoding"""
-        encodings = _verify_encodings(encodings) or self.encodings
-        return _encode_personname(self.split('='), encodings)
-
-    def family_comma_given(self):
-        """Return name as 'Family-name, Given-name'"""
-        return self.formatted("%(family_name)u, %(given_name)u")
+# Alias old class names for backwards compat in user code
+PersonNameUnicode = PersonName = PersonName

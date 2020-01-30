@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in debugging writing and reading"""
 
-from __future__ import print_function
 from io import BytesIO
 
 

@@ -18,7 +18,6 @@ import sys
 import os.path
 import pydicom
 from pydicom.datadict import dictionary_keyword
-from pydicom.compat import int_type
 
 import re
 
@@ -71,12 +70,10 @@ def code_imports():
     :return: a string of import statement lines
 
     """
-    line0 = "from __future__ import unicode_literals"
-    line0 += "  # Only for python2.7 and save_as unicode filename"
     line1 = "import pydicom"
     line2 = "from pydicom.dataset import Dataset"
     line3 = "from pydicom.sequence import Sequence"
-    return line_term.join((line0, line1, line2, line3))
+    return line_term.join((line1, line2, line3))
 
 
 def code_dataelem(dataelem,
@@ -323,7 +320,7 @@ def main(default_exclude_size, args=None):
     parser.add_argument(
         '-e',
         '--exclude-size',
-        type=int_type,
+        type=int,
         default=default_exclude_size,
         help=help_exclude_size)
     parser.add_argument(

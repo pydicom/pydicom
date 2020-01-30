@@ -1,13 +1,10 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-from __future__ import absolute_import
 
 import warnings
 from struct import pack
 
-from pydicom import compat
-from pydicom.compat import in_py2
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
 )
@@ -18,7 +15,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.valuerep import extra_length_VRs, PersonNameUnicode
+from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
 
@@ -279,14 +276,7 @@ def write_PN(fp, data_element, encodings=None):
     else:
         val = data_element.value
 
-    if val and isinstance(val[0], compat.text_type) or not in_py2:
-        try:
-            val = [elem.encode(encodings) for elem in val]
-        except TypeError:
-            # we get here in Python 2 if val is a unicode string
-            val = [PersonNameUnicode(elem, encodings) for elem in val]
-            val = [elem.encode(encodings) for elem in val]
-
+    val = [elem.encode(encodings) for elem in val]
     val = b'\\'.join(val)
 
     if len(val) % 2 != 0:
@@ -301,7 +291,7 @@ def write_string(fp, data_element, padding=' '):
     if val is not None:
         if len(val) % 2 != 0:
             val = val + padding  # pad to even length
-        if isinstance(val, compat.text_type):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
         fp.write(val)
 
@@ -312,13 +302,13 @@ def write_text(fp, data_element, encodings=None):
     if val is not None:
         encodings = encodings or [default_encoding]
         if _is_multi_value(val):
-            if val and isinstance(val[0], compat.text_type):
+            if val and isinstance(val[0], str):
                 val = b'\\'.join([encode_string(val, encodings)
                                   for val in val])
             else:
                 val = b'\\'.join([val for val in val])
         else:
-            if isinstance(val, compat.text_type):
+            if isinstance(val, str):
                 val = encode_string(val, encodings)
 
         if len(val) % 2 != 0:
@@ -346,8 +336,7 @@ def write_number_string(fp, data_element):
     if len(val) % 2 != 0:
         val = val + ' '  # pad to even length
 
-    if not in_py2:
-        val = bytes(val, default_encoding)
+    val = bytes(val, default_encoding)
 
     fp.write(val)
 
@@ -363,18 +352,18 @@ def _format_DA(val):
 
 def write_DA(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_DA(x) for x in val))
         else:
             val = _format_DA(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -391,18 +380,18 @@ def _format_DT(val):
 
 def write_DT(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_DT(x) for x in val))
         else:
             val = _format_DT(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -421,18 +410,18 @@ def _format_TM(val):
 
 def write_TM(fp, data_element):
     val = data_element.value
-    if isinstance(val, (str, compat.string_types)):
+    if isinstance(val, str):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, (str, compat.string_types))
+            val = "\\".join((x if isinstance(x, str)
                              else _format_TM(x) for x in val))
         else:
             val = _format_TM(val)
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
-        if isinstance(val, compat.string_types):
+        if isinstance(val, str):
             val = val.encode(default_encoding)
 
         fp.write(val)
@@ -512,10 +501,8 @@ def write_data_element(fp, data_element, encodings=None):
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
-        if not in_py2:
-            fp.write(bytes(VR, default_encoding))
-        else:
-            fp.write(VR)
+        fp.write(bytes(VR, default_encoding))
+
         if VR in extra_length_VRs:
             fp.write_US(0)  # reserved 2 bytes
 
@@ -896,7 +883,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     caller_owns_file = True
     # Open file if not already a file object
-    if isinstance(filename, compat.string_types):
+    if isinstance(filename, str):
         fp = DicomFile(filename, 'wb')
         # caller provided a file name; we own the file handle
         caller_owns_file = False
