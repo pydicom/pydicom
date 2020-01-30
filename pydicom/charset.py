@@ -286,7 +286,7 @@ def decode_string(value, encodings, delimiters):
     ----------
     value : bytes
         The encoded byte string in the DICOM element value. Should be
-        :class:`bytes` for Python 3.
+        :class:`bytes`
     encodings : list of str
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific

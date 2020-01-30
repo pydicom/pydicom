@@ -18,7 +18,7 @@ import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (MultiString, DA, DT, TM, TEXT_VR_DELIMS)
 
-from pydicom.valuerep import PersonName3 as PersonName
+from pydicom.valuerep import PersonName
 
 
 def convert_tag(byte_string, is_little_endian, offset=0):
@@ -312,7 +312,7 @@ def convert_PN(byte_string, encodings=None):
 
     Returns
     -------
-    valuerep.PersonName3 or list of PersonName3
+    valuerep.PersonName or list of PersonName
         The decoded 'PN' value(s).
     """
     def get_valtype(x):

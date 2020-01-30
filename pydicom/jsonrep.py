@@ -4,7 +4,7 @@
 import base64
 import warnings
 
-from pydicom.valuerep import PersonName3
+from pydicom.valuerep import PersonName
 
 # Order of keys is significant!
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
@@ -89,7 +89,7 @@ class JsonDataElementConverter(object):
         Returns
         -------
         str or bytes or int or float or dataset_class
-        or PersonName3 or list of any of these types
+        or PersonName or list of any of these types
             The value or value list of the newly created data element.
         """
         from pydicom.dataelem import empty_value_for_VR
@@ -143,7 +143,7 @@ class JsonDataElementConverter(object):
 
         Returns
         -------
-        dataset_class or PersonName3
+        dataset_class or PersonName
         or str or int or float
             A single value of the corresponding :class:`DataElement`.
         """
@@ -220,7 +220,7 @@ class JsonDataElementConverter(object):
 
         Returns
         -------
-        PersonName3 or str
+        PersonName or str
             The decoded PersonName object or an empty string.
         """
         if not isinstance(value, dict):

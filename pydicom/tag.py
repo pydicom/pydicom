@@ -127,7 +127,7 @@ def Tag(arg, arg2=None):
 class BaseTag(int):
     """Represents a DICOM element (group, element) tag.
 
-    Tags are represented as a :class:`int`.
+    Tags are represented as an :class:`int`.
 
     Attributes
     ----------

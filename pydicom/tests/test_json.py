@@ -9,18 +9,18 @@ from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag, BaseTag
-from pydicom.valuerep import PersonName3
+from pydicom.valuerep import PersonName
 
 
 class TestPersonName(object):
     def test_json_pn_from_file(self):
         with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
-        assert isinstance(ds[0x00080090].value, PersonName3)
-        assert isinstance(ds[0x00100010].value, PersonName3)
+        assert isinstance(ds[0x00080090].value, PersonName)
+        assert isinstance(ds[0x00100010].value, PersonName)
         inner_seq = ds[0x04000561].value[0][0x04000550]
         dataelem = inner_seq[0][0x00100010]
-        assert isinstance(dataelem.value, PersonName3)
+        assert isinstance(dataelem.value, PersonName)
 
     def test_pn_components_to_json(self):
         def check_name(tag, components):
@@ -114,7 +114,7 @@ class TestPersonName(object):
         vr = "PN"
         value = [{"Alphabetic": ""}]
         dataelem = DataElement.from_json(Dataset, tag, vr, value, "Value")
-        assert isinstance(dataelem.value, PersonName3)
+        assert isinstance(dataelem.value, PersonName)
 
 
 class TestAT(object):

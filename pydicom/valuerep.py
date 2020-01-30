@@ -606,15 +606,15 @@ def _encode_personname(components, encodings):
     return b'='.join(encoded_comps)
 
 
-class PersonName3(object):
+class PersonName:
     def __new__(cls, *args, **kwargs):
-        # Handle None value by returning None instead of a PersonName3 object
+        # Handle None value by returning None instead of a PersonName object
         if len(args) and args[0] is None:
             return None
-        return super(PersonName3, cls).__new__(cls)
+        return super(PersonName, cls).__new__(cls)
 
     def __init__(self, val, encodings=None, original_string=None):
-        if isinstance(val, PersonName3):
+        if isinstance(val, PersonName):
             encodings = val.encodings
             self.original_string = val.original_string
             self._components = tuple(str(val).split('='))
@@ -767,7 +767,7 @@ class PersonName3(object):
 
         Returns
         -------
-        valuerep.PersonName3
+        valuerep.PersonName
             A person name object that will return the decoded string with
             the given encodings on demand. If the encodings are not given,
             the current object is returned.
@@ -782,7 +782,7 @@ class PersonName3(object):
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
                 self.components, self.encodings or [default_encoding])
-        return PersonName3(self.original_string, encodings)
+        return PersonName(self.original_string, encodings)
 
     def encode(self, encodings=None):
         """Return the patient name decoded by the given `encodings`.
@@ -827,96 +827,5 @@ class PersonName3(object):
         return bool(self.original_string)
 
 
-class PersonNameBase(object):
-    """Base class for Person Name classes"""
-
-    def __init__(self, val):
-        """Initialize the PN properties"""
-        # Note normally use __new__ on subclassing an immutable,
-        # but here we just want to do some pre-processing
-        # for properties PS 3.5-2008 section 6.2 (p.28)
-        # and 6.2.1 describes PN. Briefly:
-        # single-byte-characters=ideographic
-        # characters=phonetic-characters
-        # (each with?):
-        #   family-name-complex
-        #  ^Given-name-complex
-        #  ^Middle-name^name-prefix^name-suffix
-        self.parse()
-
-    def formatted(self, format_str):
-        """Return a formatted string according to the format pattern
-
-        Parameters
-        ----------
-        format_str : str
-            The string to use for formatting the PN element value. Use
-            "...%(property)...%(property)..." where property is one of
-            `family_name`, `given_name`, `middle_name`, `name_prefix`, or
-            `name_suffix`.
-
-        Returns
-        -------
-        str
-            The formatted PN element value.
-        """
-        return format_str % self.__dict__
-
-    def parse(self):
-        """Break down the components and name parts"""
-        self.components = tuple(self.split("="))
-        nComponents = len(self.components)
-        self.single_byte = self.components[0]
-        self.ideographic = ''
-        self.phonetic = ''
-        if nComponents > 1:
-            self.ideographic = self.components[1]
-        if nComponents > 2:
-            self.phonetic = self.components[2]
-
-        if self.single_byte:
-            # in case missing trailing items are left out
-            name_string = self.single_byte + "^^^^"
-            parts = name_string.split("^")[:5]
-            self.family_name, self.given_name, self.middle_name = parts[:3]
-            self.name_prefix, self.name_suffix = parts[3:]
-        else:
-            (self.family_name, self.given_name, self.middle_name,
-             self.name_prefix, self.name_suffix) = ('', '', '', '', '')
-
-
-class PersonName(PersonNameBase, bytes):
-    """Human-friendly class to hold the value of elements with VR  of 'PN'.
-
-    The value is parsed into the following properties:
-
-    * single-byte, ideographic, and phonetic components (DICOM Standard, Part
-      5, :dcm:`Section 6.2.1<part05/sect_6.2.html#sect_6.2.1>`)
-    * family_name, given_name, middle_name, name_prefix, name_suffix
-    """
-
-    def __new__(cls, val):
-        """Return instance of the new class"""
-        # Check if trying to convert a string that has already been converted
-        if isinstance(val, PersonName):
-            return val
-        return super(PersonName, cls).__new__(cls, val)
-
-    def encode(self, *args):
-        """Dummy method to mimic py2 str behavior in py3 bytes subclass"""
-        # This greatly simplifies the write process so all objects have the
-        # "encode" method
-        return self
-
-    def family_comma_given(self):
-        """Return name as 'Family-name, Given-name'"""
-        return self.formatted("%(family_name)s, %(given_name)s")
-
-    # def __str__(self):
-    # return str(self.byte_string)
-    # XXX need to process the ideographic or phonetic components?
-    # def __len__(self):
-    # return len(self.byte_string)
-
-
-PersonNameUnicode = PersonName3  # for backwards compat in user code
+# Alias old class names for backwards compat in user code
+PersonNameUnicode = PersonName = PersonName  

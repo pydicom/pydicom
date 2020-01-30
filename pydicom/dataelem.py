@@ -26,7 +26,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import PersonName3
+from pydicom.valuerep import PersonName
 
 BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
@@ -439,7 +439,7 @@ class DataElement(object):
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
-        if isinstance(self.value, (str, bytes, PersonName3)):
+        if isinstance(self.value, (str, bytes, PersonName)):
             return 1 if self.value else 0
         try:
             iter(self.value)
@@ -522,7 +522,7 @@ class DataElement(object):
         elif self.VR == "UI":
             return UID(val) if val is not None else None
         elif self.VR == "PN":
-            return PersonName3(val)
+            return PersonName(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought
         # elif self.VR == "PN":

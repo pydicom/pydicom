@@ -84,7 +84,7 @@ ensure that the value gets written correctly?
 +----+------------------+-----------------+-----------------------------------+
 | OW | Other Word       | :class:`bytes`  | :class:`bytes`                    |
 +----+------------------+-----------------+-----------------------------------+
-| PN | Person Name      | :class:`str`    | :class:`~valuerep.PersonName3`             |
+| PN | Person Name      | :class:`str`    | :class:`~valuerep.PersonName`     |
 +----+------------------+-----------------+-----------------------------------+
 | SH | Short String     | :class:`str`    | :class:`str`                      |
 +----+------------------+-----------------+-----------------------------------+

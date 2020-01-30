@@ -2274,7 +2274,7 @@ class TestWritePN(object):
         assert encoded == fp.getvalue()
 
         # regression test: make sure no warning is issued, e.g. the
-        # PersonName3 value has not saved the default encoding
+        # PersonName value has not saved the default encoding
         fp = DicomBytesIO()
         fp.is_little_endian = True
         with pytest.warns(None) as warnings:

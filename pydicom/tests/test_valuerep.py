@@ -22,7 +22,7 @@ from pydicom.data import get_testdata_files
 from pydicom.valuerep import DS, IS
 import pytest
 
-from pydicom.valuerep import PersonName3
+from pydicom.valuerep import PersonName
 
 
 try:
@@ -276,7 +276,7 @@ class TestDecimalString(object):
 class TestPersonName(object):
     def test_last_first(self):
         """PN: Simple Family-name^Given-name works..."""
-        pn = PersonName3("Family^Given")
+        pn = PersonName("Family^Given")
         assert "Family" == pn.family_name
         assert 'Given' == pn.given_name
         assert '' == pn.name_suffix
@@ -284,7 +284,7 @@ class TestPersonName(object):
 
     def test_copy(self):
         """PN: Copy and deepcopy works..."""
-        pn = PersonName3(
+        pn = PersonName(
             'Hong^Gildong='
             '\033$)C\373\363^\033$)C\321\316\324\327='
             '\033$)C\310\253^\033$)C\261\346\265\277',
@@ -307,25 +307,25 @@ class TestPersonName(object):
         """PN: 3component (single-byte, ideographic,
         phonetic characters) works..."""
         # Example name from PS3.5-2008 section I.2 p. 108
-        pn = PersonName3('Hong^Gildong='
+        pn = PersonName('Hong^Gildong='
                         '\033$)C\373\363^\033$)C\321\316\324\327='
                         '\033$)C\310\253^\033$)C\261\346\265\277')
         assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
 
     def test_formatting(self):
         """PN: Formatting works..."""
-        pn = PersonName3("Family^Given")
+        pn = PersonName("Family^Given")
         assert "Family, Given" == pn.family_comma_given()
 
     def test_unicode_kr(self):
         """PN: 3component in unicode works (Korean)..."""
         # Example name from PS3.5-2008 section I.2 p. 101
-        pn = PersonName3(b'Hong^Gildong='
+        pn = PersonName(b'Hong^Gildong='
                                b'\033$)C\373\363^\033$)C\321\316\324\327='
                                b'\033$)C\310\253^\033$)C\261\346\265\277',
                                [default_encoding, 'euc_kr'])
 
-        # PersonName3 does not decode the components automatically
+        # PersonName does not decode the components automatically
         pn = pn.decode()
         assert (u'Hong', u'Gildong') == (pn.family_name, pn.given_name)
         assert u'洪^吉洞' == pn.ideographic
@@ -334,7 +334,7 @@ class TestPersonName(object):
     def test_unicode_jp_from_bytes(self):
         """PN: 3component in unicode works (Japanese)..."""
         # Example name from PS3.5-2008 section H  p. 98
-        pn = PersonName3(b'Yamada^Tarou='
+        pn = PersonName(b'Yamada^Tarou='
                                b'\033$B;3ED\033(B^\033$BB@O:\033(B='
                                b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
                                [default_encoding, 'iso2022_jp'])
@@ -345,7 +345,7 @@ class TestPersonName(object):
 
     def test_unicode_jp_from_bytes_comp_delimiter(self):
         """The example encoding without the escape sequence before '='"""
-        pn = PersonName3(b'Yamada^Tarou='
+        pn = PersonName(b'Yamada^Tarou='
                                b'\033$B;3ED\033(B^\033$BB@O:='
                                b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
                                [default_encoding, 'iso2022_jp'])
@@ -357,7 +357,7 @@ class TestPersonName(object):
     def test_unicode_jp_from_bytes_caret_delimiter(self):
         """PN: 3component in unicode works (Japanese)..."""
         # Example name from PS3.5-2008 section H  p. 98
-        pn = PersonName3(b'Yamada^Tarou='
+        pn = PersonName(b'Yamada^Tarou='
                                b'\033$B;3ED\033(B^\033$BB@O:\033(B='
                                b'\033$B$d$^$@\033(B^\033$B$?$m$&\033(B',
                                [default_encoding, 'iso2022_jp'])
@@ -368,7 +368,7 @@ class TestPersonName(object):
 
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
-        pn = PersonName3(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+        pn = PersonName(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
                                [default_encoding, 'iso2022_jp'])
         assert (u'Yamada', u'Tarou') == (pn.family_name, pn.given_name)
         assert u'山田^太郎' == pn.ideographic
@@ -377,31 +377,31 @@ class TestPersonName(object):
     def test_not_equal(self):
         """PN3: Not equal works correctly (issue 121)..."""
         # Meant to only be used in python 3 but doing simple check here
-        from pydicom.valuerep import PersonName3
-        pn = PersonName3("John^Doe")
+        from pydicom.valuerep import PersonName
+        pn = PersonName("John^Doe")
         assert not pn != "John^Doe"
 
     def test_encoding_carried(self):
         """Test encoding is carried over to a new PN3 object"""
         # Issue 466
-        from pydicom.valuerep import PersonName3
-        pn = PersonName3("John^Doe", encodings='iso_ir_126')
+        from pydicom.valuerep import PersonName
+        pn = PersonName("John^Doe", encodings='iso_ir_126')
         assert pn.encodings == ('iso_ir_126',)
-        pn2 = PersonName3(pn)
+        pn2 = PersonName(pn)
         assert pn2.encodings == ('iso_ir_126',)
 
     def test_hash(self):
         """Test that the same name creates the same hash."""
         # Regression test for #785
-        pn1 = PersonName3("John^Doe^^Dr", encodings=default_encoding)
-        pn2 = PersonName3("John^Doe^^Dr", encodings=default_encoding)
+        pn1 = PersonName("John^Doe^^Dr", encodings=default_encoding)
+        pn2 = PersonName("John^Doe^^Dr", encodings=default_encoding)
         assert hash(pn1) == hash(pn2)
-        pn3 = PersonName3("John^Doe", encodings=default_encoding)
+        pn3 = PersonName("John^Doe", encodings=default_encoding)
         assert hash(pn1) != hash(pn3)
 
-        pn1 = PersonName3(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+        pn1 = PersonName(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
                                 [default_encoding, 'iso2022_jp'])
-        pn2 = PersonName3(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
+        pn2 = PersonName(u'Yamada^Tarou=山田^太郎=やまだ^たろう',
                                 [default_encoding, 'iso2022_jp'])
         assert hash(pn1) == hash(pn2)
 

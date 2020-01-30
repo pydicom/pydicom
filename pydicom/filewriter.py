@@ -15,7 +15,7 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import UncompressedPixelTransferSyntaxes
-from pydicom.valuerep import extra_length_VRs, PersonName3
+from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
 
