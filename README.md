@@ -36,7 +36,7 @@ Documentation
 documentation for [the previous 0.9.9 version](https://pydicom.github.io/pydicom/0.9/)
 is still there for reference.
 
-See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.html)
+See [Getting Started](https://pydicom.github.io/pydicom/stable/old/getting_started.html)
 for installation and basic information, and the
 [User Guide](https://pydicom.github.io/pydicom/stable/pydicom_user_guide.html)
 for an overview of how to use the *pydicom* library.
