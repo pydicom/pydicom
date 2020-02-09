@@ -19,7 +19,7 @@ from pydicom.dataset import (Dataset, FileDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
-from pydicom.fileutil import read_undefined_length_value
+from pydicom.fileutil import read_undefined_length_value, path_from_pathlike
 from pydicom.misc import size_in_bytes
 from pydicom.sequence import Sequence
 from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
@@ -769,7 +769,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
 
     Parameters
     ----------
-    fp : str or file-like
+    fp : str or PathLike or file-like
         Either a file-like object, or a string containing the file name. If a
         file-like object, the caller is responsible for closing it.
     defer_size : int or str or None, optional
@@ -829,6 +829,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     """
     # Open file if not already a file object
     caller_owns_file = True
+    fp = path_from_pathlike(fp)
     if isinstance(fp, str):
         # caller provided a file name; we own the file handle
         caller_owns_file = False

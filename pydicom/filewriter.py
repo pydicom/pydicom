@@ -11,6 +11,7 @@ from pydicom.charset import (
 from pydicom.dataelem import DataElement_from_raw
 from pydicom.dataset import Dataset, validate_file_meta
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
+from pydicom.fileutil import path_from_pathlike
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
@@ -810,7 +811,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     Parameters
     ----------
-    filename : str or file-like
+    filename : str or PathLike or file-like
         Name of file or the file-like to write the new DICOM file to.
     dataset : pydicom.dataset.FileDataset
         Dataset holding the DICOM information; e.g. an object read with
@@ -883,6 +884,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     caller_owns_file = True
     # Open file if not already a file object
+    filename = path_from_pathlike(filename)
     if isinstance(filename, str):
         fp = DicomFile(filename, 'wb')
         # caller provided a file name; we own the file handle

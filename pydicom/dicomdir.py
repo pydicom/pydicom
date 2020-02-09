@@ -28,7 +28,7 @@ class DicomDir(FileDataset):
 
         Parameters
         ----------
-        filename_or_obj : str or None
+        filename_or_obj : str or PathLike or file-like or None
             Full path and filename to the file of ``None`` if
             :class:`io.BytesIO`.
         dataset : dataset.Dataset

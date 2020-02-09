@@ -8,6 +8,11 @@ Changelog
   Classes `PersonNameUnicode` and `PersonName3` are aliased to `PersonName` but
   are deprecated and will be removed in version 2.1
 
+Enhancements
+............
+* Allow PathLike objects for filename argument in `dcmread` and `dcmwrite`
+  (:issue:`1047`)
+
 Fixes
 .....
 * Fixed reading of datasets with an empty `Specific Character Set` tag
