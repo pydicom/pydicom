@@ -12,3 +12,5 @@ Fixes
 .....
 * Fixed reading of datasets with an empty `Specific Character Set` tag
   (regression, :issue:`1038`)
+* Fix failure to parse dataset with an empty *LUT Descriptor* or
+  *Red/Green/Blue Palette Color LUT Descriptor* element. (:issue:`1049`)

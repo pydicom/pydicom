@@ -674,6 +674,16 @@ class TestReader(object):
             assert elem.VR == 'SS'
             assert elem.value == [62720, -2048, 16]
 
+    def test_lut_descriptor_empty(self):
+        """Regression test for #1049: LUT empty raises."""
+        bs = DicomBytesIO(b'\x28\x00\x01\x11\x53\x53\x00\x00')
+        bs.is_little_endian = True
+        bs.is_implicit_VR = False
+        ds = dcmread(bs, force=True)
+        elem = ds[0x00281101]
+        assert elem.value == None
+        assert elem.VR == 'SS'
+
 
 class TestIncorrectVR(object):
     def setup(self):
