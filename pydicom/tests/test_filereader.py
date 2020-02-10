@@ -681,7 +681,7 @@ class TestReader(object):
         bs.is_implicit_VR = False
         ds = dcmread(bs, force=True)
         elem = ds[0x00281101]
-        assert elem.value == None
+        assert elem.value is None
         assert elem.VR == 'SS'
 
 
