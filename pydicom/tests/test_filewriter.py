@@ -6,6 +6,7 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from io import BytesIO
 import os
+from pathlib import Path
 from platform import python_implementation
 
 from struct import unpack
@@ -136,6 +137,14 @@ class TestWriteFile(object):
         """Input file, write back and verify
            them identical (JPEG2K file)."""
         self.compare(jpeg_name)
+
+    def test_pathlib_path_filename(self):
+        """Check that file can be written using pathlib.Path"""
+        ds = dcmread(Path(ct_name))
+        ds.save_as(self.file_out, write_like_original=True)
+        self.file_out.seek(0)
+        ds1 = dcmread(self.file_out)
+        assert ds.PatientName == ds1.PatientName
 
     def testListItemWriteBack(self):
         """Change item in a list and confirm

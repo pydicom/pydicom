@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
-
+import os
+import pathlib
+import sys
 from struct import pack, unpack
 
 from pydicom.misc import size_in_bytes
@@ -93,7 +95,7 @@ def read_undefined_length_value(fp,
                                 is_little_endian,
                                 delimiter_tag,
                                 defer_size=None,
-                                read_size=1024*8):
+                                read_size=1024 * 8):
     """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
@@ -260,3 +262,32 @@ def read_delimiter_item(fp, delimiter):
     if length != 0:
         logger.warn("Expected delimiter item to have length 0, "
                     "got %d at file position 0x%x", length, fp.tell() - 4)
+
+
+def path_from_pathlike(file_object):
+    """Returns the path if `file_object` is a path-like object, otherwise the
+    original `file_object`.
+
+    Parameters
+    ----------
+    file_object: str or PathLike or file-like
+
+    Returns
+    -------
+    str or file-like
+        the string representation of the given path object, or the object
+        itself in case of an object not representing a path.
+
+    ..note:
+
+        ``PathLike`` objects have been introduced in Python 3.6. In Python 3.5,
+        only objects of type :class:`pathlib.Path` are considered.
+    """
+    if sys.version_info < (3, 6):
+        if isinstance(file_object, pathlib.Path):
+            return str(file_object)
+        return file_object
+    try:
+        return os.fspath(file_object)
+    except TypeError:
+        return file_object

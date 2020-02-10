@@ -5,6 +5,8 @@ import fnmatch
 import os
 from os.path import abspath, dirname, join
 
+from pydicom.fileutil import path_from_pathlike
+
 DATA_ROOT = abspath(dirname(__file__))
 
 
@@ -13,7 +15,7 @@ def get_files(base, pattern):
 
     Parameters
     ----------
-    base : str
+    base : str or PathLike
         Base directory to recursively search.
 
     pattern : str
@@ -26,6 +28,7 @@ def get_files(base, pattern):
         The list of filenames matched.
     """
 
+    base = path_from_pathlike(base)
     # if the user forgot to add them
     pattern = "*" + pattern + "*"
 

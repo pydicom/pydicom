@@ -35,6 +35,7 @@ from pydicom.datadict import dictionary_VR
 from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
                               repeater_has_keyword)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.fileutil import path_from_pathlike
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, reshape_pixel_array, get_image_pixel_ids
 )
@@ -1733,7 +1734,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        filename : str or file-like
+        filename : str or PathLike or file-like
             Name of file or the file-like to write the new DICOM file to.
         write_like_original : bool, optional
             If ``True`` (default), preserves the following information from
@@ -2238,7 +2239,7 @@ class FileDataset(Dataset):
 
         Parameters
         ----------
-        filename_or_obj : str or BytesIO or None
+        filename_or_obj : str or PathLike or BytesIO or None
             Full path and filename to the file, memory buffer object, or
             ``None`` if is a :class:`io.BytesIO`.
         dataset : Dataset or dict
@@ -2263,6 +2264,7 @@ class FileDataset(Dataset):
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
         filename = None
+        filename_or_obj = path_from_pathlike(filename_or_obj)
         if isinstance(filename_or_obj, str):
             filename = filename_or_obj
             self.fileobj_type = open

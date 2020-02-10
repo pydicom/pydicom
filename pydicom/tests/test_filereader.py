@@ -7,6 +7,7 @@ import io
 from io import BytesIO
 import os
 import shutil
+from pathlib import Path
 from struct import unpack
 import sys
 import tempfile
@@ -113,6 +114,10 @@ class TestReader(object):
         ds = dcmread(utf8_filename)
         os.remove(utf8_filename)
         assert ds is not None
+
+    def test_pathlib_path_filename(self):
+        """Check that file can be read using pathlib.Path"""
+        ds = dcmread(Path(priv_SQ_name))
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test
