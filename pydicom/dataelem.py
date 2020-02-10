@@ -741,9 +741,13 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
 
-    if raw.tag in _LUT_DESCRIPTOR_TAGS and value[0] < 0:
+    if raw.tag in _LUT_DESCRIPTOR_TAGS and value:
         # We only fix the first value as the third value is 8 or 16
-        value[0] += 65536
+        try:
+            if value[0] < 0:
+                value[0] += 65536
+        except TypeError:
+            pass
 
     return DataElement(raw.tag, VR, value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)
