@@ -118,7 +118,6 @@ class TestReader(object):
     def test_pathlib_path_filename(self):
         """Check that file can be read using pathlib.Path"""
         ds = dcmread(Path(priv_SQ_name))
-        assert ds is not None
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test

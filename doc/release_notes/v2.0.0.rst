@@ -10,8 +10,8 @@ Changelog
 
 Enhancements
 ............
-* Allow PathLike objects for filename argument in `dcmread` and `dcmwrite`
-  (:issue:`1047`)
+* Allow PathLike objects for filename argument in `dcmread`, `dcmwrite` and
+  `Dataset.save_as` (:issue:`1047`)
 
 Fixes
 .....
