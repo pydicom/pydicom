@@ -222,7 +222,7 @@
 <h1>pydicom.filereader.dcmread<a class="headerlink" href="#pydicom-filereader-dcmread" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.filereader.dcmread">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">stop_before_pixels=False</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e7de71b4/pydicom/filereader.py#L759"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">stop_before_pixels=False</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/557a51a3/pydicom/filereader.py#L759"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File
 Format</a>. If the dataset is not stored in
@@ -233,7 +233,7 @@ set <cite>force</cite> to <code class="docutils literal notranslate"><span class
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>file-like</em>) – Either a file-like object, or a string containing the file name. If a
+<li><p><strong>fp</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em>) – Either a file-like object, or a string containing the file name. If a
 file-like object, the caller is responsible for closing it.</p></li>
 <li><p><strong>defer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), all elements are read into memory. If specified,
 then if a data element’s stored value is larger than <cite>defer_size</cite>, the
