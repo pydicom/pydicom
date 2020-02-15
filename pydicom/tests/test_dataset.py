@@ -58,6 +58,8 @@ class TestDataset(object):
         sub_ds.BeamNumber = '1'
         dataset.BeamSequence = Sequence([sub_ds])
         fp = DicomBytesIO()
+        dataset.is_little_endian = True
+        dataset.is_implicit_VR = True
         pydicom.write_file(fp, dataset)
 
         def _reset():
