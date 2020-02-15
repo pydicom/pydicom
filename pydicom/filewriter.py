@@ -843,6 +843,17 @@ def dcmwrite(filename, dataset, write_like_original=True):
         If ``False``, produces a file conformant with the DICOM File Format,
         with explicit lengths for all elements.
 
+    Raises
+    ------
+    AttributeError
+        If either ``dataset.is_implicit_VR`` or ``dataset.is_little_endian``
+        have not been set.
+    ValueError
+        If group 2 elements are in ``dataset`` rather than
+        ``dataset.file_meta``, or if a preamble is given but is not 128 bytes
+        long, or if Transfer Syntax is a compressed type and pixel data is not
+        compressed.
+
     See Also
     --------
     pydicom.dataset.FileDataset
