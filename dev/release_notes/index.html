@@ -343,6 +343,8 @@ are deprecated and will be removed in version 2.1</p></li>
 (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
 <li><p>Fix failure to parse dataset with an empty <em>LUT Descriptor</em> or
 <em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
+<li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
+having different checks in each</p></li>
 </ul>
 </div>
 </div>

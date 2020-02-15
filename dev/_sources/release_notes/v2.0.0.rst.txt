@@ -19,3 +19,5 @@ Fixes
   (regression, :issue:`1038`)
 * Fix failure to parse dataset with an empty *LUT Descriptor* or
   *Red/Green/Blue Palette Color LUT Descriptor* element. (:issue:`1049`)
+* Made `Dataset.save_as` a wrapper for `dcmwrite` (:issue:`1042`) rather than
+  having different checks in each
