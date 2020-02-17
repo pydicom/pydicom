@@ -67,6 +67,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.d
 JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
+JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_jpeg.dcm")
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
 # JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
@@ -217,6 +218,7 @@ REFERENCE_DATA = [
     (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (J2KR_08_08_3_0_1F_YBR_ICT, (J2KR, 8, 3, 0, 1, (480, 640, 3), 'uint8')),
     (J2KR_16_10_1_0_1F_M1, (J2KR, 16, 1, 0, 1, (1760, 1760), 'uint16')),
     (J2KR_16_12_1_0_1F_M2, (J2KR, 16, 1, 0, 1, (1024, 1024), 'uint16')),
@@ -284,6 +286,15 @@ JPEG_MATCHING_DATASETS = [
             (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
             (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
+        ],
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_RGB,
+        get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
+        [
+            (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+            (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+            (244, 244, 244), (244, 244, 244),
         ],
     ),
 ]
@@ -529,12 +540,12 @@ class TestPillowHandler_JPEG(object):
     @pytest.mark.parametrize('fpath, rpath, values', JPEG_MATCHING_DATASETS)
     def test_array(self, fpath, rpath, values):
         """Test pixel_array returns correct values."""
-        print(values)
         ds = dcmread(fpath)
         arr = ds.pixel_array
         if 'YBR' in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
+        # TODO
         ref = dcmread(rpath).pixel_array
 
         if values:
