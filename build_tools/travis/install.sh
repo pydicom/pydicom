@@ -43,7 +43,11 @@ if [[ "$DISTRIB" == "conda" ]]; then
     conda create -n testenv --yes python=$PYTHON_VERSION pip
     source activate testenv
     # pytest-cov failed for >= 2.6.  Bug https://github.com/z4r/python-coveralls/issues/66
-    conda install --yes nose pytest "pytest-cov<2.6" setuptools
+    if [[ "$PYTHON_VERSION" == "2.7" ]]; then
+        conda install --yes nose pytest "pytest-cov<2.6" setuptools
+    else
+        conda install --yes nose pytest pytest-cov setuptools
+    fi    
     if [[ "$NUMPY" == "true" ]]; then
         conda install --yes numpy
     fi
