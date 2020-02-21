@@ -31,13 +31,7 @@ import pydicom.uid
 
 logger = logging.getLogger('pydicom')
 
-PillowSupportedTransferSyntaxes = [
-    pydicom.uid.JPEGBaseline,
-    pydicom.uid.JPEGLossless,
-    pydicom.uid.JPEGExtended,
-    pydicom.uid.JPEG2000,
-    pydicom.uid.JPEG2000Lossless,
-]
+
 PillowJPEG2000TransferSyntaxes = [
     pydicom.uid.JPEG2000,
     pydicom.uid.JPEG2000Lossless,
@@ -46,6 +40,10 @@ PillowJPEGTransferSyntaxes = [
     pydicom.uid.JPEGBaseline,
     pydicom.uid.JPEGExtended,
 ]
+PillowSupportedTransferSyntaxes = (
+    PillowJPEGTransferSyntaxes + PillowJPEG2000TransferSyntaxes
+)
+
 
 HANDLER_NAME = 'Pillow'
 
@@ -115,6 +113,8 @@ def get_pixeldata(ds):
     logger.debug("Trying to use Pillow to read pixel array "
                  "(has pillow = %s)", HAVE_PIL)
     transfer_syntax = ds.file_meta.TransferSyntaxUID
+    logger.debug("Transfer Syntax UID: '{}'".format(transfer_syntax))
+
     if not HAVE_PIL:
         msg = ("The pillow package is required to use pixel_array for "
                "this transfer syntax {0}, and pillow could not be "
@@ -133,21 +133,11 @@ def get_pixeldata(ds):
                .format(transfer_syntax.name))
         raise NotImplementedError(msg)
 
-    if transfer_syntax not in PillowSupportedTransferSyntaxes:
-        msg = ("this transfer syntax {0}, can not be read because "
-               "Pillow does not support this syntax"
-               .format(transfer_syntax.name))
-        raise NotImplementedError(msg)
-
-    if transfer_syntax in PillowJPEGTransferSyntaxes:
-        logger.debug("This is a JPEG lossy format")
-        if ds.BitsAllocated > 8:
-            raise NotImplementedError("JPEG Lossy only supported if "
-                                      "Bits Allocated = 8")
-    elif transfer_syntax in PillowJPEG2000TransferSyntaxes:
-        logger.debug("This is a JPEG 2000 format")
-    else:
-        logger.debug("This is a another pillow supported format")
+    if transfer_syntax == pydicom.uid.JPEGExtended and ds.BitsAllocated != 8:
+        raise NotImplementedError(
+            "{} - {} only supported by Pillow if Bits Allocated = 8"
+            .format(pydicom.uid.JPEGExtended, pydicom.uid.JPEGExtended.name)
+        )
 
     pixel_bytes = bytearray()
     if getattr(ds, 'NumberOfFrames', 1) > 1:

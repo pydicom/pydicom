@@ -67,6 +67,10 @@ MR2_*.dcm
   * unsigned 16-bit/12-bit with rescale and windowing
   * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
 
+JPGLosslessP14SV1_1s_1f_8b.dcm
+  * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Process 14, Selection Value 1
+  * 1 sample/px, 1 frame, 8-bits stored, monochrome2
+
 JPEG2000.dcm and JPEG2000_UNC.dcm (uncompressed version)
   * JPEG 2000 small image
   * to test JPEG transfer syntax, eventually JPEG decompression
@@ -110,7 +114,7 @@ mlut_18.dcm
   * Modality LUT Sequence
   * One of the IHE (https://wiki.ihe.net/index.php/Main_Page) MESA display test
     images
-    
+
 no_meta.dcm
     * Same as CT_small.dcm with no File Meta Information header
 
