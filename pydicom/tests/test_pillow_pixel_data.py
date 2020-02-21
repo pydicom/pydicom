@@ -579,7 +579,6 @@ class TestPillowHandler_JPEG(object):
     def test_JPGE_16bit_raises(self):
         """Test decoding JPEG lossy with pillow handler fails."""
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
-        print(ds.file_meta.TransferSyntaxUID)
         msg = (
             r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
             r"supported if Bits Allocated = 8"

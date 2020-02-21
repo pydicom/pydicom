@@ -133,9 +133,9 @@ def get_pixeldata(ds):
                .format(transfer_syntax.name))
         raise NotImplementedError(msg)
 
-    if transfer_syntax == pydicom.uid.JPEGExtended and ds.BitsAllocated > 8:
+    if transfer_syntax == pydicom.uid.JPEGExtended and ds.BitsAllocated != 8:
         raise NotImplementedError(
-            "{} - {} only supported if Bits Allocated = 8"
+            "{} - {} only supported by Pillow if Bits Allocated = 8"
             .format(pydicom.uid.JPEGExtended, pydicom.uid.JPEGExtended.name)
         )
 
