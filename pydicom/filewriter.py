@@ -736,9 +736,16 @@ def dcmwrite(filename, dataset, write_like_original=True):
     the DICOM File Format).
 
     If `write_like_original` is ``False``, `dataset` will be stored in the
-    :dcm:`DICOM File Format <part10/chapter_7.html>`. The
-    byte stream of the `dataset` will be placed into the file after the
-    DICOM *File Meta Information*.
+    :dcm:`DICOM File Format <part10/chapter_7.html>`.  To do
+    so requires that the ``Dataset.file_meta`` attribute
+    exists and contains a :class:`Dataset` with the required (Type 1) *File
+    Meta Information Group* elements. The byte stream of the `dataset` will be
+    placed into the file after the DICOM *File Meta Information*.
+
+    If `write_like_original` is ``True`` then the :class:`Dataset` will be
+    written as is (after minimal validation checking) and may or may not
+    contain all or parts of the *File Meta Information* (and hence may or
+    may not be conformant with the DICOM File Format).
 
     **File Meta Information**
 
@@ -836,6 +843,17 @@ def dcmwrite(filename, dataset, write_like_original=True):
         If ``False``, produces a file conformant with the DICOM File Format,
         with explicit lengths for all elements.
 
+    Raises
+    ------
+    AttributeError
+        If either ``dataset.is_implicit_VR`` or ``dataset.is_little_endian``
+        have not been set.
+    ValueError
+        If group 2 elements are in ``dataset`` rather than
+        ``dataset.file_meta``, or if a preamble is given but is not 128 bytes
+        long, or if Transfer Syntax is a compressed type and pixel data is not
+        compressed.
+
     See Also
     --------
     pydicom.dataset.FileDataset
@@ -844,6 +862,34 @@ def dcmwrite(filename, dataset, write_like_original=True):
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
+
+    # Ensure is_little_endian and is_implicit_VR are set
+    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
+        has_tsyntax = False
+        try:
+            tsyntax = dataset.file_meta.TransferSyntaxUID
+            if not tsyntax.is_private:
+                dataset.is_little_endian = tsyntax.is_little_endian
+                dataset.is_implicit_VR = tsyntax.is_implicit_VR
+                has_tsyntax = True
+        except AttributeError:
+            pass
+
+        if not has_tsyntax:
+            raise AttributeError(
+                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
+                "set appropriately before saving."
+                .format(dataset.__class__.__name__)
+            )
+
+    # Try and ensure that `is_undefined_length` is set correctly
+    try:
+        tsyntax = dataset.file_meta.TransferSyntaxUID
+        if not tsyntax.is_private:
+            dataset['PixelData'].is_undefined_length = tsyntax.is_compressed
+    except (AttributeError, KeyError):
+        pass
+
     # Check that dataset's group 0x0002 elements are only present in the
     #   `dataset.file_meta` Dataset - user may have added them to the wrong
     #   place
