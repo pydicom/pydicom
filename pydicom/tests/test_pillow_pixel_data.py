@@ -70,10 +70,6 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
-# JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
-# No supported datasets available
-# JPGL14: 1.2.840.10008.1.2.4.57 - JPEG Lossless P14
-# No supported datasets available
 
 # JPEG 2000 - ISO/IEC 15444 Standard
 # J2KR: 1.2.840.100008.1.2.4.90 - JPEG 2000 Lossless
@@ -102,12 +98,16 @@ JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 RLE = get_testdata_file("MR_small_RLE.dcm")
 JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPEG-lossy.dcm")
 JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
+# JPGL14: 1.2.840.10008.1.2.4.57 - JPEG Lossless P14
+# No datasets available
+# JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
+JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 JPEG_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG:
-    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended, JPEGLossless]
+    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended]
 
 JPEG2K_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG2K:
@@ -131,6 +131,7 @@ REFERENCE_DATA_UNSUPPORTED = [
     (EXPB, ('1.2.840.10008.1.2.2', 'OB^^^^')),
     (DEFL, ('1.2.840.10008.1.2.1.99', '^^^^')),
     (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
+    (JPGL_08_08_1_0_1F, ('1.2.840.10008.1.2.4.70', 'Citizen^Jan')),
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
@@ -578,15 +579,19 @@ class TestPillowHandler_JPEG(object):
     def test_JPGE_16bit_raises(self):
         """Test decoding JPEG lossy with pillow handler fails."""
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
-        msg = r"JPEG Lossy only supported if Bits Allocated = 8"
+        print(ds.file_meta.TransferSyntaxUID)
+        msg = (
+            r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
+            r"supported if Bits Allocated = 8"
+        )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_JPGL_raises(self):
-        """Test decoding JPEG lossless with pillow handler fails."""
+        """Test decoding JPEG Lossless with pillow handler fails."""
         ds = dcmread(JPGL_16_16_1_1_1F_M2)
-        msg = r"cannot identify image file"
-        with pytest.raises((IOError, OSError), match=msg):
+        msg = r"as there are no pixel data handlers available that support it"
+        with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_JPGB_odd_data_size(self):

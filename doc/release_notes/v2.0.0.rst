@@ -19,3 +19,6 @@ Fixes
   (regression, :issue:`1038`)
 * Fix failure to parse dataset with an empty *LUT Descriptor* or
   *Red/Green/Blue Palette Color LUT Descriptor* element. (:issue:`1049`)
+* Removed ``1.2.840.10008.1.2.4.70`` - JPEG Lossless (Process 14, SV1) from
+  the Pillow pixel data handler as Pillow doesn't support JPEG Lossless.
+  (:issue:`1053`)
