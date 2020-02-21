@@ -345,6 +345,9 @@ are deprecated and will be removed in version 2.1</p></li>
 <em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
 <li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
 having different checks in each</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.70</span></code> - JPEG Lossless (Process 14, SV1) from
+the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1053">#1053</a>)</p></li>
 </ul>
 </div>
 </div>

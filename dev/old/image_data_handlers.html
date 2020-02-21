@@ -229,6 +229,8 @@ means before you use them for medical purposes.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s1">&#39;path/to/dicom/file&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
 <span class="go">&#39;1.2.840.10008.1.2.1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span>
+<span class="go">16</span>
 </pre></div>
 </div>
 <p>As far as we have been able to verify, the following transfer syntaxes are
@@ -304,7 +306,7 @@ Pillow</p></th>
 <td></td>
 <td></td>
 <td><p>✓</p></td>
-<td><p>✓<sup>1</sup></p></td>
+<td><p>✓<sup>1,3</sup></p></td>
 </tr>
 <tr class="row-even"><td><p>JPEG Lossless (Process 14)</p></td>
 <td><p>1.2.840.10008.1.2.4.57</p></td>
@@ -318,7 +320,7 @@ Pillow</p></th>
 <td></td>
 <td></td>
 <td><p>✓</p></td>
-<td><p>✓<sup>3</sup></p></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><p>JPEG LS Lossless</p></td>
 <td><p>1.2.840.10008.1.2.4.80</p></td>
@@ -367,7 +369,7 @@ Pillow</p></th>
 <div class="line-block">
 <div class="line"><sup>1</sup> <em>only with JpegImagePlugin</em></div>
 <div class="line"><sup>2</sup> <em>only with Jpeg2KImagePlugin</em></div>
-<div class="line"><sup>3</sup> <em>not supported for &gt; 8 bit</em></div>
+<div class="line"><sup>3</sup> <em>only if (0028,0100) Bits Allocated = 8</em></div>
 </div>
 </div>
 <div class="section" id="usage">
