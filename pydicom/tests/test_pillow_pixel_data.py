@@ -581,7 +581,7 @@ class TestPillowHandler_JPEG(object):
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
         msg = (
             r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
-            r"supported if Bits Allocated = 8"
+            r"supported by Pillow if Bits Allocated = 8"
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
