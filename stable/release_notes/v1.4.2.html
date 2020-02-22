@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Exceptions (pydicom.errors) &mdash; pydicom 1.4.2 documentation</title>
+  <title>Version 1.4.2 &mdash; pydicom 1.4.2 documentation</title>
   
 
   
@@ -38,9 +38,7 @@
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pydicom.errors.InvalidDicomError" href="generated/pydicom.errors.InvalidDicomError.html" />
-    <link rel="prev" title="pydicom.encaps.itemize_frame" href="generated/pydicom.encaps.itemize_frame.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -97,30 +95,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Documentation</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.errors.InvalidDicomError.html">pydicom.errors.InvalidDicomError</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="fileio.html">Dataset IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
@@ -133,7 +113,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release notes</a></li>
 </ul>
 
             
@@ -179,9 +159,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html">API Reference</a> &raquo;</li>
-        
-      <li>Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</li>
+      <li>Version 1.4.2</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -198,19 +176,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="exceptions-pydicom-errors">
-<span id="api-errors"></span><h1>Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)<a class="headerlink" href="#exceptions-pydicom-errors" title="Permalink to this headline">¶</a></h1>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidDicomError</span></code></a>(*args)</p></td>
-<td><p>Exception that is raised when the the file does not appear to be DICOM.</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="version-1-4-2">
+<h1>Version 1.4.2<a class="headerlink" href="#version-1-4-2" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
+(regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
+<li><p>Fix failure to parse dataset with an empty <em>LUT Descriptor</em> or
+<em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
+<li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
+having different checks in each</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.70</span></code> - JPEG Lossless (Process 14, SV1) from
+the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1053">#1053</a>)</p></li>
+</ul>
+</div>
+</div>
 </div>
 
 
@@ -218,15 +202,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="generated/pydicom.errors.InvalidDicomError.html" class="btn btn-neutral float-right" title="pydicom.errors.InvalidDicomError" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="generated/pydicom.encaps.itemize_frame.html" class="btn btn-neutral float-left" title="pydicom.encaps.itemize_frame" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

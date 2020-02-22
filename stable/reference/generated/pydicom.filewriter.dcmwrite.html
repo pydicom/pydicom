@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filewriter.dcmwrite &mdash; pydicom 1.4.1 documentation</title>
+  <title>pydicom.filewriter.dcmwrite &mdash; pydicom 1.4.2 documentation</title>
   
 
   
@@ -23,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                1.4.1
+                1.4.2
               </div>
             
           
@@ -233,16 +233,22 @@
 <h1>pydicom.filewriter.dcmwrite<a class="headerlink" href="#pydicom-filewriter-dcmwrite" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pydicom.filewriter.dcmwrite">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">dataset</em>, <em class="sig-param">write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/236e7a2c/pydicom/filewriter.py#L742"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">dataset</em>, <em class="sig-param">write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4e066633/pydicom/filewriter.py#L742"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts
 of the File Meta Information (and hence may or may not be conformant with
 the DICOM File Format).</p>
 <p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, <cite>dataset</cite> will be stored in the
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>. The
-byte stream of the <cite>dataset</cite> will be placed into the file after the
-DICOM <em>File Meta Information</em>.</p>
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File Format</a>.  To do
+so requires that the <code class="docutils literal notranslate"><span class="pre">Dataset.file_meta</span></code> attribute
+exists and contains a <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> with the required (Type 1) <em>File
+Meta Information Group</em> elements. The byte stream of the <cite>dataset</cite> will be
+placed into the file after the DICOM <em>File Meta Information</em>.</p>
+<p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> will be
+written as is (after minimal validation checking) and may or may not
+contain all or parts of the <em>File Meta Information</em> (and hence may or
+may not be conformant with the DICOM File Format).</p>
 <p><strong>File Meta Information</strong></p>
 <p>The <em>File Meta Information</em> consists of a 128-byte preamble, followed by
 a 4 byte <code class="docutils literal notranslate"><span class="pre">b'DICM'</span></code> prefix, followed by the <em>File Meta Information Group</em>
@@ -337,6 +343,16 @@ what the original had.</p></li>
 <p>If <code class="docutils literal notranslate"><span class="pre">False</span></code>, produces a file conformant with the DICOM File Format,
 with explicit lengths for all elements.</p>
 </p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If either <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> or <code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code>
+    have not been set.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If group 2 elements are in <code class="docutils literal notranslate"><span class="pre">dataset</span></code> rather than
+    <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>, or if a preamble is given but is not 128 bytes
+    long, or if Transfer Syntax is a compressed type and pixel data is not
+    compressed.</p></li>
 </ul>
 </dd>
 </dl>
