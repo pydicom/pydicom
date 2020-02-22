@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/pydicom/pydicom/branch/master/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)
 [![PyPI version](https://badge.fury.io/py/pydicom.svg)](https://badge.fury.io/py/pydicom)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3614067.svg)](https://doi.org/10.5281/zenodo.3614067)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3678889.svg)](https://doi.org/10.5281/zenodo.3678889)
 [![Gitter](https://badges.gitter.im/pydicom/Lobby.svg)](https://gitter.im/pydicom/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 *pydicom* is a pure python package for working with [DICOM](http://medical.nema.org/) files.
@@ -36,7 +36,7 @@ Documentation
 documentation for [the previous 0.9.9 version](https://pydicom.github.io/pydicom/0.9/)
 is still there for reference.
 
-See [Getting Started](https://pydicom.github.io/pydicom/stable/getting_started.html)
+See [Getting Started](https://pydicom.github.io/pydicom/stable/old/getting_started.html)
 for installation and basic information, and the
 [User Guide](https://pydicom.github.io/pydicom/stable/pydicom_user_guide.html)
 for an overview of how to use the *pydicom* library.

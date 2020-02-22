@@ -205,7 +205,7 @@ def data_element_generator(fp,
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == BaseTag(0x00080005):
                 from pydicom.values import convert_string
-                encoding = convert_string(value, is_little_endian)
+                encoding = convert_string(value or b'', is_little_endian)
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
@@ -250,15 +250,6 @@ def data_element_generator(fp,
                     logger_debug("Reading undefined length data element")
                 value = read_undefined_length_value(fp, is_little_endian,
                                                     delimiter, defer_size)
-
-                # If the tag is (0008,0005) Specific Character Set,
-                # then store it
-                if tag == (0x08, 0x05):
-                    from pydicom.values import convert_string
-                    encoding = convert_string(value, is_little_endian)
-                    # Store the encoding value in the generator for use
-                    # with future elements (SQs)
-                    encoding = convert_encodings(encoding)
 
                 # tags with undefined length are skipped after read
                 if has_tag_set and tag not in tag_set:
