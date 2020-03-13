@@ -1155,8 +1155,9 @@ class TestNumpy_PaletteColor(object):
         # Regression test for #1068
         ds = dcmread(MOD_16, force=True)
         assert 'RedPaletteColorLookupTableDescriptor' not in ds
-        ref = ds.pixel_array.copy()
-        assert np.array_equal(ref, apply_color_lut(ds.pixel_array, ds))
+        msg = r"No suitable Palette Color Lookup Table Module found"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
 
 
 
