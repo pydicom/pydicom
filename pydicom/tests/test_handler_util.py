@@ -1160,7 +1160,6 @@ class TestNumpy_PaletteColor(object):
             apply_color_lut(ds.pixel_array, ds)
 
 
-
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ExpandSegmentedLUT(object):
     """Tests for util._expand_segmented_lut()."""
