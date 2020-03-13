@@ -1150,6 +1150,15 @@ class TestNumpy_PaletteColor(object):
         assert [60160, 25600, 37376] == list(rgb[arr == 130][0])
         assert ([60160, 25600, 37376] == rgb[arr == 130]).all()
 
+    def test_unchanged(self):
+        """Test dataset with no LUT is unchanged."""
+        # Regression test for #1068
+        ds = dcmread(MOD_16, force=True)
+        assert 'RedPaletteColorLookupTableDescriptor' not in ds
+        ref = ds.pixel_array.copy()
+        assert np.array_equal(ref, apply_color_lut(ds.pixel_array, ds))
+
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ExpandSegmentedLUT(object):
