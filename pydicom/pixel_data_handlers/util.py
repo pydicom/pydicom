@@ -112,6 +112,9 @@ def apply_color_lut(arr, ds=None, palette=None):
             "Table Module is not currently supported"
         )
 
+    if 'RedPaletteColorLookupTableDescriptor' not in ds:
+        raise ValueError("No suitable Palette Color Lookup Table Module found")
+
     # All channels are supposed to be identical
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
     # A value of 0 = 2^16 entries
