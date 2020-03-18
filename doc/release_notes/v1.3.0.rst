@@ -9,11 +9,11 @@ Documentation
 * New User Guide page for Python 2 support timeline
 * New User Guide page for working with private data elements
 * example loading set of CT slices and plotting axial, sagittal
-  and coronal (:pull_request:`789`)
+  and coronal (:pr:`789`)
 
 Changes
 .......
-* Removed deprecated uid variables, config.image_handlers and DeferredDataElement (:pull_request:`760`)
+* Removed deprecated uid variables, config.image_handlers and DeferredDataElement (:pr:`760`)
 * ``dataelem.isMultiValue`` is deprecated and will be removed in v1.4.
   Use ``dataelem.DataElement.VM`` instead.
 * ``dataelem.isStringOrStringList`` and ``dataelem.isString`` functions are
@@ -30,7 +30,7 @@ Enhancements
   ``datadict.add_private_dict_entries`` to add custom private tags
   (:issue:`799`)
 * Added possibility to write into zip file using gzip, by avoiding seek (:issue:`753`)
-* Added RLE encoding (:pull_request:`730`)
+* Added RLE encoding (:pr:`730`)
 * Added handling of incorrect transfer syntax (explicit vs implicit)
   (:issue:`820`)
 * Added creation of Tag instances by DICOM keyword, e.g Tag("PatientName")
