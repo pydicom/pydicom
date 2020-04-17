@@ -700,6 +700,20 @@ class TestReader(object):
         assert elem.value == -2816
         assert elem.VR == 'SS'
 
+    def test_reading_of(self):
+        """Test reading a dataset with OF element."""
+        bs = DicomBytesIO(
+            b'\x28\x00\x01\x11\x53\x53\x06\x00\x00\xf5\x00\xf8\x10\x00'
+            b'\xe0\x7f\x08\x00\x4F\x46\x00\x00\x04\x00\x00\x00\x00\x01\x02\x03'
+        )
+        bs.is_little_endian = True
+        bs.is_implicit_VR = False
+
+        ds = dcmread(bs, force=True)
+        elem = ds['FloatPixelData']
+        assert 'OF' == elem.VR
+        assert b'\x00\x01\x02\x03' == elem.value
+
 
 class TestIncorrectVR(object):
     def setup(self):

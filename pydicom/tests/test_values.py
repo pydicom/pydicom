@@ -5,9 +5,10 @@
 import pytest
 
 from pydicom.tag import Tag
-from pydicom.values import (convert_value, converters, convert_tag,
-                            convert_ATvalue, convert_DA_string, convert_text,
-                            convert_single_string, convert_AE_string)
+from pydicom.values import (
+    convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
+    convert_text, convert_single_string, convert_AE_string, convert_OWvalue
+)
 
 
 class TestConvertTag(object):
@@ -188,3 +189,11 @@ class TestConvertValue(object):
         # Fix converters
         converters['PN'] = converter_func
         assert 'PN' in converters
+
+
+class TestConvertOValues(object):
+    """Test converting values with the 'O' VRs like OB, OW, OF, etc."""
+    def test_convert_of(self):
+        """Test converting OF."""
+        fp = b'\x00\x01\x02\x03'
+        assert b'\x00\x01\x02\x03' == convert_OWvalue(fp, True)
