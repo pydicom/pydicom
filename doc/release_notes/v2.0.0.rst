@@ -24,3 +24,6 @@ Fixes
 * Removed ``1.2.840.10008.1.2.4.70`` - JPEG Lossless (Process 14, SV1) from
   the Pillow pixel data handler as Pillow doesn't support JPEG Lossless.
   (:issue:`1053`)
+* Fixed error when writing elements with a VR of **OF** (:issue:`1075`)
+* Fixed improper conversion when reading elements with a VR of **OF**
+  (:issue:`1075`)
