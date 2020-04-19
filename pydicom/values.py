@@ -634,7 +634,7 @@ converters = {
     'LT': convert_single_string,
     'OB': convert_OBvalue,
     'OD': convert_OBvalue,
-    'OF': (convert_numbers, 'f'),
+    'OF': convert_OWvalue,
     'OL': convert_OBvalue,
     'OW': convert_OWvalue,
     'OV': convert_OVvalue,
