@@ -233,7 +233,15 @@ def apply_modality_lut(arr, ds):
         nominal_depth = item.LUTDescriptor[2]
 
         dtype = 'uint{}'.format(nominal_depth)
-        lut_data = np.asarray(item.LUTData, dtype=dtype)
+
+        # Ambiguous VR, US or OW
+        if item['LUTData'].VR == 'OW':
+            endianness = '<' if ds.is_little_endian else '>'
+            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
+            lut_data = unpack(unpack_fmt, item.LUTData)
+        else:
+            lut_data = item.LUTData
+        lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
@@ -316,7 +324,14 @@ def apply_voi_lut(arr, ds, index=0):
                 .format(nominal_depth)
             )
 
-        lut_data = np.asarray(item.LUTData, dtype=dtype)
+        # Ambiguous VR, US or OW
+        if item['LUTData'].VR == 'OW':
+            endianness = '<' if ds.is_little_endian else '>'
+            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
+            lut_data = unpack(unpack_fmt, item.LUTData)
+        else:
+            lut_data = item.LUTData
+        lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)

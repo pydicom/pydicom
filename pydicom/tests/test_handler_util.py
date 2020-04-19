@@ -858,6 +858,37 @@ class TestNumpy_ModalityLUT(object):
         out = apply_modality_lut(arr, ds)
         assert arr is out
 
+    def test_lutdata_ow(self):
+        """Test LUT Data with VR OW."""
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.is_little_endian is True
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        seq.LUTData = pack('<4096H', *seq.LUTData)
+        seq['LUTData'].VR = 'OW'
+        arr = ds.pixel_array
+        assert -2048 == arr.min()
+        assert 4095 == arr.max()
+        out = apply_modality_lut(arr, ds)
+
+        # IV > 2047 -> LUT[4095]
+        mapped_pixels = arr > 2047
+        assert 65535 == out[mapped_pixels][0]
+        assert (65535 == out[mapped_pixels]).all()
+        assert out.flags.writeable
+        assert out.dtype == np.uint16
+
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PaletteColor(object):
@@ -1925,3 +1956,21 @@ class TestNumpy_VOILUT(object):
         arr = np.asarray([-128, -127, -1, 0, 1, 126, 127], dtype='int8')
         out = apply_voi_lut(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+    def test_voi_lutdata_ow(self):
+        """Test LUT Data with VR OW."""
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_explicit_VR = True
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack('<4H', *item.LUTData)
+        item['LUTData'].VR = 'OW'
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='uint16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()
