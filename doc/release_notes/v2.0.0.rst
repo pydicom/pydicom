@@ -17,7 +17,7 @@ Fixes
 .....
 * Fixed reading of datasets with an empty `Specific Character Set` tag
   (regression, :issue:`1038`)
-* Fix failure to parse dataset with an empty *LUT Descriptor* or
+* Fixed failure to parse dataset with an empty *LUT Descriptor* or
   *Red/Green/Blue Palette Color LUT Descriptor* element. (:issue:`1049`)
 * Made `Dataset.save_as` a wrapper for `dcmwrite` (:issue:`1042`) rather than
   having different checks in each
@@ -27,3 +27,6 @@ Fixes
 * Fixed error when writing elements with a VR of **OF** (:issue:`1075`)
 * Fixed improper conversion when reading elements with a VR of **OF**
   (:issue:`1075`)
+* Fixed :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and
+  :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` not handling
+  (0028,3006) *LUT Data* with a VR of **OW** (:issue:`1073`)
