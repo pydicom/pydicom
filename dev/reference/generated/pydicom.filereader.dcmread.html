@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filereader.read_dataset" href="pydicom.filereader.read_dataset.html" />
@@ -220,9 +222,9 @@
             
   <div class="section" id="pydicom-filereader-dcmread">
 <h1>pydicom.filereader.dcmread<a class="headerlink" href="#pydicom-filereader-dcmread" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.filereader.dcmread">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">stop_before_pixels=False</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/caf0db10/pydicom/filereader.py#L759"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_before_pixels</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">specific_tags</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e37422e6/pydicom/filereader.py#L759"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File
 Format</a>. If the dataset is not stored in

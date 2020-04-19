@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Read DICOM directory" href="plot_read_dicom_directory.html" />
@@ -189,7 +191,7 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="write-dicom-data">
 <span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this headline">¶</a></h1>
@@ -199,21 +201,21 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpyb54xck4.dcm
+Writing test file /tmp/tmpsu6tf0d8.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpmr6_7_e_.dcm
-Load file /tmp/tmpyb54xck4.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20200318&#39;
-(0008, 0033) Content Time                        TM: &#39;220707.624031&#39;
+Writing test file as Big Endian Explicit VR /tmp/tmp9vhz8wxv.dcm
+Load file /tmp/tmpsu6tf0d8.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20200419&#39;
+(0008, 0033) Content Time                        TM: &#39;083315.625329&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpyb54xck4.dcm ...
-Load file /tmp/tmpmr6_7_e_.dcm ...
-(0008, 0023) Content Date                        DA: &#39;20200318&#39;
-(0008, 0033) Content Time                        TM: &#39;220707.624031&#39;
+Remove file /tmp/tmpsu6tf0d8.dcm ...
+Load file /tmp/tmp9vhz8wxv.dcm ...
+(0008, 0023) Content Date                        DA: &#39;20200419&#39;
+(0008, 0033) Content Time                        TM: &#39;083315.625329&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpmr6_7_e_.dcm ...
+Remove file /tmp/tmp9vhz8wxv.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -227,71 +229,71 @@ Remove file /tmp/tmpmr6_7_e_.dcm ...
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">FileDataset</span></a>
 
 <span class="c1"># Create some temporary filenames</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="View documentation for tempfile.NamedTemporaryFile"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="View documentation for tempfile.NamedTemporaryFile"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_little_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="tempfile.NamedTemporaryFile" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-function"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_big_endian</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile" title="tempfile.NamedTemporaryFile" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-function"><span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a><span class="p">)</span><span class="o">.</span><span class="n">name</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting file meta information...&quot;</span><span class="p">)</span>
 <span class="c1"># Populate required values for file meta information</span>
-<span class="n">file_meta</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-<span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.5.1.4.1.1.2&#39;</span>
-<span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPInstanceUID</span> <span class="o">=</span> <span class="s2">&quot;1.2.3&quot;</span>
-<span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span> <span class="o">=</span> <span class="s2">&quot;1.2.3.4&quot;</span>
+<span class="n">file_meta</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
+<a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span></a> <span class="o">=</span> <span class="s1">&#39;1.2.840.10008.5.1.4.1.1.2&#39;</span>
+<a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPInstanceUID</span></a> <span class="o">=</span> <span class="s2">&quot;1.2.3&quot;</span>
+<a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">file_meta</span><span class="o">.</span><span class="n">ImplementationClassUID</span></a> <span class="o">=</span> <span class="s2">&quot;1.2.3.4&quot;</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting dataset values...&quot;</span><span class="p">)</span>
 <span class="c1"># Create the FileDataset instance (initially no data elements, but file_meta</span>
 <span class="c1"># supplied)</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">FileDataset</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">,</span> <span class="p">{},</span>
+<span class="n">ds</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">FileDataset</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_little_endian</span></a><span class="p">,</span> <span class="p">{},</span>
                  <span class="n">file_meta</span><span class="o">=</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">preamble</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">128</span><span class="p">)</span>
 
 <span class="c1"># Add the data elements -- not trying to set all required here. Check DICOM</span>
 <span class="c1"># standard</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s2">&quot;Test^Firstname&quot;</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span> <span class="o">=</span> <span class="s2">&quot;123456&quot;</span>
+<a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span></a> <span class="o">=</span> <span class="s2">&quot;Test^Firstname&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span></a> <span class="o">=</span> <span class="s2">&quot;123456&quot;</span>
 
 <span class="c1"># Set the transfer syntax</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">True</span>
+<a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span></a> <span class="o">=</span> <span class="kc">True</span>
+<a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span></a> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="c1"># Set creation date/time</span>
-<a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="View documentation for datetime.datetime"><span class="n">dt</span></a> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ContentDate</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime" title="View documentation for datetime.datetime.strftime"><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span></a><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">timeStr</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime.strftime" title="View documentation for datetime.datetime.strftime"><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span></a><span class="p">(</span><span class="s1">&#39;%H%M%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># long format with micro seconds</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">ContentTime</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">timeStr</span></a>
+<a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">ContentDate</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timeStr</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="datetime.datetime" class="sphx-glr-backref-module-datetime sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dt</span></a><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%H%M%S.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># long format with micro seconds</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">ContentTime</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">timeStr</span></a>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_little_endian</span></a><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_little_endian</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;File saved.&quot;</span><span class="p">)</span>
 
 <span class="c1"># Write as a different transfer syntax XXX shouldn&#39;t need this but pydicom</span>
 <span class="c1"># 0.9.5 bug not recognizing transfer syntax</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <a href="../../reference/generated/pydicom.uid.ExplicitVRBigEndian.html#pydicom.uid.ExplicitVRBigEndian" title="View documentation for pydicom.uid.ExplicitVRBigEndian"><span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRBigEndian</span></a>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
+<a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pydicom</span><span class="o">.</span><span class="n">uid</span><span class="o">.</span><span class="n">ExplicitVRBigEndian</span></a>
+<a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span></a> <span class="o">=</span> <span class="kc">False</span>
+<a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span></a> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file as Big Endian Explicit VR&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">)</span>
-<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing test file as Big Endian Explicit VR&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_big_endian</span></a><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_big_endian</span></a><span class="p">)</span>
 
 <span class="c1"># reopen the data just for checking</span>
-<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a> <span class="ow">in</span> <span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_little_endian</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename_big_endian</span></a><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Load file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">))</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="ow">in</span> <span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_little_endian</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename_big_endian</span></a><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Load file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">))</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 
     <span class="c1"># remove the created file</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Remove file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">))</span>
-    <a href="https://docs.python.org/3/library/os.html#os.remove" title="View documentation for os.remove"><span class="n">os</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="View documentation for builtins.str"><span class="n">filename</span></a><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Remove file </span><span class="si">{}</span><span class="s1"> ...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">))</span>
+    <a href="https://docs.python.org/3/library/os.html#os.remove" title="os.remove" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.007 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7e3f494a513e0ac1eb4963e47afed114/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/44c3a2647e8572357403f4dc998e2848/plot_write_dicom.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_write_dicom.ipynb</span></code></a></p>
 </div>
 </div>

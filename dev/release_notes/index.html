@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Frequently asked questions" href="../faq/index.html" /> 
@@ -348,6 +350,9 @@ having different checks in each</p></li>
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.4.70</span></code> - JPEG Lossless (Process 14, SV1) from
 the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1053">#1053</a>)</p></li>
+<li><p>Fixed error when writing elements with a VR of <strong>OF</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
+<li><p>Fixed improper conversion when reading elements with a VR of <strong>OF</strong>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
 </ul>
 </div>
 </div>

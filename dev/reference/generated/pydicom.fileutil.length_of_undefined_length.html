@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.fileutil.read_delimiter_item" href="pydicom.fileutil.read_delimiter_item.html" />
@@ -215,9 +217,9 @@
             
   <div class="section" id="pydicom-fileutil-length-of-undefined-length">
 <h1>pydicom.fileutil.length_of_undefined_length<a class="headerlink" href="#pydicom-fileutil-length-of-undefined-length" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.fileutil.length_of_undefined_length">
-<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">length_of_undefined_length</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">delimiter</em>, <em class="sig-param">is_little_endian</em>, <em class="sig-param">read_size=128</em>, <em class="sig-param">rewind=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/caf0db10/pydicom/fileutil.py#L214"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.length_of_undefined_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">length_of_undefined_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">delimiter</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">read_size</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">rewind</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e37422e6/pydicom/fileutil.py#L214"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.length_of_undefined_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search through the file to find the delimiter and return the length
 of the data element.</p>
 <dl class="field-list simple">

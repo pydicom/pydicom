@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filereader.read_deferred_data_element" href="pydicom.filereader.read_deferred_data_element.html" />
@@ -220,9 +222,9 @@
             
   <div class="section" id="pydicom-filereader-read-dataset">
 <h1>pydicom.filereader.read_dataset<a class="headerlink" href="#pydicom-filereader-read-dataset" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.filereader.read_dataset">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_dataset</code><span class="sig-paren">(</span><em class="sig-param">fp</em>, <em class="sig-param">is_implicit_VR</em>, <em class="sig-param">is_little_endian</em>, <em class="sig-param">bytelength=None</em>, <em class="sig-param">stop_when=None</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">parent_encoding='iso8859'</em>, <em class="sig-param">specific_tags=None</em>, <em class="sig-param">at_top_level=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/caf0db10/pydicom/filereader.py#L308"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">is_implicit_VR</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">bytelength</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_when</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent_encoding</span><span class="o">=</span><span class="default_value">'iso8859'</span></em>, <em class="sig-param"><span class="n">specific_tags</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">at_top_level</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e37422e6/pydicom/filereader.py#L308"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance containing the next
 dataset in the file.</p>
 <dl class="field-list simple">

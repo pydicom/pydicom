@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Downsize MRI image using pydicom" href="image_processing/plot_downsize_image.html" />
@@ -188,7 +190,7 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-dicomtree-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-dicomtree-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="show-a-dicom-file-using-hierarchical-tree">
 <span id="sphx-glr-auto-examples-dicomtree-py"></span><h1>Show a dicom file using hierarchical tree<a class="headerlink" href="#show-a-dicom-file-using-hierarchical-tree" title="Permalink to this headline">¶</a></h1>
@@ -207,14 +209,14 @@ python3 dicomtree.py</p>
 
 <span class="k">def</span> <span class="nf">RunTree</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
     <span class="n">top</span> <span class="o">=</span> <span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">relief</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">RAISED</span><span class="p">,</span> <span class="n">bd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">tree</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.Tree" title="View documentation for tkinter.tix.Tree"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tree</span></a><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="s2">&quot;hlist.columns 2&quot;</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.Tree" title="tkinter.tix.Tree" class="sphx-glr-backref-module-tkinter-tix sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tree</span></a><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="s2">&quot;hlist.columns 2&quot;</span><span class="p">)</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
               <span class="n">side</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">LEFT</span><span class="p">)</span>
     <span class="c1"># print(tree.hlist.keys())   # use to see the available configure() options</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">bg</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="s1">&#39;Courier 10&#39;</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">selectbackground</span><span class="o">=</span><span class="s1">&#39;light yellow&#39;</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 
-    <span class="n">box</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.ButtonBox" title="View documentation for tkinter.tix.ButtonBox"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">ButtonBox</span></a><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">)</span>
+    <span class="n">box</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.ButtonBox" title="tkinter.tix.ButtonBox" class="sphx-glr-backref-module-tkinter-tix sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">ButtonBox</span></a><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">)</span>
     <span class="c1"># box.add(&#39;ok&#39;, text=&#39;Ok&#39;, underline=0, command=w.destroy, width=6)</span>
     <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;exit&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Exit&#39;</span><span class="p">,</span> <span class="n">underline</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
     <span class="n">box</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
@@ -233,7 +235,7 @@ python3 dicomtree.py</p>
 
 <span class="k">def</span> <span class="nf">show_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">ds</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>  <span class="c1"># change strings to unicode</span>
     <span class="n">recurse_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="s2">&quot;root&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">autosetmode</span><span class="p">()</span>
@@ -264,24 +266,24 @@ python3 dicomtree.py</p>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="kn">import</span> <span class="nn">pydicom</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please supply a dicom file name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
-        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="View documentation for sys.exit"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.Tk" title="View documentation for tkinter.tix.Tk"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
+        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.Tk" title="tkinter.tix.Tk" class="sphx-glr-backref-module-tkinter-tix sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
     <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">x</span><span class="si">{1:d}</span><span class="s2">+</span><span class="si">{2:d}</span><span class="s2">+</span><span class="si">{3:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;DICOM tree viewer - &quot;</span> <span class="o">+</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;DICOM tree viewer - &quot;</span> <span class="o">+</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="n">RunTree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">RunTree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-dicomtree-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/92d31ca968c0f62408d1b29d921a3665/dicomtree.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">dicomtree.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ed6f1c20c1095e9847d76669a78b69c3/dicomtree.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">dicomtree.ipynb</span></code></a></p>
 </div>
 </div>

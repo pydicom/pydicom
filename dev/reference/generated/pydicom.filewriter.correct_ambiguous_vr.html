@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filewriter.correct_ambiguous_vr_element" href="pydicom.filewriter.correct_ambiguous_vr_element.html" />
@@ -231,9 +233,9 @@
             
   <div class="section" id="pydicom-filewriter-correct-ambiguous-vr">
 <h1>pydicom.filewriter.correct_ambiguous_vr<a class="headerlink" href="#pydicom-filewriter-correct-ambiguous-vr" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.filewriter.correct_ambiguous_vr">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">is_little_endian</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/caf0db10/pydicom/filewriter.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e37422e6/pydicom/filewriter.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through <cite>ds</cite> correcting ambiguous VR elements (if possible).</p>
 <p>When it’s not possible to correct the VR, the element will be returned
 unchanged. Currently the only ambiguous VR elements not corrected for are

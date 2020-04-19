@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Anonymize DICOM data" href="plot_anonymize.html" />
@@ -187,7 +189,7 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="working-with-sequences">
 <span id="sphx-glr-auto-examples-metadata-processing-plot-sequences-py"></span><h1>Working with sequences<a class="headerlink" href="#working-with-sequences" title="Permalink to this headline">¶</a></h1>
@@ -201,44 +203,44 @@
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.sequence</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue" class="sphx-glr-backref-module-pydicom-multival sphx-glr-backref-type-py-class"><span class="n">Sequence</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a>
 
 <span class="c1"># create to toy datasets</span>
-<span class="n">block_ds1</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-<span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockType</span> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
-<span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockName</span> <span class="o">=</span> <span class="s2">&quot;Block1&quot;</span>
+<span class="n">block_ds1</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockType</span></a> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">block_ds1</span><span class="o">.</span><span class="n">BlockName</span></a> <span class="o">=</span> <span class="s2">&quot;Block1&quot;</span>
 
-<span class="n">block_ds2</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
-<span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockType</span> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
-<span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockName</span> <span class="o">=</span> <span class="s2">&quot;Block2&quot;</span>
+<span class="n">block_ds2</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockType</span></a> <span class="o">=</span> <span class="s2">&quot;APERTURE&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">block_ds2</span><span class="o">.</span><span class="n">BlockName</span></a> <span class="o">=</span> <span class="s2">&quot;Block2&quot;</span>
 
-<span class="n">beam</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">beam</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
 <span class="c1"># note that you should add beam data elements like BeamName, etc; these are</span>
 <span class="c1"># skipped in this example</span>
-<span class="n">plan_ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">plan_ds</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
 <span class="c1"># starting from scratch since we did not read a file</span>
-<span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">([</span><span class="n">beam</span><span class="p">])</span>
-<span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BlockSequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">([</span><span class="n">block_ds1</span><span class="p">,</span> <span class="n">block_ds2</span><span class="p">])</span>
+<span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span> <span class="o">=</span> <a href="../../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue" class="sphx-glr-backref-module-pydicom-multival sphx-glr-backref-type-py-class"><span class="n">Sequence</span></a><span class="p">([</span><span class="n">beam</span><span class="p">])</span>
+<span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BlockSequence</span> <span class="o">=</span> <a href="../../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue" class="sphx-glr-backref-module-pydicom-multival sphx-glr-backref-type-py-class"><span class="n">Sequence</span></a><span class="p">([</span><span class="n">block_ds1</span><span class="p">,</span> <span class="n">block_ds2</span><span class="p">])</span>
 <span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">NumberOfBlocks</span> <span class="o">=</span> <span class="mi">2</span>
 
 <span class="n">beam0</span> <span class="o">=</span> <span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of blocks: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam0</span><span class="o">.</span><span class="n">BlockSequence</span><span class="p">))</span>
 
 <span class="c1"># create a new data set</span>
-<span class="n">block_ds3</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">block_ds3</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class"><span class="n">Dataset</span></a><span class="p">()</span>
 <span class="c1"># add data elements to it as above and don&#39;t forget to update Number of Blocks</span>
 <span class="c1"># data element</span>
-<span class="n">beam0</span><span class="o">.</span><span class="n">BlockSequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_ds3</span><span class="p">)</span>
+<a href="../../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.append" title="pydicom.multival.MultiValue.append" class="sphx-glr-backref-module-pydicom-multival sphx-glr-backref-type-py-method"><span class="n">beam0</span><span class="o">.</span><span class="n">BlockSequence</span><span class="o">.</span><span class="n">append</span></a><span class="p">(</span><span class="n">block_ds3</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">plan_ds</span><span class="o">.</span><span class="n">BeamSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">BlockSequence</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.002 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-metadata-processing-plot-sequences-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/03374c3fd4f2559d0f640a6dc7cdb0f1/plot_sequences.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_sequences.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c91ebf577cb200394bfdaa77257bd52d/plot_sequences.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_sequences.ipynb</span></code></a></p>
 </div>
 </div>

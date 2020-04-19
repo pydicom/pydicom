@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filewriter.multi_string" href="pydicom.filewriter.multi_string.html" />
@@ -231,9 +233,9 @@
             
   <div class="section" id="pydicom-filewriter-dcmwrite">
 <h1>pydicom.filewriter.dcmwrite<a class="headerlink" href="#pydicom-filewriter-dcmwrite" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.filewriter.dcmwrite">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">dataset</em>, <em class="sig-param">write_like_original=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/caf0db10/pydicom/filewriter.py#L730"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">write_like_original</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e37422e6/pydicom/filewriter.py#L730"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts

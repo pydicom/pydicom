@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_metadata_processing_plot_sequences.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_metadata_processing_plot_sequences.py:
 
 
 ======================
@@ -84,13 +86,13 @@ This examples illustrates how to work with sequences.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_sequences.ipynb <plot_sequences.ipynb>`
 
