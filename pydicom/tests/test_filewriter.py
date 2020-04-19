@@ -21,10 +21,11 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import dcmread, read_dataset, read_file
-from pydicom.filewriter import (write_data_element, write_dataset,
-                                correct_ambiguous_vr, write_file_meta_info,
-                                correct_ambiguous_vr_element, write_numbers,
-                                write_PN, _format_DT, write_text)
+from pydicom.filewriter import (
+    write_data_element, write_dataset, correct_ambiguous_vr,
+    write_file_meta_info, correct_ambiguous_vr_element, write_numbers,
+    write_PN, _format_DT, write_text, write_OWvalue
+)
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
@@ -2249,6 +2250,32 @@ class TestWriteNumbers(object):
         fmt = 'H'
         write_numbers(fp, elem, fmt)
         assert fp.getvalue() == b'\x00\x01'
+
+
+class TestWriteOtherVRs(object):
+    """Tests for writing the 'O' VRs like OB, OW, OF, etc."""
+    def test_write_of(self):
+        """Test writing element with VR OF"""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        elem = DataElement(0x7fe00008, 'OF', b'\x00\x01\x02\x03')
+        write_OWvalue(fp, elem)
+        assert fp.getvalue() == b'\x00\x01\x02\x03'
+
+    def test_write_of_dataset(self):
+        """Test writing a dataset with an element with VR OF."""
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        ds.FloatPixelData = b'\x00\x01\x02\x03'
+        ds.save_as(fp)
+        assert fp.getvalue() == (
+            # Tag             | VR            | Length        | Value
+            b'\xe0\x7f\x08\x00\x4F\x46\x00\x00\x04\x00\x00\x00\x00\x01\x02\x03'
+        )
 
 
 class TestWritePN(object):

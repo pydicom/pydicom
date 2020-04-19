@@ -1004,7 +1004,7 @@ writers = {
     'LT': (write_text, None),
     'OB': (write_OBvalue, None),
     'OD': (write_OWvalue, None),
-    'OF': (write_numbers, 'f'),
+    'OF': (write_OWvalue, None),
     'OL': (write_OWvalue, None),
     'OW': (write_OWvalue, None),
     'OV': (write_OWvalue, None),
