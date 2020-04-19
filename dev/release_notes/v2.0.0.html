@@ -200,7 +200,7 @@ are deprecated and will be removed in version 2.1</p></li>
 <ul class="simple">
 <li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
 (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
-<li><p>Fix failure to parse dataset with an empty <em>LUT Descriptor</em> or
+<li><p>Fixed failure to parse dataset with an empty <em>LUT Descriptor</em> or
 <em>Red/Green/Blue Palette Color LUT Descriptor</em> element. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1049">#1049</a>)</p></li>
 <li><p>Made <cite>Dataset.save_as</cite> a wrapper for <cite>dcmwrite</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1042">#1042</a>) rather than
 having different checks in each</p></li>
@@ -210,6 +210,9 @@ the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
 <li><p>Fixed error when writing elements with a VR of <strong>OF</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
 <li><p>Fixed improper conversion when reading elements with a VR of <strong>OF</strong>
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1075">#1075</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> not handling
+(0028,3006) <em>LUT Data</em> with a VR of <strong>OW</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1073">#1073</a>)</p></li>
 </ul>
 </div>
 </div>
