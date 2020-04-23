@@ -929,7 +929,7 @@ class Dataset(dict):
                     return new_block()
                 else:
                     break
-            if self._dict[private_creator_tag].value == private_creator:
+            if self[private_creator_tag].value == private_creator:
                 return new_block()
 
         raise KeyError(
@@ -972,7 +972,7 @@ class Dataset(dict):
             private_creator_tag = Tag(group, element)
             if private_creator_tag not in self._dict:
                 break
-            private_creators.append(self._dict[private_creator_tag].value)
+            private_creators.append(self[private_creator_tag].value)
         return private_creators
 
     def get_private_item(self, group, element_offset, private_creator):
