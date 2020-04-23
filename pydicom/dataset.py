@@ -1729,7 +1729,7 @@ class Dataset(dict):
         """
         self.file_meta = getattr(self, 'file_meta', Dataset())
 
-    def fix_meta_info(self, enforce_standard=True):
+    def fix_meta_info(self, enforce_standard=True, check_standard=False):
         """Ensure the file meta info exists and has the correct values
         for transfer syntax and media storage UIDs.
 
@@ -1744,8 +1744,13 @@ class Dataset(dict):
         Parameters
         ----------
         enforce_standard : bool, optional
-            If ``True``, a check for incorrect and missing elements is
-            performed (see :func:`~validate_file_meta`).
+            If `enforce_standard` or `check_standard` is ``True``, a check for
+            incorrect and missing elements is performed
+            (see :func:`~validate_file_meta`).
+        check_standard : bool, optional
+            If `enforce_standard` or `check_standard` is ``True``, a check for
+            incorrect and missing elements is performed
+            (see :func:`~validate_file_meta`).
         """
         self.ensure_file_meta()
 
@@ -1761,8 +1766,12 @@ class Dataset(dict):
             self.file_meta.MediaStorageSOPClassUID = self.SOPClassUID
         if 'SOPInstanceUID' in self:
             self.file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
-        if enforce_standard:
-            validate_file_meta(self.file_meta, enforce_standard=True)
+        if enforce_standard or check_standard:
+            validate_file_meta(
+                self.file_meta,
+                enforce_standard=enforce_standard,
+                check_standard=check_standard,
+            )
 
     def __setattr__(self, name, value):
         """Intercept any attempts to set a value for an instance attribute.
@@ -2245,7 +2254,7 @@ class FileDataset(Dataset):
         return NotImplemented
 
 
-def validate_file_meta(file_meta, enforce_standard=True):
+def validate_file_meta(file_meta, enforce_standard=True, check_standard=None):
     """Validate the *File Meta Information* elements in `file_meta`.
 
     .. versionchanged:: 1.2
@@ -2271,11 +2280,23 @@ def validate_file_meta(file_meta, enforce_standard=True):
         * (0002,0003) *Media Storage SOP Instance UID*
         * (0002,0010) *Transfer Syntax UID*
 
+    check_standard : bool, optional
+        Defaults to ``False``. If `enforce_standard` is ``False``, you can set
+        `check_standard` to ``True`` to check the presence of the following
+        elements *without modifying them*:
+
+        * (0002,0002) *Media Storage SOP Class UID*
+        * (0002,0003) *Media Storage SOP Instance UID*
+        * (0002,0010) *Transfer Syntax UID*
+
+        If `enforce_standard` is ``True``, the value of `check_standard` is
+        ignored and the check is always performed.
+
     Raises
     ------
     ValueError
-        If `enforce_standard` is ``True`` and any of the checked *File Meta
-        Information* elements are missing from `file_meta`.
+        If `enforce_standard` or `check_standard` is ``True`` and any of the
+        checked *File Meta Information* elements are missing from `file_meta`.
     ValueError
         If any non-Group 2 Elements are present in `file_meta`.
     """
@@ -2296,6 +2317,7 @@ def validate_file_meta(file_meta, enforce_standard=True):
             file_meta.ImplementationVersionName = (
                 'PYDICOM ' + ".".join(str(x) for x in __version_info__))
 
+    if enforce_standard or check_standard:
         # Check that required File Meta Information elements are present
         missing = []
         for element in [0x0002, 0x0003, 0x0010]:
