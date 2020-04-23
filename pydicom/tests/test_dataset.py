@@ -1470,34 +1470,67 @@ class TestDatasetElements(object):
 
         file_meta.PatientID = 'PatientID'
         for enforce_standard in (True, False):
-            with pytest.raises(
-                    ValueError,
-                    match=r'Only File Meta Information Group '
-                          r'\(0002,eeee\) elements must be present .*'):
+            for check_standard in (True, False):
+                with pytest.raises(
+                        ValueError,
+                        match=r'Only File Meta Information Group '
+                              r'\(0002,eeee\) elements must be present .*'):
+                    validate_file_meta(
+                        file_meta,
+                        enforce_standard=enforce_standard,
+                        check_standard=check_standard,
+                    )
+
+        for enforce_standard, check_standard in [
+            # if enforce_standard is True, check_standard shouldn't matter
+            (True, True), (True, False),
+            # if enforce_standard is False and check_standard is True
+            # we should still get all the errors, but the dataset should
+            # never change
+            (False, True)
+        ]:
+            file_meta = Dataset()
+            file_meta.MediaStorageSOPClassUID = '1.2.3'
+            file_meta.MediaStorageSOPInstanceUID = '1.2.4'
+            # still missing TransferSyntaxUID
+            with pytest.raises(ValueError):
                 validate_file_meta(
-                    file_meta, enforce_standard=enforce_standard)
+                    file_meta,
+                    enforce_standard=enforce_standard,
+                    check_standard=check_standard
+                )
 
-        file_meta = Dataset()
-        file_meta.MediaStorageSOPClassUID = '1.2.3'
-        file_meta.MediaStorageSOPInstanceUID = '1.2.4'
-        # still missing TransferSyntaxUID
-        with pytest.raises(ValueError):
-            validate_file_meta(file_meta, enforce_standard=True)
+            file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
+            validate_file_meta(
+                file_meta,
+                enforce_standard=enforce_standard,
+                check_standard=check_standard
+            )
 
-        file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
-        validate_file_meta(file_meta, enforce_standard=True)
+            if enforce_standard:
+                # check the default created values
+                assert b'\x00\x01' == \
+                    file_meta.FileMetaInformationVersion
+                assert PYDICOM_IMPLEMENTATION_UID == \
+                    file_meta.ImplementationClassUID
+                assert file_meta.ImplementationVersionName\
+                    .startswith('PYDICOM ')
+            else:
+                # check that the values were not added
+                assert 'FileMetaInformationVersion' not in file_meta
+                assert 'ImplementationClassUID' not in file_meta
+                assert 'ImplementationVersionName' not in file_meta
 
-        # check the default created values
-        assert b'\x00\x01' == file_meta.FileMetaInformationVersion
-        assert PYDICOM_IMPLEMENTATION_UID == file_meta.ImplementationClassUID
-        assert file_meta.ImplementationVersionName.startswith('PYDICOM ')
-
-        file_meta.ImplementationClassUID = '1.2.3.4'
-        file_meta.ImplementationVersionName = 'ACME LTD'
-        validate_file_meta(file_meta, enforce_standard=True)
-        # check that existing values are left alone
-        assert '1.2.3.4' == file_meta.ImplementationClassUID
-        assert 'ACME LTD' == file_meta.ImplementationVersionName
+            file_meta.ImplementationClassUID = '1.2.3.4'
+            file_meta.ImplementationVersionName = 'ACME LTD'
+            validate_file_meta(
+                file_meta,
+                enforce_standard=enforce_standard,
+                check_standard=check_standard
+            )
+            # check that existing values are left alone
+            assert '1.2.3.4' == file_meta.ImplementationClassUID
+            assert 'ACME LTD' == file_meta.ImplementationVersionName
 
 
 class TestFileDataset(object):
