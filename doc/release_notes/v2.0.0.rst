@@ -30,3 +30,4 @@ Fixes
 * Fixed :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and
   :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` not handling
   (0028,3006) *LUT Data* with a VR of **OW** (:issue:`1073`)
+* Fixed access to private creator tag in raw datasets (:issue:`1078`)

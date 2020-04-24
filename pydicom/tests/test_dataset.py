@@ -955,6 +955,17 @@ class TestDataset(object):
         item = ds.get_private_item(0x0009, 0x02, 'Creator 2.0')
         assert 2 == item.value
 
+    def test_private_creator_from_raw_ds(self):
+        # regression test for #1078
+        ct_filename = get_testdata_files("CT_small")[0]
+        ds = dcmread(ct_filename)
+        ds.private_block(0x11, 'GEMS_PATI_01', create=True)
+        assert ['GEMS_PATI_01'] == ds.private_creators(0x11)
+
+        assert [] == ds.private_creators(0x13)
+        ds.private_block(0x13, 'GEMS_PATI_01', create=True)
+        assert ['GEMS_PATI_01'] == ds.private_creators(0x13)
+
     def test_add_new_private_tag(self):
         ds = Dataset()
         ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
