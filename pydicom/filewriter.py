@@ -856,7 +856,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
 
     See Also
     --------
-    pydicom.dataset.FileDataset
+    pydicom.dataset.Dataset
         Dataset class with relevant attributes and information.
     pydicom.dataset.Dataset.save_as
         Write a DICOM file from a dataset that was read in with ``dcmread()``.

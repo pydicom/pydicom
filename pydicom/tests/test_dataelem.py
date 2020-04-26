@@ -104,7 +104,7 @@ class TestDataElement(object):
         assert 'Private tag data' == elem.description()
         elem = DataElement(0x00110F00, 'LO', 12345)
         assert elem.tag.is_private
-        assert not hasattr(elem, 'private_creator')
+        assert elem.private_creator is None
         assert 'Private tag data' == elem.description()
 
     def test_description_unknown(self):
