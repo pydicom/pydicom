@@ -4,7 +4,7 @@
 import pytest
 
 import pydicom
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import Dataset, FileDataset, validate_file_meta
 from pydicom.encaps import encapsulate
@@ -793,7 +793,7 @@ class TestDataset(object):
         assert '1.2.3.4' == ds.get_item(0x00080018).value
 
         # Test deferred read
-        test_file = get_testdata_files('MR_small.dcm')[0]
+        test_file = get_testdata_file('MR_small.dcm')
         ds = dcmread(test_file, force=True, defer_size='0.8 kB')
         ds_ref = dcmread(test_file, force=True)
         # get_item will follow the deferred read branch
@@ -957,7 +957,7 @@ class TestDataset(object):
 
     def test_private_creator_from_raw_ds(self):
         # regression test for #1078
-        ct_filename = get_testdata_files("CT_small")[0]
+        ct_filename = get_testdata_file("CT_small.dcm")
         ds = dcmread(ct_filename)
         ds.private_block(0x11, 'GEMS_PATI_01', create=True)
         assert ['GEMS_PATI_01'] == ds.private_creators(0x11)
@@ -965,6 +965,15 @@ class TestDataset(object):
         assert [] == ds.private_creators(0x13)
         ds.private_block(0x13, 'GEMS_PATI_01', create=True)
         assert ['GEMS_PATI_01'] == ds.private_creators(0x13)
+
+    def test_add_known_private_tag(self):
+        # regression test for #1082
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
+        assert '[Patient Status]' == ds[0x11, 0x1010].name
+
+        block = ds.private_block(0x11, 'GEMS_PATI_01')
+        block.add_new(0x10, 'SS', 1)
+        assert '[Patient Status]' == ds[0x11, 0x1010].name
 
     def test_add_new_private_tag(self):
         ds = Dataset()
@@ -1256,7 +1265,7 @@ class TestDataset(object):
 
     def test_with(self):
         """Test Dataset.__enter__ and __exit__."""
-        test_file = get_testdata_files('CT_small.dcm')[0]
+        test_file = get_testdata_file('CT_small.dcm')
         with dcmread(test_file) as ds:
             assert 'CompressedSamples^CT1' == ds.PatientName
 
@@ -1273,7 +1282,7 @@ class TestDataset(object):
     def test_pixel_array_already_have(self):
         """Test Dataset._get_pixel_array when we already have the array"""
         # Test that _pixel_array is returned unchanged unless required
-        fpath = get_testdata_files("CT_small.dcm")[0]
+        fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
         ds._pixel_id = get_image_pixel_ids(ds)
         ds._pixel_array = 'Test Value'
@@ -1283,7 +1292,7 @@ class TestDataset(object):
 
     def test_pixel_array_id_changed(self):
         """Test that we try to get new pixel data if the id has changed."""
-        fpath = get_testdata_files("CT_small.dcm")[0]
+        fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
         ds.file_meta.TransferSyntaxUID = '1.2.3.4'
         ds._pixel_id = 1234
@@ -1299,7 +1308,7 @@ class TestDataset(object):
 
     def test_pixel_array_unknown_syntax(self):
         """Test that pixel_array for an unknown syntax raises exception."""
-        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.file_meta.TransferSyntaxUID = '1.2.3.4'
         msg = (
             r"Unable to decode pixel data with a transfer syntax UID of "
@@ -1338,7 +1347,7 @@ class TestDataset(object):
 
     def test_set_convert_private_elem_from_raw(self):
         """Test Dataset.__setitem__ with a raw private element"""
-        test_file = get_testdata_files('CT_small.dcm')[0]
+        test_file = get_testdata_file('CT_small.dcm')
         ds = dcmread(test_file, force=True)
         # 'tag VR length value value_tell is_implicit_VR is_little_endian'
         elem = RawDataElement((0x0043, 0x1029), 'OB', 2, b'\x00\x01', 0,
@@ -1359,7 +1368,7 @@ class TestDataset(object):
 
     def test_trait_names(self):
         """Test Dataset.trait_names contains element keywords"""
-        test_file = get_testdata_files('CT_small.dcm')[0]
+        test_file = get_testdata_file('CT_small.dcm')
         ds = dcmread(test_file, force=True)
         names = ds.trait_names()
         assert 'PatientName' in names
@@ -1513,7 +1522,7 @@ class TestDatasetElements(object):
 
 class TestFileDataset(object):
     def setup(self):
-        self.test_file = get_testdata_files('CT_small.dcm')[0]
+        self.test_file = get_testdata_file('CT_small.dcm')
 
     def test_pickle(self):
         ds = pydicom.dcmread(self.test_file)
@@ -1598,7 +1607,7 @@ class TestDatasetOverlayArray(object):
         pydicom.config.overlay_data_handlers = [NP_HANDLER]
 
         self.ds = dcmread(
-            get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
+            get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
         )
 
         class DummyHandler(object):

@@ -22,7 +22,6 @@ from itertools import takewhile
 import json
 import os
 import os.path
-import warnings
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -181,7 +180,9 @@ class PrivateBlock(object):
             The value of the data element. See :meth:`Dataset.add_new()`
             for a description.
         """
-        self.dataset.add_new(self.get_tag(element_offset), VR, value)
+        tag = self.get_tag(element_offset)
+        self.dataset.add_new(tag, VR, value)
+        self.dataset[tag].private_creator = self.private_creator
 
 
 def _dict_equal(a, b, exclude=None):
@@ -666,7 +667,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        key : str or int or BaseTag
+        key : str or int or Tuple[int, int] or BaseTag
             The element keyword or tag or the class attribute name to get.
         default : obj or None, optional
             If the element or class attribute is not present, return
@@ -892,9 +893,8 @@ class Dataset(dict):
 
         Returns
         -------
-        int
-            Element base for the given tag (the last 2 hex digits are always 0)
-            as a 32-bit :class:`int`.
+        PrivateBlock
+            The existing or newly created private block.
 
         Raises
         ------
@@ -1243,7 +1243,7 @@ class Dataset(dict):
 
         Returns
         -------
-        type
+        DataElement or type
             The data element for `key` if it exists, or the default value if
             it is a :class:`~pydicom.dataelem.DataElement` or
             ``None``, or a :class:`~pydicom.dataelem.DataElement`
@@ -1815,7 +1815,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        key : int
+        key : int or Tuple[int, int] or str
             The tag for the element to be added to the Dataset.
         value : dataelem.DataElement or dataelem.RawDataElement
             The element to add to the :class:`Dataset`.
