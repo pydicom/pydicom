@@ -207,7 +207,7 @@ be placed in ``_build/html/`` and are viewable in a web browser. See the
 ``README`` file in the ``doc/`` directory for more information.
 
 For building the documentation, you will need
-[sphinx](http://sphinx.pocoo.org/),
+[sphinx](https://www.sphinx-doc.org/),
 [numpy](http://numpy.org/),
 [matplotlib](http://matplotlib.org/), and
 [pillow](http://pillow.readthedocs.io/en/latest/).
