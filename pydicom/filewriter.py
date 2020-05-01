@@ -727,6 +727,42 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     fp.write(buffer.getvalue())
 
 
+def _write_dataset(fp, dataset, write_like_original):
+    """Write the Data Set to a file-like. Assumes the file meta information,
+    if any, has been written.
+    """
+
+    # if we want to write with the same endianess and VR handling as
+    # the read dataset we want to preserve raw data elements for
+    # performance reasons (which is done by get_item);
+    # otherwise we use the default converting item getter
+    if dataset.is_original_encoding:
+        get_item = Dataset.get_item
+    else:
+        get_item = Dataset.__getitem__
+
+    # WRITE DATASET
+    # The transfer syntax used to encode the dataset can't be changed
+    #   within the dataset.
+    # Write any Command Set elements now as elements must be in tag order
+    #   Mixing Command Set with other elements is non-conformant so we
+    #   require `write_like_original` to be True
+    command_set = get_item(dataset, slice(0x00000000, 0x00010000))
+    if command_set and write_like_original:
+        fp.is_implicit_VR = True
+        fp.is_little_endian = True
+        write_dataset(fp, command_set)
+
+    # Set file VR and endianness. MUST BE AFTER writing META INFO (which
+    #   requires Explicit VR Little Endian) and COMMAND SET (which requires
+    #   Implicit VR Little Endian)
+    fp.is_implicit_VR = dataset.is_implicit_VR
+    fp.is_little_endian = dataset.is_little_endian
+
+    # Write non-Command Set elements now
+    write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
+
+
 def dcmwrite(filename, dataset, write_like_original=True):
     """Write `dataset` to the `filename` specified.
 
@@ -938,15 +974,6 @@ def dcmwrite(filename, dataset, write_like_original=True):
     else:
         fp = DicomFileLike(filename)
 
-    # if we want to write with the same endianess and VR handling as
-    # the read dataset we want to preserve raw data elements for
-    # performance reasons (which is done by get_item);
-    # otherwise we use the default converting item getter
-    if dataset.is_original_encoding:
-        get_item = Dataset.get_item
-    else:
-        get_item = Dataset.__getitem__
-
     try:
         # WRITE FILE META INFORMATION
         if preamble:
@@ -959,26 +986,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
             write_file_meta_info(fp, dataset.file_meta,
                                  enforce_standard=not write_like_original)
 
-        # WRITE DATASET
-        # The transfer syntax used to encode the dataset can't be changed
-        #   within the dataset.
-        # Write any Command Set elements now as elements must be in tag order
-        #   Mixing Command Set with other elements is non-conformant so we
-        #   require `write_like_original` to be True
-        command_set = get_item(dataset, slice(0x00000000, 0x00010000))
-        if command_set and write_like_original:
-            fp.is_implicit_VR = True
-            fp.is_little_endian = True
-            write_dataset(fp, command_set)
-
-        # Set file VR and endianness. MUST BE AFTER writing META INFO (which
-        #   requires Explicit VR Little Endian) and COMMAND SET (which requires
-        #   Implicit VR Little Endian)
-        fp.is_implicit_VR = dataset.is_implicit_VR
-        fp.is_little_endian = dataset.is_little_endian
-
-        # Write non-Command Set elements now
-        write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
+        _write_dataset(fp, dataset, write_like_original)
     finally:
         if not caller_owns_file:
             fp.close()
