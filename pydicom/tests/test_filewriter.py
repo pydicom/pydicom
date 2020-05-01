@@ -49,6 +49,7 @@ datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
+deflate_name = get_testdata_file("image_dfl.dcm")
 
 base_version = '.'.join(str(i) for i in __version_info__)
 
@@ -221,6 +222,23 @@ class TestWriteFile(object):
         self.file_out.seek(0)
         ds = read_file(self.file_out)
         assert ds.PerformedProcedureCodeSequence == []
+
+    def test_write_deflated(self):
+        """Read a Deflated Explicit VR Little Endian file, write it,
+           and then read the output, to verify that the written file
+           is correct.
+           """
+        original = read_file(deflate_name)
+        original.save_as(self.file_out)
+
+        self.file_out.seek(0)
+        rewritten = read_file(self.file_out)
+
+        assert (original.file_meta.TransferSyntaxUID ==
+                rewritten.file_meta.TransferSyntaxUID)
+        assert len(original) == len(rewritten)
+        assert original.ImageComments == rewritten.ImageComments
+        assert original.PixelData == rewritten.PixelData
 
 
 class TestScratchWriteDateTime(TestWriteFile):
