@@ -3,6 +3,7 @@
 
 
 import warnings
+import zlib
 from struct import pack
 
 from pydicom.charset import (
@@ -15,7 +16,8 @@ from pydicom.fileutil import path_from_pathlike
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
-from pydicom.uid import UncompressedPixelTransferSyntaxes
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
+                         DeflatedExplicitVRLittleEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
@@ -981,12 +983,32 @@ def dcmwrite(filename, dataset, write_like_original=True):
             fp.write(preamble)
             fp.write(b'DICM')
 
+        tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(fp, dataset.file_meta,
                                  enforce_standard=not write_like_original)
+            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
 
-        _write_dataset(fp, dataset, write_like_original)
+        if (tsyntax == DeflatedExplicitVRLittleEndian):
+            # See PS3.6-2008 A.5 (p 71)
+            # when written, the entire dataset following
+            #     the file metadata was prepared the normal way,
+            #     then "deflate" compression applied.
+            buffer = DicomBytesIO()
+            _write_dataset(buffer, dataset, write_like_original)
+
+            # Compress the encoded data and write to file
+            compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+            deflated = compressor.compress(buffer.parent.getvalue())
+            deflated += compressor.flush()
+            if len(deflated) % 2:
+                deflated += b'\x00'
+
+            fp.write(deflated)
+        else:
+            _write_dataset(fp, dataset, write_like_original)
+
     finally:
         if not caller_owns_file:
             fp.close()
