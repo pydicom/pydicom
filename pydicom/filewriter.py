@@ -991,9 +991,9 @@ def dcmwrite(filename, dataset, write_like_original=True):
             tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
 
         if (tsyntax == DeflatedExplicitVRLittleEndian):
-            # See PS3.6-2008 A.5 (p 71)
-            # when written, the entire dataset following
-            #     the file metadata was prepared the normal way,
+            # See PS3.5 section A.5
+            # when writing, the entire dataset following
+            #     the file metadata is prepared the normal way,
             #     then "deflate" compression applied.
             buffer = DicomBytesIO()
             _write_dataset(buffer, dataset, write_like_original)
