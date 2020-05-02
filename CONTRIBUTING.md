@@ -3,7 +3,7 @@ Contributing to pydicom
 =======================
 
 This is the guide for contributing code, documentation and tests, and for
-filing issues. Please read it carefully to help making the code review
+filing issues. Please read it carefully to help make the code review
 process go as smoothly as possible and maximize the likelihood of your
 contribution being merged.
 
@@ -53,7 +53,25 @@ GitHub, clone, and develop on a branch. Steps:
 5. Add a meaningful commit message. Pull requests are "squash-merged", e.g.
    squashed into one commit with all commit messages combined. The commit
    messages can be edited during the merge, but it helps if they are clearly
-   and briefly showing what has been done in the commit.   
+   and briefly showing what has been done in the commit. Check out the 
+   [seven commonly accepted rules](https://www.theserverside.com/video/Follow-these-git-commit-message-guidelines)
+   for commit messages. Here are some examples, taken from actual commits:
+   
+   ```
+   Add support for new VRs OV, SV, UV
+   
+   -  closes #1016
+   ```
+   ```
+   Add warning when saving compressed without encapsulation  
+   ``` 
+   ```
+   Add optional handler argument to Dataset.decompress()
+   
+   - also add it to Dataset.convert_pixel_data()
+   - add separate error handling for given handle
+   - see #537
+   ```
    
 6. To record your changes in Git, push the changes to your GitHub
    account with:
