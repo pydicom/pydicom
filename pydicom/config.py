@@ -96,6 +96,15 @@ Note that the default of this value will change to ``True`` in version 2.0.
 .. versionadded:: 1.4
 """
 
+replace_un_with_known_vr = True
+""" If ``True``, and the VR of a known data element is encoded as 'UN' in
+an explicit encoding, the VR is changed to the known value.
+Can be set to ``False`` where the content of the tag shown as 'UN' is 
+not DICOM-conform and would lead to a failure if accessing it.  
+
+.. versionadded:: 2.0
+"""
+
 # Logging system and debug function to change logging level
 logger = logging.getLogger('pydicom')
 logger.addHandler(logging.NullHandler())

@@ -41,6 +41,11 @@ rtstruct.dcm            : Impl VR Little Endian
   * JPEG2000, JPEG2000Lossless and uncompressed versions
   * Mismatch between BitsStored and sample bit depth
 
+bad_sequence.dcm
+   * Anonymized test dataset for issue #1067, provided by @sylvainKritter
+   * JPEGLossless:Non-hierarchical-1stOrderPrediction
+   * contains invalid sequence (encoded as Implicit Lille Endian) with VR "UN"
+
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
   * Downsized to 128x128 from 'CT1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/

@@ -210,8 +210,9 @@ class DataElement(object):
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
-        if VR == 'UN' and (is_undefined_length or value is None or
-                           len(value) < 0xffff):
+        if (VR == 'UN' and not tag.is_private and
+                config.replace_un_with_known_vr and
+                (is_undefined_length or value is None or len(value) < 0xffff)):
             try:
                 VR = dictionary_VR(tag)
             except KeyError:
@@ -728,7 +729,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
                 msg += " can't look up VR"
                 raise KeyError(msg)
-    elif VR == 'UN' and not raw.tag.is_private:
+    elif (VR == 'UN' and not raw.tag.is_private and
+          config.replace_un_with_known_vr):
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if (raw.length == 0xffffffff or raw.value is None or
