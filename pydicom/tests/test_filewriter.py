@@ -11,6 +11,7 @@ from platform import python_implementation
 
 from struct import unpack
 from tempfile import TemporaryFile
+import zlib
 
 import pytest
 
@@ -49,6 +50,7 @@ datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
+deflate_name = get_testdata_file("image_dfl.dcm")
 
 base_version = '.'.join(str(i) for i in __version_info__)
 
@@ -75,6 +77,18 @@ def bytes_identical(a_bytes, b_bytes):
         while a_bytes[pos] == b_bytes[pos]:
             pos += 1
         return False, pos  # False if not identical, position of 1st diff
+
+
+def as_assertable(dataset):
+    """Copy the elements in a Dataset (including the file_meta, if any)
+       to a set that can be safely compared using pytest's assert.
+       (Datasets can't be so compared because DataElements are not
+       hashable.)"""
+    safe_dict = dict((str(elem.tag) + " " + elem.keyword, elem.value)
+                     for elem in dataset)
+    if hasattr(dataset, "file_meta"):
+        safe_dict.update(as_assertable(dataset.file_meta))
+    return safe_dict
 
 
 class TestWriteFile(object):
@@ -221,6 +235,41 @@ class TestWriteFile(object):
         self.file_out.seek(0)
         ds = read_file(self.file_out)
         assert ds.PerformedProcedureCodeSequence == []
+
+    def test_write_deflated_retains_elements(self):
+        """Read a Deflated Explicit VR Little Endian file, write it,
+           and then read the output, to verify that the written file
+           contains the same data.
+           """
+        original = read_file(deflate_name)
+        original.save_as(self.file_out)
+
+        self.file_out.seek(0)
+        rewritten = read_file(self.file_out)
+
+        assert as_assertable(rewritten) == as_assertable(original)
+
+    def test_write_deflated_deflates_post_file_meta(self):
+        """Read a Deflated Explicit VR Little Endian file, write it,
+           and then check the bytes in the output, to verify that the
+           written file is deflated past the file meta information.
+           """
+        original = read_file(deflate_name)
+        original.save_as(self.file_out)
+
+        first_byte_past_file_meta = 0x14e
+        with open(deflate_name, "rb") as original_file:
+            original_file.seek(first_byte_past_file_meta)
+            original_post_meta_file_bytes = original_file.read()
+        unzipped_original = zlib.decompress(original_post_meta_file_bytes,
+                                            -zlib.MAX_WBITS)
+
+        self.file_out.seek(first_byte_past_file_meta)
+        rewritten_post_meta_file_bytes = self.file_out.read()
+        unzipped_rewritten = zlib.decompress(rewritten_post_meta_file_bytes,
+                                             -zlib.MAX_WBITS)
+
+        assert unzipped_rewritten == unzipped_original
 
 
 class TestScratchWriteDateTime(TestWriteFile):

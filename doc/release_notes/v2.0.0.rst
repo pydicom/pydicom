@@ -12,6 +12,8 @@ Enhancements
 ............
 * Allow PathLike objects for filename argument in `dcmread`, `dcmwrite` and
   `Dataset.save_as` (:issue:`1047`)
+* Deflate post-file meta information data when writing a dataset with the
+  Deflated Explicit VR Little Endian transfer syntax UID (:issue:`1086`)
 
 Fixes
 .....
