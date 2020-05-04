@@ -44,7 +44,8 @@ rtstruct.dcm            : Impl VR Little Endian
 bad_sequence.dcm
    * Anonymized test dataset for issue #1067, provided by @sylvainKritter
    * JPEGLossless:Non-hierarchical-1stOrderPrediction
-   * contains invalid sequence (encoded as Implicit Lille Endian) with VR "UN"
+   * contains invalid sequence (encoded as Implicit Little Endian) with VR
+   "UN"
 
 CT_small.dcm
   * CT image, Explicit VR, LittleEndian
