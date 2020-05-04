@@ -3,6 +3,7 @@
 
 
 import warnings
+import zlib
 from struct import pack
 
 from pydicom.charset import (
@@ -15,7 +16,8 @@ from pydicom.fileutil import path_from_pathlike
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
-from pydicom.uid import UncompressedPixelTransferSyntaxes
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
+                         DeflatedExplicitVRLittleEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
@@ -727,6 +729,42 @@ def write_file_meta_info(fp, file_meta, enforce_standard=True):
     fp.write(buffer.getvalue())
 
 
+def _write_dataset(fp, dataset, write_like_original):
+    """Write the Data Set to a file-like. Assumes the file meta information,
+    if any, has been written.
+    """
+
+    # if we want to write with the same endianess and VR handling as
+    # the read dataset we want to preserve raw data elements for
+    # performance reasons (which is done by get_item);
+    # otherwise we use the default converting item getter
+    if dataset.is_original_encoding:
+        get_item = Dataset.get_item
+    else:
+        get_item = Dataset.__getitem__
+
+    # WRITE DATASET
+    # The transfer syntax used to encode the dataset can't be changed
+    #   within the dataset.
+    # Write any Command Set elements now as elements must be in tag order
+    #   Mixing Command Set with other elements is non-conformant so we
+    #   require `write_like_original` to be True
+    command_set = get_item(dataset, slice(0x00000000, 0x00010000))
+    if command_set and write_like_original:
+        fp.is_implicit_VR = True
+        fp.is_little_endian = True
+        write_dataset(fp, command_set)
+
+    # Set file VR and endianness. MUST BE AFTER writing META INFO (which
+    #   requires Explicit VR Little Endian) and COMMAND SET (which requires
+    #   Implicit VR Little Endian)
+    fp.is_implicit_VR = dataset.is_implicit_VR
+    fp.is_little_endian = dataset.is_little_endian
+
+    # Write non-Command Set elements now
+    write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
+
+
 def dcmwrite(filename, dataset, write_like_original=True):
     """Write `dataset` to the `filename` specified.
 
@@ -938,15 +976,6 @@ def dcmwrite(filename, dataset, write_like_original=True):
     else:
         fp = DicomFileLike(filename)
 
-    # if we want to write with the same endianess and VR handling as
-    # the read dataset we want to preserve raw data elements for
-    # performance reasons (which is done by get_item);
-    # otherwise we use the default converting item getter
-    if dataset.is_original_encoding:
-        get_item = Dataset.get_item
-    else:
-        get_item = Dataset.__getitem__
-
     try:
         # WRITE FILE META INFORMATION
         if preamble:
@@ -954,31 +983,32 @@ def dcmwrite(filename, dataset, write_like_original=True):
             fp.write(preamble)
             fp.write(b'DICM')
 
+        tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(fp, dataset.file_meta,
                                  enforce_standard=not write_like_original)
+            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
 
-        # WRITE DATASET
-        # The transfer syntax used to encode the dataset can't be changed
-        #   within the dataset.
-        # Write any Command Set elements now as elements must be in tag order
-        #   Mixing Command Set with other elements is non-conformant so we
-        #   require `write_like_original` to be True
-        command_set = get_item(dataset, slice(0x00000000, 0x00010000))
-        if command_set and write_like_original:
-            fp.is_implicit_VR = True
-            fp.is_little_endian = True
-            write_dataset(fp, command_set)
+        if (tsyntax == DeflatedExplicitVRLittleEndian):
+            # See PS3.5 section A.5
+            # when writing, the entire dataset following
+            #     the file metadata is prepared the normal way,
+            #     then "deflate" compression applied.
+            buffer = DicomBytesIO()
+            _write_dataset(buffer, dataset, write_like_original)
 
-        # Set file VR and endianness. MUST BE AFTER writing META INFO (which
-        #   requires Explicit VR Little Endian) and COMMAND SET (which requires
-        #   Implicit VR Little Endian)
-        fp.is_implicit_VR = dataset.is_implicit_VR
-        fp.is_little_endian = dataset.is_little_endian
+            # Compress the encoded data and write to file
+            compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+            deflated = compressor.compress(buffer.parent.getvalue())
+            deflated += compressor.flush()
+            if len(deflated) % 2:
+                deflated += b'\x00'
 
-        # Write non-Command Set elements now
-        write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
+            fp.write(deflated)
+        else:
+            _write_dataset(fp, dataset, write_like_original)
+
     finally:
         if not caller_owns_file:
             fp.close()
