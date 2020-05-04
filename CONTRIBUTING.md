@@ -11,9 +11,9 @@ _Note:_
 If you want to contribute new functionality, you may first consider if this 
 functionality belongs to the pydicom core, or is better suited for
 [contrib-pydicom](https://github.com/pydicom/contrib-pydicom). contrib-pydicom
-collects some convenient functionality that is using pydicom, but does not
-belong to the pydicom core. If you are unsure, create an issue where you can
-discuss this before creating a pull request.
+collects some convenient functionality that uses pydicom, but doesn't
+belong to the pydicom core. If you're not sure where your contribution belongs, 
+create an issue where you can discuss this before creating a pull request.
 
 
 How to contribute
@@ -100,9 +100,9 @@ submit a pull request:
 -  If your pull request addresses an issue, please use the pull request title to
    describe the issue and mention the issue number in the pull request
    description. This will make sure a link back to the original issue is
-   created. Use "closes #PR-NUM" or "fixes #PR-NUM" to indicate github to
-   automatically close the related issue. Use any other keyword (i.e: works on,
-   related) to avoid github to close the referenced issue.
+   created. Use "closes #issue-number" or "fixes #issue-number" to let GitHub 
+   automatically close the related issue on commit. Use any other keyword 
+   (i.e. works on, related) to avoid GitHub to close the referenced issue.
 
 -  All public methods should have informative docstrings with sample
    usage presented as doctests when appropriate.
@@ -130,8 +130,8 @@ submit a pull request:
 -  Documentation and high-coverage tests are necessary for enhancements to be
    accepted. Bug-fixes shall be provided with 
    [regression tests](https://en.wikipedia.org/wiki/regression_testing) that
-   fail before the fix, for new features the correct behavior shall be verified
-   by feature tests. A good practice to write sufficient tests is 
+   fail before the fix. For new features, the correct behavior shall be
+   verified by feature tests. A good practice to write sufficient tests is 
    [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 
 You can also check for common programming errors and style issues with the
@@ -168,7 +168,7 @@ following tools:
 
 Filing bugs
 -----------
-We use Github issues to track all bugs and feature requests; feel free to
+We use GitHub issues to track all bugs and feature requests; feel free to
 open an issue if you have found a bug or wish to see a feature implemented.
 
 It is recommended to check that your issue complies with the
@@ -220,5 +220,6 @@ For building the documentation, you will need
 [pillow](http://pillow.readthedocs.io/en/latest/).
 
 When you are writing documentation that references DICOM, it is often
-helpful to reference the related part of the DICOM standard. Try to make the
+helpful to reference the related part of the
+[DICOM standard](https://www.dicomstandard.org/current/). Try to make the
 explanations intuitive and understandable also for users not fluent in DICOM.
