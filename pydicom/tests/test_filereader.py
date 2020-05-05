@@ -95,6 +95,7 @@ save_dir = os.getcwd()
 class TestReader(object):
     def teardown(self):
         config.enforce_valid_values = False
+        config.replace_un_with_known_vr = True
 
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
@@ -247,6 +248,17 @@ class TestReader(object):
         # If we can read anything else, the decompression must have been ok.
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
+
+    def test_bad_sequence(self):
+        """Test that automatic UN conversion can be switched off."""
+        with pytest.raises(NotImplementedError):
+            ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+            # accessing the elements of the faulty sequence raises
+            str(ds.CTDIPhantomTypeCodeSequence)
+
+        config.replace_un_with_known_vr = False
+        ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+        str(ds.CTDIPhantomTypeCodeSequence)
 
     def test_no_pixels_read(self):
         """Returns all data elements before pixels using
