@@ -2,10 +2,19 @@
 Contributing to pydicom
 =======================
 
-This is the summary for contributing code, documentation, testing, and filing
-issues. Please read it carefully to help making the code review process go as
-smoothly as possible and maximize the likelihood of your contribution being
-merged.
+This is the guide for contributing code, documentation and tests, and for
+filing issues. Please read it carefully to help make the code review
+process go as smoothly as possible and maximize the likelihood of your
+contribution being merged.
+
+_Note:_  
+If you want to contribute new functionality, you may first consider if this 
+functionality belongs to the pydicom core, or is better suited for
+[contrib-pydicom](https://github.com/pydicom/contrib-pydicom). contrib-pydicom
+collects some convenient functionality that uses pydicom, but doesn't
+belong to the pydicom core. If you're not sure where your contribution belongs, 
+create an issue where you can discuss this before creating a pull request.
+
 
 How to contribute
 -----------------
@@ -41,13 +50,37 @@ GitHub, clone, and develop on a branch. Steps:
    $ git commit
    ```
 
-   to record your changes in Git, then push the changes to your GitHub account with:
+5. Add a meaningful commit message. Pull requests are "squash-merged", e.g.
+   squashed into one commit with all commit messages combined. The commit
+   messages can be edited during the merge, but it helps if they are clearly
+   and briefly showing what has been done in the commit. Check out the 
+   [seven commonly accepted rules](https://www.theserverside.com/video/Follow-these-git-commit-message-guidelines)
+   for commit messages. Here are some examples, taken from actual commits:
+   
+   ```
+   Add support for new VRs OV, SV, UV
+   
+   -  closes #1016
+   ```
+   ```
+   Add warning when saving compressed without encapsulation  
+   ``` 
+   ```
+   Add optional handler argument to Dataset.decompress()
+   
+   - also add it to Dataset.convert_pixel_data()
+   - add separate error handling for given handle
+   - see #537
+   ```
+   
+6. To record your changes in Git, push the changes to your GitHub
+   account with:
 
    ```bash
    $ git push -u origin my-feature
    ```
 
-5. Follow [these instructions](https://help.github.com/articles/creating-a-pull-request-from-a-fork)
+7. Follow [these instructions](https://help.github.com/articles/creating-a-pull-request-from-a-fork)
 to create a pull request from your fork. This will send an email to the committers.
 
 (If any of the above seems like magic to you, please look up the
@@ -59,31 +92,28 @@ Pull Request Checklist
 We recommend that your contribution complies with the following rules before you
 submit a pull request:
 
--  Follow the
-   [coding-guidelines](http://pydicom.org/dev/developers/contributing.html#coding-guidelines).
-
--  Use, when applicable, the validation tools and scripts in the
-   `pydicom.utils` submodule.  A list of utility routines available
-   for developers can be found in the
-   [Utilities for Developers](http://pydicom.org/dev/developers/utilities.html#developers-utils)
-   page.
-
+-  Follow the style used in the rest of the code. That mostly means to
+   follow [PEP-8 guidelines](https://www.python.org/dev/peps/pep-0008/) for
+   the code, and the [Google style](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings)
+   for documentation.
+   
 -  If your pull request addresses an issue, please use the pull request title to
    describe the issue and mention the issue number in the pull request
    description. This will make sure a link back to the original issue is
-   created. Use "closes #PR-NUM" or "fixes #PR-NUM" to indicate github to
-   automatically close the related issue. Use any other keyword (i.e: works on,
-   related) to avoid github to close the referenced issue.
+   created. Use "closes #issue-number" or "fixes #issue-number" to let GitHub 
+   automatically close the related issue on commit. Use any other keyword 
+   (i.e. works on, related) to avoid GitHub to close the referenced issue.
 
 -  All public methods should have informative docstrings with sample
    usage presented as doctests when appropriate.
 
 -  Please prefix the title of your pull request with `[MRG]` (Ready for Merge),
-   if the contribution is complete and ready for a detailed review. Two core
-   developers will review your code and change the prefix of the pull request to
-   `[MRG + 1]` on approval, making it eligible for merging. An incomplete
-   contribution -- where you expect to do more work before receiving a full
-   review -- should be prefixed `[WIP]` (to indicate a work in progress) and
+   if the contribution is complete and ready for a detailed review. Some of the
+   core developers will review your code, make suggestions for changes, and
+   approve it as soon as it is ready for merge. Pull requests are usually merged
+   after two approvals by core developers, or other developers asked to review the code. 
+   An incomplete contribution -- where you expect to do more work before receiving a full
+   review -- should be prefixed with `[WIP]` (to indicate a work in progress) and
    changed to `[MRG]` when it matures. WIPs may be useful to: indicate you are
    working on something to avoid duplicated work, request broad review of
    functionality or API, or seek collaborators. WIPs often benefit from the
@@ -91,31 +121,24 @@ submit a pull request:
    [task list](https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
    in the PR description.
 
--  When adding additional functionality, provide at least one
-   example script in the ``examples/`` folder. Have a look at other
+-  When adding additional functionality, check if it makes sense to add one or
+   more example scripts in the ``examples/`` folder. Have a look at other
    examples for reference. Examples should demonstrate why the new
    functionality is useful in practice and, if possible, compare it
    to other methods available in pydicom.
 
 -  Documentation and high-coverage tests are necessary for enhancements to be
-   accepted. Bug-fixes or new features should be provided with 
-   [non-regression tests](https://en.wikipedia.org/wiki/Non-regression_testing).
-   These tests verify the correct behavior of the fix or feature. In this
-   manner, further modifications on the code base are granted to be consistent
-   with the desired behavior.
-   For the Bug-fixes case, at the time of the PR, this tests should fail for
-   the code base in master and pass for the PR code.
+   accepted. Bug-fixes shall be provided with 
+   [regression tests](https://en.wikipedia.org/wiki/regression_testing) that
+   fail before the fix. For new features, the correct behavior shall be
+   verified by feature tests. A good practice to write sufficient tests is 
+   [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 
--  The documentation should also include expected time and space
-   complexity of the algorithm and scalability, e.g. "this algorithm
-   can scale to a large number of samples > 100000, but does not
-   scale in dimensionality: n_features is expected to be lower than
-   100".
+You can also check for common programming errors and style issues with the
+following tools:
 
-You can also check for common programming errors with the following
-tools:
-
--  Code with good unittest **coverage** (at least 80%), check with:
+-  Code with good unittest **coverage** (current coverage or better), check
+ with:
 
   ```bash
   $ pip install pytest pytest-cov
@@ -132,8 +155,8 @@ tools:
 -  No PEP8 warnings, check with:
 
   ```bash
-  $ pip install pep8
-  $ pep8 path/to/module.py
+  $ pip install pycodestyle  # formerly called pep8 
+  $ pycodestyle path/to/module.py
   ```
 
 -  AutoPEP8 can help you fix some of the easy redundant errors:
@@ -143,13 +166,9 @@ tools:
   $ autopep8 path/to/pep8.py
   ```
 
-Bonus points for contributions that include a performance analysis with
-a benchmark script and profiling output (please report on the mailing
-list or on the GitHub issue).
-
 Filing bugs
 -----------
-We use Github issues to track all bugs and feature requests; feel free to
+We use GitHub issues to track all bugs and feature requests; feel free to
 open an issue if you have found a bug or wish to see a feature implemented.
 
 It is recommended to check that your issue complies with the
@@ -170,7 +189,6 @@ following rules before submitting:
   ```python
   import platform; print(platform.platform())
   import sys; print("Python", sys.version)
-  import numpy; print("numpy", numpy.__version__)
   import pydicom; print("pydicom", pydicom.__version__)
   ```
 
@@ -180,22 +198,11 @@ following rules before submitting:
    non beautified version of the trackeback)
 
 
-New contributor tips
---------------------
-
-A great way to start contributing to pydicom is to pick an item
-from the list of [Easy issues](https://github.com/pydicom/pydicom/issues?labels=Easy)
-in the issue tracker. Resolving these issues allow you to start
-contributing to the project without much prior knowledge. Your
-assistance in this area will be greatly appreciated by the more
-experienced developers as it helps free up their time to concentrate on
-other issues.
-
 Documentation
 -------------
 
 We are glad to accept any sort of documentation: function docstrings,
-reStructuredText documents (like this one), tutorials, etc.
+reStructuredText documents, tutorials, etc.
 reStructuredText documents live in the source code repository under the
 ``doc/`` directory.
 
@@ -212,8 +219,7 @@ For building the documentation, you will need
 [matplotlib](http://matplotlib.org/), and
 [pillow](http://pillow.readthedocs.io/en/latest/).
 
-When you are writing documentation, it is important to reference the related
-part of the DICOM standard, and give give intuition to the reader on what the
-method does. It is best to always start with a small paragraph with a
-hand-waving explanation of what the method does to the data and a figure (coming
-from an example) illustrating it.
+When you are writing documentation that references DICOM, it is often
+helpful to reference the related part of the
+[DICOM standard](https://www.dicomstandard.org/current/). Try to make the
+explanations intuitive and understandable also for users not fluent in DICOM.
