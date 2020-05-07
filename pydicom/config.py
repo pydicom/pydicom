@@ -8,8 +8,8 @@ import logging
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
-"""Set to ``True`` to use :class:`decimal.Decimal` to hold the value for
-elements with a VR of 'DS'.
+"""Set using :function:`DS_decimal` to control if elements with a VR of 'DS'
+are represented as :class:`~decimal.Decimal`.
 
 Default ``False``.
 """
@@ -51,6 +51,8 @@ def DS_decimal(use_Decimal_boolean=True):
         ``True`` to derive :class:`~pydicom.valuerep.DS` from
         :class:`decimal.Decimal`, ``False`` to derive it from :class:`float`.
     """
+    global use_DS_decimal
+
     use_DS_decimal = use_Decimal_boolean
     import pydicom.valuerep
     if use_DS_decimal:
