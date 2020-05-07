@@ -581,14 +581,22 @@ class Dataset(dict):
         if isinstance(key, slice):
             for tag in self._slice_dataset(key.start, key.stop, key.step):
                 del self._dict[tag]
+                # invalidate private blocks in case a private creator is
+                # deleted - will be re-created on next access
+                if self._private_blocks and BaseTag(tag).is_private_creator:
+                    self._private_blocks = {}
         else:
             # Assume is a standard tag (for speed in common case)
             try:
                 del self._dict[key]
+                if self._private_blocks and BaseTag(key).is_private_creator:
+                    self._private_blocks = {}
             # If not a standard tag, than convert to Tag and try again
             except KeyError:
                 tag = Tag(key)
                 del self._dict[tag]
+                if self._private_blocks and tag.is_private_creator:
+                    self._private_blocks = {}
 
     def __dir__(self):
         """Give a list of attributes available in the :class:`Dataset`.

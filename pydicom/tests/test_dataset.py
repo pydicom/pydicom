@@ -1019,6 +1019,52 @@ class TestDataset(object):
         assert ['Creator 1.0', 'Creator 2.0'] == ds.private_creators(0x0009)
         assert not ds.private_creators(0x0011)
 
+    def test_create_private_tag_after_removing_all(self):
+        # regression test for #1097 - make sure private blocks are updated
+        # after removing all private tags
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+
+        ds.remove_private_tags()
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+        assert len(ds) == 2
+        assert (0x000b0010) in ds
+        assert ds[0x000b0010].value == 'dog^2'
+
+    def test_create_private_tag_after_removing_private_creator(self):
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+
+        del ds[0x000b0010]
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x02, "SH", "Poodle")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
+        del ds[Tag(0x000b, 0x0010)]
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
+    def test_create_private_tag_after_removing_slice(self):
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+
+        del ds[0x000b0010:0x000b1110]
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+        assert len(ds) == 2
+        assert ds[0x000b0010].value == 'dog^2'
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
