@@ -9,6 +9,7 @@ from struct import pack
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
 )
+from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw
 from pydicom.dataset import Dataset, validate_file_meta
 from pydicom.filebase import DicomFile, DicomFileLike, DicomBytesIO
@@ -20,6 +21,10 @@ from pydicom.uid import (UncompressedPixelTransferSyntaxes,
                          DeflatedExplicitVRLittleEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
+
+
+if have_numpy:
+    import numpy
 
 
 def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
@@ -259,6 +264,8 @@ def write_UI(fp, data_element):
 
 def _is_multi_value(val):
     """Return True if `val` is a multi-value container."""
+    if have_numpy and isinstance(val, numpy.ndarray):
+        return True
     return isinstance(val, (MultiValue, list, tuple))
 
 
@@ -328,8 +335,8 @@ def write_number_string(fp, data_element):
 
     if _is_multi_value(val):
         val = "\\".join((x.original_string
-                         if hasattr(x, 'original_string') else str(x)
-                         for x in val))
+                         if hasattr(x, 'original_string')
+                         else str(x) for x in val))
     else:
         if hasattr(val, 'original_string'):
             val = val.original_string

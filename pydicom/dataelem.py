@@ -75,6 +75,13 @@ def empty_value_for_VR(VR, raw=False):
     return None
 
 
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
+
+
 def isMultiValue(value):
     """Return ``True`` if `value` is list-like (iterable).
 
@@ -535,8 +542,14 @@ class DataElement(object):
             return True
 
         if isinstance(other, self.__class__):
-            return (self.tag == other.tag and self.VR == other.VR
-                    and self.value == other.value)
+            if self.tag == other.tag and self.VR == other.VR:
+                if isinstance(self.value, numpy.ndarray):
+                    return (len(self.value) == len(other.value)
+                            and numpy.allclose(self.value, other.value))
+                else:
+                    return self.value == other.value
+            else:
+                return False
 
         return NotImplemented
 

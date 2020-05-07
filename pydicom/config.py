@@ -5,6 +5,14 @@
 
 import logging
 
+
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
+
+
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal = False
@@ -38,6 +46,32 @@ def reset_data_element_callback():
     data_element_callback_kwargs = {}
 
 
+def DS_numpy(use_numpy=True):
+    """Set whether multi-valued elements with VR of DS will be numpy arrays
+
+    Parameters
+    ----------
+    use_numpy : bool
+        ``True`` to read multi-value DS elements as `:class:~numpy.ndarray`
+        ``False`` to read multi-valued DS data elements as type
+           `:class:~python.mulitval.MultiValue`
+        Note: once a value has been accessed, changing this setting will
+        no longer change its type
+
+    Raises
+    ------
+    ValueError
+        If use_DS_Decimal and use_numpy are both True.
+    """
+
+    global use_DS_numpy
+
+    if use_DS_decimal is True and use_numpy is True:
+        raise ValueError("Cannot set use_DS_numpy True "
+                         "if use_DS_Decimal is True")
+    use_DS_numpy = use_numpy
+
+
 def DS_decimal(use_Decimal_boolean=True):
     """Set DS class to be derived from :class:`decimal.Decimal` or
     class:`float`.
@@ -50,7 +84,17 @@ def DS_decimal(use_Decimal_boolean=True):
     use_Decimal_boolean : bool
         ``True`` to derive :class:`~pydicom.valuerep.DS` from
         :class:`decimal.Decimal`, ``False`` to derive it from :class:`float`.
+
+    Raises
+    ------
+    ValueError
+        If use_Decimal_boolean and use_DS_numpy are both True.
     """
+    # XXX need this to work properly    global use_DS_decimal
+
+    if use_Decimal_boolean is True and use_DS_numpy is True:
+        raise ValueError("Cannot set DS to Decimal while use_DS_numpy is True")
+
     use_DS_decimal = use_Decimal_boolean
     import pydicom.valuerep
     if use_DS_decimal:
@@ -60,6 +104,14 @@ def DS_decimal(use_Decimal_boolean=True):
 
 
 # Configuration flags
+use_DS_numpy = False
+"""Set using the function `:function:DS_numpy`
+Default: False."""
+
+use_IS_numpy = False
+"""Set to False to avoid IS values being returned as numpy ndarray objects.
+Default: False."""
+
 allow_DS_float = False
 """Set to ``True`` to allow :class:`~pydicom.valuerep.DSdecimal`
 instances to be created using :class:`floats<float>`; otherwise, they must be
