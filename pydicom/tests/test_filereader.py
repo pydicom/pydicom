@@ -1232,18 +1232,21 @@ class TestDSISnumpy:
         config.use_DS_numpy = self.orig_DS_numpy
         config.use_DS_decimal = self.orig_DS_decimal
 
-    def test_IS_numpy(self):
-        """Test class of the object matches the config."""
-        # config.use_DS_numpy default is True
-        # ndarray should be used if it is available
+    @pytest.mark.skipif(have_numpy, reason="Testing import error")
+    def test_IS_numpy_import_error(self):
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
+        # no numpy, then trying to use numpy raises error
+        with pytest.raises(ImportError):
+            col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+
+    @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
+    def test_IS_numpy_class(self):
+        config.use_IS_numpy = True        
+        rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
-        if have_numpy:
-            assert isinstance(col, numpy.ndarray)
-            assert "int64" == col.dtype
-        else:
-            assert isinstance(col, MultiValue)
+        assert isinstance(col, numpy.ndarray)
+        assert "int64" == col.dtype
 
     def test_IS_not_numpy(self):
         """Test class of the object matches the config,
@@ -1253,19 +1256,23 @@ class TestDSISnumpy:
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
         assert isinstance(col, MultiValue)
 
-    def test_DS_numpy(self):
-        """Test class of the object matches the config."""
-        # ndarray should be used if it is available
+    @pytest.mark.skipif(have_numpy, reason="Testing import error")
+    def test_DS_numpy_import_error(self):
         config.use_DS_numpy = True
+        rtss = dcmread(rtstruct_name, force=True)
+        # no numpy, then trying to use numpy raises error
+        with pytest.raises(ImportError):
+            cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+
+    @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
+    def test_DS_numpy_class(self):
+        config.use_DS_numpy = True        
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
-        if have_numpy:
-            assert isinstance(cd, numpy.ndarray)
-            assert "float64" == cd.dtype
-        else:
-            assert isinstance(cd, MultiValue)
-
+        assert isinstance(cd, numpy.ndarray)
+        assert "float64" == cd.dtype        
+        
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
         config.use_DS_numpy = False

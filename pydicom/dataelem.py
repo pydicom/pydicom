@@ -15,6 +15,7 @@ from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
+from pydicom import config
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -26,6 +27,9 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import PersonName
+
+if config.have_numpy:
+    import numpy
 
 BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
@@ -543,7 +547,7 @@ class DataElement(object):
 
         if isinstance(other, self.__class__):
             if self.tag == other.tag and self.VR == other.VR:
-                if isinstance(self.value, numpy.ndarray):
+                if have_numpy and isinstance(self.value, numpy.ndarray):
                     return (len(self.value) == len(other.value)
                             and numpy.allclose(self.value, other.value))
                 else:
