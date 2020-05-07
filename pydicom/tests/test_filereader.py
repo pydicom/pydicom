@@ -1242,7 +1242,7 @@ class TestDSISnumpy:
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_IS_numpy_class(self):
-        config.use_IS_numpy = True        
+        config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
         assert isinstance(col, numpy.ndarray)
@@ -1266,13 +1266,13 @@ class TestDSISnumpy:
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_DS_numpy_class(self):
-        config.use_DS_numpy = True        
+        config.use_DS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
         assert isinstance(cd, numpy.ndarray)
-        assert "float64" == cd.dtype        
-        
+        assert "float64" == cd.dtype
+
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
         config.use_DS_numpy = False
