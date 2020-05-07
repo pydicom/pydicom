@@ -1052,6 +1052,12 @@ class TestDataset(object):
         assert len(ds) == 3
         assert ds[0x000b0010].value == 'dog^1'
 
+        del ds['0x000b0010']
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
     def test_create_private_tag_after_removing_slice(self):
         ds = Dataset()
         block = ds.private_block(0x000b, 'dog^1', create=True)
