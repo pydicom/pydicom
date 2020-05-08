@@ -40,3 +40,5 @@ Fixes
   (0028,3006) *LUT Data* with a VR of **OW** (:issue:`1073`)
 * Fixed access to private creator tag in raw datasets (:issue:`1078`)
 * Fixed description of newly added known private tag (:issue:`1082`)
+* Fixed bug in updating `pydicom.config.use_DS_Decimal` flag
+  in :func:`~pydicom.config.DS_decimal`
