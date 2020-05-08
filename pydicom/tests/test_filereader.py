@@ -35,10 +35,9 @@ from pydicom.pixel_data_handlers import gdcm_handler
 
 have_gdcm_handler = gdcm_handler.is_available()
 
-try:
+have_numpy = pydicom.config.have_numpy
+if have_numpy:
     import numpy  # NOQA
-except ImportError:
-    numpy = None
 
 try:
     import jpeg_ls
@@ -1332,7 +1331,7 @@ class TestDeferredRead(object):
         for data_elem in ds_norm:
             tag = data_elem.tag
 
-            if data_elem.value.__class__.__name__ == "ndarray":
+            if have_numpy and isinstance(data_elem.value, numpy.ndarray):
                 assert numpy.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value

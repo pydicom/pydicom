@@ -177,7 +177,7 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
         if re.match(regex, num_string) is None:
             raise ValueError("DS: char(s) not in repertoire: '{}'".
                              format(re.sub(regex[:-2], '', num_string)))
-        value = numpy.fromstring(num_string, dtype='f8', sep=chr(92))  # 92:'\'
+        value = numpy.fromstring(num_string, dtype='f8', sep="\\")
         if len(value) == 1:  # Don't use array for one number
             value = value[0]
         return value

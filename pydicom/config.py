@@ -66,7 +66,7 @@ def DS_numpy(use_numpy=True):
 
     global use_DS_numpy
 
-    if use_DS_decimal is True and use_numpy is True:
+    if use_DS_decimal and use_numpy:
         raise ValueError("Cannot set use_DS_numpy True "
                          "if use_DS_Decimal is True")
     use_DS_numpy = use_numpy
