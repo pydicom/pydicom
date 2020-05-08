@@ -20,3 +20,4 @@ Configuration Options (:mod:`pydicom.config`)
    pixel_data_handlers
    reset_data_element_callback
    use_DS_decimal
+   DS_decimal
