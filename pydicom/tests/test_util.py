@@ -266,7 +266,3 @@ class TestDataElementCallbackTests(object):
             assert numpy.allclose(expected, got)
         else:
             assert expected == got
-
-
-if __name__ == "__main__":
-    unittest.main()
