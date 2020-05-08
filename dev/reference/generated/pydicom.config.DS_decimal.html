@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.values.convert_value &mdash; pydicom 2.0.0.dev0 documentation</title>
+  <title>pydicom.config.DS_decimal &mdash; pydicom 2.0.0.dev0 documentation</title>
   
 
   
@@ -41,8 +41,8 @@
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Element Multi-value Representation (pydicom.multival)" href="../elem.multival.html" />
-    <link rel="prev" title="pydicom.values.convert_UR_string" href="pydicom.values.convert_UR_string.html" /> 
+    <link rel="next" title="Getting Included Datasets (pydicom.data)" href="../data.html" />
+    <link rel="prev" title="pydicom.config.use_DS_decimal" href="pydicom.config.use_DS_decimal.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -106,40 +106,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.debug.html">pydicom.config.debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.DS_decimal</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_AE_string.html">pydicom.values.convert_AE_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_ATvalue.html">pydicom.values.convert_ATvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DA_string.html">pydicom.values.convert_DA_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DS_string.html">pydicom.values.convert_DS_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DT_string.html">pydicom.values.convert_DT_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_IS_string.html">pydicom.values.convert_IS_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_numbers.html">pydicom.values.convert_numbers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OBvalue.html">pydicom.values.convert_OBvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OWvalue.html">pydicom.values.convert_OWvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_PN.html">pydicom.values.convert_PN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_single_string.html">pydicom.values.convert_single_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_SQ.html">pydicom.values.convert_SQ</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_string.html">pydicom.values.convert_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_tag.html">pydicom.values.convert_tag</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_text.html">pydicom.values.convert_text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_TM_string.html">pydicom.values.convert_TM_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UI.html">pydicom.values.convert_UI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UN.html">pydicom.values.convert_UN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UR_string.html">pydicom.values.convert_UR_string</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.values.convert_value</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
@@ -210,11 +193,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
+          <li><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a> &raquo;</li>
         
-          <li><a href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a> &raquo;</li>
-        
-      <li>pydicom.values.convert_value</li>
+      <li>pydicom.config.DS_decimal</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -231,25 +212,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-values-convert-value">
-<h1>pydicom.values.convert_value<a class="headerlink" href="#pydicom-values-convert-value" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-config-ds-decimal">
+<h1>pydicom.config.DS_decimal<a class="headerlink" href="#pydicom-config-ds-decimal" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.values.convert_value">
-<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">raw_data_element</span></em>, <em class="sig-param"><span class="n">encodings</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8f6ad14d/pydicom/values.py#L527"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return encoded element value using the appropriate decoder.</p>
+<dt id="pydicom.config.DS_decimal">
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">DS_decimal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_Decimal_boolean</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8f6ad14d/pydicom/config.py#L41"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.DS_decimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set DS class to be derived from <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p>
+<p>If this function is never called, the default in <em>pydicom</em> &gt;= 0.9.8
+is for DS to be based on <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>raw_data_element</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The encoded element value.</p></li>
-<li><p><strong>encodings</strong> (<em>list of str</em><em>, </em><em>optional</em>) – A list of the character encoding schemes used to encode any text
-elements.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The element value decoded using the appropriate decoder.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)">type</a> or list of type</p>
+<dd class="field-odd"><p><strong>use_Decimal_boolean</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> to derive <a class="reference internal" href="pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-class docutils literal notranslate"><span class="pre">DS</span></code></a> from
+<a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>, <code class="docutils literal notranslate"><span class="pre">False</span></code> to derive it from <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,10 +239,10 @@ elements.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../elem.multival.html" class="btn btn-neutral float-right" title="Element Multi-value Representation (pydicom.multival)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../data.html" class="btn btn-neutral float-right" title="Getting Included Datasets (pydicom.data)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.values.convert_UR_string.html" class="btn btn-neutral float-left" title="pydicom.values.convert_UR_string" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.config.use_DS_decimal.html" class="btn btn-neutral float-left" title="pydicom.config.use_DS_decimal" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

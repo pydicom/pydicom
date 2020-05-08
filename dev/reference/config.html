@@ -117,6 +117,7 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -246,7 +247,10 @@
 <td><p>Reset the <a class="reference internal" href="generated/pydicom.config.data_element_callback.html#pydicom.config.data_element_callback" title="pydicom.config.data_element_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_element_callback()</span></code></a> function to the default.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_decimal</span></code></a></p></td>
-<td><p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to use <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> to hold the value for elements with a VR of ‘DS’.</p></td>
+<td><p>Set using <a class="reference internal" href="generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_decimal()</span></code></a> to control if elements with a VR of <strong>DS</strong> are represented as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS_decimal</span></code></a>([use_Decimal_boolean])</p></td>
+<td><p>Set DS class to be derived from <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
