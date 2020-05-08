@@ -54,7 +54,6 @@ except ImportError:
         # Neither worked, so it's likely not installed.
         PILImg = None
 
-have_numpy = numpy is not None
 have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
