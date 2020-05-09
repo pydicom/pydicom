@@ -1227,8 +1227,8 @@ class TestDSISnumpy:
 
     def teardown(self):
         config.use_IS_numpy = self.orig_IS_numpy
-        config.use_DS_numpy = self.orig_DS_numpy
-        config.use_DS_decimal = self.orig_DS_decimal
+        config.DS_decimal(self.orig_DS_decimal)
+        config.DS_numpy(self.orig_DS_numpy)
 
     @pytest.mark.skipif(have_numpy, reason="Testing import error")
     def test_IS_numpy_import_error(self):
@@ -1281,12 +1281,15 @@ class TestDSISnumpy:
 
     @pytest.mark.skipif(not have_numpy, reason="numpy not installed")
     def test_DS_conflict_config(self):
-        config.DS_numpy(False)
+        config.DS_decimal(True)
+        with pytest.raises(ValueError):
+            config.DS_numpy(True)
 
-        # XXX put back when fix global use_DS_decimal
-        # with pytest.raises(ValueError):
-        #     config.DS_decimal(True)
-        #     config.DS_numpy(True)
+    @pytest.mark.skipif(not have_numpy, reason="numpy not installed")
+    def test_DS_conflict_config2(self):
+        config.DS_numpy(True)
+        with pytest.raises(ValueError):
+            config.DS_decimal(True)
 
 
 class TestDeferredRead(object):
