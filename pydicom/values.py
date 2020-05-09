@@ -158,11 +158,22 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
 
     Returns
     -------
-    valuerep.DSfloat or valuerep.DSdecimal or list of DSfloat/DSdecimal
-        If :attr:`~pydicom.config.use_DS_decimal` is ``True`` then returns
-        :class:`~pydicom.valuerep.DSdecimal` or a :class:`list` of
-        ``DSdecimal``, otherwise returns :class:`~pydicom.valuerep.DSfloat` or
-        a ``list`` of ``DSfloat``.
+    :class:`~pydicom.valuerep.DSfloat`, :class:`~pydicom.valuerep.DSdecimal`, :class:`numpy.float64`, list of DSfloat/DSdecimal or :class:`numpy.ndarray`   of :class:`numpy.float64`
+
+        If :attr:`~pydicom.config.use_DS_decimal` is ``False`` (default),
+        returns a :class:`~pydicom.valuerep.DSfloat` or list of them
+
+        If :attr:`~pydicom.config.use_DS_decimal` is ``True``,
+        returns a :class:`~pydicom.valuerep.DSdecimal` or list of them
+    
+        If :data:`~pydicom.config.use_DS_numpy` is ``True``,
+        returns a :class:`numpy.float64` or a :class:`numpy.ndarray` of them
+
+
+    .. versionchanged:: 2.0
+
+        The option to return numpy values was added.
+
     """
     num_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
@@ -207,7 +218,7 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
     Returns
     -------
     str or list of str or valuerep.DT or list of DT
-        if
+        If
         :attr:`~pydicom.config.datetime_conversion` is ``True`` then returns
         :class:`~pydicom.valuerep.DT` or a :class:`list` of ``DT``, otherwise
         returns :class:`str` or ``list`` of ``str``.
@@ -237,8 +248,18 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
 
     Returns
     -------
-    valuerep.IS or list of IS
-        The decoded value(s).
+    :class:`~pydicom.valuerep.IS` or list of them, or :class:`numpy.int64` or :class:`~numpy.ndarray` of them
+        
+        If :data:`~pydicom.config.use_IS_numpy` is ``False`` (default), returns
+        a single :class:`~pydicom.valuerep.IS` or a list of them
+        
+        If :data:`~pydicom.config.use_IS_numpy` is ``True``, returns
+        a single :class:`numpy.int64` or a :class:`~numpy.ndarray` of them
+
+
+    .. versionchanged:: 2.0
+
+        The option to return numpy values was added.
     """
     num_string = byte_string.decode(default_encoding)
 
