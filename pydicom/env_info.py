@@ -34,11 +34,12 @@ def print_table(version_rows):
     print(row_format.format("module", "version"))
     print(row_format.format("------", "-------"))
     for module, version in version_rows:
-        print(row_format.format(module, version))
+        # Some version strings have multiple lines and need to be squashed
+        print(row_format.format(module, version.replace("\n", " ")))
 
 
 def extract_version(module):
-    return getattr(module, "__version__", "**no __version__ attribute**")
+    return getattr(module, "__version__", "**cannot determine version**")
 
 
 if __name__ == "__main__":
