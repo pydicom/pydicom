@@ -22,9 +22,11 @@ def main():
         try:
             m = importlib.import_module(module)
         except ImportError:
-            version_rows.append((module, "_module not found_"))
+            version = "_module not found_"
         else:
-            version_rows.append((module, extract_version(m)))
+            version = extract_version(m) or "**cannot determine version**"
+
+        version_rows.append((module, version))
 
     print_table(version_rows)
 
@@ -39,7 +41,9 @@ def print_table(version_rows):
 
 
 def extract_version(module):
-    return getattr(module, "__version__", "**cannot determine version**")
+    if module.__name__ == "gdcm":
+        return getattr(module, "GDCM_VERSION", None)
+    return getattr(module, "__version__", None)
 
 
 if __name__ == "__main__":
