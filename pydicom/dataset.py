@@ -913,7 +913,7 @@ class Dataset(dict):
             If the private creator tag is not found in the given group and
             the `create` parameter is ``False``.
         """
-        def new_block():
+        def new_block(element):
             block = PrivateBlock(key, self, element)
             self._private_blocks[key] = block
             return block
@@ -929,19 +929,23 @@ class Dataset(dict):
             raise ValueError(
                 'Tag must be private if private creator is given')
 
-        for element in range(0x10, 0x100):
-            private_creator_tag = Tag(group, element)
-            if private_creator_tag not in self._dict:
-                if create:
-                    self.add_new(private_creator_tag, 'LO', private_creator)
-                    return new_block()
-                else:
-                    break
-            if self[private_creator_tag].value == private_creator:
-                return new_block()
+        # find block with matching private creator
+        data_el = next((el for el in self[(group, 0x10):(group, 0x100)]
+                        if el.value == private_creator), None)
+        if data_el is not None:
+            return new_block(data_el.tag.element)
 
-        raise KeyError(
-            "Private creator '{}' not found".format(private_creator))
+        if not create:
+            # not found and shall not be created - raise
+            raise KeyError(
+                "Private creator '{}' not found".format(private_creator))
+
+        # private creator not existing - find first unused private block
+        # and add the private creator
+        first_free_el = next(el for el in range(0x10, 0x100)
+                             if Tag(group, el) not in self._dict)
+        self.add_new(Tag(group, first_free_el), 'LO', private_creator)
+        return new_block(first_free_el)
 
     def private_creators(self, group):
         """Return a list of private creator names in the given group.
@@ -975,13 +979,7 @@ class Dataset(dict):
         if group % 2 == 0:
             raise ValueError('Group must be an odd number')
 
-        private_creators = []
-        for element in range(0x10, 0x100):
-            private_creator_tag = Tag(group, element)
-            if private_creator_tag not in self._dict:
-                break
-            private_creators.append(self[private_creator_tag].value)
-        return private_creators
+        return [x.value for x in self[(group, 0x10):(group, 0x100)]]
 
     def get_private_item(self, group, element_offset, private_creator):
         """Return the data element for the given private tag `group`.
