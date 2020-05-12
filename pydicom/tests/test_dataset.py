@@ -917,9 +917,10 @@ class TestDataset(object):
         ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
         ds.add_new(0x00090010, 'LO', 'Creator 1.0')
         ds.add_new(0x00091001, 'SH', 'Version1')
-        ds.add_new(0x00090011, 'LO', 'Creator 2.0')
-        ds.add_new(0x00091101, 'SH', 'Version2')
-        ds.add_new(0x00091102, 'US', 2)
+        # make sure it works with non-contiguous blocks
+        ds.add_new(0x00090020, 'LO', 'Creator 2.0')
+        ds.add_new(0x00092001, 'SH', 'Version2')
+        ds.add_new(0x00092002, 'US', 2)
 
         # Dataset.private_block
         with pytest.raises(ValueError, match='Tag must be private'):
@@ -1018,6 +1019,68 @@ class TestDataset(object):
             ds.private_creators(0x0008)
         assert ['Creator 1.0', 'Creator 2.0'] == ds.private_creators(0x0009)
         assert not ds.private_creators(0x0011)
+
+    def test_non_contiguous_private_creators(self):
+        ds = Dataset()
+        ds.add_new(0x00080005, 'CS', 'ISO_IR 100')
+        ds.add_new(0x00090010, 'LO', 'Creator 1.0')
+        ds.add_new(0x00090020, 'LO', 'Creator 2.0')
+        ds.add_new(0x000900ff, 'LO', 'Creator 3.0')
+
+        assert (['Creator 1.0', 'Creator 2.0', 'Creator 3.0'] ==
+                ds.private_creators(0x0009))
+
+    def test_create_private_tag_after_removing_all(self):
+        # regression test for #1097 - make sure private blocks are updated
+        # after removing all private tags
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+
+        ds.remove_private_tags()
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+        assert len(ds) == 2
+        assert (0x000b0010) in ds
+        assert ds[0x000b0010].value == 'dog^2'
+
+    def test_create_private_tag_after_removing_private_creator(self):
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+
+        del ds[0x000b0010]
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x02, "SH", "Poodle")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
+        del ds[Tag(0x000b, 0x0010)]
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
+        del ds['0x000b0010']
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 3
+        assert ds[0x000b0010].value == 'dog^1'
+
+    def test_create_private_tag_after_removing_slice(self):
+        ds = Dataset()
+        block = ds.private_block(0x000b, 'dog^1', create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+
+        del ds[0x000b0010:0x000b1110]
+        block = ds.private_block(0x000b, 'dog^2', create=True)
+        block.add_new(0x01, "SH", "Poodle")
+        assert len(ds) == 2
+        assert ds[0x000b0010].value == 'dog^2'
 
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
