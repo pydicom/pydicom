@@ -37,3 +37,5 @@ Fixes
 * Fixed access to private creator tag in raw datasets (:issue:`1078`)
 * Fixed description of newly added known private tag (:issue:`1082`)
 * Fixed update of private blocks after deleting private creator (:issue:`1097`)
+* Fixed bug in updating `pydicom.config.use_DS_Decimal` flag
+  in :func:`~pydicom.config.DS_decimal`

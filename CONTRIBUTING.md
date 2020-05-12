@@ -183,14 +183,23 @@ following rules before submitting:
    See [Creating and highlighting code blocks](https://help.github.com/articles/creating-and-highlighting-code-blocks).
 
 -  Please include your operating system type and version number, as well
-   as your Python, pydicom and numpy versions. This information
-   can be found by running the following code snippet:
+   as your Python and pydicom versions.
 
-  ```python
-  import platform; print(platform.platform())
-  import sys; print("Python", sys.version)
-  import pydicom; print("pydicom", pydicom.__version__)
-  ```
+   If you're using **pydicom 2 or later**, please use the `pydicom_env_info`
+   module to gather this information :
+
+   ```bash
+   $ python -m pydicom.env_info
+   ```
+
+   For **pydicom 1.x**, please run the following code snippet instead.
+
+   ```python
+   import platform, sys, pydicom
+   print(platform.platform(),
+         "\nPython", sys.version,
+         "\npydicom", pydicom.__version__)
+   ```
 
 -  please include a [reproducible](http://stackoverflow.com/help/mcve) code
    snippet or link to a [gist](https://gist.github.com). If an exception is
