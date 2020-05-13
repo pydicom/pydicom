@@ -1247,6 +1247,10 @@ class TestDSISnumpy:
         assert isinstance(col, numpy.ndarray)
         assert "int64" == col.dtype
 
+        # Check a conversion with only a single value
+        roi_num = rtss.ROIContourSequence[0].ReferencedROINumber
+        assert isinstance(roi_num, numpy.int64)
+
     def test_IS_not_numpy(self):
         """Test class of the object matches the config,
         when the config is changed"""
@@ -1271,6 +1275,10 @@ class TestDSISnumpy:
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
         assert isinstance(cd, numpy.ndarray)
         assert "float64" == cd.dtype
+
+        # Check conversion with only a single value
+        roi_vol = rtss.StructureSetROISequence[0].ROIVolume
+        assert isinstance(roi_vol, numpy.float64)
 
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
