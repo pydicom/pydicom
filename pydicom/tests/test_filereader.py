@@ -29,6 +29,7 @@ from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
+from pydicom import values
 
 
 from pydicom.pixel_data_handlers import gdcm_handler
@@ -1290,6 +1291,27 @@ class TestDSISnumpy:
         config.DS_numpy(True)
         with pytest.raises(ValueError):
             config.DS_decimal(True)
+
+    @pytest.mark.skipif(not have_numpy, reason="numpy not installed")
+    def test_DS_bad_chars(self):
+        config.DS_numpy(True)
+        with pytest.raises(ValueError):
+            values.convert_DS_string(b"123.1b", True)
+
+    @pytest.mark.skipif(not have_numpy, reason="numpy not installed")
+    def test_IS_bad_chars(self):
+        config.use_IS_numpy = True
+        with pytest.raises(ValueError):
+            values.convert_IS_string(b"123b", True)
+
+    @pytest.mark.skipif(have_numpy, reason="testing numpy ImportError")
+    def test_numpy_import_warning(self):
+        config.DS_numpy(True)
+        config.use_IS_numpy = True
+        with pytest.raises(ImportError):
+            values.convert_DS_string(b"123.1", True)
+        with pytest.raises(ImportError):
+            values.convert_IS_string(b"123", True)
 
 
 class TestDeferredRead(object):

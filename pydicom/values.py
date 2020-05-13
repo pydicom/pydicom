@@ -165,9 +165,19 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
 
         If :attr:`~pydicom.config.use_DS_decimal` is ``True``,
         returns a :class:`~pydicom.valuerep.DSdecimal` or list of them
-    
+
         If :data:`~pydicom.config.use_DS_numpy` is ``True``,
         returns a :class:`numpy.float64` or a :class:`numpy.ndarray` of them
+
+    Raises
+    ------
+    ValueError
+        If :data:`~pydicom.config.use_DS_numpy` is ``True`` and the string
+        contains non-valid characters
+
+    ImportError
+        If :data:`~pydicom.config.use_DS_numpy` is ``True`` and numpy is not
+        available
 
 
     .. versionchanged:: 2.0
@@ -249,12 +259,22 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     Returns
     -------
     :class:`~pydicom.valuerep.IS` or list of them, or :class:`numpy.int64` or :class:`~numpy.ndarray` of them
-        
+
         If :data:`~pydicom.config.use_IS_numpy` is ``False`` (default), returns
         a single :class:`~pydicom.valuerep.IS` or a list of them
-        
+
         If :data:`~pydicom.config.use_IS_numpy` is ``True``, returns
         a single :class:`numpy.int64` or a :class:`~numpy.ndarray` of them
+
+    Raises
+    ------
+    ValueError
+        If :data:`~pydicom.config.use_IS_numpy` is ``True`` and the string
+        contains non-valid characters
+
+    ImportError
+        If :data:`~pydicom.config.use_IS_numpy` is ``True`` and numpy is not
+        available
 
 
     .. versionchanged:: 2.0
