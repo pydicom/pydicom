@@ -147,6 +147,10 @@ def convert_DA_string(byte_string, is_little_endian, struct_format=None):
 def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     """Return a decoded 'DS' value.
 
+    .. versionchanged:: 2.0
+
+        The option to return numpy values was added.
+
     Parameters
     ----------
     byte_string : bytes or str
@@ -178,12 +182,6 @@ def convert_DS_string(byte_string, is_little_endian, struct_format=None):
     ImportError
         If :data:`~pydicom.config.use_DS_numpy` is ``True`` and numpy is not
         available
-
-
-    .. versionchanged:: 2.0
-
-        The option to return numpy values was added.
-
     """
     num_string = byte_string.decode(default_encoding)
     # Below, go directly to DS class instance
@@ -247,6 +245,10 @@ def convert_DT_string(byte_string, is_little_endian, struct_format=None):
 def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     """Return a decoded 'IS' value.
 
+    .. versionchanged:: 2.0
+
+        The option to return numpy values was added.
+
     Parameters
     ----------
     byte_string : bytes or str
@@ -275,11 +277,6 @@ def convert_IS_string(byte_string, is_little_endian, struct_format=None):
     ImportError
         If :data:`~pydicom.config.use_IS_numpy` is ``True`` and numpy is not
         available
-
-
-    .. versionchanged:: 2.0
-
-        The option to return numpy values was added.
     """
     num_string = byte_string.decode(default_encoding)
 

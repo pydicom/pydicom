@@ -47,24 +47,24 @@ def reset_data_element_callback():
 
 
 def DS_numpy(use_numpy=True):
-    """Set whether multi-valued elements with VR of DS will be numpy arrays
+    """Set whether multi-valued elements with VR of **DS** will be numpy arrays
 
     .. versionadded:: 2.0
 
     Parameters
     ----------
     use_numpy : bool, optional
-        ``True`` (default) to read multi-value DS elements
-           as `:class:~numpy.ndarray`
-        ``False`` to read multi-valued DS data elements as type
-           `:class:~python.mulitval.MultiValue`
+        ``True`` (default) to read multi-value **DS** elements
+        as :class:`~numpy.ndarray`, ``False`` to read multi-valued **DS**
+        data elements as type :class:`~python.mulitval.MultiValue`
+
         Note: once a value has been accessed, changing this setting will
         no longer change its type
 
     Raises
     ------
     ValueError
-        If :data:`use_DS_decimal` and :data:`use_DS_numpy` are both True.
+        If :data:`use_DS_decimal` and `use_numpy` are both True.
 
     """
 
