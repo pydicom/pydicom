@@ -1760,3 +1760,34 @@ class TestFileMeta:
         ds_meta.PatientName = "x"
         with pytest.raises(KeyError):
             ds.file_meta = ds_meta
+
+    def test_init_file_meta(self):
+        """Check instantiation of FileMetaDataset"""
+        ds_meta = Dataset()
+        ds_meta.TransferSyntaxUID = "1.2"
+
+        # Accepts with group 2
+        file_meta = FileMetaDataset(ds_meta)
+        assert "1.2" == file_meta.TransferSyntaxUID
+
+        # Accepts dict
+        dict_meta = {0x20010: DataElement(0x20010, "UI", "2.3")}
+        file_meta = FileMetaDataset(dict_meta)
+        assert "2.3" == file_meta.TransferSyntaxUID
+
+        # Fails if not dict or Dataset
+        with pytest.raises(ValueError):
+            FileMetaDataset(["1", "2"])
+
+        # Raises KeyError if init with non-group-2
+        ds_meta.PatientName = "x"
+        with pytest.raises(KeyError):
+            FileMetaDataset(ds_meta)
+
+    def test_set_file_meta(self):
+        """Check adding items to existing FileMetaDataset"""
+        file_meta = FileMetaDataset()
+
+        # Raising KeyError for non-group2 already covered
+        # Here check assigning via non-Tag
+        file_meta[0x20010] = DataElement(0x20010, "UI", "2.3")
