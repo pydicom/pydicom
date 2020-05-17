@@ -21,6 +21,11 @@ from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.data import get_testdata_files
 
+have_numpy = True
+try:
+    import numpy
+except ImportError:
+    have_numpy = False
 
 test_dir = os.path.dirname(__file__)
 raw_hex_module = os.path.join(test_dir, '_write_stds.py')
@@ -253,8 +258,11 @@ class TestDataElementCallbackTests(object):
                             process_unknown_VRs=False)
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
-        expected = [valuerep.DSfloat(x) for x in ["2", "4", "8", "16"]]
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         config.reset_data_element_callback()
 
-        assert expected == got
+        expected = [2., 4., 8., 16.]
+        if have_numpy and config.use_DS_numpy:
+            assert numpy.allclose(expected, got)
+        else:
+            assert expected == got

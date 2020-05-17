@@ -784,7 +784,7 @@ class Dataset(dict):
         if not char_set:
             char_set = self._parent_encoding
         else:
-            char_set = convert_encodings(char_set)
+            char_set = convert_encodings(char_set.value)
 
         return char_set
 
