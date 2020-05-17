@@ -1541,6 +1541,7 @@ class TestDatasetElements(object):
         assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
         self.ds.fix_meta_info(enforce_standard=True)
 
+        self.ds.file_meta = Dataset()  # not FileMetaDataset
         self.ds.file_meta.PatientID = 'PatientID'
         with pytest.raises(ValueError,
                            match=r'Only File Meta Information Group '

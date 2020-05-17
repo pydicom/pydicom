@@ -1736,7 +1736,7 @@ class Dataset(dict):
         """
         # Changed in v2.0 so does not re-assign self.file_meta with getattr()
         if not hasattr(self, "file_meta"):
-            self.file_meta = Dataset()
+            self.file_meta = FileMetaDataset()
 
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
