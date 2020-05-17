@@ -1823,7 +1823,7 @@ class Dataset(dict):
         if value is not None:
             non_group2 = [
                 Tag(tag) for tag in value.keys()
-                if Tag(tag).group !=2
+                if Tag(tag).group != 2
             ]
             if non_group2:
                 raise KeyError(
@@ -1831,7 +1831,7 @@ class Dataset(dict):
                         non_group2
                     )
                 )
-        
+
         self.__dict__["file_meta"] = value
         if not isinstance(value, FileMetaDataset):
             warnings.warn(
