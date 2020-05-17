@@ -340,6 +340,10 @@ are deprecated and will be removed in version 2.1</p></li>
 Deflated Explicit VR Little Endian transfer syntax UID (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1086">#1086</a>)</p></li>
 <li><p>Added <cite>config.replace_un_with_known_vr</cite> to be able to switch off automatic
 VR conversion for known tags with VR “UN” (see <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1067">#1067</a>)</p></li>
+<li><p>Added <cite>config.use_DS_numpy</cite> and <cite>config.use_IS_numpy</cite> to have multi-valued
+data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a numpy array (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/623">#623</a>)
+(much faster for bigger arrays).  Both default to False to preserve previous
+behavior</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
