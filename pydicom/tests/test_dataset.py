@@ -6,7 +6,9 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, validate_file_meta
+from pydicom.dataset import (
+    Dataset, FileDataset, validate_file_meta, FileMetaDataset
+)
 from pydicom.encaps import encapsulate
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
@@ -1728,3 +1730,33 @@ class TestDatasetOverlayArray(object):
         pydicom.config.overlay_data_handlers = [self.dummy]
         with pytest.raises(ValueError, match=r"Dummy error message"):
             self.ds.overlay_array(0x6000)
+
+
+class TestFileMeta:
+    def test_deprecation_warning(self):
+        """Assigning ds.file_meta warns if not FileMetaDataset instance"""
+        ds = Dataset()
+        with pytest.warns(DeprecationWarning):
+            ds.file_meta = Dataset()
+
+    def test_assign_file_meta(self):
+        """Test can only set group 2 elements in File Meta"""
+        # FileMetaDataset accepts only group 2
+        file_meta = FileMetaDataset()
+        with pytest.raises(KeyError):
+            file_meta.PatientID = "123"
+        
+        # No error if assign file meta with no group 2:
+        ds = Dataset()
+        ds.file_meta = Dataset()
+        
+        ds_meta = Dataset()
+        ds_meta.TransferSyntaxUID = "1.2"
+        ds.file_meta = ds_meta
+        
+        # Error on assigning file meta if any non-group 2
+        ds_meta.PatientName = "x"
+        with pytest.raises(KeyError):
+            ds.file_meta = ds_meta
+
+        

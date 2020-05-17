@@ -22,6 +22,7 @@ from itertools import takewhile
 import json
 import os
 import os.path
+import warnings
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -1733,7 +1734,9 @@ class Dataset(dict):
 
         .. versionadded:: 1.2
         """
-        self.file_meta = getattr(self, 'file_meta', Dataset())
+        # Changed in v2.0 so does not re-assign self.file_meta with getattr()
+        if not hasattr(self, "file_meta"):
+            self.file_meta = Dataset()
 
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
@@ -1808,11 +1811,34 @@ class Dataset(dict):
                              'element and must be added using '
                              'the add() or add_new() methods.'
                              .format(name))
+        elif name == "file_meta":
+            self._set_file_meta(value)
         else:
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
+
+    def _set_file_meta(self, value):
+        if value is not None:
+            non_group2 = [
+                Tag(tag) for tag in value.keys()
+                if Tag(tag).group !=2
+            ]
+            if non_group2:
+                raise KeyError(
+                    "Cannot set file_meta with non-group-2 tags {}".format(
+                        non_group2
+                    )
+                )
+        
+        self.__dict__["file_meta"] = value
+        if not isinstance(value, FileMetaDataset):
+            warnings.warn(
+                "Starting in pydicom 3.0, Dataset.file_meta must be a "
+                "FileMetaDataset class instance",
+                DeprecationWarning
+            )
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
@@ -2313,3 +2339,76 @@ def validate_file_meta(file_meta, enforce_standard=True):
             for tag in missing:
                 msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
             raise ValueError(msg[:-1])  # Remove final newline
+
+
+class FileMetaDataset(Dataset):
+    """Contains a collection (dictionary) of group 2 DICOM Data Elements.
+
+    ..versionadded:: 2.0
+
+    Derived from :class:`~pydicom.dataset.Dataset`, but only allows
+    Group 2 (File Meta Information) data elements
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize a FileMetaDataset
+
+        Parameters are as per :class:`Dataset`; this overrides the super class
+        only to check that all are group 2 data elements
+
+        Raises
+        ------
+        KeyError
+            If a dict of data elements is supplied, and any are not group 2.
+        ValueError
+            If the passed argument is not a :class:`dict` or :class:`Dataset`
+        """
+
+        if args is not None and len(args) > 0:
+            arg0 = args[0]
+            if not isinstance(arg0, (Dataset, dict)):
+                raise ValueError(
+                    "Argument must be a dict or Dataset, not {}".format(
+                        type(arg0)
+                    )
+                )
+
+            non_group2 = [
+                Tag(tag) for tag in arg0.keys() if Tag(tag).group != 2
+            ]
+            if non_group2:
+                msg = (
+                    "FileMetaDataset: attempted to set non-group 2 "
+                    "elements: {}"
+                )
+                raise KeyError(msg.format(non_group2))
+
+        super().__init__(*args, **kwargs)
+
+    def __setitem__(self, key, value):
+        """Override parent class to only allow setting of group 2 elements.
+
+        Parameters
+        ----------
+        key : int or Tuple[int, int] or str
+            The tag for the element to be added to the Dataset.
+        value : dataelem.DataElement or dataelem.RawDataElement
+            The element to add to the :class:`FileMetaDataset`.
+
+        Raises
+        ------
+        KeyError
+            If `key` is not a DICOM Group 2 tag.
+        """
+
+        if isinstance(value.tag, BaseTag):
+            tag = value.tag
+        else:
+            tag = Tag(value.tag)
+
+        if tag.group != 2:
+            raise KeyError(
+                "Only group 2 data elements are allowed in a FileMetaDataset"
+            )
+
+        super().__setitem__(key, value)
