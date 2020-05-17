@@ -40,10 +40,10 @@ class TestDataset(object):
         # This comes from bug fix for issue 42
         # First, fake enough to try the pixel_array property
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.PixelData = 'xyzlmnop'
         msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = (r"'Dataset' object has no attribute "
+        msg_from_numpy = (r"'FileMetaDataset' object has no attribute "
                           "'TransferSyntaxUID'")
         msg_from_pillow = (r"'Dataset' object has no attribute "
                            "'PixelRepresentation'")
@@ -1170,7 +1170,7 @@ class TestDataset(object):
             ds.save_as(fp, write_like_original=False)
 
         ds.is_implicit_VR = True
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = '1.1'
         ds.file_meta.MediaStorageSOPInstanceUID = '1.2'
         ds.file_meta.TransferSyntaxUID = '1.3'
@@ -1183,7 +1183,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
         ds['PixelData'].VR = 'OB'
@@ -1200,7 +1200,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         ds['PixelData'].VR = 'OB'
@@ -1212,7 +1212,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.save_as(fp)
 
@@ -1222,7 +1222,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.save_as(fp)
 
         del ds.file_meta
@@ -1234,7 +1234,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2.3.4.5.6'
         ds.save_as(fp)
 
@@ -1252,7 +1252,7 @@ class TestDataset(object):
             ds.save_as(fp)
 
         # Test private transfer syntax raises
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2'
         with pytest.raises(AttributeError, match=msg):
             ds.save_as(fp)
@@ -1267,7 +1267,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
@@ -1296,7 +1296,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2.3.4.5'
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
@@ -1549,11 +1549,12 @@ class TestDatasetElements(object):
             self.ds.fix_meta_info(enforce_standard=True)
 
     def test_validate_and_correct_file_meta(self):
-        file_meta = Dataset()
+        file_meta = FileMetaDataset()
         validate_file_meta(file_meta, enforce_standard=False)
         with pytest.raises(ValueError):
             validate_file_meta(file_meta, enforce_standard=True)
 
+        file_meta = Dataset() # not FileMetaDataset for bkwds-compat checks
         file_meta.PatientID = 'PatientID'
         for enforce_standard in (True, False):
             with pytest.raises(
@@ -1563,7 +1564,7 @@ class TestDatasetElements(object):
                 validate_file_meta(
                     file_meta, enforce_standard=enforce_standard)
 
-        file_meta = Dataset()
+        file_meta = FileMetaDataset()
         file_meta.MediaStorageSOPClassUID = '1.2.3'
         file_meta.MediaStorageSOPInstanceUID = '1.2.4'
         # still missing TransferSyntaxUID
@@ -1738,7 +1739,7 @@ class TestFileMeta:
         """Assigning ds.file_meta warns if not FileMetaDataset instance"""
         ds = Dataset()
         with pytest.warns(DeprecationWarning):
-            ds.file_meta = Dataset()
+            ds.file_meta = Dataset()  # not FileMetaDataset
 
     def test_assign_file_meta(self):
         """Test can only set group 2 elements in File Meta"""
@@ -1749,7 +1750,7 @@ class TestFileMeta:
         
         # No error if assign file meta with no group 2:
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         
         ds_meta = Dataset()
         ds_meta.TransferSyntaxUID = "1.2"
