@@ -33,7 +33,7 @@ import pytest
 import pydicom
 from pydicom import config
 from pydicom.data import get_testdata_files
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
 
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
@@ -1068,7 +1068,7 @@ class TestNumpy_NumpyHandler(object):
     def test_endianness_not_set(self):
         """Test for #704, Dataset.is_little_endian unset."""
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.Rows = 10
         ds.Columns = 10
