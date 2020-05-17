@@ -379,7 +379,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     ds = Dataset(raw_data_elements)
     if 0x00080005 in raw_data_elements:
-        char_set = DataElement_from_raw(raw_data_elements[0x00080005])
+        char_set = DataElement_from_raw(raw_data_elements[0x00080005]).value
         encoding = convert_encodings(char_set)
     else:
         encoding = parent_encoding

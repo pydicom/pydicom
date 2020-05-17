@@ -1,14 +1,11 @@
-import unittest
-
 import pytest
 
 from pydicom.sr.coding import Code
 from pydicom.uid import UID
 
 
-class TestCode(unittest.TestCase):
-    def setUp(self):
-        super(TestCode, self).setUp()
+class TestCode:
+    def setup(self):
         self._value = "373098007"
         self._meaning = "Mean Value of population"
         self._scheme_designator = "SCT"

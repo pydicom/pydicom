@@ -1,15 +1,10 @@
-import unittest
-
 import pytest
 
 from pydicom.sr.codedict import codes
 from pydicom.sr.coding import Code
 
 
-class TestCodeDict(unittest.TestCase):
-    def setUp(self):
-        super(TestCodeDict, self).setUp()
-
+class TestCodeDict:
     def test_dcm_1(self):
         assert codes.DCM.Modality == Code(
             value="121139", scheme_designator="DCM", meaning="Modality"
