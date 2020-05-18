@@ -1801,3 +1801,25 @@ class TestFileMeta:
         ds.file_meta = FileMetaDataset()
         del ds.file_meta
         assert not hasattr(ds, "file_meta")
+
+    def test_show_file_meta(self):
+        orig_show = pydicom.config.show_file_meta
+        pydicom.config.show_file_meta = True
+
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2"
+        ds.PatientName = "test"
+        shown = str(ds)
+
+        assert shown.startswith("Dataset.file_meta ---")
+        assert shown.splitlines()[1].startswith(
+            "(0002, 0010) Transfer Syntax UID"
+        )
+
+        # Turn off file_meta display
+        pydicom.config.show_file_meta = False
+        shown = str(ds)
+        assert shown.startswith("(0010, 0010) Patient's Name")
+
+        pydicom.config.show_file_meta = orig_show

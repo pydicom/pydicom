@@ -1674,6 +1674,11 @@ class Dataset(dict):
         It is also used by ``top()``, therefore the `top_level_only` flag.
         This function recurses, with increasing indentation levels.
 
+        ..versionchanged:: 2.0
+
+            The file meta information is returned in its own section,
+            if :data:`~pydicom.config.show_file_meta` is ``True`` (default)
+
         Parameters
         ----------
         indent : int, optional
@@ -1690,6 +1695,23 @@ class Dataset(dict):
         strings = []
         indent_str = self.indent_chars * indent
         nextindent_str = self.indent_chars * (indent + 1)
+
+        # Display file meta, if configured to do so, and are a regular Dataset
+        if (
+            indent == 0
+            and hasattr(self, "file_meta")
+            and not isinstance(self, FileMetaDataset)
+            and pydicom.config.show_file_meta
+        ):
+            strings.append("Dataset.file_meta -------------------------------")
+            if self.file_meta is None:
+                strings.append("None")
+            else:
+                for data_element in self.file_meta:
+                    with tag_in_exception(data_element.tag):
+                        strings.append(indent_str + repr(data_element))
+            strings.append("-------------------------------------------------")
+
         for data_element in self:
             with tag_in_exception(data_element.tag):
                 if data_element.VR == "SQ":  # a sequence
@@ -1938,7 +1960,14 @@ class Dataset(dict):
             return all_tags[i_start:i_stop:step]
 
     def __str__(self):
-        """Handle str(dataset)."""
+        """Handle str(dataset).
+
+        ..versionchanged:: 2.0
+
+            The file meta information was added in its own section,
+            if :data:`pydicom.config.show_file_meta` is ``True``
+
+        """
         return self._pretty_str()
 
     def top(self):
