@@ -1779,7 +1779,7 @@ class TestFileMeta:
         assert "2.3" == file_meta.TransferSyntaxUID
 
         # Fails if not dict or Dataset
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             FileMetaDataset(["1", "2"])
 
         # Raises KeyError if init with non-group-2
