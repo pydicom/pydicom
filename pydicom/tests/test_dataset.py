@@ -1746,7 +1746,7 @@ class TestFileMeta:
         """Test can only set group 2 elements in File Meta"""
         # FileMetaDataset accepts only group 2
         file_meta = FileMetaDataset()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             file_meta.PatientID = "123"
 
         # No error if assign empty file meta
@@ -1761,7 +1761,7 @@ class TestFileMeta:
 
         # Error on assigning file meta if any non-group 2
         ds_meta.PatientName = "x"
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             ds.file_meta = ds_meta
 
     def test_init_file_meta(self):
@@ -1784,7 +1784,7 @@ class TestFileMeta:
 
         # Raises KeyError if init with non-group-2
         ds_meta.PatientName = "x"
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             FileMetaDataset(ds_meta)
 
     def test_set_file_meta(self):

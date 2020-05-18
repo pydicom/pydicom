@@ -1840,25 +1840,15 @@ class Dataset(dict):
             object.__setattr__(self, name, value)
 
     def _set_file_meta(self, value):
-        if value is not None:
-            non_group2 = [
-                Tag(tag) for tag in value.keys()
-                if Tag(tag).group != 2
-            ]
-            if non_group2:
-                raise KeyError(
-                    "Cannot set file_meta with non-group-2 tags {}".format(
-                        non_group2
-                    )
-                )
-
-        self.__dict__["file_meta"] = value
         if value is not None and not isinstance(value, FileMetaDataset):
+            FileMetaDataset.validate(value)
             warnings.warn(
                 "Starting in pydicom 3.0, Dataset.file_meta must be a "
                 "FileMetaDataset class instance",
                 DeprecationWarning
             )
+
+        self.__dict__["file_meta"] = value
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
@@ -2386,32 +2376,46 @@ class FileMetaDataset(Dataset):
 
         Raises
         ------
-        KeyError
-            If a dict of data elements is supplied, and any are not group 2.
+        ValueError
+            If any data elements are not group 2.
         TypeError
             If the passed argument is not a :class:`dict` or :class:`Dataset`
         """
-
-        if args is not None and len(args) > 0:
-            arg0 = args[0]
-            if not isinstance(arg0, (Dataset, dict)):
-                raise TypeError(
-                    "Argument must be a dict or Dataset, not {}".format(
-                        type(arg0)
-                    )
-                )
-
-            non_group2 = [
-                Tag(tag) for tag in arg0.keys() if Tag(tag).group != 2
-            ]
-            if non_group2:
-                msg = (
-                    "FileMetaDataset: attempted to set non-group 2 "
-                    "elements: {}"
-                )
-                raise KeyError(msg.format(non_group2))
-
         super().__init__(*args, **kwargs)
+        FileMetaDataset.validate(self._dict)
+
+    @staticmethod
+    def validate(init_value):
+        """Raise errors if initialization value is not acceptable for file_meta
+
+        Parameters
+        ----------
+        init_value: dict or Dataset
+            The tag:data element pairs to initialize a file meta dataset
+
+        Raises
+        ------
+        TypeError
+            If the passed argument is not a :class:`dict` or :class:`Dataset`
+        ValueError
+            If any data elements passed are not group 2.
+        """
+        if init_value is None:
+            return
+
+        if not isinstance(init_value, (Dataset, dict)):
+            raise TypeError(
+                "Argument must be a dict or Dataset, not {}".format(
+                    type(init_value)
+                )
+            )
+
+        non_group2 = [
+            Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2
+        ]
+        if non_group2:
+            msg = "Attempted to set non-group 2 elements: {}"
+            raise ValueError(msg.format(non_group2))
 
     def __setitem__(self, key, value):
         """Override parent class to only allow setting of group 2 elements.
@@ -2425,7 +2429,7 @@ class FileMetaDataset(Dataset):
 
         Raises
         ------
-        KeyError
+        ValueError
             If `key` is not a DICOM Group 2 tag.
         """
 
@@ -2435,7 +2439,7 @@ class FileMetaDataset(Dataset):
             tag = Tag(value.tag)
 
         if tag.group != 2:
-            raise KeyError(
+            raise ValueError(
                 "Only group 2 data elements are allowed in a FileMetaDataset"
             )
 
