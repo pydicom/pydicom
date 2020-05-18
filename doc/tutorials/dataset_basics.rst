@@ -325,7 +325,7 @@ The answer is a file header containing:
 * Followed by a 4 byte ``DICM`` prefix
 * Followed by the required DICOM :dcm:`File Meta Information
   <part10/chapter_7.html#table_7.1-1>` elements, which in *pydicom* are
-  stored in a :class:`~pydicom.dataset.Dataset` instance in the
+  stored in a :class:`~pydicom.dataset.FileMetaDataset` instance in the
   :attr:`~pydicom.dataset.FileDataset.file_meta` attribute::
 
     >>> ds.file_meta
@@ -584,7 +584,7 @@ so get in the habit of making sure it's there and correct.
 Because we deleted the :attr:`~pydicom.dataset.FileDataset.file_meta` dataset
 we need to add it back::
 
-    >>> ds.file_meta = Dataset()
+    >>> ds.file_meta = FileMetaDataset()
 
 And now we can add our *Transfer Syntax UID* element and save to file::
 
