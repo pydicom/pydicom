@@ -1696,20 +1696,18 @@ class Dataset(dict):
         indent_str = self.indent_chars * indent
         nextindent_str = self.indent_chars * (indent + 1)
 
-        # Display file meta, if configured to do so, and are a regular Dataset
+        # Display file meta, if configured to do so, and have a non-empty one
         if (
             indent == 0
             and hasattr(self, "file_meta")
-            and not isinstance(self, FileMetaDataset)
+            and self.file_meta is not None
+            and len(self.file_meta) > 0
             and pydicom.config.show_file_meta
         ):
             strings.append("Dataset.file_meta -------------------------------")
-            if self.file_meta is None:
-                strings.append("None")
-            else:
-                for data_element in self.file_meta:
-                    with tag_in_exception(data_element.tag):
-                        strings.append(indent_str + repr(data_element))
+            for data_element in self.file_meta:
+                with tag_in_exception(data_element.tag):
+                    strings.append(indent_str + repr(data_element))
             strings.append("-------------------------------------------------")
 
         for data_element in self:
