@@ -1541,7 +1541,8 @@ class TestDatasetElements(object):
         assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
         self.ds.fix_meta_info(enforce_standard=True)
 
-        self.ds.file_meta = Dataset()  # not FileMetaDataset
+        with pytest.warns(DeprecationWarning):
+            self.ds.file_meta = Dataset()  # not FileMetaDataset
         self.ds.file_meta.PatientID = 'PatientID'
         with pytest.raises(ValueError,
                            match=r'Only File Meta Information Group '
@@ -1748,13 +1749,15 @@ class TestFileMeta:
         with pytest.raises(KeyError):
             file_meta.PatientID = "123"
 
-        # No error if assign file meta with no group 2:
+        # No error if assign empty file meta
         ds = Dataset()
         ds.file_meta = FileMetaDataset()
 
-        ds_meta = Dataset()
+        # Can assign non-empty file_meta
+        ds_meta = Dataset()  # not FileMetaDataset
         ds_meta.TransferSyntaxUID = "1.2"
-        ds.file_meta = ds_meta
+        with pytest.warns(DeprecationWarning):
+            ds.file_meta = ds_meta
 
         # Error on assigning file meta if any non-group 2
         ds_meta.PatientName = "x"
@@ -1791,3 +1794,10 @@ class TestFileMeta:
         # Raising KeyError for non-group2 already covered
         # Here check assigning via non-Tag
         file_meta[0x20010] = DataElement(0x20010, "UI", "2.3")
+
+    def test_del_file_meta(self):
+        """Can delete the file_meta attribute"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        del ds.file_meta
+        assert not hasattr(ds, "file_meta")

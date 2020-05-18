@@ -1833,7 +1833,7 @@ class Dataset(dict):
                 )
 
         self.__dict__["file_meta"] = value
-        if not isinstance(value, FileMetaDataset):
+        if value is not None and not isinstance(value, FileMetaDataset):
             warnings.warn(
                 "Starting in pydicom 3.0, Dataset.file_meta must be a "
                 "FileMetaDataset class instance",
@@ -2168,9 +2168,10 @@ class FileDataset(Dataset):
     preamble : str or bytes or None
         The optional DICOM preamble prepended to the :class:`FileDataset`, if
         available.
-    file_meta : Dataset or None
-        The Dataset's file meta information as a :class:`Dataset`, if available
-        (``None`` if not present). Consists of group ``0x0002`` elements.
+    file_meta : FileMetaDataset or None
+        The Dataset's file meta information as a :class:`FileMetaDataset`,
+        if available (``None`` if not present).
+        Consists of group ``0x0002`` elements.
     filename : str or None
         The filename that the :class:`FileDataset` was read from (if read from
         file) or ``None`` if the filename is not available (if read from a
