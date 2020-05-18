@@ -2372,7 +2372,7 @@ def validate_file_meta(file_meta, enforce_standard=True):
 class FileMetaDataset(Dataset):
     """Contains a collection (dictionary) of group 2 DICOM Data Elements.
 
-    ..versionadded:: 2.0
+    .. versionadded:: 2.0
 
     Derived from :class:`~pydicom.dataset.Dataset`, but only allows
     Group 2 (File Meta Information) data elements
@@ -2388,14 +2388,14 @@ class FileMetaDataset(Dataset):
         ------
         KeyError
             If a dict of data elements is supplied, and any are not group 2.
-        ValueError
+        TypeError
             If the passed argument is not a :class:`dict` or :class:`Dataset`
         """
 
         if args is not None and len(args) > 0:
             arg0 = args[0]
             if not isinstance(arg0, (Dataset, dict)):
-                raise ValueError(
+                raise TypeError(
                     "Argument must be a dict or Dataset, not {}".format(
                         type(arg0)
                     )

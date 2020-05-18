@@ -4,6 +4,20 @@ Version 2.0.0
 Changelog
 ---------
 * Dropped support for Python 2 (only Python 3.5+ supported)
+
+* Changes to `Dataset.file_meta`
+
+  * file_meta now shown by default in dataset `str` or `repr` output;
+    :data:`pydicom.config.show_file_meta` can be set ``False`` to restore
+    previous behavior
+
+  * new :class:`~pydicom.dataset.FileMetaDataset` class that accepts
+    only group 2 data elements
+
+  * Deprecation warning given unless `Dataset.file_meta` set with
+    a :class:`~pydicom.dataset.FileMetaDataset` object (in *pydicom* 3,
+    it will be required)
+
 * Old `PersonName` class removed; `PersonName3` renamed to `PersonName`.
   Classes `PersonNameUnicode` and `PersonName3` are aliased to `PersonName` but
   are deprecated and will be removed in version 2.1
