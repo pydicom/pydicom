@@ -172,11 +172,12 @@ not DICOM conformant and would lead to a failure if accessing it.
 """
 
 show_file_meta = True
-""" If ``True`` (default), the 'str' and 'repr' methods
-of :class:`~pydicom.dataset.Dataset begin with a separate section
-displaying the file meta information data elements
-
+"""
 .. versionadded:: 2.0
+
+If ``True`` (default), the 'str' and 'repr' methods
+of :class:`~pydicom.dataset.Dataset` begin with a separate section
+displaying the file meta information data elements
 """
 
 # Logging system and debug function to change logging level
