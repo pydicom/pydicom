@@ -1782,18 +1782,29 @@ class TestFileMeta:
         with pytest.raises(TypeError):
             FileMetaDataset(["1", "2"])
 
-        # Raises KeyError if init with non-group-2
+        # Raises error if init with non-group-2
         ds_meta.PatientName = "x"
         with pytest.raises(ValueError):
             FileMetaDataset(ds_meta)
+
+        # None can be passed, to match Dataset behavior
+        FileMetaDataset(None)
 
     def test_set_file_meta(self):
         """Check adding items to existing FileMetaDataset"""
         file_meta = FileMetaDataset()
 
-        # Raising KeyError for non-group2 already covered
-        # Here check assigning via non-Tag
+        # Raise error if set non-group 2
+        with pytest.raises(ValueError):
+            file_meta.PatientID = "1"
+
+        # Check assigning via non-Tag
         file_meta[0x20010] = DataElement(0x20010, "UI", "2.3")
+
+        # Check RawDataElement
+        file_meta[0x20010] = RawDataElement(
+            0x20010, "UI", 4, "1.23", 0, True, True
+        )
 
     def test_del_file_meta(self):
         """Can delete the file_meta attribute"""
