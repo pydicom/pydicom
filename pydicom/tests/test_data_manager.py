@@ -12,7 +12,7 @@ from pydicom.data import (
 from pydicom.data.data_manager import DATA_ROOT, get_testdata_file
 
 
-class TestGetData(object):
+class TestGetData:
     def test_get_dataset(self):
         """Test the different functions to get lists of data files."""
         # Test base locations

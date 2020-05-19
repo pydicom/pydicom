@@ -12,7 +12,7 @@ test_file = get_testdata_files('CT_small.dcm')[0]
 no_meta_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
 
 
-class TestMisc(object):
+class TestMisc:
     def test_is_dicom(self):
         """Test the is_dicom function."""
         invalid_file = test_file.replace('CT_', 'CT')  # invalid file

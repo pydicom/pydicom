@@ -107,7 +107,7 @@ _backslash_str = "\\"
 _backslash_byte = b"\\"
 
 
-class DataElement(object):
+class DataElement:
     """Contain and manipulate a DICOM Element.
 
     Examples

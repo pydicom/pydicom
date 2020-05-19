@@ -19,7 +19,7 @@ TEST_FILES = (
 )
 
 
-class TestDicomDir(object):
+class TestDicomDir:
     """Test dicomdir.DicomDir class"""
 
     def teardown(self):

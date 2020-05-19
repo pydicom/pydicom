@@ -15,7 +15,7 @@ ItemDelimiterTag = 0xFFFEE00D  # end of Sequence Item
 SequenceDelimiterTag = 0xFFFEE0DD  # end of Sequence of undefined length
 
 
-class dicomfile(object):
+class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
     def __init__(self, filename):

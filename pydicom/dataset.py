@@ -52,7 +52,7 @@ except ImportError:
     have_numpy = False
 
 
-class PrivateBlock(object):
+class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
 
     .. versionadded:: 1.3

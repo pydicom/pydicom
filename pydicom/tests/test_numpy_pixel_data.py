@@ -186,7 +186,7 @@ SUPPORTED_HANDLER_NAMES = (
 
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoNumpyHandler(object):
+class TestNoNumpy_NoNumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
@@ -251,7 +251,7 @@ class TestNoNumpy_NoNumpyHandler(object):
 
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NumpyHandler(object):
+class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
@@ -322,7 +322,7 @@ class TestNoNumpy_NumpyHandler(object):
 
 # Numpy is available, the numpy handler is unavailable
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
-class TestNumpy_NoNumpyHandler(object):
+class TestNumpy_NoNumpyHandler:
     """Tests for handling datasets without the handler."""
 
     def setup(self):
@@ -420,7 +420,7 @@ REFERENCE_DATA_LITTLE = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_NumpyHandler(object):
+class TestNumpy_NumpyHandler:
     """Tests for handling Pixel Data with the handler."""
 
     def setup(self):
@@ -1093,7 +1093,7 @@ class TestNumpy_NumpyHandler(object):
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_GetPixelData(object):
+class TestNumpy_GetPixelData:
     """Tests for numpy_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
@@ -1294,7 +1294,7 @@ REFERENCE_PACK_UNPACK = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_UnpackBits(object):
+class TestNumpy_UnpackBits:
     """Tests for numpy_handler.unpack_bits."""
 
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
@@ -1325,7 +1325,7 @@ REFERENCE_PACK_PARTIAL = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PackBits(object):
+class TestNumpy_PackBits:
     """Tests for numpy_handler.pack_bits."""
 
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)

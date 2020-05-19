@@ -8,7 +8,7 @@ import pytest
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
 
 
-class TestGenerateUID(object):
+class TestGenerateUID:
     def test_generate_uid(self):
         """Test UID generator"""
         # Test standard UID generation with pydicom prefix
@@ -78,7 +78,7 @@ class TestGenerateUID(object):
             assert uid.is_valid
 
 
-class TestUID(object):
+class TestUID:
     """Test DICOM UIDs"""
     @classmethod
     def setup_class(self):
@@ -291,7 +291,7 @@ class TestUID(object):
         assert a == b
 
 
-class TestUIDPrivate(object):
+class TestUIDPrivate:
     """Test private UIDs"""
     @classmethod
     def setup_class(self):

@@ -28,7 +28,7 @@ def _filtered(allnames, filters):
         return sorted(allnames)
 
 
-class _CID_Dict(object):
+class _CID_Dict:
     repr_format = "{} = {}"
     str_format = "{:20} {:12} {:8} {}\n"
 
@@ -169,7 +169,7 @@ class _CID_Dict(object):
         return dir(self)
 
 
-class _CodesDict(object):
+class _CodesDict:
     def __init__(self, scheme=None):
         self.scheme = scheme
         if scheme:

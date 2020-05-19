@@ -32,7 +32,7 @@ default_encoding = "iso8859"
     platform.python_implementation() == "PyPy",
     reason="PyPy has trouble with this pickle",
 )
-class TestTM(object):
+class TestTM:
     """Unit tests for pickling TM"""
 
     def test_pickling(self):
@@ -48,7 +48,7 @@ class TestTM(object):
         assert str(x) == str(x2)
 
 
-class TestDT(object):
+class TestDT:
     """Unit tests for pickling DT"""
 
     def test_pickling(self):
@@ -62,7 +62,7 @@ class TestDT(object):
         assert str(x) == str(x2)
 
 
-class TestDA(object):
+class TestDA:
     """Unit tests for pickling DA"""
 
     def test_pickling(self):
@@ -76,7 +76,7 @@ class TestDA(object):
         assert str(x) == str(x2)
 
 
-class TestDS(object):
+class TestDS:
     """Unit tests for DS values"""
 
     def test_empty_value(self):
@@ -92,7 +92,7 @@ class TestDS(object):
         assert 0.9 == val
 
 
-class TestDSfloat(object):
+class TestDSfloat:
     """Unit tests for pickling DSfloat"""
 
     def test_pickling(self):
@@ -121,7 +121,7 @@ class TestDSfloat(object):
         assert '"1.1"' == repr(val)
 
 
-class TestDSdecimal(object):
+class TestDSdecimal:
     """Unit tests for pickling DSdecimal"""
 
     def test_pickling(self):
@@ -145,7 +145,7 @@ class TestDSdecimal(object):
         assert 9 == pydicom.valuerep.DSdecimal(9.0)
 
 
-class TestIS(object):
+class TestIS:
     """Unit tests for IS"""
 
     def test_empty_value(self):
@@ -204,12 +204,12 @@ class TestIS(object):
         assert '"1"' == repr(val)
 
 
-class TestBadValueRead(object):
+class TestBadValueRead:
     """Unit tests for handling a bad value for a VR
        (a string in a number VR here)"""
 
     def setup(self):
-        class TagLike(object):
+        class TagLike:
             pass
 
         self.tag = TagLike()
@@ -242,7 +242,7 @@ class TestBadValueRead(object):
             convert_value("IS", self.tag)
 
 
-class TestDecimalString(object):
+class TestDecimalString:
     """Unit tests unique to the use of DS class
        derived from python Decimal"""
 
@@ -279,7 +279,7 @@ class TestDecimalString(object):
             valuerep.DS(invalid_string)
 
 
-class TestPersonName(object):
+class TestPersonName:
     def test_last_first(self):
         """PN: Simple Family-name^Given-name works..."""
         pn = PersonName("Family^Given")
@@ -428,7 +428,7 @@ class TestPersonName(object):
         assert hash(pn1) == hash(pn2)
 
 
-class TestDateTime(object):
+class TestDateTime:
     """Unit tests for DA, DT, TM conversion to datetime objects"""
 
     def setup(self):

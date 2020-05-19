@@ -61,7 +61,7 @@ IN_TRAVIS = get_envar("TRAVIS") == 'true'
 
 
 @pytest.mark.skipif(not IN_TRAVIS, reason="Tests not running in Travis")
-class TestBuilds(object):
+class TestBuilds:
     """Tests for the testing builds in Travis CI."""
     def test_distribution(self):
         """Test that the distribution is correct."""

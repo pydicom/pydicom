@@ -96,7 +96,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     return tfile
 
 
-class TimeGetPixelData_LargeDataset(object):
+class TimeGetPixelData_LargeDataset:
     """Time tests for numpy_handler.get_pixeldata with large datasets."""
     def setup(self):
         """Setup the tests."""
@@ -110,7 +110,7 @@ class TimeGetPixelData_LargeDataset(object):
             get_pixeldata(self.ds_16_3_100)
 
 
-class TimeGetPixelData(object):
+class TimeGetPixelData:
     """Time tests for numpy_handler.get_pixeldata."""
     def setup(self):
         """Setup the tests."""

@@ -44,7 +44,7 @@ def adapt_dataset_from_bytes(blob):
     return dataset
 
 
-class DummyDataBase(object):
+class DummyDataBase:
     def __init__(self):
         self._blobs = {}
 

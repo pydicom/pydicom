@@ -91,7 +91,7 @@ def as_assertable(dataset):
     return safe_dict
 
 
-class TestWriteFile(object):
+class TestWriteFile:
     def setup(self):
         self.file_out = TemporaryFile('w+b')
 
@@ -314,7 +314,7 @@ class TestScratchWriteDateTime(TestWriteFile):
         assert TM_expected == ds.TimeOfLastCalibration
 
 
-class TestWriteDataElement(object):
+class TestWriteDataElement:
     """Attempt to write data elements has the expected behaviour"""
 
     def setup(self):
@@ -717,7 +717,7 @@ class TestWriteDataElement(object):
             write_data_element(fp, elem)
 
 
-class TestCorrectAmbiguousVR(object):
+class TestCorrectAmbiguousVR:
     """Test correct_ambiguous_vr."""
 
     def test_pixel_representation_vm_one(self):
@@ -1027,7 +1027,7 @@ class TestCorrectAmbiguousVR(object):
         assert 'SS' == ds[0x00283000][0][0x00283002].VR
 
 
-class TestCorrectAmbiguousVRElement(object):
+class TestCorrectAmbiguousVRElement:
     """Test filewriter.correct_ambiguous_vr_element"""
 
     def test_not_ambiguous(self):
@@ -1080,7 +1080,7 @@ class TestCorrectAmbiguousVRElement(object):
         assert out.value == 0xfffe
 
 
-class TestWriteAmbiguousVR(object):
+class TestWriteAmbiguousVR:
     """Attempt to write data elements with ambiguous VR."""
 
     def setup(self):
@@ -1140,7 +1140,7 @@ class TestWriteAmbiguousVR(object):
         assert ['UTF8'] == ds.read_encoding
 
 
-class TestScratchWrite(object):
+class TestScratchWrite:
     """Simple dataset from scratch, written in all endian/VR combinations"""
 
     def setup(self):
@@ -1192,7 +1192,7 @@ class TestScratchWrite(object):
         self.compare_write(impl_LE_deflen_std_hex, file_ds)
 
 
-class TestWriteToStandard(object):
+class TestWriteToStandard:
     """Unit tests for writing datasets to the DICOM standard"""
 
     def test_preamble_default(self):
@@ -1629,7 +1629,7 @@ class TestWriteToStandard(object):
         assert 'MessageID' not in ds_out
 
 
-class TestWriteFileMetaInfoToStandard(object):
+class TestWriteFileMetaInfoToStandard:
     """Unit tests for writing File Meta Info to the DICOM standard."""
 
     def test_bad_elements(self):
@@ -1789,7 +1789,7 @@ class TestWriteFileMetaInfoToStandard(object):
         assert test_length == 68 + class_length + version_length
 
 
-class TestWriteNonStandard(object):
+class TestWriteNonStandard:
     """Unit tests for writing datasets not to the DICOM standard."""
 
     def setup(self):
@@ -2129,7 +2129,7 @@ class TestWriteNonStandard(object):
                 self.compare_bytes(bytes_in.getvalue(), bytes_out.getvalue())
 
 
-class TestWriteFileMetaInfoNonStandard(object):
+class TestWriteFileMetaInfoNonStandard:
     """Unit tests for writing File Meta Info not to the DICOM standard."""
 
     def setup(self):
@@ -2251,7 +2251,7 @@ class TestWriteFileMetaInfoNonStandard(object):
         assert ref_meta == meta
 
 
-class TestWriteNumbers(object):
+class TestWriteNumbers:
     """Test filewriter.write_numbers"""
 
     def test_write_empty_value(self):
@@ -2301,7 +2301,7 @@ class TestWriteNumbers(object):
         assert fp.getvalue() == b'\x00\x01'
 
 
-class TestWriteOtherVRs(object):
+class TestWriteOtherVRs:
     """Tests for writing the 'O' VRs like OB, OW, OF, etc."""
     def test_write_of(self):
         """Test writing element with VR OF"""
@@ -2327,7 +2327,7 @@ class TestWriteOtherVRs(object):
         )
 
 
-class TestWritePN(object):
+class TestWritePN:
     """Test filewriter.write_PN"""
 
     def test_no_encoding(self):
@@ -2397,7 +2397,7 @@ class TestWritePN(object):
         assert encoded == fp.getvalue()
 
 
-class TestWriteText(object):
+class TestWriteText:
     """Test filewriter.write_PN"""
 
     def teardown(self):
@@ -2540,7 +2540,7 @@ class TestWriteText(object):
         assert decoded == convert_text(encoded, encodings)
 
 
-class TestWriteDT(object):
+class TestWriteDT:
     """Test filewriter.write_DT"""
 
     def test_format_dt(self):
@@ -2558,7 +2558,7 @@ class TestWriteDT(object):
         assert _format_DT(elem.value) == '20010203123456'
 
 
-class TestWriteUndefinedLengthPixelData(object):
+class TestWriteUndefinedLengthPixelData:
     """Test write_data_element() for pixel data with undefined length."""
 
     def setup(self):
