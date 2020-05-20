@@ -79,24 +79,6 @@ def empty_value_for_VR(VR, raw=False):
     return None
 
 
-def isMultiValue(value):
-    """Return ``True`` if `value` is list-like (iterable).
-
-    .. deprecated:: 1.3
-       This function is deprecated, use :attr:`DataElement.VM` instead.
-
-    """
-    msg = 'isMultiValue is deprecated, use DataElement.VM instead'
-    warnings.warn(msg, DeprecationWarning)
-    if isinstance(value, (str, bytes)):
-        return False
-    try:
-        iter(value)
-    except TypeError:
-        return False
-    return True
-
-
 def _is_bytes(val):
     """Return True only if `val` is of type `bytes`."""
     return isinstance(val, bytes)
@@ -107,7 +89,7 @@ _backslash_str = "\\"
 _backslash_byte = b"\\"
 
 
-class DataElement(object):
+class DataElement:
     """Contain and manipulate a DICOM Element.
 
     Examples

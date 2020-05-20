@@ -138,7 +138,7 @@ REFERENCE_DATA_UNSUPPORTED = [
 
 # Numpy and the pillow handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoPillowHandler(object):
+class TestNoNumpy_NoPillowHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
@@ -378,7 +378,7 @@ JPEG2K_MATCHING_DATASETS = [
 
 
 @pytest.mark.skipif(not HAVE_JPEG2K, reason='Pillow or JPEG2K not available')
-class TestPillowHandler_JPEG2K(object):
+class TestPillowHandler_JPEG2K:
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -486,7 +486,7 @@ class TestPillowHandler_JPEG2K(object):
 
 
 @pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
-class TestPillowHandler_JPEG(object):
+class TestPillowHandler_JPEG:
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -601,7 +601,7 @@ class TestPillowHandler_JPEG(object):
         assert pixel_data.shape == (3, 3, 3)
 
 
-class TestPillow_GetJ2KPrecision(object):
+class TestPillow_GetJ2KPrecision:
     """Tests for _get_j2k_precision."""
     def test_precision(self):
         """Test getting the precision for a JPEG2K bytestream."""

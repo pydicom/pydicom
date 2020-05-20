@@ -94,7 +94,7 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class TestReader(object):
+class TestReader:
     def teardown(self):
         config.enforce_valid_values = False
         config.replace_un_with_known_vr = True
@@ -783,7 +783,7 @@ class TestReader(object):
         assert b"\x00\x01\x02\x03" == elem.value
 
 
-class TestIncorrectVR(object):
+class TestIncorrectVR:
     def setup(self):
         config.enforce_valid_values = False
         self.ds_explicit = BytesIO(
@@ -877,7 +877,7 @@ class TestIncorrectVR(object):
         ds.remove_private_tags()  # forces it to actually parse SQ
 
 
-class TestUnknownVR(object):
+class TestUnknownVR:
     @pytest.mark.parametrize(
         "vr_bytes, str_output",
         [
@@ -1322,7 +1322,7 @@ class TestDSISnumpy:
             values.convert_IS_string(b"123", True)
 
 
-class TestDeferredRead(object):
+class TestDeferredRead:
     """Test that deferred data element reading (for large size)
     works as expected
     """
@@ -1387,7 +1387,7 @@ class TestDeferredRead(object):
         assert 32768 == len(dataset.PixelData)
 
 
-class TestReadTruncatedFile(object):
+class TestReadTruncatedFile:
     def testReadFileWithMissingPixelData(self):
         mr = dcmread(truncated_mr_name)
         mr.decode()
@@ -1419,7 +1419,7 @@ class TestReadTruncatedFile(object):
             mr.pixel_array
 
 
-class TestFileLike(object):
+class TestFileLike:
     """Test that can read DICOM files with file-like object rather than
     filename
     """
@@ -1476,7 +1476,7 @@ class TestFileLike(object):
         file_like.close()
 
 
-class TestDataElementGenerator(object):
+class TestDataElementGenerator:
     """Test filereader.data_element_generator"""
 
     def test_little_endian_explicit(self):

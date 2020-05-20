@@ -102,7 +102,7 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class TestGDCM_JPEG_LS_no_gdcm(object):
+class TestGDCM_JPEG_LS_no_gdcm:
     def setup(self):
         self.unicode_filename = os.path.join(
             tempfile.gettempdir(), "ДИКОМ.dcm")
@@ -127,7 +127,7 @@ class TestGDCM_JPEG_LS_no_gdcm(object):
             self.emri_jpeg_ls_lossless.pixel_array
 
 
-class TestGDCM_JPEG2000_no_gdcm(object):
+class TestGDCM_JPEG2000_no_gdcm:
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -165,7 +165,7 @@ class TestGDCM_JPEG2000_no_gdcm(object):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
-class TestGDCM_JPEGlossy_no_gdcm(object):
+class TestGDCM_JPEGlossy_no_gdcm:
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -190,7 +190,7 @@ class TestGDCM_JPEGlossy_no_gdcm(object):
             self.color_3d_jpeg.pixel_array
 
 
-class TestGDCM_JPEGlossless_no_gdcm(object):
+class TestGDCM_JPEGlossless_no_gdcm:
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -341,7 +341,7 @@ else:
         with_gdcm_params = []
 
 
-class TestsWithGDCM(object):
+class TestsWithGDCM:
     @pytest.fixture(params=with_gdcm_params, scope='class', autouse=True)
     def with_gdcm(self, request):
         original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
@@ -540,7 +540,7 @@ class TestsWithGDCM(object):
         assert PhotometricInterpretation == t.PhotometricInterpretation
 
 
-class TestSupportFunctions(object):
+class TestSupportFunctions:
     @pytest.fixture(scope='class')
     def dataset_2d(self):
         return dcmread(mr_name)

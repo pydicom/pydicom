@@ -61,7 +61,7 @@ ENCODED_NAMES = [
 ]
 
 
-class TestCharset(object):
+class TestCharset:
     def teardown(self):
         config.enforce_valid_values = False
 

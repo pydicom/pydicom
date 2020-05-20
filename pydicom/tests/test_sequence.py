@@ -7,7 +7,7 @@ from pydicom.dataset import Dataset
 from pydicom.sequence import Sequence
 
 
-class TestSequence(object):
+class TestSequence:
     def testDefaultInitialization(self):
         """Sequence: Ensure a valid Sequence is created"""
         empty = Sequence()

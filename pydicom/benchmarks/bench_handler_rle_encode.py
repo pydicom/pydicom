@@ -24,7 +24,7 @@ EXPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
 EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
 
 
-class TimeRLEEncodeSegment(object):
+class TimeRLEEncodeSegment:
     """Time tests for rle_handler._rle_encode_segment."""
     def setup(self):
         ds = dcmread(EXPL_8_1_1F)
@@ -39,7 +39,7 @@ class TimeRLEEncodeSegment(object):
             _rle_encode_segment(self.arr)
 
 
-class TimeRLEEncodeFrame(object):
+class TimeRLEEncodeFrame:
     """Time tests for rle_handler.rle_encode_frame."""
     def setup(self):
         ds = dcmread(EXPL_8_1_1F)

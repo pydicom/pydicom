@@ -12,7 +12,7 @@ import sys
 python_version = sys.version_info
 
 
-class TestMultiValue(object):
+class TestMultiValue:
     def testMultiDS(self):
         """MultiValue: Multi-valued data elements can be created........"""
         multival = MultiValue(DS, ['11.1', '22.2', '33.3'])

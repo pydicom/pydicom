@@ -24,12 +24,12 @@ from pydicom.uid import (
 )
 
 
-class BadRepr(object):
+class BadRepr:
     def __repr__(self):
         raise ValueError("bad repr")
 
 
-class TestDataset(object):
+class TestDataset:
     """Tests for dataset.Dataset."""
     def setup(self):
         self.ds = Dataset()
@@ -1485,7 +1485,7 @@ class TestDataset(object):
         assert 'TestC' == ds2.PatientName
 
 
-class TestDatasetElements(object):
+class TestDatasetElements:
     """Test valid assignments of data elements"""
     def setup(self):
         self.ds = Dataset()
@@ -1588,7 +1588,7 @@ class TestDatasetElements(object):
         assert 'ACME LTD' == file_meta.ImplementationVersionName
 
 
-class TestFileDataset(object):
+class TestFileDataset:
     def setup(self):
         self.test_file = get_testdata_file('CT_small.dcm')
 
@@ -1634,7 +1634,7 @@ class TestFileDataset(object):
 
     def test_creation_with_container(self):
         """FileDataset.__init__ works OK with a container such as gzip"""
-        class Dummy(object):
+        class Dummy:
             filename = '/some/path/to/test'
 
         ds = Dataset()
@@ -1667,7 +1667,7 @@ class TestFileDataset(object):
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
 
-class TestDatasetOverlayArray(object):
+class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -1678,7 +1678,7 @@ class TestDatasetOverlayArray(object):
             get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
         )
 
-        class DummyHandler(object):
+        class DummyHandler:
             def __init__(self):
                 self.raise_exc = False
                 self.has_dependencies = True
