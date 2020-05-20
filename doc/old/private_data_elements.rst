@@ -34,7 +34,7 @@ Here is an example of some private tags displayed for pydicom's test file
 
     >>> from pydicom import dcmread
     >>> from pydicom.data import get_testdata_file
-    >>> ct_filename = get_testdata_file("CT_small")
+    >>> ct_filename = get_testdata_file("CT_small.dcm")
     >>> ds = dcmread(ct_filename)
     >>> ds
     Dataset.file_meta -------------------------------

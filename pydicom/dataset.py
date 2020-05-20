@@ -1698,8 +1698,7 @@ class Dataset(dict):
 
         # Display file meta, if configured to do so, and have a non-empty one
         if (
-            indent == 0
-            and hasattr(self, "file_meta")
+            hasattr(self, "file_meta")
             and self.file_meta is not None
             and len(self.file_meta) > 0
             and pydicom.config.show_file_meta
