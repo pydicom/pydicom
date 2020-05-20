@@ -6,7 +6,9 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
-from pydicom.dataset import Dataset, FileDataset, validate_file_meta
+from pydicom.dataset import (
+    Dataset, FileDataset, validate_file_meta, FileMetaDataset
+)
 from pydicom.encaps import encapsulate
 from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
@@ -38,10 +40,10 @@ class TestDataset(object):
         # This comes from bug fix for issue 42
         # First, fake enough to try the pixel_array property
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.PixelData = 'xyzlmnop'
         msg_from_gdcm = r"'Dataset' object has no attribute 'filename'"
-        msg_from_numpy = (r"'Dataset' object has no attribute "
+        msg_from_numpy = (r"'FileMetaDataset' object has no attribute "
                           "'TransferSyntaxUID'")
         msg_from_pillow = (r"'Dataset' object has no attribute "
                            "'PixelRepresentation'")
@@ -1168,7 +1170,7 @@ class TestDataset(object):
             ds.save_as(fp, write_like_original=False)
 
         ds.is_implicit_VR = True
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = '1.1'
         ds.file_meta.MediaStorageSOPInstanceUID = '1.2'
         ds.file_meta.TransferSyntaxUID = '1.3'
@@ -1181,7 +1183,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
         ds['PixelData'].VR = 'OB'
@@ -1198,7 +1200,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         ds['PixelData'].VR = 'OB'
@@ -1210,7 +1212,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.save_as(fp)
 
@@ -1220,7 +1222,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.save_as(fp)
 
         del ds.file_meta
@@ -1232,7 +1234,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2.3.4.5.6'
         ds.save_as(fp)
 
@@ -1250,7 +1252,7 @@ class TestDataset(object):
             ds.save_as(fp)
 
         # Test private transfer syntax raises
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2'
         with pytest.raises(AttributeError, match=msg):
             ds.save_as(fp)
@@ -1265,7 +1267,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = JPEGBaseline
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
@@ -1294,7 +1296,7 @@ class TestDataset(object):
         ds = Dataset()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = '1.2.3.4.5'
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
@@ -1539,6 +1541,8 @@ class TestDatasetElements(object):
         assert '4.5.6' == self.ds.file_meta.MediaStorageSOPInstanceUID
         self.ds.fix_meta_info(enforce_standard=True)
 
+        with pytest.warns(DeprecationWarning):
+            self.ds.file_meta = Dataset()  # not FileMetaDataset
         self.ds.file_meta.PatientID = 'PatientID'
         with pytest.raises(ValueError,
                            match=r'Only File Meta Information Group '
@@ -1546,11 +1550,12 @@ class TestDatasetElements(object):
             self.ds.fix_meta_info(enforce_standard=True)
 
     def test_validate_and_correct_file_meta(self):
-        file_meta = Dataset()
+        file_meta = FileMetaDataset()
         validate_file_meta(file_meta, enforce_standard=False)
         with pytest.raises(ValueError):
             validate_file_meta(file_meta, enforce_standard=True)
 
+        file_meta = Dataset()  # not FileMetaDataset for bkwds-compat checks
         file_meta.PatientID = 'PatientID'
         for enforce_standard in (True, False):
             with pytest.raises(
@@ -1560,7 +1565,7 @@ class TestDatasetElements(object):
                 validate_file_meta(
                     file_meta, enforce_standard=enforce_standard)
 
-        file_meta = Dataset()
+        file_meta = FileMetaDataset()
         file_meta.MediaStorageSOPClassUID = '1.2.3'
         file_meta.MediaStorageSOPInstanceUID = '1.2.4'
         # still missing TransferSyntaxUID
@@ -1728,3 +1733,104 @@ class TestDatasetOverlayArray(object):
         pydicom.config.overlay_data_handlers = [self.dummy]
         with pytest.raises(ValueError, match=r"Dummy error message"):
             self.ds.overlay_array(0x6000)
+
+
+class TestFileMeta:
+    def test_deprecation_warning(self):
+        """Assigning ds.file_meta warns if not FileMetaDataset instance"""
+        ds = Dataset()
+        with pytest.warns(DeprecationWarning):
+            ds.file_meta = Dataset()  # not FileMetaDataset
+
+    def test_assign_file_meta(self):
+        """Test can only set group 2 elements in File Meta"""
+        # FileMetaDataset accepts only group 2
+        file_meta = FileMetaDataset()
+        with pytest.raises(ValueError):
+            file_meta.PatientID = "123"
+
+        # No error if assign empty file meta
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+
+        # Can assign non-empty file_meta
+        ds_meta = Dataset()  # not FileMetaDataset
+        ds_meta.TransferSyntaxUID = "1.2"
+        with pytest.warns(DeprecationWarning):
+            ds.file_meta = ds_meta
+
+        # Error on assigning file meta if any non-group 2
+        ds_meta.PatientName = "x"
+        with pytest.raises(ValueError):
+            ds.file_meta = ds_meta
+
+    def test_init_file_meta(self):
+        """Check instantiation of FileMetaDataset"""
+        ds_meta = Dataset()
+        ds_meta.TransferSyntaxUID = "1.2"
+
+        # Accepts with group 2
+        file_meta = FileMetaDataset(ds_meta)
+        assert "1.2" == file_meta.TransferSyntaxUID
+
+        # Accepts dict
+        dict_meta = {0x20010: DataElement(0x20010, "UI", "2.3")}
+        file_meta = FileMetaDataset(dict_meta)
+        assert "2.3" == file_meta.TransferSyntaxUID
+
+        # Fails if not dict or Dataset
+        with pytest.raises(TypeError):
+            FileMetaDataset(["1", "2"])
+
+        # Raises error if init with non-group-2
+        ds_meta.PatientName = "x"
+        with pytest.raises(ValueError):
+            FileMetaDataset(ds_meta)
+
+        # None can be passed, to match Dataset behavior
+        FileMetaDataset(None)
+
+    def test_set_file_meta(self):
+        """Check adding items to existing FileMetaDataset"""
+        file_meta = FileMetaDataset()
+
+        # Raise error if set non-group 2
+        with pytest.raises(ValueError):
+            file_meta.PatientID = "1"
+
+        # Check assigning via non-Tag
+        file_meta[0x20010] = DataElement(0x20010, "UI", "2.3")
+
+        # Check RawDataElement
+        file_meta[0x20010] = RawDataElement(
+            0x20010, "UI", 4, "1.23", 0, True, True
+        )
+
+    def test_del_file_meta(self):
+        """Can delete the file_meta attribute"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        del ds.file_meta
+        assert not hasattr(ds, "file_meta")
+
+    def test_show_file_meta(self):
+        orig_show = pydicom.config.show_file_meta
+        pydicom.config.show_file_meta = True
+
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = "1.2"
+        ds.PatientName = "test"
+        shown = str(ds)
+
+        assert shown.startswith("Dataset.file_meta ---")
+        assert shown.splitlines()[1].startswith(
+            "(0002, 0010) Transfer Syntax UID"
+        )
+
+        # Turn off file_meta display
+        pydicom.config.show_file_meta = False
+        shown = str(ds)
+        assert shown.startswith("(0010, 0010) Patient's Name")
+
+        pydicom.config.show_file_meta = orig_show

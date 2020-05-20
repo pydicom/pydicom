@@ -16,7 +16,7 @@ import pytest
 
 import pydicom.config
 from pydicom import config
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
 from pydicom.filereader import dcmread, read_dataset
@@ -854,7 +854,7 @@ class TestIncorrectVR(object):
         # followed by a sequence with an item (dataset) having
         # a data element length that looks like a potential valid VR
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.MediaStorageSOPClassUID = "1.1.1"
         ds.file_meta.MediaStorageSOPInstanceUID = "2.2.2"
         ds.is_implicit_VR = True
