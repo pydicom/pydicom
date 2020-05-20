@@ -17,7 +17,7 @@ import tempfile
 import datetime
 
 import pydicom
-from pydicom.dataset import Dataset, FileDataset
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 
 # Create some temporary filenames
 suffix = '.dcm'
@@ -26,7 +26,7 @@ filename_big_endian = tempfile.NamedTemporaryFile(suffix=suffix).name
 
 print("Setting file meta information...")
 # Populate required values for file meta information
-file_meta = Dataset()
+file_meta = FileMetaDataset()
 file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
 file_meta.MediaStorageSOPInstanceUID = "1.2.3"
 file_meta.ImplementationClassUID = "1.2.3.4"

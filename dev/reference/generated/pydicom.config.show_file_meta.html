@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.config.use_DS_numpy &mdash; pydicom 2.0.0.dev0 documentation</title>
+  <title>pydicom.config.show_file_meta &mdash; pydicom 2.0.0.dev0 documentation</title>
   
 
   
@@ -41,8 +41,8 @@
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Getting Included Datasets (pydicom.data)" href="../data.html" />
-    <link rel="prev" title="pydicom.config.use_IS_numpy" href="pydicom.config.use_IS_numpy.html" /> 
+    <link rel="next" title="pydicom.config.DS_decimal" href="pydicom.config.DS_decimal.html" />
+    <link rel="prev" title="pydicom.config.reset_data_element_callback" href="pydicom.config.reset_data_element_callback.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -116,12 +116,12 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.show_file_meta</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.use_DS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -199,7 +199,7 @@
         
           <li><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a> &raquo;</li>
         
-      <li>pydicom.config.use_DS_numpy</li>
+      <li>pydicom.config.show_file_meta</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -216,17 +216,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-config-use-ds-numpy">
-<h1>pydicom.config.use_DS_numpy<a class="headerlink" href="#pydicom-config-use-ds-numpy" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-config-show-file-meta">
+<h1>pydicom.config.show_file_meta<a class="headerlink" href="#pydicom-config-show-file-meta" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
-<dt id="pydicom.config.use_DS_numpy">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">use_DS_numpy</code><em class="property"> = False</em><a class="headerlink" href="#pydicom.config.use_DS_numpy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set using the function <a class="reference internal" href="pydicom.config.DS_numpy.html#pydicom.config.DS_numpy" title="pydicom.config.DS_numpy"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_numpy()</span></code></a> to control
-whether arrays of VR <strong>DS</strong> are returned as numpy arrays.
-Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-<div class="versionadded">
+<dt id="pydicom.config.show_file_meta">
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">show_file_meta</code><em class="property"> = True</em><a class="headerlink" href="#pydicom.config.show_file_meta" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionadded">
 <p><span class="versionmodified added">New in version 2.0.</span></p>
 </div>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the ‘str’ and ‘repr’ methods
+of <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> begin with a separate section
+displaying the file meta information data elements</p>
 </dd></dl>
 
 </div>
@@ -239,10 +239,10 @@ Default: <code class="docutils literal notranslate"><span class="pre">False</spa
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../data.html" class="btn btn-neutral float-right" title="Getting Included Datasets (pydicom.data)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.config.DS_decimal.html" class="btn btn-neutral float-right" title="pydicom.config.DS_decimal" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.config.use_IS_numpy.html" class="btn btn-neutral float-left" title="pydicom.config.use_IS_numpy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.config.reset_data_element_callback.html" class="btn btn-neutral float-left" title="pydicom.config.reset_data_element_callback" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -196,7 +196,33 @@
 <span id="sphx-glr-auto-examples-plot-dicom-difference-py"></span><h1>Analyse differences between DICOM files<a class="headerlink" href="#analyse-differences-between-dicom-files" title="Permalink to this headline">¶</a></h1>
 <p>This examples illustrates how to find the differences between two DICOM files.</p>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ (0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  Dataset.file_meta -------------------------------
+
+- (0002, 0000) File Meta Information Group Length  UL: 190
+
++ (0002, 0000) File Meta Information Group Length  UL: 192
+
+  (0002, 0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;
+
+- (0002, 0002) Media Storage SOP Class UID         UI: MR Image Storage
+
++ (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+
+- (0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.4.1.1.20040826185059.5457
+
++ (0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
+
+  (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+
+  (0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
+
+  (0002, 0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;
+
+  (0002, 0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;
+
+  -------------------------------------------------
+
++ (0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;
 
 - (0008, 0008) Image Type                          CS: [&#39;DERIVED&#39;, &#39;SECONDARY&#39;, &#39;OTHER&#39;]
 
@@ -876,7 +902,7 @@
         <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.119 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.139 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a3b4852d291f27302d2926716393406e/plot_dicom_difference.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></p>

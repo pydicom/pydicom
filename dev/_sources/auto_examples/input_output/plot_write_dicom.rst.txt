@@ -28,21 +28,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmp7pdt2xs6.dcm
+    Writing test file /tmp/tmp5_wbam3e.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpq2jutu22.dcm
-    Load file /tmp/tmp7pdt2xs6.dcm ...
-    (0008, 0023) Content Date                        DA: '20200517'
-    (0008, 0033) Content Time                        TM: '005739.955565'
+    Writing test file as Big Endian Explicit VR /tmp/tmpgk26clqv.dcm
+    Load file /tmp/tmp5_wbam3e.dcm ...
+    Dataset.file_meta -------------------------------
+    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
+    (0002, 0012) Implementation Class UID            UI: 1.2.3.4
+    -------------------------------------------------
+    (0008, 0023) Content Date                        DA: '20200520'
+    (0008, 0033) Content Time                        TM: '162109.238840'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp7pdt2xs6.dcm ...
-    Load file /tmp/tmpq2jutu22.dcm ...
-    (0008, 0023) Content Date                        DA: '20200517'
-    (0008, 0033) Content Time                        TM: '005739.955565'
+    Remove file /tmp/tmp5_wbam3e.dcm ...
+    Load file /tmp/tmpgk26clqv.dcm ...
+    Dataset.file_meta -------------------------------
+    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
+    (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
+    (0002, 0012) Implementation Class UID            UI: 1.2.3.4
+    -------------------------------------------------
+    (0008, 0023) Content Date                        DA: '20200520'
+    (0008, 0033) Content Time                        TM: '162109.238840'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpq2jutu22.dcm ...
+    Remove file /tmp/tmpgk26clqv.dcm ...
 
 
 
@@ -63,7 +74,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
     import datetime
 
     import pydicom
-    from pydicom.dataset import Dataset, FileDataset
+    from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 
     # Create some temporary filenames
     suffix = '.dcm'
@@ -72,7 +83,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     print("Setting file meta information...")
     # Populate required values for file meta information
-    file_meta = Dataset()
+    file_meta = FileMetaDataset()
     file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
     file_meta.MediaStorageSOPInstanceUID = "1.2.3"
     file_meta.ImplementationClassUID = "1.2.3.4"
@@ -124,7 +135,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.005 seconds)
+   **Total running time of the script:** ( 0 minutes  0.007 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:

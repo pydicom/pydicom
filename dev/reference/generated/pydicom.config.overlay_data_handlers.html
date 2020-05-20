@@ -116,6 +116,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
@@ -235,7 +236,7 @@ sized numpy array from an <em>Overlay Data</em> element.</p>
 <dt>def is_available():</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler’s dependencies are installed, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
-<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
+<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
 <em>Overlay Data</em> with element tag <cite>group</cite>, in <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <cite>ds</cite> or raise
 an exception.</p>
 </dd>

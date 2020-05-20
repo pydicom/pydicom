@@ -33,10 +33,20 @@ Here is an example of some private tags displayed for pydicom's test file
 'CT_small.dcm'::
 
     >>> from pydicom import dcmread
-    >>> from pydicom.data import get_testdata_files
-    >>> ct_filename = get_testdata_files("CT_small")[0]
+    >>> from pydicom.data import get_testdata_file
+    >>> ct_filename = get_testdata_file("CT_small.dcm")
     >>> ds = dcmread(ct_filename)
     >>> ds
+    Dataset.file_meta -------------------------------
+    (0002, 0000) File Meta Information Group Length  UL: 192
+    (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322
+    (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+    (0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2
+    (0002, 0013) Implementation Version Name         SH: 'DCTOOL100'
+    (0002, 0016) Source Application Entity Title     AE: 'CLUNIE1'
+    -------------------------------------------------
     (0008, 0005) Specific Character Set              CS: 'ISO_IR 100'
     (0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'AX
     IAL']

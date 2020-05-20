@@ -184,6 +184,18 @@
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Dropped support for Python 2 (only Python 3.5+ supported)</p></li>
+<li><p>Changes to <cite>Dataset.file_meta</cite></p>
+<ul>
+<li><p>file_meta now shown by default in dataset <cite>str</cite> or <cite>repr</cite> output;
+<a class="reference internal" href="../reference/generated/pydicom.config.show_file_meta.html#pydicom.config.show_file_meta" title="pydicom.config.show_file_meta"><code class="xref py py-data docutils literal notranslate"><span class="pre">pydicom.config.show_file_meta</span></code></a> can be set <code class="docutils literal notranslate"><span class="pre">False</span></code> to restore
+previous behavior</p></li>
+<li><p>new <a class="reference internal" href="../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a> class that accepts
+only group 2 data elements</p></li>
+<li><p>Deprecation warning given unless <cite>Dataset.file_meta</cite> set with
+a <a class="reference internal" href="../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a> object (in <em>pydicom</em> 3,
+it will be required)</p></li>
+</ul>
+</li>
 <li><p>Old <cite>PersonName</cite> class removed; <cite>PersonName3</cite> renamed to <cite>PersonName</cite>.
 Classes <cite>PersonNameUnicode</cite> and <cite>PersonName3</cite> are aliased to <cite>PersonName</cite> but
 are deprecated and will be removed in version 2.1</p></li>

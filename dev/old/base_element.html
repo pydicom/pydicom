@@ -220,15 +220,23 @@ dictionary instead of the keys normally yielded by iterating a <a class="referen
 <p>A <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> could be created directly, but you will
 usually get one by reading an existing DICOM file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># get some test data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can display the entire dataset by simply printing its string
 (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str()</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#repr" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">repr()</span></code></a>) value:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> 
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="go">(0002, 0000) File Meta Information Group Length  UL: 156</span>
+<span class="go">(0002, 0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage</span>
+<span class="go">(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023</span>
+<span class="go">(0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian</span>
+<span class="go">(0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8</span>
+<span class="go">-------------------------------------------------</span>
 <span class="go">(0008, 0012) Instance Creation Date              DA: &#39;20030903&#39;</span>
 <span class="go">(0008, 0013) Instance Creation Time              TM: &#39;150031&#39;</span>
 <span class="go">(0008, 0016) SOP Class UID                       UI: RT Plan Storage</span>
@@ -378,14 +386,14 @@ operator:</p>
 <p>To work with (7FE0,0010) <em>Pixel Data</em>, the raw <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> are available
 through the <cite>PixelData</cite> keyword:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read data with actual pixel data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_bytes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
 </pre></div>
 </div>
 <p>However its much more convenient to use
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> to return a
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> (requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> (requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> 
 <span class="go">array([[175, 180, 166, ..., 203, 207, 216],</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.dicomdir.DicomDir &mdash; pydicom 2.0.0.dev0 documentation</title>
+  <title>pydicom.dataset.FileMetaDataset &mdash; pydicom 2.0.0.dev0 documentation</title>
   
 
   
@@ -41,8 +41,8 @@
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Bulk Data Encapsulation Utilities (pydicom.encaps)" href="../encaps.html" />
-    <link rel="prev" title="DICOMDIR (pydicom.dicomdir)" href="../dicomdir.html" /> 
+    <link rel="next" title="pydicom.dataset.PrivateBlock" href="pydicom.dataset.PrivateBlock.html" />
+    <link rel="prev" title="pydicom.dataset.FileDataset" href="pydicom.dataset.FileDataset.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -110,12 +110,16 @@
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.dicomdir.DicomDir</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.Dataset.html">pydicom.dataset.Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.FileDataset.html">pydicom.dataset.FileDataset</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.dataset.FileMetaDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.PrivateBlock.html">pydicom.dataset.PrivateBlock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.validate_file_meta.html">pydicom.dataset.validate_file_meta</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
@@ -183,9 +187,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a> &raquo;</li>
+          <li><a href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a> &raquo;</li>
         
-      <li>pydicom.dicomdir.DicomDir</li>
+      <li>pydicom.dataset.FileMetaDataset</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -202,44 +206,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-dicomdir-dicomdir">
-<h1>pydicom.dicomdir.DicomDir<a class="headerlink" href="#pydicom-dicomdir-dicomdir" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-dataset-filemetadataset">
+<h1>pydicom.dataset.FileMetaDataset<a class="headerlink" href="#pydicom-dataset-filemetadataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.dicomdir.DicomDir">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dicomdir.</code><code class="sig-name descname">DicomDir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename_or_obj</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">preamble</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_meta</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_implicit_VR</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">is_little_endian</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dicomdir.py#L10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Hold a DICOMDIR dataset read from file.</p>
-<p>Derived from <a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>, but additional methods
-are available, specific to the Directory structure</p>
+<dt id="pydicom.dataset.FileMetaDataset">
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">FileMetaDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dataset.py#L2361"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains a collection (dictionary) of group 2 DICOM Data Elements.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.</span></p>
+</div>
+<p>Derived from <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, but only allows
+Group 2 (File Meta Information) data elements</p>
 <dl class="py method">
-<dt id="pydicom.dicomdir.DicomDir.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename_or_obj</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">preamble</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_meta</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_implicit_VR</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">is_little_endian</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dicomdir.py#L17"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a DICOMDIR dataset read from a DICOM file.</p>
-<p>Carries forward all the initialization from
-<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a></p>
+<dt id="pydicom.dataset.FileMetaDataset.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dataset.py#L2370"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a FileMetaDataset</p>
+<p>Parameters are as per <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>; this overrides the super class
+only to check that all are group 2 data elements</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Full path and filename to the file of <code class="docutils literal notranslate"><span class="pre">None</span></code> if
-<a class="reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BytesIO</span></code></a>.</p></li>
-<li><p><strong>dataset</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – Some form of dictionary, usually a
-<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> from
-<a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></li>
-<li><p><strong>preamble</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – The 128-byte DICOM preamble.</p></li>
-<li><p><strong>file_meta</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The file meta <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, such as
-the one returned by
-<a class="reference internal" href="pydicom.filereader.read_file_meta_info.html#pydicom.filereader.read_file_meta_info" title="pydicom.filereader.read_file_meta_info"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_file_meta_info()</span></code></a>, or an empty
-<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> if no file meta information is
-in the file.</p></li>
-<li><p><strong>is_implicit_VR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if implicit VR transfer syntax used (default); <code class="docutils literal notranslate"><span class="pre">False</span></code>
-if explicit VR.</p></li>
-<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if little endian transfer syntax used (default); <code class="docutils literal notranslate"><span class="pre">False</span></code>
-if big endian.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If any data elements are not group 2.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
 </ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference internal" href="pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><strong>InvalidDicomError</strong></a> – If the file transfer syntax is not Little Endian Explicit and
-    <a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a>
-    is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -251,17 +240,17 @@ if big endian.</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dicomdir.DicomDir.__init__" title="pydicom.dicomdir.DicomDir.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(filename_or_obj, dataset[, …])</p></td>
-<td><p>Initialize a DICOMDIR dataset read from a DICOM file.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.FileMetaDataset.__init__" title="pydicom.dataset.FileMetaDataset.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Initialize a FileMetaDataset</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code>(data_element)</p></td>
-<td><p>Add an element to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Add an element to the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_new</span></code>(tag, VR, value)</p></td>
-<td><p>Create a new element and add it to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Create a new element and add it to the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>()</p></td>
-<td><p>Delete all the elements from the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Delete all the elements from the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_pixel_data</span></code>([handler_name])</p></td>
 <td><p>Convert pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally.</p></td>
@@ -273,16 +262,16 @@ if big endian.</p></li>
 <td><p>Return the element corresponding to the element keyword <cite>name</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code>()</p></td>
-<td><p>Apply character set decoding to the elements in the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Apply character set decoding to the elements in the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code>([handler_name])</p></td>
-<td><p>Decompresses <em>Pixel Data</em> and modifies the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> in-place.</p></td>
+<td><p>Decompresses <em>Pixel Data</em> and modifies the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in-place.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dir</span></code>(*filters)</p></td>
-<td><p>Return an alphabetical list of element keywords in the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Return an alphabetical list of element keywords in the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">elements</span></code>()</p></td>
-<td><p>Yield the top-level elements of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Yield the top-level elements of the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_file_meta</span></code>()</p></td>
 <td><p>Create an empty <code class="docutils literal notranslate"><span class="pre">Dataset.file_meta</span></code> if none exists.</p></td>
@@ -291,10 +280,10 @@ if big endian.</p></li>
 <td><p>Ensure the file meta info exists and has the correct values for transfer syntax and media storage UIDs.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">formatted_lines</span></code>([element_format, …])</p></td>
-<td><p>Iterate through the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for each element.</p></td>
+<td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for each element.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code>(json_dataset[, bulk_data_uri_handler])</p></td>
-<td><p>Add elements to the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> from DICOM JSON format.</p></td>
+<td><p>Add elements to the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from DICOM JSON format.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code></p></td>
 <td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
@@ -309,67 +298,67 @@ if big endian.</p></li>
 <td><p>Return the data element for the given private tag <cite>group</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">group_dataset</span></code>(group)</p></td>
-<td><p>Return a <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> containing only elements of a certain group.</p></td>
+<td><p>Return a <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing only elements of a certain group.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
-<td><p>Return the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> items to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> items to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterall</span></code>()</p></td>
-<td><p>Iterate through the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, yielding all the elements.</p></td>
+<td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, yielding all the elements.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
-<td><p>Return the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlay_array</span></code>(group)</p></td>
 <td><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dicomdir.DicomDir.parse_records" title="pydicom.dicomdir.DicomDir.parse_records"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_records</span></code></a>()</p></td>
-<td><p>Build the hierarchy of given directory records, and structure into Patient, Studies, Series, Images hierarchy.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(key, *args)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(key, *args)</p></td>
 <td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.pop" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.pop()</span></code></a> with support for tags and keywords.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
 <td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_block</span></code>(group, private_creator[, create])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_block</span></code>(group, private_creator[, create])</p></td>
 <td><p>Return the block for the given tag <cite>group</cite> and <cite>private_creator</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_creators</span></code>(group)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_creators</span></code>(group)</p></td>
 <td><p>Return a list of private creator names in the given group.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_private_tags</span></code>()</p></td>
-<td><p>Remove all private elements from the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_private_tags</span></code>()</p></td>
+<td><p>Remove all private elements from the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as</span></code>(filename[, write_like_original])</p></td>
-<td><p>Write the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> to <cite>filename</cite>.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as</span></code>(filename[, write_like_original])</p></td>
+<td><p>Write the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to <cite>filename</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_original_encoding</span></code>(is_implicit_vr, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_original_encoding</span></code>(is_implicit_vr, …)</p></td>
 <td><p>Set the values for the original transfer syntax and encoding.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(key[, default])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(key[, default])</p></td>
 <td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.setdefault()</span></code></a> with support for tags and keywords.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([bulk_data_threshold, …])</p></td>
-<td><p>Return a JSON representation of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([bulk_data_threshold, …])</p></td>
+<td><p>Return a JSON representation of the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json_dict</span></code>([bulk_data_threshold, …])</p></td>
-<td><p>Return a dictionary representation of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> conforming to the DICOM JSON Model as described in the DICOM Standard, Part 18, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">Annex F</a>.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json_dict</span></code>([bulk_data_threshold, …])</p></td>
+<td><p>Return a dictionary representation of the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> conforming to the DICOM JSON Model as described in the DICOM Standard, Part 18, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">Annex F</a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">top</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">top</span></code>()</p></td>
 <td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> representation of the top level elements.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trait_names</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trait_names</span></code>()</p></td>
 <td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of valid names for auto-completion code.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(dictionary)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(dictionary)</p></td>
 <td><p>Extend <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> to handle DICOM tags and keywords.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.FileMetaDataset.validate" title="pydicom.dataset.FileMetaDataset.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(init_value)</p></td>
+<td><p>Raise errors if initialization value is not acceptable for file_meta</p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
-<td><p>Return the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> values to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> values to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">walk</span></code>(callback[, recursive])</p></td>
-<td><p>Iterate through the <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset's</span></code> elements and run <cite>callback</cite> on each.</p></td>
+<td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset's</span></code></a> elements and run <cite>callback</cite> on each.</p></td>
 </tr>
 </tbody>
 </table>
@@ -390,7 +379,7 @@ if big endian.</p></li>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_original_encoding</span></code></p></td>
-<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the encoding to be used for writing is set and is the same as that used to originally encode the  <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>.</p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the encoding to be used for writing is set and is the same as that used to originally encode the  <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></p></td>
 <td><p>Return the pixel data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
@@ -398,12 +387,20 @@ if big endian.</p></li>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="pydicom.dicomdir.DicomDir.parse_records">
-<code class="sig-name descname">parse_records</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dicomdir.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dicomdir.DicomDir.parse_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build the hierarchy of given directory records, and structure
-into Patient, Studies, Series, Images hierarchy.</p>
-<p>This is intended for initial read of file only,
-it will not reorganize correctly if records are changed.</p>
+<dt id="pydicom.dataset.FileMetaDataset.validate">
+<em class="property">static </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">init_value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/414bcbad/pydicom/dataset.py#L2386"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise errors if initialization value is not acceptable for file_meta</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>init_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <a class="reference external" href="tag:data">tag:data</a> element pairs to initialize a file meta dataset</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If any data elements passed are not group 2.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -418,10 +415,10 @@ it will not reorganize correctly if records are changed.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../encaps.html" class="btn btn-neutral float-right" title="Bulk Data Encapsulation Utilities (pydicom.encaps)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.dataset.PrivateBlock.html" class="btn btn-neutral float-right" title="pydicom.dataset.PrivateBlock" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../dicomdir.html" class="btn btn-neutral float-left" title="DICOMDIR (pydicom.dicomdir)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.dataset.FileDataset.html" class="btn btn-neutral float-left" title="pydicom.dataset.FileDataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

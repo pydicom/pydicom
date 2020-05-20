@@ -334,6 +334,16 @@ no matter what the contents of the file are:</p>
 </div>
 <p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
+<span class="go">(0002, 0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage</span>
+<span class="go">(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="go">(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
+<span class="go">(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
+<span class="go">(0002, 0013) Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
+<span class="go">(0002, 0016) Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
+<span class="go">-------------------------------------------------</span>
 <span class="go">(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
 <span class="go">(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
 <span class="go">(0008, 0012) Instance Creation Date              DA: &#39;20040119&#39;</span>
@@ -523,7 +533,7 @@ The answer is a file header containing:</p>
 </li>
 <li><p>Followed by a 4 byte <code class="docutils literal notranslate"><span class="pre">DICM</span></code> prefix</p></li>
 <li><p>Followed by the required DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html#table_7.1-1">File Meta Information</a> elements, which in <em>pydicom</em> are
-stored in a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance in the
+stored in a <a class="reference internal" href="../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a> instance in the
 <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a> attribute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span>
 <span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
@@ -771,7 +781,7 @@ usually this will only be the <em>Transfer Syntax UID</em>. It’s an important 
 so get in the habit of making sure it’s there and correct.</p>
 <p>Because we deleted the <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta" title="pydicom.dataset.FileDataset.file_meta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">file_meta</span></code></a> dataset
 we need to add it back:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span> <span class="o">=</span> <span class="n">FileMetaDataset</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>And now we can add our <em>Transfer Syntax UID</em> element and save to file:</p>
