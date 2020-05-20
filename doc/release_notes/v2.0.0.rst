@@ -7,6 +7,8 @@ Changelog
 * Old `PersonName` class removed; `PersonName3` renamed to `PersonName`.
   Classes `PersonNameUnicode` and `PersonName3` are aliased to `PersonName` but
   are deprecated and will be removed in version 2.1
+* ``dataelem.isMultiValue`` (previously deprecated) has been removed.
+  Use ``dataelem.DataElement.VM`` instead.
 
 Enhancements
 ............
