@@ -55,7 +55,7 @@ datasets saved as blobs in a database.
         return dataset
 
 
-    class DummyDataBase(object):
+    class DummyDataBase:
         def __init__(self):
             self._blobs = {}
 
