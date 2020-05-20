@@ -5,7 +5,7 @@
 import pydicom.env_info
 
 
-class TestEnvInfo(object):
+class TestEnvInfo:
     """Test the env_info module"""
 
     def test_report_looks_like_a_table(self, capsys):

@@ -12,7 +12,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.valuerep import PersonName
 
 
-class TestPersonName(object):
+class TestPersonName:
     def test_json_pn_from_file(self):
         with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
@@ -117,7 +117,7 @@ class TestPersonName(object):
         assert isinstance(dataelem.value, PersonName)
 
 
-class TestAT(object):
+class TestAT:
     def test_to_json(self):
         ds = Dataset()
         ds.add_new(0x00091001, 'AT', [0x00100010, 0x00100020])
@@ -158,7 +158,7 @@ class TestAT(object):
             assert 0x00100010 == ds[0x00091002].value
 
 
-class TestDataSetToJson(object):
+class TestDataSetToJson:
     def test_json_from_dicom_file(self):
         ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
         ds_json = ds1.to_json()
@@ -271,7 +271,7 @@ class TestDataSetToJson(object):
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
 
-class TestSequence(object):
+class TestSequence:
     def test_nested_sequences(self):
         test1_json = get_testdata_file("test1.json")
         with open(test1_json) as f:
@@ -283,7 +283,7 @@ class TestSequence(object):
         assert ds == ds2
 
 
-class TestBinary(object):
+class TestBinary:
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, 'OB', b'BinaryContent')

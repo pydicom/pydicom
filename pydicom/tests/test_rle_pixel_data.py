@@ -189,7 +189,7 @@ REFERENCE_DATA_UNSUPPORTED = [
 
 # Numpy and the RLE handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoRLEHandler(object):
+class TestNoNumpy_NoRLEHandler:
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
@@ -234,7 +234,7 @@ class TestNoNumpy_NoRLEHandler(object):
 
 # Numpy unavailable and the RLE handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_RLEHandler(object):
+class TestNoNumpy_RLEHandler:
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
@@ -292,7 +292,7 @@ class TestNoNumpy_RLEHandler(object):
 
 # Numpy is available, the RLE handler is unavailable
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_NoRLEHandler(object):
+class TestNumpy_NoRLEHandler:
     """Tests for handling datasets with no handler."""
     def setup(self):
         """Setup the environment."""
@@ -337,7 +337,7 @@ class TestNumpy_NoRLEHandler(object):
 
 # Numpy and the RLE handler are available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEHandler(object):
+class TestNumpy_RLEHandler:
     """Tests for handling datasets with the handler."""
     def setup(self):
         """Setup the environment."""
@@ -717,7 +717,7 @@ class TestNumpy_RLEHandler(object):
 
 # Tests for rle_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_GetPixelData(object):
+class TestNumpy_GetPixelData:
     """Tests for rle_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
@@ -822,7 +822,7 @@ HEADER_DATA = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEParseHeader(object):
+class TestNumpy_RLEParseHeader:
     """Tests for rle_handler._parse_rle_header."""
     def test_invalid_header_length(self):
         """Test exception raised if header is not 64 bytes long."""
@@ -851,7 +851,7 @@ class TestNumpy_RLEParseHeader(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEDecodeFrame(object):
+class TestNumpy_RLEDecodeFrame:
     """Tests for rle_handler._rle_decode_frame."""
     def test_unsupported_bits_allocated_raises(self):
         """Test exception raised for BitsAllocated not a multiple of 8."""
@@ -1048,7 +1048,7 @@ class TestNumpy_RLEDecodeFrame(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEDecodeSegment(object):
+class TestNumpy_RLEDecodeSegment:
     """Tests for rle_handler._rle_decode_segment.
 
     Using int8
@@ -1196,7 +1196,7 @@ REFERENCE_ENCODE_ROW = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeRow(object):
+class TestNumpy_RLEEncodeRow:
     """Tests for rle_handler._rle_encode_row."""
     @pytest.mark.parametrize('input, output', REFERENCE_ENCODE_ROW)
     def test_encode(self, input, output):
@@ -1205,7 +1205,7 @@ class TestNumpy_RLEEncodeRow(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeFrame(object):
+class TestNumpy_RLEEncodeFrame:
     """Tests for rle_handler.rle_encode_frame."""
     def setup(self):
         """Setup the tests."""
@@ -1417,7 +1417,7 @@ class TestNumpy_RLEEncodeFrame(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodePlane(object):
+class TestNumpy_RLEEncodePlane:
     """Tests for rle_handler._rle_encode_plane."""
     def test_8bit(self):
         """Test encoding an 8-bit plane into 1 segment."""
@@ -1630,7 +1630,7 @@ class TestNumpy_RLEEncodePlane(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeSegment(object):
+class TestNumpy_RLEEncodeSegment:
     """Tests for rle_handler._rle_encode_segment."""
     def test_one_row(self):
         """Test encoding data that contains only a single row."""

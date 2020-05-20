@@ -11,7 +11,7 @@ from pydicom.values import (
 )
 
 
-class TestConvertTag(object):
+class TestConvertTag:
     def test_big_endian(self):
         """Test convert_tag with a big endian byte string"""
         bytestring = b'\x00\x10\x00\x20'
@@ -41,13 +41,13 @@ class TestConvertTag(object):
         convert_tag(bytestring, True)
 
 
-class TestConvertAE(object):
+class TestConvertAE:
     def test_strip_blanks(self):
         bytestring = b'  AE_TITLE '
         assert u'AE_TITLE' == convert_AE_string(bytestring, True)
 
 
-class TestConvertText(object):
+class TestConvertText:
     def test_single_value(self):
         """Test that encoding can change inside a text string"""
         bytestring = (b'Dionysios is \x1b\x2d\x46'
@@ -103,7 +103,7 @@ class TestConvertText(object):
         assert ['Values', 'with zeros'] == convert_text(bytestring)
 
 
-class TestConvertAT(object):
+class TestConvertAT:
     def test_big_endian(self):
         """Test convert_ATvalue with a big endian byte string"""
         # VM 1
@@ -145,7 +145,7 @@ class TestConvertAT(object):
         convert_ATvalue(bytestring, True)
 
 
-class TestConvertDA(object):
+class TestConvertDA:
     def test_big_endian(self):
         """Test convert_DA_string with a big endian byte string"""
         # VM 1
@@ -176,7 +176,7 @@ class TestConvertDA(object):
         assert convert_DA_string(bytestring, True) == ''
 
 
-class TestConvertValue(object):
+class TestConvertValue:
     def test_convert_value_raises(self):
         """Test convert_value raises exception if unsupported VR"""
         converter_func = converters['PN']
@@ -191,7 +191,7 @@ class TestConvertValue(object):
         assert 'PN' in converters
 
 
-class TestConvertOValues(object):
+class TestConvertOValues:
     """Test converting values with the 'O' VRs like OB, OW, OF, etc."""
     def test_convert_of(self):
         """Test converting OF."""

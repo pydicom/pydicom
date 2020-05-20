@@ -14,7 +14,7 @@ from pydicom.datadict import (keyword_for_tag, dictionary_description,
 from pydicom.datadict import add_dict_entry, add_dict_entries
 
 
-class TestDict(object):
+class TestDict:
     def test_tag_not_found(self):
         """dicom_dictionary: CleanName returns blank string for unknown tag"""
         assert '' == keyword_for_tag(0x99991111)

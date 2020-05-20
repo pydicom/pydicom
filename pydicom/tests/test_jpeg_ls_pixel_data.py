@@ -67,7 +67,7 @@ SUPPORTED_HANDLER_NAMES = (
     'jpegls', 'jpeg_ls', 'JPEG_LS', 'jpegls_handler', 'JPEG_LS_Handler'
 )
 
-class TestJPEGLS_no_jpeg_ls(object):
+class TestJPEGLS_no_jpeg_ls:
     def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -84,7 +84,7 @@ class TestJPEGLS_no_jpeg_ls(object):
             self.jpeg_ls_lossless.pixel_array
 
 
-class TestJPEGLS_JPEG2000_no_jpeg_ls(object):
+class TestJPEGLS_JPEG2000_no_jpeg_ls:
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -108,7 +108,7 @@ class TestJPEGLS_JPEG2000_no_jpeg_ls(object):
             self.emri_jpeg_2k_lossless.pixel_array
 
 
-class TestJPEGLS_JPEGlossy_no_jpeg_ls(object):
+class TestJPEGLS_JPEGlossy_no_jpeg_ls:
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -133,7 +133,7 @@ class TestJPEGLS_JPEGlossy_no_jpeg_ls(object):
             self.color_3d_jpeg.pixel_array
 
 
-class TestJPEGLS_JPEGlossless_no_jpeg_ls(object):
+class TestJPEGLS_JPEGlossless_no_jpeg_ls:
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -157,7 +157,7 @@ class TestJPEGLS_JPEGlossless_no_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class TestJPEGLS_JPEG_LS_with_jpeg_ls(object):
+class TestJPEGLS_JPEG_LS_with_jpeg_ls:
     def setup(self):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -195,7 +195,7 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class TestJPEGLS_JPEG2000_with_jpeg_ls(object):
+class TestJPEGLS_JPEG2000_with_jpeg_ls:
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -218,7 +218,7 @@ class TestJPEGLS_JPEG2000_with_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class TestJPEGLS_JPEGlossy_with_jpeg_ls(object):
+class TestJPEGLS_JPEGlossy_with_jpeg_ls:
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -243,7 +243,7 @@ class TestJPEGLS_JPEGlossy_with_jpeg_ls(object):
 
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
-class TestJPEGLS_JPEGlossless_with_jpeg_ls(object):
+class TestJPEGLS_JPEGlossless_with_jpeg_ls:
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers

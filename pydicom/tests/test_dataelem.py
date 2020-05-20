@@ -24,7 +24,7 @@ from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
 
 
-class TestDataElement(object):
+class TestDataElement:
     """Tests for dataelem.DataElement."""
     def setup(self):
         self.data_elementSH = DataElement((1, 2), "SH", "hello")
@@ -511,7 +511,7 @@ class TestDataElement(object):
         assert elem.value == []
 
 
-class TestRawDataElement(object):
+class TestRawDataElement:
     """Tests for dataelem.RawDataElement."""
     def test_key_error(self):
         """RawDataElement: conversion of unknown tag throws KeyError..."""

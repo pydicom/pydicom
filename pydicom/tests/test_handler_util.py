@@ -61,7 +61,7 @@ VOI_08_1F = get_testdata_files("vlut_04.dcm")[0]
 
 # Tests with Numpy unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy(object):
+class TestNoNumpy:
     """Tests for the util functions without numpy."""
     def test_pixel_dtype_raises(self):
         """Test that pixel_dtype raises exception without numpy."""
@@ -88,7 +88,7 @@ REFERENCE_DTYPE = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PixelDtype(object):
+class TestNumpy_PixelDtype:
     """Tests for util.pixel_dtype."""
     def setup(self):
         """Setup the test dataset."""
@@ -275,7 +275,7 @@ if HAVE_NP:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ReshapePixelArray(object):
+class TestNumpy_ReshapePixelArray:
     """Tests for util.reshape_pixel_array."""
     def setup(self):
         """Setup the test dataset."""
@@ -527,7 +527,7 @@ class TestNumpy_ReshapePixelArray(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ConvertColourSpace(object):
+class TestNumpy_ConvertColourSpace:
     """Tests for util.convert_color_space."""
     def test_unknown_current_raises(self):
         """Test an unknown current color space raises exception."""
@@ -635,7 +635,7 @@ class TestNumpy_ConvertColourSpace(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_DtypeCorrectedForEndianness(object):
+class TestNumpy_DtypeCorrectedForEndianness:
     """Tests for util.dtype_corrected_for_endianness."""
     def test_byte_swapping(self):
         """Test that the endianess of the system is taken into account."""
@@ -736,7 +736,7 @@ REFERENCE_LENGTH = [
 ]
 
 
-class TestGetExpectedLength(object):
+class TestGetExpectedLength:
     """Tests for util.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
@@ -785,7 +785,7 @@ class TestGetExpectedLength(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ModalityLUT(object):
+class TestNumpy_ModalityLUT:
     """Tests for util.apply_modality_lut()."""
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
@@ -890,7 +890,7 @@ class TestNumpy_ModalityLUT(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PaletteColor(object):
+class TestNumpy_PaletteColor:
     """Tests for util.apply_color_lut()."""
     def setup(self):
         """Setup the tests"""
@@ -1191,7 +1191,7 @@ class TestNumpy_PaletteColor(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ExpandSegmentedLUT(object):
+class TestNumpy_ExpandSegmentedLUT:
     """Tests for util._expand_segmented_lut()."""
     def test_discrete(self):
         """Test expanding a discrete segment."""
@@ -1412,7 +1412,7 @@ class TestNumpy_ExpandSegmentedLUT(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_VOILUT(object):
+class TestNumpy_VOILUT:
     """Tests for util.apply_voi_lut()."""
     def test_voi_single_view(self):
         """Test VOI LUT with a single view."""

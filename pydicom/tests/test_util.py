@@ -32,7 +32,7 @@ raw_hex_module = os.path.join(test_dir, '_write_stds.py')
 raw_hex_code = open(raw_hex_module, "rb").read()
 
 
-class TestCodify(object):
+class TestCodify:
     """Test the utils.codify module"""
     def test_camel_to_underscore(self):
         """Test utils.codify.camel_to_underscore"""
@@ -143,7 +143,7 @@ class TestCodify(object):
         assert r"c:\temp\testout.dcm" in out
 
 
-class TestDump(object):
+class TestDump:
     """Test the utils.dump module"""
     def test_print_character(self):
         """Test utils.dump.print_character"""
@@ -173,7 +173,7 @@ class TestDump(object):
         pass
 
 
-class TestFixer(object):
+class TestFixer:
     """Test the utils.fixer module"""
     def test_fix_separator_callback(self):
         """Test utils.fixer.fix_separator_callback"""
@@ -192,7 +192,7 @@ class TestFixer(object):
         pass
 
 
-class TestHexUtil(object):
+class TestHexUtil:
     """Test the utils.hexutil module"""
     def test_hex_to_bytes(self):
         """Test utils.hexutil.hex2bytes"""
@@ -227,7 +227,7 @@ class TestHexUtil(object):
         assert hexstring == bytes2hex(bytestring)
 
 
-class TestDataElementCallbackTests(object):
+class TestDataElementCallbackTests:
     def setup(self):
         # Set up a dataset with commas in one item instead of backslash
         config.enforce_valid_values = True
