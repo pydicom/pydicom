@@ -60,7 +60,7 @@ class TestCodify(object):
     def test_code_imports(self):
         """Test utils.codify.code_imports"""
         out = 'import pydicom\n'
-        out += 'from pydicom.dataset import Dataset\n'
+        out += 'from pydicom.dataset import Dataset, FileMetaDataset\n'
         out += 'from pydicom.sequence import Sequence'
         assert out == code_imports()
 

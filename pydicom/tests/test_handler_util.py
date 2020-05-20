@@ -15,7 +15,7 @@ except ImportError:
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_files, get_palette_files
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
@@ -93,7 +93,7 @@ class TestNumpy_PixelDtype(object):
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     def test_unknown_pixel_representation_raises(self):
@@ -280,7 +280,7 @@ class TestNumpy_ReshapePixelArray(object):
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         self.ds.Rows = 4
         self.ds.Columns = 5
@@ -889,7 +889,6 @@ class TestNumpy_ModalityLUT(object):
         assert 58974 == out[291, 385]
 
 
-
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PaletteColor(object):
     """Tests for util.apply_color_lut()."""
@@ -991,7 +990,7 @@ class TestNumpy_PaletteColor(object):
     def test_uint08_16(self):
         """Test uint8 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         assert 8 == ds.BitsStored
         assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
@@ -1084,7 +1083,7 @@ class TestNumpy_PaletteColor(object):
     def test_16_allocated_8_entries(self):
         """Test LUT with 8-bit entries in 16 bits allocated."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor = [200, 0, 8]
         lut = pack('<200H', *list(range(0, 200)))
@@ -1148,7 +1147,7 @@ class TestNumpy_PaletteColor(object):
     def test_first_map_positive(self):
         """Test a positive first mapping value."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor[1] = 10
         arr = ds.pixel_array
@@ -1166,7 +1165,7 @@ class TestNumpy_PaletteColor(object):
     def test_first_map_negative(self):
         """Test a positive first mapping value."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor[1] = -10
         arr = ds.pixel_array

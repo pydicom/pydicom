@@ -71,7 +71,7 @@ def code_imports():
 
     """
     line1 = "import pydicom"
-    line2 = "from pydicom.dataset import Dataset"
+    line2 = "from pydicom.dataset import Dataset, FileMetaDataset"
     line3 = "from pydicom.sequence import Sequence"
     return line_term.join((line1, line2, line3))
 
@@ -199,7 +199,8 @@ def code_sequence(dataelem,
 def code_dataset(ds,
                  dataset_name="ds",
                  exclude_size=None,
-                 include_private=False):
+                 include_private=False,
+                 is_file_meta=False):
     """Return python code lines for import statements needed by other code
 
     :arg exclude_size: if specified, values longer than this (in bytes)
@@ -212,7 +213,8 @@ def code_dataset(ds,
 
     """
     lines = []
-    lines.append(dataset_name + " = Dataset()")
+    ds_class = " = FileMetaDataset()" if is_file_meta else " = Dataset()"
+    lines.append(dataset_name + ds_class)
     for dataelem in ds:
         # If a private data element and flag says so, skip it and go to next
         if not include_private and dataelem.tag.is_private:
@@ -259,7 +261,7 @@ def code_file(filename, exclude_size=None, include_private=False):
     # Code the file_meta information
     lines.append("# File meta info data elements")
     code_meta = code_dataset(ds.file_meta, "file_meta", exclude_size,
-                             include_private)
+                             include_private, is_file_meta=True)
     lines.append(code_meta)
     lines.append('')
 

@@ -27,15 +27,23 @@ A :class:`~dataset.Dataset` could be created directly, but you will
 usually get one by reading an existing DICOM file::
 
   >>> import pydicom
-  >>> from pydicom.data import get_testdata_files
+  >>> from pydicom.data import get_testdata_file
   >>> # get some test data
-  >>> filename = get_testdata_files("rtplan.dcm")[0]
+  >>> filename = get_testdata_file("rtplan.dcm")
   >>> ds = pydicom.dcmread(filename)
 
 You can display the entire dataset by simply printing its string
 (:class:`str()<str>` or :func:`repr`) value::
 
   >>> ds # doctest: +ELLIPSIS
+  Dataset.file_meta -------------------------------
+  (0002, 0000) File Meta Information Group Length  UL: 156
+  (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+  (0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage
+  (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023
+  (0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
+  (0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8
+  -------------------------------------------------
   (0008, 0012) Instance Creation Date              DA: '20030903'
   (0008, 0013) Instance Creation Time              TM: '150031'
   (0008, 0016) SOP Class UID                       UI: RT Plan Storage
@@ -185,7 +193,7 @@ To work with (7FE0,0010) *Pixel Data*, the raw :class:`bytes` are available
 through the `PixelData` keyword::
 
   >>> # read data with actual pixel data
-  >>> filename = get_testdata_files("CT_small.dcm")[0]
+  >>> filename = get_testdata_file("CT_small.dcm")
   >>> ds = pydicom.dcmread(filename)
   >>> pixel_bytes = ds.PixelData
 

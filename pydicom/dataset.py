@@ -22,6 +22,7 @@ from itertools import takewhile
 import json
 import os
 import os.path
+import warnings
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -1673,6 +1674,11 @@ class Dataset(dict):
         It is also used by ``top()``, therefore the `top_level_only` flag.
         This function recurses, with increasing indentation levels.
 
+        ..versionchanged:: 2.0
+
+            The file meta information is returned in its own section,
+            if :data:`~pydicom.config.show_file_meta` is ``True`` (default)
+
         Parameters
         ----------
         indent : int, optional
@@ -1689,6 +1695,20 @@ class Dataset(dict):
         strings = []
         indent_str = self.indent_chars * indent
         nextindent_str = self.indent_chars * (indent + 1)
+
+        # Display file meta, if configured to do so, and have a non-empty one
+        if (
+            hasattr(self, "file_meta")
+            and self.file_meta is not None
+            and len(self.file_meta) > 0
+            and pydicom.config.show_file_meta
+        ):
+            strings.append("Dataset.file_meta -------------------------------")
+            for data_element in self.file_meta:
+                with tag_in_exception(data_element.tag):
+                    strings.append(indent_str + repr(data_element))
+            strings.append("-------------------------------------------------")
+
         for data_element in self:
             with tag_in_exception(data_element.tag):
                 if data_element.VR == "SQ":  # a sequence
@@ -1733,7 +1753,9 @@ class Dataset(dict):
 
         .. versionadded:: 1.2
         """
-        self.file_meta = getattr(self, 'file_meta', Dataset())
+        # Changed in v2.0 so does not re-assign self.file_meta with getattr()
+        if not hasattr(self, "file_meta"):
+            self.file_meta = FileMetaDataset()
 
     def fix_meta_info(self, enforce_standard=True):
         """Ensure the file meta info exists and has the correct values
@@ -1808,11 +1830,24 @@ class Dataset(dict):
                              'element and must be added using '
                              'the add() or add_new() methods.'
                              .format(name))
+        elif name == "file_meta":
+            self._set_file_meta(value)
         else:
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
+
+    def _set_file_meta(self, value):
+        if value is not None and not isinstance(value, FileMetaDataset):
+            FileMetaDataset.validate(value)
+            warnings.warn(
+                "Starting in pydicom 3.0, Dataset.file_meta must be a "
+                "FileMetaDataset class instance",
+                DeprecationWarning
+            )
+
+        self.__dict__["file_meta"] = value
 
     def __setitem__(self, key, value):
         """Operator for Dataset[key] = value.
@@ -1912,7 +1947,14 @@ class Dataset(dict):
             return all_tags[i_start:i_stop:step]
 
     def __str__(self):
-        """Handle str(dataset)."""
+        """Handle str(dataset).
+
+        ..versionchanged:: 2.0
+
+            The file meta information was added in its own section,
+            if :data:`pydicom.config.show_file_meta` is ``True``
+
+        """
         return self._pretty_str()
 
     def top(self):
@@ -2142,9 +2184,10 @@ class FileDataset(Dataset):
     preamble : str or bytes or None
         The optional DICOM preamble prepended to the :class:`FileDataset`, if
         available.
-    file_meta : Dataset or None
-        The Dataset's file meta information as a :class:`Dataset`, if available
-        (``None`` if not present). Consists of group ``0x0002`` elements.
+    file_meta : FileMetaDataset or None
+        The Dataset's file meta information as a :class:`FileMetaDataset`,
+        if available (``None`` if not present).
+        Consists of group ``0x0002`` elements.
     filename : str or None
         The filename that the :class:`FileDataset` was read from (if read from
         file) or ``None`` if the filename is not available (if read from a
@@ -2313,3 +2356,90 @@ def validate_file_meta(file_meta, enforce_standard=True):
             for tag in missing:
                 msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
             raise ValueError(msg[:-1])  # Remove final newline
+
+
+class FileMetaDataset(Dataset):
+    """Contains a collection (dictionary) of group 2 DICOM Data Elements.
+
+    .. versionadded:: 2.0
+
+    Derived from :class:`~pydicom.dataset.Dataset`, but only allows
+    Group 2 (File Meta Information) data elements
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize a FileMetaDataset
+
+        Parameters are as per :class:`Dataset`; this overrides the super class
+        only to check that all are group 2 data elements
+
+        Raises
+        ------
+        ValueError
+            If any data elements are not group 2.
+        TypeError
+            If the passed argument is not a :class:`dict` or :class:`Dataset`
+        """
+        super().__init__(*args, **kwargs)
+        FileMetaDataset.validate(self._dict)
+
+    @staticmethod
+    def validate(init_value):
+        """Raise errors if initialization value is not acceptable for file_meta
+
+        Parameters
+        ----------
+        init_value: dict or Dataset
+            The tag:data element pairs to initialize a file meta dataset
+
+        Raises
+        ------
+        TypeError
+            If the passed argument is not a :class:`dict` or :class:`Dataset`
+        ValueError
+            If any data elements passed are not group 2.
+        """
+        if init_value is None:
+            return
+
+        if not isinstance(init_value, (Dataset, dict)):
+            raise TypeError(
+                "Argument must be a dict or Dataset, not {}".format(
+                    type(init_value)
+                )
+            )
+
+        non_group2 = [
+            Tag(tag) for tag in init_value.keys() if Tag(tag).group != 2
+        ]
+        if non_group2:
+            msg = "Attempted to set non-group 2 elements: {}"
+            raise ValueError(msg.format(non_group2))
+
+    def __setitem__(self, key, value):
+        """Override parent class to only allow setting of group 2 elements.
+
+        Parameters
+        ----------
+        key : int or Tuple[int, int] or str
+            The tag for the element to be added to the Dataset.
+        value : dataelem.DataElement or dataelem.RawDataElement
+            The element to add to the :class:`FileMetaDataset`.
+
+        Raises
+        ------
+        ValueError
+            If `key` is not a DICOM Group 2 tag.
+        """
+
+        if isinstance(value.tag, BaseTag):
+            tag = value.tag
+        else:
+            tag = Tag(value.tag)
+
+        if tag.group != 2:
+            raise ValueError(
+                "Only group 2 data elements are allowed in a FileMetaDataset"
+            )
+
+        super().__setitem__(key, value)
