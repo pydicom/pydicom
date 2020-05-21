@@ -28,32 +28,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpu4ku5hkg.dcm
+    Writing test file /tmp/tmpqmri4w8c.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpkpyf9tqt.dcm
-    Load file /tmp/tmpu4ku5hkg.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmput8a6vdm.dcm
+    Load file /tmp/tmpqmri4w8c.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20200520'
-    (0008, 0033) Content Time                        TM: '213251.672914'
+    (0008, 0023) Content Date                        DA: '20200521'
+    (0008, 0033) Content Time                        TM: '192325.619720'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpu4ku5hkg.dcm ...
-    Load file /tmp/tmpkpyf9tqt.dcm ...
+    Remove file /tmp/tmpqmri4w8c.dcm ...
+    Load file /tmp/tmput8a6vdm.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20200520'
-    (0008, 0033) Content Time                        TM: '213251.672914'
+    (0008, 0023) Content Date                        DA: '20200521'
+    (0008, 0033) Content Time                        TM: '192325.619720'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpkpyf9tqt.dcm ...
+    Remove file /tmp/tmput8a6vdm.dcm ...
 
 
 
