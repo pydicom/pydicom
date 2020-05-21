@@ -46,18 +46,13 @@ Based on Rickard Holmberg's docbook_to_dict2013.py.
 
 import os
 import xml.etree.ElementTree as ET
-
-try:
-    import urllib2
-    # python2
-
-except ImportError:
-    import urllib.request as urllib2
-    # python3
+import urllib.request as urllib2
 
 
 _DIRECTORY = os.path.dirname(__file__)
-PYDICOM_DICT_FILENAME = os.path.join(_DIRECTORY, '../../pydicom/_dicom_dict.py')
+PYDICOM_DICT_FILENAME = os.path.join(
+    _DIRECTORY, '../../pydicom/_dicom_dict.py'
+)
 MAIN_DICT_NAME = 'DicomDictionary'
 MASK_DICT_NAME = 'RepeatersDictionary'
 
