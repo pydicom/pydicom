@@ -1,0 +1,6 @@
+pydicom.datadict.dictionary\_has\_tag
+=====================================
+
+.. currentmodule:: pydicom.datadict
+
+.. autofunction:: dictionary_has_tag

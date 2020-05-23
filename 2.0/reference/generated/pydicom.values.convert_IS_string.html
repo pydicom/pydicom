@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.values.convert_IS_string &mdash; pydicom 2.0.0-rc.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.values.convert_numbers" href="pydicom.values.convert_numbers.html" />
+    <link rel="prev" title="pydicom.values.convert_DT_string" href="pydicom.values.convert_DT_string.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_AE_string.html">pydicom.values.convert_AE_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_ATvalue.html">pydicom.values.convert_ATvalue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DA_string.html">pydicom.values.convert_DA_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DS_string.html">pydicom.values.convert_DS_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DT_string.html">pydicom.values.convert_DT_string</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.values.convert_IS_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_numbers.html">pydicom.values.convert_numbers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OBvalue.html">pydicom.values.convert_OBvalue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OWvalue.html">pydicom.values.convert_OWvalue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_PN.html">pydicom.values.convert_PN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_single_string.html">pydicom.values.convert_single_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_SQ.html">pydicom.values.convert_SQ</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_string.html">pydicom.values.convert_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_tag.html">pydicom.values.convert_tag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_text.html">pydicom.values.convert_text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_TM_string.html">pydicom.values.convert_TM_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UI.html">pydicom.values.convert_UI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UN.html">pydicom.values.convert_UN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UR_string.html">pydicom.values.convert_UR_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_value.html">pydicom.values.convert_value</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
+        
+          <li><a href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.values.convert_IS_string</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-values-convert-is-string">
+<h1>pydicom.values.convert_IS_string<a class="headerlink" href="#pydicom-values-convert-is-string" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pydicom.values.convert_IS_string">
+<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_IS_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">byte_string</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">struct_format</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/values.py#L245"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_IS_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a decoded ‘IS’ value.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.0: </span>The option to return numpy values was added.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>byte_string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The encoded ‘IS’ element value.</p></li>
+<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the value is encoded as little endian, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></li>
+<li><p><strong>struct_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Not used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>If <a class="reference internal" href="pydicom.config.use_IS_numpy.html#pydicom.config.use_IS_numpy" title="pydicom.config.use_IS_numpy"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_IS_numpy</span></code></a> is <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), returns
+a single <a class="reference internal" href="pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IS</span></code></a> or a list of them</p>
+<p>If <a class="reference internal" href="pydicom.config.use_IS_numpy.html#pydicom.config.use_IS_numpy" title="pydicom.config.use_IS_numpy"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_IS_numpy</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, returns
+a single <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.int64</span></code> or a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> of them</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IS</span></code></a> or list of them, or <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.int64</span></code> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> of them</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <a class="reference internal" href="pydicom.config.use_IS_numpy.html#pydicom.config.use_IS_numpy" title="pydicom.config.use_IS_numpy"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_IS_numpy</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and the string
+    contains non-valid characters</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.8)"><strong>ImportError</strong></a> – If <a class="reference internal" href="pydicom.config.use_IS_numpy.html#pydicom.config.use_IS_numpy" title="pydicom.config.use_IS_numpy"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_IS_numpy</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and numpy is not
+    available</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom.values.convert_numbers.html" class="btn btn-neutral float-right" title="pydicom.values.convert_numbers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.values.convert_DT_string.html" class="btn btn-neutral float-left" title="pydicom.values.convert_DT_string" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

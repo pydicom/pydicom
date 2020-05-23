@@ -1,0 +1,6 @@
+pydicom.fileutil.find\_bytes
+============================
+
+.. currentmodule:: pydicom.fileutil
+
+.. autofunction:: find_bytes

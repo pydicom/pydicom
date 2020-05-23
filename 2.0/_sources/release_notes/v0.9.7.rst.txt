@@ -1,0 +1,61 @@
+Version 0.9.7
+=============
+
+Changelog
+---------
+
+pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
+compatibility. ** It is the last version which will run with Python < 2.6 **
+(it will run with Python 2.4 to Python 2.7)
+
+Major changes
+.............
+
+* Added DICOM 2011 keywords. Old "named tags" still work, but will be
+  deprecated in future versions. Most names are identical, but some have changed.
+  For example:
+
+  * SamplesperPixel becomes SamplesPerPixel (capital 'P' on 'Per')
+  * Beams becomes BeamSequence (and similar for all sequences)
+  * Decimal and integer strings handled much better (revisions 4ed698a7bfbe and
+    c313d2befb08).
+  * New classes for VR of types DS and IS (DS is derived from Python Decimal)
+  * New MultiValue class, enforcing all values of same type
+  * New config.py file with user-definable parameters:
+  * allow_DS_float (default False) for controlling whether float values can be
+    used to construct DS or IS strings.
+  * enforce_valid_values (default True) for ensuring IS, DS meet DICOM standard
+    limits To change these, use 'import dicom.config, then
+    dicom.config.<parameter>={True|False}' before setting values of data elements
+
+Users are encouraged to switch to the official DICOM keywords, as these are now
+part of the standard, and promote consistency across programming languages and
+libraries.
+
+Bug fixes
+.........
+
+* New way to read file meta information, not using the group length, instead
+  reading until end of group 2 data elements. If group length dose not match,
+  log a warning (revision b6b3658f3b14).
+* Fix bug in copying raw private data elements (issue 98)
+* Force logging level to warning on 'import dicom' (issue 102)
+* Deferred read fixed to work with gzipped files (issue 103)
+* Setting individual items in a DS or IS list now saves to file correctly
+* Japanese and Korean encoding fixes (issue 110)
+
+Other Enhancements
+..................
+
+* New Sequence class which verifies items are Datasets (issue 52)
+* Assignment to SQ data element checks value is a Sequence or can be converted
+  to one (issue 111)
+* dir(ds) now includes methods and properties as well as DICOM named tags. Work
+  only on Python >= 2.6 as previous versions do not call __dir__ method
+  (issue 95)
+* Added much more debugging info and simplified reading of data elements
+  (revision b6b3658f3b14)
+* updated example files to DICOM 2011 keywords; fixed bugs
+
+Many of the bug fixes/enhancements were submitted by users. Many thanks to
+those who contributed.

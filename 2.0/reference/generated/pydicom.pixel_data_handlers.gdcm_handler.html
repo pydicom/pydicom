@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.pixel_data_handlers.gdcm_handler &mdash; pydicom 2.0.0-rc.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.pixel_data_handlers.jpeg_ls_handler" href="pydicom.pixel_data_handlers.jpeg_ls_handler.html" />
+    <link rel="prev" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" href="../handlers.pixel_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlay_data_handlers</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.gdcm_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.jpeg_ls_handler.html">pydicom.pixel_data_handlers.jpeg_ls_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.numpy_handler.html">pydicom.pixel_data_handlers.numpy_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.pillow_handler.html">pydicom.pixel_data_handlers.pillow_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.rle_handler.html">pydicom.pixel_data_handlers.rle_handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../handlers.html">Bulk Data Handlers</a> &raquo;</li>
+        
+          <li><a href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.pixel_data_handlers.gdcm_handler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-pydicom.pixel_data_handlers.gdcm_handler">
+<span id="pydicom-pixel-data-handlers-gdcm-handler"></span><h1>pydicom.pixel_data_handlers.gdcm_handler<a class="headerlink" href="#module-pydicom.pixel_data_handlers.gdcm_handler" title="Permalink to this headline">¶</a></h1>
+<p>Use the <a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> Python package to decode
+pixel transfer syntaxes.</p>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.create_data_element" title="pydicom.pixel_data_handlers.gdcm_handler.create_data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_data_element</span></code></a>(dicom_dataset)</p></td>
+<td><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.DataElement</span></code> for the <em>Pixel Data</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.create_image" title="pydicom.pixel_data_handlers.gdcm_handler.create_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_image</span></code></a>(dicom_dataset, data_element)</p></td>
+<td><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.Image</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.create_image_reader" title="pydicom.pixel_data_handlers.gdcm_handler.create_image_reader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_image_reader</span></code></a>(filename)</p></td>
+<td><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.ImageReader</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.get_pixeldata" title="pydicom.pixel_data_handlers.gdcm_handler.get_pixeldata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pixeldata</span></code></a>(dicom_dataset)</p></td>
+<td><p>Use the GDCM package to decode <em>Pixel Data</em>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.is_available" title="pydicom.pixel_data_handlers.gdcm_handler.is_available"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_available</span></code></a>()</p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.needs_to_convert_to_RGB" title="pydicom.pixel_data_handlers.gdcm_handler.needs_to_convert_to_RGB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">needs_to_convert_to_RGB</span></code></a>(dicom_dataset)</p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to RGB.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.should_change_PhotometricInterpretation_to_RGB" title="pydicom.pixel_data_handlers.gdcm_handler.should_change_PhotometricInterpretation_to_RGB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></code></a>(…)</p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed to RGB.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.gdcm_handler.supports_transfer_syntax" title="pydicom.pixel_data_handlers.gdcm_handler.supports_transfer_syntax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supports_transfer_syntax</span></code></a>(transfer_syntax)</p></td>
+<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.create_data_element">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">create_data_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.create_data_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.DataElement</span></code> for the <em>Pixel Data</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dicom_dataset</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the <em>Pixel
+Data</em>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The converted <em>Pixel Data</em> element.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gdcm.DataElement</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.create_image">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">create_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em>, <em class="sig-param"><span class="n">data_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L126"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.create_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.Image</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dicom_dataset</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing the Image
+Pixel module.</p></li>
+<li><p><strong>data_element</strong> (<em>gdcm.DataElement</em>) – The <code class="docutils literal notranslate"><span class="pre">gdcm.DataElement</span></code> <em>Pixel Data</em> element.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gdcm.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.create_image_reader">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">create_image_reader</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L164"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.create_image_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <code class="docutils literal notranslate"><span class="pre">gdcm.ImageReader</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>unicode</em>) – The path to the DICOM dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gdcm.ImageReader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.get_pixeldata">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L181"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the GDCM package to decode <em>Pixel Data</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A correctly sized (but not shaped) array of the entire data volume</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a></p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.8)"><strong>ImportError</strong></a> – If the required packages are not available.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the image could not be read by GDCM or if the <em>Pixel Data</em> type is
+    unsupported.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If the decoded amount of data does not match the expected amount.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.is_available">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L49"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.needs_to_convert_to_RGB">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L54"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
+RGB.</p>
+<p>This affects JPEG transfer syntaxes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.should_change_PhotometricInterpretation_to_RGB">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L66"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
+to RGB.</p>
+<p>This affects JPEG transfer syntaxes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pydicom.pixel_data_handlers.gdcm_handler.supports_transfer_syntax">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.gdcm_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/gdcm_handler.py#L78"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.gdcm_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>transfer_syntax</strong> (<a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><em>uid.UID</em></a>) – The Transfer Syntax UID of the <em>Pixel Data</em> that is to be used with
+the handler.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom.pixel_data_handlers.jpeg_ls_handler.html" class="btn btn-neutral float-right" title="pydicom.pixel_data_handlers.jpeg_ls_handler" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../handlers.pixel_data.html" class="btn btn-neutral float-left" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

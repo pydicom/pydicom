@@ -1,0 +1,6 @@
+pydicom.charset.encode\_string
+==============================
+
+.. currentmodule:: pydicom.charset
+
+.. autofunction:: encode_string

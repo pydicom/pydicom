@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.encaps.generate_pixel_data &mdash; pydicom 2.0.0-rc.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.encaps.generate_pixel_data_fragment" href="pydicom.encaps.generate_pixel_data_fragment.html" />
+    <link rel="prev" title="pydicom.encaps.defragment_data" href="pydicom.encaps.defragment_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.decode_data_sequence.html">pydicom.encaps.decode_data_sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.defragment_data.html">pydicom.encaps.defragment_data</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.generate_pixel_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_pixel_data_fragment.html">pydicom.encaps.generate_pixel_data_fragment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.generate_pixel_data_frame.html">pydicom.encaps.generate_pixel_data_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.get_frame_offsets.html">pydicom.encaps.get_frame_offsets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.read_item.html">pydicom.encaps.read_item</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.encaps.generate_pixel_data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-encaps-generate-pixel-data">
+<h1>pydicom.encaps.generate_pixel_data<a class="headerlink" href="#pydicom-encaps-generate-pixel-data" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pydicom.encaps.generate_pixel_data">
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bytestream</span></em>, <em class="sig-param"><span class="n">nr_frames</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/encaps.py#L248"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield an encapsulated pixel data frame.</p>
+<p>For the following transfer syntaxes, a fragment may not contain encoded
+data from more than one frame. However data from one frame may span
+multiple fragments.</p>
+<ul class="simple">
+<li><p>1.2.840.10008.1.2.4.50 - JPEG Baseline (Process 1)</p></li>
+<li><p>1.2.840.10008.1.2.4.51 - JPEG Baseline (Process 2 and 4)</p></li>
+<li><p>1.2.840.10008.1.2.4.57 - JPEG Lossless, Non-Hierarchical (Process 14)</p></li>
+<li><p>1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-Hierarchical, First-Order
+Prediction (Process 14 [Selection Value 1])</p></li>
+<li><p>1.2.840.10008.1.2.4.80 - JPEG-LS Lossless Image Compression</p></li>
+<li><p>1.2.840.10008.1.2.4.81 - JPEG-LS Lossy (Near-Lossless) Image Compression</p></li>
+<li><p>1.2.840.10008.1.2.4.90 - JPEG 2000 Image Compression (Lossless Only)</p></li>
+<li><p>1.2.840.10008.1.2.4.91 - JPEG 2000 Image Compression</p></li>
+<li><p>1.2.840.10008.1.2.4.92 - JPEG 2000 Part 2 Multi-component Image
+Compression (Lossless Only)</p></li>
+<li><p>1.2.840.10008.1.2.4.93 - JPEG 2000 Part 2 Multi-component Image
+Compression</p></li>
+</ul>
+<p>For the following transfer syntaxes, each frame shall be encoded in one and
+only one fragment.</p>
+<ul class="simple">
+<li><p>1.2.840.10008.1.2.5 - RLE Lossless</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytestream</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – The value of the (7FE0,0010) <em>Pixel Data</em> element from an encapsulated
+dataset. The Basic Offset Table item should be present and the
+Sequence Delimiter item may or may not be present.</p></li>
+<li><p><strong>nr_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Required for multi-frame data when the Basic Offset Table is empty
+and there are multiple frames. This should be the value of (0028,0008)
+<em>Number of Frames</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>tuple of bytes</em> – An encapsulated pixel data frame, with the contents of the
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> the frame’s fragmented data.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the Basic Offset Table is empty and there are multiple fragments per
+frame then an attempt will be made to locate the frame boundaries by
+searching for the JPEG/JPEG-LS/JPEG2000 EOI/EOC marker (<code class="docutils literal notranslate"><span class="pre">0xFFD9</span></code>). If the
+marker is not present or the pixel data hasn’t been compressed using one of
+the JPEG standards then the generated pixel data may be incorrect.</p>
+<p class="rubric">References</p>
+<p>DICOM Standard Part 5, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_A.html">Annex A</a></p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom.encaps.generate_pixel_data_fragment.html" class="btn btn-neutral float-right" title="pydicom.encaps.generate_pixel_data_fragment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.encaps.defragment_data.html" class="btn btn-neutral float-left" title="pydicom.encaps.defragment_data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

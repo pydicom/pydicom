@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_dataset
+=================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_dataset

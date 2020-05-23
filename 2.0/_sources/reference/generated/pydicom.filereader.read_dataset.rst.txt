@@ -1,0 +1,6 @@
+pydicom.filereader.read\_dataset
+================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: read_dataset

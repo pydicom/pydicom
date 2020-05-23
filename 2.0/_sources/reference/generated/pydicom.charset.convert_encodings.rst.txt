@@ -1,0 +1,6 @@
+pydicom.charset.convert\_encodings
+==================================
+
+.. currentmodule:: pydicom.charset
+
+.. autofunction:: convert_encodings

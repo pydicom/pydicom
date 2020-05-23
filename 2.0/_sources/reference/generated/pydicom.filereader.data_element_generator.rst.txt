@@ -1,0 +1,6 @@
+pydicom.filereader.data\_element\_generator
+===========================================
+
+.. currentmodule:: pydicom.filereader
+
+.. autofunction:: data_element_generator

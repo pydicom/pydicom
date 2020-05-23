@@ -1,0 +1,61 @@
+Version 2.0.0
+=================================
+
+Changelog
+---------
+* Dropped support for Python 2 (only Python 3.5+ supported)
+
+* Changes to `Dataset.file_meta`
+
+  * file_meta now shown by default in dataset `str` or `repr` output;
+    :data:`pydicom.config.show_file_meta` can be set ``False`` to restore
+    previous behavior
+
+  * new :class:`~pydicom.dataset.FileMetaDataset` class that accepts
+    only group 2 data elements
+
+  * Deprecation warning given unless `Dataset.file_meta` set with
+    a :class:`~pydicom.dataset.FileMetaDataset` object (in *pydicom* 3,
+    it will be required)
+
+* Old `PersonName` class removed; `PersonName3` renamed to `PersonName`.
+  Classes `PersonNameUnicode` and `PersonName3` are aliased to `PersonName` but
+  are deprecated and will be removed in version 2.1
+* ``dataelem.isMultiValue`` (previously deprecated) has been removed.
+  Use ``dataelem.DataElement.VM`` instead.
+
+Enhancements
+............
+* Allow PathLike objects for filename argument in `dcmread`, `dcmwrite` and
+  `Dataset.save_as` (:issue:`1047`)
+* Deflate post-file meta information data when writing a dataset with the
+  Deflated Explicit VR Little Endian transfer syntax UID (:issue:`1086`)
+* Added `config.replace_un_with_known_vr` to be able to switch off automatic
+  VR conversion for known tags with VR "UN" (see :issue:`1067`)
+* Added `config.use_DS_numpy` and `config.use_IS_numpy` to have multi-valued
+  data elements with VR of **DS** or **IS** return a numpy array (:issue:`623`)
+  (much faster for bigger arrays).  Both default to False to preserve previous
+  behavior
+
+Fixes
+.....
+* Fixed reading of datasets with an empty `Specific Character Set` tag
+  (regression, :issue:`1038`)
+* Fixed failure to parse dataset with an empty *LUT Descriptor* or
+  *Red/Green/Blue Palette Color LUT Descriptor* element. (:issue:`1049`)
+* Made `Dataset.save_as` a wrapper for `dcmwrite` (:issue:`1042`) rather than
+  having different checks in each
+* Removed ``1.2.840.10008.1.2.4.70`` - JPEG Lossless (Process 14, SV1) from
+  the Pillow pixel data handler as Pillow doesn't support JPEG Lossless.
+  (:issue:`1053`)
+* Fixed error when writing elements with a VR of **OF** (:issue:`1075`)
+* Fixed improper conversion when reading elements with a VR of **OF**
+  (:issue:`1075`)
+* Fixed :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and
+  :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` not handling
+  (0028,3006) *LUT Data* with a VR of **OW** (:issue:`1073`)
+* Fixed access to private creator tag in raw datasets (:issue:`1078`)
+* Fixed description of newly added known private tag (:issue:`1082`)
+* Fixed update of private blocks after deleting private creator (:issue:`1097`)
+* Fixed bug in updating `pydicom.config.use_DS_Decimal` flag
+  in :func:`~pydicom.config.DS_decimal`

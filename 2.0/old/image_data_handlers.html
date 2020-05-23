@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Handling of compressed image data &mdash; pydicom 2.0.0-rc.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Viewing Images" href="viewing_images.html" />
+    <link rel="prev" title="Working with Overlay Data" href="working_with_overlays.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling of compressed image data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preconditions">Preconditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supported-transfer-syntaxes">Supported Transfer Syntaxes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
+        
+      <li>Handling of compressed image data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="handling-of-compressed-image-data">
+<span id="guide-compressed"></span><h1>Handling of compressed image data<a class="headerlink" href="#handling-of-compressed-image-data" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to get image data from compressed DICOM images</p>
+<div class="section" id="preconditions">
+<h2>Preconditions<a class="headerlink" href="#preconditions" title="Permalink to this headline">¶</a></h2>
+<p>To be able to decompress compressed DICOM image data, you need to have
+one or more packages installed that are able to handle this kind of data.
+<code class="docutils literal notranslate"><span class="pre">pydicom</span></code> detects the installed packages and provides image data handlers
+that use the available packages.</p>
+<p>The following packages can be used with <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> - this is the package that supports
+most compressed formats</p></li>
+<li><p><a class="reference external" href="http://pillow.readthedocs.io/en/latest/">Pillow</a>, ideally with
+<code class="docutils literal notranslate"><span class="pre">jpeg</span></code> and <code class="docutils literal notranslate"><span class="pre">jpeg2000</span></code> plugins</p></li>
+<li><p><a class="reference external" href="https://github.com/Who8MyLunch/CharPyLS">jpeg_ls</a></p></li>
+</ul>
+<p>Note that you always need the <a class="reference external" href="http://numpy.org/">NumPy</a> package to be able
+to handle image data.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>We rely on the image handling capacity of the mentioned
+packages and cannot guarantee the correctness of the generated uncompressed
+images. Be sure to verify the correctness of generated images using other
+means before you use them for medical purposes.</p>
+</div>
+</div>
+<div class="section" id="supported-transfer-syntaxes">
+<h2>Supported Transfer Syntaxes<a class="headerlink" href="#supported-transfer-syntaxes" title="Permalink to this headline">¶</a></h2>
+<p>To get the transfer syntax of a dataset you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s1">&#39;path/to/dicom/file&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span>
+<span class="go">&#39;1.2.840.10008.1.2.1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">BitsAllocated</span>
+<span class="go">16</span>
+</pre></div>
+</div>
+<p>As far as we have been able to verify, the following transfer syntaxes are
+handled by the given packages:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 24%" />
+<col style="width: 7%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>Transfer Syntax</p></th>
+<th class="head" rowspan="2"><p>NumPy</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+JPEG-LS</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+GDCM</p></th>
+<th class="head" rowspan="2"><p>NumPy +
+Pillow</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>Name</p></th>
+<th class="head"><p>UID</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>Explicit VR Little Endian</p></td>
+<td><p>1.2.840.10008.1.2.1</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Implicit VR Little Endian</p></td>
+<td><p>1.2.840.10008.1.2</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>Explicit VR Big Endian</p></td>
+<td><p>1.2.840.10008.1.2.2</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Deflated Explicit VR Little Endian</p></td>
+<td><p>1.2.840.10008.1.2.1.99</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-odd"><td><p>RLE Lossless</p></td>
+<td><p>1.2.840.10008.1.2.5</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>JPEG Baseline (Process 1)</p></td>
+<td><p>1.2.840.10008.1.2.4.50</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓<sup>1</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG Extended (Process 2 and 4)</p></td>
+<td><p>1.2.840.10008.1.2.4.51</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓<sup>1,3</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>JPEG Lossless (Process 14)</p></td>
+<td><p>1.2.840.10008.1.2.4.57</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG Lossless (Process 14, SV1)</p></td>
+<td><p>1.2.840.10008.1.2.4.70</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>JPEG LS Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.80</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG LS Lossy</p></td>
+<td><p>1.2.840.10008.1.2.4.81</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>JPEG2000 Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.90</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓<sup>2</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG2000</p></td>
+<td><p>1.2.840.10008.1.2.4.91</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓<sup>2</sup></p></td>
+</tr>
+<tr class="row-even"><td><p>JPEG2000 Multi-component Lossless</p></td>
+<td><p>1.2.840.10008.1.2.4.92</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>JPEG2000 Multi-component</p></td>
+<td><p>1.2.840.10008.1.2.4.93</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><sup>1</sup> <em>only with JpegImagePlugin</em></div>
+<div class="line"><sup>2</sup> <em>only with Jpeg2KImagePlugin</em></div>
+<div class="line"><sup>3</sup> <em>only if (0028,0100) Bits Allocated = 8</em></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To use decompressed image data from compressed DICOM images, you have two
+options:</p>
+<ul class="simple">
+<li><p>use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> on the dataset to convert
+it in-place and work with the pixel data as described before</p></li>
+<li><p>get an uncompressed copy of the pixel data as a NumPy array using
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> without
+touching the original dataset</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> adapts the
+transfer syntax of the data set, but not the <em>Photometric Interpretation</em>.
+The <em>Photometric Interpretation</em> may not match the pixel data, depending on
+the used decompression handler.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="viewing_images.html" class="btn btn-neutral float-right" title="Viewing Images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="working_with_overlays.html" class="btn btn-neutral float-left" title="Working with Overlay Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

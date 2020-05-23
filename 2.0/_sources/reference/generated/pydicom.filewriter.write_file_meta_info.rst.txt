@@ -1,0 +1,6 @@
+pydicom.filewriter.write\_file\_meta\_info
+==========================================
+
+.. currentmodule:: pydicom.filewriter
+
+.. autofunction:: write_file_meta_info

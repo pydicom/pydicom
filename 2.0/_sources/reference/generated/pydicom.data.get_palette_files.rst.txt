@@ -1,0 +1,6 @@
+pydicom.data.get\_palette\_files
+================================
+
+.. currentmodule:: pydicom.data
+
+.. autofunction:: get_palette_files
