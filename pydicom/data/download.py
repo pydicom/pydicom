@@ -33,6 +33,7 @@ except ImportError:
 
 HERE = pathlib.Path(__file__).resolve().parent
 
+
 def calculate_file_hash(filename):
     BLOCKSIZE = 65536
     hasher = hashlib.sha256()
@@ -80,7 +81,8 @@ def get_url(filename):
     try:
         url = url_map[filename]
     except KeyError:
-        raise ValueError("The file provided isn't within pydicom's urls.json record.")
+        raise ValueError(
+            "The file provided isn't within pydicom's urls.json record.")
 
     return url
 
@@ -93,7 +95,11 @@ def download_all():
     return paths
 
 
-def data_path(filename, check_hash=True, redownload_on_hash_mismatch=True, url=None):
+def data_path(
+        filename,
+        check_hash=True,
+        redownload_on_hash_mismatch=True,
+        url=None):
     filepath = get_data_dir().joinpath(filename)
 
     if check_hash and filepath.exists():
@@ -119,7 +125,8 @@ def data_path(filename, check_hash=True, redownload_on_hash_mismatch=True, url=N
                 filepath.unlink()
                 return data_path(filename, redownload_on_hash_mismatch=False)
 
-            raise ValueError("The file on disk does not match the recorded hash.")
+            raise ValueError(
+                "The file on disk does not match the recorded hash.")
 
     return filepath.resolve()
 

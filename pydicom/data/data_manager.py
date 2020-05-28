@@ -58,10 +58,10 @@ def get_files(base, pattern):
     # To preserve backwards compatibility filter the downloaded files
     # as if they are stored within DATA_ROOT/test_files/*.dcm
     dummy_online_file_path_map = online_test_file_dummy_paths()
-    dummy_online_file_path_filtered = fnmatch.filter(dummy_online_file_path_map.keys(), pattern)
-    download_names = [
-        str(dummy_online_file_path_map[dummy_path]) for dummy_path in dummy_online_file_path_filtered
-    ]
+    dummy_online_file_path_filtered = fnmatch.filter(
+        dummy_online_file_path_map.keys(), pattern)
+    download_names = [str(dummy_online_file_path_map[dummy_path])
+                      for dummy_path in dummy_online_file_path_filtered]
 
     real_online_file_paths = []
     for filename in download_names:
