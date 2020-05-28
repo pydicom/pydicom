@@ -6,7 +6,6 @@ import os
 import pathlib
 import urllib.request
 import warnings
-import zipfile
 import hashlib
 import contextlib
 
