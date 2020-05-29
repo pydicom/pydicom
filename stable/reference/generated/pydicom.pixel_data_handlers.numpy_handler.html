@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.pixel_data_handlers.numpy_handler &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.pixel_data_handlers.numpy_handler &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.pixel_data_handlers.pillow_handler" href="pydicom.pixel_data_handlers.pillow_handler.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -214,7 +216,7 @@
   <div class="section" id="module-pydicom.pixel_data_handlers.numpy_handler">
 <span id="pydicom-pixel-data-handlers-numpy-handler"></span><h1>pydicom.pixel_data_handlers.numpy_handler<a class="headerlink" href="#module-pydicom.pixel_data_handlers.numpy_handler" title="Permalink to this headline">¶</a></h1>
 <p>Use the <a class="reference external" href="https://numpy.org/">numpy</a> package to convert supported pixel
-data to a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <p><strong>Supported transfer syntaxes</strong></p>
 <ul class="simple">
 <li><p>1.2.840.10008.1.2 : Implicit VR Little Endian</p></li>
@@ -225,7 +227,7 @@ data to a <a class="reference external" href="https://docs.scipy.org/doc/numpy/r
 <p><strong>Supported data</strong></p>
 <p>The numpy handler supports the conversion of data in the (7FE0,0008) <em>Float
 Pixel Data</em>, (7FE0,0009) <em>Double Float Pixel Data</em> and (7FE0,0010)
-<em>Pixel Data</em> elements to a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> provided the
+<em>Pixel Data</em> elements to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> provided the
 related <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a>, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.24.html">Floating Point
 Image Pixel</a> or  <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.25.html">Double Floating Point Image
 Pixel</a> module elements have values given in the
@@ -313,7 +315,7 @@ YBR_FULL_422</p></td>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="pydicom.pixel_data_handlers.numpy_handler.get_pixeldata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pixeldata</span></code></a>(ds[, read_only])</p></td>
-<td><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p></td>
+<td><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="pydicom.pixel_data_handlers.numpy_handler.is_available"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_available</span></code></a>()</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p></td>
@@ -322,7 +324,7 @@ YBR_FULL_422</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to RGB.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="pydicom.pixel_data_handlers.numpy_handler.pack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pack_bits</span></code></a>(arr)</p></td>
-<td><p>Pack a binary <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
+<td><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></code></a>(ds)</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed to RGB.</p></td>
@@ -331,14 +333,14 @@ YBR_FULL_422</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.numpy_handler.unpack_bits" title="pydicom.pixel_data_handlers.numpy_handler.unpack_bits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unpack_bits</span></code></a>(bytestream)</p></td>
-<td><p>Unpack bit packed <em>Pixel Data</em> or <em>Overlay Data</em> into a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
+<td><p>Unpack bit packed <em>Pixel Data</em> or <em>Overlay Data</em> into a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param">ds</em>, <em class="sig-param">read_only=False</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">read_only</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p>
 <div class="versionchanged">
 <ul>
 <span class="versionmodified changed">Changed in version 1.4: </span><li><p>Added support for uncompressed pixel data with a <em>Photometric
@@ -380,33 +382,33 @@ Data</em> or (7FE0,0009) <em>Double Float Pixel Data</em> as a 1D array.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L76"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L76"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L93"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L93"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.pack_bits">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">pack_bits</code><span class="sig-paren">(</span><em class="sig-param">arr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L111"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pack a binary <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">pack_bits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L111"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pack a binary <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> for use with <em>Pixel Data</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
 </div>
 <p>Should be used in conjunction with (0028,0100) <em>Bits Allocated</em> = 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>arr</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing 1-bit data as ints. <cite>arr</cite> must
+<dd class="field-odd"><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing 1-bit data as ints. <cite>arr</cite> must
 only contain integer values of 0 and 1 and must have an ‘uint’  or
-‘int’ <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>. For the sake of efficiency it’s recommended
+‘int’ <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>. For the sake of efficiency it’s recommended
 that the length of <cite>arr</cite> be a multiple of 8 (i.e. that any empty
 bit-padding to round out the byte has already been added).</p>
 </dd>
@@ -426,17 +428,17 @@ bit-padding to round out the byte has already been added).</p>
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param">ds</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L102"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L102"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param">transfer_syntax</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L81"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L81"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -446,11 +448,11 @@ the handler.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.pixel_data_handlers.numpy_handler.unpack_bits">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">unpack_bits</code><span class="sig-paren">(</span><em class="sig-param">bytestream</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/pixel_data_handlers/numpy_handler.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.unpack_bits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.numpy_handler.</code><code class="sig-name descname">unpack_bits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bytestream</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/pixel_data_handlers/numpy_handler.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.numpy_handler.unpack_bits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unpack bit packed <em>Pixel Data</em> or <em>Overlay Data</em> into a
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <p>Suitable for use when (0028,0011) <em>Bits Allocated</em> or (60xx,0100) <em>Overlay
 Bits Allocated</em> is 1.</p>
 <dl class="field-list simple">
@@ -461,7 +463,7 @@ Bits Allocated</em> is 1.</p>
 <dd class="field-even"><p>The unpacked <em>Pixel Data</em> as a 1D array.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">References</p>
@@ -492,7 +494,7 @@ Bits Allocated</em> is 1.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

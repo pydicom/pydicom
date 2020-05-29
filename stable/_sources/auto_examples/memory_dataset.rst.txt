@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_memory_dataset.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_memory_dataset.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_memory_dataset.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_memory_dataset.py:
 
 
 ======================================
@@ -19,7 +21,6 @@ datasets saved as blobs in a database.
 .. code-block:: default
 
 
-    from __future__ import print_function
 
     from io import BytesIO
 
@@ -54,7 +55,7 @@ datasets saved as blobs in a database.
         return dataset
 
 
-    class DummyDataBase(object):
+    class DummyDataBase:
         def __init__(self):
             self._blobs = {}
 
@@ -109,13 +110,13 @@ datasets saved as blobs in a database.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: memory_dataset.ipynb <memory_dataset.ipynb>`
 

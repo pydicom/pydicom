@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Show working with memory-based dataset &mdash; pydicom 1.4.2 documentation</title>
+  <title>Show working with memory-based dataset &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Show a dicom file using hierarchical tree" href="dicomtree.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -188,19 +190,17 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-memory-dataset-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-memory-dataset-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="show-working-with-memory-based-dataset">
 <span id="sphx-glr-auto-examples-memory-dataset-py"></span><h1>Show working with memory-based dataset<a class="headerlink" href="#show-working-with-memory-based-dataset" title="Permalink to this headline">¶</a></h1>
 <p>Show how to write a DICOM dataset into a byte array and to read
 it back from a byte array. This can be helpful for example if working with
 datasets saved as blobs in a database.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
-
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a>
 
 <span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span><span class="p">,</span> <span class="n">dcmwrite</span>
-<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="View documentation for pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.filebase</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DicomFileLike</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
@@ -209,9 +209,9 @@ datasets saved as blobs in a database.</p>
 
 <span class="k">def</span> <span class="nf">write_dataset_to_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
     <span class="c1"># create a buffer</span>
-    <span class="k">with</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
+    <span class="k">with</span> <a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
         <span class="c1"># create a DicomFileLike object that has some properties of DataSet</span>
-        <span class="n">memory_dataset</span> <span class="o">=</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="View documentation for pydicom.filebase.DicomFileLike"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="n">memory_dataset</span> <span class="o">=</span> <a href="../reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike" class="sphx-glr-backref-module-pydicom-filebase sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">DicomFileLike</span></a><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
         <span class="c1"># write the dataset to the DicomFileLike object</span>
         <span class="n">dcmwrite</span><span class="p">(</span><span class="n">memory_dataset</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
         <span class="c1"># to read from the object, you have to rewind it</span>
@@ -222,7 +222,7 @@ datasets saved as blobs in a database.</p>
 
 <span class="k">def</span> <span class="nf">adapt_dataset_from_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">):</span>
     <span class="c1"># you can just read the dataset from the byte array</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="View documentation for io.BytesIO"><span class="n">BytesIO</span></a><span class="p">(</span><span class="n">blob</span><span class="p">))</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/io.html#io.BytesIO" title="io.BytesIO" class="sphx-glr-backref-module-io sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BytesIO</span></a><span class="p">(</span><span class="n">blob</span><span class="p">))</span>
     <span class="c1"># do some interesting stuff</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">PatientName</span> <span class="o">=</span> <span class="s1">&#39;Bond^James&#39;</span>
@@ -230,7 +230,7 @@ datasets saved as blobs in a database.</p>
     <span class="k">return</span> <span class="n">dataset</span>
 
 
-<span class="k">class</span> <span class="nc">DummyDataBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DummyDataBase</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_blobs</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -244,11 +244,11 @@ datasets saved as blobs in a database.</p>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sys</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please supply a dicom file name:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
-        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="View documentation for sys.exit"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">file_path</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="View documentation for sys.argv"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">db</span> <span class="o">=</span> <span class="n">DummyDataBase</span><span class="p">()</span>
 
     <span class="c1"># Convert a dataset to a byte array:</span>
@@ -272,10 +272,10 @@ datasets saved as blobs in a database.</p>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-memory-dataset-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/05d71e1cbcf560951075b4ea1c14b1b7/memory_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">memory_dataset.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/db21a1451d697e3d74e5f18e170717b7/memory_dataset.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">memory_dataset.ipynb</span></code></a></p>
 </div>
 </div>
@@ -302,7 +302,7 @@ datasets saved as blobs in a database.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

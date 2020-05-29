@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Elements (pydicom.dataelem) &mdash; pydicom 1.4.2 documentation</title>
+  <title>Data Elements (pydicom.dataelem) &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pydicom.dataelem.DataElement" href="generated/pydicom.dataelem.DataElement.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -111,7 +113,6 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.DataElement.html">pydicom.dataelem.DataElement</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.DataElement_from_raw.html">pydicom.dataelem.DataElement_from_raw</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.isMultiValue.html">pydicom.dataelem.isMultiValue</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html">pydicom.dataelem.RawDataElement</a></li>
 </ul>
 </li>
@@ -226,10 +227,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataelem.DataElement_from_raw.html#pydicom.dataelem.DataElement_from_raw" title="pydicom.dataelem.DataElement_from_raw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataElement_from_raw</span></code></a>(raw_data_element[, …])</p></td>
 <td><p>Return a <a class="reference internal" href="generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> created from <cite>raw_data_element</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.isMultiValue.html#pydicom.dataelem.isMultiValue" title="pydicom.dataelem.isMultiValue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMultiValue</span></code></a>(value)</p></td>
-<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>value</cite> is list-like (iterable).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>(tag, VR, length, value, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>(tag, VR, length, value, …)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -256,7 +254,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

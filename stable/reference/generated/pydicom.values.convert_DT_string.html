@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.values.convert_DT_string &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.values.convert_DT_string &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.values.convert_IS_string" href="pydicom.values.convert_IS_string.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -231,9 +233,9 @@
             
   <div class="section" id="pydicom-values-convert-dt-string">
 <h1>pydicom.values.convert_DT_string<a class="headerlink" href="#pydicom-values-convert-dt-string" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.values.convert_DT_string">
-<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_DT_string</code><span class="sig-paren">(</span><em class="sig-param">byte_string</em>, <em class="sig-param">is_little_endian</em>, <em class="sig-param">struct_format=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/values.py#L183"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_DT_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_DT_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">byte_string</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">struct_format</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/values.py#L214"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_DT_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a decoded ‘DT’ value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -244,7 +246,7 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>if
+<dd class="field-even"><p>If
 <a class="reference internal" href="pydicom.config.datetime_conversion.html#pydicom.config.datetime_conversion" title="pydicom.config.datetime_conversion"><code class="xref py py-attr docutils literal notranslate"><span class="pre">datetime_conversion</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then returns
 <a class="reference internal" href="pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-class docutils literal notranslate"><span class="pre">DT</span></code></a> or a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <code class="docutils literal notranslate"><span class="pre">DT</span></code>, otherwise
 returns <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or <code class="docutils literal notranslate"><span class="pre">list</span></code> of <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
@@ -277,7 +279,7 @@ returns <a class="reference external" href="https://docs.python.org/3/library/st
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

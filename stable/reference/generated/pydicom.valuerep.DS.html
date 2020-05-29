@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.valuerep.DS &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.valuerep.DS &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.valuerep.DSdecimal" href="pydicom.valuerep.DSdecimal.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -122,8 +124,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName3.html">pydicom.valuerep.PersonName3</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameBase.html">pydicom.valuerep.PersonNameBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
 </ul>
@@ -223,9 +223,9 @@
             
   <div class="section" id="pydicom-valuerep-ds">
 <h1>pydicom.valuerep.DS<a class="headerlink" href="#pydicom-valuerep-ds" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.valuerep.DS">
-<code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DS</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/valuerep.py#L445"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/valuerep.py#L442"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory function for creating DS class instances.</p>
 <p>Checks for blank string; if so, returns that, else calls <a class="reference internal" href="pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a>
 or <a class="reference internal" href="pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a> to create the class instance. This avoids overriding
@@ -257,7 +257,7 @@ called directly if a string has already been processed.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

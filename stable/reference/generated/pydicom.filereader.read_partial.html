@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filereader.read_partial &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.filereader.read_partial &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.filereader.read_preamble" href="pydicom.filereader.read_preamble.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -220,9 +222,9 @@
             
   <div class="section" id="pydicom-filereader-read-partial">
 <h1>pydicom.filereader.read_partial<a class="headerlink" href="#pydicom-filereader-read-partial" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.filereader.read_partial">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_partial</code><span class="sig-paren">(</span><em class="sig-param">fileobj</em>, <em class="sig-param">stop_when=None</em>, <em class="sig-param">defer_size=None</em>, <em class="sig-param">force=False</em>, <em class="sig-param">specific_tags=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/filereader.py#L632"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_partial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileobj</span></em>, <em class="sig-param"><span class="n">stop_when</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">specific_tags</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/filereader.py#L633"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_partial" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a DICOM file until a condition is met.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -277,7 +279,7 @@ reaching pixel data.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

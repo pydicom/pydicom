@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.charset.encode_string &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.charset.encode_string &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Configuration Options (pydicom.config)" href="../config.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -205,9 +207,9 @@
             
   <div class="section" id="pydicom-charset-encode-string">
 <h1>pydicom.charset.encode_string<a class="headerlink" href="#pydicom-charset-encode-string" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.charset.encode_string">
-<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">encode_string</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">encodings</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/charset.py#L452"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.encode_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">encode_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">encodings</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/charset.py#L444"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.encode_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode a unicode string <cite>value</cite> into <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> using <cite>encodings</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -215,8 +217,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>unicode</em>) – The unicode string as presented to the user. Should be <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>
-for Python 3 and <code class="xref py py-class docutils literal notranslate"><span class="pre">unicode</span></code> for Python 2.</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The unicode string as presented to the user.</p></li>
 <li><p><strong>encodings</strong> (<em>list of str</em>) – The encodings needed to encode the string as a list of Python
 encodings, converted from the encodings in (0008,0005) <em>Specific
 Character Set</em>.</p></li>
@@ -227,11 +228,10 @@ Character Set</em>.</p></li>
 the given encodings, and
 <a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
 <code class="docutils literal notranslate"><span class="pre">False</span></code>, a warning is issued, and <cite>value</cite> is encoded using the first
-encoding with replacement characters, resulting in data loss. Should
-be <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> for Python 3 and <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for Python 2.</p>
+encoding with replacement characters, resulting in data loss.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#UnicodeEncodeError" title="(in Python v3.8)"><strong>UnicodeEncodeError</strong></a> – If  <a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a>
@@ -263,7 +263,7 @@ be <a class="reference external" href="https://docs.python.org/3/library/stdtype
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

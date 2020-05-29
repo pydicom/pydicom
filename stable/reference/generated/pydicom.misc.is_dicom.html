@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.misc.is_dicom &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.misc.is_dicom &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.misc.size_in_bytes" href="pydicom.misc.size_in_bytes.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -203,9 +205,9 @@
             
   <div class="section" id="pydicom-misc-is-dicom">
 <h1>pydicom.misc.is_dicom<a class="headerlink" href="#pydicom-misc-is-dicom" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.misc.is_dicom">
-<code class="sig-prename descclassname">pydicom.misc.</code><code class="sig-name descname">is_dicom</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/misc.py#L26"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.misc.is_dicom" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.misc.</code><code class="sig-name descname">is_dicom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/misc.py#L26"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.misc.is_dicom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the file at <cite>file_path</cite> is a DICOM file.</p>
 <p>This function is a pared down version of
 <a class="reference internal" href="pydicom.filereader.read_preamble.html#pydicom.filereader.read_preamble" title="pydicom.filereader.read_preamble"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_preamble()</span></code></a> meant for a fast return. The
@@ -244,7 +246,7 @@ file is read for a conformant preamble (‘DICM’), returning
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_metadata_processing_plot_add_dict_entries.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_metadata_processing_plot_add_dict_entries.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py:
 
 
 =====================================================
@@ -49,7 +51,6 @@ dictionary dynamically.
     #           Guillaume Lemaitre <g.lemaitre58@gmail.com>
     # license : MIT
 
-    from __future__ import print_function
 
     from pydicom.datadict import DicomDictionary, keyword_dict
     from pydicom.dataset import Dataset
@@ -97,13 +98,13 @@ dictionary dynamically.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_add_dict_entries.py <plot_add_dict_entries.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_add_dict_entries.ipynb <plot_add_dict_entries.ipynb>`
 

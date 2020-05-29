@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.valuerep.DSdecimal &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.valuerep.DSdecimal &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.valuerep.DSfloat" href="pydicom.valuerep.DSfloat.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -122,8 +124,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName3.html">pydicom.valuerep.PersonName3</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameBase.html">pydicom.valuerep.PersonNameBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
 </ul>
@@ -223,16 +223,16 @@
             
   <div class="section" id="pydicom-valuerep-dsdecimal">
 <h1>pydicom.valuerep.DSdecimal<a class="headerlink" href="#pydicom-valuerep-dsdecimal" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="pydicom.valuerep.DSdecimal">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DSdecimal</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/valuerep.py#L357"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Store value for an element with VR ‘DS’ as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.valuerep.</code><code class="sig-name descname">DSdecimal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/valuerep.py#L354"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store value for an element with VR <strong>DS</strong> as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p>
 <p class="rubric">Notes</p>
 <p>If constructed from an empty string, returns the empty string, not an
 instance of this class.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="pydicom.valuerep.DSdecimal.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/valuerep.py#L416"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/valuerep.py#L413"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.valuerep.DSdecimal.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the original string if one given, for exact write-out of same
 value later. E.g. if set <code class="docutils literal notranslate"><span class="pre">'1.23e2'</span></code>, <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> would
 write <code class="docutils literal notranslate"><span class="pre">'123'</span></code>, but <a class="reference internal" href="pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-class docutils literal notranslate"><span class="pre">DS</span></code></a> will use the original.</p>
@@ -451,7 +451,7 @@ write <code class="docutils literal notranslate"><span class="pre">'123'</span><
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

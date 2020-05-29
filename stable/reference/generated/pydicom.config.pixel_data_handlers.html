@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.config.pixel_data_handlers &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.config.pixel_data_handlers &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.config.reset_data_element_callback" href="pydicom.config.reset_data_element_callback.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -114,7 +116,12 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -211,7 +218,7 @@
             
   <div class="section" id="pydicom-config-pixel-data-handlers">
 <h1>pydicom.config.pixel_data_handlers<a class="headerlink" href="#pydicom-config-pixel-data-handlers" title="Permalink to this headline">¶</a></h1>
-<dl class="data">
+<dl class="py data">
 <dt id="pydicom.config.pixel_data_handlers">
 <code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">pixel_data_handlers</code><em class="property"> = [&lt;module 'pydicom.pixel_data_handlers.numpy_handler' from '/home/circleci/project/pydicom/pixel_data_handlers/numpy_handler.py'&gt;, &lt;module 'pydicom.pixel_data_handlers.rle_handler' from '/home/circleci/project/pydicom/pixel_data_handlers/rle_handler.py'&gt;, &lt;module 'pydicom.pixel_data_handlers.gdcm_handler' from '/home/circleci/project/pydicom/pixel_data_handlers/gdcm_handler.py'&gt;, &lt;module 'pydicom.pixel_data_handlers.pillow_handler' from '/home/circleci/project/pydicom/pixel_data_handlers/pillow_handler.py'&gt;, &lt;module 'pydicom.pixel_data_handlers.jpeg_ls_handler' from '/home/circleci/project/pydicom/pixel_data_handlers/jpeg_ls_handler.py'&gt;]</em><a class="headerlink" href="#pydicom.config.pixel_data_handlers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handlers for converting (7FE0,0010) <em>Pixel Data</em>.</p>
@@ -229,7 +236,7 @@ correctly sized numpy array from the <em>Pixel Data</em> element.</p>
 <dt>def is_available():</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler’s dependencies are installed, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
-<dt>def get_pixeldata(ds):</dt><dd><p>Return a correctly sized 1D <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
+<dt>def get_pixeldata(ds):</dt><dd><p>Return a correctly sized 1D <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
 <em>Pixel Data</em> in <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <cite>ds</cite> or raise an exception. Reshaping the
 returned array to the correct dimensions is handled automatically.</p>
 </dd>
@@ -269,7 +276,7 @@ exception.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

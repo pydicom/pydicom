@@ -20,6 +20,7 @@ Somewhere to start
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_dicom_difference_thumb.png
+     :alt: Analyse differences between DICOM files
 
      :ref:`sphx_glr_auto_examples_plot_dicom_difference.py`
 
@@ -40,6 +41,7 @@ Somewhere to start
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_show_charset_name_thumb.png
+     :alt: Display unicode person names
 
      :ref:`sphx_glr_auto_examples_show_charset_name.py`
 
@@ -60,6 +62,7 @@ Somewhere to start
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_memory_dataset_thumb.png
+     :alt: Show working with memory-based dataset
 
      :ref:`sphx_glr_auto_examples_memory_dataset.py`
 
@@ -80,6 +83,7 @@ Somewhere to start
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_dicomtree_thumb.png
+     :alt: Show a dicom file using hierarchical tree
 
      :ref:`sphx_glr_auto_examples_dicomtree.py`
 
@@ -117,6 +121,7 @@ be applied to DICOM images.
 .. only:: html
 
  .. figure:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_downsize_image_thumb.png
+     :alt: Downsize MRI image using pydicom
 
      :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py`
 
@@ -137,6 +142,7 @@ be applied to DICOM images.
 .. only:: html
 
  .. figure:: /auto_examples/image_processing/images/thumb/sphx_glr_reslice_thumb.png
+     :alt: Load CT slices and plot axial, sagittal and coronal images
 
      :ref:`sphx_glr_auto_examples_image_processing_reslice.py`
 
@@ -173,6 +179,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_rtplan_thumb.png
+     :alt: Read RTPLAN DICOM and list information
 
      :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py`
 
@@ -193,6 +200,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_thumb.png
+     :alt: Read DICOM and ploting using matplotlib
 
      :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py`
 
@@ -213,6 +221,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_printing_dataset_thumb.png
+     :alt: Format the output of the data set printing
 
      :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py`
 
@@ -233,6 +242,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_write_dicom_thumb.png
+     :alt: Write DICOM data
 
      :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py`
 
@@ -253,6 +263,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_directory_thumb.png
+     :alt: Read DICOM directory
 
      :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py`
 
@@ -285,31 +296,12 @@ metadata of DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
-
-.. only:: html
-
- .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
-
-     :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/metadata_processing/plot_sequences
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynami...">
 
 .. only:: html
 
  .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
+     :alt: Add dictionary items in the standard DICOM dictionary
 
      :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
 
@@ -325,11 +317,33 @@ metadata of DICOM data.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
+     :alt: Working with sequences
+
+     :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/metadata_processing/plot_sequences
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example is a starting point to anonymize DICOM data.">
 
 .. only:: html
 
  .. figure:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_anonymize_thumb.png
+     :alt: Anonymize DICOM data
 
      :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py`
 
@@ -354,13 +368,13 @@ metadata of DICOM data.
     :class: sphx-glr-footer-gallery
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
     :download:`Download all examples in Python source code: auto_examples_python.zip <//home/circleci/project/doc/auto_examples/auto_examples_python.zip>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
     :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/circleci/project/doc/auto_examples/auto_examples_jupyter.zip>`
 

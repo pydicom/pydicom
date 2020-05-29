@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.dataset.validate_file_meta &mdash; pydicom 1.4.2 documentation</title>
+  <title>pydicom.dataset.validate_file_meta &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Bulk Data Handlers" href="../handlers.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -111,6 +113,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.Dataset.html">pydicom.dataset.Dataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.FileDataset.html">pydicom.dataset.FileDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.FileMetaDataset.html">pydicom.dataset.FileMetaDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.dataset.PrivateBlock.html">pydicom.dataset.PrivateBlock</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.dataset.validate_file_meta</a></li>
 </ul>
@@ -205,9 +208,9 @@
             
   <div class="section" id="pydicom-dataset-validate-file-meta">
 <h1>pydicom.dataset.validate_file_meta<a class="headerlink" href="#pydicom-dataset-validate-file-meta" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="pydicom.dataset.validate_file_meta">
-<code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">validate_file_meta</code><span class="sig-paren">(</span><em class="sig-param">file_meta</em>, <em class="sig-param">enforce_standard=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2e4a511a/pydicom/dataset.py#L2262"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.validate_file_meta" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">validate_file_meta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_meta</span></em>, <em class="sig-param"><span class="n">enforce_standard</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b4ff70af/pydicom/dataset.py#L2297"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.validate_file_meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate the <em>File Meta Information</em> elements in <cite>file_meta</cite>.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 1.2: </span>Moved from <code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>.</p>
@@ -265,7 +268,7 @@ already present:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

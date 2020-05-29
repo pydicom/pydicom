@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Display unicode person names &mdash; pydicom 1.4.2 documentation</title>
+  <title>Display unicode person names &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Show working with memory-based dataset" href="memory_dataset.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -188,7 +190,7 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-show-charset-name-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-show-charset-name-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="display-unicode-person-names">
 <span id="sphx-glr-auto-examples-show-charset-name-py"></span><h1>Display unicode person names<a class="headerlink" href="#display-unicode-person-names" title="Permalink to this headline">¶</a></h1>
@@ -196,33 +198,29 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
 <span class="c1"># license : MIT</span>
 
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">compat</span>
-<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.valuerep</span> <span class="kn">import</span> <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a>
 
-<span class="k">if</span> <span class="n">compat</span><span class="o">.</span><span class="n">in_py2</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">Tkinter</span> <span class="k">as</span> <span class="nn">tkinter</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">tkinter</span>
+<span class="kn">import</span> <span class="nn">tkinter</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
 <span class="n">default_encoding</span> <span class="o">=</span> <span class="s1">&#39;iso8859&#39;</span>
 
-<span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="View documentation for tkinter.Tk"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
+<span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
 <span class="c1"># root.geometry(&quot;%dx%d%+d%+d&quot; % (800, 600, 0, 0))</span>
 
 <span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB@O:&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$@</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">=&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;GB18030&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xe7\x8e\x8b\x5e\xe5\xb0\x8f\xe6\x9d\xb1</span><span class="s2">=&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
-    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="View documentation for pydicom.valuerep.PersonNameUnicode"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+    <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321\316\324\327</span><span class="s2">=&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261\346\265\277</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
@@ -235,10 +233,10 @@
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-show-charset-name-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/f6ff0299eec8313c43b396d0df93919e/show_charset_name.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">show_charset_name.py</span></code></a></p>
 </div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/bb021fd9386c2d9fad526c267d8726d5/show_charset_name.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">show_charset_name.ipynb</span></code></a></p>
 </div>
 </div>
@@ -265,7 +263,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

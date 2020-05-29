@@ -10,7 +10,6 @@ datasets saved as blobs in a database.
 
 """
 
-from __future__ import print_function
 
 from io import BytesIO
 
@@ -45,7 +44,7 @@ def adapt_dataset_from_bytes(blob):
     return dataset
 
 
-class DummyDataBase(object):
+class DummyDataBase:
     def __init__(self):
         self._blobs = {}
 

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_write_dicom.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_input_output_plot_write_dicom.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_write_dicom.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_input_output_plot_write_dicom.py:
 
 
 ================
@@ -26,21 +28,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpaapcsucs.dcm
+    Writing test file /tmp/tmpe_bchwpr.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpzexg8itn.dcm
-    Load file /tmp/tmpaapcsucs.dcm ...
-    (0008, 0023) Content Date                        DA: '20200222'
-    (0008, 0033) Content Time                        TM: '161649.566762'
+    Writing test file as Big Endian Explicit VR /tmp/tmppkd4j93o.dcm
+    Load file /tmp/tmpe_bchwpr.dcm ...
+    Dataset.file_meta -------------------------------
+    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
+    (0002, 0012) Implementation Class UID            UI: 1.2.3.4
+    -------------------------------------------------
+    (0008, 0023) Content Date                        DA: '20200523'
+    (0008, 0033) Content Time                        TM: '182756.335073'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpaapcsucs.dcm ...
-    Load file /tmp/tmpzexg8itn.dcm ...
-    (0008, 0023) Content Date                        DA: '20200222'
-    (0008, 0033) Content Time                        TM: '161649.566762'
+    Remove file /tmp/tmpe_bchwpr.dcm ...
+    Load file /tmp/tmppkd4j93o.dcm ...
+    Dataset.file_meta -------------------------------
+    (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
+    (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
+    (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
+    (0002, 0012) Implementation Class UID            UI: 1.2.3.4
+    -------------------------------------------------
+    (0008, 0023) Content Date                        DA: '20200523'
+    (0008, 0033) Content Time                        TM: '182756.335073'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpzexg8itn.dcm ...
+    Remove file /tmp/tmppkd4j93o.dcm ...
 
 
 
@@ -61,7 +74,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
     import datetime
 
     import pydicom
-    from pydicom.dataset import Dataset, FileDataset
+    from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 
     # Create some temporary filenames
     suffix = '.dcm'
@@ -70,7 +83,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     print("Setting file meta information...")
     # Populate required values for file meta information
-    file_meta = Dataset()
+    file_meta = FileMetaDataset()
     file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
     file_meta.MediaStorageSOPInstanceUID = "1.2.3"
     file_meta.ImplementationClassUID = "1.2.3.4"
@@ -122,7 +135,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.005 seconds)
+   **Total running time of the script:** ( 0 minutes  0.006 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
@@ -135,13 +148,13 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_write_dicom.py <plot_write_dicom.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_write_dicom.ipynb <plot_write_dicom.ipynb>`
 

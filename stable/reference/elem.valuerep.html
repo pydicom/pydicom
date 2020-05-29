@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Specialized Element Value Representation (pydicom.valuerep) &mdash; pydicom 1.4.2 documentation</title>
+  <title>Specialized Element Value Representation (pydicom.valuerep) &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pydicom.valuerep.DA" href="generated/pydicom.valuerep.DA.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -122,8 +124,6 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.PersonName3.html">pydicom.valuerep.PersonName3</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.PersonNameBase.html">pydicom.valuerep.PersonNameBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
 </ul>
@@ -230,40 +230,34 @@ or TM and utilities.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DA</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘DA’ as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>DA</strong> as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS</span></code></a>(val)</p></td>
 <td><p>Factory function for creating DS class instances.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSdecimal</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘DS’ as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>DS</strong> as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSfloat</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘DS’ as <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>DS</strong> as <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DT</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘DT’ as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>DT</strong> as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IS</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘IS’ as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>IS</strong> as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.MultiString.html#pydicom.valuerep.MultiString" title="pydicom.valuerep.MultiString"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiString</span></code></a>(val[, valtype])</p></td>
 <td><p>Split a bytestring by delimiters if there are any</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonName</span></code></a>(val)</p></td>
-<td><p>Human-friendly class to hold the value of elements with VR  of ‘PN’.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonName3.html#pydicom.valuerep.PersonName3" title="pydicom.valuerep.PersonName3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonName3</span></code></a>(val[, encodings, original_string])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonName</span></code></a>(val[, encodings, original_string])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonNameBase.html#pydicom.valuerep.PersonNameBase" title="pydicom.valuerep.PersonNameBase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonNameBase</span></code></a>(val)</p></td>
-<td><p>Base class for Person Name classes</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonNameUnicode</span></code></a>(val, encodings)</p></td>
-<td><p>Unicode version of Person Name</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PersonNameUnicode</span></code></a></p></td>
+<td><p>alias of <a class="reference internal" href="generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydicom.valuerep.PersonName</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM" title="pydicom.valuerep.TM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TM</span></code></a>(val)</p></td>
-<td><p>Store value for an element with VR ‘TM’ as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.time</span></code></a>.</p></td>
+<td><p>Store value for an element with VR <strong>TM</strong> as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.time</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -289,7 +283,7 @@ or TM and utilities.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

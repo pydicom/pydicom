@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Representation of Datasets (pydicom.dataset) &mdash; pydicom 1.4.2 documentation</title>
+  <title>Representation of Datasets (pydicom.dataset) &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pydicom.dataset.Dataset" href="generated/pydicom.dataset.Dataset.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -111,6 +113,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.dataset.Dataset.html">pydicom.dataset.Dataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.dataset.FileDataset.html">pydicom.dataset.FileDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.dataset.FileMetaDataset.html">pydicom.dataset.FileMetaDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.dataset.PrivateBlock.html">pydicom.dataset.PrivateBlock</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.dataset.validate_file_meta.html">pydicom.dataset.validate_file_meta</a></li>
 </ul>
@@ -216,10 +219,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileDataset</span></code></a>(filename_or_obj, dataset[, …])</p></td>
 <td><p>An extension of <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to make reading and writing to file-like easier.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrivateBlock</span></code></a>(key, dataset, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileMetaDataset</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Contains a collection (dictionary) of group 2 DICOM Data Elements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrivateBlock</span></code></a>(key, dataset, …)</p></td>
 <td><p>Helper class for a private block in the <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.dataset.validate_file_meta.html#pydicom.dataset.validate_file_meta" title="pydicom.dataset.validate_file_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_file_meta</span></code></a>(file_meta[, enforce_standard])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.dataset.validate_file_meta.html#pydicom.dataset.validate_file_meta" title="pydicom.dataset.validate_file_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate_file_meta</span></code></a>(file_meta[, enforce_standard])</p></td>
 <td><p>Validate the <em>File Meta Information</em> elements in <cite>file_meta</cite>.</p></td>
 </tr>
 </tbody>
@@ -246,7 +252,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

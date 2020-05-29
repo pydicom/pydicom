@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Core elements in pydicom &mdash; pydicom 1.4.2 documentation</title>
+  <title>Core elements in pydicom &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Writing DICOM Files" href="writing_files.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -112,7 +114,7 @@
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support Plan for Pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -218,15 +220,23 @@ dictionary instead of the keys normally yielded by iterating a <a class="referen
 <p>A <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> could be created directly, but you will
 usually get one by reading an existing DICOM file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_files</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># get some test data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtplan.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>You can display the entire dataset by simply printing its string
 (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str()</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#repr" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">repr()</span></code></a>) value:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> 
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="go">(0002, 0000) File Meta Information Group Length  UL: 156</span>
+<span class="go">(0002, 0001) File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="go">(0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage</span>
+<span class="go">(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023</span>
+<span class="go">(0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian</span>
+<span class="go">(0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8</span>
+<span class="go">-------------------------------------------------</span>
 <span class="go">(0008, 0012) Instance Creation Date              DA: &#39;20030903&#39;</span>
 <span class="go">(0008, 0013) Instance Creation Time              TM: &#39;150031&#39;</span>
 <span class="go">(0008, 0016) SOP Class UID                       UI: RT Plan Storage</span>
@@ -251,7 +261,7 @@ the example program <a class="reference external" href="https://github.com/pydic
 </pre></div>
 </div>
 <p>When using the tag number directly a <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>
-instance is returned, so <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
+instance is returned, so <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
 must be used to get the value.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -376,14 +386,14 @@ operator:</p>
 <p>To work with (7FE0,0010) <em>Pixel Data</em>, the raw <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> are available
 through the <cite>PixelData</cite> keyword:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># read data with actual pixel data</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_files</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_bytes</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span>
 </pre></div>
 </div>
 <p>However its much more convenient to use
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> to return a
-<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> (requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> (requires the <a class="reference external" href="http://numpy.org">NumPy library</a>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> 
 <span class="go">array([[175, 180, 166, ..., 203, 207, 216],</span>
@@ -412,8 +422,8 @@ things:</p>
 value</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">VM</span></code></a> – the element’s Value Multiplicity as
 an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>. This is automatically determined from the contents of
-the <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a>.</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a> – the element’s actual value.
+the <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a> – the element’s actual value.
 A regular value like a number or string (or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of them if the
 VM &gt; 1), or a <a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>.</p></li>
 </ul>
@@ -424,8 +434,7 @@ VM &gt; 1), or a <a class="reference internal" href="../reference/generated/pydi
 <p><a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a> is not generally used directly in user code, as
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-func docutils literal notranslate"><span class="pre">BaseTags</span></code></a> are automatically created when you assign or read
 elements using their keywords as illustrated in sections above.</p>
-<p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> class is derived from <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> in Python 3 and
-<a class="reference external" href="https://docs.python.org/2/library/functions.html#long">long</a> in Python 2,
+<p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> class is derived from <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
 so in effect, it is just a number with some extra behaviour:</p>
 <blockquote>
 <div><ul>
@@ -447,10 +456,10 @@ enforces that the DICOM tag fits in the expected 4-byte (group,element)</p></li>
 </pre></div>
 </div>
 </li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.group" title="pydicom.tag.BaseTag.group"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.group</span></code></a> and
+<li><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#id1" title="pydicom.tag.BaseTag.group"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.group</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.elem" title="pydicom.tag.BaseTag.elem"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.elem</span></code></a> to return the group and element
 portions of the tag.</p></li>
-<li><p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.is_private" title="pydicom.tag.BaseTag.is_private"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.is_private</span></code></a> property checks
+<li><p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#id2" title="pydicom.tag.BaseTag.is_private"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.is_private</span></code></a> property checks
 whether the tag represents a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
@@ -486,7 +495,7 @@ etc. are available.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

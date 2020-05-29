@@ -1,0 +1,6 @@
+pydicom.config.use\_IS\_numpy
+=============================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: use_IS_numpy

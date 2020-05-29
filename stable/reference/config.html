@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Options (pydicom.config) &mdash; pydicom 1.4.2 documentation</title>
+  <title>Configuration Options (pydicom.config) &mdash; pydicom 2.0.0-rc.1 documentation</title>
   
 
   
@@ -35,8 +35,10 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pydicom.config.allow_DS_float" href="generated/pydicom.config.allow_DS_float.html" />
@@ -67,7 +69,7 @@
             
             
               <div class="version">
-                1.4.2
+                2.0.0-rc.1
               </div>
             
           
@@ -114,7 +116,12 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -243,8 +250,26 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.reset_data_element_callback.html#pydicom.config.reset_data_element_callback" title="pydicom.config.reset_data_element_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_data_element_callback</span></code></a>()</p></td>
 <td><p>Reset the <a class="reference internal" href="generated/pydicom.config.data_element_callback.html#pydicom.config.data_element_callback" title="pydicom.config.data_element_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_element_callback()</span></code></a> function to the default.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_decimal</span></code></a></p></td>
-<td><p>Set to <code class="docutils literal notranslate"><span class="pre">True</span></code> to use <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> to hold the value for elements with a VR of ‘DS’.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.show_file_meta.html#pydicom.config.show_file_meta" title="pydicom.config.show_file_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_file_meta</span></code></a></p></td>
+<td><p><div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.</span></p>
+</div>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS_decimal</span></code></a>([use_Decimal_boolean])</p></td>
+<td><p>Set DS class to be derived from <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.DS_numpy.html#pydicom.config.DS_numpy" title="pydicom.config.DS_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS_numpy</span></code></a>([use_numpy])</p></td>
+<td><p>Set whether multi-valued elements with VR of <strong>DS</strong> will be numpy arrays</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_decimal</span></code></a></p></td>
+<td><p>Set using <a class="reference internal" href="generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_decimal()</span></code></a> to control if elements with a VR of <strong>DS</strong> are represented as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.config.use_IS_numpy.html#pydicom.config.use_IS_numpy" title="pydicom.config.use_IS_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_IS_numpy</span></code></a></p></td>
+<td><p>Set to False to avoid IS values being returned as numpy ndarray objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.config.use_DS_numpy.html#pydicom.config.use_DS_numpy" title="pydicom.config.use_DS_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_DS_numpy</span></code></a></p></td>
+<td><p>Set using the function <a class="reference internal" href="generated/pydicom.config.DS_numpy.html#pydicom.config.DS_numpy" title="pydicom.config.DS_numpy"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_numpy()</span></code></a> to control whether arrays of VR <strong>DS</strong> are returned as numpy arrays.</p></td>
 </tr>
 </tbody>
 </table>
@@ -270,7 +295,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2008-2019, Darcy Mason and pydicom contributors
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>

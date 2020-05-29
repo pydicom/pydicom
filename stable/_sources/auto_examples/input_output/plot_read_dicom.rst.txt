@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_dicom.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_input_output_plot_read_dicom.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_dicom.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_input_output_plot_read_dicom.py:
 
 
 =======================================
@@ -17,6 +19,7 @@ information, and show it using matplotlib.
 
 
 .. image:: /auto_examples/input_output/images/sphx_glr_plot_read_dicom_001.png
+    :alt: plot read dicom
     :class: sphx-glr-single-img
 
 
@@ -93,7 +96,7 @@ information, and show it using matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.090 seconds)
+   **Total running time of the script:** ( 0 minutes  0.174 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:
@@ -106,13 +109,13 @@ information, and show it using matplotlib.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_read_dicom.py <plot_read_dicom.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_read_dicom.ipynb <plot_read_dicom.ipynb>`
 
