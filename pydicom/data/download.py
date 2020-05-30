@@ -71,8 +71,8 @@ def get_data_dir():
 
 @functools.lru_cache()
 def get_url_map():
-    with open(HERE.joinpath("urls.json"), "r") as f:
-        url_map = json.load(f)
+    with open(HERE.joinpath("urls.json"), "r") as url_file:
+        url_map = json.load(url_file)
 
     return url_map
 
