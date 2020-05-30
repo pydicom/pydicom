@@ -9,6 +9,8 @@ import warnings
 import hashlib
 import contextlib
 
+from . import retry
+
 try:
     import tqdm
 
@@ -52,6 +54,7 @@ def get_config_dir():
     return config_dir
 
 
+@retry.retry(urllib.error.HTTPError)
 def download_with_progress(url, filepath):
     with DownloadProgressBar(
         unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
@@ -159,3 +162,4 @@ def data_file_hash_check(filename):
         raise
 
     return cached_filehash == calculated_filehash
+
