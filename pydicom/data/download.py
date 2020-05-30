@@ -38,7 +38,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 def calculate_file_hash(filename):
     BLOCKSIZE = 65536
     hasher = hashlib.sha256()
-    with open(filename, "rb") as f:
+    with open(str(filename), "rb") as f:
         buf = f.read(BLOCKSIZE)
         while len(buf) > 0:
             hasher.update(buf)
@@ -71,7 +71,7 @@ def get_data_dir():
 
 @functools.lru_cache()
 def get_url_map():
-    with open(HERE.joinpath("urls.json"), "r") as url_file:
+    with open(str(HERE.joinpath("urls.json")), "r") as url_file:
         url_map = json.load(url_file)
 
     return url_map
@@ -130,7 +130,7 @@ class NoHashFound(KeyError):
 
 
 def get_cached_filehash(filename):
-    with open(HERE.joinpath("hashes.json"), "r") as hash_file:
+    with open(str(HERE.joinpath("hashes.json")), "r") as hash_file:
         hashes = json.load(hash_file)
 
     try:
@@ -151,12 +151,12 @@ def data_file_hash_check(filename):
         cached_filehash = get_cached_filehash(filename)
     except NoHashFound:
         warnings.warn("Hash not found in hashes.json. File will be updated.")
-        with open(HERE.joinpath("hashes.json"), "r") as hash_file:
+        with open(str(HERE.joinpath("hashes.json")), "r") as hash_file:
             hashes = json.load(hash_file)
 
         hashes[filename] = calculated_filehash
 
-        with open(HERE.joinpath("hashes.json"), "w") as hash_file:
+        with open(str(HERE.joinpath("hashes.json")), "w") as hash_file:
             json.dump(hashes, hash_file, indent=2, sort_keys=True)
 
         raise
