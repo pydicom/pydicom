@@ -65,7 +65,8 @@ def get_files(base, pattern):
 
     real_online_file_paths = []
     for filename in download_names:
-        real_online_file_paths.append(str(download.data_path(filename)))
+        real_online_file_paths.append(
+            str(download.data_path_with_download(filename)))
 
     files += real_online_file_paths
 
@@ -121,8 +122,7 @@ def get_testdata_file(name):
 
     for filename in download.get_url_map().keys():
         if filename == name:
-            return str(download.data_path(filename))
-
+            return str(download.data_path_with_download(filename))
 
 
 def get_testdata_files(pattern="*"):

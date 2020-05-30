@@ -23,7 +23,7 @@ except ImportError:
     def DownloadProgressBar(*args, **kwargs):
         try:
             class dummy:
-                def update_to(*args, **kwargs):
+                def update_to(*args, **kwargs):  # pylint: disable = no-method-argument
                     pass
 
             yield dummy
@@ -86,7 +86,7 @@ def get_url(filename):
     return url
 
 
-def data_path(
+def data_path_with_download(
         filename,
         check_hash=True,
         redownload_on_hash_mismatch=True,
@@ -114,7 +114,7 @@ def data_path(
         if not hash_agrees:
             if redownload_on_hash_mismatch:
                 filepath.unlink()
-                return data_path(filename, redownload_on_hash_mismatch=False)
+                return data_path_with_download(filename, redownload_on_hash_mismatch=False)
 
             raise ValueError(
                 "The file on disk does not match the recorded hash.")
