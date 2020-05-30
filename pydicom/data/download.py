@@ -86,14 +86,6 @@ def get_url(filename):
     return url
 
 
-def download_all():
-    paths = []
-    for file_name in get_url_map().keys():
-        paths.append(data_path(file_name))
-
-    return paths
-
-
 def data_path(
         filename,
         check_hash=True,
