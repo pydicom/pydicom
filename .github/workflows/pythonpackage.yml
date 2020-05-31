@@ -21,10 +21,6 @@ jobs:
       id: getfile
       run: |
         echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
-    - name: PEP8 checks
-      run: |
-        pip install flake8
-        flake8 —count —select=E901,E999,F821,F822,F823 —show-source —statistics ${{ steps.getfile.outputs.files }} 
     - name: Test with no external libraries
       run: |
         pip install pytest
