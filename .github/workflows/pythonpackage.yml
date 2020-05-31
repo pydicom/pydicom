@@ -35,10 +35,11 @@ jobs:
       run: |
         pytest
     - name: Test with GDCM on one OS/Python
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
         conda install --yes -c conda-forge gdcm
         conda --version
-        pytest -v
+        echo 'Show pytest lines with gdcm in them....'
+        pytest -v | grep -i -E 'gdcm|==='
 
 
