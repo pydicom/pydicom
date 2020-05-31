@@ -55,7 +55,7 @@ DESCRIPTION = description
 URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
-VERSION = __version__
+VERSION = __version__  # noqa: F821
 REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 
