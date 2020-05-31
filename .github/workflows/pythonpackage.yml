@@ -9,6 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
+        #  ** Update flake8 literals if change os or python-versions
         os: [ubuntu-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8]
 
@@ -19,7 +20,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Flake8 checks
-      if: ${{ matrix.os == matrix.os.0 && matrix.python-version == matrix.python-version.0 }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.6' }}
       run: |
         pip install flake8
         flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
