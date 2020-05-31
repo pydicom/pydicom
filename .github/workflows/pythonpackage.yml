@@ -34,3 +34,11 @@ jobs:
     - name: Test with numpy
       run: |
         pytest
+    - name: Test with GDCM on one OS/Python
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
+      run: |
+        conda install --yes -c conda-forge gdcm
+        conda --version
+        pytest -v
+
+
