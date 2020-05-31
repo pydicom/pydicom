@@ -18,10 +18,11 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: get changed files
-      id: getfile
+    - name: Flake8 checks
+      if: matrix.os == "ubuntu-latest"    
       run: |
-        echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | xargs)"
+        pip install flake8
+        flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
     - name: Test with no external libraries
       run: |
         pip install pytest
