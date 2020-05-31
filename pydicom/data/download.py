@@ -1,4 +1,7 @@
-# Copyright 2018-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2020 pydicom authors. See LICENSE file for details.
+
+# Copyright 2018-2019 Cancer Care Associates.
+# Relicensed under pydicom LICENSE by Simon Biggs.
 
 import functools
 import json
@@ -59,7 +62,7 @@ def download_with_progress(url, filepath):
     with DownloadProgressBar(
         unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
     ) as t:
-        urllib.request.urlretrieve(url, filepath, reporthook=t.update_to)
+        urllib.request.urlretrieve(url, str(filepath), reporthook=t.update_to)
 
 
 def get_data_dir():
