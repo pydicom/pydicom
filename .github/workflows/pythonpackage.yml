@@ -48,9 +48,12 @@ jobs:
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
-        conda install --yes -c conda-forge gdcm
-        conda --version
-        echo 'Show pytest lines with gdcm in them....'
+        apt-get install -y --no-install-recommends swig python3-dev build-essential
+        git clone --branch release https://github.com/malaterre/GDCM.git
+        mkdir gdcmbin
+        cd gdcmbin
+        cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        make
+        mv bin/gdcm.py /usr/lib/python${{ matrix.python-version }}/site-packages  # should use python sysconfig.get_path()["purelib"]
         pytest -v | grep -i -E 'gdcm|==='
-
 
