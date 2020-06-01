@@ -45,19 +45,30 @@ jobs:
         pip install git+https://github.com/Who8MyLunch/CharPyLS
         echo 'show relevant test lines'
         pytest -v | grep -i -E 'pillow|jpeg_ls|==='
-    - name: Test with GDCM on one OS/Python
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
+    - name: Cache GDCM
+      id: cache-gdcm
+      uses: actions/cache@v2
+      with:
+        path: gdcm
+        key: GDCM
+    - name: Build GDCM
+      if: steps.cache-gdcm.outputs.cache-hit != 'true'
       run: |
-        sudo apt-get install -y --no-install-recommends swig python3-dev build-essential
+        sudo apt-get install -y --no-install-recommends build-essential
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
         cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
+
+    - name: Test with GDCM on one OS/Python
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
+      run: |
+        sudo apt-get install -y --no-install-recommends swig python3-dev
         # python -c 'import sysconfig;print(sysconfig.get_paths()["purelib"])'
         # Create super-simple setup.py for pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > bin/setup.py
         pip install -e bin/
-        # sudo mv bin/gdcm.py /usr/lib/python${{ matrix.python-version }}/site-packages  # should use python sysconfig.get_path()["purelib"]
+        python3 -c 'import gdcm; print(gdcm.GDCM_VERSION)'
         pytest -v | grep -i -E 'gdcm|==='
 
