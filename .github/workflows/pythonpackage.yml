@@ -54,6 +54,10 @@ jobs:
         cd gdcmbin
         cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
-        mv bin/gdcm.py /usr/lib/python${{ matrix.python-version }}/site-packages  # should use python sysconfig.get_path()["purelib"]
+        python -c 'print(sysconfig.get_path()["purelib"])'
+        # Create super-simple setup.py for pip install
+        echo 'from setuptools import setup; setup(name="gdcm.py")' > setup.py
+        pip install -e bin/
+        # sudo mv bin/gdcm.py /usr/lib/python${{ matrix.python-version }}/site-packages  # should use python sysconfig.get_path()["purelib"]
         pytest -v | grep -i -E 'gdcm|==='
 
