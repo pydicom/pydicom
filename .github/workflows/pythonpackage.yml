@@ -54,7 +54,7 @@ jobs:
     - name: Build GDCM
       if: steps.cache-gdcm.outputs.cache-hit != 'true'
       run: |
-        sudo apt-get install -y --no-install-recommends build-essential
+        sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
