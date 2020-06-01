@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 0.9.8 &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>Version 2.1.0 &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -161,7 +161,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Version 0.9.8</li>
+      <li>Version 2.1.0</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -178,56 +178,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-8">
-<h1>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
-compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
-VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
-available, but is off by default.</p>
-<div class="section" id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Requires Python 2.6 or later, in preparation for Python 3 compatibility</p></li>
-<li><p>experimental Python 3 compatibility (unofficial at this point) – uncomment
-the two indicated lines in setup.py to use it. Please provide feedback to the
-issues list.</p></li>
-<li><p>DS values reverted to using float as default (issue 114) due to slow
-performance using Python Decimal. Speed tests show approx factor of 10
-improvement compared with pydicom 0.9.7 (several revisions up to
-r78ba350a3eb8)</p></li>
-<li><p>streamlined much code internally taking advantage of modern Python
-constructs: decorators, generators, etc</p></li>
-</ul>
-</div>
-<div class="section" id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
-774b7a55db33)</p></li>
-<li><p>Fix rewind behavior in find_bytes (issue 60, revision 6b949a5b925b)</p></li>
-<li><p>Fix error in nested private sequences (issue 113, revision 84af4b240add)</p></li>
-</ul>
+  <div class="section" id="version-2-1-0">
+<h1>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
-3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</p></li>
-<li><p>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</p></li>
-</ul>
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="contrib-file-changes">
-<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>Fix for pydicom_series for DS decimal (revision e830f30b6781)</p></li>
-<li><p>new dcm_qt_tree.py module - tree display of DICOM files using PySide and
-Qt. Contributed by Padraig Looney.</p></li>
-</ul>
-<p>Special acknowledgement to Jonathan Suever who contributed most of the Python 3
-work and many bug fixes.</p>
-</div>
+<div class="section" id="fixes">
+<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
