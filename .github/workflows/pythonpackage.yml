@@ -60,6 +60,7 @@ jobs:
         cd gdcmbin
         cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
+        cd ..
 
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
@@ -67,8 +68,8 @@ jobs:
         sudo apt-get install -y --no-install-recommends swig python3-dev
         # python -c 'import sysconfig;print(sysconfig.get_paths()["purelib"])'
         # Create super-simple setup.py for pip install
-        echo 'from setuptools import setup; setup(name="gdcm.py")' > bin/setup.py
-        pip install -e bin/
+        echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
+        pip install -e gdcmbin/bin/
         python3 -c 'import gdcm; print(gdcm.GDCM_VERSION)'
         pytest -v | grep -i -E 'gdcm|==='
 
