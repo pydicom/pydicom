@@ -19,6 +19,10 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Initial test environment setup
+      run: |
+        pip install wheel
+        pip install pytest
     - name: Flake8 checks
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.6' }}
       run: |
@@ -26,7 +30,6 @@ jobs:
         flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
     - name: Test with no external libraries
       run: |
-        pip install pytest
         pytest
     - name: Install numpy
       run: |
@@ -40,7 +43,8 @@ jobs:
         pip install pillow
         pip install cython
         pip install git+https://github.com/Who8MyLunch/CharPyLS
-        pytest
+        echo 'show relevant test lines'
+        pytest -v | grep -i -E 'pillow|jpeg_ls|==='
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
