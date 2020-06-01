@@ -54,7 +54,7 @@ jobs:
         cd gdcmbin
         cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
-        python -c 'print(sysconfig.get_path()["purelib"])'
+        python -c 'import sysconfig;print(sysconfig.get_path()["purelib"])'
         # Create super-simple setup.py for pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > bin/setup.py
         pip install -e bin/
