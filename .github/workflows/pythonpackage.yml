@@ -48,7 +48,7 @@ jobs:
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
-        apt-get install -y --no-install-recommends swig python3-dev build-essential
+        sudo apt-get install -y --no-install-recommends swig python3-dev build-essential
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
