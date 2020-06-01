@@ -49,7 +49,7 @@ jobs:
       id: cache-gdcm
       uses: actions/cache@v2
       with:
-        path: gdcm
+        path: gdcmbin
         key: GDCM
     - name: Build GDCM
       if: steps.cache-gdcm.outputs.cache-hit != 'true'
