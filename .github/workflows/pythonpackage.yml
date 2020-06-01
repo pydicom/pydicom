@@ -37,10 +37,10 @@ jobs:
     - name: External pixel data handlers
       if: ${{ matrix.python-version == '3.8' }}
       run: |
-      pip install pillow
-      pip install cython
-      pip install git+https://github.com/Who8MyLunch/CharPyLS
-      pytest
+        pip install pillow
+        pip install cython
+        pip install git+https://github.com/Who8MyLunch/CharPyLS
+        pytest
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
