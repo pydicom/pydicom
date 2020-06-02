@@ -84,7 +84,7 @@ jobs:
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
         pytest --cov=pydicom --cov-append
     - name: Send coverage results
-      if: ${{ success() }}
+      if: ${{ success() && matrix.os == 'ubuntu-latest' }}
       run: >
         bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
         0 https://codecov.io/bash) || (sleep 30 && bash <(curl
