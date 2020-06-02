@@ -19,15 +19,26 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        python -m pip install -U pip # to get version > 20 to have cache dir
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
     - name: Initial test environment setup
       run: |
-        pip install wheel
-        pip install pytest
+        python -m pip install wheel pytest
     - name: Flake8 checks
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.6' }}
       run: |
-        pip install flake8
+        python -m pip install flake8
         flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+        # exit-zero treats all errors as warnings.
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics        
     - name: Test with no external libraries
       run: |
         pytest
@@ -37,12 +48,11 @@ jobs:
     - name: Test with numpy
       run: |
         pytest
-    - name: External pixel data handlers
+    - name: Pillow and jpeg_ls
       if: ${{ matrix.python-version == '3.8' }}
       run: |
-        pip install pillow
-        pip install cython
-        pip install git+https://github.com/Who8MyLunch/CharPyLS
+        python -m pip install pillow cython
+        python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         echo 'show relevant test lines'
         pytest -v | grep -i -E 'pillow|jpeg_ls|==='
     - name: Cache GDCM
@@ -65,11 +75,10 @@ jobs:
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
-        sudo apt-get install -y --no-install-recommends swig python3-dev
-        # python -c 'import sysconfig;print(sysconfig.get_paths()["purelib"])'
-        # Create super-simple setup.py for pip install
+        # sudo apt-get install -y --no-install-recommends swig python3-dev
+        # Create super-simple setup.py for python -m pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
-        pip install -e gdcmbin/bin/
-        python3 -c 'import gdcm; print(gdcm.GDCM_VERSION)'
-        pytest -v | grep -i -E 'gdcm|==='
+        python -m pip install -e gdcmbin/bin/
+        python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
+        pytest -v | grep -i -E 'gdcm|===' # Just to see if being skipped or not
 
