@@ -22,7 +22,7 @@ jobs:
     - name: Get pip cache dir
       id: pip-cache
       run: |
-        python -m pip install -U pip # to get version > 20 to have cache dir
+        python -m pip install -U pip # to ensure version > 20 to have cache dir
         echo "::set-output name=dir::$(pip cache dir)"
     - name: pip cache
       uses: actions/cache@v2
@@ -63,7 +63,7 @@ jobs:
         path: gdcmbin
         key: GDCM
     - name: Build GDCM
-      if: startsWith(matrix.os, "ubuntu") && steps.cache-gdcm.outputs.cache-hit != 'true'
+      if: ${{ matrix.os == 'ubuntu-latest' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         git clone --branch release https://github.com/malaterre/GDCM.git
