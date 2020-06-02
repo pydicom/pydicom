@@ -41,20 +41,20 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics        
     - name: Test with no external libraries
       run: |
-        pytest
+        pytest --cov=pydicom --cov-append
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest
+        pytest --cov=pydicom --cov-append
     - name: Pillow and jpeg_ls
       if: ${{ matrix.python-version == '3.8' }}
       run: |
         python -m pip install pillow cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         echo 'show relevant test lines'
-        pytest -v | grep -i -E 'pillow|jpeg_ls|==='
+        pytest --cov=pydicom --cov-append
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -81,5 +81,11 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest -v | grep -i -E 'gdcm|===' # Just to see if being skipped or not
-
+        pytest --cov=pydicom --cov-append
+    - name: Send coverage results
+      if: ${{ success() }}
+      run: |
+        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time \
+        0 https://codecov.io/bash) || (sleep 30 && bash <(curl \
+        --connect-timeout 10 --retry 10 --retry-max-time \
+        0 https://codecov.io/bash))
