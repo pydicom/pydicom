@@ -85,8 +85,8 @@ jobs:
         pytest --cov=pydicom --cov-append
     - name: Send coverage results
       if: ${{ success() }}
-      run: |
-        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time \
-        0 https://codecov.io/bash) || (sleep 30 && bash <(curl \
-        --connect-timeout 10 --retry 10 --retry-max-time \
+      run: >
+        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
+        0 https://codecov.io/bash) || (sleep 30 && bash <(curl
+        --connect-timeout 10 --retry 10 --retry-max-time
         0 https://codecov.io/bash))
