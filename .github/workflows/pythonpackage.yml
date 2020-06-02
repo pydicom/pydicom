@@ -57,7 +57,7 @@ jobs:
         pytest -v | grep -i -E 'pillow|jpeg_ls|==='
     - name: Cache GDCM
       id: cache-gdcm
-      if: startsWith(matrix.os, "ubuntu")
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       uses: actions/cache@v2
       with:
         path: gdcmbin
