@@ -10,7 +10,7 @@ jobs:
       max-parallel: 4
       matrix:
         #  ** Update flake8 literals if change os or python-versions
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version:  [3.6, 3.7, 3.8]
 
     steps:
@@ -57,12 +57,13 @@ jobs:
         pytest -v | grep -i -E 'pillow|jpeg_ls|==='
     - name: Cache GDCM
       id: cache-gdcm
+      if: startsWith(matrix.os, "ubuntu")
       uses: actions/cache@v2
       with:
         path: gdcmbin
         key: GDCM
     - name: Build GDCM
-      if: steps.cache-gdcm.outputs.cache-hit != 'true'
+      if: startsWith(matrix.os, "ubuntu") && steps.cache-gdcm.outputs.cache-hit != 'true'
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         git clone --branch release https://github.com/malaterre/GDCM.git
