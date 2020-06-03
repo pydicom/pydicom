@@ -89,7 +89,7 @@ jobs:
     - name: Build GDCM
       if: >
         ${{ matrix.os == 'ubuntu-latest' && steps.cache-gdcm.outputs.cache-hit != 'true'
-        && matrix.python-version == "3.8" }}
+        && matrix.python-version == '3.8' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         git clone --branch release https://github.com/malaterre/GDCM.git
