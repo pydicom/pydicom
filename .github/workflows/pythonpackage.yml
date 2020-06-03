@@ -42,9 +42,9 @@ jobs:
         os: [ubuntu-latest, windows-latest] # , macos-latest]
         python-version:  [3.7, 3.8]  # 3.6, 3.7, 
         include:
-          os: ubuntu-latest
-          python-version: 3.8
-          gdcm: true
+          - os: ubuntu-latest
+            python-version: 3.8
+            gdcm: true
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
