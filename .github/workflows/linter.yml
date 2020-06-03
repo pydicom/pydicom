@@ -7,7 +7,6 @@ jobs:
     runs-on: ${{ matrix.os }
     strategy:
       matrix:
-        #  ** Update flake8 literals if change os or python-versions
         os: [ubuntu-latest]
         python-version:  [3.8]
     steps:
@@ -30,5 +29,6 @@ jobs:
         python -m pip install flake8
         flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
     - name: Style warnings
-          # exit-zero treats all errors as warnings.
+      run: |    
+        # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics        
