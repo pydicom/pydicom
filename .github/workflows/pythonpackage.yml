@@ -1,10 +1,10 @@
-name: Python package
+name: Testsuite
 
 on: [push]
 
 jobs:
   build:
-
+    needs: flake8
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 4
@@ -14,9 +14,9 @@ jobs:
         python-version:  [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Get pip cache dir
@@ -33,13 +33,6 @@ jobs:
       run: |
         python -m pip install wheel 
         python -m pip install pytest pytest-cov
-    - name: Flake8 checks
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.6' }}
-      run: |
-        python -m pip install flake8
-        flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
-        # exit-zero treats all errors as warnings.
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics        
     - name: Test with no external libraries
       run: |
         pytest --cov=pydicom --cov-append
@@ -54,7 +47,6 @@ jobs:
       run: |
         python -m pip install pillow cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
-        echo 'show relevant test lines'
         pytest --cov=pydicom --cov-append
     - name: Cache GDCM
       id: cache-gdcm
@@ -77,7 +69,6 @@ jobs:
     - name: Test with GDCM on one OS/Python
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
-        # sudo apt-get install -y --no-install-recommends swig python3-dev
         # Create super-simple setup.py for python -m pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
