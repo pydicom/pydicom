@@ -41,12 +41,14 @@ jobs:
       matrix:
         #  ** Update flake8 literals if change os or python-versions
         os: [ubuntu-latest, windows-latest] # , macos-latest]
-        python-version:  [3.7, 3.8]  # 3.6, 3.7, 
+        python-version:  [3.6, 3.7, 3.8]  # 3.6, 3.7, 
         include:
           - os: ubuntu-latest
             python-version: 3.8
-            gdcm: true
             pillow-jpegls: true
+            gdcm: true
+            coverage-args: --cov=pydicom --cov-append
+            
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -69,13 +71,13 @@ jobs:
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        pytest --cov=pydicom --cov-append
+        pytest ${{ matrix.coverage-args }}
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest --cov=pydicom --cov-append
+        pytest ${{ matrix.coverage-args }}
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.pillow-jpegls }}
       run: |
@@ -84,7 +86,7 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.pillow-jpegls }}
       run: |
-        pytest --cov=pydicom --cov-append
+        pytest ${{ matrix.coverage-args }}
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm }}
@@ -93,7 +95,7 @@ jobs:
         path: gdcmbin
         key: GDCM
 
-    - name: Build GDCM
+    - name: Build GDCM (not in cache)
       if: ${{ matrix.gdcm && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
@@ -110,7 +112,7 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest --cov=pydicom --cov-append
+        pytest ${{ matrix.coverage-args }}
 
     - name: Send coverage results
       if: ${{ success() && matrix.os == 'ubuntu-latest' }}
