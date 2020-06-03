@@ -3,7 +3,7 @@ name: Testsuite
 on: [push]
 
 jobs:
-  flake8:
+  Linter:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,10 +35,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics        
 
   build:
-    needs: flake8
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 4
       matrix:
         #  ** Update flake8 literals if change os or python-versions
         os: [ubuntu-latest, windows-latest] # , macos-latest]
@@ -72,11 +70,13 @@ jobs:
     - name: Test with numpy
       run: |
         pytest --cov=pydicom --cov-append
-    - name: Pillow and jpeg_ls
+    - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.python-version == '3.8' }}
       run: |
         python -m pip install pillow cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
+    - name: Run Pillow and jpeg_ls tests
+      run: |
         pytest --cov=pydicom --cov-append
     - name: Cache GDCM
       id: cache-gdcm
@@ -85,8 +85,11 @@ jobs:
       with:
         path: gdcmbin
         key: GDCM
+
     - name: Build GDCM
-      if: ${{ matrix.os == 'ubuntu-latest' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
+      if: >
+        ${{ matrix.os == 'ubuntu-latest' && steps.cache-gdcm.outputs.cache-hit != 'true'
+        && matrix.python-version == "3.8" }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         git clone --branch release https://github.com/malaterre/GDCM.git
@@ -95,15 +98,15 @@ jobs:
         cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
         cd ..
-
     - name: Test with GDCM on one OS/Python
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
       run: |
         # Create super-simple setup.py for python -m pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
         pytest --cov=pydicom --cov-append
+
     - name: Send coverage results
       if: ${{ success() && matrix.os == 'ubuntu-latest' }}
       run: >
