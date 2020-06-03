@@ -283,10 +283,6 @@ def path_from_pathlike(file_object):
         ``PathLike`` objects have been introduced in Python 3.6. In Python 3.5,
         only objects of type :class:`pathlib.Path` are considered.
     """
-    if sys.version_info < (3, 6):
-        if isinstance(file_object, pathlib.Path):
-            return str(file_object)
-        return file_object
     try:
         return os.fspath(file_object)
     except TypeError:
