@@ -104,7 +104,7 @@ jobs:
         path: gdcmbin
         key: GDCM
 
-    - name: Build GDCM (not in cache)
+    - name: Build GDCM (if not in cache)
       if: ${{ matrix.gdcm && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev

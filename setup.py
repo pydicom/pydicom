@@ -78,7 +78,7 @@ def data_files_inventory():
 PACKAGE_DATA = {'pydicom': data_files_inventory()}
 
 opts = dict(name=NAME,
-            python_requires='>=3.5',
+            python_requires='>=3.6',
             version=VERSION,
             maintainer=MAINTAINER,
             maintainer_email=MAINTAINER_EMAIL,
