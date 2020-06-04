@@ -73,7 +73,7 @@ class _CID_Dict:
             raise AttributeError(msg)
         elif len(matches) > 1:
             # Should never happen, but just in case
-            msg = "Multiple schemes found for '{}' in cid{}".format(name, cid)
+            msg = "Multiple schemes found for '{}' in cid{}".format(name, self.cid)
             raise AssertionError(msg)
         else:
             scheme = matches[0]
@@ -90,7 +90,7 @@ class _CID_Dict:
                 if len(matches) > 1:
                     # Should never happen, but check in case
                     msg = "{} had multiple code matches for cid{}".format(
-                        name, cid
+                        name, self.cid
                     )
                     raise AssertionError(msg)
                 code, val = matches[0]
