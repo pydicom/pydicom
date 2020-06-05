@@ -31,14 +31,14 @@ jobs:
       id: diff-files
       uses: trilom/file-changes-action@v1.2.4
       with:
-        output: '\n\r'
-        fileOutput: '\n\r'
+        output: '\n'
+        fileOutput: '\n'
     - name: Get .py files changed
       id: pydiff
       run: >
         echo "::set-output name=pyfiles::$(echo -e 
-        '${{ steps.diff-files.outputs.files_added }} ${{ steps.diff-files.outputs.files_modified }}'
-        | grep '\.py'
+        '${{ steps.diff-files.outputs.files_added }}\n${{ steps.diff-files.outputs.files_modified }}' 
+        | grep '\.py' | tr '\n' ' '
         )"
 
     - name: Install linter
