@@ -37,7 +37,7 @@ jobs:
       id: pydiff
       run: >
         echo "::set-output name=pyfiles::$(echo -e 
-        ${{ steps.diff-files.outputs.files_added }} ${{ steps.diff-files.outputs.files_modified }}
+        '${{ steps.diff-files.outputs.files_added }} ${{ steps.diff-files.outputs.files_modified }}'
         | grep '\.py'
         )"
 
