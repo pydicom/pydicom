@@ -26,8 +26,6 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
-from sys import byteorder
-
 import pytest
 
 import pydicom

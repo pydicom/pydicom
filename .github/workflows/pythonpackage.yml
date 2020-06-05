@@ -31,7 +31,6 @@ jobs:
     - name: Get files changed
       id: diff-files
       run: >
-        # Get list of all .py files modified, except those deleted
         echo "::set-output name=files::$(git diff-tree -r --diff-filter=d 
         --name-only master ${{ github.SHA }} | grep '\.py$')"
 
