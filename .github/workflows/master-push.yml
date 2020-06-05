@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - master-workflow # While testing in the PR introducing it
 
 jobs:
   build:
