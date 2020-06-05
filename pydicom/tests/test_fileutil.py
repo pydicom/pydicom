@@ -1,6 +1,5 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
-import sys
 from io import BytesIO
 from pathlib import Path
 
