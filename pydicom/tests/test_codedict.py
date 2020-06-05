@@ -1,5 +1,3 @@
-import pytest
-
 from pydicom.sr.codedict import codes
 from pydicom.sr.coding import Code
 
