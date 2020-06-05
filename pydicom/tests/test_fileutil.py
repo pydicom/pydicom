@@ -31,7 +31,5 @@ class TestPathFromPathLike:
     def test_pathlib_path(self):
         assert 'test.dcm' == path_from_pathlike(Path('test.dcm'))
 
-    @pytest.mark.skipif(sys.version_info < (3, 6),
-                        reason="Path-like objects introduced in Python 3.6")
     def test_path_like(self):
         assert 'test.dcm' == path_from_pathlike(PathLike('test.dcm'))
