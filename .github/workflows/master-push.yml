@@ -16,9 +16,10 @@ jobs:
         python-version:  [3.6, 3.7, 3.8]
         pillow-jpegls: [true]
         include:
-        - os: ubuntu-latest
-          gdcm: true
-            
+          - { gdcm: true, os: ubuntu-latest, python-version: 3.6, pillow-jpegls: false }
+          - { gdcm: true, os: ubuntu-latest, python-version: 3.7, pillow-jpegls: false }
+          - { gdcm: true, os: ubuntu-latest, python-version: 3.8, pillow-jpegls: false }
+    
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}

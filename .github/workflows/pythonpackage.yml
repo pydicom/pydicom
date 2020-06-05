@@ -1,9 +1,9 @@
 name: Testsuite
 
-on: push
-  branches-ignore:
-    - master
-    - master-workflow # While testing in the PR introducing it
+on:
+  push:
+    branches-ignore:
+      - master
 
 jobs:
   Linter:
