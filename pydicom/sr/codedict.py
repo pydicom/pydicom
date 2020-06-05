@@ -42,8 +42,7 @@ class _CID_Dict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0
@@ -183,8 +182,7 @@ class _CodesDict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0

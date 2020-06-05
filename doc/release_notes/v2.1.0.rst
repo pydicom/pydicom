@@ -3,6 +3,7 @@ Version 2.1.0
 
 Changes
 -------
+* Dropped support for Python 3.5 (only Python 3.6+ supported)
 
 Enhancements
 ------------
