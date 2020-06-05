@@ -1,6 +1,9 @@
 name: Testsuite
 
-on: [push]
+on: push
+  branches-ignore:
+    - master
+    - master-workflow # While testing in the PR introducing it
 
 jobs:
   Linter:
@@ -28,29 +31,28 @@ jobs:
     - name: Get files changed
       id: diff-files
       run: >
-        echo "::set-output name=files::$(git diff-tree --no-commit-id --name-only
-        --diff-filter=AM ${{ github.ref }} | grep '.py$')"
+        # Get list of all .py files modified, except those deleted
+        echo "::set-output name=files::$(git diff-tree -r --diff-filter=d 
+        --name-only master ${{ github.SHA }} | grep '\.py$')"
 
+    - name: Install linter
+      run: python -m pip install flake8
     - name: Syntax errors check
       run: |
-        # Get list of added and modified files. [Is github.ref correct choice?]
-        export DIFF_FILES=``
         echo 'flake8 for files ${{ steps.diff-files.outputs.files }}'
-        python -m pip install flake8
-        python -m flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics ${{ steps.diff-files.outputs.files }}
+        python -m flake8 --select=E901,E999,F821,F822,F823 ${{ steps.diff-files.outputs.files }}
     - name: Style warnings
       run: |    
-        # exit-zero treats all errors as warnings.
-        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics ${{ steps.diff-files.outputs.files }}
+        # exit-zero treats all errors as warnings
+        python -m flake8 --exit-zero ${{ steps.diff-files.outputs.files }}
 
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        #  ** Update flake8 literals if change os or python-versions
-        os: [ubuntu-latest, windows-latest] # , macos-latest]
-        python-version:  [3.6, 3.7, 3.8]  # 3.6, 3.7, 
+        os: [ubuntu-latest, windows-latest]
+        python-version:  [3.6, 3.7, 3.8]
         include:
           - os: ubuntu-latest
             python-version: 3.8
@@ -88,34 +90,35 @@ jobs:
       run: |
         pytest ${{ matrix.coverage-args }}
     - name: Set up Pillow and jpeg_ls
-      if: ${{ matrix.pillow-jpegls }}
+      if: ${{ matrix.pillow-jpegls == 'true' }}
       run: |
         python -m pip install pillow cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
     - name: Run Pillow and jpeg_ls tests
-      if: ${{ matrix.pillow-jpegls }}
+      if: ${{ matrix.pillow-jpegls == 'true' }}
       run: |
         pytest ${{ matrix.coverage-args }}
     - name: Cache GDCM
       id: cache-gdcm
-      if: ${{ matrix.gdcm }}
+      if: ${{ matrix.gdcm == 'true' }}
       uses: actions/cache@v2
       with:
         path: gdcmbin
         key: GDCM
 
     - name: Build GDCM (if not in cache)
-      if: ${{ matrix.gdcm && steps.cache-gdcm.outputs.cache-hit != 'true' }}
+      if: ${{ matrix.gdcm == 'true' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
+        sudo apt-get install -y --no-install-recommends ninja-build
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
-        cmake -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
-        make
+        cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        ninja  # alternative to `make`
         cd ..
-    - name: Test with GDCM on one OS/Python
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
+    - name: Test with GDCM
+      if: ${{ matrix.gdcm == 'true' }}
       run: |
         # Create super-simple setup.py for python -m pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
