@@ -56,7 +56,6 @@ try:
         get_pixeldata,
         unpack_bits,
         pack_bits,
-        pixel_dtype,
     )
 except ImportError:
     NP_HANDLER = None

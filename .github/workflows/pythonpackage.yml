@@ -29,9 +29,15 @@ jobs:
 
     - name: Get files changed
       id: diff-files
-      run: |
-        URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
-        echo "::set-output name=files::$(curl -s -X GET -G $URL | jq -r '.[] | .filename')"
+      uses: trilom/file-changes-action@v1.2.4
+      with:
+        output: '\n\r'
+        fileOutput: '\n\r'
+      run: >
+        echo "::set-output name=pyfiles::$(echo -e 
+        ${{ steps.diff-files.outputs.files_added }} ${{ steps.diff-files.outputs.files_modified }}) 
+        | grep '\.py'
+        )"
 
     - name: Install linter
       run: python -m pip install flake8
