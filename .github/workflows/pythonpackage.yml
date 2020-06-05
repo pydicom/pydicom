@@ -30,9 +30,8 @@ jobs:
 
     - name: Get files changed
       id: diff-files
-      run: >
-        echo "::set-output name=files::$(git diff-tree -r --diff-filter=d 
-        --name-only ${{ github.base_ref }} ${{ github.SHA }} | grep '\.py$')"
+      run: |
+        echo "::set-output name=files::$(git diff-tree -r --diff-filter=d --name-only ${{ github.SHA }} )"
 
     - name: Install linter
       run: python -m pip install flake8
