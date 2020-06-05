@@ -14,11 +14,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version:  [3.6, 3.7, 3.8]
-        pillow-jpegls: [true]
+        jpeg-deps: [pillow-jpegls]
+        gdcm-dep: [no-gdcm]
         include:
-          - { gdcm: true, os: ubuntu-latest, python-version: 3.6, pillow-jpegls: false }
-          - { gdcm: true, os: ubuntu-latest, python-version: 3.7, pillow-jpegls: false }
-          - { gdcm: true, os: ubuntu-latest, python-version: 3.8, pillow-jpegls: false }
+          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
+          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
+          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
     
     steps:
     - uses: actions/checkout@v2
@@ -50,24 +51,24 @@ jobs:
       run: |
         pytest 
     - name: Set up Pillow and jpeg_ls
-      if: ${{ matrix.pillow-jpegls == 'true' }}
+      if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
         python -m pip install pillow cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
     - name: Run Pillow and jpeg_ls tests
-      if: ${{ matrix.pillow-jpegls == 'true' }}
+      if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
         pytest 
     - name: Cache GDCM
       id: cache-gdcm
-      if: ${{ matrix.gdcm == 'true' }}
+      if: ${{ matrix.gdcm-dep == 'gdcm' }}
       uses: actions/cache@v2
       with:
         path: gdcmbin
         key: GDCM
 
     - name: Build GDCM (if not in cache)
-      if: ${{ matrix.gdcm == 'true' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
+      if: ${{ matrix.gdcm-dep == 'gdcm' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
         sudo apt-get install -y ninja-build
@@ -78,7 +79,7 @@ jobs:
         ninja
         cd ..
     - name: Test with GDCM
-      if: ${{ matrix.gdcm == 'true' }}
+      if: ${{ matrix.gdcm-dep == 'gdcm' }}
       run: |
         # Create super-simple setup.py for python -m pip install
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
