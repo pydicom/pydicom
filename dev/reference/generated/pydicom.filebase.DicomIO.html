@@ -217,11 +217,11 @@
 <h1>pydicom.filebase.DicomIO<a class="headerlink" href="#pydicom-filebase-dicomio" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.filebase.DicomIO">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.filebase.</code><code class="sig-name descname">DicomIO</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L11"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.filebase.</code><code class="sig-name descname">DicomIO</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L11"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO" title="Permalink to this definition">¶</a></dt>
 <dd><p>File object which holds transfer syntax info and anything else we need.</p>
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L21"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L21"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -302,86 +302,86 @@
 </table>
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read">
-<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">need_exact_length</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L57"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">need_exact_length</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L57"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads the required length, returns EOFError if gets less</p>
 <p>If length is <code class="docutils literal notranslate"><span class="pre">None</span></code>, then read all bytes</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_beUL">
-<code class="sig-name descname">read_beUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L102"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_beUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L102"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an unsigned long read with big endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_beUS">
-<code class="sig-name descname">read_beUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L49"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_beUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L49"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_beUS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an unsigned short from the file with big endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_be_tag">
-<code class="sig-name descname">read_be_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_be_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_be_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_be_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and return two unsigned shorts (big endian) from the file.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_leUL">
-<code class="sig-name descname">read_leUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L53"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_leUL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L53"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an unsigned long read with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_leUS">
-<code class="sig-name descname">read_leUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L44"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_leUS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L44"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_leUS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an unsigned short from the file with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.read_le_tag">
-<code class="sig-name descname">read_le_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L25"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_le_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">read_le_tag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L25"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.read_le_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and return two unsigned shorts (little endian) from the file.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_UL">
-<code class="sig-name descname">write_UL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L87"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_UL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_UL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L87"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_UL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned long with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_US">
-<code class="sig-name descname">write_US</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_US" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_US</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_US" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned short with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_beUL">
-<code class="sig-name descname">write_beUL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_beUL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L95"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned long with big endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_beUS">
-<code class="sig-name descname">write_beUS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L91"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_beUS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L91"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_beUS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned short with big endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_leUL">
-<code class="sig-name descname">write_leUL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L87"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_leUL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L87"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned long with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_leUS">
-<code class="sig-name descname">write_leUS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_leUS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_leUS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an unsigned short with little endian byte order</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.filebase.DicomIO.write_tag">
-<code class="sig-name descname">write_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5a51b80d/pydicom/filebase.py#L36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/filebase.py#L36"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filebase.DicomIO.write_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a dicom tag (two unsigned shorts) to the file.</p>
 </dd></dl>
 
