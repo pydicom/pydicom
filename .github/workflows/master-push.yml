@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - master-workflow  # Testing during development of the workflow
 
 jobs:
   build:
@@ -19,6 +20,7 @@ jobs:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
+          # - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
     
     steps:
     - uses: actions/checkout@v2
@@ -85,3 +87,9 @@ jobs:
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
         pytest 
+    - name: Test pymedphys pydicom-dependent tests
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
+      run: |
+        python -m pip install --pre pymedphys
+        pymedphys dev tests --run-only-pydicom
+        pymedphys dev tests --run-only-pydicom --run-only-slow
