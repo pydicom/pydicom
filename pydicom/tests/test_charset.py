@@ -286,8 +286,9 @@ class TestCharset:
             elem = DataElement(0x00100010, 'PN',
                                b'Dionysios=\x1b\x2d\x46'
                                b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-            pydicom.charset.decode_element(elem,
-                                   ['ISO_2022-IR 100', 'ISO 2022 IR 126'])
+            pydicom.charset.decode_element(
+                elem, ['ISO_2022-IR 100', 'ISO 2022 IR 126']
+            )
             assert u'Dionysios=Διονυσιος' == elem.value
 
         with pytest.warns(UserWarning,
