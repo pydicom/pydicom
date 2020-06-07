@@ -10,7 +10,6 @@ A DataElement has a tag,
 
 import base64
 import json
-import warnings
 from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly

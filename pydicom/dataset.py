@@ -46,12 +46,6 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
 
 from importlib.util import find_spec as have_package
 
-have_numpy = True
-try:
-    import numpy
-except ImportError:
-    have_numpy = False
-
 
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
