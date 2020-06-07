@@ -27,7 +27,7 @@ import sys
 
 import pytest
 
-from pydicom import dcmread, Dataset, config
+from pydicom import dcmread, Dataset
 import pydicom.config
 from pydicom.data import get_testdata_files
 from pydicom.dataset import FileMetaDataset

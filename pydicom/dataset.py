@@ -46,12 +46,6 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
 
 from importlib.util import find_spec as have_package
 
-have_numpy = True
-try:
-    import numpy
-except ImportError:
-    have_numpy = False
-
 
 class PrivateBlock:
     """Helper class for a private block in the :class:`Dataset`.
@@ -605,8 +599,7 @@ class Dataset(dict):
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(list(zip(
             *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
         props = set(list(zip(

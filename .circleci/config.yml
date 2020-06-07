@@ -22,12 +22,12 @@ jobs:
       - checkout
       - run:
           name: Checkout merge commit
-          command: ./build_tools/circle/checkout_merge_commit.sh
+          command: bash ./build_tools/circle/checkout_merge_commit.sh
       - run:
           # Check whether the doc build is required, install build dependencies and
           # run sphinx to build the doc.
           name: Build documentation
-          command: ./build_tools/circle/build_doc.sh
+          command: bash ./build_tools/circle/build_doc.sh
           timeout: "3600"  # seconds
 
       - run:
@@ -46,4 +46,4 @@ jobs:
 
       - deploy:
           name: Deploy documentation
-          command: ./build_tools/circle/push_doc.sh
+          command: bash ./build_tools/circle/push_doc.sh

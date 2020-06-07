@@ -42,8 +42,7 @@ class _CID_Dict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0
@@ -73,7 +72,7 @@ class _CID_Dict:
             raise AttributeError(msg)
         elif len(matches) > 1:
             # Should never happen, but just in case
-            msg = "Multiple schemes found for '{}' in cid{}".format(name, cid)
+            msg = "Multiple schemes found for '{}' in cid{}".format(name, self.cid)
             raise AssertionError(msg)
         else:
             scheme = matches[0]
@@ -90,7 +89,7 @@ class _CID_Dict:
                 if len(matches) > 1:
                     # Should never happen, but check in case
                     msg = "{} had multiple code matches for cid{}".format(
-                        name, cid
+                        name, self.cid
                     )
                     raise AssertionError(msg)
                 code, val = matches[0]
@@ -183,8 +182,7 @@ class _CodesDict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0
