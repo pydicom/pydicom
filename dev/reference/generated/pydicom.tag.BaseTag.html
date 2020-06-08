@@ -219,41 +219,26 @@
 <h1>pydicom.tag.BaseTag<a class="headerlink" href="#pydicom-tag-basetag" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.tag.BaseTag">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.tag.</code><code class="sig-name descname">BaseTag</code><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6284735b/pydicom/tag.py#L127"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.tag.</code><code class="sig-name descname">BaseTag</code><a class="reference external" href="https://github.com/pydicom/pydicom/blob/056c0f18/pydicom/tag.py#L127"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a DICOM element (group, element) tag.</p>
 <p>Tags are represented as an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 <dl class="py attribute">
 <dt id="pydicom.tag.BaseTag.element">
-<code class="sig-name descname">element</code><a class="headerlink" href="#pydicom.tag.BaseTag.element" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">element</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></em><a class="headerlink" href="#pydicom.tag.BaseTag.element" title="Permalink to this definition">¶</a></dt>
 <dd><p>The element number of the tag.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.tag.BaseTag.group">
-<code class="sig-name descname">group</code><a class="headerlink" href="#pydicom.tag.BaseTag.group" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">group</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></em><a class="headerlink" href="#pydicom.tag.BaseTag.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>The group number of the tag.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.tag.BaseTag.is_private">
-<code class="sig-name descname">is_private</code><a class="headerlink" href="#pydicom.tag.BaseTag.is_private" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_private</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></em><a class="headerlink" href="#pydicom.tag.BaseTag.is_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> if the corresponding element is private, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -269,22 +254,22 @@ otherwise.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.__init__" title="pydicom.tag.BaseTag.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.__init__" title="pydicom.tag.BaseTag.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_integer_ratio</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_integer_ratio</span></code>()</p></td>
 <td><p>Return integer ratio.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bit_length</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bit_length</span></code>()</p></td>
 <td><p>Number of bits necessary to represent self in binary.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conjugate</span></code></p></td>
 <td><p>Returns self, the complex conjugate of any int.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_bytes</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_bytes</span></code>(byteorder, *[, signed])</p></td>
 <td><p>Return the integer represented by the given array of bytes.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_bytes</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_bytes</span></code>(length, byteorder, *[, signed])</p></td>
 <td><p>Return an array of bytes representing an integer.</p></td>
 </tr>
 </tbody>
