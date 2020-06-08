@@ -338,9 +338,9 @@ class TestPersonName:
 
         # PersonName does not decode the components automatically
         pn = pn.decode()
-        assert (u"Hong", u"Gildong") == (pn.family_name, pn.given_name)
-        assert u"洪^吉洞" == pn.ideographic
-        assert u"홍^길동" == pn.phonetic
+        assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
+        assert "洪^吉洞" == pn.ideographic
+        assert "홍^길동" == pn.phonetic
 
     def test_unicode_jp_from_bytes(self):
         """PN: 3component in unicode works (Japanese)..."""
@@ -352,9 +352,9 @@ class TestPersonName:
             [default_encoding, "iso2022_jp"],
         )
         pn = pn.decode()
-        assert (u"Yamada", u"Tarou") == (pn.family_name, pn.given_name)
-        assert u"山田^太郎" == pn.ideographic
-        assert u"やまだ^たろう" == pn.phonetic
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
 
     def test_unicode_jp_from_bytes_comp_delimiter(self):
         """The example encoding without the escape sequence before '='"""
@@ -365,9 +365,9 @@ class TestPersonName:
             [default_encoding, "iso2022_jp"],
         )
         pn = pn.decode()
-        assert (u"Yamada", u"Tarou") == (pn.family_name, pn.given_name)
-        assert u"山田^太郎" == pn.ideographic
-        assert u"やまだ^たろう" == pn.phonetic
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
 
     def test_unicode_jp_from_bytes_caret_delimiter(self):
         """PN: 3component in unicode works (Japanese)..."""
@@ -379,18 +379,18 @@ class TestPersonName:
             [default_encoding, "iso2022_jp"],
         )
         pn = pn.decode()
-        assert (u"Yamada", u"Tarou") == (pn.family_name, pn.given_name)
-        assert u"山田^太郎" == pn.ideographic
-        assert u"やまだ^たろう" == pn.phonetic
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
 
     def test_unicode_jp_from_unicode(self):
         """A person name initialized from unicode is already decoded"""
         pn = PersonName(
-            u"Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
         )
-        assert (u"Yamada", u"Tarou") == (pn.family_name, pn.given_name)
-        assert u"山田^太郎" == pn.ideographic
-        assert u"やまだ^たろう" == pn.phonetic
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
 
     def test_not_equal(self):
         """PN3: Not equal works correctly (issue 121)..."""
@@ -420,10 +420,10 @@ class TestPersonName:
         assert hash(pn1) != hash(pn3)
 
         pn1 = PersonName(
-            u"Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
         )
         pn2 = PersonName(
-            u"Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
         )
         assert hash(pn1) == hash(pn2)
 
