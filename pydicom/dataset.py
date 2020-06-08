@@ -322,7 +322,7 @@ class Dataset(dict):
     >>> jsonmodel = ds.to_json()
     >>> ds2 = Dataset()
     >>> ds2.from_json(jsonmodel)
-    (0010, 0010) Patient's Name                      PN: u'Some^Name'
+    (0010, 0010) Patient's Name                      PN: 'Some^Name'
 
     Attributes
     ----------
