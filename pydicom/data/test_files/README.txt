@@ -57,6 +57,11 @@ eCT_Supplemental.dcm
   * 2 frames, 16 bits allocated/stored, MONOCHROME2
   * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
 
+GDCMJ2K_TextGBR.dcm (from GDCM)
+  * JPEG 2000 Lossless transfer syntax
+  * Contains non-conformant Pixel Data with a JP2 header
+  * unsigned 8-bit, 3 samples/px, YBR_RCT Photometric Interpretation
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/

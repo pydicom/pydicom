@@ -7,6 +7,8 @@ Changes
 
 Enhancements
 ------------
+* Added a new pixel data handler based on pylibjpeg which supports all
+  (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 
 Fixes
 -----
