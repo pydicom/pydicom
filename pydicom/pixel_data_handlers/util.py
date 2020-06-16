@@ -989,6 +989,10 @@ def reshape_pixel_array(ds, arr):
     | 1.2.840.10008.1.2.5    | RLE Lossless       | 1                     |
     +------------------------+--------------------+-----------------------+
 
+    .. versionchanged:: 2.1
+
+        JPEG-LS transfer syntaxes changed to *Planar Configuration* of 0
+
     Parameters
     ----------
     ds : dataset.Dataset

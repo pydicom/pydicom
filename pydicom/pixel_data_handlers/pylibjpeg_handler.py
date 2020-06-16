@@ -2,6 +2,8 @@
 """Use the `pylibjpeg <https://github.com/pydicom/pylibjpeg/>`_ package
 to convert supported pixel data to a :class:`numpy.ndarray`.
 
+.. versionadded:: 2.1
+
 **Supported data**
 
 The pylibjpeg handler supports the conversion of data in the (7FE0,0010)
@@ -146,6 +148,8 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
 def as_array(ds):
     """Return the entire *Pixel Data* as an :class:`~numpy.ndarray`.
 
+    .. versionadded:: 2.1
+
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
@@ -166,6 +170,8 @@ def as_array(ds):
 
 def generate_frames(ds, reshape=True):
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
+
+    .. versionadded:: 2.1
 
     Parameters
     ----------
@@ -241,6 +247,8 @@ def generate_frames(ds, reshape=True):
 
 def get_pixeldata(ds):
     """Return a :class:`numpy.ndarray` of the pixel data.
+
+    .. versionadded:: 2.1
 
     Parameters
     ----------
