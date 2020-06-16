@@ -36,8 +36,8 @@ jobs:
     - name: Get .py files changed
       id: pydiff
       run: >
-        echo "::set-output name=pyfiles::$(echo -e 
-        '${{ steps.diff-files.outputs.files_added }}\n${{ steps.diff-files.outputs.files_modified }}' 
+        echo "::set-output name=pyfiles::$(echo -e
+        '${{ steps.diff-files.outputs.files_added }}\n${{ steps.diff-files.outputs.files_modified }}'
         | grep '\.py' | tr '\n' ' '
         )"
 
@@ -60,9 +60,10 @@ jobs:
             python-version: 3.8
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
+            pylibjpeg-deps: none, lj+oj
             coverage-args: --cov=pydicom --cov-append
             coverage: coverage
-            
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -81,7 +82,7 @@ jobs:
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
     - name: Initial test environment setup
       run: |
-        python -m pip install wheel 
+        python -m pip install wheel
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
@@ -128,6 +129,14 @@ jobs:
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
         pytest ${{ matrix.coverage-args }}
+
+    - name: Test pylibjpeg
+      run: |
+        python -m pip install pylibjpeg
+        python -m pip uninstall -y pylibjpeg-openjpeg
+        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
+        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}

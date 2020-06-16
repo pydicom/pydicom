@@ -179,6 +179,16 @@ JPG_MATCHING_DATASETS = [
     ),
 ]
 
+
+# JPEG-LS - ISO/IEC 14495 Standard
+JLSL = JPEGLSLossy
+JLSN = JPEGLSLossless
+JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
+JLS_REFERENCE_DATA = [
+    # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)
+    (JPEG_LS_LOSSLESS, (JLSN, 16, 1, 1, 1, (64, 64), 'int16')),
+]
+
 # JPEG 2000 - ISO/IEC 15444 Standard
 J2KR = JPEG2000Lossless
 J2KI = JPEG2000
@@ -448,10 +458,6 @@ class TestJPEG:
             ds.pixel_array
 
 
-# JPEG-LS - ISO/IEC 14495 Standard
-JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-
-
 @pytest.mark.skipif(not TEST_JPEGLS, reason="no -libjpeg plugin")
 class TestJPEGLS:
     def setup(self):
@@ -462,6 +468,32 @@ class TestJPEGLS:
     def teardown(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
+
+    @pytest.mark.parametrize('fpath, data', JLS_REFERENCE_DATA)
+    def test_properties(self, fpath, data):
+        """Test dataset and pixel array properties are as expected."""
+        ds = dcmread(fpath)
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.BitsAllocated == data[1]
+        assert ds.SamplesPerPixel == data[2]
+        assert ds.PixelRepresentation == data[3]
+        assert getattr(ds, 'NumberOfFrames', 1) == data[4]
+
+        arr = ds.pixel_array
+
+        assert arr.flags.writeable
+        assert data[5] == arr.shape
+        assert arr.dtype == data[6]
+
+    def test_arrary(self):
+        """Test returned array values are OK."""
+        ds = dcmread(JPEG_LS_LOSSLESS)
+        arr = ds.pixel_array
+
+        # Checked against GDCM
+        assert ([ 170,  193,  191,  373, 1293, 2053, 1879, 1683, 1711] ==
+            arr[55:65, 35].tolist()
+        )
 
 
 @pytest.mark.skipif(not TEST_JPEG2K, reason="no -openjpeg plugin")
