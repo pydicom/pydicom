@@ -93,7 +93,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
 # JPGE: 1.2.840.1.2.4.51 - JPEG Extended
 JPGE_BAD = get_testdata_file("JPEG-lossy.dcm")  # Bad JPEG file
-JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPGExtended.dcm")  # Fixed version of JPEG-lossy.dcm
+JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPGExtended.dcm")  # Fixed version
 # JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
 JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
@@ -363,7 +363,7 @@ class TestHandler:
         """Test returned value."""
         ds = dcmread(J2KR_16_12_1_0_1F_M2)
         func = LJ_HANDLER.should_change_PhotometricInterpretation_to_RGB
-        assert func(ds) == False
+        assert func(ds) is False
 
 
 @pytest.mark.skipif(not TEST_JPEG, reason="no -libjpeg plugin")
@@ -497,7 +497,8 @@ class TestJPEGLS:
         arr = ds.pixel_array
 
         # Checked against GDCM
-        assert ([ 170,  193,  191,  373, 1293, 2053, 1879, 1683, 1711] ==
+        assert (
+            [170, 193, 191, 373, 1293, 2053, 1879, 1683, 1711] ==
             arr[55:65, 35].tolist()
         )
 
