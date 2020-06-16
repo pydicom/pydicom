@@ -90,6 +90,7 @@ jobs:
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: |
+        python -m pip install pytest-pylint
         python -m pip install --pre pymedphys>=0.31.0dev0
         pymedphys dev tests --run-only-pydicom
         pymedphys dev tests --run-only-pydicom --run-only-slow
