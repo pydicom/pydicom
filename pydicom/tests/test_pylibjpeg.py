@@ -508,8 +508,8 @@ class TestJPEG2K:
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     @pytest.mark.parametrize('fpath, data', J2K_REFERENCE_DATA)
-    def test_properties(self, fpath, data):
-        """Test dataset and pixel array properties are as expected."""
+    def test_properties_as_array(self, fpath, data):
+        """Test dataset, pixel_array and as_array() are as expected."""
         ds = dcmread(fpath)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
@@ -517,7 +517,15 @@ class TestJPEG2K:
         assert ds.PixelRepresentation == data[3]
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
+        # Check Dataset.pixel_array
         arr = ds.pixel_array
+
+        assert arr.flags.writeable
+        assert data[5] == arr.shape
+        assert arr.dtype == data[6]
+
+        # Check handlers as_array() function
+        arr = as_array(ds)
 
         assert arr.flags.writeable
         assert data[5] == arr.shape
