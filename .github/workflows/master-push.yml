@@ -12,14 +12,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version:  [3.6, 3.7, 3.8]
+        os: [ubuntu-latest]  #, windows-latest, macos-latest]
+        python-version:  [3.8]  # 3.6, 3.7, 
         jpeg-deps: [pillow-jpegls]
         gdcm-dep: [no-gdcm]
         include:
-          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
-          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
-          - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
+          # - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
+          # - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
+          # - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
           - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
     
     steps:
@@ -90,7 +90,6 @@ jobs:
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: |
-        python -m pip install pytest-pylint
-        python -m pip install --pre pymedphys>=0.31.0dev0
+        python -m pip install --pre pymedphys[tests]>=0.31.0dev0
         pymedphys dev tests --run-only-pydicom
         pymedphys dev tests --run-only-pydicom --run-only-slow
