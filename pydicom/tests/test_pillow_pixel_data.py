@@ -242,9 +242,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
@@ -263,9 +261,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,

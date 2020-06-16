@@ -79,65 +79,105 @@ REFERENCE_DATA_UNSUPPORTED = [
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
+# JPEG - ISO/IEC 10918 Standard
+# FMT_BA_BV_SPX_PR_FRAMESF_PI
+# JPGB: 1.2.840.10008.1.2.4.50 - JPEG Baseline (8-bit only)
+JPGB_08_08_3_0_1F_YBR_FULL = get_testdata_file("SC_rgb_small_odd_jpeg.dcm")
+JPGB_08_08_3_0_120F_YBR_FULL_422 = get_testdata_file("color3d_jpeg_baseline.dcm")  # noqa
+# Different subsampling 411, 422, 444
+JPGB_08_08_3_0_1F_YBR_FULL_422_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+np.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
+JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
+# JPGE: 1.2.840.1.2.4.51 - JPEG Extended
+JPGE_BAD = get_testdata_file("JPEG-lossy.dcm")  # Bad JPEG file
+JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPGExtended.dcm")  # Fixed version of JPEG-lossy.dcm
+# JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
+JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
+JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
 
-def test_unsupported_syntaxes():
-    """Test that UNSUPPORTED_SYNTAXES is as expected."""
-    for syntax in SUPPORTED_SYNTAXES:
-        assert syntax not in UNSUPPORTED_SYNTAXES
+JPGB = JPEGBaseline
+JPGE = JPEGExtended
+JPGL = JPEGLossless
 
-
-@pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
-class TestHandler:
-    """Tests for handling Pixel Data with the handler."""
-    def setup(self):
-        """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
-
-    def teardown(self):
-        """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
-
-    def test_environment(self):
-        """Check that the testing environment is as expected."""
-        assert HAVE_NP
-        assert HAVE_PYLIBJPEG
-        assert LJ_HANDLER is not None
-
-    def test_unsupported_syntax_raises(self):
-        """Test pixel_array raises exception for unsupported syntaxes."""
-        pydicom.config.pixel_data_handlers = [LJ_HANDLER]
-
-        ds = dcmread(EXPL)
-        for uid in UNSUPPORTED_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises((NotImplementedError, RuntimeError)):
-                ds.pixel_array
-
-
-@pytest.mark.skipif(not TEST_JPEG, reason="no -libjpeg plugin")
-class TestJPEG:
-    def setup(self):
-        """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
-
-    def teardown(self):
-        """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
-
-
-@pytest.mark.skipif(not TEST_JPEGLS, reason="no -libjpeg plugin")
-class TestJPEGLS:
-    def setup(self):
-        """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
-
-    def teardown(self):
-        """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
-
+JPG_REFERENCE_DATA = [
+    # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)
+    (JPGB_08_08_3_0_120F_YBR_FULL_422, (JPGB, 8, 3, 0, 120, (120, 480, 640, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
+    (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
+    (JPGE_16_12_1_0_1F_M2, (JPGE, 16, 1, 0, 1, (1024, 256), 'uint16')),
+    (JPGL_08_08_1_0_1F, (JPGL, 8, 1, 0, 1, (768, 1024), 'uint8')),
+    (JPGL_16_16_1_1_1F_M2, (JPGL, 16, 1, 1, 1, (1024, 256), 'int16')),
+]
+JPG_MATCHING_DATASETS = [
+    # (compressed, reference, hard coded check values), px tolerance
+    pytest.param(
+        JPGB_08_08_3_0_1F_YBR_FULL_422_411,
+        get_testdata_file("SC_rgb_dcmtk_ebcynp_dcmd.dcm"),
+        [
+            (253, 1, 0), (253, 129, 131), (0, 255, 5), (127, 255, 129),
+            (0, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        2
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_YBR_FULL_422_422,
+        get_testdata_file("SC_rgb_dcmtk_ebcys2_dcmd.dcm"),
+        [
+            (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
+            (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        0
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_YBR_FULL_411,
+        get_testdata_file("SC_rgb_dcmtk_ebcyn1_dcmd.dcm"),
+        [
+            (253, 1, 0), (253, 129, 131), (0, 255, 5), (127, 255, 129),
+            (0, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        2
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_YBR_FULL_422,
+        get_testdata_file("SC_rgb_dcmtk_ebcyn2_dcmd.dcm"),
+        [
+            (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
+            (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        0
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_YBR_FULL_444,
+        get_testdata_file("SC_rgb_dcmtk_ebcys4_dcmd.dcm"),
+        [
+            (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
+            (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        0
+    ),
+    pytest.param(
+        JPGB_08_08_3_0_1F_RGB,
+        get_testdata_file("SC_rgb_dcmtk_ebcr_dcmd.dcm"),
+        [
+            (255, 0, 0), (255, 128, 128), (0, 255, 0), (128, 255, 128),
+            (0, 0, 255), (128, 128, 255), (0, 0, 0), (64, 64, 64),
+            (192, 192, 192), (255, 255, 255),
+        ],
+        1
+    ),
+]
 
 # JPEG 2000 - ISO/IEC 15444 Standard
 J2KR = JPEG2000Lossless
@@ -227,9 +267,6 @@ J2K_MATCHING_DATASETS = [
         J2KI_08_08_3_0_1F_YBR_ICT,
         get_testdata_file("US1_UNCI.dcm"),
         {},
-        marks=pytest.mark.xfail(
-            reason="Needs YBR_ICT to RGB conversion"
-        )
     ),
     pytest.param(
         J2KI_16_10_1_0_1F_M1,
@@ -257,6 +294,174 @@ J2K_MATCHING_DATASETS = [
         {},
     ),
 ]
+
+
+def test_unsupported_syntaxes():
+    """Test that UNSUPPORTED_SYNTAXES is as expected."""
+    for syntax in SUPPORTED_SYNTAXES:
+        assert syntax not in UNSUPPORTED_SYNTAXES
+
+
+@pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
+class TestHandler:
+    """Tests for handling Pixel Data with the handler."""
+    def setup(self):
+        """Setup the test datasets and the environment."""
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.pixel_data_handlers = self.original_handlers
+
+    def test_environment(self):
+        """Check that the testing environment is as expected."""
+        assert HAVE_NP
+        assert HAVE_PYLIBJPEG
+        assert LJ_HANDLER is not None
+
+    def test_unsupported_syntax_raises(self):
+        """Test pixel_array raises exception for unsupported syntaxes."""
+        pydicom.config.pixel_data_handlers = [LJ_HANDLER]
+
+        ds = dcmread(EXPL)
+        for uid in UNSUPPORTED_SYNTAXES:
+            ds.file_meta.TransferSyntaxUID = uid
+            with pytest.raises((NotImplementedError, RuntimeError)):
+                ds.pixel_array
+
+    @pytest.mark.skipif(HAVE_LJ and HAVE_OJ, reason="plugins available")
+    def test_no_plugins_raises(self):
+        """Test exception raised if required plugin missing."""
+        ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        msg = (
+            r"Unable to convert the Pixel Data as the 'pylibjpeg-libjpeg' "
+            r"plugin is not installed"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
+
+        ds = dcmread(J2KI_08_08_3_0_1F_RGB)
+        msg = (
+            r"Unable to convert the Pixel Data as the 'pylibjpeg-openjpeg' "
+            r"plugin is not installed"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
+
+
+@pytest.mark.skipif(not TEST_JPEG, reason="no -libjpeg plugin")
+class TestJPEG:
+    def setup(self):
+        """Setup the test datasets and the environment."""
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.pixel_data_handlers = self.original_handlers
+
+    @pytest.mark.parametrize('fpath, data', JPG_REFERENCE_DATA)
+    def test_properties(self, fpath, data):
+        """Test dataset and pixel array properties are as expected."""
+        ds = dcmread(fpath)
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.BitsAllocated == data[1]
+        assert ds.SamplesPerPixel == data[2]
+        assert ds.PixelRepresentation == data[3]
+        assert getattr(ds, 'NumberOfFrames', 1) == data[4]
+
+        arr = ds.pixel_array
+
+        assert arr.flags.writeable
+        assert data[5] == arr.shape
+        assert arr.dtype == data[6]
+
+    @pytest.mark.parametrize('fpath, rpath, val, tol', JPG_MATCHING_DATASETS)
+    def test_array(self, fpath, rpath, val, tol):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        arr = ds.pixel_array
+        if 'YBR' in ds.PhotometricInterpretation:
+            arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
+
+        ref = dcmread(rpath).pixel_array
+
+        if val:
+            assert tuple(arr[5, 50, :]) == val[0]
+            assert tuple(arr[15, 50, :]) == val[1]
+            assert tuple(arr[25, 50, :]) == val[2]
+            assert tuple(arr[35, 50, :]) == val[3]
+            assert tuple(arr[45, 50, :]) == val[4]
+            assert tuple(arr[55, 50, :]) == val[5]
+            assert tuple(arr[65, 50, :]) == val[6]
+            assert tuple(arr[75, 50, :]) == val[7]
+            assert tuple(arr[85, 50, :]) == val[8]
+            assert tuple(arr[95, 50, :]) == val[9]
+
+        # All results within `tol` intensity units of the reference
+        assert np.allclose(arr, ref, atol=tol)
+
+    @pytest.mark.parametrize('fpath, rpath, val, tol', JPG_MATCHING_DATASETS)
+    def test_generate_frames(self, fpath, rpath, val, tol):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        frame_generator = generate_frames(ds)
+        ref = dcmread(rpath).pixel_array
+
+        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+        for ii in range(nr_frames):
+            arr = next(frame_generator)
+            if 'YBR' in ds.PhotometricInterpretation:
+                arr = convert_color_space(
+                    arr, ds.PhotometricInterpretation, 'RGB'
+                )
+
+            if nr_frames > 1:
+                assert np.allclose(arr, ref[ii, ...], atol=tol)
+            else:
+                assert np.allclose(arr, ref, atol=tol)
+
+        with pytest.raises(StopIteration):
+            next(frame_generator)
+
+    def test_bad_file_raises(self):
+        """Test a bad JPEG file raises an exception."""
+        ds = dcmread(JPGE_BAD)
+        msg = (
+            r"libjpeg error code '-1038' returned from Decode\(\): A "
+            r"misplaced marker segment was found - scan start must be zero "
+            r"and scan stop must be 63 for the sequential operating modes"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
+
+    def test_missing_element_raises(self):
+        """Test that missing required element raises exception."""
+        ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        del ds.PixelData
+        msg = (
+            r"Unable to convert the pixel data as the following required "
+            r"elements are missing from the dataset: PixelData"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            ds.pixel_array
+
+
+# JPEG-LS - ISO/IEC 14495 Standard
+JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
+
+
+@pytest.mark.skipif(not TEST_JPEGLS, reason="no -libjpeg plugin")
+class TestJPEGLS:
+    def setup(self):
+        """Setup the test datasets and the environment."""
+        self.original_handlers = pydicom.config.pixel_data_handlers
+        pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
+
+    def teardown(self):
+        """Restore the environment."""
+        pydicom.config.pixel_data_handlers = self.original_handlers
 
 
 @pytest.mark.skipif(not TEST_JPEG2K, reason="no -openjpeg plugin")
@@ -294,6 +499,25 @@ class TestJPEG2K:
 
         ref = dcmread(rpath).pixel_array
         assert np.array_equal(arr, ref)
+
+    @pytest.mark.parametrize('fpath, rpath, fixes', J2K_MATCHING_DATASETS)
+    def test_generate_frames(self, fpath, rpath, fixes):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        frame_generator = generate_frames(ds)
+        ref = dcmread(rpath).pixel_array
+
+        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+        for ii in range(nr_frames):
+            arr = next(frame_generator)
+
+            if nr_frames > 1:
+                assert np.array_equal(arr, ref[ii, ...])
+            else:
+                assert np.array_equal(arr, ref)
+
+        with pytest.raises(StopIteration):
+            next(frame_generator)
 
     def test_warnings(self):
         """Test the plugin warnings work."""

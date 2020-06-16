@@ -1,9 +1,10 @@
+# Copyright 2020 pydicom authors. See LICENSE file for details.
 """Use the `pylibjpeg <https://github.com/pydicom/pylibjpeg/>`_ package
 to convert supported pixel data to a :class:`numpy.ndarray`.
 
 **Supported data**
 
-The numpy handler supports the conversion of data in the (7FE0,0010)
+The pylibjpeg handler supports the conversion of data in the (7FE0,0010)
 *Pixel Data* elements to a :class:`~numpy.ndarray` provided the
 related :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements have
 values given in the table below.
@@ -19,7 +20,9 @@ values given in the table below.
 |             |                           |      | MONOCHROME2,  |          |
 |             |                           |      | RGB,          |          |
 |             |                           |      | YBR_FULL,     |          |
-|             |                           |      | YBR_FULL_422  |          |
+|             |                           |      | YBR_FULL_422, |          |
+|             |                           |      | YBR_ICT,      |          |
+|             |                           |      | YBR_RCT       |          |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0006) | PlanarConfiguration       | 1C   | 0, 1          | Optional |
 +-------------+---------------------------+------+---------------+----------+
@@ -30,6 +33,8 @@ values given in the table below.
 | (0028,0011) | Columns                   | 1    | N             | Required |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0100) | BitsAllocated             | 1    | 8, 16         | Required |
++-------------+---------------------------+------+---------------+----------+
+| (0028,0101) | BitsStored                | 1    | Up to 16      | Required |
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0103) | PixelRepresentation       | 1    | 0, 1          | Required |
 +-------------+---------------------------+------+---------------+----------+
@@ -63,6 +68,7 @@ try:
 except ImportError:
     HAVE_LIBJPEG = False
 
+
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import (
     pixel_dtype, get_expected_length, reshape_pixel_array
@@ -75,14 +81,14 @@ from pydicom.uid import (
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
-    JPEG2000
+    JPEG2000,
 )
 
 
-LOGGER = logging.getLogger(__name__)
+LOGGER = logging.getLogger("pydicom")
 
 
-HANDLER_NAME = 'pylibjpeg'
+HANDLER_NAME = "pylibjpeg"
 if HAVE_PYLIBJPEG:
     _DECODERS = get_pixel_data_decoders()
 
@@ -98,7 +104,7 @@ _OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
 SUPPORTED_TRANSFER_SYNTAXES = _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES
 
 DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
+    "numpy": ("http://www.numpy.org/", "NumPy"),
 }
 
 
@@ -150,14 +156,15 @@ def as_array(ds):
     Returns
     -------
     numpy.ndarray
-        The contents of (7FE0,0010) *Pixel Data* as an ndarray with shape
-        (rows, columns), (rows, columns, components), (frames, rows, columns),
-        or (frames, rows, columns, components) depending on the dataset.
+        The contents of (7FE0,0010) *Pixel Data* as an :class:`~numpy.ndarray`
+        with shape (rows, columns), (rows, columns, components), (frames,
+        rows, columns), or (frames, rows, columns, components) depending on
+        the dataset.
     """
     return reshape_pixel_array(ds, get_pixeldata(ds))
 
 
-def generate_frames(ds):
+def generate_frames(ds, reshape=True):
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
 
     Parameters
@@ -166,31 +173,41 @@ def generate_frames(ds):
         The :class:`Dataset` containing an :dcm:`Image Pixel
         <part03/sect_C.7.6.3.html>` module and the *Pixel Data* to be
         converted.
+    reshape : bool, optional
+        If ``True`` (default), then the returned :class:`~numpy.ndarray` will
+        be reshaped to the correct dimensions. If ``False`` then no reshaping
+        will be performed.
 
     Yields
     -------
     numpy.ndarray
-        A single frame of (7FE0,0010) *Pixel Data* as an ndarray with
-        shape (rows, columns) or (rows, columns, components), depending
-        on the dataset.
+        A single frame of (7FE0,0010) *Pixel Data* as an
+        :class:`~numpy.ndarray` with an appropriate dtype for the data.
+
+    Raises
+    ------
+    AttributeError
+        If `ds` is missing a required element.
+    RuntimeError
+        If the plugin required to decode the pixel data is not installed.
     """
     tsyntax = ds.file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
     if tsyntax not in _DECODERS:
         if tsyntax in _OPENJPEG_SYNTAXES:
-            plugin = 'pylibjpeg-openjpeg'
+            plugin = "pylibjpeg-openjpeg"
         else:
-            plugin = 'pylibjpeg-libjpeg'
+            plugin = "pylibjpeg-libjpeg"
 
-        raise NotImplementedError(
-            f"Unable to convert the Pixel Data as the {plugin} plugin is "
+        raise RuntimeError(
+            f"Unable to convert the Pixel Data as the '{plugin}' plugin is "
             f"not installed"
         )
 
     # Check required elements
     required_elements = [
-        'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
-        'SamplesPerPixel', 'PhotometricInterpretation', 'PixelData',
+        "BitsAllocated", "Rows", "Columns", "PixelRepresentation",
+        "SamplesPerPixel", "PhotometricInterpretation", "PixelData",
     ]
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
@@ -202,23 +219,28 @@ def generate_frames(ds):
     decoder = _DECODERS[tsyntax]
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    nr_frames = getattr(ds, "NumberOfFrames", 1)
     image_px_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         arr = decoder(frame, image_px_module)
 
-        # View and reshape as pylibjpeg returns a 1D uint8 ndarray
+        # Re-view as pylibjpeg returns a 1D uint8 ndarray
         arr = arr.view(dtype)
+
+        if not reshape:
+            yield arr
+            continue
 
         if ds.SamplesPerPixel == 1:
             yield arr.reshape(ds.Rows, ds.Columns)
-
-        if planar_configuration == 0:
-            yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
-
-        arr = arr.reshape(ds.SamplesPerPixel, ds.Rows, ds.Columns)
-        yield arr.transpose(1, 2, 0)
+        else:
+            # Planar Configuration must be present if > 1 sample/px
+            if ds.PlanarConfiguration == 0:
+                yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
+            else:
+                arr = arr.reshape(ds.SamplesPerPixel, ds.Rows, ds.Columns)
+                yield arr.transpose(1, 2, 0)
 
 
 def get_pixeldata(ds):
@@ -235,70 +257,14 @@ def get_pixeldata(ds):
     -------
     numpy.ndarray
         The contents of (7FE0,0010) *Pixel Data* as a 1D array.
-
-    Raises
-    ------
-    AttributeError
-        If `ds` is missing a required element.
-    NotImplementedError
-        If `ds` contains pixel data in an unsupported format.
-    ValueError
-        If the actual length of the pixel data doesn't match the expected
-        length.
     """
-    tsyntax = ds.file_meta.TransferSyntaxUID
-    # The check of transfer syntax must be first
-    if tsyntax not in _DECODERS:
-        if tsyntax in _OPENJPEG_SYNTAXES:
-            plugin = 'pylibjpeg-openjpeg'
-        else:
-            plugin = 'pylibjpeg-libjpeg'
+    expected_len = get_expected_length(ds, 'pixels')
+    frame_len = expected_len // getattr(ds, "NumberOfFrames", 1)
+    # Empty destination array for our decoded pixel data
+    arr = np.empty(expected_len, pixel_dtype(ds))
 
-        raise NotImplementedError(
-            f"Unable to convert the Pixel Data as the {plugin} plugin is "
-            f"not installed"
-        )
-
-    # Check required elements
-    required_elements = [
-        'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
-        'SamplesPerPixel', 'PhotometricInterpretation', 'PixelData',
-    ]
-    missing = [elem for elem in required_elements if elem not in ds]
-    if missing:
-        raise AttributeError(
-            "Unable to convert the pixel data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
-        )
-
-    # Calculate the expected length of the pixel data (in bytes)
-    #   Note: this does NOT include the trailing null byte for odd length data
-    expected_len = get_expected_length(ds)
-    if ds.PhotometricInterpretation == 'YBR_FULL_422':
-        # JPEG Transfer Syntaxes
-        # Plugin should have already resampled the pixel data
-        #   see PS3.3 C.7.6.3.1.2
-        expected_len = expected_len // 2 * 3
-
-    p_interp = ds.PhotometricInterpretation
-
-    # How long each frame is in bytes
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
-    frame_len = expected_len // nr_frames
-
-    # The decoded data will be placed here
-    arr = np.empty(expected_len, np.uint8)
-
-    decoder = _DECODERS[tsyntax]
-    LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
-
-    # Generators for the encoded JPEG image frame(s) and insertion offsets
-    generate_frames = generate_pixel_data_frame(ds.PixelData, nr_frames)
     generate_offsets = range(0, expected_len, frame_len)
-    for frame, offset in zip(generate_frames, generate_offsets):
-        # Encoded JPEG data to be sent to the decoder
-        arr[offset:offset + frame_len] = decoder(
-            frame, ds.group_dataset(0x0028)
-        )
+    for frame, offset in zip(generate_frames(ds, False), generate_offsets):
+        arr[offset:offset + frame_len] = frame
 
-    return arr.view(pixel_dtype(ds))
+    return arr

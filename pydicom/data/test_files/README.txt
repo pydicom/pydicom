@@ -78,6 +78,10 @@ MR2_*.dcm
   * unsigned 16-bit/12-bit with rescale and windowing
   * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
 
+JPGExtended.dcm
+  * 1.2.840.10008.1.2.4.51 - JPEG Extended
+  * Fixed version of JPEG-lossy.dcm
+
 JPGLosslessP14SV1_1s_1f_8b.dcm
   * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Process 14, Selection Value 1
   * 1 sample/px, 1 frame, 8-bits stored, monochrome2
