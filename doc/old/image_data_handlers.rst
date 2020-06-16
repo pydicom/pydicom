@@ -89,8 +89,8 @@ handled by the given packages:
 | :sup:`1` *only with JpegImagePlugin*
 | :sup:`2` *only with Jpeg2KImagePlugin*
 | :sup:`3` *only if (0028,0100) Bits Allocated = 8*
-| :sup:`4` *with the pylibjpeg-libjpeg* plugin
-| :sup:`5` *with the pylibjpeg-openjpeg* plugin
+| :sup:`4` *with the pylibjpeg-libjpeg plugin*
+| :sup:`5` *with the pylibjpeg-openjpeg plugin*
 
 Usage
 .....

@@ -235,12 +235,8 @@ def generate_frames(ds, reshape=True):
         if ds.SamplesPerPixel == 1:
             yield arr.reshape(ds.Rows, ds.Columns)
         else:
-            # Planar Configuration must be present if > 1 sample/px
-            if ds.PlanarConfiguration == 0:
-                yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
-            else:
-                arr = arr.reshape(ds.SamplesPerPixel, ds.Rows, ds.Columns)
-                yield arr.transpose(1, 2, 0)
+            # JPEG, JPEG-LS and JPEG 2000 are all Planar Configuration 0
+            yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
 
 
 def get_pixeldata(ds):
