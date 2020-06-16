@@ -184,7 +184,7 @@ def parse_docbook_table(book_root, caption):
                         if emph_value.text is not None:
                             # 200b is a zero width space
                             cell_values.append(emph_value.text.strip()
-                                               .replace(u"\u200b", ""))
+                                               .replace("\u200b", ""))
                         else:
                             cell_values.append("")
 
@@ -192,7 +192,7 @@ def parse_docbook_table(book_root, caption):
                     else:
                         if cell.text is not None:
                             cell_values.append(cell.text.strip()
-                                               .replace(u"\u200b", ""))
+                                               .replace("\u200b", ""))
                         else:
                             cell_values.append("")
 
@@ -256,7 +256,7 @@ for attr in attrs:
     # e.g. (0018,1153), (0018,8150) and (0018,8151)
     # SyntaxError without encoding statement
     # replace micro symbol
-    attr["Name"] = attr["Name"].replace(u"µ", "u")
+    attr["Name"] = attr["Name"].replace("µ", "u")
 
     # some new tags don't have the retired entry (2019)
     if 'Retired' not in attr:

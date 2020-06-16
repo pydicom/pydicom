@@ -428,7 +428,7 @@ class TestWriteDataElement:
                     b'20120820120804\\20130901111111 ')  # padded value
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(
-            0x0040A13A, 'DT', u'20120820120804\\20130901111111')
+            0x0040A13A, 'DT', '20120820120804\\20130901111111')
         self.check_data_element(data_elem, expected)
         data_elem = DataElement(
             0x0040A13A, 'DT', b'20120820120804\\20130901111111')
@@ -2342,7 +2342,7 @@ class TestWritePN:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00100010, 'PN', u'Test')
+        elem = DataElement(0x00100010, 'PN', 'Test')
         write_PN(fp, elem)
         assert b'Test' == fp.getvalue()
 
@@ -2370,7 +2370,7 @@ class TestWritePN:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00100010, 'PN', u'Dionysios=Διονυσιος')
+        elem = DataElement(0x00100010, 'PN', 'Dionysios=Διονυσιος')
         write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
@@ -2391,8 +2391,8 @@ class TestWritePN:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00100060, 'PN', [u'Buc^Jérôme', u'Διονυσιος',
-                                              u'Люкceмбypг'])
+        elem = DataElement(0x00100060, 'PN', ['Buc^Jérôme', 'Διονυσιος',
+                                              'Люкceмбypг'])
         write_PN(fp, elem, encodings=encodings)
         assert encoded == fp.getvalue()
 
@@ -2415,7 +2415,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Test')
+        elem = DataElement(0x00081039, 'LO', 'Test')
         write_text(fp, elem)
         assert b'Test' == fp.getvalue()
 
@@ -2434,18 +2434,18 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Dionysios is Διονυσιος')
+        elem = DataElement(0x00081039, 'LO', 'Dionysios is Διονυσιος')
         write_text(fp, elem, encodings=encodings)
         # encoding may not be the same, so decode it first
         encoded = fp.getvalue()
-        assert u'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
+        assert 'Dionysios is Διονυσιος' == convert_text(encoded, encodings)
 
     def test_encode_mixed_charsets_text(self):
         """Test encodings used inside the string in arbitrary order"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         encodings = ['latin_1', 'euc_kr', 'iso-2022-jp', 'iso_ir_127']
-        decoded = u'山田-قباني-吉洞-لنزار'
+        decoded = '山田-قباني-吉洞-لنزار'
 
         # data element with encoded value
         elem = DataElement(0x00081039, 'LO', decoded)
@@ -2471,7 +2471,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        decoded = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
+        decoded = ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг']
         elem = DataElement(0x00081039, 'LO', decoded)
         write_text(fp, elem, encodings=encodings)
         # encoding may not be the same, so decode it first
@@ -2483,7 +2483,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp'
         if 'PyPy' in python_implementation():
             # PyPy seems to have a different implementation of
@@ -2499,7 +2499,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp, iso_ir_58'
         with pytest.warns(UserWarning, match=msg):
             # encode with two invalid encodings
@@ -2513,7 +2513,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         msg = (r"'iso2022_jp' codec can't encode character u?'\\u03c2' in "
                r"position 18: illegal multibyte sequence")
         with pytest.raises(UnicodeEncodeError, match=msg):
@@ -2523,7 +2523,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
-        elem = DataElement(0x00081039, 'LO', u'Dionysios Διονυσιος')
+        elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         with pytest.raises(UnicodeEncodeError, match=msg):
             # encode with two invalid encodings
             write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
@@ -2532,7 +2532,7 @@ class TestWriteText:
         """Test that text with delimiters encodes correctly"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        decoded = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
+        decoded = 'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         elem = DataElement(0x00081039, 'LO', decoded)
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
         write_text(fp, elem, encodings=encodings)
