@@ -343,22 +343,22 @@ class TestDataElement:
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, 'UN', b'ISO_IR 126')
         ds[0x00100010] = DataElement(0x00100010, 'UN',
-                                     u'Διονυσιος'.encode('iso_ir_126'))
+                                     'Διονυσιος'.encode('iso_ir_126'))
         ds.decode()
         assert 'CS' == ds[0x00080005].VR
         assert 'PN' == ds[0x00100010].VR
-        assert u'Διονυσιος' == ds[0x00100010].value
+        assert 'Διονυσιος' == ds[0x00100010].value
 
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, 'UN',
                                      b'ISO 2022 IR 100\\ISO 2022 IR 126')
         ds[0x00100010] = DataElement(0x00100010, 'UN',
                                      b'Dionysios=\x1b\x2d\x46'
-                                     + u'Διονυσιος'.encode('iso_ir_126'))
+                                     + 'Διονυσιος'.encode('iso_ir_126'))
         ds.decode()
         assert 'CS' == ds[0x00080005].VR
         assert 'PN' == ds[0x00100010].VR
-        assert u'Dionysios=Διονυσιος' == ds[0x00100010].value
+        assert 'Dionysios=Διονυσιος' == ds[0x00100010].value
 
     def test_reading_ds_with_known_tags_with_UN_VR(self):
         """Known tags with VR UN are correctly read."""
@@ -375,10 +375,10 @@ class TestDataElement:
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, 'CS', b'ISO_IR 126')
         ds[0x00111010] = DataElement(0x00111010, 'UN',
-                                     u'Διονυσιος'.encode('iso_ir_126'))
+                                     'Διονυσιος'.encode('iso_ir_126'))
         ds.decode()
         assert 'UN' == ds[0x00111010].VR
-        assert u'Διονυσιος'.encode('iso_ir_126') == ds[0x00111010].value
+        assert 'Διονυσιος'.encode('iso_ir_126') == ds[0x00111010].value
 
     def test_tag_with_long_value_UN_VR(self):
         """Tag with length > 64kb with VR UN is not changed."""

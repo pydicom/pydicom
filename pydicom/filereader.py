@@ -840,10 +840,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     if isinstance(fp, str):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        try:
-            logger.debug(u"Reading file '{0}'".format(fp))
-        except Exception:
-            logger.debug("Reading file '{0}'".format(fp))
+        logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if config.debugging:
@@ -904,7 +901,7 @@ def read_dicomdir(filename="DICOMDIR"):
     ds = dcmread(filename)
     # Here, check that it is in fact DicomDir
     if not isinstance(ds, DicomDir):
-        msg = u"File '{0}' is not a Media Storage Directory file".format(
+        msg = "File '{0}' is not a Media Storage Directory file".format(
             filename)
         raise InvalidDicomError(msg)
     return ds
@@ -968,7 +965,7 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
 
     # Check that the file is the same as when originally read
     if is_filename and not os.path.exists(filename_or_obj):
-        raise IOError(u"Deferred read -- original file "
+        raise IOError("Deferred read -- original file "
                       "{0:s} is missing".format(filename_or_obj))
     if timestamp is not None:
         statinfo = os.stat(filename_or_obj)
