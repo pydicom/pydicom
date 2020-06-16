@@ -86,7 +86,23 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest 
+        pytest
+    
+    - name: Get PyMedPhys cache directory
+      id: pymedphys-cache-location
+      run: |
+        echo "::set-output name=dir::$(poetry run python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
+    - name: PyMedPhys Cache
+      id: pymedphys-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pymedphys-cache-location.outputs.dir }}
+        key: pymedphys-${{ hashFiles('**/hashes.json') }}
+    - name: Download all PyMedPhys data for a consistent cache
+      if: steps.pymedphys-cache.outputs.cache-hit != 'true'
+      run: |
+        poetry run python -c "from pymedphys._data import download; download.download_all()"
+
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: |
