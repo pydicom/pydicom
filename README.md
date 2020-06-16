@@ -1,7 +1,6 @@
 *pydicom*
 =======
 
-![Testsuite](https://github.com/pydicom/pydicom/workflows/Testsuite/badge.svg)
 [![CircleCI](https://circleci.com/gh/pydicom/pydicom/tree/master.svg?style=shield)](https://circleci.com/gh/pydicom/pydicom/tree/master)
 [![codecov](https://codecov.io/gh/pydicom/pydicom/branch/master/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)
