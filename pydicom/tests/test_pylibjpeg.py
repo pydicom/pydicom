@@ -359,6 +359,12 @@ class TestHandler:
         with pytest.raises(RuntimeError, match=msg):
             ds.pixel_array
 
+    def test_change_photometric_interpretation(self):
+        """Test returned value."""
+        ds = dcmread(J2KR_16_12_1_0_1F_M2)
+        func = LJ_HANDLER.should_change_PhotometricInterpretation_to_RGB
+        assert func(ds) == False
+
 
 @pytest.mark.skipif(not TEST_JPEG, reason="no -libjpeg plugin")
 class TestJPEG:
