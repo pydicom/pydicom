@@ -91,6 +91,7 @@ jobs:
     - name: Get PyMedPhys cache directory
       id: pymedphys-cache-location
       run: |
+        python -m pip install poetry
         echo "::set-output name=dir::$(poetry run python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
     - name: PyMedPhys Cache
       id: pymedphys-cache
