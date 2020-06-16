@@ -8,6 +8,9 @@ Handling of compressed image data
 .. rubric:: How to get image data from compressed DICOM images
 
 .. |chk|   unicode:: U+02713 .. CHECK MARK
+.. |b|   raw:: html
+
+   <br />
 
 Preconditions
 .............
@@ -49,10 +52,10 @@ To get the transfer syntax of a dataset you can do::
 As far as we have been able to verify, the following transfer syntaxes are
 handled by the given packages:
 
-+-------------------------------------------------------------+------------------------------------------------------------------+
-| Transfer Syntax                                             | NumPy                                                            |
-+------------------------------------+------------------------+-------+------------+---------+-----------------+-----------------+
-| Name                               | UID                    |       | JPEG-LS    | GDCM    | Pillow          | pylibjpeg       |
++-------------------------------------------------------------+-------+------------+---------+-----------------+-----------------+
+| Transfer Syntax                                             | NumPy | NumPy +|b| | NumPy + | NumPy +|b|      | NumPy +|b|      |
++------------------------------------+------------------------+       | JPEG-LS    | |b|GDCM | Pillow          | pylibjpeg       |
+| Name                               | UID                    |       |            |         |                 |                 |
 +====================================+========================+=======+============+=========+=================+=================+
 | Explicit VR Little Endian          | 1.2.840.10008.1.2.1    | |chk| | |chk|      | |chk|   |     |chk|       | |chk|           |
 +------------------------------------+------------------------+-------+------------+---------+-----------------+-----------------+
