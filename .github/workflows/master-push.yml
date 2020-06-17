@@ -104,7 +104,7 @@ jobs:
         path: ${{ steps.pymedphys-cache-location.outputs.dir }}
         key: pymedphys-${{ hashFiles('**/hashes.json') }}
     - name: Download all PyMedPhys data for a consistent cache
-      if: ${{ matrix.pymedphys-dep == 'pymedphys' && steps.pymedphys-cache.outputs.cache-hit != 'true'
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }} && steps.pymedphys-cache.outputs.cache-hit != 'true'
       run: |
         python -c "from pymedphys._data import download; download.download_all()"
 
