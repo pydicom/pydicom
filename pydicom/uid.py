@@ -267,10 +267,8 @@ RLECompressedLosslessSyntaxes = [
 ]
 
 
-def generate_uid(
-        prefix: str = PYDICOM_ROOT_UID,
-        entropy_srcs: Optional[List[str]] = None
-    ) -> UID:
+def generate_uid(prefix: str = PYDICOM_ROOT_UID,
+                 entropy_srcs: Optional[List[str]] = None) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
     .. versionchanged:: 1.3
