@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,6 +11,14 @@
   
 
   
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
@@ -19,7 +26,9 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -31,14 +40,6 @@
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" href="../handlers.pixel_data.html" />
@@ -56,7 +57,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> pydicom
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
           
 
           
@@ -86,6 +87,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -145,6 +147,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -183,7 +186,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
@@ -296,7 +299,7 @@ values</p></th>
 </table>
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.get_expected_length">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">'bytes'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/057a69f6/pydicom/overlay_data_handlers/numpy_handler.py#L86"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">'bytes'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/20102071/pydicom/overlay_data_handlers/numpy_handler.py#L86"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Overlay
 Data</em>.</p>
 <div class="versionadded">
@@ -361,7 +364,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.get_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/057a69f6/pydicom/overlay_data_handlers/numpy_handler.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/20102071/pydicom/overlay_data_handlers/numpy_handler.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Overlay Data</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -393,7 +396,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/057a69f6/pydicom/overlay_data_handlers/numpy_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/20102071/pydicom/overlay_data_handlers/numpy_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -402,7 +405,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/057a69f6/pydicom/overlay_data_handlers/numpy_handler.py#L134"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/20102071/pydicom/overlay_data_handlers/numpy_handler.py#L134"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -474,7 +477,7 @@ and <a class="reference external" href="http://dicom.nema.org/medical/dicom/curr
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/057a69f6/pydicom/overlay_data_handlers/numpy_handler.py#L72"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/20102071/pydicom/overlay_data_handlers/numpy_handler.py#L72"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -509,11 +512,19 @@ the handler.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -524,7 +535,6 @@ the handler.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
