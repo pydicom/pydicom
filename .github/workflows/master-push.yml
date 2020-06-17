@@ -91,8 +91,7 @@ jobs:
     - name: Get PyMedPhys cache directory
       id: pymedphys-cache-location
       run: |
-        python -m pip install poetry
-        echo "::set-output name=dir::$(poetry run python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
+        echo "::set-output name=dir::$(python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
     - name: PyMedPhys Cache
       id: pymedphys-cache
       uses: actions/cache@v2
@@ -102,7 +101,7 @@ jobs:
     - name: Download all PyMedPhys data for a consistent cache
       if: steps.pymedphys-cache.outputs.cache-hit != 'true'
       run: |
-        poetry run python -c "from pymedphys._data import download; download.download_all()"
+        python -c "from pymedphys._data import download; download.download_all()"
 
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
