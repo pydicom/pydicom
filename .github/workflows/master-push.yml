@@ -96,18 +96,14 @@ jobs:
       id: pymedphys-cache-location
       run: |
         echo "::set-output name=dir::$(python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
+        echo "::set-output name=version::$(python -c 'import pymedphys; print(pymedphys.__version__)')"
     - name: PyMedPhys Cache
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}    
       id: pymedphys-cache
       uses: actions/cache@v2
       with:
         path: ${{ steps.pymedphys-cache-location.outputs.dir }}
-        key: pymedphys-${{ hashFiles('**/hashes.json') }}
-    - name: Download all PyMedPhys data for a consistent cache
-      if: ${{ matrix.pymedphys-dep == 'pymedphys' && steps.pymedphys-cache.outputs.cache-hit != 'true' }}
-      run: |
-        python -c "from pymedphys._data import download; download.download_all()"
-
+        key: pymedphys-${{ steps.pymedphys-cache-location.outputs.version }}
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: |
