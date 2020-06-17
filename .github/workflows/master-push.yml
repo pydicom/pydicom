@@ -20,7 +20,7 @@ jobs:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
-          # - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
+          - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
     
     steps:
     - uses: actions/checkout@v2
@@ -86,10 +86,26 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest 
+        pytest
+    
+    - name: Install pymedphys
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
+      run: python -m pip install --pre pymedphys[tests]>=0.31.0dev0
+    - name: Get PyMedPhys cache directory
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}    
+      id: pymedphys-cache-location
+      run: |
+        echo "::set-output name=dir::$(python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
+        echo "::set-output name=version::$(python -c 'import pymedphys; print(pymedphys.__version__)')"
+    - name: PyMedPhys Cache
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}    
+      id: pymedphys-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pymedphys-cache-location.outputs.dir }}
+        key: pymedphys-${{ steps.pymedphys-cache-location.outputs.version }}
     - name: Test pymedphys pydicom-dependent tests
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: |
-        python -m pip install --pre pymedphys
         pymedphys dev tests --run-only-pydicom
         pymedphys dev tests --run-only-pydicom --run-only-slow
