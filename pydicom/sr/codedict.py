@@ -139,7 +139,7 @@ class _CID_Dict:
             The matching SR keywords. If no filters are
             used then all keywords are returned.
         """
-        allnames = set(chain(*cid_concepts[self.cid].values()))
+        allnames = set(chain.from_iterable(cid_concepts[self.cid].values()))
         return _filtered(allnames, filters)
 
     def __contains__(self, code):
@@ -250,7 +250,7 @@ class _CodesDict:
             used then all keywords are returned.
 
         """
-        allnames = set(chain(*(x.keys() for x in self._dict.values())))
+        allnames = set(chain.from_iterable(self._dict.values()))
         return _filtered(allnames, filters)
 
     def schemes(self):
