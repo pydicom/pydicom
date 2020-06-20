@@ -317,17 +317,17 @@ def decode_string(value, encodings, delimiters):
         except LookupError:
             if config.enforce_valid_values:
                 raise
-            warnings.warn(u"Unknown encoding '{}' - "
-                          u"using default encoding instead"
+            warnings.warn("Unknown encoding '{}' - "
+                          "using default encoding instead"
                           .format(first_encoding))
             first_encoding = default_encoding
             return value.decode(first_encoding)
         except UnicodeError:
             if config.enforce_valid_values:
                 raise
-            warnings.warn(u"Failed to decode byte string with encoding '{}' - "
-                          u"using replacement characters in decoded "
-                          u"string".format(first_encoding))
+            warnings.warn("Failed to decode byte string with encoding '{}' - "
+                          "using replacement characters in decoded "
+                          "string".format(first_encoding))
             return value.decode(first_encoding, errors='replace')
 
     # Each part of the value that starts with an escape sequence is decoded
@@ -344,7 +344,7 @@ def decode_string(value, encodings, delimiters):
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return u''.join([_decode_fragment(fragment, encodings, delimiters)
+    return ''.join([_decode_fragment(fragment, encodings, delimiters)
                      for fragment in fragments])
 
 
@@ -397,9 +397,9 @@ def _decode_fragment(byte_str, encodings, delimiters):
     except UnicodeError:
         if config.enforce_valid_values:
             raise
-        warnings.warn(u"Failed to decode byte string with encodings: {} - "
-                      u"using replacement characters in decoded "
-                      u"string".format(', '.join(encodings)))
+        warnings.warn("Failed to decode byte string with encodings: {} - "
+                      "using replacement characters in decoded "
+                      "string".format(', '.join(encodings)))
         return byte_str.decode(encodings[0], errors='replace')
 
 
@@ -434,10 +434,10 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
             return byte_str.decode(encoding)
 
     # unknown escape code - use first encoding
-    msg = u"Found unknown escape sequence in encoded string value"
+    msg = "Found unknown escape sequence in encoded string value"
     if config.enforce_valid_values:
         raise ValueError(msg)
-    warnings.warn(msg + u" - using encoding {}".format(encodings[0]))
+    warnings.warn(msg + " - using encoding {}".format(encodings[0]))
     return byte_str.decode(encodings[0], errors='replace')
 
 

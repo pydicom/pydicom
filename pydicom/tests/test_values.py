@@ -44,7 +44,7 @@ class TestConvertTag:
 class TestConvertAE:
     def test_strip_blanks(self):
         bytestring = b'  AE_TITLE '
-        assert u'AE_TITLE' == convert_AE_string(bytestring, True)
+        assert 'AE_TITLE' == convert_AE_string(bytestring, True)
 
 
 class TestConvertText:
@@ -53,7 +53,7 @@ class TestConvertText:
         bytestring = (b'Dionysios is \x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         encodings = ('latin_1', 'iso_ir_126')
-        assert u'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
+        assert 'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
 
     def test_multi_value(self):
         """Test that backslash is handled as value separator"""
@@ -62,7 +62,7 @@ class TestConvertText:
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == convert_text(
+        assert ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг'] == convert_text(
             bytestring, encodings)
 
     def test_single_value_with_backslash(self):
@@ -72,7 +72,7 @@ class TestConvertText:
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        assert u'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
+        assert 'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
 
     def test_single_value_with_delimiters(self):
@@ -84,7 +84,7 @@ class TestConvertText:
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'
                       b'\tJ\xe9r\xf4me')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        expected = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
+        expected = 'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         assert expected == convert_single_string(bytestring, encodings)
 
     def test_value_ending_with_padding(self):

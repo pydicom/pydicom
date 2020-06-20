@@ -16,47 +16,47 @@ from pydicom.valuerep import PersonName
 # Most of these (except the Korean file) are taken from David Clunie's
 # charset example files.
 FILE_PATIENT_NAMES = [
-    ('chrArab', u'قباني^لنزار'),
-    ('chrFren', u'Buc^Jérôme'),
-    ('chrFrenMulti', u'Buc^Jérôme'),
-    ('chrGerm', u'Äneas^Rüdiger'),
-    ('chrGreek', u'Διονυσιος'),
-    ('chrH31', u'Yamada^Tarou=山田^太郎=やまだ^たろう'),
-    ('chrH32', u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう'),
-    ('chrHbrw', u'שרון^דבורה'),
-    ('chrI2', u'Hong^Gildong=洪^吉洞=홍^길동'),
-    ('chrJapMulti', u'やまだ^たろう'),
-    ('chrJapMultiExplicitIR6', u'やまだ^たろう'),
-    ('chrKoreanMulti', u'김희중'),
-    ('chrRuss', u'Люкceмбypг'),
-    ('chrX1', u'Wang^XiaoDong=王^小東'),
-    ('chrX2', u'Wang^XiaoDong=王^小东'),
+    ('chrArab', 'قباني^لنزار'),
+    ('chrFren', 'Buc^Jérôme'),
+    ('chrFrenMulti', 'Buc^Jérôme'),
+    ('chrGerm', 'Äneas^Rüdiger'),
+    ('chrGreek', 'Διονυσιος'),
+    ('chrH31', 'Yamada^Tarou=山田^太郎=やまだ^たろう'),
+    ('chrH32', 'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう'),
+    ('chrHbrw', 'שרון^דבורה'),
+    ('chrI2', 'Hong^Gildong=洪^吉洞=홍^길동'),
+    ('chrJapMulti', 'やまだ^たろう'),
+    ('chrJapMultiExplicitIR6', 'やまだ^たろう'),
+    ('chrKoreanMulti', '김희중'),
+    ('chrRuss', 'Люкceмбypг'),
+    ('chrX1', 'Wang^XiaoDong=王^小東'),
+    ('chrX2', 'Wang^XiaoDong=王^小东'),
 ]
 
 # Test data for all single-byte coding extensions.
 # Mostly taken from the same example files.
 ENCODED_NAMES = [
-    ('ISO 2022 IR 13', u'ﾔﾏﾀﾞ^ﾀﾛｳ',
+    ('ISO 2022 IR 13', 'ﾔﾏﾀﾞ^ﾀﾛｳ',
      b'\x1b\x29\x49\xd4\xcf\xc0\xde\x5e\xc0\xdb\xb3'),
-    ('ISO 2022 IR 100', u'Buc^Jérôme',
+    ('ISO 2022 IR 100', 'Buc^Jérôme',
      b'\x1b\x2d\x41\x42\x75\x63\x5e\x4a\xe9\x72\xf4\x6d\x65'),
-    ('ISO 2022 IR 101', u'Wałęsa',
+    ('ISO 2022 IR 101', 'Wałęsa',
      b'\x1b\x2d\x42\x57\x61\xb3\xea\x73\x61'),
-    ('ISO 2022 IR 109', u'antaŭnomo',
+    ('ISO 2022 IR 109', 'antaŭnomo',
      b'\x1b\x2d\x43\x61\x6e\x74\x61\xfd\x6e\x6f\x6d\x6f'),
-    ('ISO 2022 IR 110', u'vārds',
+    ('ISO 2022 IR 110', 'vārds',
      b'\x1b\x2d\x44\x76\xe0\x72\x64\x73'),
-    ('ISO 2022 IR 127', u'قباني^لنزار',
+    ('ISO 2022 IR 127', 'قباني^لنزار',
      b'\x1b\x2d\x47\xe2\xc8\xc7\xe6\xea\x5e\xe4\xe6\xd2\xc7\xd1'),
-    ('ISO 2022 IR 126', u'Διονυσιος',
+    ('ISO 2022 IR 126', 'Διονυσιος',
      b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2'),
-    ('ISO 2022 IR 138', u'שרון^דבורה',
+    ('ISO 2022 IR 138', 'שרון^דבורה',
      b'\x1b\x2d\x48\xf9\xf8\xe5\xef\x5e\xe3\xe1\xe5\xf8\xe4'),
-    ('ISO 2022 IR 144', u'Люкceмбypг',
+    ('ISO 2022 IR 144', 'Люкceмбypг',
      b'\x1b\x2d\x4c\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'),
-    ('ISO 2022 IR 148', u'Çavuşoğlu',
+    ('ISO 2022 IR 148', 'Çavuşoğlu',
      b'\x1b\x2d\x4d\xc7\x61\x76\x75\xfe\x6f\xf0\x6c\x75'),
-    ('ISO 2022 IR 166', u'นามสกุล',
+    ('ISO 2022 IR 166', 'นามสกุล',
      b'\x1b\x2d\x54\xb9\xd2\xc1\xca\xa1\xd8\xc5'),
 ]
 
@@ -66,7 +66,7 @@ class TestCharset:
         config.enforce_valid_values = False
 
     def test_encodings(self):
-        test_string = u'Hello World'
+        test_string = 'Hello World'
         for x in pydicom.charset.python_encoding.items():
             test_string.encode(x[1])
 
@@ -82,7 +82,7 @@ class TestCharset:
 
         sequence = ds[0x32, 0x1064][0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
-        assert u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
+        assert 'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
     def test_inherited_character_set_in_sequence(self):
         """charset: can read and decode SQ with parent encoding............."""
@@ -93,24 +93,26 @@ class TestCharset:
         # dataset's encoding
         sequence = ds[0x32, 0x1064][0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
-        assert u'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
+        assert 'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
     def test_standard_file(self):
         """charset: can read and decode standard file without special char.."""
         ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.decode()
-        assert u'CompressedSamples^CT1' == ds.PatientName
+        assert 'CompressedSamples^CT1' == ds.PatientName
 
     def test_invalid_character_set(self):
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
-        with pytest.warns(UserWarning,
-                          match=u"Unknown encoding 'Unsupported' "
-                                u"- using default encoding instead"):
+        with pytest.warns(
+            UserWarning,
+            match=("Unknown encoding 'Unsupported' "
+                   "- using default encoding instead")
+        ):
             ds.decode()
-            assert u'CompressedSamples^CT1' == ds.PatientName
+            assert 'CompressedSamples^CT1' == ds.PatientName
 
     def test_invalid_character_set_enforce_valid(self):
         """charset: raise on invalid encoding"""
@@ -119,7 +121,7 @@ class TestCharset:
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
         with pytest.raises(LookupError,
-                           match=u"Unknown encoding 'Unsupported'"):
+                           match="Unknown encoding 'Unsupported'"):
             ds.decode()
 
     def test_decoding_with_specific_tags(self):
@@ -129,7 +131,7 @@ class TestCharset:
         ds = dcmread(rus_file, specific_tags=['PatientName'])
         ds.decode()
         assert 2 == len(ds)  # specific character set is always decoded
-        assert u'Люкceмбypг' == ds.PatientName
+        assert 'Люкceмбypг' == ds.PatientName
 
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
@@ -150,7 +152,7 @@ class TestCharset:
         with pytest.warns(UserWarning, match="Failed to decode byte string "
                                              "with encoding 'UTF8'"):
             pydicom.charset.decode_element(elem, ['ISO_IR 192'])
-            assert u'���������' == elem.value
+            assert '���������' == elem.value
 
     def test_bad_encoded_single_encoding_enforce_standard(self):
         """Test handling bad encoding for single encoding if
@@ -175,7 +177,7 @@ class TestCharset:
                 elem,
                 ['ISO_IR 192', 'ISO 2022 IR 100', 'ISO 2022 IR 144']
             )
-            assert u'Buc^Jérôme' == elem.value
+            assert 'Buc^Jérôme' == elem.value
 
     def test_convert_encodings_warnings(self):
         """Test warning if stand-alone encodings are used as code extension"""
@@ -199,7 +201,7 @@ class TestCharset:
         with pytest.warns(UserWarning, match='Failed to decode byte string '
                                              'with encodings: iso2022_jp_2'):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
-            assert u'���������' == elem.value
+            assert '���������' == elem.value
 
     def test_bad_decoded_multi_byte_encoding_enforce_standard(self):
         """Test handling bad encoding for single encoding if
@@ -220,7 +222,7 @@ class TestCharset:
         with pytest.warns(UserWarning, match='Found unknown escape sequence '
                                              'in encoded string value'):
             pydicom.charset.decode_element(elem, ['ISO_IR 100'])
-            assert u'\x1b-FÄéïíõóéïò' == elem.value
+            assert '\x1b-FÄéïíõóéïò' == elem.value
 
     def test_unknown_escape_sequence_enforce_standard(self):
         """Test handling bad encoding for single encoding if
@@ -237,7 +239,7 @@ class TestCharset:
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         pydicom.charset.decode_element(elem, ['ISO_IR 192'])
         # correct encoding
-        assert u'Buc^Jérôme' == elem.value
+        assert 'Buc^Jérôme' == elem.value
 
         # patched encoding shall behave correctly, but a warning is issued
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
@@ -245,7 +247,7 @@ class TestCharset:
                           match='Incorrect value for Specific Character Set '
                                 "'ISO IR 192' - assuming 'ISO_IR 192'"):
             pydicom.charset.decode_element(elem, ['ISO IR 192'])
-            assert u'Buc^Jérôme' == elem.value
+            assert 'Buc^Jérôme' == elem.value
 
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xe9r\xf4me')
         with pytest.warns(UserWarning,
@@ -258,14 +260,14 @@ class TestCharset:
         # not patched incorrect encoding is replaced by default encoding
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         with pytest.warns(UserWarning,
-                          match=u"Unknown encoding 'ISOIR 192' - "
-                                u"using default encoding instead"):
+                          match="Unknown encoding 'ISOIR 192' - "
+                                "using default encoding instead"):
             pydicom.charset.decode_element(elem, ['ISOIR 192'])
 
         # Python encoding also can be used directly
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         pydicom.charset.decode_element(elem, ['utf8'])
-        assert u'Buc^Jérôme' == elem.value
+        assert 'Buc^Jérôme' == elem.value
 
     def test_patched_code_extension_charset(self):
         """Test some commonly misspelled charset values for code extensions."""
@@ -276,7 +278,7 @@ class TestCharset:
         pydicom.charset.decode_element(
             elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
         )
-        assert u'Dionysios=Διονυσιος' == elem.value
+        assert 'Dionysios=Διονυσιος' == elem.value
 
         # patched encoding shall behave correctly, but a warning is issued
         with pytest.warns(UserWarning,
@@ -289,7 +291,8 @@ class TestCharset:
             pydicom.charset.decode_element(
                 elem, ['ISO_2022-IR 100', 'ISO 2022 IR 126']
             )
-            assert u'Dionysios=Διονυσιος' == elem.value
+
+            assert 'Dionysios=Διονυσιος' == elem.value
 
         with pytest.warns(UserWarning,
                           match=r'Incorrect value for Specific Character Set '
@@ -298,9 +301,10 @@ class TestCharset:
             elem = DataElement(0x00100010, 'PN',
                                b'Dionysios=\x1b\x2d\x46'
                                b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-            pydicom.charset.decode_element(elem,
-                                   ['ISO 2022 IR 100', 'ISO_2022_IR+126'])
-            assert u'Dionysios=Διονυσιος' == elem.value
+            pydicom.charset.decode_element(
+                elem, ['ISO 2022 IR 100', 'ISO_2022_IR+126']
+            )
+            assert 'Dionysios=Διονυσιος' == elem.value
 
     def test_multi_charset_default_value(self):
         """Test that the first value is used if no escape code is given"""
@@ -309,13 +313,13 @@ class TestCharset:
         pydicom.charset.decode_element(
             elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144']
         )
-        assert u'Buc^Jérôme' == elem.value
+        assert 'Buc^Jérôme' == elem.value
 
         elem = DataElement(0x00081039, 'LO', b'R\xf6ntgenaufnahme')
         pydicom.charset.decode_element(
             elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144']
         )
-        assert u'Röntgenaufnahme' == elem.value
+        assert 'Röntgenaufnahme' == elem.value
 
     def test_single_byte_multi_charset_personname(self):
         # component groups with different encodings
@@ -325,7 +329,7 @@ class TestCharset:
         pydicom.charset.decode_element(
             elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
         )
-        assert u'Dionysios=Διονυσιος' == elem.value
+        assert 'Dionysios=Διονυσιος' == elem.value
 
         # multiple values with different encodings
         encoded = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
@@ -333,10 +337,10 @@ class TestCharset:
                    b'\x1b\x2d\x4C'
                    b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
         elem = DataElement(0x00100060, 'PN', encoded)
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100',
-                                      'ISO 2022 IR 144',
-                                      'ISO 2022 IR 126'])
-        assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == elem.value
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144', 'ISO 2022 IR 126']
+        )
+        assert ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг'] == elem.value
 
     def test_single_byte_multi_charset_text(self):
         # changed encoding inside the string
@@ -346,7 +350,7 @@ class TestCharset:
         pydicom.charset.decode_element(
             elem, ['ISO 2022 IR 100', 'ISO 2022 IR 126']
         )
-        assert u'Dionysios is Διονυσιος' == elem.value
+        assert 'Dionysios is Διονυσιος' == elem.value
 
         # multiple values with different encodings
         elem = DataElement(0x00081039, 'LO',
@@ -354,17 +358,17 @@ class TestCharset:
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                            b'\x1b\x2d\x4C'
                            b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
-        pydicom.charset.decode_element(elem, ['ISO 2022 IR 100',
-                                      'ISO 2022 IR 144',
-                                      'ISO 2022 IR 126'])
-        assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == elem.value
+        pydicom.charset.decode_element(
+            elem, ['ISO 2022 IR 100', 'ISO 2022 IR 144', 'ISO 2022 IR 126']
+        )
+        assert ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг'] == elem.value
 
     @pytest.mark.parametrize('encoding, decoded, raw_data', ENCODED_NAMES)
     def test_single_byte_code_extensions(self, encoding, decoded, raw_data):
         # single-byte encoding as code extension
         elem = DataElement(0x00081039, 'LO', b'ASCII+' + raw_data)
         pydicom.charset.decode_element(elem, ['', encoding])
-        assert u'ASCII+' + decoded == elem.value
+        assert 'ASCII+' + decoded == elem.value
 
     @pytest.mark.parametrize('filename, patient_name', FILE_PATIENT_NAMES)
     def test_charset_patient_names(self, filename, patient_name):
@@ -413,8 +417,8 @@ class TestCharset:
         # regression test for #850
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         with pytest.warns(UserWarning,
-                          match=u"Unknown encoding 'ISO 2022 IR 146' "
-                                u"- using default encoding instead"):
+                          match="Unknown encoding 'ISO 2022 IR 146' "
+                                "- using default encoding instead"):
             pydicom.charset.decode_element(
                 elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
 
@@ -436,7 +440,7 @@ class TestCharset:
             ds_out = dcmread(fp)
             assert original_string == ds_out.PatientName.original_string
 
-        japanese_pn = PersonName(u"Mori^Ogai=森^鷗外=もり^おうがい")
+        japanese_pn = PersonName("Mori^Ogai=森^鷗外=もり^おうがい")
         pyencs = pydicom.charset.convert_encodings(["ISO 2022 IR 6",
                                                     "ISO 2022 IR 87",
                                                     "ISO 2022 IR 159"])
@@ -452,7 +456,7 @@ class TestCharset:
 
     def test_japanese_multi_byte_encoding(self):
         """Test japanese multi byte strings are correctly encoded."""
-        encoded = pydicom.charset.encode_string(u'あaｱア齩', ['shift_jis',
+        encoded = pydicom.charset.encode_string('あaｱア齩', ['shift_jis',
                                                 'iso2022_jp', 'iso2022_jp_2'])
         expect = b'\x1b$B$"\x1b(Ja\x1b)I\xb1\x1b$B%"\x1b$(DmN\x1b(J'
         assert expect == bytes(encoded)
@@ -460,10 +464,10 @@ class TestCharset:
     def test_bad_japanese_encoding(self):
         """Test japanese multi byte strings are not correctly encoded."""
         with pytest.warns(UserWarning,
-                          match=u"Failed to encode value with encodings"
-                                u": shift_jis - using replacement character"
-                                u"s in encoded string"):
-            encoded = pydicom.charset.encode_string(u'あaｱア', ['shift_jis'])
+                          match="Failed to encode value with encodings"
+                                ": shift_jis - using replacement character"
+                                "s in encoded string"):
+            encoded = pydicom.charset.encode_string('あaｱア', ['shift_jis'])
             assert b'?a??' == encoded
 
     def test_deprecated_decode(self):
