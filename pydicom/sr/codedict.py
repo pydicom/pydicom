@@ -15,17 +15,12 @@ cid_for_name = {v: k for k, v in name_for_cid.items()}
 
 
 def _filtered(allnames, filters):
-    """Helper function for dir() methods"""
-    matches = {}
-    for filter_ in filters:
-        filter_ = filter_.lower()
-        match = [x for x in allnames if x.lower().find(filter_) != -1]
-        matches.update(dict([(x, 1) for x in match]))
-    if filters:
-        names = sorted(matches.keys())
-        return names
-    else:
-        return sorted(allnames)
+    if not filters:
+        return sorted(set(allnames))
+    lowered_filters = tuple(map(str.lower, filters))
+    include_name = lambda name: any(lowered_filter in name.lower() # noqa: E731
+                                    for lowered_filter in lowered_filters)
+    return sorted(set(filter(include_name, allnames)))
 
 
 class _CID_Dict:
@@ -139,8 +134,8 @@ class _CID_Dict:
             The matching SR keywords. If no filters are
             used then all keywords are returned.
         """
-        allnames = set(chain.from_iterable(cid_concepts[self.cid].values()))
-        return _filtered(allnames, filters)
+        return _filtered(chain.from_iterable(cid_concepts[self.cid].values()),
+                         filters)
 
     def __contains__(self, code):
         """Checks whether a given code is a member of the context group.
@@ -250,8 +245,7 @@ class _CodesDict:
             used then all keywords are returned.
 
         """
-        allnames = set(chain.from_iterable(self._dict.values()))
-        return _filtered(allnames, filters)
+        return _filtered(chain.from_iterable(self._dict.values()), filters)
 
     def schemes(self):
         return self._dict.keys()
