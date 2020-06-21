@@ -150,7 +150,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     return False
 
 
-def as_array(ds: "Dataset") -> np.ndarray:
+def as_array(ds: "Dataset") -> "np.ndarray":
     """Return the entire *Pixel Data* as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -173,7 +173,7 @@ def as_array(ds: "Dataset") -> np.ndarray:
     return reshape_pixel_array(ds, get_pixeldata(ds))
 
 
-def generate_frames(ds: "Dataset", reshape: bool = True) -> np.ndarray:
+def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -250,7 +250,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> np.ndarray:
             yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
 
 
-def get_pixeldata(ds: "Dataset") -> np.ndarray:
+def get_pixeldata(ds: "Dataset") -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the pixel data.
 
     .. versionadded:: 2.1
