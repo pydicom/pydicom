@@ -60,6 +60,7 @@ jobs:
             python-version: 3.8
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
+            pylibjpeg-dep: normal
             coverage-args: --cov=pydicom --cov-append
             coverage: coverage
 
@@ -130,6 +131,7 @@ jobs:
         pytest ${{ matrix.coverage-args }}
 
     - name: Test pylibjpeg
+      if: ${{ matrix.pylibjpeg-dep == 'normal' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
