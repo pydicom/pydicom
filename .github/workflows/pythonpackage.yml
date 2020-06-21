@@ -60,7 +60,7 @@ jobs:
             python-version: 3.8
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
-            pylibjpeg-dep: normal
+            pylibjpeg-dep: pylibjpeg
             coverage-args: --cov=pydicom --cov-append
             coverage: coverage
 
