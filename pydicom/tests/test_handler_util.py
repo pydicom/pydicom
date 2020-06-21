@@ -943,9 +943,7 @@ class TestNumpy_PaletteColor:
         """Test that an invalid bit depth raises an exception."""
         ds = dcmread(PAL_08_256_0_16_1F)
         ds.RedPaletteColorLookupTableDescriptor[2] = 15
-        msg = (
-            r'data type "uint15" not understood'
-        )
+        msg = r"data type ['\"]uint15['\"] not understood"
         with pytest.raises(TypeError, match=msg):
             apply_color_lut(ds.pixel_array, ds)
 

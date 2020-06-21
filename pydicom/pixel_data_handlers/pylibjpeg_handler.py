@@ -44,6 +44,10 @@ values given in the table below.
 """
 
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 try:
     import numpy as np
@@ -84,6 +88,7 @@ from pydicom.uid import (
     JPEGLSLossy,
     JPEG2000Lossless,
     JPEG2000,
+    UID
 )
 
 
@@ -110,12 +115,12 @@ DEPENDENCIES = {
 }
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_PYLIBJPEG
 
 
-def supports_transfer_syntax(tsyntax):
+def supports_transfer_syntax(tsyntax: UID) -> bool:
     """Return ``True`` if the handler supports the `tsyntax`.
 
     Parameters
@@ -127,7 +132,7 @@ def supports_transfer_syntax(tsyntax):
     return tsyntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def needs_to_convert_to_RGB(ds):
+def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
@@ -136,7 +141,7 @@ def needs_to_convert_to_RGB(ds):
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(ds):
+def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
@@ -145,7 +150,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def as_array(ds):
+def as_array(ds: "Dataset") -> np.ndarray:
     """Return the entire *Pixel Data* as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -168,7 +173,7 @@ def as_array(ds):
     return reshape_pixel_array(ds, get_pixeldata(ds))
 
 
-def generate_frames(ds, reshape=True):
+def generate_frames(ds: "Dataset", reshape: bool = True) -> np.ndarray:
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -245,7 +250,7 @@ def generate_frames(ds, reshape=True):
             yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
 
 
-def get_pixeldata(ds):
+def get_pixeldata(ds: "Dataset") -> np.ndarray:
     """Return a :class:`numpy.ndarray` of the pixel data.
 
     .. versionadded:: 2.1
