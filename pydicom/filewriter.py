@@ -38,7 +38,7 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
             elem.VR = 'OB'
-        elif ds.is_implicit_VR is True:
+        elif ds.is_implicit_VR :
             # Non-compressed Pixel Data - Implicit Little Endian
             # PS3.5 Annex A1: VR is always OW
             elem.VR = 'OW'
@@ -90,8 +90,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # Need to handle type check for elements with VM > 1
         elem_value = elem.value if elem.VM == 1 else elem.value[0]
         if not isinstance(elem_value, int):
-            elem.value = convert_numbers(elem.value, is_little_endian,
-                                         byte_type)
+            elem.value = convert_numbers(
+                elem.value, is_little_endian, byte_type
+            )
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
     # (5400, 0110) Channel Minimum Value
@@ -102,7 +103,7 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
-        if ds.is_implicit_VR is True:
+        if ds.is_implicit_VR:
             elem.VR = 'OW'
         else:
             elem.VR = 'OW' if ds.WaveformBitsAllocated > 8 else 'OB'
@@ -116,8 +117,7 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
             elem.VR = 'US'
             elem_value = elem.value if elem.VM == 1 else elem.value[0]
             if not isinstance(elem_value, int):
-                elem.value = convert_numbers(elem.value, is_little_endian,
-                                             'H')
+                elem.value = convert_numbers(elem.value, is_little_endian, 'H')
         else:
             elem.VR = 'OW'
 
@@ -460,7 +460,7 @@ def write_data_element(fp, data_element, encodings=None):
     buffer.is_implicit_VR = fp.is_implicit_VR
 
     VR = data_element.VR
-    if fp.is_implicit_VR is False and len(VR) != 2:
+    if not fp.is_implicit_VR and len(VR) != 2:
         msg = (
             f"Cannot write ambiguous VR of '{VR}' for data element with "
             f"tag {repr(data_element.tag)}.\nSet the correct VR before "
@@ -497,7 +497,7 @@ def write_data_element(fp, data_element, encodings=None):
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
     if is_undefined_length and data_element.tag == 0x7fe00010:
         encap_item = b'\xfe\xff\x00\xe0'
-        if fp.is_little_endian is False:
+        if not fp.is_little_endian:
             # Non-conformant endianness
             encap_item = b'\xff\xfe\xe0\x00'
         if not data_element.value.startswith(encap_item):
@@ -509,7 +509,7 @@ def write_data_element(fp, data_element, encodings=None):
             )
 
     value_length = buffer.tell()
-    if (fp.is_implicit_VR is False and VR not in extra_length_VRs and
+    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length and value_length > 0xffff):
         # see PS 3.5, section 6.2.2 for handling of this case
         msg = (
@@ -522,13 +522,13 @@ def write_data_element(fp, data_element, encodings=None):
         VR = 'UN'
 
     # write the VR for explicit transfer syntax
-    if fp.is_implicit_VR is False:
+    if not fp.is_implicit_VR:
         fp.write(bytes(VR, default_encoding))
 
         if VR in extra_length_VRs:
             fp.write_US(0)  # reserved 2 bytes
 
-    if (fp.is_implicit_VR is False and VR not in extra_length_VRs and
+    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
             not is_undefined_length):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
@@ -546,6 +546,13 @@ def write_dataset(fp, dataset, parent_encoding=default_encoding):
     """Write a Dataset dictionary to the file. Return the total length written.
     """
     _harmonize_properties(dataset, fp)
+
+    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
+        name = dataset.__class__.__name__
+        raise AttributeError(
+            f"'{name}.is_little_endian' and '{name}.is_implicit_VR' must "
+            f"be set appropriately before saving"
+        )
 
     if not dataset.is_original_encoding:
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
