@@ -271,6 +271,17 @@ class TestWriteFile:
 
         assert unzipped_rewritten == unzipped_original
 
+    def test_write_dataset_without_encoding(self):
+        """Test that write_dataset() raises if encoding not set."""
+        ds = Dataset()
+        bs = BytesIO()
+        msg = (
+            r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must "
+            r"be set appropriately before saving"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            write_dataset(bs, ds)
+
 
 class TestScratchWriteDateTime(TestWriteFile):
     """Write and reread simple or multi-value DA/DT/TM data elements"""

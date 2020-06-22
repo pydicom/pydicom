@@ -38,7 +38,7 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
             elem.VR = 'OB'
-        elif ds.is_implicit_VR :
+        elif ds.is_implicit_VR:
             # Non-compressed Pixel Data - Implicit Little Endian
             # PS3.5 Annex A1: VR is always OW
             elem.VR = 'OW'
@@ -986,7 +986,7 @@ def dcmwrite(filename, dataset, write_like_original=True):
     # Check for decompression, give warnings if inconsistencies
     # If decompressed, then pixel_array is now used instead of PixelData
     if dataset.is_decompressed:
-        if dataset.file_meta.TransferSyntaxUID.is_compressed is True:
+        if dataset.file_meta.TransferSyntaxUID.is_compressed:
             raise ValueError(
                 f"The Transfer Syntax UID element in "
                 f"'{dataset.__class__.__name__}.file_meta' is compressed "
