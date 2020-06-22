@@ -2663,10 +2663,10 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.is_little_endian = True
         self.fp.is_implicit_VR = False
 
-        msg = (r'The value for the data element \(3004, 0058\) exceeds the '
-               r'size of 64 kByte and cannot be written in an explicit '
-               r'transfer syntax. The data element VR is changed from '
-               r'"DS" to "UN" to allow saving the data.')
+        msg = (r"The value for the data element \(3004, 0058\) exceeds the "
+               r"size of 64 kByte and cannot be written in an explicit "
+               r"transfer syntax. The data element VR is changed from "
+               r"'DS' to 'UN' to allow saving the data.")
 
         with pytest.warns(UserWarning, match=msg):
             write_data_element(self.fp, pixel_data)

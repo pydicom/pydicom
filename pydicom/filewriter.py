@@ -38,9 +38,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
             elem.VR = 'OB'
-        # Non-compressed Pixel Data - Implicit Little Endian
-        # PS3.5 Annex A1: VR is always OW
-        elif ds.is_implicit_VR:
+        elif ds.is_implicit_VR is True:
+            # Non-compressed Pixel Data - Implicit Little Endian
+            # PS3.5 Annex A1: VR is always OW
             elem.VR = 'OW'
         else:
             # Non-compressed Pixel Data - Explicit VR
@@ -102,7 +102,7 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
-        if ds.is_implicit_VR:
+        if ds.is_implicit_VR is True:
             elem.VR = 'OW'
         else:
             elem.VR = 'OW' if ds.WaveformBitsAllocated > 8 else 'OB'
@@ -164,9 +164,9 @@ def correct_ambiguous_vr_element(elem, ds, is_little_endian):
         try:
             _correct_ambiguous_vr_element(elem, ds, is_little_endian)
         except AttributeError as e:
-            reason = ('Failed to resolve ambiguous VR for tag'
-                      ' {}: '.format(elem.tag)) + str(e)
-            raise AttributeError(reason)
+            raise AttributeError(
+                f"Failed to resolve ambiguous VR for tag {elem.tag}: " + str(e)
+            )
 
     return elem
 
@@ -240,7 +240,8 @@ def write_numbers(fp, data_element, struct_format):
                 fp.write(pack(format_string, val))
     except Exception as e:
         raise IOError(
-            "{0}\nfor data_element:\n{1}".format(str(e), str(data_element)))
+            f"{str(e)}\nfor data_element:\n{str(data_element)}"
+        )
 
 
 def write_OBvalue(fp, data_element):
@@ -273,8 +274,8 @@ def multi_string(val):
     """Put a string together with delimiter if has more than one value"""
     if _is_multi_value(val):
         return "\\".join(val)
-    else:
-        return val
+
+    return val
 
 
 def write_PN(fp, data_element, encodings=None):
@@ -313,8 +314,9 @@ def write_text(fp, data_element, encodings=None):
         encodings = encodings or [default_encoding]
         if _is_multi_value(val):
             if val and isinstance(val[0], str):
-                val = b'\\'.join([encode_string(val, encodings)
-                                  for val in val])
+                val = b'\\'.join(
+                    [encode_string(val, encodings) for val in val]
+                )
             else:
                 val = b'\\'.join([val for val in val])
         else:
@@ -334,9 +336,12 @@ def write_number_string(fp, data_element):
     val = data_element.value
 
     if _is_multi_value(val):
-        val = "\\".join((x.original_string
-                         if hasattr(x, 'original_string')
-                         else str(x) for x in val))
+        val = "\\".join(
+            (
+                x.original_string if hasattr(x, 'original_string')
+                else str(x) for x in val
+            )
+        )
     else:
         if hasattr(val, 'original_string'):
             val = val.original_string
@@ -356,8 +361,8 @@ def _format_DA(val):
         return ''
     elif hasattr(val, 'original_string'):
         return val.original_string
-    else:
-        return val.strftime("%Y%m%d")
+
+    return val.strftime("%Y%m%d")
 
 
 def write_DA(fp, data_element):
@@ -366,10 +371,12 @@ def write_DA(fp, data_element):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, str)
-                             else _format_DA(x) for x in val))
+            val = "\\".join(
+                (x if isinstance(x, str) else _format_DA(x) for x in val)
+            )
         else:
             val = _format_DA(val)
+
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
@@ -384,8 +391,8 @@ def _format_DT(val):
         return val.original_string
     elif val.microsecond > 0:
         return val.strftime("%Y%m%d%H%M%S.%f%z")
-    else:
-        return val.strftime("%Y%m%d%H%M%S%z")
+
+    return val.strftime("%Y%m%d%H%M%S%z")
 
 
 def write_DT(fp, data_element):
@@ -394,8 +401,9 @@ def write_DT(fp, data_element):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, str)
-                             else _format_DT(x) for x in val))
+            val = "\\".join(
+                (x if isinstance(x, str) else _format_DT(x) for x in val)
+            )
         else:
             val = _format_DT(val)
         if len(val) % 2 != 0:
@@ -414,8 +422,8 @@ def _format_TM(val):
         return val.original_string
     elif val.microsecond > 0:
         return val.strftime("%H%M%S.%f")
-    else:
-        return val.strftime("%H%M%S")
+
+    return val.strftime("%H%M%S")
 
 
 def write_TM(fp, data_element):
@@ -424,10 +432,12 @@ def write_TM(fp, data_element):
         write_string(fp, data_element)
     else:
         if _is_multi_value(val):
-            val = "\\".join((x if isinstance(x, str)
-                             else _format_TM(x) for x in val))
+            val = "\\".join(
+                (x if isinstance(x, str) else _format_TM(x) for x in val)
+            )
         else:
             val = _format_TM(val)
+
         if len(val) % 2 != 0:
             val = val + ' '  # pad to even length
 
@@ -450,11 +460,12 @@ def write_data_element(fp, data_element, encodings=None):
     buffer.is_implicit_VR = fp.is_implicit_VR
 
     VR = data_element.VR
-    if not fp.is_implicit_VR and len(VR) != 2:
-        msg = ("Cannot write ambiguous VR of '{}' for data element with "
-               "tag {}.\nSet the correct VR before writing, or use an "
-               "implicit VR transfer syntax".format(
-                   VR, repr(data_element.tag)))
+    if fp.is_implicit_VR is False and len(VR) != 2:
+        msg = (
+            f"Cannot write ambiguous VR of '{VR}' for data element with "
+            f"tag {repr(data_element.tag)}.\nSet the correct VR before "
+            f"writing, or use an implicit VR transfer syntax"
+        )
         raise ValueError(msg)
 
     if data_element.is_raw:
@@ -464,8 +475,8 @@ def write_data_element(fp, data_element, encodings=None):
     else:
         if VR not in writers:
             raise NotImplementedError(
-                "write_data_element: unknown Value Representation "
-                "'{0}'".format(VR))
+                f"write_data_element: unknown Value Representation '{VR}'"
+            )
 
         encodings = encodings or [default_encoding]
         encodings = convert_encodings(encodings)
@@ -486,7 +497,7 @@ def write_data_element(fp, data_element, encodings=None):
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
     if is_undefined_length and data_element.tag == 0x7fe00010:
         encap_item = b'\xfe\xff\x00\xe0'
-        if not fp.is_little_endian:
+        if fp.is_little_endian is False:
             # Non-conformant endianness
             encap_item = b'\xff\xfe\xe0\x00'
         if not data_element.value.startswith(encap_item):
@@ -498,25 +509,26 @@ def write_data_element(fp, data_element, encodings=None):
             )
 
     value_length = buffer.tell()
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
+    if (fp.is_implicit_VR is False and VR not in extra_length_VRs and
             not is_undefined_length and value_length > 0xffff):
         # see PS 3.5, section 6.2.2 for handling of this case
-        msg = ('The value for the data element {} exceeds the size '
-               'of 64 kByte and cannot be written in an explicit transfer '
-               'syntax. The data element VR is changed from "{}" to "UN" '
-               'to allow saving the data.'
-               .format(data_element.tag, VR))
+        msg = (
+            f"The value for the data element {data_element.tag} exceeds the "
+            f"size of 64 kByte and cannot be written in an explicit transfer "
+            f"syntax. The data element VR is changed from '{VR}' to 'UN' "
+            f"to allow saving the data."
+        )
         warnings.warn(msg)
         VR = 'UN'
 
     # write the VR for explicit transfer syntax
-    if not fp.is_implicit_VR:
+    if fp.is_implicit_VR is False:
         fp.write(bytes(VR, default_encoding))
 
         if VR in extra_length_VRs:
             fp.write_US(0)  # reserved 2 bytes
 
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
+    if (fp.is_implicit_VR is False and VR not in extra_length_VRs and
             not is_undefined_length):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
@@ -921,10 +933,10 @@ def dcmwrite(filename, dataset, write_like_original=True):
             pass
 
         if not has_tsyntax:
+            name = dataset.__class__.__name__
             raise AttributeError(
-                "'{0}.is_little_endian' and '{0}.is_implicit_VR' must be "
-                "set appropriately before saving."
-                .format(dataset.__class__.__name__)
+                f"'{name}.is_little_endian' and '{name}.is_implicit_VR' must "
+                f"be set appropriately before saving"
             )
 
     # Try and ensure that `is_undefined_length` is set correctly
@@ -939,17 +951,19 @@ def dcmwrite(filename, dataset, write_like_original=True):
     #   `dataset.file_meta` Dataset - user may have added them to the wrong
     #   place
     if dataset.group_dataset(0x0002) != Dataset():
-        raise ValueError("File Meta Information Group Elements (0002,eeee) "
-                         "should be in their own Dataset object in the "
-                         "'{0}.file_meta' "
-                         "attribute.".format(dataset.__class__.__name__))
+        raise ValueError(
+            f"File Meta Information Group Elements (0002,eeee) should be in "
+            f"their own Dataset object in the "
+            f"'{dataset.__class__.__name__}.file_meta' attribute."
+        )
 
     # A preamble is required under the DICOM standard, however if
     #   `write_like_original` is True we treat it as optional
     preamble = getattr(dataset, 'preamble', None)
     if preamble and len(preamble) != 128:
-        raise ValueError("'{0}.preamble' must be 128-bytes "
-                         "long.".format(dataset.__class__.__name__))
+        raise ValueError(
+            f"'{dataset.__class__.__name__}.preamble' must be 128-bytes long."
+        )
     if not preamble and not write_like_original:
         # The default preamble is 128 0x00 bytes.
         preamble = b'\x00' * 128
@@ -965,10 +979,12 @@ def dcmwrite(filename, dataset, write_like_original=True):
     # Check for decompression, give warnings if inconsistencies
     # If decompressed, then pixel_array is now used instead of PixelData
     if dataset.is_decompressed:
-        xfer = dataset.file_meta.TransferSyntaxUID
-        if xfer not in UncompressedPixelTransferSyntaxes:
-            raise ValueError("file_meta transfer SyntaxUID is compressed type "
-                             "but pixel data has been decompressed")
+        if dataset.file_meta.TransferSyntaxUID.is_compressed is True:
+            raise ValueError(
+                f"The Transfer Syntax UID element in "
+                f"'{dataset.__class__.__name__}.file_meta' is compressed "
+                f"but the pixel data has been decompressed"
+            )
 
         # Force PixelData to the decompressed version
         dataset.PixelData = dataset.pixel_array.tobytes()
@@ -993,8 +1009,9 @@ def dcmwrite(filename, dataset, write_like_original=True):
         tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
-            write_file_meta_info(fp, dataset.file_meta,
-                                 enforce_standard=not write_like_original)
+            write_file_meta_info(
+                fp, dataset.file_meta, enforce_standard=not write_like_original
+            )
             tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
 
         if (tsyntax == DeflatedExplicitVRLittleEndian):

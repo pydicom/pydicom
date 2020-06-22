@@ -1246,7 +1246,7 @@ class TestDataset:
         # Raise if is_implicit_VR or is_little_endian missing with no tsyntax
         msg = (
             r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must be "
-            r"set appropriately before saving."
+            r"set appropriately before saving"
         )
         with pytest.raises(AttributeError, match=msg):
             ds.save_as(fp)
