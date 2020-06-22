@@ -183,17 +183,31 @@
             
   <div class="section" id="version-2-1-0">
 <h1>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changes">
-<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 </ul>
-</div>
 <div class="section" id="enhancements">
-<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Large testing data is no longer distributed within the pydicom package
+with the aim to reduce the package download size. These test files
+will download on-the-fly whenever either the tests are run, or should
+the file(s) be requested via the data manager functions.
+For example:</p>
+<ul>
+<li><p>to download all files and get their paths on disk you can run
+<code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_files()</span></code>.</p></li>
+<li><p>To download the 7.2 MB file <code class="docutils literal notranslate"><span class="pre">RG1_UNCI.dcm</span></code> and get its path on disk
+you can run <code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
+</ul>
+</li>
+</ul>
 </div>
 <div class="section" id="fixes">
-<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+</div>
 </div>
 </div>
 

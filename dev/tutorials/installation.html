@@ -101,6 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#install-the-official-release">Install the official release</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-using-pip">Install using pip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-using-conda">Install using conda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-example-test-dicom-files">Downloading example/test DICOM files</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#install-the-optional-libraries">Install the optional libraries</a><ul>
@@ -123,6 +124,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#install-the-official-release">Install the official release</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#install-using-pip">Install using pip</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#install-using-conda">Install using conda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#downloading-example-test-dicom-files">Downloading example/test DICOM files</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#install-the-optional-libraries">Install the optional libraries</a><ul>
@@ -262,9 +264,20 @@ one of the release <code class="docutils literal notranslate"><span class="pre">
 </pre></div>
 </div>
 </div>
+<div class="section" id="downloading-example-test-dicom-files">
+<span id="tut-install-libs"></span><h3>Downloading example/test DICOM files<a class="headerlink" href="#downloading-example-test-dicom-files" title="Permalink to this headline">¶</a></h3>
+<p>A range of the test data files are not distributed within the pydicom package
+so as to keep the package download size small. These files are instead housed
+on Zenodo at &lt;<a class="reference external" href="https://zenodo.org/communities/pydicom">https://zenodo.org/communities/pydicom</a>&gt;. To download all of the
+pydicom test files and get all of the respective paths of where this data is
+housed run the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_testdata_files</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="install-the-optional-libraries">
-<span id="tut-install-libs"></span><h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this headline">¶</a></h2>
+<h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this headline">¶</a></h2>
 <p>If you’re going to be manipulating pixel data then
 <a class="reference external" href="https://numpy.org/">NumPy</a> is required.</p>
 <p>Using pip:</p>

@@ -120,23 +120,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-1-0">Version 2.1.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#changes">Changes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#enhancements">Enhancements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fixes">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changelog">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#enhancements">Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fixes">Fixes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-0-0">Version 2.0.0</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#changelog">Changelog</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id1">Enhancements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Enhancements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Fixes</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-4-1">Version 1.4.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Changelog</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id4">Fixes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5">Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Changelog</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Fixes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#changes">Changes</a></li>
 </ul>
 </li>
 </ul>
@@ -332,23 +334,37 @@
 <h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="version-2-1-0">
 <h2>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="changelog">
+<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 </ul>
-</div>
 <div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Large testing data is no longer distributed within the pydicom package
+with the aim to reduce the package download size. These test files
+will download on-the-fly whenever either the tests are run, or should
+the file(s) be requested via the data manager functions.
+For example:</p>
+<ul>
+<li><p>to download all files and get their paths on disk you can run
+<code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_files()</span></code>.</p></li>
+<li><p>To download the 7.2 MB file <code class="docutils literal notranslate"><span class="pre">RG1_UNCI.dcm</span></code> and get its path on disk
+you can run <code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
+</ul>
+</li>
+</ul>
 </div>
 <div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<h4>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h4>
+</div>
 </div>
 </div>
 <div class="section" id="version-2-0-0">
 <h2>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="changelog">
-<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Changelog<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 2 (only Python 3.5+ supported)</p></li>
 <li><p>Changes to <cite>Dataset.file_meta</cite></p>
@@ -369,8 +385,8 @@ are deprecated and will be removed in version 2.1</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> (previously deprecated) has been removed.
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
 </ul>
-<div class="section" id="id1">
-<h4>Enhancements<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id2">
+<h4>Enhancements<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Allow PathLike objects for filename argument in <cite>dcmread</cite>, <cite>dcmwrite</cite> and
 <cite>Dataset.save_as</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1047">#1047</a>)</p></li>
@@ -384,8 +400,8 @@ data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a num
 behavior</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h4>Fixes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id3">
+<h4>Fixes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
 (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1038">#1038</a>)</p></li>
@@ -413,16 +429,16 @@ in <a class="reference internal" href="../reference/generated/pydicom.config.DS_
 </div>
 <div class="section" id="version-1-4-1">
 <h2>Version 1.4.1<a class="headerlink" href="#version-1-4-1" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id3">
-<h3>Changelog<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="id4">
-<h4>Fixes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<h3>Changelog<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>Fixes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed writing of empty sequences (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1030">#1030</a>)</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h4>Changes<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="changes">
+<h4>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>In <cite>Dataset.to_json</cite> and <cite>Dataset.to_json_dict</cite>, the default of the
 <cite>bulk_data_threshold</cite> argument has changed to 1024, and is now ignored if
