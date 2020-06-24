@@ -271,6 +271,17 @@ class TestWriteFile:
 
         assert unzipped_rewritten == unzipped_original
 
+    def test_write_dataset_without_encoding(self):
+        """Test that write_dataset() raises if encoding not set."""
+        ds = Dataset()
+        bs = BytesIO()
+        msg = (
+            r"'Dataset.is_little_endian' and 'Dataset.is_implicit_VR' must "
+            r"be set appropriately before saving"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            write_dataset(bs, ds)
+
 
 class TestScratchWriteDateTime(TestWriteFile):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
@@ -2663,10 +2674,10 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.is_little_endian = True
         self.fp.is_implicit_VR = False
 
-        msg = (r'The value for the data element \(3004, 0058\) exceeds the '
-               r'size of 64 kByte and cannot be written in an explicit '
-               r'transfer syntax. The data element VR is changed from '
-               r'"DS" to "UN" to allow saving the data.')
+        msg = (r"The value for the data element \(3004, 0058\) exceeds the "
+               r"size of 64 kByte and cannot be written in an explicit "
+               r"transfer syntax. The data element VR is changed from "
+               r"'DS' to 'UN' to allow saving the data.")
 
         with pytest.warns(UserWarning, match=msg):
             write_data_element(self.fp, pixel_data)
