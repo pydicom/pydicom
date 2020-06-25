@@ -17,10 +17,13 @@ cid_for_name = {v: k for k, v in name_for_cid.items()}
 def _filtered(allnames, filters):
     if not filters:
         return sorted(set(allnames))
-    lowered_filters = tuple(map(str.lower, filters))
-    include_name = lambda name: any(lowered_filter in name.lower() # noqa: E731
-                                    for lowered_filter in lowered_filters)
-    return sorted(set(filter(include_name, allnames)))
+    lowered_filters = tuple(filter.lower() for filter in filters)
+    return sorted(set(
+        name for name in allnames if
+        any((lowered_filter in name.lower())
+            for lowered_filter in lowered_filters)
+    ))
+
 
 
 class _CID_Dict:
