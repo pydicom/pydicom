@@ -1,6 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
-from copy import deepcopy
 from decimal import Decimal
 import re
 
@@ -749,6 +748,29 @@ class PersonName:
 
     def __str__(self):
         return '='.join(self.components).__str__()
+
+    def __next__(self):
+        # Initialize if not done already
+        if not hasattr(self, "_i"):
+            self.__iter__()
+
+        # Get next or stop
+        if self._i < self._rep_len:
+            c = self._str_rep[self._i]
+            self._i += 1
+            return c
+        else:
+            raise StopIteration
+
+    def __iter__(self):
+        # Get string rep. and length, initialize counter
+        self._str_rep = self.__str__()
+        self._rep_len = len(self._str_rep)
+        self._i = 0
+        return self
+
+    def __contains__(self, x):
+        return x in self.__str__()
 
     def __repr__(self):
         return '='.join(self.components).__repr__()

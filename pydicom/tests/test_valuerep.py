@@ -427,6 +427,36 @@ class TestPersonName:
         )
         assert hash(pn1) == hash(pn2)
 
+    def test_next(self):
+        """Test that the next function works on it's own"""
+        pn1 = PersonName("John^Doe^^Dr", encodings=default_encoding)
+        assert next(pn1) == "J"
+
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
+        assert next(pn2) == "Y"
+        assert next(pn2) == "a"
+
+    def test_iterator(self):
+        """Test that iterators can be corretly constructed"""
+        name_str = "John^Doe^^Dr"
+        pn1 = PersonName(name_str)
+        
+        for i, c in enumerate(pn1):
+            assert name_str[i] == c
+
+        # Ensure that multiple iterators can be created on the same variable
+        for i, c in enumerate(pn1):
+            assert name_str[i] == c
+
+    def test_contains(self):
+        """Test that characters can be check if they are within the name"""
+        pn1 = PersonName("John^Doe")
+        assert ("J" in pn1) == True
+        assert ("o" in pn1) == True
+        assert ("x" in pn1) == False
+
 
 class TestDateTime:
     """Unit tests for DA, DT, TM conversion to datetime objects"""
