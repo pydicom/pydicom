@@ -750,11 +750,7 @@ class PersonName:
         return '='.join(self.components).__str__()
 
     def __next__(self):
-        # Initialize if not done already
-        if not hasattr(self, "_i"):
-            self.__iter__()
-
-        # Get next or stop
+        # Get next character or stop iteration
         if self._i < self._rep_len:
             c = self._str_rep[self._i]
             self._i += 1
@@ -763,7 +759,7 @@ class PersonName:
             raise StopIteration
 
     def __iter__(self):
-        # Get string rep. and length, initialize counter
+        # Get string rep. and length, initialize index counter
         self._str_rep = self.__str__()
         self._rep_len = len(self._str_rep)
         self._i = 0
