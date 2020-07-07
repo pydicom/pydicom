@@ -127,6 +127,251 @@ class TestRawReaderImplVR:
             assert expected == len(got.value)
             assert got.value.startswith(b'ABCDEFGHIJ\0')
 
+    def testExplVRLittleEndianEncapsulatedUndefLength(self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "18 00 00 00"  # Item (dataset) Length
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "55 56 57 58"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "00 00 00 00"  # required Item Length Field of value 0
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            b'\xfe\xff\x00\xe0\x18\x00\x00\x00ABCDEFGHIJKLMNOPQRSTUVWX',
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        assert expected == next(de_gen)
+        assert 52 == infile.tell()
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthTwoFragments(self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length broken into two defined-length fragments..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "18 00 00 00"  # Item (dataset) Length
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "55 56 57 58"
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "14 00 00 00"  # Item (dataset) Length
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "00 00 00 00"  # required Item Length Field of value 0
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            (b'\xfe\xff\x00\xe0\x18\x00\x00\x00ABCDEFGHIJKLMNOPQRSTUVWX'
+             b'\xfe\xff\x00\xe0\x14\x00\x00\x00ABCDEFGHIJKLMNOPQRST'),
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        assert expected == next(de_gen)
+        assert 80 == infile.tell()
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthUndefItemLength(self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length and whose fragment (Item) also has an undefined
+        length..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "ff ff ff ff"  # Item (dataset) Length - undefined
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "55 56 57 58"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "00 00 00 00"  # required Item Length Field of value 0
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            b'\xfe\xff\x00\xe0\xff\xff\xff\xffABCDEFGHIJKLMNOPQRSTUVWX',
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        assert expected == next(de_gen)
+        assert 52 == infile.tell()
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthAndTooLongItemLength(
+            self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length and whose fragment (Item) has an erroneous (too long)
+        length..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "50 00 00 00"  # Item (dataset) Length - too long
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "55 56 57 58"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "00 00 00 00"  # required Item Length Field of value 0
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            b'\xfe\xff\x00\xe0\x50\x00\x00\x00ABCDEFGHIJKLMNOPQRSTUVWX',
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        assert expected == next(de_gen)
+        assert 52 == infile.tell()
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthAndItemLengthMIssing(
+            self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length and whose fragment (Item) ends before its length
+        is specified..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        with pytest.raises(EOFError):
+            next(de_gen)
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthDeferred(self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length that's longer than defer_size..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "14 00 00 00"  # Item (dataset) Length
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "51 52 53 54"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "00 00 00 00"  # required Item Length Field of value 0
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            None,        # extracted data
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True,
+                                        defer_size=16)
+        assert expected == next(de_gen)
+        assert 48 == infile.tell()
+
+    def testExplVRLittleEndianEncapsulatedUndefLengthBadDelimiterLength(self):
+        """Raw read: Expl VR Little Endian encapsulated pixel data with
+        undefined length and a bad (non-zero) sequence delimiter length..."""
+
+        hexstr = (
+            "e0 7f 10 00"  # (7fe0, 0010) Pixel Data
+            "4f 42 00 00"  # VR OB, 2 bytes reserved
+            "ff ff ff ff"  # -1 undefined length
+            "fe ff 00 e0"  # (fffe, e000) Item Tag
+            "10 00 00 00"  # Item (dataset) Length
+            "41 42 43 44"
+            "45 46 47 48"
+            "49 4a 4b 4c"
+            "4d 4e 4f 50"
+            "fe ff dd e0"  # (fffe, edd) Sequence Delimiter
+            "12 13 14 15"  # bad non-0 required Item Length Field
+        )
+
+        infile = BytesIO(hex2bytes(hexstr))
+        expected = (
+            (0x7fe0, 0x10),
+            'OB',
+            0xffffffff,  # declared value length
+            b'\xfe\xff\x00\xe0\x10\x00\x00\x00ABCDEFGHIJKLMNOP',
+            12,          # value starts 12 bytes after beginning of element
+            False,       # is Implicit VR
+            True         # is Little Endian
+        )
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=True)
+        assert expected == next(de_gen)
+        assert 44 == infile.tell()
+
 
 class TestRawSequence:
     # See DICOM standard PS3.5-2008 section 7.5 for sequence syntax

@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
 import pathlib
@@ -6,7 +6,7 @@ import sys
 from struct import pack, unpack
 
 from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag, Tag
+from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag
 from pydicom.datadict import dictionary_description
 
 from pydicom.config import logger
@@ -126,6 +126,28 @@ def read_undefined_length_value(fp,
         If EOF is reached before delimiter found.
     """
     data_start = fp.tell()
+    defer_size = size_in_bytes(defer_size)
+
+    # It's common for an undefined length value item to be an
+    # encapsulated pixel data as defined in PS3.5 section A.4.
+    # Attempt to parse the data under that assumption, since the method
+    #  1. is proof against coincidental embedded sequence delimiter tags
+    #  2. avoids accumulating any data in memory if the element is large
+    #     enough to be deferred
+    #  3. does not double-accumulate data (in chunks and then joined)
+    #
+    # Unfortunately, some implementations deviate from the standard and the
+    # encapsulated pixel data-parsing algorithm fails. In that case, we fall
+    # back to a method of scanning the entire element value for the
+    # sequence delimiter, as was done historically.
+    if delimiter_tag == SequenceDelimiterTag:
+        was_value_found, value = _try_read_encapsulated_pixel_data(
+                                    fp,
+                                    is_little_endian,
+                                    defer_size)
+        if was_value_found:
+            return value
+
     search_rewind = 3
 
     if is_little_endian:
@@ -137,7 +159,6 @@ def read_undefined_length_value(fp,
     found = False
     eof = False
     value_chunks = []
-    defer_size = size_in_bytes(defer_size)
     byte_count = 0  # for defer_size checks
     while not found:
         chunk_start = fp.tell()
@@ -179,6 +200,116 @@ def read_undefined_length_value(fp,
         return None
     else:
         return b"".join(value_chunks)
+
+
+def _try_read_encapsulated_pixel_data(fp, is_little_endian, defer_size=None):
+    """Attempt to read an undefined length value item as if it were
+    encapsulated pixel data as defined in PS3.5 section A.4.
+
+    On success, the file will be set to the first byte after the delimiter
+    and its following four zero bytes. If unsuccessful, the file will be left
+    in its original position.
+
+    Parameters
+    ----------
+    fp : file-like
+        The file-like to read.
+    is_little_endian : bool
+        ``True`` if the file transfer syntax is little endian, else ``False``.
+    defer_size : int or None, optional
+        Size to avoid loading large elements in memory. See
+        :func:`~pydicom.filereader.dcmread` for more parameter info.
+
+    Returns
+    -------
+    bool, bytes
+        Whether or not the value was parsed properly and, if it was,
+        the value.
+    """
+
+    if is_little_endian:
+        tag_format = b"<HH"
+        length_format = b"<L"
+    else:
+        tag_format = b">HH"
+        length_format = b">L"
+
+    sequence_delimiter_bytes = pack(tag_format,
+                                    SequenceDelimiterTag.group,
+                                    SequenceDelimiterTag.elem)
+    item_bytes = pack(tag_format, ItemTag.group, ItemTag.elem)
+
+    data_start = fp.tell()
+    byte_count = 0
+    while True:
+        tag_bytes = fp.read(4)
+        if len(tag_bytes) < 4:
+            # End of file reached while scanning.
+            # Maybe the sequence delimiter is missing or or maybe we read past
+            # it due to an inaccurate length indicator for an element
+            logger.debug(
+                "End of input encountered while parsing undefined length "
+                "value as encapsulated pixel data. Unable to find tag at "
+                "position 0x%x. Falling back to byte by byte scan.",
+                fp.tell() - len(tag_bytes))
+            fp.seek(data_start)
+            return (False, None)
+        byte_count += 4
+
+        if tag_bytes == sequence_delimiter_bytes:
+            break
+
+        if tag_bytes == item_bytes:
+            length_bytes = fp.read(4)
+            if len(length_bytes) < 4:
+                # End of file reached while scanning.
+                # Maybe the sequence delimiter is missing or or maybe we read
+                # past it due to an inaccurate length indicator for an element
+                logger.debug(
+                    "End of input encountered while parsing undefined length "
+                    "value as encapsulated pixel data. Unable to find length "
+                    "for tag %s at position 0x%x. Falling back to byte by "
+                    "byte scan.",
+                    ItemTag, fp.tell()-len(length_bytes))
+                fp.seek(data_start)
+                return (False, None)
+            byte_count += 4
+            length = unpack(length_format, length_bytes)[0]
+
+            try:
+                fp.seek(length, os.SEEK_CUR)
+            except OverflowError:
+                logger.debug(
+                    "Too-long length %04x for tag %s at position 0x%x found "
+                    "while parsing undefined length value as encapsulated "
+                    "pixel data. Falling back to byte-by-byte scan.",
+                    length, ItemTag, fp.tell()-8)
+                fp.seek(data_start)
+                return (False, None)
+            byte_count += length
+        else:
+            logger.debug(
+                "Unknown tag bytes %s at position 0x%x found "
+                "while parsing undefined length value as encapsulated "
+                "pixel data. Falling back to byte-by-byte scan.",
+                tag_bytes.hex(), fp.tell()-4)
+            fp.seek(data_start)
+            return (False, None)
+
+    length = fp.read(4)
+    if length != b"\0\0\0\0":
+        msg = ("Expected 4 zero bytes after undefined length delimiter "
+               "at pos {0:04x}")
+        logger.debug(msg.format(fp.tell() - 4))
+
+    if defer_size is not None and defer_size <= byte_count:
+        value = None
+    else:
+        fp.seek(data_start)
+        value = fp.read(byte_count - 4)
+
+    fp.seek(data_start + byte_count + 4)
+    return (True, value)
 
 
 def find_delimiter(fp, delimiter, is_little_endian, read_size=128,

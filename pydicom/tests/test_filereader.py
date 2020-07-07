@@ -490,6 +490,11 @@ class TestReader:
         ds = dcmread(fp, force=True)
         assert "OB" == ds[0x7FE00010].VR
 
+    def test_read_encoded_pixel_data_without_embedded_sequence_delimiter(self):
+        ds = dcmread(jpeg2000_name)
+        assert "OB" == ds[0x7FE00010].VR
+        assert 266 == len(ds[0x7FE00010].value)
+
     def test_read_encoded_pixel_data_with_embedded_sequence_delimiter(self):
         """Test ignoring embedded sequence delimiter in encoded pixel
         data fragment. Reproduces #1140.
