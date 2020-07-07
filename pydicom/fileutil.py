@@ -155,7 +155,7 @@ def read_undefined_length_value(fp,
             new_bytes = bytes_read[:index]
             byte_count += len(new_bytes)
             if defer_size is None or byte_count < defer_size:
-                value_chunks.append(bytes_read[:index])
+                value_chunks.append(new_bytes)
             fp.seek(chunk_start + index + 4)  # rewind to end of delimiter
             length = fp.read(4)
             if length != b"\0\0\0\0":
