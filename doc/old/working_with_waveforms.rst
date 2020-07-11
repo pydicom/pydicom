@@ -2,7 +2,7 @@
 .. title:: Working with Waveform Data
 
 Working with Waveform Data
-=========================
+==========================
 
 .. currentmodule:: pydicom
 

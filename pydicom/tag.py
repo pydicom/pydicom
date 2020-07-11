@@ -128,16 +128,6 @@ class BaseTag(int):
     """Represents a DICOM element (group, element) tag.
 
     Tags are represented as an :class:`int`.
-
-    Attributes
-    ----------
-    element : int
-        The element number of the tag.
-    group : int
-        The group number of the tag.
-    is_private : bool
-        Returns ``True`` if the corresponding element is private, ``False``
-        otherwise.
     """
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:

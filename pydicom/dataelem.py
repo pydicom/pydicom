@@ -140,8 +140,6 @@ class DataElement:
         (default ``True``).
     tag : BaseTag
         The element's tag.
-    value
-        The element's stored value(s).
     VR : str
         The element's Value Representation.
     """
