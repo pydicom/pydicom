@@ -1,14 +1,25 @@
 Version 2.1.0
 =================================
 
-Changes
--------
+Changelog
+---------
 * Dropped support for Python 3.5 (only Python 3.6+ supported)
 
 Enhancements
-------------
+............
+* Large testing data is no longer distributed within the pydicom package
+  with the aim to reduce the package download size. These test files
+  will download on-the-fly whenever either the tests are run, or should
+  the file(s) be requested via the data manager functions.
+  For example:
+
+  * to download all files and get their paths on disk you can run
+    ``pydicom.data.get_testdata_files()``.
+
+  * To download the 7.2 MB file ``RG1_UNCI.dcm`` and get its path on disk
+    you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
 * Added a new pixel data handler based on pylibjpeg which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 
 Fixes
------
+.....

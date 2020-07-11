@@ -7,7 +7,22 @@ from os.path import abspath, dirname, join
 
 from pydicom.fileutil import path_from_pathlike
 
+from . import download
+
 DATA_ROOT = abspath(dirname(__file__))
+
+
+def online_test_file_dummy_paths():
+    filenames = list(download.get_url_map().keys())
+
+    test_files_root = join(DATA_ROOT, 'test_files')
+
+    dummy_path_map = {
+        join(test_files_root, filename): filename
+        for filename in filenames
+    }
+
+    return dummy_path_map
 
 
 def get_files(base, pattern):
@@ -39,6 +54,21 @@ def get_files(base, pattern):
                                              pattern)
             if len(filename_filter):
                 files.append(filename_filter[0])
+
+    # To preserve backwards compatibility filter the downloaded files
+    # as if they are stored within DATA_ROOT/test_files/*.dcm
+    dummy_online_file_path_map = online_test_file_dummy_paths()
+    dummy_online_file_path_filtered = fnmatch.filter(
+        dummy_online_file_path_map.keys(), join(base, pattern))
+    download_names = [str(dummy_online_file_path_map[dummy_path])
+                      for dummy_path in dummy_online_file_path_filtered]
+
+    real_online_file_paths = []
+    for filename in download_names:
+        real_online_file_paths.append(
+            str(download.data_path_with_download(filename)))
+
+    files += real_online_file_paths
 
     return files
 
@@ -89,6 +119,10 @@ def get_testdata_file(name):
         for filename in filenames:
             if filename == name:
                 return os.path.join(root, filename)
+
+    for filename in download.get_url_map().keys():
+        if filename == name:
+            return str(download.data_path_with_download(filename))
 
 
 def get_testdata_files(pattern="*"):

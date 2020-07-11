@@ -291,6 +291,7 @@ class TestCharset:
             pydicom.charset.decode_element(
                 elem, ['ISO_2022-IR 100', 'ISO 2022 IR 126']
             )
+
             assert 'Dionysios=Διονυσιος' == elem.value
 
         with pytest.warns(UserWarning,

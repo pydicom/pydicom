@@ -52,6 +52,19 @@ Install using conda
 
 .. _tut_install_libs:
 
+
+Downloading example/test DICOM files
+------------------------------------
+
+A range of the test data files are not distributed within the pydicom package
+so as to keep the package download size small. These files are instead housed
+on Zenodo at <https://zenodo.org/communities/pydicom>. To download all of the
+pydicom test files and get all of the respective paths of where this data is
+housed run the following::
+
+  pydicom.data.get_testdata_files()
+
+
 Install the optional libraries
 ==============================
 
