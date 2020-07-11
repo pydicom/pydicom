@@ -22,7 +22,14 @@ from itertools import takewhile
 import json
 import os
 import os.path
+from typing import Generator, TYPE_CHECKING
 import warnings
+
+if TYPE_CHECKING:
+    try:
+        import numpy as np
+    except ImportError:
+        pass
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -42,6 +49,7 @@ from pydicom.pixel_data_handlers.util import (
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
+from pydicom.waveform_data_handlers import numpy_handler as wave_handler
 
 
 from importlib.util import find_spec as have_package
@@ -1607,6 +1615,38 @@ class Dataset(dict):
         """
         self.convert_pixel_data()
         return self._pixel_array
+
+    @property
+    def waveform_generator(self) -> Generator["np.ndarray", None, None]:
+        """Return a generator that yields an :class:`~numpy.ndarray` for each
+        multiplex group in the (5400,0100) *Waveform Sequence*.
+
+        .. versionadded:: 2.1
+
+        Yields
+        ------
+        numpy.ndarray
+            The *Waveform Data* for a multiplex group as an
+            :class:`~numpy.ndarray` with shape (samples, channels). If a
+            channel item contains a (003A,0212) *Channel Sensitivity Correction
+            Factor* element then it will be applied, otherwise the raw data
+            will be used instead.
+
+        See Also
+        --------
+        :func:`~pydicom.waveform_data_handlers.numpy_handler.generate_multiplex`
+        """
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        if not wave_handler.supports_transfer_syntax(transfer_syntax):
+            raise NotImplementedError(
+                f"Unable to decode waveform data with a transfer syntax UID "
+                f"of '{transfer_syntax}' ({transfer_syntax.name})"
+            )
+
+        if not wave_handler.is_available():
+            raise RuntimeError("The waveform data handler requires numpy")
+
+        return wave_handler.generate_multiplex(self, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
