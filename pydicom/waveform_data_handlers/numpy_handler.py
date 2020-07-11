@@ -98,8 +98,7 @@ def generate_multiplex(
         If ``True`` (default), then yield the raw unitless waveform data. If
         ``False`` then attempt to convert the raw data for each channel to the
         quantity specified by the corresponding (003A,0210) *Channel
-        Sensitivity* unit. If no corresponding *Channel Sensitivity* element is
-        present then the raw data for that channel will be yielded.
+        Sensitivity* unit.
 
     Yields
     ------
@@ -112,7 +111,7 @@ def generate_multiplex(
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
         raise NotImplementedError(
             "Unable to convert the waveform data as the transfer syntax "
-            "is not supported by the waveform data handler."
+            "is not supported by the waveform data handler"
         )
 
     if 'WaveformSequence' not in ds:
@@ -159,20 +158,16 @@ def generate_multiplex(
             (item.WaveformBitsAllocated, item.WaveformSampleInterpretation)
         ]
         arr = np.frombuffer(item.WaveformData[:expected_len], dtype=dtype)
-        # Make sure its not read-only
-        arr = np.copy(arr)
+        # Reshape to (samples, channels) and make writeable
+        arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
         if not as_raw:
             # Apply correction factor (if possible)
+            arr = arr.astype('float')
             for jj, channel in enumerate(item.ChannelDefinitionSequence):
                 if "ChannelSensitivityCorrectionFactor" not in channel:
                     continue
 
-                arr[..., jj] = (
-                    arr[..., jj] * channel.ChannelSensitivityCorrectionFactor
-                )
+                arr[..., jj] *= channel.ChannelSensitivityCorrectionFactor
 
-        # Reshape so array is (samples, channels)
-        yield arr.reshape(
-            item.NumberOfWaveformSamples, item.NumberOfWaveformChannels
-        )
+        yield arr

@@ -11,12 +11,18 @@ Working with Waveform Data
 Introduction
 ------------
 
-A dataset may contain a (5400,0100) *Waveform Sequence*, where each item in
-the sequence is a group of waveforms (a multiplex). Each multiplex group
-contains one or more channels that are synchronised at a common sampling
-frequency in Hz given by the (003A,001A) *Sampling Frequency*. The multiplex
-group also contains a (5400,1010) *Waveform Data* element containing the
-group's encoded waveforms:
+Some DICOM SOP classes such as :dcm:`Basic Voice Audio Waveform
+<part03/sect_A.34.2.html>` and :dcm:`12-Lead ECG<part03/sect_A.34.3.html>`
+contain a (5400,0100) *Waveform Sequence* element,
+where each item in the sequence is a related group of waveforms (a multiplex).
+The requirements of the sequence is given by the :dcm:`Waveform
+module <part03/sect_C.10.9.html>` in Part 3, Annex C.10.9 of the DICOM
+Standard.
+
+Each multiplex consists of one or more channels synchronised at a
+common sampling frequency (in Hz), which is given by the (003A,001A) *Sampling
+Frequency*, and the waveform data for each multiplex is encoded in the
+(5400,1010) *Waveform Data* element.
 
 >>> from pydicom import dcmread
 >>> from pydicom.data import get_testdata_file
@@ -54,12 +60,12 @@ group in the *Waveform Sequence*.
   >>> multiplex_1 = next(generator)
   >>> multiplex_1
   array([[  80,   90,   10, ...,  -20,  -55,  -40],
-       [  65,   85,   20, ...,  -20,  -60,  -40],
-       [  50,   80,   30, ...,  -20,  -65,  -40],
-       ...,
-       [  20,  105,   85, ..., -110, -120,  -80],
-       [  17,  110,   93, ..., -110, -120,  -85],
-       [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)
+         [  65,   85,   20, ...,  -20,  -60,  -40],
+         [  50,   80,   30, ...,  -20,  -65,  -40],
+         ...,
+         [  20,  105,   85, ..., -110, -120,  -80],
+         [  17,  110,   93, ..., -110, -120,  -85],
+         [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)
   >>> multiplex_1.shape
   (10000, 12)
   >>> multiplex_2 = next(generator)
@@ -78,8 +84,3 @@ function with the *as_raw* keyword parameter instead:
 
   >>> from pydicom.waveform_generator.numpy_handler import generate_multiplex
   >>> generator = generate_multiplex(ds, as_raw=True)
-
-The reason a generator is used to return the waveform data is that there's no
-guarantee that each multiplex group will have the same number of channels or
-samples, so it's not possible to use an :class:`~numpy.ndarray` to contain
-all the waveforms.

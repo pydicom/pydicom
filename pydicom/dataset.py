@@ -1629,8 +1629,7 @@ class Dataset(dict):
             The *Waveform Data* for a multiplex group as an
             :class:`~numpy.ndarray` with shape (samples, channels). If a
             channel item contains a (003A,0212) *Channel Sensitivity Correction
-            Factor* element then it will be applied, otherwise the raw data
-            will be used instead.
+            Factor* element then it will be applied.
 
         See Also
         --------
