@@ -33,7 +33,7 @@ def test_waveform_generator_raises():
     """Test overlay_array raises exception for all syntaxes."""
     ds = dcmread(ECG)
     msg = r"The waveform data handler requires numpy"
-    with pytest.raises(NotImplementedError, match=msg):
+    with pytest.raises(RuntimeError, match=msg):
         next(ds.waveform_generator)
 
 
