@@ -14,7 +14,7 @@ Data* to a :class:`numpy.ndarray`.
 **Supported data**
 
 The numpy handler supports the conversion of data in the (5400,0100)
-*Waveform Sequence* element to a :class:`~numpy.ndarray` provided the
+*Waveform Sequence* element to an :class:`~numpy.ndarray` provided the
 related :dcm:`Waveform<part03/sect_C.10.9.html>` module elements have values
 given in the table below.
 
@@ -82,18 +82,18 @@ def supports_transfer_syntax(transfer_syntax: UID) -> bool:
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def generate_multiplex(
-        ds: "Dataset", as_raw: bool = True
-    ) -> Generator["np.ndarray", None, None]:
-    """Yield a numpy ndarray for each multiplex group in the Waveform Sequence.
+def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndarray", None, None]:  # noqa
+    """Yield an :class:`~numpy.ndarray` for each multiplex group in the
+    *Waveform Sequence*.
 
     .. versionadded:: 2.1
 
     Parameters
     ----------
     ds : pydicom.dataset.Dataset
-        The :class:`Dataset` containing a Waveform module and the
-        *Waveform Sequence* to be converted.
+        The :class:`Dataset` containing a :dcm:`Waveform
+        <part03/sect_C.10.9.html>` module and the *Waveform Sequence* to be
+        converted.
     as_raw : bool, optional
         If ``True`` (default), then yield the raw unitless waveform data. If
         ``False`` then attempt to convert the raw data for each channel to the
@@ -103,8 +103,8 @@ def generate_multiplex(
     Yields
     ------
     np.ndarray
-        The waveform data for a multiplex group as a numpy ndarray with shape
-        (samples, channels).
+        The waveform data for a multiplex group as an :class:`~numpy.ndarray`
+        with shape (samples, channels).
     """
     transfer_syntax = ds.file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first

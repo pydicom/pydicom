@@ -21,8 +21,8 @@ Standard.
 
 Each multiplex consists of one or more channels synchronised at a
 common sampling frequency (in Hz), which is given by the (003A,001A) *Sampling
-Frequency*, and the waveform data for each multiplex is encoded in the
-(5400,1010) *Waveform Data* element.
+Frequency*. The waveform data for each multiplex is encoded in the
+corresponding (5400,1010) *Waveform Data* element.
 
 >>> from pydicom import dcmread
 >>> from pydicom.data import get_testdata_file
@@ -65,7 +65,7 @@ group in the *Waveform Sequence*.
          ...,
          [  20,  105,   85, ..., -110, -120,  -80],
          [  17,  110,   93, ..., -110, -120,  -85],
-         [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)
+         [  20,  110,   90, ..., -110, -120,  -90]], dtype=float)
   >>> multiplex_1.shape
   (10000, 12)
   >>> multiplex_2 = next(generator)
@@ -77,8 +77,8 @@ group in the *Waveform Sequence*.
   StopIteration
 
 If the *Channel Sensitivity Correction Factor* is available for a given channel
-then it will be applied to the raw channel data, otherwise the raw data will
-be used. If you need the raw data without any corrections then you can use the
+then it will be applied to the raw channel data. If you need the raw data
+without any corrections then you can use the
 :func:`~pydicom.waveform_data_handlers.numpy_handler.generate_multiplex`
 function with the *as_raw* keyword parameter instead:
 

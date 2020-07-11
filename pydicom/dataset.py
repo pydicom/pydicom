@@ -1619,14 +1619,14 @@ class Dataset(dict):
     @property
     def waveform_generator(self) -> Generator["np.ndarray", None, None]:
         """Return a generator that yields an :class:`~numpy.ndarray` for each
-        multiplex group in the (5400,0100) *Waveform Sequence*.
+        multiplex group in (5400,0100) *Waveform Sequence*.
 
         .. versionadded:: 2.1
 
         Yields
         ------
         numpy.ndarray
-            The *Waveform Data* for a multiplex group as an
+            The *Waveform Data* for each multiplex group as an
             :class:`~numpy.ndarray` with shape (samples, channels). If a
             channel item contains a (003A,0212) *Channel Sensitivity Correction
             Factor* element then it will be applied.

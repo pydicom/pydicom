@@ -2,7 +2,7 @@ Version 2.1.0
 =================================
 
 Changelog
--------
+---------
 * Dropped support for Python 3.5 (only Python 3.6+ supported)
 
 Enhancements
@@ -14,10 +14,10 @@ Enhancements
   For example:
 
   * to download all files and get their paths on disk you can run
-    ``pydicom.data.get_testdata_files()``.
-
-  * To download the 7.2 MB file ``RG1_UNCI.dcm`` and get its path on disk
-    you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
+    :func:`pydicom.data.get_testdata_files`.
+  * To download an individual file and get its path on disk you can use
+   :func:`pydicom.data.get_testdata_file`, e.g. for ``RG1_UNCI.dcm`` use
+    ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
 * Added handler for *Waveform Data* and :meth:`Dataset.waveform_generator
   <pydicom.dataset.Dataset.waveform_generator>` which returns a generator
   object that yields an :class:`~numpy.ndarray` for each multiplex group in

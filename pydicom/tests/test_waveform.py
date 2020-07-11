@@ -34,7 +34,7 @@ def test_waveform_generator_raises():
     ds = dcmread(ECG)
     msg = r"The waveform data handler requires numpy"
     with pytest.raises(NotImplementedError, match=msg):
-        ds.waveform_generator
+        next(ds.waveform_generator)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
