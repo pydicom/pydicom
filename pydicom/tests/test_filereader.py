@@ -123,7 +123,7 @@ class TestReader:
 
     def test_pathlib_path_filename(self):
         """Check that file can be read using pathlib.Path"""
-        ds = dcmread(Path(priv_SQ_name))
+        dcmread(Path(priv_SQ_name))
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test
@@ -1253,7 +1253,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+            rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_IS_numpy_class(self):
@@ -1281,7 +1281,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+            rtss.ROIContourSequence[0].ContourSequence[0].ContourData
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_DS_numpy_class(self):

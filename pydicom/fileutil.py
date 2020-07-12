@@ -1,8 +1,6 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
-import pathlib
-import sys
 from struct import pack, unpack
 
 from pydicom.misc import size_in_bytes
