@@ -279,6 +279,17 @@ syntax, then this fact is announced in a :class:`NotImplementedError`
 exception.
 """
 
+APPLY_J2K_CORRECTIONS = True
+"""Use the information within JPEG 2000 data to correct the returned pixel data
+
+.. versionadded:: 1.2
+
+If ``True`` (default), then for handlers that support JPEG 2000 pixel data,
+use the component precision and sign to correct the returned ndarray when
+using the pixel data handlers. If ``False`` then only rely on the element
+values within the dataset when applying corrections.
+"""
+
 
 def debug(debug_on=True, default_handler=True):
     """Turn on/off debugging of DICOM file reading and writing.

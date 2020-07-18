@@ -26,6 +26,7 @@ from pydicom.pixel_data_handlers.util import (
     _expand_segmented_lut,
     apply_modality_lut,
     apply_voi_lut,
+    get_j2k_precision
 )
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -1971,3 +1972,45 @@ class TestNumpy_VOILUT:
         out = apply_voi_lut(arr, ds)
         assert 'uint16' == out.dtype
         assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+
+class TestGetJ2KPrecision:
+    """Tests for get_j2k_precision."""
+    def test_precision(self):
+        """Test getting the precision for a JPEG2K bytestream."""
+        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
+        # Signed
+        assert 16 == get_j2k_precision(base + b'\x8F')
+        assert 15 == get_j2k_precision(base + b'\x8E')
+        assert 14 == get_j2k_precision(base + b'\x8D')
+        assert 13 == get_j2k_precision(base + b'\x8C')
+        assert 12 == get_j2k_precision(base + b'\x8B')
+        assert 11 == get_j2k_precision(base + b'\x8A')
+        assert 10 == get_j2k_precision(base + b'\x89')
+        assert 9 == get_j2k_precision(base + b'\x88')
+        assert 8 == get_j2k_precision(base + b'\x87')
+        # Unsigned
+        assert 16 == get_j2k_precision(base + b'\x0F')
+        assert 15 == get_j2k_precision(base + b'\x0E')
+        assert 14 == get_j2k_precision(base + b'\x0D')
+        assert 13 == get_j2k_precision(base + b'\x0C')
+        assert 12 == get_j2k_precision(base + b'\x0B')
+        assert 11 == get_j2k_precision(base + b'\x0A')
+        assert 10 == get_j2k_precision(base + b'\x09')
+        assert 9 == get_j2k_precision(base + b'\x08')
+        assert 8 == get_j2k_precision(base + b'\x07')
+
+    def test_not_j2k(self):
+        """Test result when no JPEG2K SOF marker present"""
+        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
+        assert get_j2k_precision(base + b'\x8F') is None
+
+    def test_no_siz(self):
+        """Test result when no SIZ box present"""
+        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
+        assert get_j2k_precision(base + b'\x8F') is None
+
+    def test_short_bytestream(self):
+        """Test result when no SIZ box present"""
+        assert get_j2k_precision(b'') is None
+        assert get_j2k_precision(b'\xff\x4f\xff\x51' + b'\x00' * 20) is None

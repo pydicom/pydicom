@@ -4,6 +4,10 @@ pixel transfer syntaxes.
 """
 
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 try:
     import numpy
@@ -13,15 +17,20 @@ except ImportError:
 
 try:
     import gdcm
+    from gdcm import DataElement
     HAVE_GDCM = True
-    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(gdcm.DataElement,
-                                          'SetByteStringValue')
+    HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, 'SetByteStringValue')
 except ImportError:
     HAVE_GDCM = False
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
+from pydicom import config
+from pydicom.encaps import generate_pixel_data
 import pydicom.uid
-from pydicom.pixel_data_handlers.util import get_expected_length, pixel_dtype
+from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
+from pydicom.pixel_data_handlers.util import (
+    get_expected_length, pixel_dtype, get_j2k_precision
+)
 
 
 HANDLER_NAME = 'GDCM'
@@ -46,36 +55,37 @@ should_convert_these_syntaxes_to_RGB = [
     pydicom.uid.JPEGBaseline, ]
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_GDCM
 
 
-def needs_to_convert_to_RGB(dicom_dataset):
+def needs_to_convert_to_RGB(ds: "Dataset"):
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
     This affects JPEG transfer syntaxes.
     """
-    should_convert = (dicom_dataset.file_meta.TransferSyntaxUID in
-                      should_convert_these_syntaxes_to_RGB)
-    should_convert &= dicom_dataset.SamplesPerPixel == 3
+    should_convert = (
+        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+    )
+    should_convert &= ds.SamplesPerPixel == 3
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = (dicom_dataset.file_meta.TransferSyntaxUID in
+    should_change = (ds.file_meta.TransferSyntaxUID in
                      should_convert_these_syntaxes_to_RGB)
-    should_change &= dicom_dataset.SamplesPerPixel == 3
+    should_change &= ds.SamplesPerPixel == 3
     return False
 
 
-def supports_transfer_syntax(transfer_syntax):
+def supports_transfer_syntax(transfer_syntax: UID) -> bool:
     """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
@@ -87,12 +97,12 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def create_data_element(dicom_dataset):
+def create_data_element(ds: "Dataset") -> "DataElement":
     """Return a ``gdcm.DataElement`` for the *Pixel Data*.
 
     Parameters
     ----------
-    dicom_dataset : dataset.Dataset
+    ds : dataset.Dataset
         The :class:`~pydicom.dataset.Dataset` containing the *Pixel
         Data*.
 
@@ -102,13 +112,14 @@ def create_data_element(dicom_dataset):
         The converted *Pixel Data* element.
     """
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
-    if dicom_dataset.file_meta.TransferSyntaxUID.is_compressed:
-        if getattr(dicom_dataset, 'NumberOfFrames', 1) > 1:
-            pixel_data_sequence = pydicom.encaps.decode_data_sequence(
-                dicom_dataset.PixelData)
+    if ds.file_meta.TransferSyntaxUID.is_compressed:
+        if getattr(ds, 'NumberOfFrames', 1) > 1:
+            pixel_data_sequence = (
+                pydicom.encaps.decode_data_sequence(ds.PixelData)
+            )
         else:
             pixel_data_sequence = [
-                pydicom.encaps.defragment_data(dicom_dataset.PixelData)
+                pydicom.encaps.defragment_data(ds.PixelData)
             ]
 
         fragments = gdcm.SequenceOfFragments.New()
@@ -118,17 +129,17 @@ def create_data_element(dicom_dataset):
             fragments.AddFragment(fragment)
         data_element.SetValue(fragments.__ref__())
     else:
-        data_element.SetByteStringValue(dicom_dataset.PixelData)
+        data_element.SetByteStringValue(ds.PixelData)
 
     return data_element
 
 
-def create_image(dicom_dataset, data_element):
+def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     """Return a ``gdcm.Image``.
 
     Parameters
     ----------
-    dicom_dataset : dataset.Dataset
+    ds : dataset.Dataset
         The :class:`~pydicom.dataset.Dataset` containing the Image
         Pixel module.
     data_element : gdcm.DataElement
@@ -139,34 +150,41 @@ def create_image(dicom_dataset, data_element):
     gdcm.Image
     """
     image = gdcm.Image()
-    number_of_frames = getattr(dicom_dataset, 'NumberOfFrames', 1)
+    number_of_frames = getattr(ds, 'NumberOfFrames', 1)
     image.SetNumberOfDimensions(2 if number_of_frames == 1 else 3)
-    image.SetDimensions(
-        (dicom_dataset.Columns, dicom_dataset.Rows, number_of_frames))
+    image.SetDimensions((ds.Columns, ds.Rows, number_of_frames))
     image.SetDataElement(data_element)
+
     pi_type = gdcm.PhotometricInterpretation.GetPIType(
-        dicom_dataset.PhotometricInterpretation)
+        ds.PhotometricInterpretation
+    )
     image.SetPhotometricInterpretation(
-        gdcm.PhotometricInterpretation(pi_type))
+        gdcm.PhotometricInterpretation(pi_type)
+    )
     ts_type = gdcm.TransferSyntax.GetTSType(
-        str.__str__(dicom_dataset.file_meta.TransferSyntaxUID))
+        str.__str__(ds.file_meta.TransferSyntaxUID)
+    )
     image.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
     pixel_format = gdcm.PixelFormat(
-        dicom_dataset.SamplesPerPixel, dicom_dataset.BitsAllocated,
-        dicom_dataset.BitsStored, dicom_dataset.HighBit,
-        dicom_dataset.PixelRepresentation)
+        ds.SamplesPerPixel,
+        ds.BitsAllocated,
+        ds.BitsStored,
+        ds.HighBit,
+        ds.PixelRepresentation
+    )
     image.SetPixelFormat(pixel_format)
-    if 'PlanarConfiguration' in dicom_dataset:
-        image.SetPlanarConfiguration(dicom_dataset.PlanarConfiguration)
+    if 'PlanarConfiguration' in ds:
+        image.SetPlanarConfiguration(ds.PlanarConfiguration)
+
     return image
 
 
-def create_image_reader(filename):
+def create_image_reader(filename: str) -> "gdcm.ImageReader":
     """Return a ``gdcm.ImageReader``.
 
     Parameters
     ----------
-    filename: str or unicode
+    filename: str
         The path to the DICOM dataset.
 
     Returns
@@ -178,7 +196,7 @@ def create_image_reader(filename):
     return image_reader
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     """Use the GDCM package to decode *Pixel Data*.
 
     Returns
@@ -196,17 +214,14 @@ def get_pixeldata(dicom_dataset):
     AttributeError
         If the decoded amount of data does not match the expected amount.
     """
-
     if not HAVE_GDCM:
-        msg = ("GDCM requires both the gdcm package and numpy "
-               "and one or more could not be imported")
-        raise ImportError(msg)
+        raise ImportError("The GDCM handler requires both gdcm and numpy")
 
     if HAVE_GDCM_IN_MEMORY_SUPPORT:
-        gdcm_data_element = create_data_element(dicom_dataset)
-        gdcm_image = create_image(dicom_dataset, gdcm_data_element)
+        gdcm_data_element = create_data_element(ds)
+        gdcm_image = create_image(ds, gdcm_data_element)
     else:
-        gdcm_image_reader = create_image_reader(dicom_dataset.filename)
+        gdcm_image_reader = create_image_reader(ds.filename)
         if not gdcm_image_reader.Read():
             raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
@@ -219,14 +234,13 @@ def get_pixeldata(dicom_dataset):
     # Therefore, we can encode them back to their original bytearray
     # representation on Python 3 by using the same parameters.
 
-    pixel_bytearray = gdcm_image.GetBuffer().encode(
-        "utf-8", "surrogateescape")
+    pixel_bytearray = gdcm_image.GetBuffer().encode("utf-8", "surrogateescape")
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include
     # the first n_rows * n_columns * dtype_size bytes.
-    expected_length_bytes = get_expected_length(dicom_dataset)
-    if dicom_dataset.PhotometricInterpretation == 'YBR_FULL_422':
+    expected_length_bytes = get_expected_length(ds)
+    if ds.PhotometricInterpretation == 'YBR_FULL_422':
         # GDCM has already resampled the pixel data, see PS3.3 C.7.6.3.1.2
         expected_length_bytes = expected_length_bytes // 2 * 3
 
@@ -240,16 +254,36 @@ def get_pixeldata(dicom_dataset):
             #   in a Numpy error later on.
             pass
 
-    numpy_dtype = pixel_dtype(dicom_dataset)
-    pixel_array = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+    numpy_dtype = pixel_dtype(ds)
+    arr = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
 
-    expected_length_pixels = get_expected_length(dicom_dataset, 'pixels')
-    if pixel_array.size != expected_length_pixels:
-        raise AttributeError("Amount of pixel data %d does "
-                             "not match the expected data %d" %
-                             (pixel_array.size, expected_length_pixels))
+    expected_length_pixels = get_expected_length(ds, 'pixels')
+    if arr.size != expected_length_pixels:
+        raise AttributeError(
+            f"Amount of pixel data {arr.size} does not match the "
+            f"expected data {expected_length_pixels}"
+        )
 
-    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
-        dicom_dataset.PhotometricInterpretation = "RGB"
+    if (
+        config.APPLY_J2K_CORRECTIONS
+        and ds.file_meta.TransferSyntaxUID in [JPEG2000, JPEG2000Lossless]
+    ):
+        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+        codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
+        try:
+            j2k_precision, j2k_sign = get_j2k_precision(codestream)
+        except:
+            j2k_sign = None
 
-    return pixel_array.copy()
+        if j2k_sign == 0 and ds.PixelRepresentation == 1:
+            # Convert unsigned J2K data to 2's complement
+            shift = ds.BitsAllocated - j2k_precision
+            pixel_module = ds.group_dataset(0x0028)
+            pixel_module.PixelRepresentation = 0
+            dtype = pixel_dtype(pixel_module)
+            arr = (arr.astype(dtype) << shift).astype(numpy_dtype) >> shift
+
+    if should_change_PhotometricInterpretation_to_RGB(ds):
+        ds.PhotometricInterpretation = "RGB"
+
+    return arr.copy()

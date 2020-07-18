@@ -838,6 +838,45 @@ def get_image_pixel_ids(ds):
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
+def get_j2k_precision(bs):
+    """Return the bit depth and sign of JPEG 2000 component samples.
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    bs : bytes
+        The JPEG 2000 (ISO/IEC 15444-1) data to be parsed.
+
+    Returns
+    -------
+    int, bool
+        The bit depth (precision) of the component samples and
+        ``True`` if the components are signed, ``False`` if unsigned.
+
+    Raises
+    ------
+    ValueError
+        If unable to parse the JPEG 2000 data.
+    """
+    # First 2 bytes must be the SOC marker - if not then wrong format
+    if bs[0:2] != b'\xff\x4f':
+        raise ValueError("No SOC marker found at offset 0")
+
+    # SIZ is required to be the second marker - Figure A-3 in 15444-1
+    if bs[2:4] != b'\xff\x51':
+        raise ValueError("No SIZ marker found at offset 2")
+
+    # See 15444-1 A.5.1 for format of the SIZ box and contents
+    ssiz = ord(bs[42:43])
+    if ssiz & 0x80:
+        # Signed
+        return (ssiz & 0x7F) + 1, True
+
+    # Unsigned
+    return ssiz + 1, False
+
+
 def pixel_dtype(ds, as_float=False):
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 

@@ -6,7 +6,9 @@ import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixel_data_handlers.util import (
+    convert_color_space, get_j2k_precision
+)
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     JPEGBaseline,
@@ -27,9 +29,7 @@ except ImportError:
 
 try:
     from pydicom.pixel_data_handlers import pillow_handler as PIL_HANDLER
-    from pydicom.pixel_data_handlers.pillow_handler import (
-        get_pixeldata, _get_j2k_precision
-    )
+    from pydicom.pixel_data_handlers.pillow_handler import get_pixeldata
     HAVE_PIL = PIL_HANDLER.HAVE_PIL
     HAVE_JPEG = PIL_HANDLER.HAVE_JPEG
     HAVE_JPEG2K = PIL_HANDLER.HAVE_JPEG2K
@@ -76,6 +76,7 @@ J2KR_16_15_1_0_1F_M1 = get_testdata_file("RG1_J2KR.dcm")
 J2KR_16_16_1_0_10F_M2 = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 J2KR_16_14_1_1_1F_M2 = get_testdata_file("693_J2KR.dcm")
 J2KR_16_16_1_1_1F_M2 = get_testdata_file("MR_small_jp2klossless.dcm")
+J2KR_16_13_1_1_1F_M2_MISMATCH = get_testdata_file("J2K_pixelrep_mismatch.dcm")
 # J2KI: 1.2.840.10008.1.2.4.91 - JPEG 2000
 J2KI_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_gdcm_KY.dcm")
 J2KI_08_08_3_0_1F_YBR_ICT = get_testdata_file("US1_J2KI.dcm")
@@ -379,11 +380,13 @@ class TestPillowHandler_JPEG2K:
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
+        self.original_j2k = pydicom.config.APPLY_J2K_CORRECTIONS
         pydicom.config.pixel_data_handlers = [NP_HANDLER, PIL_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
+        pydicom.config.APPLY_J2K_CORRECTIONS = self.original_j2k
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -422,8 +425,8 @@ class TestPillowHandler_JPEG2K:
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
         bs = defragment_data(ds.PixelData)
-        if _get_j2k_precision(bs) != ds.BitsStored:
-            with pytest.warns(UserWarning, match=r"doesn't match the sample"):
+        if get_j2k_precision(bs)[0] != ds.BitsStored:
+            with pytest.warns(UserWarning, match=r"doesn't match the JPEG 20"):
                 arr = ds.pixel_array
         else:
             arr = ds.pixel_array
@@ -450,11 +453,9 @@ class TestPillowHandler_JPEG2K:
         """Test that the precision warning works OK."""
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
         msg = (
-            r"The \(0028,0101\) 'Bits Stored' value doesn't match the "
-            r"sample bit depth of the JPEG2000 pixel data \(16 vs 14 bit\). "
-            r"It's recommended that you first change the 'Bits Stored' "
-            r"value to match the JPEG2000 bit depth in order to get the "
-            r"correct pixel data"
+            r"The \(0028,0101\) 'Bits Stored' value \(16-bit\) doesn't match "
+            r"the JPEG 2000 data \(14-bit\). It's recommended that you "
+            r"change the 'Bits Stored' value"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.pixel_array
@@ -471,6 +472,7 @@ class TestPillowHandler_JPEG2K:
 
     def test_changing_bits_stored(self):
         """Test changing BitsStored affects the pixel data."""
+        pydicom.config.APPLY_J2K_CORRECTIONS = False
         ds = dcmread(J2KR_16_14_1_1_1F_M2)
         assert 16 == ds.BitsStored
         with pytest.warns(UserWarning):
@@ -479,6 +481,28 @@ class TestPillowHandler_JPEG2K:
         ds.BitsStored = 14
         arr_14 = ds.pixel_array
         assert not np.array_equal(arr, arr_14)
+
+    def test_pixel_rep_mismatch(self):
+        """Test mismatched j2k sign and Pixel Representation."""
+        ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        assert 1 == ds.PixelRepresentation
+        assert 13 == ds.BitsStored
+
+        bs = defragment_data(ds.PixelData)
+        assert 13, False == get_j2k_precision(bs)
+        arr = ds.pixel_array
+
+        assert 'int16' == arr.dtype
+        assert (512, 512) == arr.shape
+        assert arr.flags.writeable
+
+        assert -2000 == arr[0, 0]
+        assert ([621, 412, 138, -193, -520, -767, -907, -966, -988, -995]
+            == arr[47:57, 279].tolist()
+        )
+        assert ([-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732]
+            == arr[328:338, 106].tolist()
+        )
 
 
 @pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
@@ -595,45 +619,3 @@ class TestPillowHandler_JPEG:
         pixel_data = ds.pixel_array
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)
-
-
-class TestPillow_GetJ2KPrecision:
-    """Tests for _get_j2k_precision."""
-    def test_precision(self):
-        """Test getting the precision for a JPEG2K bytestream."""
-        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
-        # Signed
-        assert 16 == _get_j2k_precision(base + b'\x8F')
-        assert 15 == _get_j2k_precision(base + b'\x8E')
-        assert 14 == _get_j2k_precision(base + b'\x8D')
-        assert 13 == _get_j2k_precision(base + b'\x8C')
-        assert 12 == _get_j2k_precision(base + b'\x8B')
-        assert 11 == _get_j2k_precision(base + b'\x8A')
-        assert 10 == _get_j2k_precision(base + b'\x89')
-        assert 9 == _get_j2k_precision(base + b'\x88')
-        assert 8 == _get_j2k_precision(base + b'\x87')
-        # Unsigned
-        assert 16 == _get_j2k_precision(base + b'\x0F')
-        assert 15 == _get_j2k_precision(base + b'\x0E')
-        assert 14 == _get_j2k_precision(base + b'\x0D')
-        assert 13 == _get_j2k_precision(base + b'\x0C')
-        assert 12 == _get_j2k_precision(base + b'\x0B')
-        assert 11 == _get_j2k_precision(base + b'\x0A')
-        assert 10 == _get_j2k_precision(base + b'\x09')
-        assert 9 == _get_j2k_precision(base + b'\x08')
-        assert 8 == _get_j2k_precision(base + b'\x07')
-
-    def test_not_j2k(self):
-        """Test result when no JPEG2K SOF marker present"""
-        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
-        assert _get_j2k_precision(base + b'\x8F') is None
-
-    def test_no_siz(self):
-        """Test result when no SIZ box present"""
-        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
-        assert _get_j2k_precision(base + b'\x8F') is None
-
-    def test_short_bytestream(self):
-        """Test result when no SIZ box present"""
-        assert _get_j2k_precision(b'') is None
-        assert _get_j2k_precision(b'\xff\x4f\xff\x51' + b'\x00' * 20) is None
