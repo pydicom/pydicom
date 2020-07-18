@@ -18,7 +18,7 @@ Enhancements
 
   * To download the 7.2 MB file ``RG1_UNCI.dcm`` and get its path on disk
     you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
-* When JPEG the 2000 image data is unsigned and the *Pixel Representation* is 1
+* When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
 
 Fixes

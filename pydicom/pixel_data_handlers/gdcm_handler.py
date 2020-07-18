@@ -79,8 +79,9 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = (ds.file_meta.TransferSyntaxUID in
-                     should_convert_these_syntaxes_to_RGB)
+    should_change = (
+        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+    )
     should_change &= ds.SamplesPerPixel == 3
     return False
 

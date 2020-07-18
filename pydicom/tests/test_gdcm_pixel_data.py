@@ -13,7 +13,9 @@ import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
-from pydicom.pixel_data_handlers.util import _convert_YBR_FULL_to_RGB
+from pydicom.pixel_data_handlers.util import (
+    _convert_YBR_FULL_to_RGB, get_j2k_precision
+)
 from pydicom.tag import Tag
 
 gdcm_missing_message = "GDCM is not available in this test environment"

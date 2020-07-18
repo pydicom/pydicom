@@ -167,8 +167,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
 
-    dtype = pixel_dtype(ds)
-    arr = numpy.frombuffer(pixel_bytes, dtype)
+    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
     if transfer_syntax in PillowJPEG2000TransferSyntaxes:
         # Pillow converts N-bit data to 8- or 16-bit unsigned data,

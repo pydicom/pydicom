@@ -282,7 +282,7 @@ exception.
 APPLY_J2K_CORRECTIONS = True
 """Use the information within JPEG 2000 data to correct the returned pixel data
 
-.. versionadded:: 1.2
+.. versionadded:: 2.1
 
 If ``True`` (default), then for handlers that support JPEG 2000 pixel data,
 use the component precision and sign to correct the returned ndarray when
