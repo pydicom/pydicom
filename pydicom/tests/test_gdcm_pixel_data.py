@@ -573,7 +573,7 @@ class TestsWithGDCM:
         assert 13 == ds.BitsStored
 
         bs = defragment_data(ds.PixelData)
-        assert 13, False == get_j2k_precision(bs)
+        assert (13, False) == get_j2k_precision(bs)
         arr = ds.pixel_array
 
         assert 'int16' == arr.dtype
@@ -581,11 +581,11 @@ class TestsWithGDCM:
         assert arr.flags.writeable
 
         assert -2000 == arr[0, 0]
-        assert ([621, 412, 138, -193, -520, -767, -907, -966, -988, -995]
-            == arr[47:57, 279].tolist()
+        assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (
+            arr[47:57, 279].tolist()
         )
-        assert ([-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732]
-            == arr[328:338, 106].tolist()
+        assert [-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+            arr[328:338, 106].tolist()
         )
 
 
