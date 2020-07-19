@@ -21,3 +21,4 @@ Enhancements
 
 Fixes
 .....
+* ``Dataset.copy`` now works as expected (see :issue:`1146`)
