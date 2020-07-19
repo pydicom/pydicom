@@ -1853,6 +1853,11 @@ class TestFileMeta:
         assert ds_copy.PatientName == "John^Doe"
         assert ds_copy.BeamSequence[0].Manufacturer == "Linac, co."
         assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
+        if copy_method == copy.deepcopy:
+            assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
+        else:
+            # shallow copy
+            assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
         assert ds_copy.is_implicit_VR
         assert ds_copy.is_little_endian
         assert ds_copy.read_encoding == "utf-8"

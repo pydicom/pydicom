@@ -503,7 +503,7 @@ class Dataset(dict):
         self.walk(decode_callback, recursive=False)
 
     def copy(self):
-        """Return a deep copy of the dataset."""
+        """Return a shallow copy of the dataset."""
         return copy.copy(self)
 
     def __delattr__(self, name):
