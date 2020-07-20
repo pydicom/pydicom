@@ -64,7 +64,7 @@
     "SC_ybr_full_uncompressed.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/SC_ybr_full_uncompressed.dcm",
     "US1_J2KI.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/US1_J2KI.dcm",
     "US1_J2KR.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/US1_J2KR.dcm",
-    "US1_UNCI.dcm": "https://github.com/pydicom/pydicom-data/raw/38c2e1c744cb8c5ac96558cbedd6741dc16602055/data/US1_UNCI.dcm",
+    "US1_UNCI.dcm": "https://github.com/pydicom/pydicom-data/raw/8c2e1c744cb8c5ac96558cbedd6741dc16602055/data/US1_UNCI.dcm",
     "US1_UNCR.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/US1_UNCR.dcm",
     "vlut_04.dcm": "https://github.com/pydicom/pydicom-data/raw/39a2eb31815eec435dc26c322c27aec5cfcbddb6/data/vlut_04.dcm"
 }
