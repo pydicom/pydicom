@@ -337,9 +337,6 @@ JPEG2K_MATCHING_DATASETS = [
         J2KI_08_08_3_0_1F_YBR_ICT,
         get_testdata_file("US1_UNCI.dcm"),
         {},
-        marks=pytest.mark.xfail(
-            reason="Needs YBR_ICT to RGB conversion"
-        )
     ),
     pytest.param(
         J2KI_16_10_1_0_1F_M1,
