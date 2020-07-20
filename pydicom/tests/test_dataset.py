@@ -1,16 +1,17 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataset module."""
+import copy
 
 import pytest
 
 import pydicom
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import (
     Dataset, FileDataset, validate_file_meta, FileMetaDataset
 )
 from pydicom.encaps import encapsulate
-from pydicom import dcmread
 from pydicom.filebase import DicomBytesIO
 from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
 from pydicom.pixel_data_handlers.util import get_image_pixel_ids
@@ -1834,3 +1835,29 @@ class TestFileMeta:
         assert shown.startswith("(0010, 0010) Patient's Name")
 
         pydicom.config.show_file_meta = orig_show
+
+    @pytest.mark.parametrize('copy_method',
+                             [Dataset.copy, copy.copy, copy.deepcopy])
+    def test_copy(self, copy_method):
+        ds = Dataset()
+        ds.PatientName = "John^Doe"
+        ds.BeamSequence = [Dataset(), Dataset(), Dataset()]
+        ds.BeamSequence[0].Manufacturer = "Linac, co."
+        ds.BeamSequence[1].Manufacturer = "Linac and Sons, co."
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.read_encoding = "utf-8"
+        ds_copy = copy_method(ds)
+        assert isinstance(ds_copy, Dataset)
+        assert len(ds_copy) == 2
+        assert ds_copy.PatientName == "John^Doe"
+        assert ds_copy.BeamSequence[0].Manufacturer == "Linac, co."
+        assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
+        if copy_method == copy.deepcopy:
+            assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
+        else:
+            # shallow copy
+            assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
+        assert ds_copy.is_implicit_VR
+        assert ds_copy.is_little_endian
+        assert ds_copy.read_encoding == "utf-8"

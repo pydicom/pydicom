@@ -14,7 +14,7 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
-
+import copy
 from bisect import bisect_left
 import io
 import inspect  # for __dir__
@@ -501,6 +501,10 @@ class Dataset(dict):
                 decode_data_element(data_element, dicom_character_set)
 
         self.walk(decode_callback, recursive=False)
+
+    def copy(self):
+        """Return a shallow copy of the dataset."""
+        return copy.copy(self)
 
     def __delattr__(self, name):
         """Intercept requests to delete an attribute by `name`.
