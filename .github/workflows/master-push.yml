@@ -38,6 +38,12 @@ jobs:
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
+    - name: Cache pydicom test data
+      id: cache-testdata
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.HOME }}/.pydicom
+        key: pydicom-testdata
     - name: Initial test environment setup
       run: |
         python -m pip install wheel 
