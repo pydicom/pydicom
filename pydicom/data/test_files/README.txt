@@ -61,6 +61,11 @@ eCT_Supplemental.dcm
   * 2 frames, 16 bits allocated/stored, MONOCHROME2
   * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
 
+GDCMJ2K_TextGBR.dcm (from GDCM)
+  * JPEG 2000 Lossless transfer syntax
+  * Contains non-conformant Pixel Data with a JP2 header
+  * unsigned 8-bit, 3 samples/px, YBR_RCT Photometric Interpretation
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
@@ -76,6 +81,10 @@ MR2_*.dcm
   * JPEG2000, JPEG2000Lossless and uncompressed versions
   * unsigned 16-bit/12-bit with rescale and windowing
   * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
+JPGExtended.dcm
+  * 1.2.840.10008.1.2.4.51 - JPEG Extended
+  * Fixed version of JPEG-lossy.dcm
 
 JPGLosslessP14SV1_1s_1f_8b.dcm
   * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Process 14, Selection Value 1
