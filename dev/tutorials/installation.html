@@ -108,6 +108,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#installing-pillow">Installing Pillow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installing-charpyls">Installing CharPyLS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installing-gdcm">Installing GDCM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-pylibjpeg">Installing pylibjpeg</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#install-the-development-version">Install the development version</a></li>
@@ -131,6 +132,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#installing-pillow">Installing Pillow</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#installing-charpyls">Installing CharPyLS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#installing-gdcm">Installing GDCM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#installing-pylibjpeg">Installing pylibjpeg</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#install-the-development-version">Install the development version</a></li>
@@ -295,10 +297,10 @@ the dataset’s (0002,0010) <em>Transfer Syntax UID</em> value.</p>
 <div class="section" id="installing-pillow">
 <h3>Installing Pillow<a class="headerlink" href="#installing-pillow" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://pillow.readthedocs.io/">Pillow</a> is a popular Python imaging library
-that can handle the decompression of some JPEG and JPEG2000 images.</p>
+that can handle the decompression of some JPEG and JPEG 2000 images.</p>
 <p>Using pip; you may need to make sure that the
 <a class="reference external" href="http://libjpeg.sourceforge.net/">libjpeg</a> (for JPEG) and
-<a class="reference external" href="http://www.openjpeg.org/">openjpeg</a> (for JPEG2000) libraries are installed
+<a class="reference external" href="http://www.openjpeg.org/">openjpeg</a> (for JPEG 2000) libraries are installed
 beforehand:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install pillow
 </pre></div>
@@ -328,13 +330,23 @@ $ pip install git+https://github.com/Who8MyLunch/CharPyLS
 <div class="section" id="installing-gdcm">
 <h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> is a C++ library for working with
-DICOM datasets that can decompress JPEG, JPEG-LS and JPEG2000 images.</p>
+DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
 <p>Unfortunately there’s no easy way to install the Python GDCM bindings
 using pip. <a class="reference external" href="https://github.com/pydicom/pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda">This page</a>
 has instructions for installing in a virtual environment in Ubuntu
 19.04+ or Debian Buster+ using the <code class="docutils literal notranslate"><span class="pre">python3-gdcm</span></code> package.</p>
 <p>Through conda:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install gdcm -c conda-forge
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-pylibjpeg">
+<h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> is a Python framework for
+decompressing JPEG, JPEG-LS and JPEG 2000 images provided a suitable plugin
+is installed.</p>
+<p>Using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg
 </pre></div>
 </div>
 </div>
