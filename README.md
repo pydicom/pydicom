@@ -1,8 +1,6 @@
 *pydicom*
 =======
 
-[![Build Status](https://travis-ci.org/pydicom/pydicom.svg?branch=master)](https://travis-ci.org/pydicom/pydicom)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/1vjtkr82lumnd3i7?svg=true)](https://ci.appveyor.com/project/glemaitre/pydicom)
 [![CircleCI](https://circleci.com/gh/pydicom/pydicom/tree/master.svg?style=shield)](https://circleci.com/gh/pydicom/pydicom/tree/master)
 [![codecov](https://codecov.io/gh/pydicom/pydicom/branch/master/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)

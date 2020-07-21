@@ -242,9 +242,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
@@ -263,9 +261,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,
@@ -341,9 +337,6 @@ JPEG2K_MATCHING_DATASETS = [
         J2KI_08_08_3_0_1F_YBR_ICT,
         get_testdata_file("US1_UNCI.dcm"),
         {},
-        marks=pytest.mark.xfail(
-            reason="Needs YBR_ICT to RGB conversion"
-        )
     ),
     pytest.param(
         J2KI_16_10_1_0_1F_M1,
