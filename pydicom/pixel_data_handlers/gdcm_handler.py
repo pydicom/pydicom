@@ -31,7 +31,7 @@ from pydicom.encaps import generate_pixel_data
 import pydicom.uid
 from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
 from pydicom.pixel_data_handlers.util import (
-    get_expected_length, pixel_dtype, get_j2k_precision
+    get_expected_length, pixel_dtype, get_j2k_parameters
 )
 
 
@@ -288,7 +288,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
 
-        params = get_j2k_precision(codestream)
+        params = get_j2k_parameters(codestream)
         j2k_precision = params.setdefault("precision", None)
         j2k_sign = params.setdefault("is_signed", None)
 

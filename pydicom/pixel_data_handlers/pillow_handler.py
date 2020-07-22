@@ -30,7 +30,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_precision
+from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
 from pydicom.uid import (
     UID, JPEG2000, JPEG2000Lossless, JPEGBaseline, JPEGExtended
 )
@@ -148,7 +148,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             pixel_bytes.extend(im.tobytes())
 
             if not j2k_precision:
-                params = get_j2k_precision(frame)
+                params = get_j2k_parameters(frame)
                 j2k_precision = params.setdefault("precision", None)
                 j2k_sign = params.setdefault("is_signed", None)
 
@@ -160,7 +160,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             im.draft('YCbCr', (ds.Rows, ds.Columns))
         pixel_bytes.extend(im.tobytes())
 
-        params = get_j2k_precision(pixel_data)
+        params = get_j2k_parameters(pixel_data)
         j2k_precision = params.setdefault("precision", None)
         j2k_sign = params.setdefault("is_signed", None)
 

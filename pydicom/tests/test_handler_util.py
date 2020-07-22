@@ -26,7 +26,7 @@ from pydicom.pixel_data_handlers.util import (
     _expand_segmented_lut,
     apply_modality_lut,
     apply_voi_lut,
-    get_j2k_precision
+    get_j2k_parameters
 )
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -1973,48 +1973,34 @@ class TestNumpy_VOILUT:
         assert [0, 127, 32768, 65535, 65535] == out.tolist()
 
 
-class TestGetJ2KPrecision:
-    """Tests for get_j2k_precision."""
+class TestGetJ2KParameters:
+    """Tests for get_j2k_parameters."""
     def test_precision(self):
         """Test getting the precision for a JPEG2K bytestream."""
         base = b'\xff\x4f\xff\x51' + b'\x00' * 38
         # Signed
-        assert (16, True) == get_j2k_precision(base + b'\x8F')
-        assert (15, True) == get_j2k_precision(base + b'\x8E')
-        assert (14, True) == get_j2k_precision(base + b'\x8D')
-        assert (13, True) == get_j2k_precision(base + b'\x8C')
-        assert (12, True) == get_j2k_precision(base + b'\x8B')
-        assert (11, True) == get_j2k_precision(base + b'\x8A')
-        assert (10, True) == get_j2k_precision(base + b'\x89')
-        assert (9, True) == get_j2k_precision(base + b'\x88')
-        assert (8, True) == get_j2k_precision(base + b'\x87')
+        for ii in range(135, 144):
+            params = get_j2k_parameters(base + bytes([ii]))
+            assert ii - 127 == params["precision"]
+            assert params["is_signed"]
+
         # Unsigned
-        assert (16, False) == get_j2k_precision(base + b'\x0F')
-        assert (15, False) == get_j2k_precision(base + b'\x0E')
-        assert (14, False) == get_j2k_precision(base + b'\x0D')
-        assert (13, False) == get_j2k_precision(base + b'\x0C')
-        assert (12, False) == get_j2k_precision(base + b'\x0B')
-        assert (11, False) == get_j2k_precision(base + b'\x0A')
-        assert (10, False) == get_j2k_precision(base + b'\x09')
-        assert (9, False) == get_j2k_precision(base + b'\x08')
-        assert (8, False) == get_j2k_precision(base + b'\x07')
+        for ii in range(7, 16):
+            params = get_j2k_parameters(base + bytes([ii]))
+            assert ii + 1 == params["precision"]
+            assert not params["is_signed"]
 
     def test_not_j2k(self):
         """Test result when no JPEG2K SOF marker present"""
         base = b'\xff\x4e\xff\x51' + b'\x00' * 38
-        with pytest.raises(ValueError, match=r"No SOC marker found"):
-            get_j2k_precision(base + b'\x8F')
+        assert {} == get_j2k_parameters(base + b'\x8F')
 
     def test_no_siz(self):
         """Test result when no SIZ box present"""
         base = b'\xff\x4f\xff\x52' + b'\x00' * 38
-        with pytest.raises(ValueError, match=r"No SIZ marker found"):
-            get_j2k_precision(base + b'\x8F')
+        assert {} == get_j2k_parameters(base + b'\x8F')
 
     def test_short_bytestream(self):
         """Test result when no SIZ box present"""
-        with pytest.raises(ValueError, match=r"No SOC marker found"):
-            get_j2k_precision(b'')
-
-        with pytest.raises(TypeError, match=r"string of length 0 found"):
-            get_j2k_precision(b'\xff\x4f\xff\x51' + b'\x00' * 20)
+        assert {} == get_j2k_parameters(b'')
+        assert {} == get_j2k_parameters(b'\xff\x4f\xff\x51' + b'\x00' * 20)

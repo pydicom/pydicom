@@ -7,7 +7,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, get_j2k_precision
+    convert_color_space, get_j2k_parameters
 )
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
@@ -418,7 +418,7 @@ class TestPillowHandler_JPEG2K:
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
         bs = defragment_data(ds.PixelData)
-        if get_j2k_precision(bs)[0] != ds.BitsStored:
+        if get_j2k_parameters(bs)["precision"] != ds.BitsStored:
             with pytest.warns(UserWarning, match=r"doesn't match the JPEG 20"):
                 arr = ds.pixel_array
         else:
@@ -482,7 +482,9 @@ class TestPillowHandler_JPEG2K:
         assert 13 == ds.BitsStored
 
         bs = defragment_data(ds.PixelData)
-        assert (13, False) == get_j2k_precision(bs)
+        params = get_j2k_parameters(bs)
+        assert 13 == params["precision"]
+        assert not params["is_signed"]
         arr = ds.pixel_array
 
         assert 'int16' == arr.dtype

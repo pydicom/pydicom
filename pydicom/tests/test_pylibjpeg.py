@@ -7,7 +7,9 @@ import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixel_data_handlers.util import (
+    convert_color_space, get_j2k_parameters
+)
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -200,6 +202,7 @@ J2KR_16_15_1_0_1F_M1 = get_testdata_file("RG1_J2KR.dcm")
 J2KR_16_16_1_0_10F_M2 = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 J2KR_16_14_1_1_1F_M2 = get_testdata_file("693_J2KR.dcm")
 J2KR_16_16_1_1_1F_M2 = get_testdata_file("MR_small_jp2klossless.dcm")
+J2KR_16_13_1_1_1F_M2_MISMATCH = get_testdata_file("J2K_pixelrep_mismatch.dcm")
 # Non-conformant pixel data -> JP2 header present
 J2KR_08_08_3_0_1F_YBR_RCT = get_testdata_file("GDCMJ2K_TextGBR.dcm")
 # J2KI: 1.2.840.10008.1.2.4.91 - JPEG 2000
@@ -623,3 +626,27 @@ class TestJPEG2K:
         ds = dcmread(get_testdata_file("MR2_J2KR.dcm"))
         ref = ds.pixel_array
         assert np.array_equal(arr, ref)
+
+    def test_pixel_rep_mismatch(self):
+        """Test mismatched j2k sign and Pixel Representation."""
+        ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        assert 1 == ds.PixelRepresentation
+        assert 13 == ds.BitsStored
+
+        bs = defragment_data(ds.PixelData)
+        params = get_j2k_parameters(bs)
+        assert 13 == params["precision"]
+        assert not params["is_signed"]
+        arr = ds.pixel_array
+
+        assert 'int16' == arr.dtype
+        assert (512, 512) == arr.shape
+        assert arr.flags.writeable
+
+        assert -2000 == arr[0, 0]
+        assert [621, 412, 138, -193, -520, -767, -907, -966, -988, -995] == (
+            arr[47:57, 279].tolist()
+        )
+        assert [-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
+            arr[328:338, 106].tolist()
+        )

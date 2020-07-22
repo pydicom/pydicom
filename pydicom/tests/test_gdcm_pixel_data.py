@@ -15,7 +15,7 @@ from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.pixel_data_handlers.util import (
-    _convert_YBR_FULL_to_RGB, get_j2k_precision
+    _convert_YBR_FULL_to_RGB, get_j2k_parameters
 )
 from pydicom.tag import Tag
 
@@ -584,7 +584,9 @@ class TestsWithGDCM:
         assert 13 == ds.BitsStored
 
         bs = defragment_data(ds.PixelData)
-        assert (13, False) == get_j2k_precision(bs)
+        params = get_j2k_parameters(bs)
+        assert 13 == params["precision"]
+        assert not params["is_signed"]
         arr = ds.pixel_array
 
         assert 'int16' == arr.dtype
