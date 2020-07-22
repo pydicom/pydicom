@@ -52,32 +52,6 @@ def calculate_file_hash(filename):
     return hasher.hexdigest()
 
 
-def check_network(addr=('8.8.8.8', 53), retry=5, timeout=3):
-    """Return ``True`` if a connection to `addr` is available.
-
-    .. versionadded: 2.1
-
-    Parameters
-    ----------
-    addr : 2-tuple, optional
-        The ('IP address', port) to attempt to connect to, default:
-        ``('8.8.8.8', 53)``.
-    retry : int, optional
-        The number of retry attempts (default ``5``).
-    timeout : int, optional
-        The amount of time to wait for each connection attempt (default: ``3``
-        seconds).
-    """
-    for ii in range(5):
-        try:
-            socket.setdefaulttimeout(timeout)
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(addr)
-        except socket.error as exc:
-            pass
-
-    return False
-
-
 def get_config_dir():
     config_dir = pathlib.Path.home().joinpath(".pydicom")
     config_dir.mkdir(exist_ok=True)

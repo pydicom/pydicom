@@ -51,6 +51,7 @@ import os
 from os.path import abspath, dirname, join
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
+import warnings
 
 from pydicom.fileutil import path_from_pathlike
 
@@ -168,14 +169,13 @@ def get_files(
     ]
 
     real_online_file_paths = []
-    if download.check_network():
-        for filename in download_names:
-            try:
-                real_online_file_paths.append(
-                    str(download.data_path_with_download(filename))
-                )
-            except Exception as exc:
-                pass
+    for filename in download_names:
+        try:
+            real_online_file_paths.append(
+                str(download.data_path_with_download(filename))
+            )
+        except Exception as exc:
+            pass
 
     files += real_online_file_paths
 
