@@ -2,7 +2,7 @@ Version 2.1.0
 =================================
 
 Changelog
--------
+---------
 * Dropped support for Python 3.5 (only Python 3.6+ supported)
 
 Enhancements
@@ -18,8 +18,11 @@ Enhancements
 
   * To download the 7.2 MB file ``RG1_UNCI.dcm`` and get its path on disk
     you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
+* Added a new pixel data handler based on pylibjpeg which supports all
+  (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
 
 Fixes
 .....
+* ``Dataset.copy`` now works as expected (see :issue:`1146`)

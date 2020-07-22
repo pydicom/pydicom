@@ -4,10 +4,12 @@ pixel transfer syntaxes.
 """
 
 import sys
+from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydicom.dataset import Dataset
+
 
 try:
     import numpy
@@ -180,20 +182,34 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     return image
 
 
-def create_image_reader(filename: str) -> "gdcm.ImageReader":
+def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
     """Return a ``gdcm.ImageReader``.
 
     Parameters
     ----------
-    filename: str
-        The path to the DICOM dataset.
+    ds : pydicom.dataset.Dataset
+        The dataset to create the reader from.
 
     Returns
     -------
     gdcm.ImageReader
     """
     image_reader = gdcm.ImageReader()
-    image_reader.SetFileName(filename)
+    fname = getattr(ds, 'filename', None)
+    if fname and isinstance(fname, str):
+        pass
+    else:
+        # Copy the relevant elements and write to a temporary file to avoid
+        #   having to deal with all the possible objects the dataset may
+        #   originate with
+        new = ds.group_dataset(0x0028)
+        new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
+        new.file_meta = ds.file_meta
+        tfile = NamedTemporaryFile('wb')
+        new.save_as(tfile.name)
+        fname = tfile.name
+
+    image_reader.SetFileName(fname)
     return image_reader
 
 
@@ -222,7 +238,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         gdcm_data_element = create_data_element(ds)
         gdcm_image = create_image(ds, gdcm_data_element)
     else:
-        gdcm_image_reader = create_image_reader(ds.filename)
+        gdcm_image_reader = create_image_reader(dicom_dataset)
         if not gdcm_image_reader.Read():
             raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()

@@ -1,4 +1,8 @@
 Test Files used for testing pydicom
+
+2020-06 Many files were moved to an external data store,
+and are downloaded as needed.
+
 -----------------------------------
 I obtained images to test the pydicom code, and revised them as follow:
   * images were often downsized to keep the total file size quite small (typically <50K-ish). I wanted unittests for the code where I could run a number of tests quickly, and with files I could include in the source (and binary) distributions without bloating them too much
@@ -57,6 +61,11 @@ eCT_Supplemental.dcm
   * 2 frames, 16 bits allocated/stored, MONOCHROME2
   * Enhanced CT with supplemental (at IV 1024) 16-bit palette colour LUT data
 
+GDCMJ2K_TextGBR.dcm (from GDCM)
+  * JPEG 2000 Lossless transfer syntax
+  * Contains non-conformant Pixel Data with a JP2 header
+  * unsigned 8-bit, 3 samples/px, YBR_RCT Photometric Interpretation
+
 J2K_pixelrep_mismatch.dcm
   * Dataset from issue 1149
   * J2K data is unsigned, Pixel Representation 1
@@ -77,6 +86,10 @@ MR2_*.dcm
   * JPEG2000, JPEG2000Lossless and uncompressed versions
   * unsigned 16-bit/12-bit with rescale and windowing
   * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
+
+JPGExtended.dcm
+  * 1.2.840.10008.1.2.4.51 - JPEG Extended
+  * Fixed version of JPEG-lossy.dcm
 
 JPGLosslessP14SV1_1s_1f_8b.dcm
   * 1.2.840.10008.1.2.4.70 - JPEG Lossless, Process 14, Selection Value 1
