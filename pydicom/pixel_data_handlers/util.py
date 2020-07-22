@@ -838,43 +838,42 @@ def get_image_pixel_ids(ds):
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
-def get_j2k_precision(bs):
-    """Return the bit depth and sign of JPEG 2000 component samples.
+def get_j2k_parameters(codestream):
+    """Return a dict containing JPEG 2000 component parameters.
 
     .. versionadded:: 2.1
 
     Parameters
     ----------
-    bs : bytes
-        The JPEG 2000 (ISO/IEC 15444-1) data to be parsed.
+    codestream : bytes
+        The JPEG 2000 (ISO/IEC 15444-1) codestream to be parsed.
 
     Returns
     -------
-    int, bool
-        The bit depth (precision) of the component samples and
-        ``True`` if the components are signed, ``False`` if unsigned.
-
-    Raises
-    ------
-    ValueError
-        If unable to parse the JPEG 2000 data.
+    dict
+        A dict containing parameters for the first component sample in the
+        JPEG 2000 `codestream`, or an empty dict if unable to parse the data.
+        Available parameters are ``{"precision": int, "is_signed": bool}``.
     """
-    # First 2 bytes must be the SOC marker - if not then wrong format
-    if bs[0:2] != b'\xff\x4f':
-        raise ValueError("No SOC marker found at offset 0")
+    try:
+        # First 2 bytes must be the SOC marker - if not then wrong format
+        if codestream[0:2] != b'\xff\x4f':
+            return {}
 
-    # SIZ is required to be the second marker - Figure A-3 in 15444-1
-    if bs[2:4] != b'\xff\x51':
-        raise ValueError("No SIZ marker found at offset 2")
+        # SIZ is required to be the second marker - Figure A-3 in 15444-1
+        if codestream[2:4] != b'\xff\x51':
+            return {}
 
-    # See 15444-1 A.5.1 for format of the SIZ box and contents
-    ssiz = ord(bs[42:43])
-    if ssiz & 0x80:
-        # Signed
-        return (ssiz & 0x7F) + 1, True
+        # See 15444-1 A.5.1 for format of the SIZ box and contents
+        ssiz = codestream[42]
+        if ssiz & 0x80:
+            return {"precision": (ssiz & 0x7F) + 1, "is_signed": True}
 
-    # Unsigned
-    return ssiz + 1, False
+        return {"precision": ssiz + 1, "is_signed": False}
+    except (IndexError, TypeError):
+        pass
+
+    return {}
 
 
 def pixel_dtype(ds, as_float=False):

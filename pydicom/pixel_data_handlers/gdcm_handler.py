@@ -271,12 +271,12 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     ):
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
-        try:
-            j2k_precision, j2k_sign = get_j2k_precision(codestream)
-        except:
-            j2k_sign = None
 
-        if j2k_sign == 0 and ds.PixelRepresentation == 1:
+        params = get_j2k_precision(codestream)
+        j2k_precision = params.setdefault("precision", None)
+        j2k_sign = params.setdefault("is_signed", None)
+
+        if not j2k_sign and ds.PixelRepresentation == 1:
             # Convert unsigned J2K data to 2's complement
             shift = ds.BitsAllocated - j2k_precision
             pixel_module = ds.group_dataset(0x0028)

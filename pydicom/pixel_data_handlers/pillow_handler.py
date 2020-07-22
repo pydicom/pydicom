@@ -148,10 +148,10 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             pixel_bytes.extend(im.tobytes())
 
             if not j2k_precision:
-                try:
-                    j2k_precision, j2k_sign = get_j2k_precision(frame)
-                except:
-                    pass
+                params = get_j2k_precision(frame)
+                j2k_precision = params.setdefault("precision", None)
+                j2k_sign = params.setdefault("is_signed", None)
+
     else:
         # single compressed frame
         pixel_data = defragment_data(ds.PixelData)
@@ -160,10 +160,9 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             im.draft('YCbCr', (ds.Rows, ds.Columns))
         pixel_bytes.extend(im.tobytes())
 
-        try:
-            j2k_precision, j2k_sign = get_j2k_precision(pixel_data)
-        except:
-            j2k_precision, j2k_sign = None, None
+        params = get_j2k_precision(pixel_data)
+        j2k_precision = params.setdefault("precision", None)
+        j2k_sign = params.setdefault("is_signed", None)
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
 
