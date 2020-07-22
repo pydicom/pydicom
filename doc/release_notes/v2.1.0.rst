@@ -20,7 +20,14 @@ Enhancements
     you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
 * Added a new pixel data handler based on pylibjpeg which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
+* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`,
+  :func:`~pydicom.pixel_data_handlers.apply_windowing` and
+  :func:`~pydicom.data.get_dataset` aliases
+* Added ability to register external data sources for use with the functions
+  in :mod:`pydicom.data`
 
 Fixes
 .....
 * ``Dataset.copy`` now works as expected (see :issue:`1146`)
+* Fixed :func:`~pydicom.data.get_files` raising an exception if no
+  network connection is available

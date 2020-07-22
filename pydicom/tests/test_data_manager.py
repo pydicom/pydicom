@@ -9,15 +9,22 @@ import pytest
 from pydicom.data import (
     get_charset_files, get_testdata_files, get_palette_files
 )
-from pydicom.data.data_manager import DATA_ROOT, get_testdata_file
+from pydicom.data.data_manager import (
+    DATA_ROOT, get_testdata_file, EXTERNAL_DATA_SOURCES
+)
 from pydicom.data.download import get_data_dir
 
 
 class TestGetData:
     def test_get_dataset(self):
         """Test the different functions to get lists of data files."""
-
+        # The cached files downloaded from the pydicom-data repo
         cached_data_test_files = str(get_data_dir())
+
+        # If pydicom-data is available locally
+        ext_path = None
+        if 'pydicom-data' in EXTERNAL_DATA_SOURCES:
+            ext_path = EXTERNAL_DATA_SOURCES['pydicom-data'].data_path
 
         # Test base locations
         charbase = os.path.join(DATA_ROOT, 'charset_files')
@@ -41,7 +48,12 @@ class TestGetData:
 
         # The files should be from their respective bases
         for x in testdata:
-            assert testbase in x or cached_data_test_files in x
+            assert (
+                testbase in x
+                or cached_data_test_files in x
+                or (ext_path in x if ext_path else False)
+            )
+
         for x in chardata:
             assert charbase in x
 

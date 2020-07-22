@@ -51,6 +51,32 @@ def calculate_file_hash(filename):
     return hasher.hexdigest()
 
 
+def check_network(addr='8.8.8.8', retry=5, timeout=5):
+    """Return ``True`` if a connection to `addr` is available.
+
+    .. versionadded: 2.1
+
+    Parameters
+    ----------
+    addr : str, optional
+        The IPv4 address to attempt to connect to (default: ``8.8.8.8``).
+    retry : int, optional
+        The number of retry attempts (default ``5``).
+    timeout : int, optional
+        The amount of time to wait for each connection attempt (default: ``5``
+        seconds).
+    """
+    return False
+
+    # TODO; fix this pseudocode
+    for ii in range(5):
+        response = urllib.request.url(addr, timeout=5)
+        if response.status == 200:
+            return True
+
+    return False
+
+
 def get_config_dir():
     config_dir = pathlib.Path.home().joinpath(".pydicom")
     config_dir.mkdir(exist_ok=True)
@@ -166,4 +192,3 @@ def data_file_hash_check(filename):
         raise
 
     return cached_filehash == calculated_filehash
-
