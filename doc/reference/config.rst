@@ -19,4 +19,10 @@ Configuration Options (:mod:`pydicom.config`)
    overlay_data_handlers
    pixel_data_handlers
    reset_data_element_callback
+   show_file_meta
+   DS_decimal
+   DS_numpy
    use_DS_decimal
+   use_IS_numpy
+   use_DS_numpy
+

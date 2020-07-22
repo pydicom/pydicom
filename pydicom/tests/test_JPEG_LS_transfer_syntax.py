@@ -2,7 +2,6 @@
 
 import os
 import sys
-import re
 import pytest
 import pydicom
 from pydicom.filereader import dcmread

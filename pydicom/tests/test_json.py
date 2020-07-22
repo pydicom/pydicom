@@ -12,7 +12,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.valuerep import PersonName
 
 
-class TestPersonName(object):
+class TestPersonName:
     def test_json_pn_from_file(self):
         with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
@@ -40,58 +40,58 @@ class TestPersonName(object):
             assert components[0] == value['Alphabetic']
 
         ds = Dataset()
-        ds.add_new(0x00100010, 'PN', u'Yamada^Tarou=山田^太郎=やまだ^たろう')
-        ds.add_new(0x00091001, 'PN', u'Yamada^Tarou')
-        ds.add_new(0x00091002, 'PN', u'Yamada^Tarou==')
-        ds.add_new(0x00091003, 'PN', u'=山田^太郎=やまだ^たろう')
-        ds.add_new(0x00091004, 'PN', u'Yamada^Tarou==やまだ^たろう')
-        ds.add_new(0x00091005, 'PN', u'==やまだ^たろう')
-        ds.add_new(0x00091006, 'PN', u'=山田^太郎')
-        ds.add_new(0x00091007, 'PN', u'Yamada^Tarou=山田^太郎')
+        ds.add_new(0x00100010, 'PN', 'Yamada^Tarou=山田^太郎=やまだ^たろう')
+        ds.add_new(0x00091001, 'PN', 'Yamada^Tarou')
+        ds.add_new(0x00091002, 'PN', 'Yamada^Tarou==')
+        ds.add_new(0x00091003, 'PN', '=山田^太郎=やまだ^たろう')
+        ds.add_new(0x00091004, 'PN', 'Yamada^Tarou==やまだ^たろう')
+        ds.add_new(0x00091005, 'PN', '==やまだ^たろう')
+        ds.add_new(0x00091006, 'PN', '=山田^太郎')
+        ds.add_new(0x00091007, 'PN', 'Yamada^Tarou=山田^太郎')
         ds_json = ds.to_json_dict()
-        check_name('00100010', ['Yamada^Tarou', u'山田^太郎', u'やまだ^たろう'])
+        check_name('00100010', ['Yamada^Tarou', '山田^太郎', 'やまだ^たろう'])
         check_name('00091001', ['Yamada^Tarou'])
         check_name('00091002', ['Yamada^Tarou'])
-        check_name('00091003', ['', u'山田^太郎', u'やまだ^たろう'])
-        check_name('00091004', ['Yamada^Tarou', '', u'やまだ^たろう'])
-        check_name('00091005', ['', '', u'やまだ^たろう'])
-        check_name('00091006', ['', u'山田^太郎'])
-        check_name('00091007', ['Yamada^Tarou', u'山田^太郎'])
+        check_name('00091003', ['', '山田^太郎', 'やまだ^たろう'])
+        check_name('00091004', ['Yamada^Tarou', '', 'やまだ^たろう'])
+        check_name('00091005', ['', '', 'やまだ^たろう'])
+        check_name('00091006', ['', '山田^太郎'])
+        check_name('00091007', ['Yamada^Tarou', '山田^太郎'])
 
     def test_pn_components_from_json(self):
         # this is the encoded dataset from the previous test, with some
         # empty components omitted
-        ds_json = (u'{"00100010": {"vr": "PN", "Value": [{"Alphabetic": '
-                   u'"Yamada^Tarou", "Ideographic": "山田^太郎", '
-                   u'"Phonetic": "やまだ^たろう"}]}, '
-                   u'"00091001": {"vr": "PN", "Value": '
-                   u'[{"Alphabetic": "Yamada^Tarou"}]}, '
-                   u'"00091002": {"vr": "PN", "Value": '
-                   u'[{"Alphabetic": "Yamada^Tarou", "Ideographic": "", '
-                   u'"Phonetic": ""}]}, '
-                   u'"00091003": {"vr": "PN", "Value": [{'
-                   u'"Ideographic": "山田^太郎", '
-                   u'"Phonetic": "やまだ^たろう"}]}, '
-                   u'"00091004": {"vr": "PN", "Value": '
-                   u'[{"Alphabetic": "Yamada^Tarou", '
-                   u'"Phonetic": "やまだ^たろう"}]}, '
-                   u'"00091005": {"vr": "PN", "Value": '
-                   u'[{"Phonetic": "やまだ^たろう"}]}, '
-                   u'"00091006": {"vr": "PN", "Value":'
-                   u' [{"Ideographic": "山田^太郎"}]}, '
-                   u'"00091007": {"vr": "PN", "Value": '
-                   u'[{"Alphabetic": "Yamada^Tarou", '
-                   u'"Ideographic": "山田^太郎"}]}}')
+        ds_json = ('{"00100010": {"vr": "PN", "Value": [{"Alphabetic": '
+                   '"Yamada^Tarou", "Ideographic": "山田^太郎", '
+                   '"Phonetic": "やまだ^たろう"}]}, '
+                   '"00091001": {"vr": "PN", "Value": '
+                   '[{"Alphabetic": "Yamada^Tarou"}]}, '
+                   '"00091002": {"vr": "PN", "Value": '
+                   '[{"Alphabetic": "Yamada^Tarou", "Ideographic": "", '
+                   '"Phonetic": ""}]}, '
+                   '"00091003": {"vr": "PN", "Value": [{'
+                   '"Ideographic": "山田^太郎", '
+                   '"Phonetic": "やまだ^たろう"}]}, '
+                   '"00091004": {"vr": "PN", "Value": '
+                   '[{"Alphabetic": "Yamada^Tarou", '
+                   '"Phonetic": "やまだ^たろう"}]}, '
+                   '"00091005": {"vr": "PN", "Value": '
+                   '[{"Phonetic": "やまだ^たろう"}]}, '
+                   '"00091006": {"vr": "PN", "Value":'
+                   ' [{"Ideographic": "山田^太郎"}]}, '
+                   '"00091007": {"vr": "PN", "Value": '
+                   '[{"Alphabetic": "Yamada^Tarou", '
+                   '"Ideographic": "山田^太郎"}]}}')
 
         ds = Dataset.from_json(ds_json)
-        assert u'Yamada^Tarou=山田^太郎=やまだ^たろう' == ds.PatientName
-        assert u'Yamada^Tarou' == ds[0x00091001].value
-        assert u'Yamada^Tarou' == ds[0x00091002].value
-        assert u'=山田^太郎=やまだ^たろう' == ds[0x00091003].value
-        assert u'Yamada^Tarou==やまだ^たろう' == ds[0x00091004].value
-        assert u'==やまだ^たろう' == ds[0x00091005].value
-        assert u'=山田^太郎' == ds[0x00091006].value
-        assert u'Yamada^Tarou=山田^太郎' == ds[0x00091007].value
+        assert 'Yamada^Tarou=山田^太郎=やまだ^たろう' == ds.PatientName
+        assert 'Yamada^Tarou' == ds[0x00091001].value
+        assert 'Yamada^Tarou' == ds[0x00091002].value
+        assert '=山田^太郎=やまだ^たろう' == ds[0x00091003].value
+        assert 'Yamada^Tarou==やまだ^たろう' == ds[0x00091004].value
+        assert '==やまだ^たろう' == ds[0x00091005].value
+        assert '=山田^太郎' == ds[0x00091006].value
+        assert 'Yamada^Tarou=山田^太郎' == ds[0x00091007].value
 
     def test_empty_value(self):
         ds = Dataset()
@@ -102,12 +102,12 @@ class TestPersonName(object):
 
     def test_multi_value_to_json(self):
         ds = Dataset()
-        patient_names = [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг']
+        patient_names = ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг']
         ds.add_new(0x00091001, 'PN', patient_names)
         ds_json = ds.to_json_dict()
-        assert [{'Alphabetic': u'Buc^Jérôme'},
-                {'Alphabetic': u'Διονυσιος'},
-                {'Alphabetic': u'Люкceмбypг'}] == ds_json['00091001']['Value']
+        assert [{'Alphabetic': 'Buc^Jérôme'},
+                {'Alphabetic': 'Διονυσιος'},
+                {'Alphabetic': 'Люкceмбypг'}] == ds_json['00091001']['Value']
 
     def test_dataelem_from_json(self):
         tag = 0x0080090
@@ -117,7 +117,7 @@ class TestPersonName(object):
         assert isinstance(dataelem.value, PersonName)
 
 
-class TestAT(object):
+class TestAT:
     def test_to_json(self):
         ds = Dataset()
         ds.add_new(0x00091001, 'AT', [0x00100010, 0x00100020])
@@ -158,7 +158,7 @@ class TestAT(object):
             assert 0x00100010 == ds[0x00091002].value
 
 
-class TestDataSetToJson(object):
+class TestDataSetToJson:
     def test_json_from_dicom_file(self):
         ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
         ds_json = ds1.to_json()
@@ -193,18 +193,18 @@ class TestDataSetToJson(object):
         ds.add_new(0x00091010, 'FD', 3.14159265)
         ds.add_new(0x00091011, 'CS', 'TEST MODE')
         ds.add_new(0x00091012, 'PN', 'CITIZEN^1')
-        ds.add_new(0x00091013, 'PN', u'Yamada^Tarou=山田^太郎=やまだ^たろう')
+        ds.add_new(0x00091013, 'PN', 'Yamada^Tarou=山田^太郎=やまだ^たろう')
         ds.add_new(0x00091014, 'IS', '42')
         ds.add_new(0x00091015, 'DS', '3.14159265')
         ds.add_new(0x00091016, 'AE', b'CONQUESTSRV1')
         ds.add_new(0x00091017, 'AS', '055Y')
-        ds.add_new(0x00091018, 'LT', 50 * u'Калинка,')
+        ds.add_new(0x00091018, 'LT', 50 * 'Калинка,')
         ds.add_new(0x00091019, 'UC', 'LONG CODE VALUE')
         ds.add_new(0x0009101a, 'UN', b'\x0102\x3040\x5060')
         ds.add_new(0x0009101b, 'UR', 'https://example.com')
         ds.add_new(0x0009101c, 'AT', [0x00100010, 0x00100020])
-        ds.add_new(0x0009101d, 'ST', 100 * u'علي بابا')
-        ds.add_new(0x0009101e, 'SH', u'Διονυσιος')
+        ds.add_new(0x0009101d, 'ST', 100 * 'علي بابا')
+        ds.add_new(0x0009101e, 'SH', 'Διονυσιος')
         ds.add_new(0x00090011, 'LO', 'Creator 2.0')
         ds.add_new(0x00091101, 'SH', 'Version2')
         ds.add_new(0x00091102, 'US', 2)
@@ -220,7 +220,7 @@ class TestDataSetToJson(object):
         assert json_model['0009100D']['Value'] == [40000]
         assert json_model['0009100F']['Value'] == [3.14]
         assert json_model['00091010']['Value'] == [3.14159265]
-        assert json_model['00091018']['Value'] == [50 * u'Калинка,']
+        assert json_model['00091018']['Value'] == [50 * 'Калинка,']
 
         ds2 = Dataset.from_json(json_string)
         assert ds == ds2
@@ -271,7 +271,7 @@ class TestDataSetToJson(object):
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
 
-class TestSequence(object):
+class TestSequence:
     def test_nested_sequences(self):
         test1_json = get_testdata_file("test1.json")
         with open(test1_json) as f:
@@ -283,7 +283,7 @@ class TestSequence(object):
         assert ds == ds2
 
 
-class TestBinary(object):
+class TestBinary:
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, 'OB', b'BinaryContent')

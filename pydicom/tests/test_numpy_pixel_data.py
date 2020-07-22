@@ -26,14 +26,12 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
-from sys import byteorder
-
 import pytest
 
 import pydicom
 from pydicom import config
 from pydicom.data import get_testdata_files
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
 
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
@@ -58,7 +56,6 @@ try:
         get_pixeldata,
         unpack_bits,
         pack_bits,
-        pixel_dtype,
     )
 except ImportError:
     NP_HANDLER = None
@@ -186,17 +183,17 @@ SUPPORTED_HANDLER_NAMES = (
 
 # Numpy and the numpy handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoNumpyHandler(object):
+class TestNoNumpy_NoNumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = []
+        self.original_handlers = config.pixel_data_handlers
+        config.pixel_data_handlers = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -251,17 +248,17 @@ class TestNoNumpy_NoNumpyHandler(object):
 
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NumpyHandler(object):
+class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [NP_HANDLER]
+        self.original_handlers = config.pixel_data_handlers
+        config.pixel_data_handlers = [NP_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -322,17 +319,17 @@ class TestNoNumpy_NumpyHandler(object):
 
 # Numpy is available, the numpy handler is unavailable
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is unavailable')
-class TestNumpy_NoNumpyHandler(object):
+class TestNumpy_NoNumpyHandler:
     """Tests for handling datasets without the handler."""
 
     def setup(self):
         """Setup the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = []
+        self.original_handlers = config.pixel_data_handlers
+        config.pixel_data_handlers = []
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -420,17 +417,17 @@ REFERENCE_DATA_LITTLE = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_NumpyHandler(object):
+class TestNumpy_NumpyHandler:
     """Tests for handling Pixel Data with the handler."""
 
     def setup(self):
         """Setup the test datasets and the environment."""
-        self.original_handlers = pydicom.config.pixel_data_handlers
-        pydicom.config.pixel_data_handlers = [NP_HANDLER]
+        self.original_handlers = config.pixel_data_handlers
+        config.pixel_data_handlers = [NP_HANDLER]
 
     def teardown(self):
         """Restore the environment."""
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        config.pixel_data_handlers = self.original_handlers
 
     def test_environment(self):
         """Check that the testing environment is as expected."""
@@ -1068,7 +1065,7 @@ class TestNumpy_NumpyHandler(object):
     def test_endianness_not_set(self):
         """Test for #704, Dataset.is_little_endian unset."""
         ds = Dataset()
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         ds.Rows = 10
         ds.Columns = 10
@@ -1093,7 +1090,7 @@ class TestNumpy_NumpyHandler(object):
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_GetPixelData(object):
+class TestNumpy_GetPixelData:
     """Tests for numpy_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
@@ -1294,7 +1291,7 @@ REFERENCE_PACK_UNPACK = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_UnpackBits(object):
+class TestNumpy_UnpackBits:
     """Tests for numpy_handler.unpack_bits."""
 
     @pytest.mark.parametrize('input, output', REFERENCE_PACK_UNPACK)
@@ -1325,7 +1322,7 @@ REFERENCE_PACK_PARTIAL = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PackBits(object):
+class TestNumpy_PackBits:
     """Tests for numpy_handler.pack_bits."""
 
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)

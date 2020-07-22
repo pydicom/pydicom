@@ -48,7 +48,7 @@ def convert_to_python_number(value, vr):
     return value
 
 
-class JsonDataElementConverter(object):
+class JsonDataElementConverter:
     """Handles conversion between JSON struct and :class:`DataElement`.
 
     .. versionadded:: 1.4

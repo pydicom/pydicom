@@ -3070,6 +3070,8 @@ DicomDictionary = {
     0x00687001: ('CS', '1', "Model Modification", '', 'ModelModification'),  # noqa
     0x00687002: ('CS', '1', "Model Mirroring", '', 'ModelMirroring'),  # noqa
     0x00687003: ('SQ', '1', "Model Usage Code Sequence", '', 'ModelUsageCodeSequence'),  # noqa
+    0x00687004: ('UI', '1', "Model Group UID", '', 'ModelGroupUID'),  # noqa
+    0x00687005: ('UR', '1', "Relative URI Reference Within Encapsulated Document", '', 'RelativeURIReferenceWithinEncapsulatedDocument'),  # noqa
     0x00700001: ('SQ', '1', "Graphic Annotation Sequence", '', 'GraphicAnnotationSequence'),  # noqa
     0x00700002: ('CS', '1', "Graphic Layer", '', 'GraphicLayer'),  # noqa
     0x00700003: ('CS', '1', "Bounding Box Annotation Units", '', 'BoundingBoxAnnotationUnits'),  # noqa
@@ -4598,6 +4600,17 @@ DicomDictionary = {
     0x30100087: ('SQ', '1', "Weekday Fraction Pattern Sequence", '', 'WeekdayFractionPatternSequence'),  # noqa
     0x30100088: ('SQ', '1', "Delivery Time Structure Code Sequence", '', 'DeliveryTimeStructureCodeSequence'),  # noqa
     0x30100089: ('SQ', '1', "Treatment Site Modifier Code Sequence", '', 'TreatmentSiteModifierCodeSequence'),  # noqa
+    0x30100090: ('CS', '1', "Robotic Base Location Indicator", '', 'RoboticBaseLocationIndicator'),  # noqa
+    0x30100091: ('SQ', '1', "Robotic Path Node Set Code Sequence", '', 'RoboticPathNodeSetCodeSequence'),  # noqa
+    0x30100092: ('UL', '1', "Robotic Node Identifier", '', 'RoboticNodeIdentifier'),  # noqa
+    0x30100093: ('FD', '3', "RT Treatment Source Coordinates", '', 'RTTreatmentSourceCoordinates'),  # noqa
+    0x30100094: ('FD', '1', "Radiation Source Coordinate SystemYaw Angle", '', 'RadiationSourceCoordinateSystemYawAngle'),  # noqa
+    0x30100095: ('FD', '1', "Radiation Source Coordinate SystemRoll Angle", '', 'RadiationSourceCoordinateSystemRollAngle'),  # noqa
+    0x30100096: ('FD', '1', "Radiation Source Coordinate System Pitch Angle", '', 'RadiationSourceCoordinateSystemPitchAngle'),  # noqa
+    0x30100097: ('SQ', '1', "Robotic Path Control Point Sequence", '', 'RoboticPathControlPointSequence'),  # noqa
+    0x30100098: ('SQ', '1', "Tomotherapeutic Control Point Sequence", '', 'TomotherapeuticControlPointSequence'),  # noqa
+    0x30100099: ('FD', '1-n', "Tomotherapeutic Leaf Open Durations", '', 'TomotherapeuticLeafOpenDurations'),  # noqa
+    0x3010009A: ('FD', '1-n', "Tomotherapeutic Leaf Initial Closed Durations", '', 'TomotherapeuticLeafInitialClosedDurations'),  # noqa
     0x40000010: ('LT', '1', "Arbitrary", 'Retired', 'Arbitrary'),  # noqa
     0x40004000: ('LT', '1', "Text Comments", 'Retired', 'TextComments'),  # noqa
     0x40080040: ('SH', '1', "Results ID", 'Retired', 'ResultsID'),  # noqa

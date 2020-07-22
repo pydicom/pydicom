@@ -118,7 +118,7 @@ REFERENCE_DATA_UNSUPPORTED = [
 
 
 # Numpy is/isn't available, numpy handler is unavailable
-class TestNoNumpyHandler(object):
+class TestNoNumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
@@ -141,7 +141,7 @@ class TestNoNumpyHandler(object):
 
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NumpyHandler(object):
+class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
     def setup(self):
         """Setup the environment."""
@@ -199,7 +199,7 @@ REFERENCE_DATA_LITTLE = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_NumpyHandler(object):
+class TestNumpy_NumpyHandler:
     """Tests for handling Overlay Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -312,7 +312,7 @@ class TestNumpy_NumpyHandler(object):
 
 # Tests for numpy_handler module with Numpy available
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_GetOverlayArray(object):
+class TestNumpy_GetOverlayArray:
     """Tests for numpy_handler.get_overlay_array with numpy."""
     def test_no_overlay_data_raises(self):
         """Test get_overlay_array raises if dataset has no OverlayData."""
@@ -432,7 +432,7 @@ if HAVE_NP:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ReshapeOverlayArray(object):
+class TestNumpy_ReshapeOverlayArray:
     """Tests for numpy_handler.reshape_overlay_array."""
     def setup(self):
         """Setup the test dataset."""
@@ -537,7 +537,7 @@ REFERENCE_LENGTH = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_GetExpectedLength(object):
+class TestNumpy_GetExpectedLength:
     """Tests for numpy_handler.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):

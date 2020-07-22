@@ -35,7 +35,6 @@ CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
@@ -55,7 +54,7 @@ DESCRIPTION = description
 URL = "https://github.com/pydicom/pydicom"
 DOWNLOAD_URL = "https://github.com/pydicom/pydicom/archive/master.zip"
 LICENSE = "MIT"
-VERSION = __version__
+VERSION = __version__  # noqa: F821
 REQUIRES = []
 SETUP_REQUIRES = pytest_runner
 
@@ -79,7 +78,7 @@ def data_files_inventory():
 PACKAGE_DATA = {'pydicom': data_files_inventory()}
 
 opts = dict(name=NAME,
-            python_requires='>=3.5',
+            python_requires='>=3.6',
             version=VERSION,
             maintainer=MAINTAINER,
             maintainer_email=MAINTAINER_EMAIL,

@@ -15,7 +15,7 @@ except ImportError:
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_files, get_palette_files
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
@@ -61,7 +61,7 @@ VOI_08_1F = get_testdata_files("vlut_04.dcm")[0]
 
 # Tests with Numpy unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy(object):
+class TestNoNumpy:
     """Tests for the util functions without numpy."""
     def test_pixel_dtype_raises(self):
         """Test that pixel_dtype raises exception without numpy."""
@@ -88,12 +88,12 @@ REFERENCE_DTYPE = [
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PixelDtype(object):
+class TestNumpy_PixelDtype:
     """Tests for util.pixel_dtype."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
     def test_unknown_pixel_representation_raises(self):
@@ -275,12 +275,12 @@ if HAVE_NP:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ReshapePixelArray(object):
+class TestNumpy_ReshapePixelArray:
     """Tests for util.reshape_pixel_array."""
     def setup(self):
         """Setup the test dataset."""
         self.ds = Dataset()
-        self.ds.file_meta = Dataset()
+        self.ds.file_meta = FileMetaDataset()
         self.ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
         self.ds.Rows = 4
         self.ds.Columns = 5
@@ -467,16 +467,15 @@ class TestNumpy_ReshapePixelArray(object):
 
     def test_compressed_syntaxes_1conf(self):
         """Test the compressed syntaxes that are always 1 planar conf."""
-        for uid in ['1.2.840.10008.1.2.4.80',
-                    '1.2.840.10008.1.2.4.81',
-                    '1.2.840.10008.1.2.5']:
+        for uid in ['1.2.840.10008.1.2.5']:
             self.ds.file_meta.TransferSyntaxUID = uid
             self.ds.PlanarConfiguration = 0
             self.ds.NumberOfFrames = 1
             self.ds.SamplesPerPixel = 3
 
-            arr = reshape_pixel_array(self.ds,
-                                      RESHAPE_ARRAYS['1frame_3sample_1config'])
+            arr = reshape_pixel_array(
+                self.ds, RESHAPE_ARRAYS['1frame_3sample_1config']
+            )
             assert (4, 5, 3) == arr.shape
             assert np.array_equal(arr, self.ref_1_3)
 
@@ -527,7 +526,7 @@ class TestNumpy_ReshapePixelArray(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ConvertColourSpace(object):
+class TestNumpy_ConvertColourSpace:
     """Tests for util.convert_color_space."""
     def test_unknown_current_raises(self):
         """Test an unknown current color space raises exception."""
@@ -635,7 +634,7 @@ class TestNumpy_ConvertColourSpace(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_DtypeCorrectedForEndianness(object):
+class TestNumpy_DtypeCorrectedForEndianness:
     """Tests for util.dtype_corrected_for_endianness."""
     def test_byte_swapping(self):
         """Test that the endianess of the system is taken into account."""
@@ -736,7 +735,7 @@ REFERENCE_LENGTH = [
 ]
 
 
-class TestGetExpectedLength(object):
+class TestGetExpectedLength:
     """Tests for util.get_expected_length."""
     @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
@@ -785,7 +784,7 @@ class TestGetExpectedLength(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ModalityLUT(object):
+class TestNumpy_ModalityLUT:
     """Tests for util.apply_modality_lut()."""
     def test_slope_intercept(self):
         """Test the rescale slope/intercept transform."""
@@ -858,9 +857,39 @@ class TestNumpy_ModalityLUT(object):
         out = apply_modality_lut(arr, ds)
         assert arr is out
 
+    def test_lutdata_ow(self):
+        """Test LUT Data with VR OW."""
+        ds = dcmread(MOD_16_SEQ)
+        assert ds.is_little_endian is True
+        seq = ds.ModalityLUTSequence[0]
+        assert [4096, -2048, 16] == seq.LUTDescriptor
+        seq.LUTData = pack('<4096H', *seq.LUTData)
+        seq['LUTData'].VR = 'OW'
+        arr = ds.pixel_array
+        assert -2048 == arr.min()
+        assert 4095 == arr.max()
+        out = apply_modality_lut(arr, ds)
+
+        # IV > 2047 -> LUT[4095]
+        mapped_pixels = arr > 2047
+        assert 65535 == out[mapped_pixels][0]
+        assert (65535 == out[mapped_pixels]).all()
+        assert out.flags.writeable
+        assert out.dtype == np.uint16
+
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[0, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[50, 50:55])
+        assert [65535, 65535, 65535, 65535, 65535] == list(out[100, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[150, 50:55])
+        assert [65535, 65535, 49147, 49147, 65535] == list(out[200, 50:55])
+        assert 39321 == out[185, 340]
+        assert 45867 == out[185, 385]
+        assert 52428 == out[228, 385]
+        assert 58974 == out[291, 385]
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_PaletteColor(object):
+class TestNumpy_PaletteColor:
     """Tests for util.apply_color_lut()."""
     def setup(self):
         """Setup the tests"""
@@ -914,9 +943,7 @@ class TestNumpy_PaletteColor(object):
         """Test that an invalid bit depth raises an exception."""
         ds = dcmread(PAL_08_256_0_16_1F)
         ds.RedPaletteColorLookupTableDescriptor[2] = 15
-        msg = (
-            r'data type "uint15" not understood'
-        )
+        msg = r"data type ['\"]uint15['\"] not understood"
         with pytest.raises(TypeError, match=msg):
             apply_color_lut(ds.pixel_array, ds)
 
@@ -960,7 +987,7 @@ class TestNumpy_PaletteColor(object):
     def test_uint08_16(self):
         """Test uint8 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         assert 8 == ds.BitsStored
         assert 16 == ds.RedPaletteColorLookupTableDescriptor[2]
@@ -1053,7 +1080,7 @@ class TestNumpy_PaletteColor(object):
     def test_16_allocated_8_entries(self):
         """Test LUT with 8-bit entries in 16 bits allocated."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor = [200, 0, 8]
         lut = pack('<200H', *list(range(0, 200)))
@@ -1117,7 +1144,7 @@ class TestNumpy_PaletteColor(object):
     def test_first_map_positive(self):
         """Test a positive first mapping value."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor[1] = 10
         arr = ds.pixel_array
@@ -1135,7 +1162,7 @@ class TestNumpy_PaletteColor(object):
     def test_first_map_negative(self):
         """Test a positive first mapping value."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
-        ds.file_meta = Dataset()
+        ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.RedPaletteColorLookupTableDescriptor[1] = -10
         arr = ds.pixel_array
@@ -1150,9 +1177,18 @@ class TestNumpy_PaletteColor(object):
         assert [60160, 25600, 37376] == list(rgb[arr == 130][0])
         assert ([60160, 25600, 37376] == rgb[arr == 130]).all()
 
+    def test_unchanged(self):
+        """Test dataset with no LUT is unchanged."""
+        # Regression test for #1068
+        ds = dcmread(MOD_16, force=True)
+        assert 'RedPaletteColorLookupTableDescriptor' not in ds
+        msg = r"No suitable Palette Color Lookup Table Module found"
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(ds.pixel_array, ds)
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_ExpandSegmentedLUT(object):
+class TestNumpy_ExpandSegmentedLUT:
     """Tests for util._expand_segmented_lut()."""
     def test_discrete(self):
         """Test expanding a discrete segment."""
@@ -1373,7 +1409,7 @@ class TestNumpy_ExpandSegmentedLUT(object):
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_VOILUT(object):
+class TestNumpy_VOILUT:
     """Tests for util.apply_voi_lut()."""
     def test_voi_single_view(self):
         """Test VOI LUT with a single view."""
@@ -1916,3 +1952,21 @@ class TestNumpy_VOILUT(object):
         arr = np.asarray([-128, -127, -1, 0, 1, 126, 127], dtype='int8')
         out = apply_voi_lut(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+    def test_voi_lutdata_ow(self):
+        """Test LUT Data with VR OW."""
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_explicit_VR = True
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        item.LUTData = pack('<4H', *item.LUTData)
+        item['LUTData'].VR = 'OW'
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='uint16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()

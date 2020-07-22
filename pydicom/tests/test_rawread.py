@@ -11,7 +11,7 @@ from pydicom.sequence import Sequence
 from pydicom.util.hexutil import hex2bytes
 
 
-class TestRawReaderExplVRTests(object):
+class TestRawReaderExplVRTests:
     # See comments in data_element_generator
     # summary of DICOM data element formats
     # Here we are trying to test all those variations
@@ -78,7 +78,7 @@ class TestRawReaderExplVRTests(object):
             assert got.value.startswith(b'ABCDEFGHIJ\0')
 
 
-class TestRawReaderImplVR(object):
+class TestRawReaderImplVR:
     # See comments in data_element_generator
     # summary of DICOM data element formats
     # Here we are trying to test all those variations
@@ -128,7 +128,7 @@ class TestRawReaderImplVR(object):
             assert got.value.startswith(b'ABCDEFGHIJ\0')
 
 
-class TestRawSequence(object):
+class TestRawSequence:
     # See DICOM standard PS3.5-2008 section 7.5 for sequence syntax
     def testEmptyItem(self):
         """Read sequence with a single empty item..."""

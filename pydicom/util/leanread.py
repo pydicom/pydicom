@@ -2,6 +2,8 @@
 """Read a dicom media file"""
 
 from pydicom.misc import size_in_bytes
+from pydicom.datadict import dictionary_VR
+from pydicom.tag import TupleTag
 from struct import Struct, unpack
 
 extra_length_VRs_b = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
@@ -15,7 +17,7 @@ ItemDelimiterTag = 0xFFFEE00D  # end of Sequence Item
 SequenceDelimiterTag = 0xFFFEE0DD  # end of Sequence of undefined length
 
 
-class dicomfile(object):
+class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
     def __init__(self, filename):
@@ -167,7 +169,7 @@ def data_element_generator(fp,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionary_VR(tag)
+                    VR = dictionary_VR((group, elem))
                 except KeyError:
                     # Look ahead to see if it consists of items and
                     # is thus a SQ

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the GDCM Pixel Data handler."""
 
+from io import BytesIO
 import os
 import sys
 import tempfile
@@ -102,7 +103,7 @@ dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class TestGDCM_JPEG_LS_no_gdcm(object):
+class TestGDCM_JPEG_LS_no_gdcm:
     def setup(self):
         self.unicode_filename = os.path.join(
             tempfile.gettempdir(), "ДИКОМ.dcm")
@@ -127,7 +128,7 @@ class TestGDCM_JPEG_LS_no_gdcm(object):
             self.emri_jpeg_ls_lossless.pixel_array
 
 
-class TestGDCM_JPEG2000_no_gdcm(object):
+class TestGDCM_JPEG2000_no_gdcm:
     def setup(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
@@ -165,7 +166,7 @@ class TestGDCM_JPEG2000_no_gdcm(object):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 
 
-class TestGDCM_JPEGlossy_no_gdcm(object):
+class TestGDCM_JPEGlossy_no_gdcm:
     def setup(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
@@ -190,7 +191,7 @@ class TestGDCM_JPEGlossy_no_gdcm(object):
             self.color_3d_jpeg.pixel_array
 
 
-class TestGDCM_JPEGlossless_no_gdcm(object):
+class TestGDCM_JPEGlossless_no_gdcm:
     def setup(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
@@ -341,7 +342,7 @@ else:
         with_gdcm_params = []
 
 
-class TestsWithGDCM(object):
+class TestsWithGDCM:
     @pytest.fixture(params=with_gdcm_params, scope='class', autouse=True)
     def with_gdcm(self, request):
         original_value = HAVE_GDCM_IN_MEMORY_SUPPORT
@@ -539,8 +540,18 @@ class TestsWithGDCM(object):
         assert results[9] == tuple(a[95, 50, :])
         assert PhotometricInterpretation == t.PhotometricInterpretation
 
+    def test_bytes_io(self):
+        """Test using a BytesIO as the dataset source."""
+        with open(jpeg2000_name, 'rb') as f:
+            bs = BytesIO(f.read())
 
-class TestSupportFunctions(object):
+        ds = dcmread(bs)
+        arr = ds.pixel_array
+        assert (1024, 256) == arr.shape
+        assert arr.flags.writeable
+
+
+class TestSupportFunctions:
     @pytest.fixture(scope='class')
     def dataset_2d(self):
         return dcmread(mr_name)
@@ -634,7 +645,8 @@ class TestSupportFunctions(object):
         assert planar == image.GetPlanarConfiguration()
 
     @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    def test_create_image_reader_with_string(self):
-        image_reader = gdcm_handler.create_image_reader(mr_name)
+    def test_create_image_reader(self):
+        ds = dcmread(mr_name)
+        image_reader = gdcm_handler.create_image_reader(ds)
         assert image_reader is not None
         assert image_reader.Read()

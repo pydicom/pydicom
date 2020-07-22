@@ -6,7 +6,7 @@ import pytest
 from pydicom.tag import BaseTag, Tag, TupleTag, tag_in_exception
 
 
-class TestBaseTag(object):
+class TestBaseTag:
     """Test the BaseTag class."""
     def test_le_same_class(self):
         """Test __le__ of two classes with same type."""
@@ -241,7 +241,7 @@ class TestBaseTag(object):
         assert not BaseTag(0x00090100).is_private_creator
 
 
-class TestTag(object):
+class TestTag:
     """Test the Tag method."""
     def test_tag_single_int(self):
         """Test creating a Tag from a single int."""
@@ -363,14 +363,14 @@ class TestTag(object):
         pytest.raises(ValueError, Tag, -65535, -1)
 
 
-class TestTupleTag(object):
+class TestTupleTag:
     """Test the TupleTag method."""
     def test_tuple_tag(self):
         """Test quick tag construction with TupleTag."""
         assert TupleTag((0xFFFF, 0xFFee)) == BaseTag(0xFFFFFFEE)
 
 
-class TestTagInException(object):
+class TestTagInException:
     """Test the tag_in_exception method."""
     def test_raise_exception(self):
         """"""

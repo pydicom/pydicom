@@ -24,7 +24,7 @@ from pydicom.filebase import DicomBytesIO
 JP2K_10FRAME_NOBOT = get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
 
 
-class TestGetFrameOffsets(object):
+class TestGetFrameOffsets:
     """Test encaps.get_frame_offsets"""
     def test_bad_tag(self):
         """Test raises exception if no item tag."""
@@ -92,7 +92,7 @@ class TestGetFrameOffsets(object):
             get_frame_offsets(fp)
 
 
-class TestGetNrFragments(object):
+class TestGetNrFragments:
     """Test encaps.get_nr_fragments"""
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -199,7 +199,7 @@ class TestGetNrFragments(object):
             get_nr_fragments(fp)
 
 
-class TestGeneratePixelDataFragment(object):
+class TestGeneratePixelDataFragment:
     """Test encaps.generate_pixel_data_fragment"""
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -322,7 +322,7 @@ class TestGeneratePixelDataFragment(object):
         pytest.raises(StopIteration, next, fragments)
 
 
-class TestGeneratePixelDataFrames(object):
+class TestGeneratePixelDataFrames:
     """Test encaps.generate_pixel_data_frames"""
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -483,7 +483,7 @@ class TestGeneratePixelDataFrames(object):
             next(frame_gen)
 
 
-class TestGeneratePixelData(object):
+class TestGeneratePixelData:
     """Test encaps.generate_pixel_data"""
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -741,7 +741,7 @@ class TestGeneratePixelData(object):
         pytest.raises(StopIteration, next, frames)
 
 
-class TestDecodeDataSequence(object):
+class TestDecodeDataSequence:
     """Test encaps.decode_data_sequence"""
     def test_empty_bot_single_fragment(self):
         """Test a single-frame image where the frame is one fragments"""
@@ -878,7 +878,7 @@ class TestDecodeDataSequence(object):
         ]
 
 
-class TestDefragmentData(object):
+class TestDefragmentData:
     """Test encaps.defragment_data"""
     def test_defragment(self):
         """Test joining fragmented data works"""
@@ -898,7 +898,7 @@ class TestDefragmentData(object):
         assert defragment_data(bytestream) == reference
 
 
-class TestReadItem(object):
+class TestReadItem:
     """Test encaps.read_item"""
     def test_item_undefined_length(self):
         """Test exception raised if item length undefined."""
@@ -1009,7 +1009,7 @@ class TestReadItem(object):
         assert read_item(fp) == b'\x01\x02\x03\x04\x05\x06'
 
 
-class TestFragmentFrame(object):
+class TestFragmentFrame:
     """Test encaps.fragment_frame."""
     def test_single_fragment_even_data(self):
         """Test 1 fragment from even data"""
@@ -1095,7 +1095,7 @@ class TestFragmentFrame(object):
                 pass
 
 
-class TestEncapsulateFrame(object):
+class TestEncapsulateFrame:
     """Test encaps.itemise_frame."""
     def test_single_item(self):
         """Test encapsulating into one fragment"""
@@ -1133,7 +1133,7 @@ class TestEncapsulateFrame(object):
         pytest.raises(StopIteration, next, item_generator)
 
 
-class TestEncapsulate(object):
+class TestEncapsulate:
     """Test encaps.encapsulate."""
     def test_encapsulate_single_fragment_per_frame_no_bot(self):
         """Test encapsulating single fragment per frame with no BOT values."""

@@ -15,7 +15,7 @@ from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
                               DataElement_from_raw, empty_value_for_VR)
-from pydicom.dataset import (Dataset, FileDataset)
+from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
@@ -379,7 +379,7 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
 
     ds = Dataset(raw_data_elements)
     if 0x00080005 in raw_data_elements:
-        char_set = DataElement_from_raw(raw_data_elements[0x00080005])
+        char_set = DataElement_from_raw(raw_data_elements[0x00080005]).value
         encoding = convert_encodings(char_set)
     else:
         encoding = parent_encoding
@@ -516,8 +516,12 @@ def _read_file_meta_info(fp):
         return tag.group != 2
 
     start_file_meta = fp.tell()
-    file_meta = read_dataset(fp, is_implicit_VR=False, is_little_endian=True,
-                             stop_when=_not_group_0002)
+    file_meta = FileMetaDataset(
+                    read_dataset(
+                        fp, is_implicit_VR=False, is_little_endian=True,
+                        stop_when=_not_group_0002
+                    )
+    )
     if not file_meta._dict:
         return file_meta
 
@@ -528,9 +532,12 @@ def _read_file_meta_info(fp):
         file_meta[list(file_meta.elements())[0].tag]
     except NotImplementedError:
         fp.seek(start_file_meta)
-        file_meta = read_dataset(fp, is_implicit_VR=True,
-                                 is_little_endian=True,
-                                 stop_when=_not_group_0002)
+        file_meta = FileMetaDataset(
+                        read_dataset(
+                            fp, is_implicit_VR=True, is_little_endian=True,
+                            stop_when=_not_group_0002
+                        )
+        )
 
     # Log if the Group Length doesn't match actual length
     if 'FileMetaInformationGroupLength' in file_meta:
@@ -710,7 +717,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
         is_implicit_VR = False
         is_little_endian = False
     elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
-        # See PS3.6-2008 A.5 (p 71)
+        # See PS3.5 section A.5
         # when written, the entire dataset following
         #     the file metadata was prepared the normal way,
         #     then "deflate" compression applied.
@@ -833,10 +840,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     if isinstance(fp, str):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        try:
-            logger.debug(u"Reading file '{0}'".format(fp))
-        except Exception:
-            logger.debug("Reading file '{0}'".format(fp))
+        logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
 
     if config.debugging:
@@ -897,7 +901,7 @@ def read_dicomdir(filename="DICOMDIR"):
     ds = dcmread(filename)
     # Here, check that it is in fact DicomDir
     if not isinstance(ds, DicomDir):
-        msg = u"File '{0}' is not a Media Storage Directory file".format(
+        msg = "File '{0}' is not a Media Storage Directory file".format(
             filename)
         raise InvalidDicomError(msg)
     return ds
@@ -961,7 +965,7 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
 
     # Check that the file is the same as when originally read
     if is_filename and not os.path.exists(filename_or_obj):
-        raise IOError(u"Deferred read -- original file "
+        raise IOError("Deferred read -- original file "
                       "{0:s} is missing".format(filename_or_obj))
     if timestamp is not None:
         statinfo = os.stat(filename_or_obj)

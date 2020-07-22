@@ -10,12 +10,11 @@ A DataElement has a tag,
 
 import base64
 import json
-import warnings
 from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
-from pydicom.charset import default_encoding
 from pydicom.config import logger
+from pydicom import config
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -27,6 +26,9 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import PersonName
+
+if config.have_numpy:
+    import numpy
 
 BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
@@ -76,24 +78,6 @@ def empty_value_for_VR(VR, raw=False):
     return None
 
 
-def isMultiValue(value):
-    """Return ``True`` if `value` is list-like (iterable).
-
-    .. deprecated:: 1.3
-       This function is deprecated, use :attr:`DataElement.VM` instead.
-
-    """
-    msg = 'isMultiValue is deprecated, use DataElement.VM instead'
-    warnings.warn(msg, DeprecationWarning)
-    if isinstance(value, (str, bytes)):
-        return False
-    try:
-        iter(value)
-    except TypeError:
-        return False
-    return True
-
-
 def _is_bytes(val):
     """Return True only if `val` is of type `bytes`."""
     return isinstance(val, bytes)
@@ -104,7 +88,7 @@ _backslash_str = "\\"
 _backslash_byte = b"\\"
 
 
-class DataElement(object):
+class DataElement:
     """Contain and manipulate a DICOM Element.
 
     Examples
@@ -144,30 +128,13 @@ class DataElement(object):
     descripWidth : int
         For string display, this is the maximum width of the description
         field (default ``35``).
-    is_retired : bool
-        For officially registered DICOM Data Elements this will be ``True`` if
-        the retired status as given in the DICOM Standard, Part 6,
-        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>` is 'RET'. For private
-        or unknown elements this will always be ``False``.
     is_undefined_length : bool
         Indicates whether the length field for the element was ``0xFFFFFFFFL``
         (ie undefined).
-    keyword : str
-        For officially registered DICOM Data Elements this will be the
-        *Keyword* as given in
-        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`. For private or
-        unknown elements this will return an empty string ``''``.
     maxBytesToDisplay : int
         For string display, elements with values containing data which is
         longer than this value will display ``"array of # bytes"``
         (default ``16``).
-    name : str
-        For officially registered DICOM Data Elements this will be the *Name*
-        as given in :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
-        For private elements known to *pydicom*
-        this will be the *Name* in the format ``'[name]'``. For unknown
-        private elements this will be ``'Private Creator'``. For unknown
-        elements this will return an empty string ``''``.
     showVR : bool
         For string display, include the element's VR just before it's value
         (default ``True``).
@@ -175,8 +142,6 @@ class DataElement(object):
         The element's tag.
     value
         The element's stored value(s).
-    VM : int
-        The Value Multiplicity of the element's stored value(s).
     VR : str
         The element's Value Representation.
     """
@@ -230,8 +195,9 @@ class DataElement(object):
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
-        if VR == 'UN' and (is_undefined_length or value is None or
-                           len(value) < 0xffff):
+        if (VR == 'UN' and not tag.is_private and
+                config.replace_un_with_known_vr and
+                (is_undefined_length or value is None or len(value) < 0xffff)):
             try:
                 VR = dictionary_VR(tag)
             except KeyError:
@@ -244,6 +210,7 @@ class DataElement(object):
             self.value = value  # calls property setter which will convert
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
+        self.private_creator = None
 
     @classmethod
     def from_json(cls, dataset_class, tag, vr, value, value_key,
@@ -553,8 +520,15 @@ class DataElement(object):
             return True
 
         if isinstance(other, self.__class__):
-            return (self.tag == other.tag and self.VR == other.VR
-                    and self.value == other.value)
+            if self.tag != other.tag or self.VR != other.VR:
+                return False
+
+            # tag and VR match, now check the value
+            if config.have_numpy and isinstance(self.value, numpy.ndarray):
+                return (len(self.value) == len(other.value)
+                        and numpy.allclose(self.value, other.value))
+            else:
+                return self.value == other.value
 
         return NotImplemented
 
@@ -616,14 +590,22 @@ class DataElement(object):
 
     @property
     def name(self):
-        """Return the DICOM dictionary name for the element as :class:`str`."""
+        """Return the DICOM dictionary name for the element as :class:`str`.
+
+        For officially registered DICOM Data Elements this will be the *Name*
+        as given in :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
+        For private elements known to *pydicom*
+        this will be the *Name* in the format ``'[name]'``. For unknown
+        private elements this will be ``'Private Creator'``. For unknown
+        elements this will return an empty string ``''``.
+        """
         return self.description()
 
     def description(self):
         """Return the DICOM dictionary name for the element as :class:`str`."""
         if self.tag.is_private:
             name = "Private tag data"  # default
-            if hasattr(self, 'private_creator'):
+            if self.private_creator:
                 try:
                     # If have name from private dictionary, use it, but
                     #   but put in square brackets so is differentiated,
@@ -633,7 +615,7 @@ class DataElement(object):
                     name = "[%s]" % (name)
                 except KeyError:
                     pass
-            elif self.tag.elem >> 8 == 0:
+            elif self.tag.element >> 8 == 0:
                 name = "Private Creator"
         elif dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
             name = dictionary_description(self.tag)
@@ -647,7 +629,13 @@ class DataElement(object):
 
     @property
     def is_retired(self):
-        """Return the element's retired status as :class:`bool`."""
+        """Return the element's retired status as :class:`bool`.
+
+        For officially registered DICOM Data Elements this will be ``True`` if
+        the retired status as given in the DICOM Standard, Part 6,
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>` is 'RET'. For private
+        or unknown elements this will always be ``False``.
+        """
         if dictionary_has_tag(self.tag):
             return dictionary_is_retired(self.tag)
         else:
@@ -655,7 +643,13 @@ class DataElement(object):
 
     @property
     def keyword(self):
-        """Return the element's keyword (if known) as :class:`str`."""
+        """Return the element's keyword (if known) as :class:`str`.
+
+        For officially registered DICOM Data Elements this will be the
+        *Keyword* as given in
+        :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`. For private or
+        unknown elements this will return an empty string ``''``.
+        """
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
         else:
@@ -727,7 +721,8 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
                 msg += " can't look up VR"
                 raise KeyError(msg)
-    elif VR == 'UN' and not raw.tag.is_private:
+    elif (VR == 'UN' and not raw.tag.is_private and
+          config.replace_un_with_known_vr):
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if (raw.length == 0xffffffff or raw.value is None or

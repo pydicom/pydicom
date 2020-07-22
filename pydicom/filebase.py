@@ -8,7 +8,7 @@ from struct import (unpack, pack)
 from io import BytesIO
 
 
-class DicomIO(object):
+class DicomIO:
     """File object which holds transfer syntax info and anything else we need.
     """
 

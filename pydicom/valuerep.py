@@ -38,7 +38,7 @@ PN_DELIMS = {0xe5}
 
 
 class DA(date):
-    """Store value for an element with VR 'DA' as :class:`datetime.date`.
+    """Store value for an element with VR **DA** as :class:`datetime.date`.
 
     Note that the :class:`datetime.date` base class is immutable.
     """
@@ -114,7 +114,7 @@ class DA(date):
 
 
 class DT(datetime):
-    """Store value for an element with VR 'DT' as :class:`datetime.datetime`.
+    """Store value for an element with VR **DT** as :class:`datetime.datetime`.
 
     Note that the :class:`datetime.datetime` base class is immutable.
     """
@@ -226,7 +226,7 @@ class DT(datetime):
 
 
 class TM(time):
-    """Store value for an element with VR 'TM' as :class:`datetime.time`.
+    """Store value for an element with VR **TM** as :class:`datetime.time`.
 
     Note that the :class:`datetime.time` base class is immutable.
     """
@@ -311,7 +311,7 @@ class TM(time):
 
 
 class DSfloat(float):
-    """Store value for an element with VR 'DS' as :class:`float`.
+    """Store value for an element with VR **DS** as :class:`float`.
 
     If constructed from an empty string, return the empty string,
     not an instance of this class.
@@ -352,7 +352,7 @@ class DSfloat(float):
 
 
 class DSdecimal(Decimal):
-    """Store value for an element with VR 'DS' as :class:`decimal.Decimal`.
+    """Store value for an element with VR **DS** as :class:`decimal.Decimal`.
 
     Notes
     -----
@@ -458,7 +458,7 @@ def DS(val):
 
 
 class IS(int):
-    """Store value for an element with VR 'IS' as :class:`int`.
+    """Store value for an element with VR **IS** as :class:`int`.
 
     Stores original integer string for exact rewriting of the string
     originally read or stored.

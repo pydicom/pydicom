@@ -112,6 +112,9 @@ def apply_color_lut(arr, ds=None, palette=None):
             "Table Module is not currently supported"
         )
 
+    if 'RedPaletteColorLookupTableDescriptor' not in ds:
+        raise ValueError("No suitable Palette Color Lookup Table Module found")
+
     # All channels are supposed to be identical
     lut_desc = ds.RedPaletteColorLookupTableDescriptor
     # A value of 0 = 2^16 entries
@@ -230,7 +233,15 @@ def apply_modality_lut(arr, ds):
         nominal_depth = item.LUTDescriptor[2]
 
         dtype = 'uint{}'.format(nominal_depth)
-        lut_data = np.asarray(item.LUTData, dtype=dtype)
+
+        # Ambiguous VR, US or OW
+        if item['LUTData'].VR == 'OW':
+            endianness = '<' if ds.is_little_endian else '>'
+            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
+            lut_data = unpack(unpack_fmt, item.LUTData)
+        else:
+            lut_data = item.LUTData
+        lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
@@ -313,7 +324,14 @@ def apply_voi_lut(arr, ds, index=0):
                 .format(nominal_depth)
             )
 
-        lut_data = np.asarray(item.LUTData, dtype=dtype)
+        # Ambiguous VR, US or OW
+        if item['LUTData'].VR == 'OW':
+            endianness = '<' if ds.is_little_endian else '>'
+            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
+            lut_data = unpack(unpack_fmt, item.LUTData)
+        else:
+            lut_data = item.LUTData
+        lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
@@ -960,9 +978,9 @@ def reshape_pixel_array(ds, arr):
     |                        | Non-hierarchical,  |                       |
     |                        | SV1                |                       |
     +------------------------+--------------------+-----------------------+
-    | 1.2.840.10008.1.2.4.80 | JPEG-LS Lossless   | 1                     |
+    | 1.2.840.10008.1.2.4.80 | JPEG-LS Lossless   | 0                     |
     +------------------------+--------------------+-----------------------+
-    | 1.2.840.10008.1.2.4.81 | JPEG-LS Lossy      | 1                     |
+    | 1.2.840.10008.1.2.4.81 | JPEG-LS Lossy      | 0                     |
     +------------------------+--------------------+-----------------------+
     | 1.2.840.10008.1.2.4.90 | JPEG 2000 Lossless | 0                     |
     +------------------------+--------------------+-----------------------+
@@ -970,6 +988,10 @@ def reshape_pixel_array(ds, arr):
     +------------------------+--------------------+-----------------------+
     | 1.2.840.10008.1.2.5    | RLE Lossless       | 1                     |
     +------------------------+--------------------+-----------------------+
+
+    .. versionchanged:: 2.1
+
+        JPEG-LS transfer syntaxes changed to *Planar Configuration* of 0
 
     Parameters
     ----------
@@ -1023,12 +1045,12 @@ def reshape_pixel_array(ds, arr):
         if transfer_syntax in ['1.2.840.10008.1.2.4.50',
                                '1.2.840.10008.1.2.4.57',
                                '1.2.840.10008.1.2.4.70',
+                               '1.2.840.10008.1.2.4.80',
+                               '1.2.840.10008.1.2.4.81',
                                '1.2.840.10008.1.2.4.90',
                                '1.2.840.10008.1.2.4.91']:
             planar_configuration = 0
-        elif transfer_syntax in ['1.2.840.10008.1.2.4.80',
-                                 '1.2.840.10008.1.2.4.81',
-                                 '1.2.840.10008.1.2.5']:
+        elif transfer_syntax in ['1.2.840.10008.1.2.5']:
             planar_configuration = 1
         else:
             planar_configuration = ds.PlanarConfiguration

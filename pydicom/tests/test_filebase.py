@@ -13,7 +13,7 @@ from pydicom.tag import Tag
 TEST_FILE = get_testdata_files('CT_small.dcm')[0]
 
 
-class TestDicomIO(object):
+class TestDicomIO:
     """Test filebase.DicomIO class"""
     def test_init(self):
         """Test __init__"""
@@ -207,7 +207,7 @@ class TestDicomIO(object):
         assert not fp.is_implicit_VR
 
 
-class TestDicomFileLike(object):
+class TestDicomFileLike:
     """Test filebase.DicomFileLike class"""
     def test_init_good_parent(self):
         """Test methods are set OK if parent is good"""
@@ -246,7 +246,7 @@ class TestDicomFileLike(object):
             assert fp.parent_read(2) == b'\x00\x01'
 
 
-class TestDicomBytesIO(object):
+class TestDicomBytesIO:
     """Test filebase.DicomBytesIO class"""
     def test_getvalue(self):
         """Test DicomBytesIO.getvalue"""
@@ -254,7 +254,7 @@ class TestDicomBytesIO(object):
         assert fp.getvalue() == b'\x00\x01\x00\x02'
 
 
-class TestDicomFile(object):
+class TestDicomFile:
     """Test filebase.DicomFile() function"""
     def test_read(self):
         """Test the function"""

@@ -16,7 +16,7 @@ PYTEST = [int(x) for x in pytest.__version__.split('.')]
 
 
 @pytest.mark.skipif(PYTEST[:2] < [3, 4], reason='no caplog')
-class TestDebug(object):
+class TestDebug:
     """Tests for config.debug()."""
     def setup(self):
         self.logger = logging.getLogger('pydicom')

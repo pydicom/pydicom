@@ -1,6 +1,14 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Compatibility functions for previous Python 2 support"""
 
+# Python 2 only - warn and mark this as deprecated.
+import warnings
+
+warnings.warn(
+    "Starting in pydicom 3.0, the compat module (used for Python 2)"
+    " will be removed",
+    DeprecationWarning
+)
 
 # Text types
 text_type = str
