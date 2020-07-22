@@ -48,6 +48,14 @@ class TestGetData:
 
         # The files should be from their respective bases
         for x in testdata:
+            # Don't check files from external sources other than pydicom-data
+            if (
+                testbase not in x
+                and cached_data_test_files not in x
+                and (ext_path not in x if ext_path else True)
+            ):
+                continue
+
             assert (
                 testbase in x
                 or cached_data_test_files in x

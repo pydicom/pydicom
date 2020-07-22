@@ -77,8 +77,16 @@ def get_external_sources() -> Dict:
     dict
         A dict of ``{'source name': <interface class instance>}``.
     """
+    # Prefer pydicom-data as the source
     entry_point = "pydicom.data.external_sources"
-    return {val.name: val.load()() for val in iter_entry_points(entry_point)}
+    sources = {vv.name: vv.load()() for vv in iter_entry_points(entry_point)}
+    out = {}
+    if "pydicom-data" in sources:
+        out["pydicom-data"] = sources["pydicom-data"]
+
+    out.update(sources)
+
+    return out
 
 
 EXTERNAL_DATA_SOURCES = get_external_sources()
