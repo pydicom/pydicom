@@ -3,6 +3,8 @@
 Pixel Data Handlers (:mod:`pydicom.pixel_data_handlers`)
 ========================================================
 
+.. currentmodule:: pydicom.pixel_data_handlers
+
 .. autosummary::
    :toctree: generated/
 

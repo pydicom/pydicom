@@ -112,12 +112,13 @@ def get_files(
     """Return all files from a set of sources.
 
     First searches the local *pydicom* data store, then any locally available
-    external sources, and finally will search the files available in the
+    external sources, and finally the files available in the
     pydicom/pydicom-data repository.
 
     .. versionchange: 2.1
 
-        Added the `dtype` keyword parameter.
+        Added the `dtype` keyword parameter, modified to search locally
+        available external data sources and the pydicom/pydicom-data repository
 
     Parameters
     ----------
@@ -183,7 +184,8 @@ def get_files(
 
 
 def get_palette_files(pattern: str = "*") -> List[str]:
-    """Return palette data files from pydicom data root.
+    """Return a list of absolute paths to palettes with filenames matching
+    `pattern`.
 
     .. versionadded:: 1.4
 
@@ -207,10 +209,19 @@ def get_palette_files(pattern: str = "*") -> List[str]:
 
 
 def get_testdata_file(name: str) -> str:
-    """Return the first test data file path with the given name found under
-    the pydicom test data root.
+    """Return an absolute path to the first matching dataset with filename
+    `name`.
 
     .. versionadded:: 1.4
+
+    First searches the local *pydicom* data store, then any locally available
+    external sources, and finally the files available in the
+    pydicom/pydicom-data repository.
+
+    .. versionchanged:: 2.1
+
+        Modified to search locally available external data sources and the
+        pydicom/pydicom-data repository
 
     Parameters
     ----------
@@ -250,7 +261,8 @@ get_dataset = get_testdata_file
 
 
 def get_testdata_files(pattern: str = "*") -> List[str]:
-    """Return test data files from pydicom data root.
+    """Return a list of absolute paths to datasets with filenames matching
+    `pattern`.
 
     Parameters
     ----------
@@ -273,7 +285,8 @@ def get_testdata_files(pattern: str = "*") -> List[str]:
 
 
 def get_charset_files(pattern: str = "*") -> List[str]:
-    """Return charset files from pydicom data root.
+    """Return a list of absolute paths to charsets with filenames matching
+    `pattern`.
 
     Parameters
     ----------
