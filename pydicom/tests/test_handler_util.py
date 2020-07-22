@@ -467,16 +467,15 @@ class TestNumpy_ReshapePixelArray:
 
     def test_compressed_syntaxes_1conf(self):
         """Test the compressed syntaxes that are always 1 planar conf."""
-        for uid in ['1.2.840.10008.1.2.4.80',
-                    '1.2.840.10008.1.2.4.81',
-                    '1.2.840.10008.1.2.5']:
+        for uid in ['1.2.840.10008.1.2.5']:
             self.ds.file_meta.TransferSyntaxUID = uid
             self.ds.PlanarConfiguration = 0
             self.ds.NumberOfFrames = 1
             self.ds.SamplesPerPixel = 3
 
-            arr = reshape_pixel_array(self.ds,
-                                      RESHAPE_ARRAYS['1frame_3sample_1config'])
+            arr = reshape_pixel_array(
+                self.ds, RESHAPE_ARRAYS['1frame_3sample_1config']
+            )
             assert (4, 5, 3) == arr.shape
             assert np.array_equal(arr, self.ref_1_3)
 
