@@ -4,6 +4,7 @@ pixel transfer syntaxes.
 """
 
 import sys
+from tempfile import NamedTemporaryFile
 
 try:
     import numpy
@@ -161,20 +162,34 @@ def create_image(dicom_dataset, data_element):
     return image
 
 
-def create_image_reader(filename):
+def create_image_reader(ds):
     """Return a ``gdcm.ImageReader``.
 
     Parameters
     ----------
-    filename: str or unicode
-        The path to the DICOM dataset.
+    ds : pydicom.dataset.Dataset
+        The dataset to create the reader from.
 
     Returns
     -------
     gdcm.ImageReader
     """
     image_reader = gdcm.ImageReader()
-    image_reader.SetFileName(filename)
+    fname = getattr(ds, 'filename', None)
+    if fname and isinstance(fname, str):
+        pass
+    else:
+        # Copy the relevant elements and write to a temporary file to avoid
+        #   having to deal with all the possible objects the dataset may
+        #   originate with
+        new = ds.group_dataset(0x0028)
+        new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
+        new.file_meta = ds.file_meta
+        tfile = NamedTemporaryFile('wb')
+        new.save_as(tfile.name)
+        fname = tfile.name
+
+    image_reader.SetFileName(fname)
     return image_reader
 
 
@@ -206,7 +221,7 @@ def get_pixeldata(dicom_dataset):
         gdcm_data_element = create_data_element(dicom_dataset)
         gdcm_image = create_image(dicom_dataset, gdcm_data_element)
     else:
-        gdcm_image_reader = create_image_reader(dicom_dataset.filename)
+        gdcm_image_reader = create_image_reader(dicom_dataset)
         if not gdcm_image_reader.Read():
             raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
