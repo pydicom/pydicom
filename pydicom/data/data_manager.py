@@ -7,7 +7,8 @@ External Data Sources
 
 *pydicom* can also search third-party data sources for matching data. To do so
 your project should register itself in it's `setup.py` file. For example, a
-project named "mydata" with it's interface class ``MyInterface``:
+project named "mydata" with it's interface class ``MyInterface`` should
+register:
 
 .. codeblock: python
 
@@ -16,17 +17,17 @@ project named "mydata" with it's interface class ``MyInterface``:
     setup(
         ...,
         entry_points={
-            "pydicom.data.external_sources": "mydata" = mydata:MyInterface",
+            "pydicom.data.external_sources": "mydata = mydata:MyInterface",
         },
     )
 
-The interface class should have two methods:
+The interface class should have, at a minimum, the following two methods:
 
-* ``get_path(name: str, dtype: int) -> str`` - returns the absolute path to the
-  first file with a filename `name` or raises a ``ValueError`` if no
+* ``get_path(self, name: str, dtype: int) -> str`` - returns the absolute path
+  to the first file with a filename `name` or raises a ``ValueError`` if no
   matching file found.
-* ``get_paths(pattern: str, dtype: int) -> List[str]`` - returns a list of
-  absolute paths to filenames matching `pattern`.
+* ``get_paths(self, pattern: str, dtype: int) -> List[str]`` - returns a list
+  of absolute paths to filenames matching `pattern`.
 
 Where `name` is the name of the filename to search for, `dtype` is an int
 that indicates the type of data to search for and should be one of the
@@ -51,7 +52,6 @@ import os
 from os.path import abspath, dirname, join
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
-import warnings
 
 from pydicom.fileutil import path_from_pathlike
 

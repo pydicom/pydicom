@@ -9,7 +9,6 @@ import os
 import pathlib
 import urllib.request
 import urllib.error
-import socket
 import warnings
 import hashlib
 import contextlib
