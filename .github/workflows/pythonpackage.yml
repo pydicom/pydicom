@@ -61,7 +61,7 @@ jobs:
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
-            coverage-args: --cov=pydicom --cov-append --omit="pydicom/benchmarks,pydicom/tests"
+            coverage-args: --cov=pydicom --cov-append
             coverage: coverage
 
     steps:
