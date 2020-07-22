@@ -9,6 +9,7 @@ import os
 import pathlib
 import urllib.request
 import urllib.error
+import socket
 import warnings
 import hashlib
 import contextlib
@@ -51,28 +52,28 @@ def calculate_file_hash(filename):
     return hasher.hexdigest()
 
 
-def check_network(addr='8.8.8.8', retry=5, timeout=5):
+def check_network(addr=('8.8.8.8', 53), retry=5, timeout=3):
     """Return ``True`` if a connection to `addr` is available.
 
     .. versionadded: 2.1
 
     Parameters
     ----------
-    addr : str, optional
-        The IPv4 address to attempt to connect to (default: ``8.8.8.8``).
+    addr : 2-tuple, optional
+        The ('IP address', port) to attempt to connect to, default:
+        ``('8.8.8.8', 53)``.
     retry : int, optional
         The number of retry attempts (default ``5``).
     timeout : int, optional
-        The amount of time to wait for each connection attempt (default: ``5``
+        The amount of time to wait for each connection attempt (default: ``3``
         seconds).
     """
-    return False
-
-    # TODO; fix this pseudocode
     for ii in range(5):
-        response = urllib.request.url(addr, timeout=5)
-        if response.status == 200:
-            return True
+        try:
+            socket.setdefaulttimeout(timeout)
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(addr)
+        except socket.error as exc:
+            pass
 
     return False
 

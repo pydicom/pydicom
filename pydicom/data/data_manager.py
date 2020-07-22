@@ -50,7 +50,7 @@ import fnmatch
 import os
 from os.path import abspath, dirname, join
 from pkg_resources import iter_entry_points
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from pydicom.fileutil import path_from_pathlike
 
@@ -105,9 +105,8 @@ def online_test_file_dummy_paths() -> Dict[str, str]:
     return dummy_path_map
 
 
-# TODO: Union of str and PathLike
 def get_files(
-    base: str, pattern: str, dtype: int = DataTypes.DATASET
+    base: Union[str, os.PathLike], pattern: str, dtype: int = DataTypes.DATASET
 ) -> List[str]:
     """Return all files from a set of sources.
 

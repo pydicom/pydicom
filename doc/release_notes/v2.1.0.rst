@@ -29,5 +29,5 @@ Enhancements
 Fixes
 .....
 * ``Dataset.copy`` now works as expected (see :issue:`1146`)
-* Fixed :func:`~pydicom.data.get_files` raising an exception if no
+* Fixed :func:`~pydicom.data.get_testdata_file` raising an exception if no
   network connection is available
