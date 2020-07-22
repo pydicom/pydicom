@@ -149,7 +149,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
             if not j2k_precision:
                 params = get_j2k_parameters(frame)
-                j2k_precision = params.setdefault("precision", None)
+                j2k_precision = params.setdefault("precision", ds.BitsStored)
                 j2k_sign = params.setdefault("is_signed", None)
 
     else:
@@ -161,7 +161,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         pixel_bytes.extend(im.tobytes())
 
         params = get_j2k_parameters(pixel_data)
-        j2k_precision = params.setdefault("precision", None)
+        j2k_precision = params.setdefault("precision", ds.BitsStored)
         j2k_sign = params.setdefault("is_signed", None)
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
@@ -171,7 +171,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if transfer_syntax in PillowJPEG2000TransferSyntaxes:
         # Pillow converts N-bit data to 8- or 16-bit unsigned data,
         # See Pillow src/libImaging/Jpeg2KDecode.c::j2ku_gray_i
-        shift = ds.BitsAllocated - ds.BitsStored
+        shift = ds.BitsAllocated - j2k_precision
         if j2k_precision and j2k_precision != ds.BitsStored:
             warnings.warn(
                 f"The (0028,0101) 'Bits Stored' value ({ds.BitsStored}-bit) "
@@ -181,8 +181,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
         if config.APPLY_J2K_CORRECTIONS and j2k_precision:
             # Corrections based on J2K data
-            shift = ds.BitsAllocated - j2k_precision
-            if j2k_sign == 0 and j2k_sign != ds.PixelRepresentation:
+            if not j2k_sign and j2k_sign != ds.PixelRepresentation:
                 # Convert unsigned J2K data to 2's complement
                 numpy.right_shift(arr, shift, out=arr)
             else:

@@ -238,7 +238,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         gdcm_data_element = create_data_element(ds)
         gdcm_image = create_image(ds, gdcm_data_element)
     else:
-        gdcm_image_reader = create_image_reader(dicom_dataset)
+        gdcm_image_reader = create_image_reader(ds)
         if not gdcm_image_reader.Read():
             raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
