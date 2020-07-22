@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the GDCM Pixel Data handler."""
 
+from io import BytesIO
 import os
 import sys
 import tempfile
@@ -539,6 +540,16 @@ class TestsWithGDCM:
         assert results[9] == tuple(a[95, 50, :])
         assert PhotometricInterpretation == t.PhotometricInterpretation
 
+    def test_bytes_io(self):
+        """Test using a BytesIO as the dataset source."""
+        with open(jpeg2000_name, 'rb') as f:
+            bs = BytesIO(f.read())
+
+        ds = dcmread(bs)
+        arr = ds.pixel_array
+        assert (1024, 256) == arr.shape
+        assert arr.flags.writeable
+
 
 class TestSupportFunctions:
     @pytest.fixture(scope='class')
@@ -634,7 +645,8 @@ class TestSupportFunctions:
         assert planar == image.GetPlanarConfiguration()
 
     @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    def test_create_image_reader_with_string(self):
-        image_reader = gdcm_handler.create_image_reader(mr_name)
+    def test_create_image_reader(self):
+        ds = dcmread(mr_name)
+        image_reader = gdcm_handler.create_image_reader(ds)
         assert image_reader is not None
         assert image_reader.Read()
