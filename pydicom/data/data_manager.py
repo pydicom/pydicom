@@ -6,6 +6,7 @@ import os
 from os.path import abspath, dirname, join
 
 from pydicom.fileutil import path_from_pathlike
+import pydicom
 
 from . import download
 
@@ -25,7 +26,7 @@ def online_test_file_dummy_paths():
     return dummy_path_map
 
 
-def get_files(base, pattern):
+def get_files(base, pattern: str):
     """Return all files from a set of sources.
 
     Parameters
@@ -73,7 +74,7 @@ def get_files(base, pattern):
     return files
 
 
-def get_palette_files(pattern="*"):
+def get_palette_files(pattern: str="*"):
     """Return palette data files from pydicom data root.
 
     .. versionadded:: 1.4
@@ -97,7 +98,7 @@ def get_palette_files(pattern="*"):
     return files
 
 
-def get_testdata_file(name):
+def get_testdata_file(name: str):
     """Return the first test data file path with the given name found under
     the pydicom test data root.
 
@@ -125,7 +126,7 @@ def get_testdata_file(name):
             return str(download.data_path_with_download(filename))
 
 
-def get_testdata_files(pattern="*"):
+def get_testdata_files(pattern: str="*"):
     """Return test data files from pydicom data root.
 
     Parameters
@@ -148,7 +149,7 @@ def get_testdata_files(pattern="*"):
     return files
 
 
-def get_charset_files(pattern="*"):
+def get_charset_files(pattern: str="*"):
     """Return charset files from pydicom data root.
 
     Parameters
@@ -169,3 +170,42 @@ def get_charset_files(pattern="*"):
     files = [filename for filename in files if not filename.endswith('.py')]
 
     return files
+
+
+def get_data(name: str, remove_private: bool=False):
+    """Read and return the dataset for the given test data filename
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    name: str
+        The name of the test file (can optionally leave .dcm suffix off)
+
+    remove_private: bool, optional
+        If True, private tags are removed before returning the dataset
+
+    Returns
+    -------
+    dataset: FileDataset
+        A pydicom FileDataset instance created from reading the file
+
+    Raises
+    ------
+    ValueError
+        If the name (or name + ".dcm") is not found in available test data
+
+    """
+
+    path = get_testdata_file(name)
+    if not path:
+        if not name.endswith(".dcm"):
+            path = get_testdata_file(f"{name}.dcm")
+            if not path:
+                raise ValueError(f"Unable to find test filename {name}")
+    
+    ds = pydicom.dcmread(path, force=True)
+    if remove_private:
+        ds.remove_private_tags()
+    
+    return ds
