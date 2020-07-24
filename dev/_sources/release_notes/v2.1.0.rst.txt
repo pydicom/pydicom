@@ -24,3 +24,7 @@ Enhancements
 Fixes
 .....
 * ``Dataset.copy`` now works as expected (see :issue:`1146`)
+
+* Optimistically parse undefined length non-SQ data as if it's encapsulated
+  pixel data to avoid erroring out on embedded sequence delimiter
+  (:issue:`1140`)

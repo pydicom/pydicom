@@ -362,6 +362,9 @@ you can run <code class="docutils literal notranslate"><span class="pre">pydicom
 <h4>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Dataset.copy</span></code> now works as expected (see <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1146">#1146</a>)</p></li>
+<li><p>Optimistically parse undefined length non-SQ data as if it’s encapsulated
+pixel data to avoid erroring out on embedded sequence delimiter
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1140">#1140</a>)</p></li>
 </ul>
 </div>
 </div>
