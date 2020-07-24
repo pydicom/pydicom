@@ -74,7 +74,7 @@ def get_files(base, pattern: str):
     return files
 
 
-def get_palette_files(pattern: str="*"):
+def get_palette_files(pattern: str = "*"):
     """Return palette data files from pydicom data root.
 
     .. versionadded:: 1.4
@@ -126,7 +126,7 @@ def get_testdata_file(name: str):
             return str(download.data_path_with_download(filename))
 
 
-def get_testdata_files(pattern: str="*"):
+def get_testdata_files(pattern: str = "*"):
     """Return test data files from pydicom data root.
 
     Parameters
@@ -149,7 +149,7 @@ def get_testdata_files(pattern: str="*"):
     return files
 
 
-def get_charset_files(pattern: str="*"):
+def get_charset_files(pattern: str = "*"):
     """Return charset files from pydicom data root.
 
     Parameters
@@ -172,7 +172,7 @@ def get_charset_files(pattern: str="*"):
     return files
 
 
-def get_data(name: str, remove_private: bool=False):
+def get_data(name: str, remove_private: bool = False):
     """Read and return the dataset for the given test data filename
 
     .. versionadded:: 2.1
@@ -203,9 +203,9 @@ def get_data(name: str, remove_private: bool=False):
             path = get_testdata_file(f"{name}.dcm")
             if not path:
                 raise ValueError(f"Unable to find test filename {name}")
-    
+
     ds = pydicom.dcmread(path, force=True)
     if remove_private:
         ds.remove_private_tags()
-    
+
     return ds
