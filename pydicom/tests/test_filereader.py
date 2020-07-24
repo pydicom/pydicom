@@ -67,6 +67,9 @@ ct_name = get_testdata_file("CT_small.dcm")
 mr_name = get_testdata_file("MR_small.dcm")
 truncated_mr_name = get_testdata_file("MR_truncated.dcm")
 jpeg2000_name = get_testdata_file("JPEG2000.dcm")
+jpeg2000_embedded_sequence_delimeter_name = get_testdata_file(
+    "JPEG2000-embedded-sequence-delimiter.dcm"
+)
 jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
 jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
@@ -120,7 +123,7 @@ class TestReader:
 
     def test_pathlib_path_filename(self):
         """Check that file can be read using pathlib.Path"""
-        ds = dcmread(Path(priv_SQ_name))
+        dcmread(Path(priv_SQ_name))
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test
@@ -486,6 +489,19 @@ class TestReader:
 
         ds = dcmread(fp, force=True)
         assert "OB" == ds[0x7FE00010].VR
+
+    def test_read_encoded_pixel_data_without_embedded_sequence_delimiter(self):
+        ds = dcmread(jpeg2000_name)
+        assert "OB" == ds[0x7FE00010].VR
+        assert 266 == len(ds[0x7FE00010].value)
+
+    def test_read_encoded_pixel_data_with_embedded_sequence_delimiter(self):
+        """Test ignoring embedded sequence delimiter in encoded pixel
+        data fragment. Reproduces #1140.
+        """
+        ds = dcmread(jpeg2000_embedded_sequence_delimeter_name)
+        assert "OB" == ds[0x7FE00010].VR
+        assert 266 == len(ds[0x7FE00010].value)
 
     def test_long_specific_char_set(self):
         """Test that specific character set is read even if it is longer
@@ -1237,7 +1253,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+            rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_IS_numpy_class(self):
@@ -1265,7 +1281,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+            rtss.ROIContourSequence[0].ContourSequence[0].ContourData
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_DS_numpy_class(self):
