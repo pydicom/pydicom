@@ -74,8 +74,8 @@ class DataTypes(IntEnum):
     JPEG = 4
 
 
-def _check_pydicom_data_hash(fpath):
-    """Return ``True`` if the SHA256 checksum of ``fpath`` is OK.
+def _check_data_hash(fpath: str) -> bool:
+    """Return ``True`` if the SHA256 checksum of the file at ``fpath`` is OK.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ def _check_pydicom_data_hash(fpath):
 
     Raises
     ------
-    NoHashFound
+    pydicom.download.NoHashFound
         If the file is missing from ``hashes.json``.
     """
     p = Path(fpath)
@@ -281,7 +281,7 @@ def get_testdata_file(name: str) -> str:
 
         # For pydicom-data, check the hash against hashes.json
         if lib == "pydicom-data":
-            if fpath and _check_pydicom_data_hash(fpath):
+            if fpath and _check_data_hash(fpath):
                 return fpath
         else:
             return fpath

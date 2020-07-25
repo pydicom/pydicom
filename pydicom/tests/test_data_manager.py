@@ -108,6 +108,7 @@ class TestExternalDataSource:
     """Tests for the external data sources."""
     def setup(self):
         self.dpath = EXTERNAL_DATA_SOURCES["pydicom-data"].data_path
+        print(self.dpath)
 
         # Backup the 693_UNCI.dcm file
         p = self.dpath / "693_UNCI.dcm"
@@ -117,6 +118,7 @@ class TestExternalDataSource:
         # Restore the backed-up file
         p = self.dpath / "693_UNCI.dcm"
         shutil.copy(self.dpath / "PYTEST_BACKUP", p)
+        os.remove(self.dpath / "PYTEST_BACKUP")
 
     def test_get_testdata_file_local(self):
         """Test that local data path retrieved OK."""
