@@ -113,6 +113,14 @@ class TestExternalDataSource:
         fname = "693_UNCI.dcm"
         assert "pydicom-data/data" in get_testdata_file(fname)
 
+    def test_get_testdata_file_external_hash_mismatch(self):
+        """Test that the external source is not used when hash is not OK."""
+        pass
+
+    def test_get_testdata_file_external_hash_match(self):
+        """Test that external source is used when hash is OK."""
+        pass
+
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
         fname = "CT_small*"

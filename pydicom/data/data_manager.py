@@ -54,9 +54,10 @@ from pathlib import Path
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
 
+from pydicom.data.download import (
+    data_path_with_download, data_file_hash_check, get_url_map
+)
 from pydicom.fileutil import path_from_pathlike
-
-from . import download
 
 
 DATA_ROOT = abspath(dirname(__file__))
@@ -69,6 +70,12 @@ class DataTypes(IntEnum):
     PALETTE = 2
     DICOMDIR = 3
     JPEG = 4
+
+
+def check_external_hash(fpath):
+    """
+    """
+    pass
 
 
 def get_external_sources() -> Dict:
@@ -95,7 +102,7 @@ EXTERNAL_DATA_SOURCES = get_external_sources()
 
 
 def online_test_file_dummy_paths() -> Dict[str, str]:
-    filenames = list(download.get_url_map().keys())
+    filenames = list(get_url_map().keys())
 
     test_files_root = join(DATA_ROOT, 'test_files')
 
@@ -160,7 +167,7 @@ def get_files(
         dummy_online_file_path_map.keys(), join(base, pattern)
     )
     download_names = [
-        str(dummy_online_file_path_map[dummy_path])
+        os.fspath(dummy_online_file_path_map[dummy_path])
         for dummy_path in dummy_online_file_path_filtered
     ]
 
@@ -168,7 +175,7 @@ def get_files(
     for filename in download_names:
         try:
             real_online_file_paths.append(
-                str(download.data_path_with_download(filename))
+                os.fspath(data_path_with_download(filename))
             )
         except Exception as exc:
             pass
@@ -237,17 +244,24 @@ def get_testdata_file(name: str) -> str:
                 return os.path.join(root, filename)
 
     # Check external data sources
-    for source in EXTERNAL_DATA_SOURCES.values():
+    for lib, source in EXTERNAL_DATA_SOURCES.items():
         try:
-            return source.get_path(name, dtype=DataTypes.DATASET)
+            fpath = source.get_path(name, dtype=DataTypes.DATASET)
         except ValueError:
-            pass
+            fpath = None
+
+        # For pydicom-data, check the hash against hashes.json
+        if lib == "pydicom-data":
+            if fpath and data_file_hash_check(fpath):
+                return fpath
+        else:
+            return fpath
 
     # Try online
-    for filename in download.get_url_map().keys():
+    for filename in get_url_map().keys():
         if filename == name:
             try:
-                return str(download.data_path_with_download(filename))
+                return os.fspath(data_path_with_download(filename))
             except Exception as exc:
                 pass
 
