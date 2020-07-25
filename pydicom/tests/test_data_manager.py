@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for pydicom.data_manager"""
 
 import os
@@ -15,6 +15,11 @@ from pydicom.data.data_manager import (
 from pydicom.data.download import get_data_dir
 
 
+EXT_PYDICOM = False
+if 'pydicom-data' in EXTERNAL_DATA_SOURCES:
+    EXT_PYDICOM = True
+
+
 class TestGetData:
     def test_get_dataset(self):
         """Test the different functions to get lists of data files."""
@@ -24,7 +29,9 @@ class TestGetData:
         # If pydicom-data is available locally
         ext_path = None
         if 'pydicom-data' in EXTERNAL_DATA_SOURCES:
-            ext_path = EXTERNAL_DATA_SOURCES['pydicom-data'].data_path
+            ext_path = os.fspath(
+                EXTERNAL_DATA_SOURCES['pydicom-data'].data_path
+            )
 
         # Test base locations
         charbase = os.path.join(DATA_ROOT, 'charset_files')
@@ -67,11 +74,11 @@ class TestGetData:
 
     def test_get_dataset_pattern(self):
         """Test that pattern is working properly."""
-        pattern = 'CT_small'
+        pattern = 'CT_small*'
         filename = get_testdata_files(pattern)
         assert filename[0].endswith('CT_small.dcm')
 
-        pattern = 'chrX1'
+        pattern = 'chrX1*'
         filename = get_charset_files(pattern)
         assert filename[0].endswith('chrX1.dcm')
 
@@ -91,3 +98,36 @@ class TestGetData:
 
         for x in palettes:
             assert palbase in x
+
+
+@pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
+class TestExternalDataSource:
+    """Tests for the external data sources."""
+    def test_get_testdata_file_local(self):
+        """Test that local data path retrieved OK."""
+        fname = "CT_small.dcm"
+        assert "pydicom/data/test_files" in get_testdata_file(fname)
+
+    def test_get_testdata_file_external(self):
+        """Test that external data source preferred over cache."""
+        fname = "693_UNCI.dcm"
+        assert "pydicom-data/data" in get_testdata_file(fname)
+
+    def test_get_testdata_files_local(self):
+        """Test that local data paths retrieved OK."""
+        fname = "CT_small*"
+        paths = get_testdata_files(fname)
+        assert 1 == len(paths)
+        assert "pydicom/data/test_files" in paths[0]
+
+    def test_get_testdata_files_local_external_and_cache(self):
+        """Test that local, external and cache paths retrieved OK."""
+        fname = "693*"
+        paths = get_testdata_files(fname)
+        assert 7 == len(paths)
+        # Local preferred first
+        assert "pydicom/data/test_files" in paths[0]
+        # External source preferred second
+        assert "pydicom-data/data" in paths[1]
+        # Cache source preferred last
+        assert ".pydicom/data" in paths[4]

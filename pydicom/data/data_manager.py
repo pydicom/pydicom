@@ -50,6 +50,7 @@ from enum import IntEnum
 import fnmatch
 import os
 from os.path import abspath, dirname, join
+from pathlib import Path
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
 
@@ -107,15 +108,17 @@ def online_test_file_dummy_paths() -> Dict[str, str]:
 
 
 def get_files(
-    base: Union[str, os.PathLike], pattern: str, dtype: int = DataTypes.DATASET
+    base: Union[str, os.PathLike],
+    pattern: str = "**/*",
+    dtype: int = DataTypes.DATASET
 ) -> List[str]:
-    """Return all files from a set of sources.
+    """Return all matching file paths from the available data sources.
 
     First searches the local *pydicom* data store, then any locally available
     external sources, and finally the files available in the
     pydicom/pydicom-data repository.
 
-    .. versionchange: 2.1
+    .. versionchanged: 2.1
 
         Added the `dtype` keyword parameter, modified to search locally
         available external data sources and the pydicom/pydicom-data repository
@@ -124,9 +127,8 @@ def get_files(
     ----------
     base : str or PathLike
         Base directory to recursively search.
-    pattern : str
-        A string pattern to filter the files. Default is "*" and it will return
-        all files.
+    pattern : str, optional
+        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
     dtype : int, optional
         The type of data to search for when using an external source, one of:
 
@@ -141,17 +143,10 @@ def get_files(
     files : list of str
         The list of filenames matched.
     """
-    base = path_from_pathlike(base)
-    # if the user forgot to add them
-    pattern = "*" + pattern + "*"
+    base = Path(path_from_pathlike(base))
 
     # Search locally
-    files = []
-    for root, _, filenames in os.walk(base):
-        for filename in filenames:
-            filename_filter = fnmatch.filter([join(root, filename)], pattern)
-            if filename_filter:
-                files.append(filename_filter[0])
+    files = [os.fspath(m) for m in base.glob(pattern)]
 
     # Search external sources
     for source in EXTERNAL_DATA_SOURCES.values():
@@ -183,7 +178,7 @@ def get_files(
     return files
 
 
-def get_palette_files(pattern: str = "*") -> List[str]:
+def get_palette_files(pattern: str = "**/*") -> List[str]:
     """Return a list of absolute paths to palettes with filenames matching
     `pattern`.
 
@@ -191,8 +186,8 @@ def get_palette_files(pattern: str = "*") -> List[str]:
 
     Parameters
     ----------
-    pattern : str, optional (default="*")
-        A string pattern to filter the files
+    pattern : str, optional (default="**/*")
+        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
 
     Returns
     -------
@@ -257,17 +252,17 @@ def get_testdata_file(name: str) -> str:
                 pass
 
 
-get_dataset = get_testdata_file
+example_dataset_path = get_testdata_file
 
 
-def get_testdata_files(pattern: str = "*") -> List[str]:
+def get_testdata_files(pattern: str = "**/*") -> List[str]:
     """Return a list of absolute paths to datasets with filenames matching
     `pattern`.
 
     Parameters
     ----------
     pattern : str, optional (default="*")
-        A string pattern to filter the files
+        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
 
     Returns
     -------
@@ -275,7 +270,6 @@ def get_testdata_files(pattern: str = "*") -> List[str]:
         The list of filenames matched.
 
     """
-
     data_path = join(DATA_ROOT, 'test_files')
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.DATASET)
@@ -291,7 +285,7 @@ def get_charset_files(pattern: str = "*") -> List[str]:
     Parameters
     ----------
     pattern : str, optional (default="*")
-        A string pattern to filter the files
+        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
 
     Returns
     ----------
@@ -299,7 +293,6 @@ def get_charset_files(pattern: str = "*") -> List[str]:
         The list of filenames matched.
 
     """
-
     data_path = join(DATA_ROOT, 'charset_files')
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.CHARSET)
