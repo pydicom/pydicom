@@ -13,8 +13,6 @@ DeflatedExplicitVRLittleEndian = b'1.2.840.10008.1.2.1.99'
 ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
 
 ItemTag = 0xFFFEE000  # start of Sequence Item
-ItemDelimiterTag = 0xFFFEE00D  # end of Sequence Item
-SequenceDelimiterTag = 0xFFFEE0DD  # end of Sequence of undefined length
 
 
 class dicomfile:
@@ -181,16 +179,6 @@ def data_element_generator(fp,
 
             if VR == b'SQ':
                 yield ((group, elem), VR, length, None, value_tell)
-                # seq = read_sequence(fp, is_implicit_VR,
-                #                     is_little_endian, length, encoding)
-                # yield DataElement(tag, VR, seq, value_tell,
-                #                   is_undefined_length=True)
             else:
                 raise NotImplementedError("This reader does not handle "
                                           "undefined length except for SQ")
-                from pydicom.fileio.fileutil import read_undefined_length_value
-
-                delimiter = SequenceDelimiterTag
-                value = read_undefined_length_value(fp, is_little_endian,
-                                                    delimiter, defer_size)
-                yield ((group, elem), VR, length, value, value_tell)

@@ -10,6 +10,7 @@ pydicom User Guide
    writing_files.rst
    working_with_pixel_data.rst
    working_with_overlays.rst
+   working_with_waveforms.rst
    image_data_handlers.rst
    viewing_images.rst
    private_data_elements.rst
