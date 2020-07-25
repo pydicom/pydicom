@@ -145,6 +145,11 @@ jobs:
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
+    - name: Test external sources using pydicom-data
+      run: |
+        python -m pip install git+https://github.com/pydicom/pydicom-data
+        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
+
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
       run: >
