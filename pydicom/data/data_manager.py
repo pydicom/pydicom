@@ -53,6 +53,7 @@ from os.path import abspath, dirname, join
 from pathlib import Path
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
+import warnings
 
 from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
@@ -193,15 +194,22 @@ def get_files(
     ]
 
     real_online_file_paths = []
+    download_error = False
     for filename in download_names:
         try:
             real_online_file_paths.append(
                 os.fspath(data_path_with_download(filename))
             )
         except Exception as exc:
-            pass
+            download_error = True
 
     files += real_online_file_paths
+
+    if download_error:
+        warnings.warn(
+            "One or more download failures occurred, the list of returned "
+            "file paths may be incomplete"
+        )
 
     return files
 
