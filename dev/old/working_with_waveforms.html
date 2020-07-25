@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Working with Waveform Data &mdash; pydicom 2.1.0.dev0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Handling of compressed image data" href="image_data_handlers.html" />
+    <link rel="prev" title="Working with Overlay Data" href="working_with_overlays.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Waveform Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-waveform-generator"><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
+        
+      <li>Working with Waveform Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="working-with-waveform-data">
+<span id="id1"></span><h1>Working with Waveform Data<a class="headerlink" href="#working-with-waveform-data" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to work with waveform data in pydicom.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Some DICOM SOP classes such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.2.html">Basic Voice Audio Waveform</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>
+contain a (5400,0100) <em>Waveform Sequence</em> element,
+where each item in the sequence is a related group of waveforms (a multiplex).
+The requirements of the sequence is given by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform
+module</a> in Part 3, Annex C.10.9 of the DICOM
+Standard.</p>
+<p>Each multiplex consists of one or more channels synchronised at a
+common sampling frequency (in Hz), which is given by the (003A,001A) <em>Sampling
+Frequency</em>. The waveform data for each multiplex is encoded in the
+corresponding (5400,1010) <em>Waveform Data</em> element.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;waveform_ecg.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span>
+<span class="go">&lt;Sequence, length 2&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">NumberOfWaveformChannels</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">SamplingFrequency</span>
+<span class="go">&quot;1000.0&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="p">[</span><span class="s1">&#39;WaveformData&#39;</span><span class="p">]</span>
+<span class="go">(5400, 1010) Waveform Data                       OW: Array of 240000 elements</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataset-waveform-generator">
+<h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code><a class="headerlink" href="#dataset-waveform-generator" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_generator" title="pydicom.dataset.Dataset.waveform_generator"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code></a> requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
+</div>
+<p>The <em>Waveform Data</em> element contains the raw bytes exactly as found in the
+file. To get the waveforms in a more useful form you can use the
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_generator" title="pydicom.dataset.Dataset.waveform_generator"><code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform_generator</span></code></a> property to return a
+<a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator-iterator">generator object</a> that yields
+a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with shape (samples, channels) for each multiplex
+group in the <em>Waveform Sequence</em>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_generator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span>
+<span class="go">array([[  80,   90,   10, ...,  -20,  -55,  -40],</span>
+<span class="go">       [  65,   85,   20, ...,  -20,  -60,  -40],</span>
+<span class="go">       [  50,   80,   30, ...,  -20,  -65,  -40],</span>
+<span class="go">       ...,</span>
+<span class="go">       [  20,  105,   85, ..., -110, -120,  -80],</span>
+<span class="go">       [  17,  110,   93, ..., -110, -120,  -85],</span>
+<span class="go">       [  20,  110,   90, ..., -110, -120,  -90]], dtype=float)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10000, 12)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1200, 12)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">StopIteration</span>
+</pre></div>
+</div>
+<p>If the <em>Channel Sensitivity Correction Factor</em> is available for a given channel
+then it will be applied to the raw channel data. If you need the raw data
+without any corrections then you can use the
+<a class="reference internal" href="../reference/generated/pydicom.waveform_data_handlers.numpy_handler.html#pydicom.waveform_data_handlers.numpy_handler.generate_multiplex" title="pydicom.waveform_data_handlers.numpy_handler.generate_multiplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code></a>
+function with the <em>as_raw</em> keyword parameter instead:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveform_generator.numpy_handler</span> <span class="kn">import</span> <span class="n">generate_multiplex</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">generate_multiplex</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="image_data_handlers.html" class="btn btn-neutral float-right" title="Handling of compressed image data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="working_with_overlays.html" class="btn btn-neutral float-left" title="Working with Overlay Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

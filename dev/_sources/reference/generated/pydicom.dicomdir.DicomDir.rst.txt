@@ -67,5 +67,6 @@ pydicom.dicomdir.DicomDir
       ~DicomDir.indent_chars
       ~DicomDir.is_original_encoding
       ~DicomDir.pixel_array
+      ~DicomDir.waveform_generator
    
    

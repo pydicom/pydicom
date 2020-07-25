@@ -1,0 +1,31 @@
+pydicom.waveform\_data\_handlers.numpy\_handler
+===============================================
+
+.. automodule:: pydicom.waveform_data_handlers.numpy_handler
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate_multiplex
+      is_available
+      supports_transfer_syntax
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

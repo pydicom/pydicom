@@ -66,5 +66,6 @@ pydicom.dataset.FileDataset
       ~FileDataset.indent_chars
       ~FileDataset.is_original_encoding
       ~FileDataset.pixel_array
+      ~FileDataset.waveform_generator
    
    

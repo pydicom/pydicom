@@ -348,14 +348,18 @@ will download on-the-fly whenever either the tests are run, or should
 the file(s) be requested via the data manager functions.
 For example:</p>
 <ul>
-<li><p>to download all files and get their paths on disk you can run
-<code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_files()</span></code>.</p></li>
-<li><p>To download the 7.2 MB file <code class="docutils literal notranslate"><span class="pre">RG1_UNCI.dcm</span></code> and get its path on disk
-you can run <code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
+<li><p>To download all files and get their paths on disk you can run
+<a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_files()</span></code></a>.</p></li>
+<li><p>To download an individual file and get its path on disk you can use
+<a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file()</span></code></a>, e.g. for <code class="docutils literal notranslate"><span class="pre">RG1_UNCI.dcm</span></code> use
+<code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
 </ul>
 </li>
 <li><p>Added a new pixel data handler based on pylibjpeg which supports all
 (non-retired) JPEG transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1127">#1127</a>)</p></li>
+<li><p>Added handler for <em>Waveform Data</em> and <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_generator" title="pydicom.dataset.Dataset.waveform_generator"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code></a> which returns a generator
+object that yields an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for each multiplex group in
+a <em>Waveform Sequence</em>.</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">

@@ -113,6 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed image data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
@@ -264,7 +265,7 @@ the example program <a class="reference external" href="https://github.com/pydic
 </pre></div>
 </div>
 <p>When using the tag number directly a <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>
-instance is returned, so <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
+instance is returned, so <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.value</span></code></a>
 must be used to get the value.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -425,8 +426,8 @@ things:</p>
 value</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">VM</span></code></a> – the element’s Value Multiplicity as
 an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>. This is automatically determined from the contents of
-the <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a>.</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#id0" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a> – the element’s actual value.
+the <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.value" title="pydicom.dataelem.DataElement.value"><code class="xref py py-attr docutils literal notranslate"><span class="pre">value</span></code></a> – the element’s actual value.
 A regular value like a number or string (or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of them if the
 VM &gt; 1), or a <a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>.</p></li>
 </ul>
@@ -459,10 +460,10 @@ enforces that the DICOM tag fits in the expected 4-byte (group,element)</p></li>
 </pre></div>
 </div>
 </li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#id1" title="pydicom.tag.BaseTag.group"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.group</span></code></a> and
+<li><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.group" title="pydicom.tag.BaseTag.group"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.group</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.elem" title="pydicom.tag.BaseTag.elem"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.elem</span></code></a> to return the group and element
 portions of the tag.</p></li>
-<li><p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#id2" title="pydicom.tag.BaseTag.is_private"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.is_private</span></code></a> property checks
+<li><p>The <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.is_private" title="pydicom.tag.BaseTag.is_private"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseTag.is_private</span></code></a> property checks
 whether the tag represents a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
