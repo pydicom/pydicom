@@ -69,7 +69,7 @@ def get_config_dir() -> str:
     """Return the path to the pydicom config directory, creating it if required
 
     The config directory will be named ``.pydicom`` and will be created in the
-    local user's home directry.
+    local user's home directory.
     """
     config_dir = pathlib.Path.home().joinpath(".pydicom")
     config_dir.mkdir(exist_ok=True)

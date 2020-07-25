@@ -55,7 +55,8 @@ from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
 
 from pydicom.data.download import (
-    data_path_with_download, data_file_hash_check, get_url_map
+    data_path_with_download, calculate_file_hash, get_cached_filehash,
+    get_url_map
 )
 from pydicom.fileutil import path_from_pathlike
 
@@ -72,10 +73,30 @@ class DataTypes(IntEnum):
     JPEG = 4
 
 
-def check_external_hash(fpath):
+def _check_pydicom_data_hash(fpath):
+    """Return ``True`` if the SHA256 checksum of ``fpath`` is OK.
+
+    Parameters
+    ----------
+    fpath : str
+        The absolute path to the file to perform the checksum for.
+
+    Returns
+    -------
+    bool
+        ``True`` if the checksum matches those in ``hashes.json``, ``False``
+        otherwise.
+
+    Raises
+    ------
+    NoHashFound
+        If the file is missing from ``hashes.json``.
     """
-    """
-    pass
+    p = Path(fpath)
+    ext_hash = calculate_file_hash(p)
+    ref_hash = get_cached_filehash(p.name)
+
+    return ext_hash == ref_hash
 
 
 def get_external_sources() -> Dict:
@@ -252,7 +273,7 @@ def get_testdata_file(name: str) -> str:
 
         # For pydicom-data, check the hash against hashes.json
         if lib == "pydicom-data":
-            if fpath and data_file_hash_check(fpath):
+            if fpath and _check_pydicom_data_hash(fpath):
                 return fpath
         else:
             return fpath

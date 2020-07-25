@@ -3,6 +3,7 @@
 
 import os
 from os.path import basename
+import shutil
 
 import pytest
 
@@ -12,7 +13,9 @@ from pydicom.data import (
 from pydicom.data.data_manager import (
     DATA_ROOT, get_testdata_file, EXTERNAL_DATA_SOURCES
 )
-from pydicom.data.download import get_data_dir
+from pydicom.data.download import (
+    get_data_dir, calculate_file_hash, get_cached_filehash
+)
 
 
 EXT_PYDICOM = False
@@ -103,6 +106,18 @@ class TestGetData:
 @pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
 class TestExternalDataSource:
     """Tests for the external data sources."""
+    def setup(self):
+        self.dpath = EXTERNAL_DATA_SOURCES["pydicom-data"].data_path
+
+        # Backup the 693_UNCI.dcm file
+        p = self.dpath / "693_UNCI.dcm"
+        shutil.copy(p, self.dpath / "PYTEST_BACKUP")
+
+    def teardown(self):
+        # Restore the backed-up file
+        p = self.dpath / "693_UNCI.dcm"
+        shutil.copy(self.dpath / "PYTEST_BACKUP", p)
+
     def test_get_testdata_file_local(self):
         """Test that local data path retrieved OK."""
         fname = "CT_small.dcm"
@@ -115,11 +130,23 @@ class TestExternalDataSource:
 
     def test_get_testdata_file_external_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
-        pass
+        p = self.dpath / "693_UNCI.dcm"
+        with open(p, 'wb') as f:
+            f.write(b"\x00\x01")
+
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash != ref_hash
+        assert ".pydicom/data" in get_testdata_file(p.name)
 
     def test_get_testdata_file_external_hash_match(self):
         """Test that external source is used when hash is OK."""
-        pass
+        fname = "693_UNCI.dcm"
+        p = self.dpath / fname
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash == ref_hash
+        assert "pydicom-data/data" in get_testdata_file(fname)
 
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
