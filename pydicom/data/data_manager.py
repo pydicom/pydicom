@@ -39,8 +39,7 @@ following:
 * ``3`` - DICOMDIR file
 * ``4`` - JPEG file
 
-And lastly, `pattern` is a str used with :func:`fnmatch.filter` to filter
-against when searching.
+And lastly, `pattern` is a str used to filter files against when searching.
 
 For a real-life example of an external data source you can look at the
 `pydicom-data <https://github.com/pydicom/pydicom-data>`_ repository.
@@ -207,7 +206,7 @@ def get_files(
 
     if download_error:
         warnings.warn(
-            "One or more download failures occurred, the list of returned "
+            "One or more download failures occurred, the list of matching "
             "file paths may be incomplete"
         )
 
@@ -283,7 +282,7 @@ def get_testdata_file(name: str) -> str:
         if lib == "pydicom-data":
             if fpath and _check_data_hash(fpath):
                 return fpath
-        else:
+        elif fpath:
             return fpath
 
     # Try online
@@ -293,9 +292,6 @@ def get_testdata_file(name: str) -> str:
                 return os.fspath(data_path_with_download(filename))
             except Exception as exc:
                 pass
-
-
-example_dataset_path = get_testdata_file
 
 
 def get_testdata_files(pattern: str = "**/*") -> List[str]:

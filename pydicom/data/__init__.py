@@ -3,7 +3,7 @@
 
 from .data_manager import (
     get_charset_files, get_testdata_file, get_testdata_files,
-    get_palette_files, DATA_ROOT
+    get_palette_files, DATA_ROOT, EXTERNAL_DATA_SOURCES
 )
 
 __all__ = [
