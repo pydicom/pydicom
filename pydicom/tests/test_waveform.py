@@ -142,6 +142,7 @@ class TestHandlerGenerateMultiplex:
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
+
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerMultiplexArray:
     """Tests for the waveform numpy_handler.multiplex_array."""
