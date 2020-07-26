@@ -187,7 +187,7 @@ def multiplex_array(ds: "Dataset", index: int = 0, as_raw: bool = True) -> "np.n
     index : int, optional
         The index of the multiplex group to return, default ``0``.
     as_raw : bool, optional
-        If ``True`` (default), then yield the raw unitless waveform data. If
+        If ``True`` (default), then return the raw unitless waveform data. If
         ``False`` then attempt to convert the raw data for each channel to the
         quantity specified by the corresponding (003A,0210) *Channel
         Sensitivity* unit.
@@ -221,7 +221,7 @@ def multiplex_array(ds: "Dataset", index: int = 0, as_raw: bool = True) -> "np.n
     if missing:
         raise AttributeError(
             f"Unable to convert the waveform multiplex group with index "
-            f"{ii} as the following required elements are missing from "
+            f"{index} as the following required elements are missing from "
             f"the sequence item: {', '.join(missing)}"
         )
 

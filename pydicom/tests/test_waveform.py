@@ -20,7 +20,9 @@ except ImportError:
 
 try:
     from pydicom.waveform_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.waveform_data_handlers.numpy_handler import generate_multiplex
+    from pydicom.waveform_data_handlers.numpy_handler import (
+        generate_multiplex, multiplex_array
+    )
 except ImportError:
     NP_HANDLER = None
 
@@ -59,8 +61,8 @@ class TestDataset:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestHandler:
-    """Tests for the waveform numpy_handler."""
+class TestHandlerGenerateMultiplex:
+    """Tests for the waveform numpy_handler.generate_multiplex."""
     def test_unsupported_syntax_raises(self):
         """Test that an unsupported syntax raises exception."""
         ds = dcmread(ECG)
@@ -134,6 +136,89 @@ class TestHandler:
         ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
         gen = generate_multiplex(ds, as_raw=False)
         arr = next(gen)
+        assert [40, 32.5, 25, 17.5, 18.5] == arr[0:5, 0].tolist()
+        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
+        assert arr.dtype == 'float'
+        assert arr.flags.writeable
+        assert (10000, 12) == arr.shape
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestHandlerMultiplexArray:
+    """Tests for the waveform numpy_handler.multiplex_array."""
+    def test_unsupported_syntax_raises(self):
+        """Test that an unsupported syntax raises exception."""
+        ds = dcmread(ECG)
+        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
+        msg = (
+            r"Unable to convert the waveform data as the transfer syntax "
+            r"is not supported by the waveform data handler"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            multiplex_array(ds)
+
+    def test_no_waveform_sequence(self):
+        """Test that missing waveform sequence raises exception."""
+        ds = dcmread(ECG)
+        del ds.WaveformSequence
+        msg = (
+            r"No \(5400,0100\) Waveform Sequence element found in the dataset"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            multiplex_array(ds)
+
+    def test_missing_required(self):
+        """Test that missing required element in sequence raises exception."""
+        ds = dcmread(ECG)
+        item = ds.WaveformSequence[0]
+        del item.NumberOfWaveformSamples
+        msg = (
+            f"Unable to convert the waveform multiplex group with index "
+            f"0 as the following required elements are missing from "
+            f"the sequence item: NumberOfWaveformSamples"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            multiplex_array(ds)
+
+    def test_as_raw(self):
+        """Test that as_raw=True works as expected."""
+        ds = dcmread(ECG)
+        item = ds.WaveformSequence[0]
+        ch_seq = item.ChannelDefinitionSequence
+        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
+        arr = multiplex_array(ds, index=0, as_raw=True)
+        assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
+        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
+        assert arr.dtype == 'int16'
+        assert arr.flags.writeable
+        assert (10000, 12) == arr.shape
+
+        arr = multiplex_array(ds, index=1, as_raw=True)
+        assert [10, 10, 30, 35, 25] == arr[0:5, 0].tolist()
+        assert [80, 80, 80, 85, 80] == arr[0:5, 1].tolist()
+        assert arr.dtype == 'int16'
+        assert arr.flags.writeable
+        assert (1200, 12) == arr.shape
+
+    def test_not_as_raw_no_channel_cf(self):
+        """Test that as_raw=False works as expected with no sensitivity CF."""
+        ds = dcmread(ECG)
+        item = ds.WaveformSequence[0]
+        for item in item.ChannelDefinitionSequence:
+            del item.ChannelSensitivityCorrectionFactor
+        arr = multiplex_array(ds, index=0, as_raw=False)
+        assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
+        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
+        assert arr.dtype == 'float'
+        assert arr.flags.writeable
+        assert (10000, 12) == arr.shape
+
+    def test_not_as_raw(self):
+        """Test that as_raw=False works as expected."""
+        ds = dcmread(ECG)
+        item = ds.WaveformSequence[0]
+        ch_seq = item.ChannelDefinitionSequence
+        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
+        arr = multiplex_array(ds, index=0, as_raw=False)
         assert [40, 32.5, 25, 17.5, 18.5] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
         assert arr.dtype == 'float'
