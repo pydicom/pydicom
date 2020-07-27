@@ -2,25 +2,20 @@
 """Tests for misc.py"""
 
 import os
-import platform
 
 import pytest
 
 from pydicom.data import get_testdata_files
 from pydicom.misc import is_dicom, size_in_bytes
 
-test_file = get_testdata_files('CT_small.dcm')[0]
-no_meta_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
+
+test_file = get_testdata_file('CT_small.dcm')
+no_meta_file = get_testdata_file('ExplVR_LitEndNoMeta.dcm')
 
 
 class TestMisc:
     def test_is_dicom(self):
         """Test the is_dicom function."""
-        # On windows test file paths are all lowercase
-        if platform.system() == "Windows":
-            invalid_file = test_file.replace('ct_', 'ct')  # invalid file
-        else:
-            invalid_file = test_file.replace('CT_', 'CT')  # invalid file
         notdicom_file = os.path.abspath(__file__)  # use own file
 
         # valid file returns True
@@ -31,7 +26,7 @@ class TestMisc:
 
         # test invalid path
         with pytest.raises(IOError):
-            is_dicom(invalid_file)
+            is_dicom('xxxx.dcm')
 
         # Test no meta prefix/preamble fails
         assert not is_dicom(no_meta_file)

@@ -3,6 +3,7 @@
 
 from io import BytesIO
 import platform
+import sys
 
 import pytest
 
@@ -11,7 +12,7 @@ from pydicom.filebase import DicomIO, DicomFileLike, DicomFile, DicomBytesIO
 from pydicom.tag import Tag
 
 
-TEST_FILE = get_testdata_files('CT_small.dcm')[0]
+TEST_FILE = get_testdata_file('CT_small.dcm')
 
 
 class TestDicomIO:
@@ -260,8 +261,8 @@ class TestDicomFile:
     def test_read(self):
         """Test the function"""
         filename = "CT_small.dcm"
-        if platform.system() == "Windows":
-            # On windows test file paths are all lowercase
+        if platform.system() == "Windows" and sys.version_info[0:2] == (3, 6):
+            # Not sure why 3.6 is different
             filename = "ct_small.dcm"
         with DicomFile(TEST_FILE, 'rb') as fp:
             assert not fp.parent.closed

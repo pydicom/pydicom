@@ -123,12 +123,12 @@ class TestExternalDataSource:
     def test_get_testdata_file_local(self):
         """Test that local data path retrieved OK."""
         fname = "CT_small.dcm"
-        assert "pydicom/data/test_files" in get_testdata_file(fname)
+        assert os.fspath("pydicom/data/test_files") in get_testdata_file(fname)
 
     def test_get_testdata_file_external(self):
         """Test that external data source preferred over cache."""
         fname = "693_UNCI.dcm"
-        assert "data_store/data" in get_testdata_file(fname)
+        assert os.fspath("data_store/data") in get_testdata_file(fname)
 
     def test_get_testdata_file_external_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
@@ -139,7 +139,7 @@ class TestExternalDataSource:
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash != ref_hash
-        assert ".pydicom/data" in get_testdata_file(p.name)
+        assert os.fspath(".pydicom/data") in get_testdata_file(p.name)
 
     def test_get_testdata_file_external_hash_match(self):
         """Test that external source is used when hash is OK."""
@@ -148,14 +148,14 @@ class TestExternalDataSource:
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash == ref_hash
-        assert "data_store/data" in get_testdata_file(fname)
+        assert os.fspath("data_store/data") in get_testdata_file(fname)
 
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
         fname = "CT_small*"
         paths = get_testdata_files(fname)
         assert 1 == len(paths)
-        assert "pydicom/data/test_files" in paths[0]
+        assert os.fspath("pydicom/data/test_files") in paths[0]
 
     def test_get_testdata_files_local_external_and_cache(self):
         """Test that local, external and cache paths retrieved OK."""
@@ -163,8 +163,8 @@ class TestExternalDataSource:
         paths = get_testdata_files(fname)
         assert 7 == len(paths)
         # Local preferred first
-        assert "pydicom/data/test_files" in paths[0]
+        assert os.fspath("pydicom/data/test_files") in paths[0]
         # External source preferred second
-        assert "data_store/data" in paths[1]
+        assert os.fspath("data_store/data") in paths[1]
         # Cache source preferred last
-        assert ".pydicom/data" in paths[4]
+        assert os.fspath(".pydicom/data") in paths[4]
