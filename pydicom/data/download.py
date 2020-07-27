@@ -128,7 +128,7 @@ def get_url(filename: str) -> str:
 
     Raises
     ------
-    KeyError
+    ValueError
         If `filename` is not in the ``urls.json`` record.
     """
     try:

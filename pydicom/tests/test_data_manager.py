@@ -3,6 +3,7 @@
 
 import os
 from os.path import basename
+from pathlib import Path
 import shutil
 
 import pytest
@@ -120,15 +121,20 @@ class TestExternalDataSource:
         shutil.copy(self.dpath / "PYTEST_BACKUP", p)
         os.remove(self.dpath / "PYTEST_BACKUP")
 
+    def as_posix(self, path):
+        return Path(path).as_posix()
+
     def test_get_testdata_file_local(self):
         """Test that local data path retrieved OK."""
         fname = "CT_small.dcm"
-        assert os.fspath("pydicom/data/test_files") in get_testdata_file(fname)
+        fpath = self.as_posix(get_testdata_file(fname))
+        assert "pydicom/data/test_files" in fpath
 
     def test_get_testdata_file_external(self):
         """Test that external data source preferred over cache."""
         fname = "693_UNCI.dcm"
-        assert os.fspath("data_store/data") in get_testdata_file(fname)
+        fpath = self.as_posix(get_testdata_file(fname))
+        assert "data_store/data" in fpath
 
     def test_get_testdata_file_external_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
@@ -139,7 +145,8 @@ class TestExternalDataSource:
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash != ref_hash
-        assert os.fspath(".pydicom/data") in get_testdata_file(p.name)
+        fpath = self.as_posix(get_testdata_file(p.name))
+        assert os.fspath(".pydicom/data") in fpath
 
     def test_get_testdata_file_external_hash_match(self):
         """Test that external source is used when hash is OK."""
@@ -148,14 +155,15 @@ class TestExternalDataSource:
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash == ref_hash
-        assert os.fspath("data_store/data") in get_testdata_file(fname)
+        fpath = self.as_posix(get_testdata_file(fname))
+        assert "data_store/data" in fpath
 
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
         fname = "CT_small*"
         paths = get_testdata_files(fname)
         assert 1 == len(paths)
-        assert os.fspath("pydicom/data/test_files") in paths[0]
+        assert "pydicom/data/test_files" in self.as_posix(paths[0])
 
     def test_get_testdata_files_local_external_and_cache(self):
         """Test that local, external and cache paths retrieved OK."""
@@ -163,8 +171,8 @@ class TestExternalDataSource:
         paths = get_testdata_files(fname)
         assert 7 == len(paths)
         # Local preferred first
-        assert os.fspath("pydicom/data/test_files") in paths[0]
+        assert "pydicom/data/test_files" in self.as_posix(paths[0])
         # External source preferred second
-        assert os.fspath("data_store/data") in paths[1]
+        assert "data_store/data" in self.as_posix(paths[1])
         # Cache source preferred last
-        assert os.fspath(".pydicom/data") in paths[4]
+        assert ".pydicom/data" in self.as_posix(paths[4])

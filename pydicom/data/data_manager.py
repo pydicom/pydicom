@@ -153,7 +153,7 @@ def get_files(
 
     Parameters
     ----------
-    base : str or PathLike
+    base : str or pathlib.Path
         Base directory to recursively search.
     pattern : str, optional
         The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
@@ -171,7 +171,7 @@ def get_files(
     files : list of str
         The list of filenames matched.
     """
-    base = Path(path_from_pathlike(base))
+    base = Path(base)
 
     # Search locally
     files = [os.fspath(m) for m in base.glob(pattern)]

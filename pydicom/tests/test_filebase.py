@@ -2,8 +2,6 @@
 """Test for filebase.py"""
 
 from io import BytesIO
-import platform
-import sys
 
 import pytest
 
@@ -260,11 +258,7 @@ class TestDicomFile:
     """Test filebase.DicomFile() function"""
     def test_read(self):
         """Test the function"""
-        filename = "CT_small.dcm"
-        if platform.system() == "Windows" and sys.version_info[0:2] == (3, 6):
-            # Not sure why 3.6 is different
-            filename = "ct_small.dcm"
         with DicomFile(TEST_FILE, 'rb') as fp:
             assert not fp.parent.closed
-            assert filename in fp.name
+            assert "CT_small.dcm" in fp.name
             assert fp.read(2) == b'\x49\x49'
