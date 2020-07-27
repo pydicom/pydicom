@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.misc import is_dicom, size_in_bytes
 
 

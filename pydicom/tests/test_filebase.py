@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.filebase import DicomIO, DicomFileLike, DicomFile, DicomBytesIO
 from pydicom.tag import Tag
 
