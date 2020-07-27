@@ -15,7 +15,11 @@ no_meta_file = get_testdata_files('ExplVR_LitEndNoMeta.dcm')[0]
 class TestMisc:
     def test_is_dicom(self):
         """Test the is_dicom function."""
-        invalid_file = test_file.replace('CT_', 'CT')  # invalid file
+        # On windows test file paths are all lowercase
+        if platform.system == "Windows":
+            invalid_file = test_file.replace('ct_', 'ct')  # invalid file
+        else:
+            invalid_file = test_file.replace('CT_', 'CT')  # invalid file
         notdicom_file = os.path.abspath(__file__)  # use own file
 
         # valid file returns True
