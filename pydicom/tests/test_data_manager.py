@@ -165,6 +165,6 @@ class TestExternalDataSource:
         # Local preferred first
         assert "pydicom/data/test_files" in paths[0]
         # External source preferred second
-        assert "pydicom-data/data" in paths[1]
+        assert "data_store/data" in paths[1]
         # Cache source preferred last
         assert ".pydicom/data" in paths[4]
