@@ -17,7 +17,7 @@ class TestMisc:
     def test_is_dicom(self):
         """Test the is_dicom function."""
         # On windows test file paths are all lowercase
-        if platform.system == "Windows":
+        if platform.system() == "Windows":
             invalid_file = test_file.replace('ct_', 'ct')  # invalid file
         else:
             invalid_file = test_file.replace('CT_', 'CT')  # invalid file

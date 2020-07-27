@@ -260,7 +260,7 @@ class TestDicomFile:
     def test_read(self):
         """Test the function"""
         filename = "CT_small.dcm"
-        if platform.system == "Windows":
+        if platform.system() == "Windows":
             # On windows test file paths are all lowercase
             filename = "ct_small.dcm"
         with DicomFile(TEST_FILE, 'rb') as fp:
