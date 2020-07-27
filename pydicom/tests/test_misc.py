@@ -2,6 +2,7 @@
 """Tests for misc.py"""
 
 import os
+import platform
 
 import pytest
 
