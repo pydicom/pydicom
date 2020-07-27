@@ -128,7 +128,7 @@ class TestExternalDataSource:
     def test_get_testdata_file_external(self):
         """Test that external data source preferred over cache."""
         fname = "693_UNCI.dcm"
-        assert "pydicom-data/data" in get_testdata_file(fname)
+        assert "data_store/data" in get_testdata_file(fname)
 
     def test_get_testdata_file_external_hash_mismatch(self):
         """Test that the external source is not used when hash is not OK."""
@@ -148,7 +148,7 @@ class TestExternalDataSource:
         ext_hash = calculate_file_hash(p)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash == ref_hash
-        assert "pydicom-data/data" in get_testdata_file(fname)
+        assert "data_store/data" in get_testdata_file(fname)
 
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
