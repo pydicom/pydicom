@@ -22,10 +22,7 @@ jobs:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
-          - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
-          pylibjpeg-dep: pylibjpeg
-          pytest-args: --cov=pydicom --cov-append
-          coverage: coverage
+          - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls, coverage: coverage}
 
     steps:
     - uses: actions/checkout@v2
@@ -55,13 +52,13 @@ jobs:
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        pytest ${{ matrix.pytest-args }}
+        pytest --cov=pydicom --cov-append
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest ${{ matrix.pytest-args }}
+        pytest --cov=pydicom --cov-append
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
@@ -70,7 +67,7 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
-        pytest ${{ matrix.pytest-args }}
+        pytest --cov=pydicom --cov-append
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm-dep == 'gdcm' }}
@@ -97,15 +94,14 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest ${{ matrix.pytest-args }}
+        pytest --cov=pydicom --cov-append
     - name: Test pylibjpeg
-      if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest --cov=pydicom --cov-append pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest --cov=pydicom --cov-append pydicom/tests/test_pylibjpeg.py
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
       run: >
