@@ -153,7 +153,7 @@ class TestExternalDataSource:
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash != ref_hash
         fpath = self.as_posix(get_testdata_file(p.name))
-        assert os.fspath(".pydicom/data") in fpath
+        assert ".pydicom/data" in fpath
 
     def test_get_testdata_file_external_hash_match(self):
         """Test that external source is used when hash is OK."""
@@ -166,7 +166,7 @@ class TestExternalDataSource:
         assert "data_store/data" in fpath
 
     def test_get_testdata_file_external_ignore_hash(self):
-        """Test that external source is used when hash is OK."""
+        """Test that non-pydicom-data external source ignores hash check."""
         EXTERNAL_DATA_SOURCES['mylib'] = EXTERNAL_DATA_SOURCES['pydicom-data']
         p = self.dpath / "693_UNCI.dcm"
         with open(p, 'wb') as f:
@@ -201,6 +201,48 @@ class TestExternalDataSource:
         assert "data_store/data" in self.as_posix(paths[1])
         # Cache source preferred last
         assert ".pydicom/data" in self.as_posix(paths[4])
+
+    def test_get_testdata_files_hash_match(self):
+        """Test that the external source is not used when hash is not OK."""
+        p = self.dpath / "693_UNCI.dcm"
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash == ref_hash
+        fpaths = get_testdata_files("693_UNCI*")
+        fpaths = [self.as_posix(p) for p in fpaths]
+        assert 2 == len(fpaths)
+        assert "data_store/data" in fpaths[0]
+        assert ".pydicom/data" in fpaths[1]
+
+    def test_get_testdata_files_hash_mismatch(self):
+        """Test that the external source is not used when hash is not OK."""
+        p = self.dpath / "693_UNCI.dcm"
+        with open(p, 'wb') as f:
+            f.write(b"\x00\x01")
+
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash != ref_hash
+        fpaths = get_testdata_files("693_UNCI*")
+        fpaths = [self.as_posix(p) for p in fpaths]
+        assert 1 == len(fpaths)
+        assert ".pydicom/data" in fpaths[0]
+
+    def test_get_testdata_files_external_ignore_hash(self):
+        """Test that non-pydicom-data external source ignores hash check."""
+        EXTERNAL_DATA_SOURCES['mylib'] = EXTERNAL_DATA_SOURCES['pydicom-data']
+        p = self.dpath / "693_UNCI.dcm"
+        with open(p, 'wb') as f:
+            f.write(b"\x00\x01")
+
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash != ref_hash
+        fpaths = get_testdata_files("693_UNCI*")
+        fpaths = [self.as_posix(p) for p in fpaths]
+        assert 2 == len(fpaths)
+        assert "data_store/data" in fpaths[0]
+        assert ".pydicom/data" in fpaths[1]
 
 
 @pytest.mark.skipif(EXT_PYDICOM, reason="pydicom-data installed")

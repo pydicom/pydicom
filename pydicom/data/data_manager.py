@@ -178,8 +178,13 @@ def get_files(
     files = [os.fspath(m) for m in base.glob(pattern)]
 
     # Search external sources
-    for source in EXTERNAL_DATA_SOURCES.values():
-        files.extend(source.get_paths(pattern, dtype))
+    for lib, source in EXTERNAL_DATA_SOURCES.items():
+        fpaths = source.get_paths(pattern, dtype)
+        if lib == "pydicom-data":
+            # For pydicom-data, check the hash against hashes.json
+            fpaths = [p for p in fpaths if _check_data_hash(p)]
+
+        files.extend(fpaths)
 
     # Search http://github.com/pydicom/pydicom-data or local cache
     # To preserve backwards compatibility filter the downloaded files
