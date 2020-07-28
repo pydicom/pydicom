@@ -2,8 +2,7 @@ name: Testsuite
 
 on:
   pull_request:
-    branches-ignore:
-      - gh-pages
+    types: [opened, synchronize]
 
 jobs:
   Linter:

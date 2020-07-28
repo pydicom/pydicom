@@ -5,6 +5,8 @@ on:
     branches:
       - master
       - master-workflow  # Testing during development of the workflow
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -16,12 +18,15 @@ jobs:
         python-version:  [3.6, 3.7, 3.8]
         jpeg-deps: [pillow-jpegls]
         gdcm-dep: [no-gdcm]
+        pylibjpeg-dep: pylibjpeg
+        pytest-args: --cov=pydicom --cov-append
+        coverage: coverage
         include:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
           - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
-    
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -46,17 +51,17 @@ jobs:
         key: pydicom-testdata
     - name: Initial test environment setup
       run: |
-        python -m pip install wheel 
+        python -m pip install wheel
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        pytest 
+        pytest ${{ matrix.pytest-args }}
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest 
+        pytest ${{ matrix.pytest-args }}
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
@@ -65,7 +70,7 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
-        pytest 
+        pytest ${{ matrix.pytest-args }}
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm-dep == 'gdcm' }}
@@ -92,19 +97,34 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest
-    
+        pytest ${{ matrix.pytest-args }}
+    - name: Test pylibjpeg
+      if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
+      run: |
+        python -m pip install pylibjpeg
+        python -m pip uninstall -y pylibjpeg-openjpeg
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+    - name: Send coverage results
+      if: ${{ success() && matrix.coverage == 'coverage' }}
+      run: >
+        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
+        0 https://codecov.io/bash) || (sleep 30 && bash <(curl
+        --connect-timeout 10 --retry 10 --retry-max-time
+        0 https://codecov.io/bash))
+
     - name: Install pymedphys
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       run: python -m pip install --pre pymedphys[tests]>=0.31.0dev0
     - name: Get PyMedPhys cache directory
-      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}    
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       id: pymedphys-cache-location
       run: |
         echo "::set-output name=dir::$(python -c 'import pymedphys._config as cf; print(str(cf.get_config_dir()))')"
         echo "::set-output name=version::$(python -c 'import pymedphys; print(pymedphys.__version__)')"
     - name: PyMedPhys Cache
-      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}    
+      if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       id: pymedphys-cache
       uses: actions/cache@v2
       with:
