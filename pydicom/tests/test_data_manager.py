@@ -90,8 +90,8 @@ class TestGetData:
 
     def test_get_testdata_file(self):
         """Test that file name is working properly."""
-        p = Path(get_testdata_file('DICOMDIR')).as_posix
-        assert "DICOMDIR" == p.name.upper
+        p = Path(get_testdata_file('DICOMDIR'))
+        assert "DICOMDIR" == p.name.upper()
 
     def test_get_palette_files(self):
         """Test data_manager.get_palette_files."""
