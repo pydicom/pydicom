@@ -144,12 +144,13 @@ jobs:
         pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
         pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        echo ${{ github.event.pull_request.head.sha }}
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
       run: >
         bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash) -N {{ github.event.pull_request.head.sha }}
+        0 https://codecov.io/bash) -N ${{ github.event.pull_request.head.sha }}
         || (sleep 30 && bash <(curl
         --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash)) -N  {{ github.event.pull_request.head.sha }}
+        0 https://codecov.io/bash)) -N  ${{ github.event.pull_request.head.sha }}
