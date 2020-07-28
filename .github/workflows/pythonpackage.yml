@@ -149,6 +149,7 @@ jobs:
       if: ${{ success() && matrix.coverage == 'coverage' }}
       run: >
         bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash) || (sleep 30 && bash <(curl
+        0 https://codecov.io/bash) -N {{ github.event.pull_request.head.sha }}
+        || (sleep 30 && bash <(curl
         --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash))
+        0 https://codecov.io/bash)) -N  {{ github.event.pull_request.head.sha }}
