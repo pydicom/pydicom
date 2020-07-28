@@ -90,7 +90,7 @@ def _check_data_hash(fpath: str) -> bool:
 
     Raises
     ------
-    pydicom.download.NoHashFound
+    pydicom.data.download.NoHashFound
         If the file is missing from ``hashes.json``.
     """
     p = Path(fpath)
@@ -292,7 +292,10 @@ def get_testdata_file(name: str) -> str:
             try:
                 return os.fspath(data_path_with_download(filename))
             except Exception as exc:
-                pass
+                warnings.warn(
+                    f"A download failure occurred while attempting to "
+                    f"retrieve {name}"
+                )
 
 
 def get_testdata_files(pattern: str = "**/*") -> List[str]:

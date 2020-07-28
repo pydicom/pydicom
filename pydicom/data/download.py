@@ -39,6 +39,7 @@ except ImportError:
 
 
 HERE = pathlib.Path(__file__).resolve().parent
+_SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
 
 
 def calculate_file_hash(fpath: pathlib.Path) -> str:
@@ -169,6 +170,9 @@ def data_path_with_download(
     pathlib.Path
         The absolute path to the file.
     """
+    if _SIMULATE_NETWORK_OUTAGE:
+        raise RuntimeError("No network!")
+
     filepath = get_data_dir().joinpath(filename)
 
     if check_hash and filepath.exists():

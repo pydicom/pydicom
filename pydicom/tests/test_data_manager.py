@@ -15,6 +15,7 @@ from pydicom.data import (
 from pydicom.data.data_manager import (
     DATA_ROOT, get_testdata_file, EXTERNAL_DATA_SOURCES
 )
+from pydicom.data import download
 from pydicom.data.download import (
     get_data_dir, calculate_file_hash, get_cached_filehash
 )
@@ -110,7 +111,6 @@ class TestExternalDataSource:
     """Tests for the external data sources."""
     def setup(self):
         self.dpath = EXTERNAL_DATA_SOURCES["pydicom-data"].data_path
-        print(self.dpath)
 
         # Backup the 693_UNCI.dcm file
         p = self.dpath / "693_UNCI.dcm"
@@ -122,8 +122,13 @@ class TestExternalDataSource:
         shutil.copy(self.dpath / "PYTEST_BACKUP", p)
         os.remove(self.dpath / "PYTEST_BACKUP")
 
+        if 'mylib' in EXTERNAL_DATA_SOURCES:
+            del EXTERNAL_DATA_SOURCES['mylib']
+
+        download._SIMULATE_NETWORK_OUTAGE = False
+
     def as_posix(self, path):
-        print(path)
+        """Return `path` as a posix path"""
         return Path(path).as_posix()
 
     def test_get_testdata_file_local(self):
@@ -145,7 +150,6 @@ class TestExternalDataSource:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
-        print(p, p.name)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash != ref_hash
         fpath = self.as_posix(get_testdata_file(p.name))
@@ -160,6 +164,24 @@ class TestExternalDataSource:
         assert ext_hash == ref_hash
         fpath = self.as_posix(get_testdata_file(fname))
         assert "data_store/data" in fpath
+
+    def test_get_testdata_file_external_ignore_hash(self):
+        """Test that external source is used when hash is OK."""
+        EXTERNAL_DATA_SOURCES['mylib'] = EXTERNAL_DATA_SOURCES['pydicom-data']
+        p = self.dpath / "693_UNCI.dcm"
+        with open(p, 'wb') as f:
+            f.write(b"\x00\x01")
+
+        ext_hash = calculate_file_hash(p)
+        ref_hash = get_cached_filehash(p.name)
+        assert ext_hash != ref_hash
+        fpath = self.as_posix(get_testdata_file(p.name))
+        assert "data_store/data" in fpath
+
+    def test_get_testdata_file_missing(self):
+        """Test no such file available."""
+        fname = "MY_MISSING_FILE.dcm"
+        assert get_testdata_file(fname) is None
 
     def test_get_testdata_files_local(self):
         """Test that local data paths retrieved OK."""
@@ -181,11 +203,39 @@ class TestExternalDataSource:
         assert ".pydicom/data" in self.as_posix(paths[4])
 
 
+@pytest.mark.skipif(EXT_PYDICOM, reason="pydicom-data installed")
+class TestDownload:
+    """Tests for the download module."""
+    def teardown(self):
+        download._SIMULATE_NETWORK_OUTAGE = False
+
+    def test_get_testdata_file_network_outage(self):
+        """Test a network outage when using get_testdata_file."""
+        download._SIMULATE_NETWORK_OUTAGE = True
+        fname = "693_UNCI.dcm"
+        msg = (
+            r"A download failure occurred while attempting to "
+            r"retrieve 693_UNCI.dcm"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert get_testdata_file(fname) is None
+
+    def test_get_testdata_files_network_outage(self):
+        """Test a network outage when using get_testdata_files."""
+        download._SIMULATE_NETWORK_OUTAGE = True
+        msg = (
+            r"One or more download failures occurred, the list of matching "
+            r"file paths may be incomplete"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert [] == get_testdata_files("693_UN*")
+
+
 def test_hashes():
     """Test for duplicates in hashes.json."""
     # We can't have case mixes because windows filenames are case insensitive
     root = Path(DATA_ROOT)
-    with open(root.joinpath("hashes.json"), "r") as f:
+    with open(root / "hashes.json", "r") as f:
         filenames = json.load(f).keys()
         filenames = [name.lower() for name in filenames]
         assert len(set(filenames)) == len(filenames)
@@ -195,7 +245,7 @@ def test_urls():
     """Test for duplicates in urls.json."""
     # We can't have case mixes because windows filenames are case insensitive
     root = Path(DATA_ROOT)
-    with open(root.joinpath("urls.json"), "r") as f:
+    with open(root / "urls.json", "r") as f:
         filenames = json.load(f).keys()
         filenames = [name.lower() for name in filenames]
         assert len(set(filenames)) == len(filenames)
