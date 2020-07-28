@@ -107,7 +107,7 @@ def get_data_dir() -> str:
 @functools.lru_cache()
 def get_url_map() -> Dict[str, str]:
     """Return a dict containing the URL mappings from ``urls.json```."""
-    with open(os.fspath(HERE.joinpath("urls.json")), "r") as url_file:
+    with open(HERE.joinpath("urls.json"), "r") as url_file:
         return json.load(url_file)
 
 
@@ -131,8 +131,11 @@ def get_url(filename: str) -> str:
     ValueError
         If `filename` is not in the ``urls.json`` record.
     """
+    # Convert filename to lowercase because windows filenames are
+    #   case-insensitive
+    urls = {k.lower(): v for k, v in get_url_map().items()}
     try:
-        return get_url_map()[filename]
+        return urls[filename.lower()]
     except KeyError:
         raise ValueError(
             "The file provided isn't within pydicom's urls.json record."
@@ -217,11 +220,14 @@ def get_cached_filehash(filename: str) -> str:
     str
         The SHA256 checksum of the cached file.
     """
-    with open(os.fspath(HERE.joinpath("hashes.json")), "r") as hash_file:
+    with open(HERE.joinpath("hashes.json"), "r") as hash_file:
         hashes = json.load(hash_file)
+        # Convert filenames to lowercase because windows filenames are
+        #   case-insensitive
+        hashes = {k.lower(): v for k, v in hashes.items()}
 
     try:
-        return hashes[filename]
+        return hashes[filename.lower()]
     except KeyError:
         raise NoHashFound
 
@@ -248,12 +254,12 @@ def data_file_hash_check(filename: str) -> bool:
         cached_filehash = get_cached_filehash(filename)
     except NoHashFound:
         warnings.warn("Hash not found in hashes.json. File will be updated.")
-        with open(os.fspath(HERE.joinpath("hashes.json")), "r") as hash_file:
+        with open(HERE.joinpath("hashes.json"), "r") as hash_file:
             hashes = json.load(hash_file)
 
         hashes[filename] = calculated_filehash
 
-        with open(os.fspath(HERE.joinpath("hashes.json")), "w") as hash_file:
+        with open(HERE.joinpath("hashes.json"), "w") as hash_file:
             json.dump(hashes, hash_file, indent=2, sort_keys=True)
 
         raise

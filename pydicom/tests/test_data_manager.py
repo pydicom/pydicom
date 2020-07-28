@@ -1,6 +1,7 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for pydicom.data_manager"""
 
+import json
 import os
 from os.path import basename
 from pathlib import Path
@@ -122,6 +123,7 @@ class TestExternalDataSource:
         os.remove(self.dpath / "PYTEST_BACKUP")
 
     def as_posix(self, path):
+        print(path)
         return Path(path).as_posix()
 
     def test_get_testdata_file_local(self):
@@ -143,6 +145,7 @@ class TestExternalDataSource:
             f.write(b"\x00\x01")
 
         ext_hash = calculate_file_hash(p)
+        print(p, p.name)
         ref_hash = get_cached_filehash(p.name)
         assert ext_hash != ref_hash
         fpath = self.as_posix(get_testdata_file(p.name))
@@ -176,3 +179,23 @@ class TestExternalDataSource:
         assert "data_store/data" in self.as_posix(paths[1])
         # Cache source preferred last
         assert ".pydicom/data" in self.as_posix(paths[4])
+
+
+def test_hashes():
+    """Test for duplicates in hashes.json."""
+    # We can't have case mixes because windows filenames are case insensitive
+    root = Path(DATA_ROOT)
+    with open(root.joinpath("hashes.json"), "r") as f:
+        filenames = json.load(f).keys()
+        filenames = [name.lower() for name in filenames]
+        assert len(set(filenames)) == len(filenames)
+
+
+def test_urls():
+    """Test for duplicates in urls.json."""
+    # We can't have case mixes because windows filenames are case insensitive
+    root = Path(DATA_ROOT)
+    with open(root.joinpath("urls.json"), "r") as f:
+        filenames = json.load(f).keys()
+        filenames = [name.lower() for name in filenames]
+        assert len(set(filenames)) == len(filenames)

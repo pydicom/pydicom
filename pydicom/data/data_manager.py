@@ -62,6 +62,7 @@ from pydicom.fileutil import path_from_pathlike
 
 
 DATA_ROOT = abspath(dirname(__file__))
+"""The absolute path to the pydicom/data directory."""
 
 
 class DataTypes(IntEnum):
