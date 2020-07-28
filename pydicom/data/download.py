@@ -144,11 +144,11 @@ def get_url(filename: str) -> str:
 
 
 def data_path_with_download(
-        filename: str,
-        check_hash: bool = True,
-        redownload_on_hash_mismatch: bool = True,
-        url: Optional[str] = None
-    ) -> pathlib.Path:
+    filename: str,
+    check_hash: bool = True,
+    redownload_on_hash_mismatch: bool = True,
+    url: Optional[str] = None
+) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
 
     If the file isn't available in the cache then it will be downloaded.
