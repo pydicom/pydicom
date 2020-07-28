@@ -23,18 +23,25 @@ Enhancements
 * Added handler for *Waveform Data* and :meth:`Dataset.waveform_generator
   <pydicom.dataset.Dataset.waveform_generator>` which returns a generator
   object that yields an :class:`~numpy.ndarray` for each multiplex group in
-a *Waveform Sequence*.
+  a *Waveform Sequence*.
 * Added :func:`~pydicom.pixel_data_handlers.apply_rescale`,
-  :func:`~pydicom.pixel_data_handlers.apply_windowing` and
-  :func:`~pydicom.data.get_dataset` aliases
+  :func:`~pydicom.pixel_data_handlers.apply_windowing`  aliases
 * Added ability to register external data sources for use with the functions
   in :mod:`pydicom.data`
+* ``__contains__``, ``__next__`` and ``__iter__`` implementations added to
+  :class:`~pydicom.valuerep.PersonName` (:issue:`1103`)
+* Added convenience constants for the MPEG transfer syntaxes to
+  :mod:`pydicom.uid` (:pr:`1155`)
 
 Fixes
 .....
-* ``Dataset.copy`` now works as expected (see :issue:`1146`)
+* :meth:`Dataset.copy()<pydicom.dataset.Dataset.copy>` now works as expected
+  (:issue:`1146`)
 * Optimistically parse undefined length non-SQ data as if it's encapsulated
   pixel data to avoid erroring out on embedded sequence delimiter
   (:issue:`1140`)
-* Fixed :func:`~pydicom.data.get_testdata_file` raising an exception if no
-  network connection is available
+* Fixed :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_files` raising an exception if no network
+  connection is available (:pr:`1156`)
+* Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
+  a file-like (:issue:`1153`)

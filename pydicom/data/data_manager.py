@@ -6,9 +6,9 @@ External Data Sources
 ---------------------
 
 *pydicom* can also search third-party data sources for matching data. To do so
-your project should register itself in it's `setup.py` file. For example, a
-project named "mydata" with it's interface class ``MyInterface`` should
-register:
+your project should register its entry points in its `setup.py` file. For
+example, a project named "mydata" with the interface class ``MyInterface``
+should register:
 
 .. codeblock: python
 
@@ -48,7 +48,6 @@ For a real-life example of an external data source you can look at the
 from enum import IntEnum
 import fnmatch
 import os
-from os.path import abspath, dirname, join
 from pathlib import Path
 from pkg_resources import iter_entry_points
 from typing import Dict, List, Union
@@ -58,10 +57,9 @@ from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
     get_url_map
 )
-from pydicom.fileutil import path_from_pathlike
 
 
-DATA_ROOT = abspath(dirname(__file__))
+DATA_ROOT = os.fspath(Path(__file__).parent.resolve())
 """The absolute path to the pydicom/data directory."""
 
 
@@ -124,12 +122,19 @@ EXTERNAL_DATA_SOURCES = get_external_sources()
 
 
 def online_test_file_dummy_paths() -> Dict[str, str]:
+    """Return a :class:`dict` of dummy paths to the downloadable test files.
+
+    Returns
+    -------
+    dict
+        A dict of dummy paths to the test files available via download.
+    """
     filenames = list(get_url_map().keys())
 
-    test_files_root = join(DATA_ROOT, 'test_files')
+    test_files_root = os.path.join(DATA_ROOT, 'test_files')
 
     dummy_path_map = {
-        join(test_files_root, filename): filename
+        os.path.join(test_files_root, filename): filename
         for filename in filenames
     }
 
@@ -154,10 +159,11 @@ def get_files(
 
     Parameters
     ----------
-    base : str or pathlib.Path
+    base : str or os.PathLike
         Base directory to recursively search.
     pattern : str, optional
-        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
+        The pattern to pass to :meth:`~pathlib.Path.glob`, default
+        (``'**/*'``).
     dtype : int, optional
         The type of data to search for when using an external source, one of:
 
@@ -169,8 +175,8 @@ def get_files(
 
     Returns
     -------
-    files : list of str
-        The list of filenames matched.
+    list of str
+        A list of absolute paths to matching files.
     """
     base = Path(base)
 
@@ -191,7 +197,7 @@ def get_files(
     # as if they are stored within DATA_ROOT/test_files/*.dcm
     dummy_online_file_path_map = online_test_file_dummy_paths()
     dummy_online_file_path_filtered = fnmatch.filter(
-        dummy_online_file_path_map.keys(), join(base, pattern)
+        dummy_online_file_path_map.keys(), os.path.join(base, pattern)
     )
     download_names = [
         os.fspath(dummy_online_file_path_map[dummy_path])
@@ -227,16 +233,16 @@ def get_palette_files(pattern: str = "**/*") -> List[str]:
 
     Parameters
     ----------
-    pattern : str, optional (default="**/*")
-        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
+    pattern : str, optional
+        The pattern to pass to :meth:`~pathlib.Path.glob`, default
+        (``'**/*'``).
 
     Returns
     -------
-    files : list of str
-        The list of filenames matched.
-
+    list of str
+        A list of absolute paths to matching files.
     """
-    data_path = join(DATA_ROOT, 'palettes')
+    data_path = Path(DATA_ROOT) / 'palettes'
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.PALETTE)
     files = [filename for filename in files if not filename.endswith('.py')]
@@ -266,16 +272,14 @@ def get_testdata_file(name: str) -> str:
 
     Returns
     -------
-    str, None
-        The full path of the file if found, or ``None``.
-
+    str or None
+        The absolute path of the file if found, or ``None``.
     """
     # Check pydicom local
-    data_path = join(DATA_ROOT, 'test_files')
-    for root, _, filenames in os.walk(data_path):
-        for filename in filenames:
-            if filename == name:
-                return os.path.join(root, filename)
+    data_path = Path(DATA_ROOT) / 'test_files'
+    matches = [m for m in data_path.rglob(name)]
+    if matches:
+        return os.fspath(matches[0])
 
     # Check external data sources
     for lib, source in EXTERNAL_DATA_SOURCES.items():
@@ -309,16 +313,16 @@ def get_testdata_files(pattern: str = "**/*") -> List[str]:
 
     Parameters
     ----------
-    pattern : str, optional (default="*")
-        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
+    pattern : str, optional
+        The pattern to pass to :meth:`~pathlib.Path.glob`, default
+        (``'**/*'``).
 
     Returns
     -------
-    files : list of str
-        The list of filenames matched.
-
+    list of str
+        A list of absolute paths to matching files.
     """
-    data_path = join(DATA_ROOT, 'test_files')
+    data_path = Path(DATA_ROOT) / 'test_files'
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.DATASET)
     files = [filename for filename in files if not filename.endswith('.py')]
@@ -326,22 +330,22 @@ def get_testdata_files(pattern: str = "**/*") -> List[str]:
     return files
 
 
-def get_charset_files(pattern: str = "*") -> List[str]:
+def get_charset_files(pattern: str = "**/*") -> List[str]:
     """Return a list of absolute paths to charsets with filenames matching
     `pattern`.
 
     Parameters
     ----------
-    pattern : str, optional (default="*")
-        The pattern to pass to :meth:`Path.glob`, default (``'**/*'``).
+    pattern : str, optional
+        The pattern to pass to :meth:`~pathlib.Path.glob`, default
+        (``'**/*'``).
 
     Returns
     ----------
-    files : list of str
-        The list of filenames matched.
-
+    list of str
+        A list of absolute paths to matching files.
     """
-    data_path = join(DATA_ROOT, 'charset_files')
+    data_path = Path(DATA_ROOT) / 'charset_files'
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.CHARSET)
     files = [filename for filename in files if not filename.endswith('.py')]

@@ -57,7 +57,7 @@ def calculate_file_hash(fpath: pathlib.Path) -> str:
     """
     BLOCKSIZE = 65536
     hasher = hashlib.sha256()
-    with open(os.fspath(fpath), "rb") as f:
+    with open(fpath, "rb") as f:
         buf = f.read(BLOCKSIZE)
         while len(buf) > 0:
             hasher.update(buf)
@@ -108,7 +108,7 @@ def get_data_dir() -> str:
 @functools.lru_cache()
 def get_url_map() -> Dict[str, str]:
     """Return a dict containing the URL mappings from ``urls.json```."""
-    with open(HERE.joinpath("urls.json"), "r") as url_file:
+    with open(HERE / "urls.json", "r") as url_file:
         return json.load(url_file)
 
 
@@ -224,7 +224,7 @@ def get_cached_filehash(filename: str) -> str:
     str
         The SHA256 checksum of the cached file.
     """
-    with open(HERE.joinpath("hashes.json"), "r") as hash_file:
+    with open(HERE / "hashes.json", "r") as hash_file:
         hashes = json.load(hash_file)
         # Convert filenames to lowercase because windows filenames are
         #   case-insensitive
@@ -258,12 +258,12 @@ def data_file_hash_check(filename: str) -> bool:
         cached_filehash = get_cached_filehash(filename)
     except NoHashFound:
         warnings.warn("Hash not found in hashes.json. File will be updated.")
-        with open(HERE.joinpath("hashes.json"), "r") as hash_file:
+        with open(HERE / "hashes.json", "r") as hash_file:
             hashes = json.load(hash_file)
 
         hashes[filename] = calculated_filehash
 
-        with open(HERE.joinpath("hashes.json"), "w") as hash_file:
+        with open(HERE / "hashes.json", "w") as hash_file:
             json.dump(hashes, hash_file, indent=2, sort_keys=True)
 
         raise

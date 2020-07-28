@@ -11,7 +11,6 @@ Getting datasets included with *pydicom*
    :toctree: generated/
 
    get_charset_files
-   get_dataset
    get_palette_files
    get_testdata_file
    get_testdata_files
