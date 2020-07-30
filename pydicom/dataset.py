@@ -1632,13 +1632,15 @@ class Dataset(dict):
         ------
         numpy.ndarray
             The *Waveform Data* for each multiplex group as an
-            :class:`~numpy.ndarray` with shape (samples, channels). If a
-            channel item contains a (003A,0212) *Channel Sensitivity Correction
-            Factor* element then it will be applied.
+            :class:`~numpy.ndarray` with shape (samples, channels). If
+            (003A,0210) *Channel Sensitivity* is present for a multiplex
+            then the values will be in the units specified by the (003A,0211)
+            *Channel Sensitivity Units Sequence*.
 
         See Also
         --------
-        :func:`~pydicom.waveform.numpy_handler.generate_multiplex`
+        :func:`~pydicom.waveforms.numpy_handler.generate_multiplex`
+        :func:`~pydicom.waveforms.numpy_handler.multiplex_array`
         """
         transfer_syntax = self.file_meta.TransferSyntaxUID
         if not wave_handler.supports_transfer_syntax(transfer_syntax):

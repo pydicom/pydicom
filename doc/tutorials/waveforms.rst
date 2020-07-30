@@ -8,12 +8,15 @@ This tutorial is about understanding waveforms in DICOM datasets and covers:
 * Decoding and displaying *Waveform Data*
 * Encoding *Waveform Data*
 
+It's assumed that you're already familiar with the :doc:`dataset basics
+<dataset_basics>`.
+
 Pre-requisites
 --------------
 
-* pydicom >= v2.1
-* numpy
-* matplotlib
+* `pydicom <https://github.com/pydicom/pydicom>`_ >= v2.1
+* `numpy <https://numpy.org/>`_
+* `matplotlib <https://matplotlib.org/>`_
 
 
 Waveforms in DICOM
@@ -26,7 +29,7 @@ Waveforms in DICOM
 
 
 
-.. codeblock:: python
+.. code-block:: python
 
     from pydicom import dcmread
     from pydicom.data import get_testdata_file
@@ -36,24 +39,30 @@ Waveforms in DICOM
 
 
 Decoding *Waveform Data*
-=======================
+========================
 
-.. codeblock:: python
+.. code-block:: python
 
-    import matplotlib.pyplot as plt
+.. code-block:: python
+
+    from pydicom import dcmread
+    from pydicom.data import get_testdata_file
+
+    fpath = get_testdata_file("waveform_ecg.dcm")
+    ds = dcmread(fpath)
 
     generator = ds.waveform_generator
     arr = next(generator)
 
-    plt.imshow(arr)
+    plt.plot(arr[..., 0])
     plt.show()
 
 
 If you need the raw data you can use the
-:func:`~pydicom.waveform_data_handlers.generate_multiplex` function with the
+:func:`~pydicom.waveforms.numpy_handler.generate_multiplex` function with the
 *as_raw* parameter:
 
-.. codeblock:: python
+.. code-block:: python
 
     from pydicom.waveform_data_handlers import generate_multiplex
 
@@ -62,9 +71,9 @@ If you need the raw data you can use the
 
 On the other hand, if you only need a specific waveform:
 
-.. codeblock:: python
+.. code-block:: python
 
-    from pydicom.waveform
+    from pydicom.waveform import multiplex_array
 
 
 Encoding *Waveform Data*

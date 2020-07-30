@@ -22,7 +22,7 @@ Enhancements
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 * Added support for decoding *Waveform Data*:
 
-  * Added :mod:`pydicom.waveforms` modules and
+  * Added :mod:`pydicom.waveforms` module and
     :func:`~pydicom.waveforms.numpy_handler.generate_multiplex` and
     :func:`~pydicom.waveforms.numpy_handler.multiplex_array` functions.
   * Added :meth:`Dataset.waveform_generator
