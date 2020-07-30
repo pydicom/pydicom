@@ -49,7 +49,7 @@ from pydicom.pixel_data_handlers.util import (
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
-from pydicom.waveform_data_handlers import numpy_handler as wave_handler
+from pydicom.waveforms import numpy_handler as wave_handler
 
 
 from importlib.util import find_spec as have_package
@@ -1638,7 +1638,7 @@ class Dataset(dict):
 
         See Also
         --------
-        :func:`~pydicom.waveform_data_handlers.numpy_handler.generate_multiplex`
+        :func:`~pydicom.waveform.numpy_handler.generate_multiplex`
         """
         transfer_syntax = self.file_meta.TransferSyntaxUID
         if not wave_handler.supports_transfer_syntax(transfer_syntax):

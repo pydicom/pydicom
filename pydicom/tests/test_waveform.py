@@ -19,8 +19,8 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    from pydicom.waveform_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.waveform_data_handlers.numpy_handler import (
+    from pydicom.waveforms import numpy_handler as NP_HANDLER
+    from pydicom.waveforms.numpy_handler import (
         generate_multiplex, multiplex_array
     )
 except ImportError:
