@@ -18,7 +18,7 @@ jobs:
         python-version:  [3.6, 3.7, 3.8]
         jpeg-deps: [pillow-jpegls]
         gdcm-dep: [no-gdcm]
-        pytest-args:
+        pytest-args: []
         include:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
