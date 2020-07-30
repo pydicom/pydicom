@@ -18,12 +18,12 @@ jobs:
         python-version:  [3.6, 3.7, 3.8]
         jpeg-deps: [pillow-jpegls]
         gdcm-dep: [no-gdcm]
-        pytest-args: [no-cov]
+        pytest-args:
         include:
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.6, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.7, jpeg-deps: no-pillow-jpegls }
           - { gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: no-pillow-jpegls }
-          - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls, coverage: coverage, pytest-args: '--cov=pydicom --cov-append'}
+          - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls, coverage: coverage, pytest-args: --cov=pydicom --cov-append}
 
     steps:
     - uses: actions/checkout@v2
