@@ -22,9 +22,6 @@ TEST_FILES = (
 class TestDicomDir:
     """Test dicomdir.DicomDir class"""
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
     @pytest.mark.parametrize("testfile", TEST_FILES)
     def test_read_file(self, testfile):
         """Test creation of DicomDir instance using filereader.read_file"""
@@ -68,8 +65,7 @@ class TestDicomDir:
         ds = dcmread(get_testdata_file('DICOMDIR-empty.dcm'))
         assert [] == ds.DirectoryRecordSequence
 
-    def test_invalid_transfer_syntax_strict_mode(self):
-        config.enforce_valid_values = True
+    def test_invalid_transfer_syntax_strict_mode(self, enforce_valid_values):
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
             dcmread(IMPLICIT_TEST_FILE)

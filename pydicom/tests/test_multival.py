@@ -35,14 +35,11 @@ class TestMultiValue:
         assert not multival
         assert 0 == len(multival)
 
-    def testLimits(self):
+    def testLimits(self, enforce_valid_values):
         """MultiValue: Raise error if any item outside DICOM limits...."""
-        original_flag = config.enforce_valid_values
-        config.enforce_valid_values = True
         with pytest.raises(OverflowError):
             MultiValue(IS, [1, -2 ** 31 - 1])
         # Overflow error not raised for IS out of DICOM valid range
-        config.enforce_valid_values = original_flag
 
     def testAppend(self):
         """MultiValue: Append of item converts it to required type..."""

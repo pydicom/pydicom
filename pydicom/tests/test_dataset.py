@@ -32,6 +32,7 @@ class BadRepr:
 
 class TestDataset:
     """Tests for dataset.Dataset."""
+
     def setup(self):
         self.ds = Dataset()
         self.ds.TreatmentMachineName = "unit001"
@@ -104,6 +105,7 @@ class TestDataset:
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
+
         class Foo(Dataset):
             @property
             def bar(self):
@@ -228,6 +230,17 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
+    def test_setdefault_unknown_tag(self, allow_invalid_values):
+        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+            elem = self.ds.setdefault(0x88880002, 'foo')
+        assert 'foo' == elem.value
+        assert 'UN' == elem.VR
+        assert 2 == len(self.ds)
+
+    def test_setdefault_unknown_tag_strict(self, enforce_valid_values):
+        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+            elem = self.ds.setdefault(0x88880004, 'foo')
+
     def test_setdefault_tuple(self):
         elem = self.ds.setdefault((0x300a, 0x00b2), 'foo')
         assert 'unit001' == elem.value
@@ -237,12 +250,22 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
+    def test_setdefault_unknown_tuple(self, allow_invalid_values):
+        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+            elem = self.ds.setdefault((0x8888, 0x0002), 'foo')
+        assert 'foo' == elem.value
+        assert 'UN' == elem.VR
+        assert 2 == len(self.ds)
+
+    def test_setdefault_unknown_tuple_strict(self, enforce_valid_values):
+        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+            elem = self.ds.setdefault((0x8888, 0x0004), 'foo')
+
     def test_setdefault_use_value(self):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
-        with pytest.raises(KeyError, match=r'Tag \(0011, 0010\) not found '
-                                           r'in DICOM dictionary'):
+        with pytest.warns(UserWarning, match=r'\(0011, 0010\)'):
             self.ds.setdefault((0x0011, 0x0010), "Test")
 
     def test_setdefault_keyword(self):
@@ -253,6 +276,11 @@ class TestDataset:
         )
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
+
+    def test_setdefault_invalid_keyword(self):
+        with pytest.raises(ValueError, match="'FooBar' is not a valid int or"
+                                             " DICOM keyword"):
+            self.ds.setdefault('FooBar', 'foo')
 
     def test_get_exists1(self):
         """Dataset: dataset.get() returns an existing item by name."""
@@ -329,6 +357,7 @@ class TestDataset:
 
     def test_dir_subclass(self):
         """Dataset.__dir__ returns class specific dir"""
+
         class DSP(Dataset):
             def test_func(self):
                 pass
@@ -574,6 +603,7 @@ class TestDataset:
 
     def test_property(self):
         """Test properties work OK."""
+
         class DSPlus(Dataset):
             @property
             def test(self):
@@ -1337,6 +1367,7 @@ class TestDataset:
 
     def test_exit_exception(self):
         """Test Dataset.__exit__ when an exception is raised."""
+
         class DSException(Dataset):
             @property
             def test(self):
@@ -1443,6 +1474,7 @@ class TestDataset:
 
     def test_walk(self):
         """Test Dataset.walk iterates through sequences"""
+
         def test_callback(dataset, elem):
             if elem.keyword == 'PatientID':
                 dataset.PatientID = 'FIXED'
@@ -1488,6 +1520,7 @@ class TestDataset:
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
+
     def setup(self):
         self.ds = Dataset()
         self.sub_ds1 = Dataset()
@@ -1635,6 +1668,7 @@ class TestFileDataset:
 
     def test_creation_with_container(self):
         """FileDataset.__init__ works OK with a container such as gzip"""
+
         class Dummy:
             filename = '/some/path/to/test'
 
@@ -1670,6 +1704,7 @@ class TestFileDataset:
 
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""
+
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers

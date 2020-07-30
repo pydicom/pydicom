@@ -62,9 +62,6 @@ ENCODED_NAMES = [
 
 
 class TestCharset:
-    def teardown(self):
-        config.enforce_valid_values = False
-
     def test_encodings(self):
         test_string = 'Hello World'
         for x in pydicom.charset.python_encoding.items():
@@ -101,7 +98,7 @@ class TestCharset:
         ds.decode()
         assert 'CompressedSamples^CT1' == ds.PatientName
 
-    def test_invalid_character_set(self):
+    def test_invalid_character_set(self, allow_invalid_values):
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.read_encoding = None
@@ -114,9 +111,8 @@ class TestCharset:
             ds.decode()
             assert 'CompressedSamples^CT1' == ds.PatientName
 
-    def test_invalid_character_set_enforce_valid(self):
+    def test_invalid_character_set_enforce_valid(self, enforce_valid_values):
         """charset: raise on invalid encoding"""
-        config.enforce_valid_values = True
         ds = dcmread(get_testdata_files("CT_small.dcm")[0])
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
@@ -154,10 +150,10 @@ class TestCharset:
             pydicom.charset.decode_element(elem, ['ISO_IR 192'])
             assert '���������' == elem.value
 
-    def test_bad_encoded_single_encoding_enforce_standard(self):
+    def test_bad_encoded_single_encoding_enforce_standard(
+            self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
         config.enforce_valid_values is set"""
-        config.enforce_valid_values = True
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'utf.?8' codec can't decode byte 0xc4 in position 0: "
@@ -193,7 +189,7 @@ class TestCharset:
         encodings = ['iso_ir_126', 'iso_ir_144']
         assert encodings == pydicom.charset.convert_encodings(encodings)
 
-    def test_bad_decoded_multi_byte_encoding(self):
+    def test_bad_decoded_multi_byte_encoding(self, allow_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -203,10 +199,10 @@ class TestCharset:
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
             assert '���������' == elem.value
 
-    def test_bad_decoded_multi_byte_encoding_enforce_standard(self):
+    def test_bad_decoded_multi_byte_encoding_enforce_standard(
+            self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
         `config.enforce_valid_values` is set"""
-        config.enforce_valid_values = True
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
@@ -214,7 +210,7 @@ class TestCharset:
         with pytest.raises(UnicodeDecodeError, match=msg):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
 
-    def test_unknown_escape_sequence(self):
+    def test_unknown_escape_sequence(self, allow_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -224,10 +220,10 @@ class TestCharset:
             pydicom.charset.decode_element(elem, ['ISO_IR 100'])
             assert '\x1b-FÄéïíõóéïò' == elem.value
 
-    def test_unknown_escape_sequence_enforce_standard(self):
+    def test_unknown_escape_sequence_enforce_standard(
+            self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
         `config.enforce_valid_values` is set"""
-        config.enforce_valid_values = True
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         with pytest.raises(ValueError, match='Found unknown escape sequence '
