@@ -103,9 +103,6 @@ class TestHandlerGenerateMultiplex:
     def test_as_raw(self):
         """Test that as_raw=True works as expected."""
         ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        ch_seq = item.ChannelDefinitionSequence
-        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
         gen = generate_multiplex(ds, as_raw=True)
         arr = next(gen)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
@@ -114,30 +111,13 @@ class TestHandlerGenerateMultiplex:
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
-    def test_not_as_raw_no_channel_cf(self):
-        """Test that as_raw=False works as expected with no sensitivity CF."""
-        ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        for item in item.ChannelDefinitionSequence:
-            del item.ChannelSensitivityCorrectionFactor
-        gen = generate_multiplex(ds, as_raw=False)
-        arr = next(gen)
-        assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
-        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'float'
-        assert arr.flags.writeable
-        assert (10000, 12) == arr.shape
-
     def test_not_as_raw(self):
         """Test that as_raw=False works as expected."""
         ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        ch_seq = item.ChannelDefinitionSequence
-        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
         gen = generate_multiplex(ds, as_raw=False)
         arr = next(gen)
-        assert [40, 32.5, 25, 17.5, 18.5] == arr[0:5, 0].tolist()
-        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
+        assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
+        assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
         assert arr.dtype == 'float'
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
@@ -183,9 +163,6 @@ class TestHandlerMultiplexArray:
     def test_as_raw(self):
         """Test that as_raw=True works as expected."""
         ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        ch_seq = item.ChannelDefinitionSequence
-        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
         arr = multiplex_array(ds, index=0, as_raw=True)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
@@ -200,28 +177,12 @@ class TestHandlerMultiplexArray:
         assert arr.flags.writeable
         assert (1200, 12) == arr.shape
 
-    def test_not_as_raw_no_channel_cf(self):
-        """Test that as_raw=False works as expected with no sensitivity CF."""
-        ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        for item in item.ChannelDefinitionSequence:
-            del item.ChannelSensitivityCorrectionFactor
-        arr = multiplex_array(ds, index=0, as_raw=False)
-        assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
-        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'float'
-        assert arr.flags.writeable
-        assert (10000, 12) == arr.shape
-
     def test_not_as_raw(self):
         """Test that as_raw=False works as expected."""
         ds = dcmread(ECG)
-        item = ds.WaveformSequence[0]
-        ch_seq = item.ChannelDefinitionSequence
-        ch_seq[0].ChannelSensitivityCorrectionFactor = 0.5
         arr = multiplex_array(ds, index=0, as_raw=False)
-        assert [40, 32.5, 25, 17.5, 18.5] == arr[0:5, 0].tolist()
-        assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
+        assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
+        assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
         assert arr.dtype == 'float'
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape

@@ -164,10 +164,12 @@ def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndar
             # Apply correction factor (if possible)
             arr = arr.astype('float')
             for jj, channel in enumerate(item.ChannelDefinitionSequence):
-                if "ChannelSensitivityCorrectionFactor" not in channel:
-                    continue
-
-                arr[..., jj] *= channel.ChannelSensitivityCorrectionFactor
+                baseline = channel.get("ChannelBaseline", 0.0)
+                sensitivity = channel.get("ChannelSensitivity", 1.0)
+                correction = channel.get("ChannelSensitivityCorrectionFactor", 1.0)
+                arr[..., jj] = (
+                    (arr[..., jj] + baseline) * sensitivity * correction
+                )
 
         yield arr
 
@@ -244,9 +246,11 @@ def multiplex_array(ds: "Dataset", index: int = 0, as_raw: bool = True) -> "np.n
         # Apply correction factor (if possible)
         arr = arr.astype('float')
         for jj, channel in enumerate(item.ChannelDefinitionSequence):
-            if "ChannelSensitivityCorrectionFactor" not in channel:
-                continue
-
-            arr[..., jj] *= channel.ChannelSensitivityCorrectionFactor
+            baseline = channel.get("ChannelBaseline", 0.0)
+            sensitivity = channel.get("ChannelSensitivity", 1.0)
+            correction = channel.get("ChannelSensitivityCorrectionFactor", 1.0)
+            arr[..., jj] = (
+                (arr[..., jj] + baseline) * sensitivity * correction
+            )
 
     return arr
