@@ -35,7 +35,7 @@ class TestDicomDir:
         with pytest.raises(InvalidDicomError, match=msg):
             DicomDir("some_name", ds, b'\x00' * 128, ds.file_meta, True, True)
 
-    def test_invalid_sop_no_file_meta(self):
+    def test_invalid_sop_no_file_meta(self, allow_invalid_values):
         """Test exception raised if invalid sop class but no file_meta"""
         ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(AttributeError,
@@ -54,7 +54,7 @@ class TestDicomDir:
         assert ds.patient_records[0].PatientName == 'Doe^Archibald'
         assert ds.patient_records[1].PatientName == 'Doe^Peter'
 
-    def test_invalid_transfer_syntax(self):
+    def test_invalid_transfer_syntax(self, allow_invalid_values):
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
             dcmread(IMPLICIT_TEST_FILE)
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):

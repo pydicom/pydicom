@@ -505,7 +505,7 @@ class TestReader:
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
 
-    def test_long_specific_char_set(self):
+    def test_long_specific_char_set(self, allow_invalid_values):
         """Test that specific character set is read even if it is longer
          than defer_size"""
         ds = Dataset()
@@ -691,7 +691,7 @@ class TestReader:
         assert ds.preamble is None
         assert Dataset() == ds.file_meta
 
-    def test_file_meta_dataset_implicit_vr(self):
+    def test_file_meta_dataset_implicit_vr(self, allow_invalid_values):
         """Test reading a file meta dataset that is implicit VR"""
 
         bytestream = (

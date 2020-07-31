@@ -261,7 +261,7 @@ class TestDataset:
         with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
             elem = self.ds.setdefault((0x8888, 0x0004), 'foo')
 
-    def test_setdefault_use_value(self):
+    def test_setdefault_use_value(self, allow_invalid_values):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
         assert 'Test' == elem.value
         assert 2 == len(self.ds)

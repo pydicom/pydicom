@@ -140,7 +140,7 @@ class TestCharset:
         pydicom.charset.decode_element(elem, [])
         assert 'iso8859' in elem.value.encodings
 
-    def test_bad_encoded_single_encoding(self):
+    def test_bad_encoded_single_encoding(self, allow_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -230,7 +230,7 @@ class TestCharset:
                                              'in encoded string value'):
             pydicom.charset.decode_element(elem, ['ISO_IR 100'])
 
-    def test_patched_charset(self):
+    def test_patched_charset(self, allow_invalid_values):
         """Test some commonly misspelled charset values"""
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         pydicom.charset.decode_element(elem, ['ISO_IR 192'])
@@ -409,7 +409,7 @@ class TestCharset:
         # we expect UTF-8 encoding here
         assert b'Buc^J\xc3\xa9r\xc3\xb4me' == ds_out.get_item(0x00100010).value
 
-    def test_invalid_second_encoding(self):
+    def test_invalid_second_encoding(self, allow_invalid_values):
         # regression test for #850
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         with pytest.warns(UserWarning,

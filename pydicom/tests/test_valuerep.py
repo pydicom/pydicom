@@ -219,7 +219,7 @@ class TestBadValueRead:
     def teardown(self):
         pydicom.values.convert_retry_VR_order = self.default_retry_order
 
-    def test_read_bad_value_in_VR_default(self):
+    def test_read_bad_value_in_VR_default(self, allow_invalid_values):
         # found a conversion
         assert "1A" == convert_value("SH", self.tag)
         # converted with fallback vr "SH"
