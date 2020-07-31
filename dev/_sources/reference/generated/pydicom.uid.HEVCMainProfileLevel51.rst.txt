@@ -1,0 +1,6 @@
+pydicom.uid.HEVCMainProfileLevel51
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HEVCMainProfileLevel51

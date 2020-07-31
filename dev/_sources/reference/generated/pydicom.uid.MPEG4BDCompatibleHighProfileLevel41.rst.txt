@@ -1,0 +1,6 @@
+pydicom.uid.MPEG4BDCompatibleHighProfileLevel41
+===============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MPEG4BDCompatibleHighProfileLevel41

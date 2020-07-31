@@ -193,6 +193,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
@@ -278,19 +279,35 @@
       </ul></li>
       <li><a href="reference/generated/pydicom.datadict.add_private_dict_entries.html#pydicom.datadict.add_private_dict_entries">add_private_dict_entries() (in module pydicom.datadict)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry">add_private_dict_entry() (in module pydicom.datadict)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.allow_DS_float.html#pydicom.config.allow_DS_float">allow_DS_float (in module pydicom.config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.append">append() (pydicom.multival.MultiValue method)</a>
 </li>
-      <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_color_lut">apply_color_lut() (in module pydicom.pixel_data_handlers.util)</a>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_color_lut.html#pydicom.pixel_data_handlers.apply_color_lut">apply_color_lut() (in module pydicom.pixel_data_handlers)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_color_lut">(in module pydicom.pixel_data_handlers.util)</a>
 </li>
-      <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut">apply_modality_lut() (in module pydicom.pixel_data_handlers.util)</a>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_modality_lut.html#pydicom.pixel_data_handlers.apply_modality_lut">apply_modality_lut() (in module pydicom.pixel_data_handlers)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut">(in module pydicom.pixel_data_handlers.util)</a>
 </li>
-      <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut">apply_voi_lut() (in module pydicom.pixel_data_handlers.util)</a>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_rescale.html#pydicom.pixel_data_handlers.apply_rescale">apply_rescale() (in module pydicom.pixel_data_handlers)</a>
+</li>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_voi_lut.html#pydicom.pixel_data_handlers.apply_voi_lut">apply_voi_lut() (in module pydicom.pixel_data_handlers)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut">(in module pydicom.pixel_data_handlers.util)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_windowing.html#pydicom.pixel_data_handlers.apply_windowing">apply_windowing() (in module pydicom.pixel_data_handlers)</a>
 </li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.pylibjpeg_handler.html#pydicom.pixel_data_handlers.pylibjpeg_handler.as_array">as_array() (in module pydicom.pixel_data_handlers.pylibjpeg_handler)</a>
 </li>
@@ -324,8 +341,12 @@
 </li>
       <li><a href="reference/generated/pydicom.values.convert_ATvalue.html#pydicom.values.convert_ATvalue">convert_ATvalue() (in module pydicom.values)</a>
 </li>
-      <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space">convert_color_space() (in module pydicom.pixel_data_handlers.util)</a>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.convert_color_space.html#pydicom.pixel_data_handlers.convert_color_space">convert_color_space() (in module pydicom.pixel_data_handlers)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space">(in module pydicom.pixel_data_handlers.util)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.values.convert_DA_string.html#pydicom.values.convert_DA_string">convert_DA_string() (in module pydicom.values)</a>
 </li>
       <li><a href="reference/generated/pydicom.values.convert_DS_string.html#pydicom.values.convert_DS_string">convert_DS_string() (in module pydicom.values)</a>
@@ -344,10 +365,10 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.convert_pixel_data">convert_pixel_data() (pydicom.dataset.Dataset method)</a>
 </li>
-      <li><a href="reference/generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN">convert_PN() (in module pydicom.values)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN">convert_PN() (in module pydicom.values)</a>
+</li>
       <li><a href="reference/generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string">convert_single_string() (in module pydicom.values)</a>
 </li>
       <li><a href="reference/generated/pydicom.values.convert_SQ.html#pydicom.values.convert_SQ">convert_SQ() (in module pydicom.values)</a>
@@ -623,6 +644,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.HEVCMain10ProfileLevel51.html#pydicom.uid.HEVCMain10ProfileLevel51">HEVCMain10ProfileLevel51 (in module pydicom.uid)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.HEVCMainProfileLevel51.html#pydicom.uid.HEVCMainProfileLevel51">HEVCMainProfileLevel51 (in module pydicom.uid)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -813,6 +846,20 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.MPEG2MainProfileHighLevel.html#pydicom.uid.MPEG2MainProfileHighLevel">MPEG2MainProfileHighLevel (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG2MainProfileMainLevel.html#pydicom.uid.MPEG2MainProfileMainLevel">MPEG2MainProfileMainLevel (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG4BDCompatibleHighProfileLevel41.html#pydicom.uid.MPEG4BDCompatibleHighProfileLevel41">MPEG4BDCompatibleHighProfileLevel41 (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG4HighProfileLevel41.html#pydicom.uid.MPEG4HighProfileLevel41">MPEG4HighProfileLevel41 (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG4HighProfileLevel422D.html#pydicom.uid.MPEG4HighProfileLevel422D">MPEG4HighProfileLevel422D (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG4HighProfileLevel423D.html#pydicom.uid.MPEG4HighProfileLevel423D">MPEG4HighProfileLevel423D (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.uid.MPEG4StereoHighProfileLevel42.html#pydicom.uid.MPEG4StereoHighProfileLevel42">MPEG4StereoHighProfileLevel42 (in module pydicom.uid)</a>
+</li>
       <li><a href="reference/generated/pydicom.filewriter.multi_string.html#pydicom.filewriter.multi_string">multi_string() (in module pydicom.filewriter)</a>
 </li>
       <li><a href="reference/generated/pydicom.valuerep.MultiString.html#pydicom.valuerep.MultiString">MultiString() (in module pydicom.valuerep)</a>

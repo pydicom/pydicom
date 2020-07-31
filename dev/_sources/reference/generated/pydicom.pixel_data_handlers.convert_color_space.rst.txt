@@ -1,0 +1,6 @@
+pydicom.pixel\_data\_handlers.convert\_color\_space
+===================================================
+
+.. currentmodule:: pydicom.pixel_data_handlers
+
+.. autofunction:: convert_color_space

@@ -14,4 +14,3 @@ Pixel Data Handlers (:mod:`pydicom.pixel_data_handlers`)
    pillow_handler
    pylibjpeg_handler
    rle_handler
-   util

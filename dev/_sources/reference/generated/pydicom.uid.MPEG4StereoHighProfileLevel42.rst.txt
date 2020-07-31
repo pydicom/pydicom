@@ -1,0 +1,6 @@
+pydicom.uid.MPEG4StereoHighProfileLevel42
+=========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MPEG4StereoHighProfileLevel42

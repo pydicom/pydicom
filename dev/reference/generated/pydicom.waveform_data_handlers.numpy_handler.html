@@ -42,7 +42,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="DICOMDIR (pydicom.dicomdir)" href="../dicomdir.html" />
+    <link rel="next" title="pydicom.pixel_data_handlers.apply_color_lut" href="pydicom.pixel_data_handlers.apply_color_lut.html" />
     <link rel="prev" title="Waveform Data Handlers (pydicom.waveform_data_handlers)" href="../handlers.waveform_data.html" /> 
 </head>
 
@@ -122,6 +122,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
@@ -292,7 +293,7 @@ SL, UL, SV, UV</p></td>
 </table>
 <dl class="py function">
 <dt id="pydicom.waveform_data_handlers.numpy_handler.generate_multiplex">
-<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">generate_multiplex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Generator[np.ndarray, None, None]<a class="reference external" href="https://github.com/pydicom/pydicom/blob/2c510a55/pydicom/waveform_data_handlers/numpy_handler.py#L85"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.generate_multiplex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">generate_multiplex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Generator[np.ndarray, None, None]<a class="reference external" href="https://github.com/pydicom/pydicom/blob/5beec161/pydicom/waveform_data_handlers/numpy_handler.py#L85"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.generate_multiplex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for each multiplex group in the
 <em>Waveform Sequence</em>.</p>
 <div class="versionadded">
@@ -318,7 +319,7 @@ with shape (samples, channels).</p>
 
 <dl class="py function">
 <dt id="pydicom.waveform_data_handlers.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2c510a55/pydicom/waveform_data_handlers/numpy_handler.py#L63"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5beec161/pydicom/waveform_data_handlers/numpy_handler.py#L63"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
@@ -327,7 +328,7 @@ with shape (samples, channels).</p>
 
 <dl class="py function">
 <dt id="pydicom.waveform_data_handlers.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2c510a55/pydicom/waveform_data_handlers/numpy_handler.py#L71"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveform_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5beec161/pydicom/waveform_data_handlers/numpy_handler.py#L71"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveform_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
@@ -350,7 +351,7 @@ the handler.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../dicomdir.html" class="btn btn-neutral float-right" title="DICOMDIR (pydicom.dicomdir)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.pixel_data_handlers.apply_color_lut.html" class="btn btn-neutral float-right" title="pydicom.pixel_data_handlers.apply_color_lut" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../handlers.waveform_data.html" class="btn btn-neutral float-left" title="Waveform Data Handlers (pydicom.waveform_data_handlers)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

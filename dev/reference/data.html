@@ -120,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
@@ -216,16 +217,16 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.data.get_charset_files.html#pydicom.data.get_charset_files" title="pydicom.data.get_charset_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_charset_files</span></code></a>([pattern])</p></td>
-<td><p>Return charset files from pydicom data root.</p></td>
+<td><p>Return a list of absolute paths to charsets with filenames matching <cite>pattern</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.data.get_palette_files.html#pydicom.data.get_palette_files" title="pydicom.data.get_palette_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_palette_files</span></code></a>([pattern])</p></td>
-<td><p>Return palette data files from pydicom data root.</p></td>
+<td><p>Return a list of absolute paths to palettes with filenames matching <cite>pattern</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_testdata_file</span></code></a>(name)</p></td>
-<td><p>Return the first test data file path with the given name found under the pydicom test data root.</p></td>
+<td><p>Return an absolute path to the first matching dataset with filename <cite>name</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_testdata_files</span></code></a>([pattern])</p></td>
-<td><p>Return test data files from pydicom data root.</p></td>
+<td><p>Return a list of absolute paths to datasets with filenames matching <cite>pattern</cite>.</p></td>
 </tr>
 </tbody>
 </table>

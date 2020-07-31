@@ -120,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
@@ -212,21 +213,28 @@
 <h1>pydicom.data.get_testdata_file<a class="headerlink" href="#pydicom-data-get-testdata-file" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.data.get_testdata_file">
-<code class="sig-prename descclassname">pydicom.data.</code><code class="sig-name descname">get_testdata_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2c510a55/pydicom/data/data_manager.py#L100"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.data.get_testdata_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the first test data file path with the given name found under
-the pydicom test data root.</p>
+<code class="sig-prename descclassname">pydicom.data.</code><code class="sig-name descname">get_testdata_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5beec161/pydicom/data/data_manager.py#L253"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.data.get_testdata_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an absolute path to the first matching dataset with filename
+<cite>name</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
+</div>
+<p>First searches the local <em>pydicom</em> data store, then any locally available
+external sources, and finally the files available in the
+pydicom/pydicom-data repository.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.1: </span>Modified to search locally available external data sources and the
+pydicom/pydicom-data repository</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The full file name (without path)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The full path of the file if found, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dd class="field-even"><p>The absolute path of the file if found, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
