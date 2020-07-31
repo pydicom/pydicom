@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    env:
+      pytest_args: ${{ matrix.pytest_args }}
     strategy:
       fail-fast: false
       matrix:
@@ -53,16 +55,16 @@ jobs:
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        PYTEST_ARGS=""
-        if [[ ${{ matrix.pytest_args }} == "cov" ]]; then PYTEST_ARGS="--cov=pydicom --cov-append"; fi
-        echo $PYTEST_ARGS
-        pytest $PYTEST_ARGS
+        ARGS=""
+        if [[ $(pytest_args) == "cov" ]]; then ARGS="--cov=pydicom --cov-append"; fi
+        echo $ARGS
+        pytest $ARGS
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest $PYTEST_ARGS
+        pytest $ARGS
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
@@ -71,7 +73,7 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
-        pytest $PYTEST_ARGS
+        pytest $ARGS
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm-dep == 'gdcm' }}
@@ -103,9 +105,9 @@ jobs:
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
-        pytest $PYTEST_ARGS pydicom/tests/test_pylibjpeg.py
+        pytest $ARGS pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
-        pytest $PYTEST_ARGS pydicom/tests/test_pylibjpeg.py
+        pytest $ARGS pydicom/tests/test_pylibjpeg.py
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
       run: >
