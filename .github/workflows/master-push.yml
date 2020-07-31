@@ -5,8 +5,6 @@ on:
     branches:
       - master
       - master-workflow  # Testing during development of the workflow
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
