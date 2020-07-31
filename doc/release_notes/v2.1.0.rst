@@ -13,16 +13,43 @@ Enhancements
   the file(s) be requested via the data manager functions.
   For example:
 
-  * to download all files and get their paths on disk you can run
-    ``pydicom.data.get_testdata_files()``.
-
-  * To download the 7.2 MB file ``RG1_UNCI.dcm`` and get its path on disk
-    you can run ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
+  * To download all files and get their paths on disk you can run
+    :func:`pydicom.data.get_testdata_files`.
+  * To download an individual file and get its path on disk you can use
+    :func:`pydicom.data.get_testdata_file`, e.g. for ``RG1_UNCI.dcm`` use
+    ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
 * Added a new pixel data handler based on pylibjpeg which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
+* Added handler for *Waveform Data* and :meth:`Dataset.waveform_generator
+  <pydicom.dataset.Dataset.waveform_generator>` which returns a generator
+  object that yields an :class:`~numpy.ndarray` for each multiplex group in
+  a *Waveform Sequence*.
+* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`,
+  :func:`~pydicom.pixel_data_handlers.apply_windowing`  aliases
+* Added ability to register external data sources for use with the functions
+  in :mod:`pydicom.data` (:pr:`1156`)
+* ``__contains__``, ``__next__`` and ``__iter__`` implementations added to
+  :class:`~pydicom.valuerep.PersonName` (:issue:`1103`)
+* Added convenience constants for the MPEG transfer syntaxes to
+  :mod:`pydicom.uid` (:pr:`1155`)
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
 
+Changes
+.......
+* Reading and adding unknown non-private tags now does not raise an exception
+  per default, only when :attr:`~pydicom.config.enforce_valid_values` is set 
+  (:issue:`1161`)
+
 Fixes
 .....
-* ``Dataset.copy`` now works as expected (see :issue:`1146`)
+* :meth:`Dataset.copy()<pydicom.dataset.Dataset.copy>` now works as expected
+  (:issue:`1146`)
+* Optimistically parse undefined length non-SQ data as if it's encapsulated
+  pixel data to avoid erroring out on embedded sequence delimiter
+  (:issue:`1140`)
+* Fixed :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_testdata_files` raising an exception if no network
+  connection is available (:pr:`1156`)
+* Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
+  a file-like (:issue:`1153`)

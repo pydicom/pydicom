@@ -138,7 +138,7 @@ class TestGDCM_JPEG2000_no_gdcm:
     def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
-    def test_JPEG2000(self):
+    def test_JPEG2000(self, allow_invalid_values):
         """JPEG2000: Returns correct values for sample data elements"""
         # XX also tests multiple-valued AT data element
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
@@ -149,15 +149,15 @@ class TestGDCM_JPEG2000_no_gdcm:
         expected = 'Lossy Compression'
         assert expected == got
 
-    def test_JPEG2000_pixel_array(self):
+    def test_JPEG2000_pixel_array(self, allow_invalid_values):
         with pytest.raises(NotImplementedError):
             self.jpeg_2k_lossless.pixel_array
 
-    def test_emri_JPEG2000_pixel_array(self):
+    def test_emri_JPEG2000_pixel_array(self, allow_invalid_values):
         with pytest.raises(NotImplementedError):
             self.emri_jpeg_2k_lossless.pixel_array
 
-    def test_jpeg2000_lossy(self):
+    def test_jpeg2000_lossy(self, allow_invalid_values):
         with pytest.raises(NotImplementedError):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 

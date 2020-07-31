@@ -127,6 +127,11 @@ JPEG-lossy.dcm
   * 1.2.840.10008.1.2.4.51 Default Transfer Syntax for Lossy JPEG 12-bit
   * GDCM prints when reading this file: "Unsupported JPEG data precision 12" and "Invalid SOS parameters for sequential JPEG", although it does appear to be read properly
 
+JPEG2000-embedded-sequence-delimiter.dcm
+  * A copy of JPEG2000.dcm, with 4 of the encoded pixel data bytes replaced with the Sequence Delimiter
+  * Almost certainly not a valid JPEG anymore, but the DICOM structure is valid
+  * Used to reproduce #1140.
+
 liver.dcm
   * The DICOM SEG example was generated using the dcmqi library: https://github.com/qiicr/dcmqi
   * Provided by Andrey Fedorov (@fedorov)

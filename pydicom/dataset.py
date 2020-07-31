@@ -22,12 +22,19 @@ from itertools import takewhile
 import json
 import os
 import os.path
+from typing import Generator, TYPE_CHECKING
 import warnings
+
+if TYPE_CHECKING:
+    try:
+        import numpy as np
+    except ImportError:
+        pass
 
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import datadict, jsonrep
+from pydicom import datadict, jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -42,6 +49,7 @@ from pydicom.pixel_data_handlers.util import (
 from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
+from pydicom.waveform_data_handlers import numpy_handler as wave_handler
 
 
 from importlib.util import find_spec as have_package
@@ -1257,6 +1265,8 @@ class Dataset(dict):
         ------
         KeyError
             If the `key` is not a valid tag or keyword.
+            If `key` is an unknown non-private tag and
+            `config.enforce_valid_values` is set.
             If no tag exists for `key`, default is not a
             :class:`~pydicom.dataelem.DataElement` and not
             ``None``, and `key` is not a known DICOM tag.
@@ -1266,7 +1276,18 @@ class Dataset(dict):
         if default is not None:
             if not isinstance(default, DataElement):
                 tag = Tag(key)
-                vr = datadict.dictionary_VR(tag)
+                try:
+                    vr = datadict.dictionary_VR(tag)
+                except KeyError:
+                    msg = "Unknown DICOM tag ({:04x}, {:04x})".format(
+                        tag.group, tag.element)
+                    if config.enforce_valid_values:
+                        msg += " can't look up VR"
+                        raise KeyError(msg)
+                    else:
+                        vr = 'UN'
+                        msg += " - setting VR to 'UN'"
+                        warnings.warn(msg)
                 default = DataElement(Tag(key), vr, default)
             self[key] = default
         return default
@@ -1612,6 +1633,37 @@ class Dataset(dict):
         """
         self.convert_pixel_data()
         return self._pixel_array
+
+    @property
+    def waveform_generator(self) -> Generator["np.ndarray", None, None]:
+        """Return a generator that yields an :class:`~numpy.ndarray` for each
+        multiplex group in (5400,0100) *Waveform Sequence*.
+
+        .. versionadded:: 2.1
+
+        Yields
+        ------
+        numpy.ndarray
+            The *Waveform Data* for each multiplex group as an
+            :class:`~numpy.ndarray` with shape (samples, channels). If a
+            channel item contains a (003A,0212) *Channel Sensitivity Correction
+            Factor* element then it will be applied.
+
+        See Also
+        --------
+        :func:`~pydicom.waveform_data_handlers.numpy_handler.generate_multiplex`
+        """
+        transfer_syntax = self.file_meta.TransferSyntaxUID
+        if not wave_handler.supports_transfer_syntax(transfer_syntax):
+            raise NotImplementedError(
+                f"Unable to decode waveform data with a transfer syntax UID "
+                f"of '{transfer_syntax}' ({transfer_syntax.name})"
+            )
+
+        if not wave_handler.is_available():
+            raise RuntimeError("The waveform data handler requires numpy")
+
+        return wave_handler.generate_multiplex(self, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa

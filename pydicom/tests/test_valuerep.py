@@ -18,7 +18,6 @@ import pytest
 
 from pydicom.valuerep import PersonName
 
-
 try:
     import cPickle as pickle
 except ImportError:
@@ -138,7 +137,7 @@ class TestDSdecimal:
     def test_float_value(self):
         config.allow_DS_float = False
         with pytest.raises(
-            TypeError, match="cannot be instantiated with a float value"
+                TypeError, match="cannot be instantiated with a float value"
         ):
             pydicom.valuerep.DSdecimal(9.0)
         config.allow_DS_float = True
@@ -172,7 +171,7 @@ class TestIS:
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
-    def test_longint(self):
+    def test_longint(self, allow_invalid_values):
         # Check that a long int is read properly
         # Will not work with enforce_valid_values
         x = pydicom.valuerep.IS(3103050000)
@@ -180,12 +179,9 @@ class TestIS:
         x2 = pickle.loads(data1_string)
         assert x.real == x2.real
 
-    def test_overflow(self):
-        original_flag = config.enforce_valid_values
-        config.enforce_valid_values = True
+    def test_overflow(self, enforce_valid_values):
         with pytest.raises(OverflowError, match="Value exceeds DICOM limits*"):
             pydicom.valuerep.IS(3103050000)
-        config.enforce_valid_values = original_flag
 
     def test_str(self):
         """Test IS.__str__()."""
@@ -223,7 +219,7 @@ class TestBadValueRead:
     def teardown(self):
         pydicom.values.convert_retry_VR_order = self.default_retry_order
 
-    def test_read_bad_value_in_VR_default(self):
+    def test_read_bad_value_in_VR_default(self, allow_invalid_values):
         # found a conversion
         assert "1A" == convert_value("SH", self.tag)
         # converted with fallback vr "SH"
@@ -233,8 +229,8 @@ class TestBadValueRead:
         # no fallback VR succeeded, returned original value untranslated
         assert b"1A" == convert_value("IS", self.tag)
 
-    def test_read_bad_value_in_VR_enforce_valid_value(self):
-        pydicom.config.enforce_valid_values = True
+    def test_read_bad_value_in_VR_enforce_valid_value(
+            self, enforce_valid_values):
         # found a conversion
         assert "1A" == convert_value("SH", self.tag)
         # invalid literal for base 10
@@ -246,13 +242,11 @@ class TestDecimalString:
     """Unit tests unique to the use of DS class
        derived from python Decimal"""
 
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def ds_decimal(self):
         config.DS_decimal(True)
-        config.enforce_valid_values = True
-
-    def teardown(self):
+        yield
         config.DS_decimal(False)
-        config.enforce_valid_values = False
 
     def test_DS_decimal_set(self):
         config.use_DS_decimal = False
@@ -272,7 +266,7 @@ class TestDecimalString:
         ds = valuerep.DS(long_str)
         assert len(str(ds)) <= 16
 
-    def test_invalid_decimal_strings(self):
+    def test_invalid_decimal_strings(self, enforce_valid_values):
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
         with pytest.raises(OverflowError):
@@ -426,6 +420,62 @@ class TestPersonName:
             "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
         )
         assert hash(pn1) == hash(pn2)
+
+    def test_next(self):
+        """Test that the next function works on it's own"""
+        # Test getting the first character
+        pn1 = PersonName("John^Doe^^Dr", encodings=default_encoding)
+        pn1_itr = iter(pn1)
+        assert next(pn1_itr) == "J"
+
+        # Test getting multiple characters
+        pn2 = PersonName(
+            "Yamada^Tarou=山田^太郎=やまだ^たろう", [default_encoding, "iso2022_jp"]
+        )
+        pn2_itr = iter(pn2)
+        assert next(pn2_itr) == "Y"
+        assert next(pn2_itr) == "a"
+
+        # Test getting all characters
+        pn3 = PersonName("SomeName")
+        pn3_itr = iter(pn3)
+        assert next(pn3_itr) == "S"
+        assert next(pn3_itr) == "o"
+        assert next(pn3_itr) == "m"
+        assert next(pn3_itr) == "e"
+        assert next(pn3_itr) == "N"
+        assert next(pn3_itr) == "a"
+        assert next(pn3_itr) == "m"
+        assert next(pn3_itr) == "e"
+
+        # Attempting to get next characeter should stop the iteration
+        # I.e. next can only start once
+        with pytest.raises(StopIteration):
+            next(pn3_itr)
+
+        # Test that next() doesn't work without instantiating an iterator
+        pn4 = PersonName("SomeName")
+        with pytest.raises(AttributeError):
+            next(pn4)
+
+    def test_iterator(self):
+        """Test that iterators can be corretly constructed"""
+        name_str = "John^Doe^^Dr"
+        pn1 = PersonName(name_str)
+
+        for i, c in enumerate(pn1):
+            assert name_str[i] == c
+
+        # Ensure that multiple iterators can be created on the same variable
+        for i, c in enumerate(pn1):
+            assert name_str[i] == c
+
+    def test_contains(self):
+        """Test that characters can be check if they are within the name"""
+        pn1 = PersonName("John^Doe")
+        assert ("J" in pn1) == True
+        assert ("o" in pn1) == True
+        assert ("x" in pn1) == False
 
 
 class TestDateTime:

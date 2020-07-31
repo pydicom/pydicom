@@ -61,7 +61,7 @@ jobs:
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
-            coverage-args: --cov=pydicom --cov-append
+            pytest-args: --cov=pydicom --cov-append
             coverage: coverage
 
     steps:
@@ -92,13 +92,13 @@ jobs:
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
@@ -107,7 +107,7 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm-dep == 'gdcm' }}
@@ -134,16 +134,21 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
 
     - name: Test pylibjpeg
-      if: ${{ matrix.pylibjpeg-dep == 'normal' }}
+      if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
-        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
-        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+
+    - name: Test external sources using pydicom-data
+      run: |
+        python -m pip install git+https://github.com/pydicom/pydicom-data
+        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
