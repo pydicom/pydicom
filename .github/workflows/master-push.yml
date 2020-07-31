@@ -84,7 +84,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: gdcmbin
-        key: GDCM
+        key: GDCM-${{ matrix.os }}-python${{ matrix.python-version }}
     - name: Build GDCM (if not in cache)
       if: ${{ matrix.gdcm-dep == 'gdcm' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
