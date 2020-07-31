@@ -211,6 +211,13 @@ object that yields an <a class="reference external" href="https://numpy.org/doc/
 a <em>Waveform Sequence</em>.</p></li>
 </ul>
 </div>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Reading and adding unknown non-private tags now does not raise an exception
+per default, only when <cite>config.enforce_valid_values</cite> is set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
+</ul>
+</div>
 <div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
