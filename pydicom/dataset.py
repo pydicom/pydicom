@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import datadict, jsonrep
+from pydicom import datadict, jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -1265,6 +1265,8 @@ class Dataset(dict):
         ------
         KeyError
             If the `key` is not a valid tag or keyword.
+            If `key` is an unknown non-private tag and
+            `config.enforce_valid_values` is set.
             If no tag exists for `key`, default is not a
             :class:`~pydicom.dataelem.DataElement` and not
             ``None``, and `key` is not a known DICOM tag.
@@ -1274,7 +1276,18 @@ class Dataset(dict):
         if default is not None:
             if not isinstance(default, DataElement):
                 tag = Tag(key)
-                vr = datadict.dictionary_VR(tag)
+                try:
+                    vr = datadict.dictionary_VR(tag)
+                except KeyError:
+                    msg = "Unknown DICOM tag ({:04x}, {:04x})".format(
+                        tag.group, tag.element)
+                    if config.enforce_valid_values:
+                        msg += " can't look up VR"
+                        raise KeyError(msg)
+                    else:
+                        vr = 'UN'
+                        msg += " - setting VR to 'UN'"
+                        warnings.warn(msg)
                 default = DataElement(Tag(key), vr, default)
             self[key] = default
         return default

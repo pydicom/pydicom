@@ -97,12 +97,12 @@ class TestJPEGLS_JPEG2000_no_jpeg_ls:
     def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
-    def test_JPEG2000PixelArray(self):
+    def test_JPEG2000PixelArray(self, allow_invalid_values):
         """JPEG2000: Now works"""
         with pytest.raises(NotImplementedError):
             self.jpeg_2k.pixel_array
 
-    def test_emri_JPEG2000PixelArray(self):
+    def test_emri_JPEG2000PixelArray(self, allow_invalid_values):
         """JPEG2000: Now works"""
         with pytest.raises(NotImplementedError):
             self.emri_jpeg_2k_lossless.pixel_array

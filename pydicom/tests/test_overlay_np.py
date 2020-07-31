@@ -225,7 +225,8 @@ class TestNumpy_NumpyHandler:
                 ds.overlay_array(0x6000)
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(self, fpath, data):
+    def test_can_access_unsupported_dataset(
+            self, fpath, data, allow_invalid_values):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID
