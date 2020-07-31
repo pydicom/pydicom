@@ -230,7 +230,6 @@ class TestHexUtil:
 class TestDataElementCallbackTests:
     def setup(self):
         # Set up a dataset with commas in one item instead of backslash
-        config.enforce_valid_values = True
         namespace = {}
         exec(raw_hex_code, {}, namespace)
         ds_bytes = hexutil.hex2bytes(namespace['impl_LE_deflen_std_hex'])
@@ -240,10 +239,7 @@ class TestDataElementCallbackTests:
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
-    def testBadSeparator(self):
+    def testBadSeparator(self, enforce_valid_values):
         """Ensure that unchanged bad separator does raise an error..."""
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)

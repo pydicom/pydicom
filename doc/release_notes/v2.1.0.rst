@@ -25,6 +25,11 @@ Enhancements
   object that yields an :class:`~numpy.ndarray` for each multiplex group in
   a *Waveform Sequence*.
 
+Changes
+.......
+* Reading and adding unknown non-private tags now does not raise an exception
+  per default, only when `config.enforce_valid_values` is set (:issue:`1161`)
+
 Fixes
 .....
 * ``Dataset.copy`` now works as expected (see :issue:`1146`)

@@ -512,13 +512,23 @@ class TestDataElement:
 
 
 class TestRawDataElement:
+
     """Tests for dataelem.RawDataElement."""
-    def test_key_error(self):
+    def test_invalid_tag_warning(self, allow_invalid_values):
+        """RawDataElement: conversion of unknown tag warns..."""
+        raw = RawDataElement(Tag(0x88880088), None, 4, b'unknown',
+                             0, True, True)
+
+        with pytest.warns(UserWarning, match=r"\(8888, 0088\)"):
+            element = DataElement_from_raw(raw)
+            assert element.VR == 'UN'
+
+    def test_key_error(self, enforce_valid_values):
         """RawDataElement: conversion of unknown tag throws KeyError..."""
         # raw data element -> tag VR length value
         #                       value_tell is_implicit_VR is_little_endian'
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
-        raw = RawDataElement(Tag(0x88880002), None, 4, 0x1111,
+        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
                              0, True, True)
 
         with pytest.raises(KeyError, match=r"\(8888, 0002\)"):

@@ -10,6 +10,7 @@ A DataElement has a tag,
 
 import base64
 import json
+import warnings
 from collections import namedtuple
 
 from pydicom import config  # don't import datetime_conversion directly
@@ -686,6 +687,12 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     Returns
     -------
     DataElement
+
+    Raises
+    ------
+    KeyError
+        If `raw_data_element` belongs to an unknown non-private tag and
+        `config.enforce_valid_values` is set.
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader
@@ -717,8 +724,13 @@ def DataElement_from_raw(raw_data_element, encoding=None):
                 VR = 'UL'
             else:
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
-                msg += " can't look up VR"
-                raise KeyError(msg)
+                if config.enforce_valid_values:
+                    msg += " can't look up VR"
+                    raise KeyError(msg)
+                else:
+                    VR = 'UN'
+                    msg += " - setting VR to 'UN'"
+                    warnings.warn(msg)
     elif (VR == 'UN' and not raw.tag.is_private and
           config.replace_un_with_known_vr):
         # handle rare case of incorrectly set 'UN' in explicit encoding
