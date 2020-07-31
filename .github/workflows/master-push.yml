@@ -115,7 +115,7 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test external sources using pydicom-data
-      if: ${{ matrix.ext_sources == "pydicom-data" }}
+      if: ${{ matrix.ext_sources == 'pydicom-data' }}
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
         pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
