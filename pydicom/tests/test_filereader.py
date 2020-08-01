@@ -99,7 +99,6 @@ save_dir = os.getcwd()
 
 class TestReader:
     def teardown(self):
-        config.enforce_valid_values = False
         config.replace_un_with_known_vr = True
 
     def test_empty_numbers_tag(self):
@@ -345,7 +344,7 @@ class TestReader:
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
 
-    def test_tag_with_unknown_length_tag_too_short(self):
+    def test_tag_with_unknown_length_tag_too_short(self, allow_invalid_values):
         """Tests handling of incomplete sequence value."""
         # the data set is the same as emri_jpeg_2k_lossless,
         # with the last 8 bytes removed to provoke the EOF error
@@ -356,7 +355,10 @@ class TestReader:
                 specific_tags=[unknown_len_tag],
             )
 
-        config.enforce_valid_values = True
+    def test_tag_with_unknown_length_tag_too_short_strict(
+            self, enforce_valid_values):
+        """Tests handling of incomplete sequence value in strict mode."""
+        unknown_len_tag = Tag(0x7FE0, 0x0010)  # Pixel Data
         with pytest.raises(EOFError, match="End of file reached*"):
             dcmread(
                 emri_jpeg_2k_lossless_too_short,
@@ -503,7 +505,7 @@ class TestReader:
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
 
-    def test_long_specific_char_set(self):
+    def test_long_specific_char_set(self, allow_invalid_values):
         """Test that specific character set is read even if it is longer
          than defer_size"""
         ds = Dataset()
@@ -689,7 +691,7 @@ class TestReader:
         assert ds.preamble is None
         assert Dataset() == ds.file_meta
 
-    def test_file_meta_dataset_implicit_vr(self):
+    def test_file_meta_dataset_implicit_vr(self, allow_invalid_values):
         """Test reading a file meta dataset that is implicit VR"""
 
         bytestream = (
@@ -801,7 +803,6 @@ class TestReader:
 
 class TestIncorrectVR:
     def setup(self):
-        config.enforce_valid_values = False
         self.ds_explicit = BytesIO(
             b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"  # SpecificCharacterSet
             b"\x08\x00\x20\x00DA\x08\x0020000101"  # StudyDate
@@ -811,10 +812,7 @@ class TestIncorrectVR:
             b"\x08\x00\x20\x00\x08\x00\x00\x0020000101"
         )
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
-    def test_implicit_vr_expected_explicit_used(self):
+    def test_implicit_vr_expected_explicit_used(self, allow_invalid_values):
         msg = (
             "Expected implicit VR, but found explicit VR - "
             "using explicit VR for reading"
@@ -827,8 +825,8 @@ class TestIncorrectVR:
         assert "ISO_IR 100" == ds.SpecificCharacterSet
         assert "20000101" == ds.StudyDate
 
-    def test_implicit_vr_expected_explicit_used_strict(self):
-        config.enforce_valid_values = True
+    def test_implicit_vr_expected_explicit_used_strict(
+            self, enforce_valid_values):
         msg = (
             "Expected implicit VR, but found explicit VR - "
             "using explicit VR for reading"
@@ -839,7 +837,7 @@ class TestIncorrectVR:
                 self.ds_explicit, is_implicit_VR=True, is_little_endian=True
             )
 
-    def test_explicit_vr_expected_implicit_used(self):
+    def test_explicit_vr_expected_implicit_used(self, allow_invalid_values):
         msg = (
             "Expected explicit VR, but found implicit VR - "
             "using implicit VR for reading"
@@ -852,8 +850,8 @@ class TestIncorrectVR:
         assert "ISO_IR 100" == ds.SpecificCharacterSet
         assert "20000101" == ds.StudyDate
 
-    def test_explicit_vr_expected_implicit_used_strict(self):
-        config.enforce_valid_values = True
+    def test_explicit_vr_expected_implicit_used_strict(
+            self, enforce_valid_values):
         msg = (
             "Expected explicit VR, but found implicit VR - "
             "using implicit VR for reading"

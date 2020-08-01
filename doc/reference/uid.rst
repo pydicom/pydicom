@@ -25,6 +25,15 @@ Predefined UIDs
    JPEG2000
    JPEG2000MultiComponentLossless
    JPEG2000MultiComponent
+   MPEG2MainProfileMainLevel
+   MPEG2MainProfileHighLevel
+   MPEG4HighProfileLevel41
+   MPEG4BDCompatibleHighProfileLevel41
+   MPEG4HighProfileLevel422D
+   MPEG4HighProfileLevel423D
+   MPEG4StereoHighProfileLevel42
+   HEVCMainProfileLevel51
+   HEVCMain10ProfileLevel51
    RLELossless
 
 
