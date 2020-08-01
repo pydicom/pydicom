@@ -11,8 +11,7 @@ This tutorial is about understanding waveforms in DICOM datasets and covers:
 It's assumed that you're already familiar with the :doc:`dataset basics
 <dataset_basics>`.
 
-Pre-requisites
---------------
+**Prerequisites**
 
 .. code-block:: bash
 
@@ -22,8 +21,12 @@ Pre-requisites
 
     conda install pydicom>=2.1 numpy matplotlib
 
-:dcm:`Waveform Explanatory Information<part17/chapter_C.html>`
-:dcm:`Waveform Information Model<part17/sect_C.5.html>`
+**References**
+
+* :dcm:`Waveform Module <part03/sect_C.10.9.html>`
+* :dcm:`Waveform Explanatory Information<part17/chapter_C.html>`
+* :dcm:`Waveform Information Model<part17/sect_C.5.html>`
+* :dcm:`Waveform IODs<part03/sect_A.34.html>`
 
 Waveforms in DICOM
 ==================
@@ -32,11 +35,7 @@ There are a number of DICOM :dcm:`Information Object Definitions
 <part03/sect_A.34.html>` (IODs) that contain
 waveforms, such as :dcm:`12-Lead ECG<part03/sect_A.34.3.html>`,
 :dcm:`Respiratory Waveform<part03/sect_A.34.9.html>` and
-:dcm:`Real-Time Audio Waveform<part03/sect_A.34.11.html>`.
-
-The waveform information model
-
-Every waveform IOD
+:dcm:`Real-Time Audio Waveform<part03/sect_A.34.11.html>`. Every waveform IOD
 uses the :dcm:`Waveform Module <part03/sect_C.10.9.html>` to represent one or
 more multi-channel time-based digitized waveforms, sampled at constant time
 intervals.
@@ -102,8 +101,8 @@ defining information for each channel is available in the (5400,0200)
 Decoding *Waveform Data*
 ========================
 
-The combined sample data is stored in the (5400,1010) *Waveform Data* element
-within each multiplex:
+The combined sample data for each multiplex is stored in the corresponding
+(5400,1010) *Waveform Data* element:
 
 .. code-block:: python
 
@@ -127,22 +126,20 @@ channels interleaved, so for our case the data is ordered as:
 
 To decode the raw multiplex waveform data to a numpy :class:`~numpy.ndarray`
 you can use the :func:`~pydicom.waveforms.numpy_handler.multiplex_array`
-function:
+function. The following decodes and returns the raw data from the multiplex at
+*index* ``0`` within the *Waveform Sequence*:
 
 .. code-block:: python
 
-    >>> import matplotlib.pyplot as plt
     >>> from pydicom.waveforms import multiplex_array
     >>> raw = multiplex_array(ds, index=0, as_raw=True)
     >>> raw[0, 0]
     80
 
-This will decode and return the raw waveforms from the multiplex at *index*
-``0`` within the *Waveform Sequence*.
 
 If (003A,0210) *Channel Sensitivity* is present within the multiplex's *Channel
 Definition Sequence* then the raw sample data needs to be corrected before it's
-in the quantity it represents. The correction is given by (sample + *Channel
+in the quantity it represents. This correction is given by (sample + *Channel
 Baseline*) x *Channel Sensitivity* x *Channel Sensitivity Correction Factor*
 and will be applied when `as_raw` is ``False`` or when using the
 :meth:`Dataset.waveform_array<pydicom.dataset.Dataset.waveform_array>`
@@ -151,18 +148,22 @@ function:
     >>> arr = ds.waveform_array(index=0)
     >>> arr[0, 0]
     >>> 100.0
+    >>> import matplotlib.pyplot as plt
     >>> fig, (ax1, ax2) = plt.subplots(2)
     >>> ax1.plot(raw[:, 0])
     >>> ax1.set_ylabel("unitless")
     >>> ax2.plot(arr[:, 0])
     >>> ax2.set_ylabel("μV")
-    >>> fig.show()
+    >>> plt.show()
 
+.. image:: waveforms_assets/waveforms_decode.png
+   :width: 800
+   :align: center
 
-When processing large amounts of waveform data it might be useful to use the
-:func:`~pydicom.waveforms.numpy_handler.generate_multiplex` function instead,
-as it yields an :class:`~numpy.ndarray` for each multiplex group within the
-*Waveform Sequence*:
+When processing large amounts of waveform data it might be more efficient to
+use the :func:`~pydicom.waveforms.numpy_handler.generate_multiplex` function
+instead. It yields an :class:`~numpy.ndarray` for each multiplex group
+within the *Waveform Sequence*:
 
 .. code-block:: python
 
@@ -177,4 +178,80 @@ as it yields an :class:`~numpy.ndarray` for each multiplex group within the
 Encoding *Waveform Data*
 ========================
 
-group -> 2 channels -> numpy int16 sin and cosine waves -> encode
+Encoding a new waveform is
+
+The new multiplex group will contain two channels representing cosine and sine
+curves. We've chosen to represent our waveforms using signed 16-bit integers,
+but you can use signed or unsigned 8, 16, 32 or 64-bit integers depending on
+the requirements of the IOD.
+
+.. code-block:: python
+
+    >>> import numpy as np
+    >>> x = np.arange(0, 4 * np.pi, 0.1)
+    >>> ch1 = (np.cos(x) * (2**15 - 1)).astype('int16')
+    >>> ch2 = (np.sin(x) * (2**15 - 1)).astype('int16')
+
+Next we create the new multiplex group that will contain the waveforms:
+
+.. code-block:: python
+
+    >>> from pydicom.dataset import Dataset
+    >>> new = Dataset()
+    >>> new.WaveformOriginality = "ORIGINAL"
+    >>> new.NumberOfWaveformChannels = 2
+    >>> new.NumberOfWaveformSamples = len(x)
+    >>> new.SamplingFrequency = "1000"
+
+We set our channel definitions (note that we have opted not to include a
+*Channel Sensitivity*, so our data will be unitless). If you were to do this
+for real you would obviously use an official coding scheme.
+
+.. code-block:: python
+
+    >>> new.ChannelDefinitionSequence = [Dataset(), Dataset()]
+    >>> chdef_seq = new.ChannelDefinitionSequence
+    >>> for chdef, curve_type in zip(chdef_seq, ["cosine", "sine"]):
+    ...     chdef.ChannelSampleSkew = "0"
+    ...     chdef.WaveformBitsStored = 16
+    ...     chdef.ChannelSourceSequence = [Dataset()]
+    ...     source = chdef.ChannelSourceSequence[0]
+    ...     source.CodeValue = "1.0"
+    ...     source.CodingSchemeDesignator = "PYDICOM"
+    ...     source.CodingSchemeVersion = "1.0"
+    ...     source.CodeMeaning = curve_type
+
+Interleave the waveforms, add it to the *Waveform Data* and set the
+corresponding *Waveform Bits Allocated* and *Waveform Sample Interpretation*
+to match our data representation type:
+
+.. code-block:: python
+
+    >>> arr = np.stack((ch1, ch2), axis=1)
+    >>> arr.shape
+    (126, 2)
+    >>> new.WaveformData = arr.tobytes()
+    >>> new.WaveformBitsAllocated = 16
+    >>> new.WaveformSampleInterpretation = 'SS'
+
+And finally add the new multiplex group to our example dataset and save:
+
+.. code-block:: python
+
+    >>> ds.WaveformSequence.append(new)
+    >>> ds.save_as("my_waveform.dcm")
+
+We should now be able to plot our new waveforms:
+
+.. code-block:: python
+
+    >>> ds = dcmread("my_waveform.dcm")
+    >>> arr = ds.waveform_array(index=2)
+    >>> fig, (ax1, ax2) = plt.subplots(2)
+    >>> ax1.plot(arr[:, 0])
+    >>> ax2.plot(arr[:, 1])
+    >>> plt.show()
+
+.. image:: waveforms_assets/waveforms_encode.png
+   :width: 800
+   :align: center

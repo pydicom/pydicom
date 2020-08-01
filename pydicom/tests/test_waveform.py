@@ -31,12 +31,12 @@ ECG = get_testdata_file('waveform_ecg.dcm')
 
 
 @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
-def test_waveform_generator_raises():
-    """Test overlay_array raises exception for all syntaxes."""
+def test_waveform_array_raises():
+    """Test waveform_array raises exception for all syntaxes."""
     ds = dcmread(ECG)
     msg = r"The waveform data handler requires numpy"
     with pytest.raises(RuntimeError, match=msg):
-        next(ds.waveform_generator)
+        ds.waveform_array()
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
