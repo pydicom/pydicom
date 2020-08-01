@@ -28,14 +28,12 @@ There are the following possibilities:
 
 import pytest
 
-import pydicom
 from pydicom import config
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filereader import dcmread
-
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -66,11 +64,11 @@ except ImportError:
 # DEFL: Deflated Explicit VR Little Endian
 # EXPB: Explicit VR Big Endian
 # 1/1, 1 sample/pixel, 1 frame
-EXPL_1_1_1F = get_testdata_files("liver_1frame.dcm")[0]
-EXPB_1_1_1F = get_testdata_files("liver_expb_1frame.dcm")[0]
+EXPL_1_1_1F = get_testdata_file("liver_1frame.dcm")
+EXPB_1_1_1F = get_testdata_file("liver_expb_1frame.dcm")
 # 1/1, 1 sample/pixel, 3 frame
-EXPL_1_1_3F = get_testdata_files("liver.dcm")[0]
-EXPB_1_1_3F = get_testdata_files("liver_expb.dcm")[0]
+EXPL_1_1_3F = get_testdata_file("liver.dcm")
+EXPB_1_1_3F = get_testdata_file("liver_expb.dcm")
 # 1/1, 3 sample/pixel, 1 frame
 EXPL_1_3_1F = None
 EXPB_1_3_1F = None
@@ -78,73 +76,73 @@ EXPB_1_3_1F = None
 EXPL_1_3_XF = None
 EXPB_1_3_XF = None
 # 8/8, 1 sample/pixel, 1 frame
-DEFL_8_1_1F = get_testdata_files("image_dfl.dcm")[0]
-EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-EXPB_8_1_1F = get_testdata_files("OBXXXX1A_expb.dcm")[0]
+DEFL_8_1_1F = get_testdata_file("image_dfl.dcm")
+EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
+EXPB_8_1_1F = get_testdata_file("OBXXXX1A_expb.dcm")
 # 8/8, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
-EXPB_8_1_2F = get_testdata_files("OBXXXX1A_expb_2frame.dcm")[0]
+EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
+EXPB_8_1_2F = get_testdata_file("OBXXXX1A_expb_2frame.dcm")
 # 8/8, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
-EXPB_8_3_1F = get_testdata_files("SC_rgb_expb.dcm")[0]
+EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
+EXPB_8_3_1F = get_testdata_file("SC_rgb_expb.dcm")
 # 8/8, 3 samples/pixel, 1 frame, 3 x 3
-EXPL_8_3_1F_ODD = get_testdata_files('SC_rgb_small_odd.dcm')[0]
+EXPL_8_3_1F_ODD = get_testdata_file('SC_rgb_small_odd.dcm')
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
-EXPL_8_3_1F_YBR422 = get_testdata_files('SC_ybr_full_422_uncompressed.dcm')[0]
+EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL
-EXPL_8_3_1F_YBR = get_testdata_files('SC_ybr_full_uncompressed.dcm')[0]
+EXPL_8_3_1F_YBR = get_testdata_file('SC_ybr_full_uncompressed.dcm')
 # 8/8, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-EXPB_8_3_2F = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
+EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
+EXPB_8_3_2F = get_testdata_file("SC_rgb_expb_2frame.dcm")
 # 16/16, 1 sample/pixel, 1 frame
-IMPL_16_1_1F = get_testdata_files("MR_small_implicit.dcm")[0]
-EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
-EXPB_16_1_1F = get_testdata_files("MR_small_expb.dcm")[0]
+IMPL_16_1_1F = get_testdata_file("MR_small_implicit.dcm")
+EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
+EXPB_16_1_1F = get_testdata_file("MR_small_expb.dcm")
 # Pixel Data with 128 bytes trailing padding
-EXPL_16_1_1F_PAD = get_testdata_files("MR_small_padded.dcm")[0]
+EXPL_16_1_1F_PAD = get_testdata_file("MR_small_padded.dcm")
 # 16/12, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
-EXPB_16_1_10F = get_testdata_files("emri_small_big_endian.dcm")[0]
+EXPL_16_1_10F = get_testdata_file("emri_small.dcm")
+EXPB_16_1_10F = get_testdata_file("emri_small_big_endian.dcm")
 # 16/16, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
-EXPB_16_3_1F = get_testdata_files("SC_rgb_expb_16bit.dcm")[0]
+EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
+EXPB_16_3_1F = get_testdata_file("SC_rgb_expb_16bit.dcm")
 # 16/16, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
-EXPB_16_3_2F = get_testdata_files("SC_rgb_expb_16bit_2frame.dcm")[0]
+EXPL_16_3_2F = get_testdata_file("SC_rgb_16bit_2frame.dcm")
+EXPB_16_3_2F = get_testdata_file("SC_rgb_expb_16bit_2frame.dcm")
 # 32/32, 1 sample/pixel, 1 frame
-IMPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
-EXPB_32_1_1F = get_testdata_files("rtdose_expb_1frame.dcm")[0]
+IMPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
+EXPB_32_1_1F = get_testdata_file("rtdose_expb_1frame.dcm")
 # 32/32, 1 sample/pixel, 15 frame
-IMPL_32_1_15F = get_testdata_files("rtdose.dcm")[0]
-EXPB_32_1_15F = get_testdata_files("rtdose_expb.dcm")[0]
+IMPL_32_1_15F = get_testdata_file("rtdose.dcm")
+EXPB_32_1_15F = get_testdata_file("rtdose_expb.dcm")
 # 32/32, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
-EXPB_32_3_1F = get_testdata_files("SC_rgb_expb_32bit.dcm")[0]
+EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
+EXPB_32_3_1F = get_testdata_file("SC_rgb_expb_32bit.dcm")
 # 32/32, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
-EXPB_32_3_2F = get_testdata_files("SC_rgb_expb_32bit_2frame.dcm")[0]
+EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
+EXPB_32_3_2F = get_testdata_file("SC_rgb_expb_32bit_2frame.dcm")
 
 # Transfer syntaxes supported by other handlers
 # JPEG Baseline (Process 1)
-JPEG_BASELINE_1 = get_testdata_files("SC_rgb_jpeg_dcmtk.dcm")[0]
+JPEG_BASELINE_1 = get_testdata_file("SC_rgb_jpeg_dcmtk.dcm")
 # JPEG Baseline (Process 2 and 4)
-JPEG_EXTENDED_2 = get_testdata_files("JPEG-lossy.dcm")[0]
+JPEG_EXTENDED_2 = get_testdata_file("JPEG-lossy.dcm")
 # JPEG Lossless (Process 14)
 JPEG_LOSSLESS_14 = None
 # JPEG Lossless (Process 14, Selection Value 1)
-JPEG_LOSSLESS_14_1 = get_testdata_files("SC_rgb_jpeg_gdcm.dcm")[0]
+JPEG_LOSSLESS_14_1 = get_testdata_file("SC_rgb_jpeg_gdcm.dcm")
 # JPEG-LS Lossless
-JPEG_LS_LOSSLESS = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
+JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 # JPEG-LS Lossy
 JPEG_LS_LOSSY = None
 # JPEG2k Lossless
-JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
+JPEG_2K_LOSSLESS = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 # JPEG2k
-JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
+JPEG_2K = get_testdata_file("JPEG2000.dcm")
 # RLE Lossless
-RLE = get_testdata_files("MR_small_RLE.dcm")[0]
+RLE = get_testdata_file("MR_small_RLE.dcm")
 # No Image Pixel module
-NO_PIXEL = get_testdata_files("rtplan.dcm")[0]
+NO_PIXEL = get_testdata_file("rtplan.dcm")
 
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
@@ -360,8 +358,7 @@ class TestNumpy_NoNumpyHandler:
         assert 8192 == len(ds.PixelData)
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(
-            self, fpath, data, allow_invalid_values):
+    def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID
@@ -484,8 +481,7 @@ class TestNumpy_NumpyHandler:
             ds.pixel_array
 
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(
-            self, fpath, data, allow_invalid_values):
+    def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID

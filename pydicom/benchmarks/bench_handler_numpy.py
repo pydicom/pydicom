@@ -10,43 +10,41 @@ from tempfile import TemporaryFile
 import numpy as np
 
 from pydicom import dcmread
+from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.data import get_testdata_files
-from pydicom.encaps import decode_data_sequence
 from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
-
 # 1/1, 1 sample/pixel, 1 frame
-EXPL_1_1_1F = get_testdata_files("liver_1frame.dcm")[0]
+EXPL_1_1_1F = get_testdata_file("liver_1frame.dcm")
 # 1/1, 1 sample/pixel, 3 frame
-EXPL_1_1_3F = get_testdata_files("liver.dcm")[0]
+EXPL_1_1_3F = get_testdata_file("liver.dcm")
 # 8/8, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
+EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
 # 8/8, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
+EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
 # 8/8, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
+EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
-EXPL_8_3_1F_YBR422 = get_testdata_files('SC_ybr_full_422_uncompressed.dcm')[0]
+EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
 # 8/8, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
 # 16/16, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
+EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
 # 16/12, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
+EXPL_16_1_10F = get_testdata_file("emri_small.dcm")
 # 16/16, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
+EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
 # 16/16, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
+EXPL_16_3_2F = get_testdata_file("SC_rgb_16bit_2frame.dcm")
 # 32/32, 1 sample/pixel, 1 frame
-IMPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
+IMPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
 # 32/32, 1 sample/pixel, 15 frame
-IMPL_32_1_15F = get_testdata_files("rtdose.dcm")[0]
+IMPL_32_1_15F = get_testdata_file("rtdose.dcm")
 # 32/32, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
+EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
 # 32/32, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
+EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
 
 
 def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
