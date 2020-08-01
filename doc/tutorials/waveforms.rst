@@ -40,8 +40,8 @@ uses the :dcm:`Waveform Module <part03/sect_C.10.9.html>` to represent one or
 more multi-channel time-based digitized waveforms, sampled at constant time
 intervals.
 
-All waveforms within a dataset are items within the (5400,0100) *Waveform
-Sequence* element:
+The waveforms within a dataset are contained in the items of the (5400,0100)
+*Waveform Sequence* element:
 
 .. code-block:: python
 
@@ -56,14 +56,14 @@ Sequence* element:
     2
 
 Each item in the sequence is a *multiplex group*, which is a group of related
-waveforms that are synchronised at common sampling frequency (in Hz).
+waveforms that are synchronised at common sampling frequencyW.
 
 .. code-block:: python
 
     >>> multiplex = waveforms[0]
     >>> multiplex.MultiplexGroupLabel
     'RHYTHM'
-    >>> multiplex.SamplingFrequency
+    >>> multiplex.SamplingFrequency  # in Hz
     "1000.0"
     >>> multiplex.NumberOfWaveformChannels
     12
@@ -113,9 +113,10 @@ The combined sample data for each multiplex is stored in the corresponding
    >>> len(multiplex.WaveformData)
    240000
 
-The data in this multiplex consists of :dcm:`signed 16-bit samples
-<part03/sect_C.10.9.html#table_C.10-10>`. Waveform data is encoded with the
-channels interleaved, so for our case the data is ordered as:
+If *Waveform Bits Allocated* is ``16`` and *Waveform Sample Interpretation* is
+``'SS'`` then the data for this multiplex consists of :dcm:`signed 16-bit
+samples <part03/sect_C.10.9.html#table_C.10-10>`. Waveform data is encoded
+with the channels interleaved, so for our case the data is ordered as:
 
 .. code-block:: text
 
@@ -142,7 +143,7 @@ Definition Sequence* then the raw sample data needs to be corrected before it's
 in the quantity it represents. This correction is given by (sample + *Channel
 Baseline*) x *Channel Sensitivity* x *Channel Sensitivity Correction Factor*
 and will be applied when `as_raw` is ``False`` or when using the
-:meth:`Dataset.waveform_array<pydicom.dataset.Dataset.waveform_array>`
+:meth:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>`
 function:
 
     >>> arr = ds.waveform_array(index=0)
@@ -178,12 +179,13 @@ within the *Waveform Sequence*:
 Encoding *Waveform Data*
 ========================
 
-Encoding a new waveform is
+Having seen how to decode and view a waveform then next step is creating our
+own multiplex group. The new group will contain two channels
+representing cosine and sine curves. We've chosen to represent our waveforms
+using signed 16-bit integers, but you can use signed or unsigned 8, 16, 32 or
+64-bit integers depending on the requirements of the IOD.
 
-The new multiplex group will contain two channels representing cosine and sine
-curves. We've chosen to represent our waveforms using signed 16-bit integers,
-but you can use signed or unsigned 8, 16, 32 or 64-bit integers depending on
-the requirements of the IOD.
+First we create two :class:`ndarrays<numpy.ndarray>` with our waveform data:
 
 .. code-block:: python
 
@@ -203,9 +205,15 @@ Next we create the new multiplex group that will contain the waveforms:
     >>> new.NumberOfWaveformSamples = len(x)
     >>> new.SamplingFrequency = "1000"
 
-We set our channel definitions (note that we have opted not to include a
-*Channel Sensitivity*, so our data will be unitless). If you were to do this
-for real you would obviously use an official coding scheme.
+To find out which elements we need to add to our new multiplex, we check the
+:dcm:`Waveform Module <part03/sect_C.10.9.html>` in Part 3 of the DICOM
+Standard. Type 1 elements must be present and not empty, Type 1C are
+conditionally required, Type 2 elements must be present but may be empty, and
+Type 3 elements are optional.
+
+Set our channel definitions, one for each channel (note that we have opted not
+to include a *Channel Sensitivity*, so our data will be unitless). If you were
+to do this for real you would obviously use an official coding scheme.
 
 .. code-block:: python
 
@@ -221,9 +229,14 @@ for real you would obviously use an official coding scheme.
     ...     source.CodingSchemeVersion = "1.0"
     ...     source.CodeMeaning = curve_type
 
-Interleave the waveforms, add it to the *Waveform Data* and set the
-corresponding *Waveform Bits Allocated* and *Waveform Sample Interpretation*
-to match our data representation type:
+Interleave the waveform samples, convert to bytes and set the *Waveform Data*.
+Since the dataset's transfer syntax is little endian, if you're working on
+a big endian system you'll need to perform the necessary conversion. You can
+determine the endianness of your system with ``import sys;
+print(sys.byteorder)``.
+
+We also set our corresponding *Waveform Bits Allocated* and *Waveform Sample
+Interpretation* element values to match our data representation type:
 
 .. code-block:: python
 

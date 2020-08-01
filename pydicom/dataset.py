@@ -1634,7 +1634,7 @@ class Dataset(dict):
         self.convert_pixel_data()
         return self._pixel_array
 
-    def waveform_array(self, index: int = 0) -> Generator["np.ndarray", None, None]:
+    def waveform_array(self, index: int = 0) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
         `index` in the (5400,0100) *Waveform Sequence*.
 

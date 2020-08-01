@@ -13,13 +13,16 @@ import matplotlib.pyplot as plt
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
+from pydicom.waveforms import generate_multiplex
 
 fpath = get_testdata_file("waveform_ecg.dcm")
 ds = dcmread(fpath)
 
 # Plot the first channel of each multiplex
+#   We could also use ds.waveform_array()
 fig, axes = plt.subplots(len(ds.WaveformSequence))
-for ax, mplx, arr in zip(axes, ds.WaveformSequence, ds.waveform_generator):
+generator = generate_multiplex(ds, as_raw=False)
+for ax, mplx, arr in zip(axes, ds.WaveformSequence, generator):
     nr_channels = mplx.NumberOfWaveformChannels
     nr_samples = mplx.NumberOfWaveformSamples
     sampling_fq = mplx.SamplingFrequency  # in Hz
