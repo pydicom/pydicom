@@ -25,10 +25,10 @@ Enhancements
   * Added :mod:`pydicom.waveforms` module and
     :func:`~pydicom.waveforms.numpy_handler.generate_multiplex` and
     :func:`~pydicom.waveforms.numpy_handler.multiplex_array` functions.
-  * Added :meth:`Dataset.waveform_generator
-    <pydicom.dataset.Dataset.waveform_generator>` which returns a generator
-    object that yields an :class:`~numpy.ndarray` for each multiplex group in
-    a *Waveform Sequence*.
+  * Added :meth:`Dataset.waveform_array
+    <pydicom.dataset.Dataset.waveform_array>` which returns an
+    :class:`~numpy.ndarray` for the multiplex group at `index` within a
+    *Waveform Sequence* element.
 
 
 Fixes

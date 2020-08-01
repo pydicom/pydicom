@@ -45,11 +45,8 @@ class TestDataset:
     def test_simple(self):
         """Simple functionality test."""
         ds = dcmread(ECG)
-        gen = ds.waveform_generator
-        arr = next(gen)
-        arr = next(gen)
-        with pytest.raises(StopIteration):
-            next(gen)
+        arr = ds.waveform_array(index=0)
+        arr = ds.waveform_array(index=1)
 
     def test_unsupported_syntax_raises(self):
         """Test that an unsupported syntax raises exception."""
@@ -57,7 +54,7 @@ class TestDataset:
         ds.file_meta.TransferSyntaxUID = '1.2.3.4'
         msg = r"Unable to decode waveform data with a transfer syntax UID"
         with pytest.raises(NotImplementedError, match=msg):
-            ds.waveform_generator
+            ds.waveform_array()
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")

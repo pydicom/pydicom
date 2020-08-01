@@ -1621,19 +1621,23 @@ class Dataset(dict):
         self.convert_pixel_data()
         return self._pixel_array
 
-    @property
-    def waveform_generator(self) -> Generator["np.ndarray", None, None]:
-        """Return a generator that yields an :class:`~numpy.ndarray` for each
-        multiplex group in (5400,0100) *Waveform Sequence*.
+    def waveform_array(self, index: int = 0) -> Generator["np.ndarray", None, None]:
+        """Return an :class:`~numpy.ndarray` for the multiplex group at
+        `index` in the (5400,0100) *Waveform Sequence*.
 
         .. versionadded:: 2.1
 
-        Yields
+        Parameters
+        ----------
+        index : int, optional
+            The index of the multiplex group to return the array for.
+
+        Returns
         ------
         numpy.ndarray
-            The *Waveform Data* for each multiplex group as an
+            The *Waveform Data* for the multiplex group as an
             :class:`~numpy.ndarray` with shape (samples, channels). If
-            (003A,0210) *Channel Sensitivity* is present for a multiplex
+            (003A,0210) *Channel Sensitivity* is present
             then the values will be in the units specified by the (003A,0211)
             *Channel Sensitivity Units Sequence*.
 
@@ -1652,7 +1656,7 @@ class Dataset(dict):
         if not wave_handler.is_available():
             raise RuntimeError("The waveform data handler requires numpy")
 
-        return wave_handler.generate_multiplex(self, as_raw=False)
+        return wave_handler.multiplex_array(self, index=index, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa
