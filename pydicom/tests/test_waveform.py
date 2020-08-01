@@ -54,7 +54,7 @@ class TestDataset:
         ds.file_meta.TransferSyntaxUID = '1.2.3.4'
         msg = r"Unable to decode waveform data with a transfer syntax UID"
         with pytest.raises(NotImplementedError, match=msg):
-            ds.waveform_array()
+            ds.waveform_array(0)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -132,7 +132,7 @@ class TestHandlerMultiplexArray:
             r"is not supported by the waveform data handler"
         )
         with pytest.raises(NotImplementedError, match=msg):
-            multiplex_array(ds)
+            multiplex_array(ds, 0)
 
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
@@ -142,7 +142,7 @@ class TestHandlerMultiplexArray:
             r"No \(5400,0100\) Waveform Sequence element found in the dataset"
         )
         with pytest.raises(AttributeError, match=msg):
-            multiplex_array(ds)
+            multiplex_array(ds, 0)
 
     def test_missing_required(self):
         """Test that missing required element in sequence raises exception."""
@@ -155,7 +155,7 @@ class TestHandlerMultiplexArray:
             f"the sequence item: NumberOfWaveformSamples"
         )
         with pytest.raises(AttributeError, match=msg):
-            multiplex_array(ds)
+            multiplex_array(ds, 0)
 
     def test_as_raw(self):
         """Test that as_raw=True works as expected."""

@@ -1634,7 +1634,7 @@ class Dataset(dict):
         self.convert_pixel_data()
         return self._pixel_array
 
-    def waveform_array(self, index: int = 0) -> "np.ndarray":
+    def waveform_array(self, index: int) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
         `index` in the (5400,0100) *Waveform Sequence*.
 
@@ -1642,7 +1642,7 @@ class Dataset(dict):
 
         Parameters
         ----------
-        index : int, optional
+        index : int
             The index of the multiplex group to return the array for.
 
         Returns
@@ -1669,7 +1669,7 @@ class Dataset(dict):
         if not wave_handler.is_available():
             raise RuntimeError("The waveform data handler requires numpy")
 
-        return wave_handler.multiplex_array(self, index=index, as_raw=False)
+        return wave_handler.multiplex_array(self, index, as_raw=False)
 
     # Format strings spec'd according to python string formatting options
     #    See http://docs.python.org/library/stdtypes.html#string-formatting-operations # noqa

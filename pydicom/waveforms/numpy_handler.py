@@ -174,7 +174,7 @@ def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndar
         yield arr
 
 
-def multiplex_array(ds: "Dataset", index: int = 0, as_raw: bool = True) -> "np.ndarray":  # noqa
+def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarray":  # noqa
     """Return an :class:`~numpy.ndarray` for the multiplex group in the
     *Waveform Sequence* at `index`.
 
@@ -186,8 +186,8 @@ def multiplex_array(ds: "Dataset", index: int = 0, as_raw: bool = True) -> "np.n
         The :class:`Dataset` containing a :dcm:`Waveform
         <part03/sect_C.10.9.html>` module and the *Waveform Sequence* to be
         converted.
-    index : int, optional
-        The index of the multiplex group to return, default ``0``.
+    index : int
+        The index of the multiplex group to return.
     as_raw : bool, optional
         If ``True`` (default), then return the raw unitless waveform data. If
         ``False`` then attempt to convert the raw data for each channel to the

@@ -56,7 +56,7 @@ The waveforms within a dataset are contained in the items of the (5400,0100)
     2
 
 Each item in the sequence is a *multiplex group*, which is a group of related
-waveforms that are synchronised at common sampling frequencyW.
+waveforms that are synchronised at common sampling frequency.
 
 .. code-block:: python
 
@@ -133,7 +133,7 @@ function. The following decodes and returns the raw data from the multiplex at
 .. code-block:: python
 
     >>> from pydicom.waveforms import multiplex_array
-    >>> raw = multiplex_array(ds, index=0, as_raw=True)
+    >>> raw = multiplex_array(ds, 0, as_raw=True)
     >>> raw[0, 0]
     80
 
@@ -146,7 +146,7 @@ and will be applied when `as_raw` is ``False`` or when using the
 :meth:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>`
 function:
 
-    >>> arr = ds.waveform_array(index=0)
+    >>> arr = ds.waveform_array(0)
     >>> arr[0, 0]
     >>> 100.0
     >>> import matplotlib.pyplot as plt
@@ -212,7 +212,7 @@ conditionally required, Type 2 elements must be present but may be empty, and
 Type 3 elements are optional.
 
 Set our channel definitions, one for each channel (note that we have opted not
-to include a *Channel Sensitivity*, so our data will be unitless). If you were
+to include a *Channel Sensitivity*, so our data will be unit-less). If you were
 to do this for real you would obviously use an official coding scheme.
 
 .. code-block:: python
@@ -259,7 +259,7 @@ We should now be able to plot our new waveforms:
 .. code-block:: python
 
     >>> ds = dcmread("my_waveform.dcm")
-    >>> arr = ds.waveform_array(index=2)
+    >>> arr = ds.waveform_array(2)
     >>> fig, (ax1, ax2) = plt.subplots(2)
     >>> ax1.plot(arr[:, 0])
     >>> ax2.plot(arr[:, 1])
