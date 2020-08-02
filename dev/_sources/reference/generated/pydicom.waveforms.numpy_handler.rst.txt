@@ -1,7 +1,7 @@
-pydicom.waveform\_data\_handlers.numpy\_handler
-===============================================
+pydicom.waveforms.numpy\_handler
+================================
 
-.. automodule:: pydicom.waveform_data_handlers.numpy_handler
+.. automodule:: pydicom.waveforms.numpy_handler
 
    
    
@@ -15,6 +15,7 @@ pydicom.waveform\_data\_handlers.numpy\_handler
    
       generate_multiplex
       is_available
+      multiplex_array
       supports_transfer_syntax
    
    

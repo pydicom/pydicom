@@ -53,6 +53,7 @@ pydicom.dataset.FileMetaDataset
       ~FileMetaDataset.validate
       ~FileMetaDataset.values
       ~FileMetaDataset.walk
+      ~FileMetaDataset.waveform_array
    
    
 
@@ -67,6 +68,5 @@ pydicom.dataset.FileMetaDataset
       ~FileMetaDataset.indent_chars
       ~FileMetaDataset.is_original_encoding
       ~FileMetaDataset.pixel_array
-      ~FileMetaDataset.waveform_generator
    
    

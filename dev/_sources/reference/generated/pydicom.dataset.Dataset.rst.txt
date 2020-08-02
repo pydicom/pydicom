@@ -52,6 +52,7 @@ pydicom.dataset.Dataset
       ~Dataset.update
       ~Dataset.values
       ~Dataset.walk
+      ~Dataset.waveform_array
    
    
 
@@ -66,6 +67,5 @@ pydicom.dataset.Dataset
       ~Dataset.indent_chars
       ~Dataset.is_original_encoding
       ~Dataset.pixel_array
-      ~Dataset.waveform_generator
    
    

@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +37,8 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -235,11 +238,11 @@ corresponding (5400,1010) <em>Waveform Data</em> element.</p>
 <h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code><a class="headerlink" href="#dataset-waveform-generator" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_generator" title="pydicom.dataset.Dataset.waveform_generator"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code></a> requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code> requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 </div>
 <p>The <em>Waveform Data</em> element contains the raw bytes exactly as found in the
 file. To get the waveforms in a more useful form you can use the
-<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_generator" title="pydicom.dataset.Dataset.waveform_generator"><code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform_generator</span></code></a> property to return a
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform_generator</span></code> property to return a
 <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator-iterator">generator object</a> that yields
 a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with shape (samples, channels) for each multiplex
 group in the <em>Waveform Sequence</em>.</p>
@@ -267,7 +270,7 @@ group in the <em>Waveform Sequence</em>.</p>
 <p>If the <em>Channel Sensitivity Correction Factor</em> is available for a given channel
 then it will be applied to the raw channel data. If you need the raw data
 without any corrections then you can use the
-<a class="reference internal" href="../reference/generated/pydicom.waveform_data_handlers.numpy_handler.html#pydicom.waveform_data_handlers.numpy_handler.generate_multiplex" title="pydicom.waveform_data_handlers.numpy_handler.generate_multiplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code></a>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code>
 function with the <em>as_raw</em> keyword parameter instead:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveform_generator.numpy_handler</span> <span class="kn">import</span> <span class="n">generate_multiplex</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">generate_multiplex</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

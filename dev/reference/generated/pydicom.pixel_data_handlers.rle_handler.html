@@ -13,6 +13,7 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
@@ -36,13 +37,15 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Waveform Data Handlers (pydicom.waveform_data_handlers)" href="../handlers.waveform_data.html" />
+    <link rel="next" title="Waveform Data Handlers (pydicom.waveforms)" href="../handlers.waveform_data.html" />
     <link rel="prev" title="pydicom.pixel_data_handlers.pylibjpeg_handler" href="pydicom.pixel_data_handlers.pylibjpeg_handler.html" /> 
 </head>
 
@@ -124,7 +127,7 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.rle_handler</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveform_data_handlers</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
@@ -324,7 +327,7 @@ values</p></th>
 </table>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">rle_segment_order</span><span class="o">=</span><span class="default_value">'&gt;'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">rle_segment_order</span><span class="o">=</span><span class="default_value">'&gt;'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Pixel Data</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -359,13 +362,13 @@ is non-conformant.</p></li>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L81"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L81"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -373,7 +376,7 @@ RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">rle_encode_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L379"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">rle_encode_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L379"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> image frame as RLE encoded
 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
 <div class="versionadded">
@@ -397,7 +400,7 @@ specified by the DICOM Standard, Part 5,
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -405,7 +408,7 @@ to RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/5d084e7e/pydicom/pixel_data_handlers/rle_handler.py#L69"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/37fc4dd4/pydicom/pixel_data_handlers/rle_handler.py#L69"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -425,7 +428,7 @@ the handler.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../handlers.waveform_data.html" class="btn btn-neutral float-right" title="Waveform Data Handlers (pydicom.waveform_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../handlers.waveform_data.html" class="btn btn-neutral float-right" title="Waveform Data Handlers (pydicom.waveforms)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pydicom.pixel_data_handlers.pylibjpeg_handler.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.pylibjpeg_handler" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

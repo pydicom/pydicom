@@ -20,10 +20,6 @@ Enhancements
     ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
 * Added a new pixel data handler based on pylibjpeg which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
-* Added handler for *Waveform Data* and :meth:`Dataset.waveform_generator
-  <pydicom.dataset.Dataset.waveform_generator>` which returns a generator
-  object that yields an :class:`~numpy.ndarray` for each multiplex group in
-  a *Waveform Sequence*.
 * Added :func:`~pydicom.pixel_data_handlers.apply_rescale`,
   :func:`~pydicom.pixel_data_handlers.apply_windowing`  aliases
 * Added ability to register external data sources for use with the functions
@@ -32,6 +28,16 @@ Enhancements
   :class:`~pydicom.valuerep.PersonName` (:issue:`1103`)
 * Added convenience constants for the MPEG transfer syntaxes to
   :mod:`pydicom.uid` (:pr:`1155`)
+* Added support for decoding *Waveform Data*:
+
+  * Added :mod:`pydicom.waveforms` module and
+    :func:`~pydicom.waveforms.numpy_handler.generate_multiplex` and
+    :func:`~pydicom.waveforms.numpy_handler.multiplex_array` functions.
+  * Added :meth:`Dataset.waveform_array()
+    <pydicom.dataset.Dataset.waveform_array>` which returns an
+    :class:`~numpy.ndarray` for the multiplex group at `index` within a
+    *Waveform Sequence* element.
+
 
 Changes
 .......

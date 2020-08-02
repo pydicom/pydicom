@@ -137,6 +137,27 @@ be applied to DICOM images.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to plot waveforms from a Waveform Sequence using matplotlib.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_waveforms_thumb.png
+     :alt: Decode and plot Waveform Data
+
+     :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/image_processing/plot_waveforms
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D ...">
 
 .. only:: html
@@ -200,7 +221,7 @@ These examples illustrate the use of pydicom to read DICOM data.
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_thumb.png
-     :alt: Read DICOM and ploting using matplotlib
+     :alt: Read a Dataset and plot Pixel Data
 
      :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py`
 
