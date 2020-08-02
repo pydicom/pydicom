@@ -1,9 +1,9 @@
-.. _api_handlers_waveformdata:
+.. _api_handlers_waveforms:
 
-Waveform Data Handlers (:mod:`pydicom.waveform_data_handlers`)
-==============================================================
+Waveform Data Handlers (:mod:`pydicom.waveforms`)
+=================================================
 
-.. currentmodule:: pydicom.waveform_data_handlers
+.. currentmodule:: pydicom.waveforms
 
 .. autosummary::
    :toctree: generated/

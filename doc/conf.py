@@ -67,6 +67,7 @@ extensions = [
     'sphinx.ext.napoleon',  # Numpy style docstrings
     'sphinx.ext.linkcode',
     'sphinx.ext.extlinks',
+    'sphinx_copybutton',
     # Custom
     'sphinx_issues',
 ]
@@ -77,6 +78,10 @@ autodoc_default_options = {
     'members': None,
     'no-inherited-members': None,
 }
+
+# copybutton conf
+copybutton_prompt_text = r'>>> |\.\.\. '
+copybutton_prompt_is_regexp = True
 
 # Shortcuts for sphinx.ext.extlinks
 extlinks = {
