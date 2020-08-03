@@ -94,7 +94,7 @@ sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
 
 python3 -m venv venv
 . venv/bin/activate
-pip install setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc sphinx-gallery sphinx-issues~=1.0
+pip install setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc sphinx-gallery sphinx-issues~=1.0 sphinx-copybutton
 
 # Build and install pydicom in dev mode
 pip install -e .
