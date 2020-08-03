@@ -17,12 +17,12 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.
 # license : MIT
 
 import pydicom
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 print(__doc__)
 
 # FIXME: add a full-sized MR image in the testing data
-filename = get_testdata_files('MR_small.dcm')[0]
+filename = get_testdata_file('MR_small.dcm')
 ds = pydicom.dcmread(filename)
 
 # get the pixel information into a numpy array
