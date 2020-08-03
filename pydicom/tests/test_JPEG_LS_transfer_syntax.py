@@ -5,7 +5,7 @@ import sys
 import pytest
 import pydicom
 from pydicom.filereader import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 pillow_missing_message = ("pillow is not available "
                           "in this test environment")
@@ -49,11 +49,11 @@ except ImportError:
     gdcm_handler = None
     HAVE_GDCM = False
 
-mr_name = get_testdata_files("MR_small.dcm")[0]
-jpeg_ls_lossless_name = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
-emri_name = get_testdata_files("emri_small.dcm")[0]
-emri_jpeg_ls_lossless = get_testdata_files(
-    "emri_small_jpeg_ls_lossless.dcm")[0]
+mr_name = get_testdata_file("MR_small.dcm")
+jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
+emri_name = get_testdata_file("emri_small.dcm")
+emri_jpeg_ls_lossless = get_testdata_file(
+    "emri_small_jpeg_ls_lossless.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 

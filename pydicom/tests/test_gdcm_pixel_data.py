@@ -92,7 +92,8 @@ sc_rgb_jpeg_dcmtk_422_YBR_FULL_422 = get_testdata_file(
 sc_rgb_jpeg_dcmtk_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
 sc_rgb_jpeg2k_gdcm_KY = get_testdata_file("SC_rgb_gdcm_KY.dcm")
 ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = get_testdata_file(
-    "SC_rgb_gdcm2k_uncompressed.dcm")
+    "SC_rgb_gdcm2k_uncompressed.dcm"
+)
 J2KR_16_13_1_1_1F_M2_MISMATCH = get_testdata_file("J2K_pixelrep_mismatch.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
@@ -138,7 +139,7 @@ class TestGDCM_JPEG2000_no_gdcm:
     def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
-    def test_JPEG2000(self, allow_invalid_values):
+    def test_JPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements"""
         # XX also tests multiple-valued AT data element
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
@@ -149,15 +150,15 @@ class TestGDCM_JPEG2000_no_gdcm:
         expected = 'Lossy Compression'
         assert expected == got
 
-    def test_JPEG2000_pixel_array(self, allow_invalid_values):
+    def test_JPEG2000_pixel_array(self):
         with pytest.raises(NotImplementedError):
             self.jpeg_2k_lossless.pixel_array
 
-    def test_emri_JPEG2000_pixel_array(self, allow_invalid_values):
+    def test_emri_JPEG2000_pixel_array(self):
         with pytest.raises(NotImplementedError):
             self.emri_jpeg_2k_lossless.pixel_array
 
-    def test_jpeg2000_lossy(self, allow_invalid_values):
+    def test_jpeg2000_lossy(self):
         with pytest.raises(NotImplementedError):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 

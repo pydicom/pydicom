@@ -2,7 +2,7 @@
 """Decoding benchmarks for the rle_handler module."""
 
 from pydicom import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.encaps import decode_data_sequence
 from pydicom.pixel_data_handlers.rle_handler import (
     get_pixeldata,
@@ -11,29 +11,29 @@ from pydicom.pixel_data_handlers.rle_handler import (
 
 
 # 8/8-bit, 1 sample/pixel, 1 frame
-OB_RLE_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
+OB_RLE_1F = get_testdata_file("OBXXXX1A_rle.dcm")
 # 8/8-bit, 1 sample/pixel, 2 frame
-OB_RLE_2F = get_testdata_files("OBXXXX1A_rle_2frame.dcm")[0]
+OB_RLE_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
 # 8/8-bit, 3 sample/pixel, 1 frame
-SC_RLE_1F = get_testdata_files("SC_rgb_rle.dcm")[0]
+SC_RLE_1F = get_testdata_file("SC_rgb_rle.dcm")
 # 8/8-bit, 3 sample/pixel, 2 frame
-SC_RLE_2F = get_testdata_files("SC_rgb_rle_2frame.dcm")[0]
+SC_RLE_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
 # 16/16-bit, 1 sample/pixel, 1 frame
-MR_RLE_1F = get_testdata_files("MR_small_RLE.dcm")[0]
+MR_RLE_1F = get_testdata_file("MR_small_RLE.dcm")
 # 16/16-bit, 3 sample/pixel, 1 frame
-SC_RLE_16_1F = get_testdata_files("SC_rgb_rle_16bit.dcm")[0]
+SC_RLE_16_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
 # 16/16-bit, 3 sample/pixel, 2 frame
-SC_RLE_16_2F = get_testdata_files("SC_rgb_rle_16bit_2frame.dcm")[0]
+SC_RLE_16_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
 # 16/12-bit, 1 sample/pixel, 10 frame
-EMRI_RLE_10F = get_testdata_files("emri_small_RLE.dcm")[0]
+EMRI_RLE_10F = get_testdata_file("emri_small_RLE.dcm")
 # 32/32-bit, 1 sample/pixel, 1 frame
-RTDOSE_RLE_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
+RTDOSE_RLE_1F = get_testdata_file("rtdose_rle_1frame.dcm")
 # 32/32-bit, 3 sample/pixel, 1 frame
-SC_RLE_32_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
+SC_RLE_32_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
 # 32/32-bit, 3 sample/pixel, 2 frame
-SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
+SC_RLE_32_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
 # 32/32-bit, 1 sample/pixel, 15 frame
-RTDOSE_RLE_15F = get_testdata_files("rtdose_rle.dcm")[0]
+RTDOSE_RLE_15F = get_testdata_file("rtdose_rle.dcm")
 
 
 class TimeRLEDecodeFrame:

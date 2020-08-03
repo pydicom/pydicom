@@ -1497,7 +1497,7 @@ class TestWriteToStandard:
         assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
         assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
 
-    def test_convert_rgb_from_implicit_to_explicit_vr(self):
+    def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use):
         """Test converting an RGB dataset from implicit to explicit VR
         and vice verse."""
         ds_orig = dcmread(sc_rgb_name)

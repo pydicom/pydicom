@@ -249,9 +249,9 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
                 # Can only get here if parsed J2K codestream OK
                 pixel_module.PixelRepresentation = 0
                 arr = arr.view(pixel_dtype(pixel_module))
-                np.left_shift(arr, shift, out=arr)
+                arr = np.left_shift(arr, shift)
                 arr = arr.astype(dtype)
-                np.right_shift(arr, shift, out=arr)
+                arr = numpy.right_shift(arr, shift)
 
         if arr.dtype != dtype:
             # Re-view as pylibjpeg returns a 1D uint8 ndarray

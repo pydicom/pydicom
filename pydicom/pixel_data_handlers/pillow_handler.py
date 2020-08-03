@@ -184,7 +184,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             shift = ds.BitsAllocated - j2k_precision
             if not j2k_sign and j2k_sign != ds.PixelRepresentation:
                 # Convert unsigned J2K data to 2's complement
-                numpy.right_shift(arr, shift, out=arr)
+                arr = numpy.right_shift(arr, shift)
             else:
                 if ds.PixelRepresentation == 1:
                     # Pillow converts signed data to unsigned
@@ -192,14 +192,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
                     arr -= 2**(ds.BitsAllocated - 1)
 
                 if shift:
-                    numpy.right_shift(arr, shift, out=arr)
+                    arr = numpy.right_shift(arr, shift)
         else:
             # Corrections based on dataset elements
             if ds.PixelRepresentation == 1:
                 arr -= 2**(ds.BitsAllocated - 1)
 
             if shift:
-                numpy.right_shift(arr, shift, out=arr)
+                arr = numpy.right_shift(arr, shift)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"

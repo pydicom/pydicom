@@ -129,7 +129,7 @@ Default: ``False``.
 allow_DS_float = False
 """Set to ``True`` to allow :class:`~pydicom.valuerep.DSdecimal`
 instances to be created using :class:`floats<float>`; otherwise, they must be
-explicitly converted to :class:`str`, with the user explicity setting the
+explicitly converted to :class:`str`, with the user explicitly setting the
 precision of digits and rounding.
 
 Default ``False``.
@@ -157,7 +157,7 @@ use_none_as_empty_text_VR_value = False
 a text VR is ``None``, otherwise (the default), it is is an empty string.
 For all other VRs the behavior does not change - the value is en empty
 list for VR **SQ** and ``None`` for all other VRs.
-Note that the default of this value will change to ``True`` in version 2.0.
+Note that the default of this value may change to ``True`` in a later version.
 
 .. versionadded:: 1.4
 """

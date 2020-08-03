@@ -2,7 +2,7 @@
 """Benchmarks for the encaps module."""
 
 from pydicom import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.encaps import (
     fragment_frame,
     itemise_frame,
@@ -11,7 +11,7 @@ from pydicom.encaps import (
 )
 
 
-JP2K_10FRAME = get_testdata_files('emri_small_jpeg_2k_lossless.dcm')[0]
+JP2K_10FRAME = get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
 
 
 class TimeFragmentFrame:
