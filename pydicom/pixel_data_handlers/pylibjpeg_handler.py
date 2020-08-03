@@ -251,7 +251,7 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
                 arr = arr.view(pixel_dtype(pixel_module))
                 arr = np.left_shift(arr, shift)
                 arr = arr.astype(dtype)
-                arr = numpy.right_shift(arr, shift)
+                arr = np.right_shift(arr, shift)
 
         if arr.dtype != dtype:
             # Re-view as pylibjpeg returns a 1D uint8 ndarray
