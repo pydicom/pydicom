@@ -12,7 +12,7 @@ import pydicom
 import platform
 from pydicom import config
 from pydicom import valuerep
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.valuerep import DS, IS
 import pytest
 
@@ -23,7 +23,7 @@ try:
 except ImportError:
     import pickle
 
-badvr_name = get_testdata_files("badVR.dcm")[0]
+badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
 
 
@@ -244,9 +244,10 @@ class TestDecimalString:
 
     @pytest.fixture(autouse=True)
     def ds_decimal(self):
+        original = config.use_DS_decimal
         config.DS_decimal(True)
         yield
-        config.DS_decimal(False)
+        config.DS_decimal(original)
 
     def test_DS_decimal_set(self):
         config.use_DS_decimal = False

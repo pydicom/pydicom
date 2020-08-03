@@ -29,7 +29,7 @@ import pytest
 
 from pydicom import dcmread, Dataset
 import pydicom.config
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
 from pydicom.uid import RLELossless, UID
@@ -66,67 +66,67 @@ except ImportError:
 # EXPL: Explicit VR Little Endian
 # RLE: RLE Lossless
 # 8/8-bit, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-RLE_8_1_1F = get_testdata_files("OBXXXX1A_rle.dcm")[0]
+EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
+RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
 # 8/8-bit, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
-RLE_8_1_2F = get_testdata_files("OBXXXX1A_rle_2frame.dcm")[0]
+EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
+RLE_8_1_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
 # 8/8-bit, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
-RLE_8_3_1F = get_testdata_files("SC_rgb_rle.dcm")[0]
+EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
+RLE_8_3_1F = get_testdata_file("SC_rgb_rle.dcm")
 # 8/8-bit, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
-RLE_8_3_2F = get_testdata_files("SC_rgb_rle_2frame.dcm")[0]
+EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
+RLE_8_3_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
 # 16/16-bit, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_files("MR_small.dcm")[0]
-RLE_16_1_1F = get_testdata_files("MR_small_RLE.dcm")[0]
+EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
+RLE_16_1_1F = get_testdata_file("MR_small_RLE.dcm")
 # 16/12-bit, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_files("emri_small.dcm")[0]
-RLE_16_1_10F = get_testdata_files("emri_small_RLE.dcm")[0]
+EXPL_16_1_10F = get_testdata_file("emri_small.dcm")
+RLE_16_1_10F = get_testdata_file("emri_small_RLE.dcm")
 # 16/16-bit, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_files("SC_rgb_16bit.dcm")[0]
-RLE_16_3_1F = get_testdata_files("SC_rgb_rle_16bit.dcm")[0]
+EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
+RLE_16_3_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
 # 16/16-bit, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_files("SC_rgb_16bit_2frame.dcm")[0]
-RLE_16_3_2F = get_testdata_files("SC_rgb_rle_16bit_2frame.dcm")[0]
+EXPL_16_3_2F = get_testdata_file("SC_rgb_16bit_2frame.dcm")
+RLE_16_3_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
 # 32/32-bit, 1 sample/pixel, 1 frame
-EXPL_32_1_1F = get_testdata_files("rtdose_1frame.dcm")[0]
-RLE_32_1_1F = get_testdata_files("rtdose_rle_1frame.dcm")[0]
+EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
+RLE_32_1_1F = get_testdata_file("rtdose_rle_1frame.dcm")
 # 32/32-bit, 1 sample/pixel, 15 frame
-EXPL_32_1_15F = get_testdata_files("rtdose.dcm")[0]
-RLE_32_1_15F = get_testdata_files("rtdose_rle.dcm")[0]
+EXPL_32_1_15F = get_testdata_file("rtdose.dcm")
+RLE_32_1_15F = get_testdata_file("rtdose_rle.dcm")
 # 32/32-bit, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_files("SC_rgb_32bit.dcm")[0]
-RLE_32_3_1F = get_testdata_files("SC_rgb_rle_32bit.dcm")[0]
+EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
+RLE_32_3_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
 # 32/32-bit, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_files("SC_rgb_32bit_2frame.dcm")[0]
-RLE_32_3_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
+EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
+RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
 
 # Transfer syntaxes supported by other handlers
 # Implicit VR Little Endian
-IMPL = get_testdata_files("rtdose_1frame.dcm")[0]
+IMPL = get_testdata_file("rtdose_1frame.dcm")
 # Deflated Explicit VR Little Endian
-DELF = get_testdata_files("image_dfl.dcm")[0]
+DELF = get_testdata_file("image_dfl.dcm")
 # Explicit VR Big Endian
-EXPB = get_testdata_files("SC_rgb_expb_2frame.dcm")[0]
+EXPB = get_testdata_file("SC_rgb_expb_2frame.dcm")
 # JPEG Baseline (Process 1)
-JPEG_BASELINE_1 = get_testdata_files("SC_rgb_jpeg_dcmtk.dcm")[0]
+JPEG_BASELINE_1 = get_testdata_file("SC_rgb_jpeg_dcmtk.dcm")
 # JPEG Baseline (Process 2 and 4)
-JPEG_EXTENDED_2 = get_testdata_files("JPEG-lossy.dcm")[0]
+JPEG_EXTENDED_2 = get_testdata_file("JPEG-lossy.dcm")
 # JPEG Lossless (Process 14)
 JPEG_LOSSLESS_14 = None
 # JPEG Lossless (Process 14, Selection Value 1)
-JPEG_LOSSLESS_14_1 = get_testdata_files("SC_rgb_jpeg_gdcm.dcm")[0]
+JPEG_LOSSLESS_14_1 = get_testdata_file("SC_rgb_jpeg_gdcm.dcm")
 # JPEG-LS Lossless
-JPEG_LS_LOSSLESS = get_testdata_files("MR_small_jpeg_ls_lossless.dcm")[0]
+JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 # JPEG-LS Lossy
 JPEG_LS_LOSSY = None
 # JPEG2k Lossless
-JPEG_2K_LOSSLESS = get_testdata_files("emri_small_jpeg_2k_lossless.dcm")[0]
+JPEG_2K_LOSSLESS = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
 # JPEG2k
-JPEG_2K = get_testdata_files("JPEG2000.dcm")[0]
+JPEG_2K = get_testdata_file("JPEG2000.dcm")
 # RLE Lossless
-RLE = get_testdata_files("MR_small_RLE.dcm")[0]
+RLE = get_testdata_file("MR_small_RLE.dcm")
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
@@ -316,8 +316,7 @@ class TestNumpy_NoRLEHandler:
         assert 6128 == len(ds.PixelData)
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(
-            self, fpath, data, allow_invalid_values):
+    def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID
@@ -369,8 +368,7 @@ class TestNumpy_RLEHandler:
                 ds.decompress(handler_name='rle')
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(
-            self, fpath, data, allow_invalid_values):
+    def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
         assert data[0] == ds.file_meta.TransferSyntaxUID

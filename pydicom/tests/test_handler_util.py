@@ -13,8 +13,8 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom import dcmread
-from pydicom.data import get_testdata_files, get_palette_files
+from pydicom import dcmread, config
+from pydicom.data import get_testdata_file, get_palette_files
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixel_data_handlers.util import (
     dtype_corrected_for_endianness,
@@ -36,27 +36,27 @@ from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
 # SUP: Supplemental Palette Color
 # LE, BE: little endian, big endian encoding
 # 8/8, 1 sample/pixel, 1 frame
-PAL_08_256_0_16_1F = get_testdata_files("OBXXXX1A.dcm")[0]
-PAL_08_200_0_16_1F = get_testdata_files("OT-PAL-8-face.dcm")[0]
+PAL_08_256_0_16_1F = get_testdata_file("OBXXXX1A.dcm")
+PAL_08_200_0_16_1F = get_testdata_file("OT-PAL-8-face.dcm")
 # 8/8, 1 sample/pixel, 2 frame
-PAL_08_256_0_16_2F = get_testdata_files("OBXXXX1A_2frame.dcm")[0]
+PAL_08_256_0_16_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
 # PALETTE COLOR with 16-bit LUTs (no indirect segments)
-PAL_SEG_LE_16_1F = get_testdata_files("gdcm-US-ALOKA-16.dcm")[0]
-PAL_SEG_BE_16_1F = get_testdata_files("gdcm-US-ALOKA-16_big.dcm")[0]
+PAL_SEG_LE_16_1F = get_testdata_file("gdcm-US-ALOKA-16.dcm")
+PAL_SEG_BE_16_1F = get_testdata_file("gdcm-US-ALOKA-16_big.dcm")
 # Supplemental palette colour + VOI windowing
-SUP_16_16_2F = get_testdata_files("eCT_Supplemental.dcm")[0]
+SUP_16_16_2F = get_testdata_file("eCT_Supplemental.dcm")
 # 8 bit, 3 samples/pixel, 1 and 2 frame datasets
 # RGB colorspace, uncompressed
-RGB_8_3_1F = get_testdata_files("SC_rgb.dcm")[0]
-RGB_8_3_2F = get_testdata_files("SC_rgb_2frame.dcm")[0]
+RGB_8_3_1F = get_testdata_file("SC_rgb.dcm")
+RGB_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
 # MOD: Modality LUT
 # SEQ: Modality LUT Sequence
-MOD_16 = get_testdata_files("CT_small.dcm")[0]
-MOD_16_SEQ = get_testdata_files("mlut_18.dcm")[0]
+MOD_16 = get_testdata_file("CT_small.dcm")
+MOD_16_SEQ = get_testdata_file("mlut_18.dcm")
 # VOI: VOI LUT Sequence
 # WIN: Windowing operation
-WIN_12_1F = get_testdata_files("MR-SIEMENS-DICOM-WithOverlays.dcm")[0]
-VOI_08_1F = get_testdata_files("vlut_04.dcm")[0]
+WIN_12_1F = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
+VOI_08_1F = get_testdata_file("vlut_04.dcm")
 
 
 # Tests with Numpy unavailable
@@ -1598,8 +1598,14 @@ class TestNumpy_VOILUT:
         assert 16 == ds.BitsAllocated
         assert 12 == ds.BitsStored
         assert 0 == ds.PixelRepresentation
-        assert [450, 200] == ds.WindowCenter
-        assert [790, 443] == ds.WindowWidth
+        if HAVE_NP and config.use_DS_numpy:
+            expected = np.array([450, 200])
+            assert np.allclose(ds.WindowCenter, expected)
+            expected = np.array([790, 443])
+            assert np.allclose(ds.WindowWidth, expected)
+        else:
+            assert [450, 200] == ds.WindowCenter
+            assert [790, 443] == ds.WindowWidth
 
         arr = ds.pixel_array
         assert 642 == arr[326, 130]
@@ -1854,8 +1860,14 @@ class TestNumpy_VOILUT:
         assert 16 == ds.BitsAllocated
         assert 12 == ds.BitsStored
         assert 0 == ds.PixelRepresentation
-        assert [450, 200] == ds.WindowCenter
-        assert [790, 443] == ds.WindowWidth
+        if HAVE_NP and config.use_DS_numpy:
+            expected = np.array([450, 200])
+            assert np.allclose(ds.WindowCenter, expected)
+            expected = np.array([790, 443])
+            assert np.allclose(ds.WindowWidth, expected)
+        else:
+            assert [450, 200] == ds.WindowCenter
+            assert [790, 443] == ds.WindowWidth
         ds.RescaleSlope = 1.2
         ds.RescaleIntercept = 0
 
@@ -1935,7 +1947,7 @@ class TestNumpy_VOILUT:
         with pytest.raises(ValueError, match=msg):
             apply_voi_lut(ds.pixel_array, ds)
 
-    def test_window_bad_index(self):
+    def test_window_bad_index(self, no_numpy_use):
         """Test windowing with a bad view index."""
         ds = dcmread(WIN_12_1F)
         assert 2 == len(ds.WindowWidth)

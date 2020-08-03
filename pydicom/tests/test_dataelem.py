@@ -10,7 +10,7 @@ import pytest
 
 from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -39,6 +39,13 @@ class TestDataElement:
 
     def teardown(self):
         config.use_none_as_empty_text_VR_value = False
+
+    @pytest.fixture
+    def replace_un_with_known_vr(self):
+        old_value = config.replace_un_with_known_vr
+        config.replace_un_with_known_vr = True
+        yield
+        config.replace_un_with_known_vr = old_value
 
     def test_VM_1(self):
         """DataElement: return correct value multiplicity for VM > 1"""
@@ -338,7 +345,7 @@ class TestDataElement:
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
 
-    def test_known_tags_with_UN_VR(self):
+    def test_known_tags_with_UN_VR(self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly decoded."""
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, 'UN', b'ISO_IR 126')
@@ -360,9 +367,10 @@ class TestDataElement:
         assert 'PN' == ds[0x00100010].VR
         assert 'Dionysios=Διονυσιος' == ds[0x00100010].value
 
-    def test_reading_ds_with_known_tags_with_UN_VR(self):
+    def test_reading_ds_with_known_tags_with_UN_VR(
+            self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly read."""
-        test_file = get_testdata_files('explicit_VR-UN.dcm')[0]
+        test_file = get_testdata_file('explicit_VR-UN.dcm')
         ds = dcmread(test_file)
         assert 'CS' == ds[0x00080005].VR
         assert 'TM' == ds[0x00080030].VR
@@ -395,7 +403,8 @@ class TestDataElement:
 
     @pytest.mark.parametrize('use_none, empty_value',
                              ((True, None), (False, '')))
-    def test_empty_text_values(self, use_none, empty_value):
+    def test_empty_text_values(self, use_none, empty_value,
+                               no_datetime_conversion):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
             setattr(ds, tag_name, value)
@@ -534,7 +543,7 @@ class TestRawDataElement:
         with pytest.raises(KeyError, match=r"\(8888, 0002\)"):
             DataElement_from_raw(raw)
 
-    def test_valid_tag(self):
+    def test_valid_tag(self, no_datetime_conversion):
         """RawDataElement: conversion of known tag succeeds..."""
         raw = RawDataElement(Tag(0x00080020), 'DA', 8, b'20170101',
                              0, False, True)

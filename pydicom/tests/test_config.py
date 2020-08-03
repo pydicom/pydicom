@@ -8,10 +8,10 @@ import pytest
 
 from pydicom import dcmread
 from pydicom.config import debug
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 
-DS_PATH = get_testdata_files("CT_small.dcm")[0]
+DS_PATH = get_testdata_file("CT_small.dcm")
 PYTEST = [int(x) for x in pytest.__version__.split('.')]
 
 

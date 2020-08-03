@@ -6,7 +6,7 @@ import pytest
 
 import pydicom.charset
 from pydicom import dcmread, config
-from pydicom.data import get_charset_files, get_testdata_files
+from pydicom.data import get_charset_files, get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
 from pydicom.valuerep import PersonName
@@ -94,13 +94,13 @@ class TestCharset:
 
     def test_standard_file(self):
         """charset: can read and decode standard file without special char.."""
-        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.decode()
         assert 'CompressedSamples^CT1' == ds.PatientName
 
     def test_invalid_character_set(self, allow_invalid_values):
         """charset: replace invalid encoding with default encoding"""
-        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
         with pytest.warns(
@@ -113,7 +113,7 @@ class TestCharset:
 
     def test_invalid_character_set_enforce_valid(self, enforce_valid_values):
         """charset: raise on invalid encoding"""
-        ds = dcmread(get_testdata_files("CT_small.dcm")[0])
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
         with pytest.raises(LookupError,
@@ -415,6 +415,13 @@ class TestCharset:
         with pytest.warns(UserWarning,
                           match="Unknown encoding 'ISO 2022 IR 146' "
                                 "- using default encoding instead"):
+            pydicom.charset.decode_element(
+                elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
+
+    def test_invalid_second_encoding_strict(self, enforce_valid_values):
+        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        with pytest.raises(LookupError,
+                           match="Unknown encoding 'ISO 2022 IR 146'"):
             pydicom.charset.decode_element(
                 elem, ['ISO 2022 IR 100', 'ISO 2022 IR 146'])
 

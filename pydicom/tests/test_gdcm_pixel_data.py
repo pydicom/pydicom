@@ -12,7 +12,7 @@ import pytest
 
 import pydicom
 from pydicom.filereader import dcmread
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers.util import _convert_YBR_FULL_to_RGB
 from pydicom.tag import Tag
 
@@ -44,62 +44,62 @@ if HAVE_GDCM:
     import gdcm
 
 
-empty_number_tags_name = get_testdata_files(
-    "reportsi_with_empty_number_tags.dcm")[0]
-rtplan_name = get_testdata_files("rtplan.dcm")[0]
-rtdose_name = get_testdata_files("rtdose.dcm")[0]
-ct_name = get_testdata_files("CT_small.dcm")[0]
-mr_name = get_testdata_files("MR_small.dcm")[0]
-truncated_mr_name = get_testdata_files("MR_truncated.dcm")[0]
-jpeg2000_name = get_testdata_files("JPEG2000.dcm")[0]
-jpeg2000_lossless_name = get_testdata_files(
-    "MR_small_jp2klossless.dcm")[0]
-jpeg_ls_lossless_name = get_testdata_files(
-    "MR_small_jpeg_ls_lossless.dcm")[0]
-jpeg_lossy_name = get_testdata_files("JPEG-lossy.dcm")[0]
-jpeg_lossless_name = get_testdata_files("JPEG-LL.dcm")[0]
-jpeg_lossless_odd_data_size_name = get_testdata_files(
-    'SC_rgb_small_odd_jpeg.dcm')[0]
-deflate_name = get_testdata_files("image_dfl.dcm")[0]
-rtstruct_name = get_testdata_files("rtstruct.dcm")[0]
-priv_SQ_name = get_testdata_files("priv_SQ.dcm")[0]
-nested_priv_SQ_name = get_testdata_files("nested_priv_SQ.dcm")[0]
-meta_missing_tsyntax_name = get_testdata_files(
-    "meta_missing_tsyntax.dcm")[0]
-no_meta_group_length = get_testdata_files(
-    "no_meta_group_length.dcm")[0]
-gzip_name = get_testdata_files("zipMR.gz")[0]
-color_px_name = get_testdata_files("color-px.dcm")[0]
-color_pl_name = get_testdata_files("color-pl.dcm")[0]
-explicit_vr_le_no_meta = get_testdata_files(
-    "ExplVR_LitEndNoMeta.dcm")[0]
-explicit_vr_be_no_meta = get_testdata_files(
-    "ExplVR_BigEndNoMeta.dcm")[0]
-emri_name = get_testdata_files("emri_small.dcm")[0]
-emri_big_endian_name = get_testdata_files(
-    "emri_small_big_endian.dcm")[0]
-emri_jpeg_ls_lossless = get_testdata_files(
-    "emri_small_jpeg_ls_lossless.dcm")[0]
-emri_jpeg_2k_lossless = get_testdata_files(
-    "emri_small_jpeg_2k_lossless.dcm")[0]
-color_3d_jpeg_baseline = get_testdata_files(
-    "color3d_jpeg_baseline.dcm")[0]
-sc_rgb_jpeg_dcmtk_411_YBR_FULL_422 = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cy+np.dcm")[0]
-sc_rgb_jpeg_dcmtk_411_YBR_FULL = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cy+n1.dcm")[0]
-sc_rgb_jpeg_dcmtk_422_YBR_FULL = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cy+n2.dcm")[0]
-sc_rgb_jpeg_dcmtk_444_YBR_FULL = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cy+s4.dcm")[0]
-sc_rgb_jpeg_dcmtk_422_YBR_FULL_422 = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cy+s2.dcm")[0]
-sc_rgb_jpeg_dcmtk_RGB = get_testdata_files(
-    "SC_rgb_dcmtk_+eb+cr.dcm")[0]
-sc_rgb_jpeg2k_gdcm_KY = get_testdata_files(
-    "SC_rgb_gdcm_KY.dcm")[0]
-ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = get_testdata_files(
-    "SC_rgb_gdcm2k_uncompressed.dcm")[0]
+empty_number_tags_name = get_testdata_file(
+    "reportsi_with_empty_number_tags.dcm")
+rtplan_name = get_testdata_file("rtplan.dcm")
+rtdose_name = get_testdata_file("rtdose.dcm")
+ct_name = get_testdata_file("CT_small.dcm")
+mr_name = get_testdata_file("MR_small.dcm")
+truncated_mr_name = get_testdata_file("MR_truncated.dcm")
+jpeg2000_name = get_testdata_file("JPEG2000.dcm")
+jpeg2000_lossless_name = get_testdata_file(
+    "MR_small_jp2klossless.dcm")
+jpeg_ls_lossless_name = get_testdata_file(
+    "MR_small_jpeg_ls_lossless.dcm")
+jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
+jpeg_lossless_name = get_testdata_file("JPEG-LL.dcm")
+jpeg_lossless_odd_data_size_name = get_testdata_file(
+    'SC_rgb_small_odd_jpeg.dcm')
+deflate_name = get_testdata_file("image_dfl.dcm")
+rtstruct_name = get_testdata_file("rtstruct.dcm")
+priv_SQ_name = get_testdata_file("priv_SQ.dcm")
+nested_priv_SQ_name = get_testdata_file("nested_priv_SQ.dcm")
+meta_missing_tsyntax_name = get_testdata_file(
+    "meta_missing_tsyntax.dcm")
+no_meta_group_length = get_testdata_file(
+    "no_meta_group_length.dcm")
+gzip_name = get_testdata_file("zipMR.gz")
+color_px_name = get_testdata_file("color-px.dcm")
+color_pl_name = get_testdata_file("color-pl.dcm")
+explicit_vr_le_no_meta = get_testdata_file(
+    "ExplVR_LitEndNoMeta.dcm")
+explicit_vr_be_no_meta = get_testdata_file(
+    "ExplVR_BigEndNoMeta.dcm")
+emri_name = get_testdata_file("emri_small.dcm")
+emri_big_endian_name = get_testdata_file(
+    "emri_small_big_endian.dcm")
+emri_jpeg_ls_lossless = get_testdata_file(
+    "emri_small_jpeg_ls_lossless.dcm")
+emri_jpeg_2k_lossless = get_testdata_file(
+    "emri_small_jpeg_2k_lossless.dcm")
+color_3d_jpeg_baseline = get_testdata_file(
+    "color3d_jpeg_baseline.dcm")
+sc_rgb_jpeg_dcmtk_411_YBR_FULL_422 = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cy+np.dcm")
+sc_rgb_jpeg_dcmtk_411_YBR_FULL = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cy+n1.dcm")
+sc_rgb_jpeg_dcmtk_422_YBR_FULL = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cy+n2.dcm")
+sc_rgb_jpeg_dcmtk_444_YBR_FULL = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cy+s4.dcm")
+sc_rgb_jpeg_dcmtk_422_YBR_FULL_422 = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cy+s2.dcm")
+sc_rgb_jpeg_dcmtk_RGB = get_testdata_file(
+    "SC_rgb_dcmtk_+eb+cr.dcm")
+sc_rgb_jpeg2k_gdcm_KY = get_testdata_file(
+    "SC_rgb_gdcm_KY.dcm")
+ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = get_testdata_file(
+    "SC_rgb_gdcm2k_uncompressed.dcm")
 
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
@@ -144,7 +144,7 @@ class TestGDCM_JPEG2000_no_gdcm:
     def teardown(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
-    def test_JPEG2000(self, allow_invalid_values):
+    def test_JPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements"""
         # XX also tests multiple-valued AT data element
         expected = [Tag(0x0054, 0x0010), Tag(0x0054, 0x0020)]
@@ -155,15 +155,15 @@ class TestGDCM_JPEG2000_no_gdcm:
         expected = 'Lossy Compression'
         assert expected == got
 
-    def test_JPEG2000_pixel_array(self, allow_invalid_values):
+    def test_JPEG2000_pixel_array(self):
         with pytest.raises(NotImplementedError):
             self.jpeg_2k_lossless.pixel_array
 
-    def test_emri_JPEG2000_pixel_array(self, allow_invalid_values):
+    def test_emri_JPEG2000_pixel_array(self):
         with pytest.raises(NotImplementedError):
             self.emri_jpeg_2k_lossless.pixel_array
 
-    def test_jpeg2000_lossy(self, allow_invalid_values):
+    def test_jpeg2000_lossy(self):
         with pytest.raises(NotImplementedError):
             self.sc_rgb_jpeg2k_gdcm_KY.pixel_array
 

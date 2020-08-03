@@ -19,7 +19,7 @@ from pydicom.util.codify import (camel_to_underscore, tag_repr,
                                  code_dataelem, main as codify_main)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 have_numpy = True
 try:
@@ -136,7 +136,7 @@ class TestCodify:
 
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
-        filename = get_testdata_files("rtplan.dcm")[0]
+        filename = get_testdata_file("rtplan.dcm")
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()
