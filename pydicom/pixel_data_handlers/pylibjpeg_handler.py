@@ -74,10 +74,10 @@ try:
 except ImportError:
     HAVE_LIBJPEG = False
 
-
+from pydicom import config
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import (
-    pixel_dtype, get_expected_length, reshape_pixel_array
+    pixel_dtype, get_expected_length, reshape_pixel_array, get_j2k_parameters
 )
 from pydicom.uid import (
     JPEGBaseline,
@@ -231,13 +231,31 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
     nr_frames = getattr(ds, "NumberOfFrames", 1)
-    image_px_module = ds.group_dataset(0x0028)
+    pixel_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
-        arr = decoder(frame, image_px_module)
+        arr = decoder(frame, pixel_module)
 
-        # Re-view as pylibjpeg returns a 1D uint8 ndarray
-        arr = arr.view(dtype)
+        if (
+            tsyntax in [JPEG2000, JPEG2000Lossless]
+            and config.APPLY_J2K_CORRECTIONS
+        ):
+            param = get_j2k_parameters(frame)
+            j2k_sign = param.setdefault('is_signed', True)
+            j2k_precision = param.setdefault('precision', ds.BitsStored)
+            shift = ds.BitsAllocated - j2k_precision
+            if shift and not j2k_sign and j2k_sign != ds.PixelRepresentation:
+                # Convert unsigned J2K data to 2s complement
+                # Can only get here if parsed J2K codestream OK
+                pixel_module.PixelRepresentation = 0
+                arr = arr.view(pixel_dtype(pixel_module))
+                arr = np.left_shift(arr, shift)
+                arr = arr.astype(dtype)
+                arr = np.right_shift(arr, shift)
+
+        if arr.dtype != dtype:
+            # Re-view as pylibjpeg returns a 1D uint8 ndarray
+            arr = arr.view(dtype)
 
         if not reshape:
             yield arr

@@ -66,6 +66,11 @@ GDCMJ2K_TextGBR.dcm (from GDCM)
   * Contains non-conformant Pixel Data with a JP2 header
   * unsigned 8-bit, 3 samples/px, YBR_RCT Photometric Interpretation
 
+J2K_pixelrep_mismatch.dcm
+  * Dataset from issue 1149
+  * J2K data is unsigned, Pixel Representation 1
+  * Bits Stored is 13
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/

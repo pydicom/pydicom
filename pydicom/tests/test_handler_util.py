@@ -26,6 +26,7 @@ from pydicom.pixel_data_handlers.util import (
     _expand_segmented_lut,
     apply_modality_lut,
     apply_voi_lut,
+    get_j2k_parameters
 )
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -1982,3 +1983,36 @@ class TestNumpy_VOILUT:
         out = apply_voi_lut(arr, ds)
         assert 'uint16' == out.dtype
         assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+
+class TestGetJ2KParameters:
+    """Tests for get_j2k_parameters."""
+    def test_precision(self):
+        """Test getting the precision for a JPEG2K bytestream."""
+        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
+        # Signed
+        for ii in range(135, 144):
+            params = get_j2k_parameters(base + bytes([ii]))
+            assert ii - 127 == params["precision"]
+            assert params["is_signed"]
+
+        # Unsigned
+        for ii in range(7, 16):
+            params = get_j2k_parameters(base + bytes([ii]))
+            assert ii + 1 == params["precision"]
+            assert not params["is_signed"]
+
+    def test_not_j2k(self):
+        """Test result when no JPEG2K SOF marker present"""
+        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
+        assert {} == get_j2k_parameters(base + b'\x8F')
+
+    def test_no_siz(self):
+        """Test result when no SIZ box present"""
+        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
+        assert {} == get_j2k_parameters(base + b'\x8F')
+
+    def test_short_bytestream(self):
+        """Test result when no SIZ box present"""
+        assert {} == get_j2k_parameters(b'')
+        assert {} == get_j2k_parameters(b'\xff\x4f\xff\x51' + b'\x00' * 20)

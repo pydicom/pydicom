@@ -838,6 +838,44 @@ def get_image_pixel_ids(ds):
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
+def get_j2k_parameters(codestream):
+    """Return a dict containing JPEG 2000 component parameters.
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    codestream : bytes
+        The JPEG 2000 (ISO/IEC 15444-1) codestream to be parsed.
+
+    Returns
+    -------
+    dict
+        A dict containing parameters for the first component sample in the
+        JPEG 2000 `codestream`, or an empty dict if unable to parse the data.
+        Available parameters are ``{"precision": int, "is_signed": bool}``.
+    """
+    try:
+        # First 2 bytes must be the SOC marker - if not then wrong format
+        if codestream[0:2] != b'\xff\x4f':
+            return {}
+
+        # SIZ is required to be the second marker - Figure A-3 in 15444-1
+        if codestream[2:4] != b'\xff\x51':
+            return {}
+
+        # See 15444-1 A.5.1 for format of the SIZ box and contents
+        ssiz = codestream[42]
+        if ssiz & 0x80:
+            return {"precision": (ssiz & 0x7F) + 1, "is_signed": True}
+
+        return {"precision": ssiz + 1, "is_signed": False}
+    except (IndexError, TypeError):
+        pass
+
+    return {}
+
+
 def pixel_dtype(ds, as_float=False):
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
