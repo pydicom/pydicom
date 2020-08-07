@@ -227,13 +227,16 @@ in <code class="xref py py-mod docutils literal notranslate"><span class="pre">p
 <em>Waveform Sequence</em> element.</p></li>
 </ul>
 </li>
+<li><p>When JPEG 2000 image data is unsigned and the <em>Pixel Representation</em> is 1
+the image data is converted to signed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1149">#1149</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
-per default, only when <cite>config.enforce_valid_values</cite> is set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
+per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">

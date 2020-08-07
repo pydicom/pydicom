@@ -20,6 +20,7 @@ pydicom.pixel\_data\_handlers.util
       dtype_corrected_for_endianness
       get_expected_length
       get_image_pixel_ids
+      get_j2k_parameters
       pixel_dtype
       reshape_pixel_array
    
