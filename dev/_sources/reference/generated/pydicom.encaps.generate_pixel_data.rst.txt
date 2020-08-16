@@ -1,4 +1,4 @@
-pydicom.encaps.generate\_pixel\_data
+﻿pydicom.encaps.generate\_pixel\_data
 ====================================
 
 .. currentmodule:: pydicom.encaps

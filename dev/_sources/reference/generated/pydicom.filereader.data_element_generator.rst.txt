@@ -1,4 +1,4 @@
-pydicom.filereader.data\_element\_generator
+﻿pydicom.filereader.data\_element\_generator
 ===========================================
 
 .. currentmodule:: pydicom.filereader

@@ -1,4 +1,4 @@
-pydicom.fileutil.read\_delimiter\_item
+﻿pydicom.fileutil.read\_delimiter\_item
 ======================================
 
 .. currentmodule:: pydicom.fileutil

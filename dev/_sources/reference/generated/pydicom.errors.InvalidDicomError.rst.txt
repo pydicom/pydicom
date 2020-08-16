@@ -1,4 +1,4 @@
-pydicom.errors.InvalidDicomError
+﻿pydicom.errors.InvalidDicomError
 ================================
 
 .. currentmodule:: pydicom.errors

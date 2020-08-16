@@ -1,4 +1,4 @@
-pydicom.filebase.DicomFileLike
+﻿pydicom.filebase.DicomFileLike
 ==============================
 
 .. currentmodule:: pydicom.filebase

@@ -1,4 +1,4 @@
-pydicom.uid.generate\_uid
+﻿pydicom.uid.generate\_uid
 =========================
 
 .. currentmodule:: pydicom.uid

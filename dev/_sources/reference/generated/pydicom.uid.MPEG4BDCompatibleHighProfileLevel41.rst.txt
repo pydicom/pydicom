@@ -1,4 +1,4 @@
-pydicom.uid.MPEG4BDCompatibleHighProfileLevel41
+﻿pydicom.uid.MPEG4BDCompatibleHighProfileLevel41
 ===============================================
 
 .. currentmodule:: pydicom.uid

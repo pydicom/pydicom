@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_OBvalue
+﻿pydicom.filewriter.write\_OBvalue
 =================================
 
 .. currentmodule:: pydicom.filewriter

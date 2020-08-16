@@ -1,4 +1,4 @@
-pydicom.datadict.get\_private\_entry
+﻿pydicom.datadict.get\_private\_entry
 ====================================
 
 .. currentmodule:: pydicom.datadict

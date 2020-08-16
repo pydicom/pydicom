@@ -1,4 +1,4 @@
-pydicom.encaps.encapsulate
+﻿pydicom.encaps.encapsulate
 ==========================
 
 .. currentmodule:: pydicom.encaps

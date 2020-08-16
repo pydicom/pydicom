@@ -1,4 +1,4 @@
-pydicom.encaps.itemize\_frame
+﻿pydicom.encaps.itemize\_frame
 =============================
 
 .. currentmodule:: pydicom.encaps

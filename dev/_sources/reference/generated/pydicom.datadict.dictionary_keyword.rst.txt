@@ -1,4 +1,4 @@
-pydicom.datadict.dictionary\_keyword
+﻿pydicom.datadict.dictionary\_keyword
 ====================================
 
 .. currentmodule:: pydicom.datadict

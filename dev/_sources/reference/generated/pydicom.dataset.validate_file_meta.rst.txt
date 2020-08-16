@@ -1,4 +1,4 @@
-pydicom.dataset.validate\_file\_meta
+﻿pydicom.dataset.validate\_file\_meta
 ====================================
 
 .. currentmodule:: pydicom.dataset

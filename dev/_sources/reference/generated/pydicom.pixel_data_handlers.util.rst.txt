@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.util
+﻿pydicom.pixel\_data\_handlers.util
 ==================================
 
 .. automodule:: pydicom.pixel_data_handlers.util

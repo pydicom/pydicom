@@ -1,4 +1,4 @@
-pydicom.charset.decode
+﻿pydicom.charset.decode
 ======================
 
 .. currentmodule:: pydicom.charset

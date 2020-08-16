@@ -1,4 +1,4 @@
-pydicom.config.reset\_data\_element\_callback
+﻿pydicom.config.reset\_data\_element\_callback
 =============================================
 
 .. currentmodule:: pydicom.config

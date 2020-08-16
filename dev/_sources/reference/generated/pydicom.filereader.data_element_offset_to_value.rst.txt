@@ -1,4 +1,4 @@
-pydicom.filereader.data\_element\_offset\_to\_value
+﻿pydicom.filereader.data\_element\_offset\_to\_value
 ===================================================
 
 .. currentmodule:: pydicom.filereader

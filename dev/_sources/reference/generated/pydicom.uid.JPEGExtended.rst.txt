@@ -1,4 +1,4 @@
-pydicom.uid.JPEGExtended
+﻿pydicom.uid.JPEGExtended
 ========================
 
 .. currentmodule:: pydicom.uid

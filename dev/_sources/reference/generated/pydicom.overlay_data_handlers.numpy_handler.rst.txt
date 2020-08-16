@@ -1,4 +1,4 @@
-pydicom.overlay\_data\_handlers.numpy\_handler
+﻿pydicom.overlay\_data\_handlers.numpy\_handler
 ==============================================
 
 .. automodule:: pydicom.overlay_data_handlers.numpy_handler

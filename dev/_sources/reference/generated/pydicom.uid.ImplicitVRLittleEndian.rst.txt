@@ -1,4 +1,4 @@
-pydicom.uid.ImplicitVRLittleEndian
+﻿pydicom.uid.ImplicitVRLittleEndian
 ==================================
 
 .. currentmodule:: pydicom.uid

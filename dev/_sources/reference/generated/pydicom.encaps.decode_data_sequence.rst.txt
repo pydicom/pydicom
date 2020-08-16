@@ -1,4 +1,4 @@
-pydicom.encaps.decode\_data\_sequence
+﻿pydicom.encaps.decode\_data\_sequence
 =====================================
 
 .. currentmodule:: pydicom.encaps

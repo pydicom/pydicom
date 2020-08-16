@@ -1,4 +1,4 @@
-pydicom.values.convert\_DA\_string
+﻿pydicom.values.convert\_DA\_string
 ==================================
 
 .. currentmodule:: pydicom.values

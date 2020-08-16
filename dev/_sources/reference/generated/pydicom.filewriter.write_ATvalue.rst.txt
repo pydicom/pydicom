@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_ATvalue
+﻿pydicom.filewriter.write\_ATvalue
 =================================
 
 .. currentmodule:: pydicom.filewriter

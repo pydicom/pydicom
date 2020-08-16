@@ -1,4 +1,4 @@
-pydicom.valuerep.MultiString
+﻿pydicom.valuerep.MultiString
 ============================
 
 .. currentmodule:: pydicom.valuerep

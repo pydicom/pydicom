@@ -1,4 +1,4 @@
-pydicom.encaps.itemize\_fragment
+﻿pydicom.encaps.itemize\_fragment
 ================================
 
 .. currentmodule:: pydicom.encaps

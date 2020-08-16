@@ -1,4 +1,4 @@
-pydicom.config.data\_element\_callback\_kwargs
+﻿pydicom.config.data\_element\_callback\_kwargs
 ==============================================
 
 .. currentmodule:: pydicom.config

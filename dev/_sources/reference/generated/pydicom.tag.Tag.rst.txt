@@ -1,4 +1,4 @@
-pydicom.tag.Tag
+﻿pydicom.tag.Tag
 ===============
 
 .. currentmodule:: pydicom.tag

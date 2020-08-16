@@ -1,4 +1,4 @@
-pydicom.datadict.dictionary\_VR
+﻿pydicom.datadict.dictionary\_VR
 ===============================
 
 .. currentmodule:: pydicom.datadict

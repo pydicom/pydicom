@@ -1,4 +1,4 @@
-pydicom.encaps.get\_frame\_offsets
+﻿pydicom.encaps.get\_frame\_offsets
 ==================================
 
 .. currentmodule:: pydicom.encaps

@@ -1,4 +1,4 @@
-pydicom.uid.UID
+﻿pydicom.uid.UID
 ===============
 
 .. currentmodule:: pydicom.uid

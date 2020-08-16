@@ -1,4 +1,4 @@
-pydicom.datadict.dictionary\_has\_tag
+﻿pydicom.datadict.dictionary\_has\_tag
 =====================================
 
 .. currentmodule:: pydicom.datadict

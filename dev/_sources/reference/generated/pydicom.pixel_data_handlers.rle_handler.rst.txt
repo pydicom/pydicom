@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.rle\_handler
+﻿pydicom.pixel\_data\_handlers.rle\_handler
 ==========================================
 
 .. automodule:: pydicom.pixel_data_handlers.rle_handler

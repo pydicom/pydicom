@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.convert\_color\_space
+﻿pydicom.pixel\_data\_handlers.convert\_color\_space
 ===================================================
 
 .. currentmodule:: pydicom.pixel_data_handlers

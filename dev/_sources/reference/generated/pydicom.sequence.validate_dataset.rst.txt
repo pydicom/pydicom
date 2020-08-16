@@ -1,4 +1,4 @@
-pydicom.sequence.validate\_dataset
+﻿pydicom.sequence.validate\_dataset
 ==================================
 
 .. currentmodule:: pydicom.sequence

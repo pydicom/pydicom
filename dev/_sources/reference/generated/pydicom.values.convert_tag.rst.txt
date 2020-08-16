@@ -1,4 +1,4 @@
-pydicom.values.convert\_tag
+﻿pydicom.values.convert\_tag
 ===========================
 
 .. currentmodule:: pydicom.values

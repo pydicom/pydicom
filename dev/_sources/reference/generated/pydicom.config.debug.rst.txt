@@ -1,4 +1,4 @@
-pydicom.config.debug
+﻿pydicom.config.debug
 ====================
 
 .. currentmodule:: pydicom.config

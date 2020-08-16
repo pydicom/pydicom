@@ -1,4 +1,4 @@
-pydicom.uid.MPEG4HighProfileLevel422D
+﻿pydicom.uid.MPEG4HighProfileLevel422D
 =====================================
 
 .. currentmodule:: pydicom.uid

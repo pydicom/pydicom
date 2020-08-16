@@ -1,4 +1,4 @@
-pydicom.tag.TupleTag
+﻿pydicom.tag.TupleTag
 ====================
 
 .. currentmodule:: pydicom.tag

@@ -1,4 +1,4 @@
-pydicom.datadict.repeater\_has\_keyword
+﻿pydicom.datadict.repeater\_has\_keyword
 =======================================
 
 .. currentmodule:: pydicom.datadict

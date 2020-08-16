@@ -1,4 +1,4 @@
-pydicom.uid.RLELossless
+﻿pydicom.uid.RLELossless
 =======================
 
 .. currentmodule:: pydicom.uid

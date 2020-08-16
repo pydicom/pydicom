@@ -1,4 +1,4 @@
-pydicom.datadict.repeater\_has\_tag
+﻿pydicom.datadict.repeater\_has\_tag
 ===================================
 
 .. currentmodule:: pydicom.datadict

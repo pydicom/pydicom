@@ -1,4 +1,4 @@
-pydicom.config.show\_file\_meta
+﻿pydicom.config.show\_file\_meta
 ===============================
 
 .. currentmodule:: pydicom.config

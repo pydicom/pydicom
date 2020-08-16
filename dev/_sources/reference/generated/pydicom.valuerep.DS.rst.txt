@@ -1,4 +1,4 @@
-pydicom.valuerep.DS
+﻿pydicom.valuerep.DS
 ===================
 
 .. currentmodule:: pydicom.valuerep

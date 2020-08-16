@@ -1,4 +1,4 @@
-pydicom.filewriter.dcmwrite
+﻿pydicom.filewriter.dcmwrite
 ===========================
 
 .. currentmodule:: pydicom.filewriter

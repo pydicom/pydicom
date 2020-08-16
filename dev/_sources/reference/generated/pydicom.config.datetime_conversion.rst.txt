@@ -1,4 +1,4 @@
-pydicom.config.datetime\_conversion
+﻿pydicom.config.datetime\_conversion
 ===================================
 
 .. currentmodule:: pydicom.config

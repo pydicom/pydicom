@@ -1,4 +1,4 @@
-pydicom.data.get\_charset\_files
+﻿pydicom.data.get\_charset\_files
 ================================
 
 .. currentmodule:: pydicom.data

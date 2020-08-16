@@ -1,4 +1,4 @@
-pydicom.values.convert\_UI
+﻿pydicom.values.convert\_UI
 ==========================
 
 .. currentmodule:: pydicom.values

@@ -1,4 +1,4 @@
-pydicom.config.use\_DS\_numpy
+﻿pydicom.config.use\_DS\_numpy
 =============================
 
 .. currentmodule:: pydicom.config

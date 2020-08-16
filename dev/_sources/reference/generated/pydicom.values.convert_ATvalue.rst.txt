@@ -1,4 +1,4 @@
-pydicom.values.convert\_ATvalue
+﻿pydicom.values.convert\_ATvalue
 ===============================
 
 .. currentmodule:: pydicom.values

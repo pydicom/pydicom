@@ -1,4 +1,4 @@
-pydicom.filebase.DicomBytesIO
+﻿pydicom.filebase.DicomBytesIO
 =============================
 
 .. currentmodule:: pydicom.filebase

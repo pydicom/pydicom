@@ -1,4 +1,4 @@
-pydicom.config.overlay\_data\_handlers
+﻿pydicom.config.overlay\_data\_handlers
 ======================================
 
 .. currentmodule:: pydicom.config

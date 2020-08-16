@@ -1,4 +1,4 @@
-pydicom.config.allow\_DS\_float
+﻿pydicom.config.allow\_DS\_float
 ===============================
 
 .. currentmodule:: pydicom.config

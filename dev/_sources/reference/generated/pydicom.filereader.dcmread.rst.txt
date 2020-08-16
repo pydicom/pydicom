@@ -1,4 +1,4 @@
-pydicom.filereader.dcmread
+﻿pydicom.filereader.dcmread
 ==========================
 
 .. currentmodule:: pydicom.filereader

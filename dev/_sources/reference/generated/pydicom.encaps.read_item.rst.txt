@@ -1,4 +1,4 @@
-pydicom.encaps.read\_item
+﻿pydicom.encaps.read\_item
 =========================
 
 .. currentmodule:: pydicom.encaps

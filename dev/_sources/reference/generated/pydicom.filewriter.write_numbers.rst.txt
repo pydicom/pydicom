@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_numbers
+﻿pydicom.filewriter.write\_numbers
 =================================
 
 .. currentmodule:: pydicom.filewriter

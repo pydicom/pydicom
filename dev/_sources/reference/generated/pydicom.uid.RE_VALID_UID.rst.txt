@@ -1,4 +1,4 @@
-pydicom.uid.RE\_VALID\_UID
+﻿pydicom.uid.RE\_VALID\_UID
 ==========================
 
 .. currentmodule:: pydicom.uid

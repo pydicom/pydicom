@@ -1,4 +1,4 @@
-pydicom.filewriter.correct\_ambiguous\_vr\_element
+﻿pydicom.filewriter.correct\_ambiguous\_vr\_element
 ==================================================
 
 .. currentmodule:: pydicom.filewriter

@@ -1,4 +1,4 @@
-pydicom.dataset.FileDataset
+﻿pydicom.dataset.FileDataset
 ===========================
 
 .. currentmodule:: pydicom.dataset

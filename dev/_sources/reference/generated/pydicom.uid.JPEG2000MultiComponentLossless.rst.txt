@@ -1,4 +1,4 @@
-pydicom.uid.JPEG2000MultiComponentLossless
+﻿pydicom.uid.JPEG2000MultiComponentLossless
 ==========================================
 
 .. currentmodule:: pydicom.uid

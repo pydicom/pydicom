@@ -1,4 +1,4 @@
-pydicom.values.convert\_PN
+﻿pydicom.values.convert\_PN
 ==========================
 
 .. currentmodule:: pydicom.values

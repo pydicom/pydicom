@@ -1,4 +1,4 @@
-pydicom.datadict.tag\_for\_keyword
+﻿pydicom.datadict.tag\_for\_keyword
 ==================================
 
 .. currentmodule:: pydicom.datadict

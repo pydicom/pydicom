@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.numpy\_handler
+﻿pydicom.pixel\_data\_handlers.numpy\_handler
 ============================================
 
 .. automodule:: pydicom.pixel_data_handlers.numpy_handler

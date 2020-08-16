@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_string
+﻿pydicom.filewriter.write\_string
 ================================
 
 .. currentmodule:: pydicom.filewriter

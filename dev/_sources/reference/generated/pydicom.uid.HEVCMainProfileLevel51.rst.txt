@@ -1,4 +1,4 @@
-pydicom.uid.HEVCMainProfileLevel51
+﻿pydicom.uid.HEVCMainProfileLevel51
 ==================================
 
 .. currentmodule:: pydicom.uid

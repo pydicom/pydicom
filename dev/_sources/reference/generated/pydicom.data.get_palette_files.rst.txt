@@ -1,4 +1,4 @@
-pydicom.data.get\_palette\_files
+﻿pydicom.data.get\_palette\_files
 ================================
 
 .. currentmodule:: pydicom.data

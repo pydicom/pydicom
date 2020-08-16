@@ -1,4 +1,4 @@
-pydicom.misc.is\_dicom
+﻿pydicom.misc.is\_dicom
 ======================
 
 .. currentmodule:: pydicom.misc

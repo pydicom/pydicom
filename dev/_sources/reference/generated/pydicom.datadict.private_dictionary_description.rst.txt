@@ -1,4 +1,4 @@
-pydicom.datadict.private\_dictionary\_description
+﻿pydicom.datadict.private\_dictionary\_description
 =================================================
 
 .. currentmodule:: pydicom.datadict

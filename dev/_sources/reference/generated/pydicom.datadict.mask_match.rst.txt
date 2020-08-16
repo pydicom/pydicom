@@ -1,4 +1,4 @@
-pydicom.datadict.mask\_match
+﻿pydicom.datadict.mask\_match
 ============================
 
 .. currentmodule:: pydicom.datadict

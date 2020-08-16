@@ -1,4 +1,4 @@
-pydicom.encaps.fragment\_frame
+﻿pydicom.encaps.fragment\_frame
 ==============================
 
 .. currentmodule:: pydicom.encaps

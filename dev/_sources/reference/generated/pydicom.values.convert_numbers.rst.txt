@@ -1,4 +1,4 @@
-pydicom.values.convert\_numbers
+﻿pydicom.values.convert\_numbers
 ===============================
 
 .. currentmodule:: pydicom.values

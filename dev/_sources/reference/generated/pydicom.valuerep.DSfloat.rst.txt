@@ -1,4 +1,4 @@
-pydicom.valuerep.DSfloat
+﻿pydicom.valuerep.DSfloat
 ========================
 
 .. currentmodule:: pydicom.valuerep

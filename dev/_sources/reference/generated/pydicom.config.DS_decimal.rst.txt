@@ -1,4 +1,4 @@
-pydicom.config.DS\_decimal
+﻿pydicom.config.DS\_decimal
 ==========================
 
 .. currentmodule:: pydicom.config

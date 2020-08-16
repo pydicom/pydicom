@@ -1,4 +1,4 @@
-pydicom.encaps.generate\_pixel\_data\_frame
+﻿pydicom.encaps.generate\_pixel\_data\_frame
 ===========================================
 
 .. currentmodule:: pydicom.encaps

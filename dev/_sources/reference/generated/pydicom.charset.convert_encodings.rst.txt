@@ -1,4 +1,4 @@
-pydicom.charset.convert\_encodings
+﻿pydicom.charset.convert\_encodings
 ==================================
 
 .. currentmodule:: pydicom.charset

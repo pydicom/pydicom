@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.pylibjpeg\_handler
+﻿pydicom.pixel\_data\_handlers.pylibjpeg\_handler
 ================================================
 
 .. automodule:: pydicom.pixel_data_handlers.pylibjpeg_handler

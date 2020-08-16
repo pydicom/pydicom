@@ -1,4 +1,4 @@
-pydicom.fileutil.absorb\_delimiter\_item
+﻿pydicom.fileutil.absorb\_delimiter\_item
 ========================================
 
 .. currentmodule:: pydicom.fileutil

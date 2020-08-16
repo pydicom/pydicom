@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_TM
+﻿pydicom.filewriter.write\_TM
 ============================
 
 .. currentmodule:: pydicom.filewriter

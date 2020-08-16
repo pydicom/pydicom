@@ -1,4 +1,4 @@
-pydicom.dataelem.RawDataElement
+﻿pydicom.dataelem.RawDataElement
 ===============================
 
 .. currentmodule:: pydicom.dataelem

@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.pillow\_handler
+﻿pydicom.pixel\_data\_handlers.pillow\_handler
 =============================================
 
 .. automodule:: pydicom.pixel_data_handlers.pillow_handler

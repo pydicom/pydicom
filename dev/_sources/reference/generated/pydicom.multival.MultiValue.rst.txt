@@ -1,4 +1,4 @@
-pydicom.multival.MultiValue
+﻿pydicom.multival.MultiValue
 ===========================
 
 .. currentmodule:: pydicom.multival

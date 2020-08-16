@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.gdcm\_handler
+﻿pydicom.pixel\_data\_handlers.gdcm\_handler
 ===========================================
 
 .. automodule:: pydicom.pixel_data_handlers.gdcm_handler

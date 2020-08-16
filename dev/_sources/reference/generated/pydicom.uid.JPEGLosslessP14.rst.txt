@@ -1,4 +1,4 @@
-pydicom.uid.JPEGLosslessP14
+﻿pydicom.uid.JPEGLosslessP14
 ===========================
 
 .. currentmodule:: pydicom.uid

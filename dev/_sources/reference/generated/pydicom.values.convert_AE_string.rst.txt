@@ -1,4 +1,4 @@
-pydicom.values.convert\_AE\_string
+﻿pydicom.values.convert\_AE\_string
 ==================================
 
 .. currentmodule:: pydicom.values

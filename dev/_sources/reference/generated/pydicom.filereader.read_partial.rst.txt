@@ -1,4 +1,4 @@
-pydicom.filereader.read\_partial
+﻿pydicom.filereader.read\_partial
 ================================
 
 .. currentmodule:: pydicom.filereader

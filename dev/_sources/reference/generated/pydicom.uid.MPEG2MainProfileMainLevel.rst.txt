@@ -1,4 +1,4 @@
-pydicom.uid.MPEG2MainProfileMainLevel
+﻿pydicom.uid.MPEG2MainProfileMainLevel
 =====================================
 
 .. currentmodule:: pydicom.uid

@@ -1,4 +1,4 @@
-pydicom.uid.MPEG4StereoHighProfileLevel42
+﻿pydicom.uid.MPEG4StereoHighProfileLevel42
 =========================================
 
 .. currentmodule:: pydicom.uid

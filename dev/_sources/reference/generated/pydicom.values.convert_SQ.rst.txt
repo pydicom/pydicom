@@ -1,4 +1,4 @@
-pydicom.values.convert\_SQ
+﻿pydicom.values.convert\_SQ
 ==========================
 
 .. currentmodule:: pydicom.values

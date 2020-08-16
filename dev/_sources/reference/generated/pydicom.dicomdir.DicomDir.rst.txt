@@ -1,4 +1,4 @@
-pydicom.dicomdir.DicomDir
+﻿pydicom.dicomdir.DicomDir
 =========================
 
 .. currentmodule:: pydicom.dicomdir

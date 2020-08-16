@@ -1,4 +1,4 @@
-pydicom.encaps.defragment\_data
+﻿pydicom.encaps.defragment\_data
 ===============================
 
 .. currentmodule:: pydicom.encaps

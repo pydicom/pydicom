@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_dataset
+﻿pydicom.filewriter.write\_dataset
 =================================
 
 .. currentmodule:: pydicom.filewriter

@@ -1,4 +1,4 @@
-pydicom.valuerep.PersonNameUnicode
+﻿pydicom.valuerep.PersonNameUnicode
 ==================================
 
 .. currentmodule:: pydicom.valuerep

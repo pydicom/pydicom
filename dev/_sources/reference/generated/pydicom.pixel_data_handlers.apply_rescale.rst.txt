@@ -1,4 +1,4 @@
-pydicom.pixel\_data\_handlers.apply\_rescale
+﻿pydicom.pixel\_data\_handlers.apply\_rescale
 ============================================
 
 .. currentmodule:: pydicom.pixel_data_handlers

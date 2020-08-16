@@ -1,4 +1,4 @@
-pydicom.fileutil.find\_bytes
+﻿pydicom.fileutil.find\_bytes
 ============================
 
 .. currentmodule:: pydicom.fileutil

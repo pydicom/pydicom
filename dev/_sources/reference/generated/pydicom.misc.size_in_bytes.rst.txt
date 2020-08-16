@@ -1,4 +1,4 @@
-pydicom.misc.size\_in\_bytes
+﻿pydicom.misc.size\_in\_bytes
 ============================
 
 .. currentmodule:: pydicom.misc

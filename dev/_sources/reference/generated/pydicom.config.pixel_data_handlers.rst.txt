@@ -1,4 +1,4 @@
-pydicom.config.pixel\_data\_handlers
+﻿pydicom.config.pixel\_data\_handlers
 ====================================
 
 .. currentmodule:: pydicom.config

@@ -1,4 +1,4 @@
-pydicom.filereader.read\_file\_meta\_info
+﻿pydicom.filereader.read\_file\_meta\_info
 =========================================
 
 .. currentmodule:: pydicom.filereader

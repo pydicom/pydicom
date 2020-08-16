@@ -1,4 +1,4 @@
-pydicom.datadict.add\_dict\_entries
+﻿pydicom.datadict.add\_dict\_entries
 ===================================
 
 .. currentmodule:: pydicom.datadict

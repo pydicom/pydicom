@@ -1,4 +1,4 @@
-pydicom.waveforms.numpy\_handler
+﻿pydicom.waveforms.numpy\_handler
 ================================
 
 .. automodule:: pydicom.waveforms.numpy_handler

@@ -1,4 +1,4 @@
-pydicom.filewriter.write\_file\_meta\_info
+﻿pydicom.filewriter.write\_file\_meta\_info
 ==========================================
 
 .. currentmodule:: pydicom.filewriter

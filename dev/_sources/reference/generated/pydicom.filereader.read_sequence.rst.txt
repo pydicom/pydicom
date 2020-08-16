@@ -1,4 +1,4 @@
-pydicom.filereader.read\_sequence
+﻿pydicom.filereader.read\_sequence
 =================================
 
 .. currentmodule:: pydicom.filereader

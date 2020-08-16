@@ -1,4 +1,4 @@
-pydicom.config.enforce\_valid\_values
+﻿pydicom.config.enforce\_valid\_values
 =====================================
 
 .. currentmodule:: pydicom.config

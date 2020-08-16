@@ -1,4 +1,4 @@
-pydicom.values.convert\_UN
+﻿pydicom.values.convert\_UN
 ==========================
 
 .. currentmodule:: pydicom.values

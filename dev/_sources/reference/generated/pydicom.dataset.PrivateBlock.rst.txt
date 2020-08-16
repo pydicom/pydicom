@@ -1,4 +1,4 @@
-pydicom.dataset.PrivateBlock
+﻿pydicom.dataset.PrivateBlock
 ============================
 
 .. currentmodule:: pydicom.dataset

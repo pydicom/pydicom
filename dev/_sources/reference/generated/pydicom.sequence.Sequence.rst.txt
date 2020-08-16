@@ -1,4 +1,4 @@
-pydicom.sequence.Sequence
+﻿pydicom.sequence.Sequence
 =========================
 
 .. currentmodule:: pydicom.sequence

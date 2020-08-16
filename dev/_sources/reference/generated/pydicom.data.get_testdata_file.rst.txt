@@ -1,4 +1,4 @@
-pydicom.data.get\_testdata\_file
+﻿pydicom.data.get\_testdata\_file
 ================================
 
 .. currentmodule:: pydicom.data
