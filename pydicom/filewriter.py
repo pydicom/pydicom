@@ -1004,8 +1004,11 @@ def dcmwrite(filename, dataset, write_like_original=True):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
     else:
-        fp = DicomFileLike(filename)
-
+        try:
+            fp = DicomFileLike(filename)
+        except AttributeError:
+            raise TypeError("dcmwrite: Expected a file path or a file-like, "
+                            "but got " + type(filename).__name__)
     try:
         # WRITE FILE META INFORMATION
         if preamble:

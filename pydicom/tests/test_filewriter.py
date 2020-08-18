@@ -1252,6 +1252,16 @@ class TestWriteToStandard:
         with pytest.raises(ValueError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
+    def test_bad_filename(self):
+        """Test that TypeError is raised for a bad filename."""
+        ds = dcmread(ct_name)
+        with pytest.raises(TypeError, match="dcmwrite: Expected a file path "
+                                            "or a file-like, but got None"):
+            ds.save_as(None)
+        with pytest.raises(TypeError, match="dcmwrite: Expected a file path "
+                                            "or a file-like, but got int"):
+            ds.save_as(42)
+
     def test_prefix(self):
         """Test that the 'DICM' prefix
            is written with preamble."""

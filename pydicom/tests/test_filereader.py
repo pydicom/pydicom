@@ -751,6 +751,17 @@ class TestReader:
             assert Dataset() == ds.file_meta
             assert Dataset() == ds[:]
 
+    def test_bad_filename(self):
+        """Test reading from non-existing file raises."""
+        with pytest.raises(FileNotFoundError):
+            dcmread("InvalidFilePath")
+        with pytest.raises(TypeError, match="dcmread: Expected a file path or "
+                                            "a file-like, but got None"):
+            dcmread(None)
+        with pytest.raises(TypeError, match="dcmread: Expected a file path or "
+                                            "a file-like, but got int"):
+            dcmread(42)
+
     def test_empty_specific_character_set(self):
         """Test that an empty Specific Character Set is handled correctly.
         Regression test for #1038"""
