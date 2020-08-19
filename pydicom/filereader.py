@@ -809,6 +809,8 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
     ------
     InvalidDicomError
         If `force` is ``True`` and the file is not a valid DICOM file.
+    TypeError
+        If `fp` is ``None`` or of an unsupported type.
 
     See Also
     --------
@@ -842,6 +844,9 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         caller_owns_file = False
         logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
+    elif fp is None or not hasattr(fp, "read") or not hasattr(fp, "seek"):
+        raise TypeError("dcmread: Expected a file path or a file-like, "
+                        "but got " + type(fp).__name__)
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
