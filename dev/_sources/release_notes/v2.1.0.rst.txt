@@ -58,3 +58,5 @@ Fixes
   connection is available (:pr:`1156`)
 * Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
   a file-like (:issue:`1153`)
+* Raise ``TypeError`` if :func:`~pydicom.dcmread` or :func:`~pydicom.dcmwrite`
+  is called with wrong argument

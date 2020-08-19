@@ -231,7 +231,7 @@
 <h1>pydicom.filereader.dcmread<a class="headerlink" href="#pydicom-filereader-dcmread" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.filereader.dcmread">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_before_pixels</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">specific_tags</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0fb375ea/pydicom/filereader.py#L766"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">dcmread</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stop_before_pixels</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">force</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">specific_tags</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1ffce39d/pydicom/filereader.py#L766"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.dcmread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read and parse a DICOM dataset stored in the DICOM File Format.</p>
 <p>Read a DICOM dataset stored in accordance with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_7.html">DICOM File
 Format</a>. If the dataset is not stored in
@@ -269,7 +269,10 @@ a parsed DICOM file.</p>
 <dd class="field-odd"><p><a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset">FileDataset</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference internal" href="pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><strong>InvalidDicomError</strong></a> – If <cite>force</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and the file is not a valid DICOM file.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="pydicom.errors.InvalidDicomError.html#pydicom.errors.InvalidDicomError" title="pydicom.errors.InvalidDicomError"><strong>InvalidDicomError</strong></a> – If <cite>force</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and the file is not a valid DICOM file.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If <cite>fp</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code> or of an unsupported type.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition seealso">

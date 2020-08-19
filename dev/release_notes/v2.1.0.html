@@ -252,6 +252,8 @@ pixel data to avoid erroring out on embedded sequence delimiter
 connection is available (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1156">#1156</a>)</p></li>
 <li><p>Fixed GDCM &lt; v2.8.8 not returning the pixel array for datasets not read from
 a file-like (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1153">#1153</a>)</p></li>
+<li><p>Raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> if <code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code> or <code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code>
+is called with wrong argument</p></li>
 </ul>
 </div>
 </div>
