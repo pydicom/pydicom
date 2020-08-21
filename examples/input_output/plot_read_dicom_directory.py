@@ -1,78 +1,74 @@
 """
-====================
-Read DICOM directory
-====================
+=======================
+Read a DICOMDIR dataset
+=======================
 
-This example shows how to read DICOM directory.
+This example shows how to read a DICOM File-set's DICOMDIR dataset.
 
 """
 
-# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# license : MIT
+import os
+from pathlib import Path
 
-from os.path import dirname, join
-from pprint import pprint
-
-import pydicom
+from pydicom import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.filereader import read_dicomdir
 
 # fetch the path to the test data
-filepath = get_testdata_file('DICOMDIR')
-print('Path to the DICOM directory: {}'.format(filepath))
-# load the data
-dicom_dir = read_dicomdir(filepath)
-base_dir = dirname(filepath)
+path = get_testdata_file('DICOMDIR')
+ds = dcmread(path)
+root_dir = Path(ds.filename).resolve().parent
+print(f'Root directory: {root_dir}\n')
 
-# go through the patient record and print information
-for patient_record in dicom_dir.patient_records:
-    if (hasattr(patient_record, 'PatientID') and
-            hasattr(patient_record, 'PatientName')):
-        print("Patient: {}: {}".format(patient_record.PatientID,
-                                       patient_record.PatientName))
-    studies = patient_record.children
-    # got through each serie
+# Iterate through the PATIENT records
+for patient in ds.patient_records:
+    print(
+        f"PATIENT: PatientID={patient.PatientID}, "
+        f"PatientName={patient.PatientName}"
+    )
+
+    # Find all the STUDY records for the patient
+    studies = [
+        ii for ii in patient.children if ii.DirectoryRecordType == "STUDY"
+    ]
     for study in studies:
-        print(" " * 4 + "Study {}: {}: {}".format(study.StudyID,
-                                                  study.StudyDate,
-                                                  study.StudyDescription))
-        all_series = study.children
-        # go through each serie
+        descr = study.StudyDescription or "(no value available)"
+        print(
+            f"{'  ' * 1}STUDY: StudyID={study.StudyID}, "
+            f"StudyDate={study.StudyDate}, StudyDescription={descr}"
+        )
+
+        # Find all the SERIES records in the study
+        all_series = [
+            ii for ii in study.children if ii.DirectoryRecordType == "SERIES"
+        ]
         for series in all_series:
-            image_count = len(series.children)
-            plural = ('', 's')[image_count > 1]
+            # Find all the IMAGE records in the series
+            images = [
+                ii for ii in series.children
+                if ii.DirectoryRecordType == "IMAGE"
+            ]
+            plural = ('', 's')[len(images) > 1]
 
-            # Write basic series info and image count
+            descr = getattr(
+                series, "SeriesDescription", "(no value available)"
+            )
+            print(
+                f"{'  ' * 2}SERIES: SeriesNumber={series.SeriesNumber}, "
+                f"Modality={series.Modality}, SeriesDescription={descr} - "
+                f"{len(images)} SOP Instance{plural}"
+            )
 
-            # Put N/A in if no Series Description
-            if 'SeriesDescription' not in series:
-                series.SeriesDescription = "N/A"
-            print(" " * 8 + "Series {}: {}: {} ({} image{})".format(
-                series.SeriesNumber, series.Modality, series.SeriesDescription,
-                image_count, plural))
+            # Get the absolute file path to each instance
+            #   Each IMAGE contains a relative file path to the root directory
+            elems = [ii["ReferencedFileID"] for ii in images]
+            # Make sure the relative file path is always a list of str
+            paths = [[ee.value] if ee.VM == 1 else ee.value for ee in elems]
+            paths = [Path(*p) for p in paths]
 
-            # Open and read something from each image, for demonstration
-            # purposes. For simple quick overview of DICOMDIR, leave the
-            # following out
-            print(" " * 12 + "Reading images...")
-            image_records = series.children
-            image_filenames = [join(base_dir, *image_rec.ReferencedFileID)
-                               for image_rec in image_records]
+            # List the instance file paths
+            for p in paths:
+                print(f"{'  ' * 3}IMAGE: Path={os.fspath(p)}")
 
-            datasets = [pydicom.dcmread(image_filename)
-                        for image_filename in image_filenames]
-
-            patient_names = set(ds.PatientName for ds in datasets)
-            patient_IDs = set(ds.PatientID for ds in datasets)
-
-            # List the image filenames
-            print("\n" + " " * 12 + "Image filenames:")
-            print(" " * 12, end=' ')
-            pprint(image_filenames, indent=12)
-
-            # Expect all images to have same patient name, id
-            # Show the set of all names, IDs found (should each have one)
-            print(" " * 12 + "Patient Names in images..: {}".format(
-                patient_names))
-            print(" " * 12 + "Patient IDs in images..: {}".format(
-                patient_IDs))
+                # Optionally read the corresponding SOP Instance
+                # instance = dcmread(Path(root_dir) / p)
+                # print(instance.PatientName)

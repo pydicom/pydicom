@@ -19,7 +19,8 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 .. code-block:: bash
 
-    conda install pydicom>=2.1 numpy matplotlib
+    conda install numpy matplotlib
+    conda install -c conda-forge pydicom>=2.1
 
 **References**
 
@@ -203,7 +204,7 @@ Next we create the new multiplex group that will contain the waveforms:
     >>> new.WaveformOriginality = "ORIGINAL"
     >>> new.NumberOfWaveformChannels = 2
     >>> new.NumberOfWaveformSamples = len(x)
-    >>> new.SamplingFrequency = "1000"
+    >>> new.SamplingFrequency = 1000.0
 
 To find out which elements we need to add to our new multiplex, we check the
 :dcm:`Waveform Module <part03/sect_C.10.9.html>` in Part 3 of the DICOM
