@@ -203,7 +203,7 @@ Next we create the new multiplex group that will contain the waveforms:
     >>> new.WaveformOriginality = "ORIGINAL"
     >>> new.NumberOfWaveformChannels = 2
     >>> new.NumberOfWaveformSamples = len(x)
-    >>> new.SamplingFrequency = "1000"
+    >>> new.SamplingFrequency = 1000.0
 
 To find out which elements we need to add to our new multiplex, we check the
 :dcm:`Waveform Module <part03/sect_C.10.9.html>` in Part 3 of the DICOM
