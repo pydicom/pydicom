@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test for dicomdir.py"""
 
+import os
 from pathlib import Path
 
 import pytest
@@ -8,9 +9,10 @@ import pytest
 from pydicom import config, dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.dicomdir import DicomDir, FileSet, File
+from pydicom.dicomdir import DicomDir, FileSet, FileInstance
 from pydicom.errors import InvalidDicomError
-from pydicom.uid import UID
+from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
+from pydicom.uid import UID, ExplicitVRLittleEndian
 
 TEST_FILE = get_testdata_file('DICOMDIR')
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
@@ -87,15 +89,15 @@ def dicomdir():
 
 
 class TestFileSetLoad:
-    """Tests for dicomdir.FileSet creating from an existing File-set."""
+    """Tests for a FileSet creating from an existing File-set."""
     def test_loading(self, dicomdir):
         """Test loading an existing File-set."""
         fs = FileSet(dicomdir)
-        assert dicomdir == fs.DICOMDIR
+        assert dicomdir == fs._dicomdir
         assert "PYDICOM_TEST" == fs.FileSetID
-        assert "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187" == fs.FileSetUID
-
-        print(fs)
+        assert "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187" == fs.UID
+        assert "dicomdirtests" in fs.path
+        assert 31 == len(fs)
 
     def test_change_file_set_id(self, dicomdir):
         """Test changing the File-set ID."""
@@ -104,8 +106,18 @@ class TestFileSetLoad:
         assert "MYFILESET" == fs.FileSetID
         assert "MYFILESET" == dicomdir.FileSetID
 
-    def test_records(self, dicomdir):
-        """Test the records."""
+    def test_change_file_set_uid(self, dicomdir):
+        """Test changing the File-set ID."""
+        original = dicomdir.file_meta.MediaStorageSOPInstanceUID
+        fs = FileSet(dicomdir)
+        assert original == fs.UID
+        new = "1.2.3.4"
+        fs.UID = new
+        assert new == fs.UID
+        assert new == dicomdir.file_meta.MediaStorageSOPInstanceUID
+
+    def test_tree(self, dicomdir):
+        """Test the tree."""
         fs = FileSet(dicomdir)
         tree = fs._tree
         # Patient level
@@ -130,134 +142,86 @@ class TestFileSetLoad:
             ['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11']
             == list(images.keys())
         )
-        record = images['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11']
-        assert "IMAGE" == record.record_type
+        instance = images['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11']
+        assert isinstance(instance, FileInstance)
 
     def test_iter(self, dicomdir):
         """Test iter(FileSet)."""
         fs = FileSet(dicomdir)
-        ii = 0
-        for record in fs:
-            ii += 1
-            assert isinstance(record, File)
+        for instance in fs:
+            assert isinstance(instance, FileInstance)
 
-        assert 31 == ii
+        assert 7 == len([ii for ii in fs if ii.PatientID == '77654033'])
+        assert 24 == len([ii for ii in fs if ii.PatientID == '98890234'])
 
-    def test_iter_files(self, dicomdir):
-        """Test iterating the File-set records."""
-        fs = FileSet(dicomdir)
-        ii = 0
-        for record in fs.iter_files():
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 31 == ii
-
-    def test_iter_patient(self, dicomdir):
-        """Test iterating the records for a patient."""
-        fs = FileSet(dicomdir)
-        ii = 0
-        for record in fs.iter_patient('77654033'):
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 7 == ii
-
-        ii = 0
-        for record in fs.iter_patient('98890234'):
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 24 == ii
-
-    def test_iter_study(self, dicomdir):
-        """Test iterating the records for a patient's study."""
-        fs = FileSet(dicomdir)
-        ii = 0
-        study_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1'
-        for record in fs.iter_study('77654033', study_uid):
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 3 == ii
-
-        ii = 0
-        study_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.1'
-        for record in fs.iter_study('77654033', study_uid):
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 4 == ii
-
-    def test_iter_series(self, dicomdir):
-        """Test iterating the records for a patient's study."""
-        fs = FileSet(dicomdir)
-        study_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1'
-        series = [
-            '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10',
-            '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.6',
-            '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.8',
-        ]
-        for series_uid in series:
-            ii = 0
-            for record in fs.iter_series('77654033', study_uid, series_uid):
-                ii += 1
-                assert isinstance(record, File)
-
-            assert 1 == ii
-
-        ii = 0
-        study_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.1'
-        series_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.2'
-        for record in fs.iter_series('77654033', study_uid, series_uid):
-            ii += 1
-            assert isinstance(record, File)
-
-        assert 4 == ii
-
-    def test_instance(self, dicomdir):
-        """Test loading a File's dataset."""
+    def test_load(self, dicomdir):
+        """Test loading the referenced SOP Instance dataset."""
         fs = FileSet(dicomdir)
         study_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.1'
         series_uid = '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.2'
-        ii = 0
-        for record in fs.iter_files('77654033', study_uid, series_uid):
-            fpath = Path(record.filepath)
-            assert fpath.exists() and fpath.is_file()
-            ds = record.instance
+        matches = fs.find(SeriesInstanceUID=series_uid)
+        assert 4 == len(matches)
+        for instance in matches:
+            ds = instance.load()
             assert '77654033' == ds.PatientID
             assert study_uid == ds.StudyInstanceUID
             assert series_uid == ds.SeriesInstanceUID
             assert "Doe^Archibald" == ds.PatientName
-            ii += 1
 
-        assert 4 == ii
+        matches = fs.find(StudyDescription="XR C Spine Comp Min 4 Views")
+        assert 3 == len(matches)
 
-    def test_len(self, dicomdir):
-        """Test len(FileSet)."""
-        fs = FileSet()
-        assert 0 == len(fs)
-
+    def test_instance(self, dicomdir):
+        print(dicomdir.filename)
         fs = FileSet(dicomdir)
-        assert 31 == len(fs)
+        assert 31 == len(fs._instances)
+        instance = fs._instances[0]
+        print(instance._records)
+        print(instance.path)
+        print(instance.TransferSyntaxUID)
+        print(instance.SOPInstanceUID)
+        print(instance.SOPClassUID)
 
 
 class TestFileSetNew:
-    """Tests for dicomdir.FileSet from a File-set created from scratch."""
-    def test_empty_DICOMDIR(self):
-        """Test DICOMDIR with no records."""
+    """Tests for a File-set created from scratch."""
+    def test_new_no_records(self):
+        """Test new with no records."""
         fs = FileSet()
-        ds = fs.DICOMDIR
+
+        # Test DICOMDIR
+        ds = fs._dicomdir
         assert isinstance(ds, Dataset)
         assert ds.FileSetID is None
+        assert 'DICOMDIR' == ds.filename
+        # Test DICOMDIR file meta
+        meta = ds.file_meta
+        assert MediaStorageDirectoryStorage == meta.MediaStorageSOPClassUID
+        assert meta.MediaStorageSOPInstanceUID.is_valid
+        assert ExplicitVRLittleEndian == meta.TransferSyntaxUID
+
+        # Test FileSet
+        assert 'pydicom/tests' in fs.path
+        assert 'DICOMDIR' not in fs.path
+        assert fs.FileSetID is None
+        assert fs.UID.is_valid
+        assert 0 == len(fs)
+
+        with pytest.raises(StopIteration):
+            next(iter(fs))
 
     def test_file_set_uid(self):
         """Test that the File-set UID is created and constant."""
         fs = FileSet()
-        uid = fs.FileSetUID
+        uid = fs.UID
         assert uid.is_valid
-        uid2 = fs.FileSetUID
+        uid2 = fs.UID
         assert uid == uid2
 
-        fs.FileSetUID = '1.2.3.4'
-        assert '1.2.3.4' == fs.FileSetUID
+        fs.UID = '1.2.3.4'
+        assert '1.2.3.4' == fs.UID
+
+
+class TestFileSetModify:
+    """Tests for modifying a File-set in-place."""
+    pass

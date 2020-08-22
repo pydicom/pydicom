@@ -1,7 +1,6 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
-"""DICOM File Set and DICOMDIR handling."""
+"""DICOM File-set handling."""
 
-from collections import defaultdict
 import os
 from pathlib import Path
 from typing import Optional, Union, List, Generator
@@ -9,10 +8,12 @@ import uuid
 import warnings
 
 from pydicom import config
-from pydicom.dataset import FileDataset, Dataset
+from pydicom.datadict import tag_for_keyword
+from pydicom.dataset import FileDataset, Dataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
 from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
-from pydicom.uid import generate_uid, UID
+from pydicom.tag import Tag, BaseTag
+from pydicom.uid import generate_uid, UID, ExplicitVRLittleEndian
 
 
 class DicomDir(FileDataset):
@@ -150,54 +151,42 @@ class DicomDir(FileDataset):
         ]
 
 
-# TODO: Class name change to Record? Move access into DicomDir?
-# TODO: FileSet -> DicomDir -> Record?
-class File:
+# TODO: Move access into DicomDir?
+class DirectoryRecord:
     """Representation of a Directory Record in a File-set."""
     def __init__(self, ds: Dataset, record: Dataset, offset: Optional[int] = None) -> None:
-        """Create a new File-set File.
+        """Create a new directory record.
 
         Parameters
         ----------
         ds : pydicom.dicomdir.DicomDir
             The DICOMDIR dataset.
         record : pydicom.dataset.Dataset
-            The DICOMDIR record for the File.
+            The DICOMDIR record.
+        offset : int, optional
+            The byte offset to the record in the DICOMDIR file.
+
+        Attributes
+        ----------
+        children : list of pydicom.dicomdir.Record
+            The child records for the current record.
+        next : pydicom.dicomdir.Record or None
+            The next record at the current level of the directory, or ``None``
+            if there is no next record.
+        parent : pydicom.dicomdir.Record or None
+            The parent record, or ``None`` for root-level records.
+        previous : pydicom.dicomdir.Record or None
+            The previous record at the current level of the directory, or
+            ``None`` if there is no previous record.
         """
-        self._root = ds
+        self._dicomdir = ds
         self.record = record
-        self.offset = offset
+        self._offset = offset
+
         self.parent = None
         self.next = None
         self.previous = None
         self.children = []
-
-    @property
-    def FileID(self) -> Union[List[str], str]:
-        """Return the File ID of the record if it references an instance.
-
-        Returns
-        -------
-        pathlib.Path
-            The relative path to the instance.
-        """
-        # Maximum 8 components
-        return Path(*self.record.ReferencedFileID)
-
-    @property
-    def filepath(self) -> str:
-        """Return the path to the File corresponding to the record."""
-        fpath = Path(self._root.filename).resolve().parent / self.FileID
-        return os.fspath(fpath)
-
-    @property
-    def instance(self):
-        """Return the SOP Instance referenced by the record as a
-        :class:`~pydicomd.dataset.Dataset`.
-        """
-        from pydicom.filereader import dcmread
-
-        return dcmread(self.filepath)
 
     @property
     def is_instance(self):
@@ -224,21 +213,100 @@ class File:
         )
 
     @property
-    def offset(self) -> int:
-        """Return the offset of the record in the DICOMDIR instance."""
-        return self._offset
-
-    @offset.setter
-    def offset(self, val: int) -> None:
-        """Set the offset of the record in the DICOMDIR instance."""
-        self._offset = val
-
-    @property
     def record_type(self) -> str:
+        """Return the record's *Directory Record Type* as :class:`str`."""
         return self.record.DirectoryRecordType
 
     def __str__(self) -> str:
-        return f"{self.offset, self.record_type}"
+        return f"{self.record_type} ({self._offset}) - {self.key}"
+
+
+class FileInstance:
+    """Representation of a File in a File-set."""
+    def __init__(self, fs):
+        """Create a new FileInstance.
+
+        Parameters
+        ----------
+        fs : pydicom.dicomdir.FileSet
+            The File-set this instance belongs to.
+        """
+        # The record that make up the instance
+        self._records = {}
+        self._fs = fs
+
+    @property
+    def file_set(self):
+        return self._fs
+
+    def __getattr__(self, name):
+        """Intercept requests for :class:`Dataset` attribute names.
+
+        If `name` matches a DICOM keyword, return the value for the
+        element with the corresponding tag.
+
+        Parameters
+        ----------
+        name
+            An element keyword or tag or a class attribute name.
+
+        Returns
+        -------
+        value
+              If `name` matches a DICOM keyword, returns the corresponding
+              element's value. Otherwise returns the class attribute's
+              value (if present).
+        """
+        tag = tag_for_keyword(name)
+        if tag is not None:  # `name` isn't a DICOM element keyword
+            tag = Tag(tag)
+            for ds in self._records.values():
+                if tag in ds.record:
+                    return ds.record[tag].value
+
+        return super().__getattribute__(self, name)
+
+    def __getitem__(self, key):
+        if isinstance(key, BaseTag):
+            tag = key
+        else:
+            tag = Tag(key)
+
+        for ds in self._records.values():
+            if tag in ds.record:
+                return ds.record[tag].value
+
+        return super().__getitem__(self, key)
+
+    def load(self):
+        from pydicom.filereader import dcmread
+
+        return dcmread(self.path)
+
+    @property
+    def path(self) -> str:
+        """Return the path to the SOP Instance referenced by the record.
+
+        Raises
+        ------
+        AttributeError
+            If the record doesn't reference a SOP Instance.
+        """
+        return os.fspath(
+            Path(self.file_set.path) / Path(*self.ReferencedFileID)
+        )
+
+    @property
+    def SOPClassUID(self):
+        return self.ReferencedSOPClassUIDInFile
+
+    @property
+    def SOPInstanceUID(self):
+        return self.ReferencedSOPInstanceUIDInFile
+
+    @property
+    def TransferSyntaxUID(self):
+        return self.ReferencedTransferSyntaxUIDInFile
 
 
 class FileSet:
@@ -251,56 +319,51 @@ class FileSet:
         ds : pydicom.dataset.Dataset, optional
             If loading an existing File-set, this is its DICOMDIR dataset.
         """
-        self._root = ds
+        # The relationship between instances
         self._tree = {}
+        # The instances belonging to the File-set
+        self._instances = []
+
+        self._dicomdir = ds or self._create_dicomdir()
+        #self._records = None
 
         if ds:
-            # Create the record tree
-            self._records = self._parse()
-            self._file_set_uid = ds.file_meta.MediaStorageSOPInstanceUID
-        else:
-            self._records = None
-            self._file_set_uid = generate_uid()
+            self._parse()
 
     def _create_dicomdir(self) -> Dataset:
         """Return a new DICOMDIR dataset."""
         ds = Dataset()
-        ds.filename = ''
+        # TODO: Placeholder, will be updated on writing/updating
+        ds.filename = 'DICOMDIR'
+
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
+        ds.file_meta.MediaStorageSOPClassUID = MediaStorageDirectoryStorage
+
         # Type 2, VR CS, VM 1
         ds.FileSetID = None
-
-        # TODO: Add record information
 
         return ds
 
     @property
-    def DICOMDIR(self) -> Dataset:
-        """Return the DICOMDIR :class:`~pydicom.dataset.Dataset`."""
-        if not self._root:
-            self._root = self._create_dicomdir()
-
-        return self._root
-
-    @property
     def FileSetID(self) -> Union[str, None]:
         """Return the File-set ID (if available) or ``None``."""
-        if self.DICOMDIR:
-            # Type 2, CS
-            return self.DICOMDIR.FileSetID
+        return self._dicomdir.FileSetID
 
     @FileSetID.setter
     def FileSetID(self, val: Union[str, None]) -> None:
         """Set the File-set ID."""
         if val is None or 0 <= len(val) <= 16:
-            self.DICOMDIR.FileSetID = val
+            self._dicomdir.FileSetID = val
 
     @property
-    def FileSetUID(self) -> str:
+    def UID(self) -> str:
         """Return the File-set UID."""
-        return self._file_set_uid
+        return self._dicomdir.file_meta.MediaStorageSOPInstanceUID
 
-    @FileSetUID.setter
-    def FileSetUID(self, uid: UID) -> None:
+    @UID.setter
+    def UID(self, uid: UID) -> None:
         """Set the File-set UID.
 
         Parameters
@@ -308,103 +371,60 @@ class FileSet:
         uid : pydicom.uid.UID
             The UID to use as the new File-set UID.
         """
-        self._file_set_uid = uid
+        self._dicomdir.file_meta.MediaStorageSOPInstanceUID = uid
 
-    def __iter__(self) -> Generator[File, None, None]:
-        """Yield all Files in the File-set."""
-        yield from self.iter_files()
-
-    def iter_patient(self, patient_id: str) -> Generator[File, None, None]:
-        """Yield all the Files in the File-set for a patient.
-
-        Parameters
-        ----------
-        patient_id : str
-            The *Patient ID* of the patient.
+    def __iter__(self) -> Generator[FileInstance, None, None]:
+        """Yield all the SOP Instances in the File-set.
 
         Yields
         ------
-        pydicom.dicomdir.File
-            A record belonging to the patient.
+        pydicom.dataset.Dataset
+            A SOP Instance from the File-set.
         """
-        yield from self.iter_files(patient_id)
+        yield from self._instances
 
-    def iter_study(self, patient_id: str, study_uid: str) -> Generator[File, None, None]:
-        """Yield all the Files in the File-set for a study.
+    def find(self, **kwargs):
+        """Return matching instances in the File-set
 
         Parameters
         ----------
-        patient_id : str
-            The *Patient ID* of the patient the study belongs to.
-        study_uid : str
-            The *Study Instance UID* of the study.
+        kwargs
 
-        Yields
-        ------
-        pydicom.dicomdir.File
-            A record belonging to the study.
+        Returns
+        -------
+        list of pydicom.dicomdir.FileInstance
+            A list of matching instances.
         """
-        yield from self.iter_files(patient_id, study_uid)
+        def match(instance, **kwargs):
+            for kw, val in kwargs.items():
+                try:
+                    assert instance[kw] == val
+                except (AssertionError, AttributeError):
+                    return False
 
-    def iter_series(self, patient_id: str, study_uid: str, series_uid: str) -> Generator[File, None, None]:
-        """Yield all the Files in the File-set for a series.
+            return True
 
-        Parameters
-        ----------
-        patient_id : str
-            The *Patient ID* of the patient the study belongs to.
-        study_uid : str
-            The *Study Instance UID* of the study the series belongs to.
-        series_uid : str
-            The *Series Instance UID* of the series.
+        matches = []
+        for instance in self:
+            if match(instance, **kwargs):
+                matches.append(instance)
 
-        Yields
-        ------
-        pydicom.dicomdir.File
-            A record belonging to the series.
-        """
-        yield from self.iter_files(patient_id, study_uid, series_uid)
-
-    def iter_files(self, *args: List[str]) -> Generator[File, None, None]:
-        """Yield Files from the File-set.
-
-        Parameters
-        ----------
-        args : list of str
-            A list of File keys.
-
-        Yields
-        ------
-        pydicom.dicomdir.File
-            A File belonging to the File-set.
-        """
-        def recurse(d):
-            for kk, vv in d.items():
-                if isinstance(vv, dict):
-                    yield from recurse(vv)
-                else:
-                    yield vv
-
-        tree = self._tree
-        for kk in args:
-            tree = tree[kk]
-
-        yield from recurse(tree)
+        return matches
 
     def __len__(self):
-        """Return the number of Files in the File-set."""
-        ii = 0
-        for r in self:
-            ii += 1
-
-        return ii
+        """Return the number of SOP Instances in the File-set."""
+        return len(self._instances)
 
     def _parse(self) -> None:
-        """Parse the records in the DICOMDIR."""
+        """Parse the records in the DICOMDIR.
+
+        Builds the relationship tree between the records.
+        """
         next_keyword = "OffsetOfTheNextDirectoryRecord"
         child_keyword = "OffsetOfReferencedLowerLevelDirectoryEntity"
 
         def get_siblings(record, parent):
+            record.parent = parent
             siblings = [record]
             next_offset = getattr(record.record, next_keyword, None)
             while next_offset:
@@ -417,9 +437,10 @@ class FileSet:
 
         # First pass: get the offsets
         records = {}
-        for record in self.DICOMDIR.DirectoryRecordSequence:
+        for record in self._dicomdir.DirectoryRecordSequence:
             offset = record.seq_item_tell
-            records[offset] = File(self.DICOMDIR, record, offset)
+            record = DirectoryRecord(self._dicomdir, record, offset)
+            records[offset] = record
 
         # Second pass: establish their inter-relationship
         for offset, record in records.items():
@@ -432,7 +453,7 @@ class FileSet:
             if child_offset:
                 record.children = get_siblings(records[child_offset], record)
 
-        self._records = records
+        #self._records = records
 
         # DICOMDIR may have no records
         if records:
@@ -441,7 +462,18 @@ class FileSet:
 
             def build_branch(record):
                 if not record.children:
-                    return record
+                    # If no children we are at the end of the branch
+                    instance = FileInstance(self)
+                    # FIXME: PRIVATE records are not unique
+                    instance._records[record.record_type] = record
+                    parent = record.parent
+                    while parent:
+                        instance._records[parent.record_type] = parent
+                        parent = parent.parent  # Move up one level
+
+                    self._instances.append(instance)
+
+                    return instance
 
                 branch = {}
                 for child in record.children:
@@ -450,7 +482,7 @@ class FileSet:
                 return branch
 
             # First record
-            record = records[self.DICOMDIR[0x00041200].value]
+            record = records[self._dicomdir[0x00041200].value]
             tree[record.key] = build_branch(record)
             while record.next:
                 record = record.next
@@ -459,9 +491,11 @@ class FileSet:
             self._tree = tree
 
     @property
-    def root(self) -> str:
-        """Return the path to the File-set root directory as :class:`str`."""
-        return os.fspath(Path(self.DICOMDIR.filename).resolve().parent)
+    def path(self) -> str:
+        """Return the absolute path to the File-set root directory as
+        :class:`str`.
+        """
+        return os.fspath(Path(self._dicomdir.filename).resolve().parent)
 
     def __str__(self) -> str:
         def prettify(d, indent=0, indent_char='  '):
@@ -477,7 +511,7 @@ class FileSet:
             "DICOM File-set",
             f"  File-set ID: {self.FileSetID or '(no value available)'}",
             f"  File-set UID: {self.FileSetUID}",
-            f"  Root directory: {self.root}",
+            f"  Root directory: {self.path}",
         ]
 
         if self._tree:
