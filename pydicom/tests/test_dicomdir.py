@@ -46,9 +46,10 @@ class TestDicomDir:
     def test_invalid_sop_no_file_meta(self, allow_invalid_values):
         """Test exception raised if invalid sop class but no file_meta"""
         ds = dcmread(get_testdata_file('CT_small.dcm'))
-        with pytest.raises(AttributeError,
-                           match="'DicomDir' object has no attribute "
-                                 "'DirectoryRecordSequence'"):
+        msg = (
+            r"'DicomDir' object has no attribute 'DirectoryRecordSequence'"
+        )
+        with pytest.raises(AttributeError, match=msg):
             with pytest.warns(UserWarning, match=r"Invalid transfer syntax"):
                 DicomDir("some_name", ds, b'\x00' * 128, None, True, True)
 
@@ -223,8 +224,3 @@ class TestFileSetNew:
 
         fs.UID = '1.2.3.4'
         assert '1.2.3.4' == fs.UID
-
-
-class TestFileSetModify:
-    """Tests for modifying a File-set in-place."""
-    pass

@@ -23,6 +23,12 @@ class DicomDir(FileDataset):
     are available, specific to the Directory structure.
 
     :dcm:`Basic Directory IOD<part03/chapter_F.html>`
+
+    Attributes
+    ----------
+    root : list of pydicom.dicomdir.DirectoryRecord
+        A list of the top-level directory records in the DICOMDIR's *Directory
+        Record Sequence*.
     """
     def __init__(self,
                  filename_or_obj,
@@ -97,69 +103,15 @@ class DicomDir(FileDataset):
             is_little_endian=is_little_endian
         )
 
-        #self.patient_records = []
-        #self.parse_records()
+        self.root = []
+        # {offset, Dataset}
+        self._records = {}
+        self._parse_records()
 
-        self._records = None
-        self._root = DirectoryRecord(self, Dataset())
-        self._parse()
-
-    def parse_records(self):
-        """Build the hierarchy of given directory records, and structure
-        into Patient, Studies, Series, Images hierarchy.
-
-        This is intended for initial read of file only,
-        it will not reorganize correctly if records are changed.
+    def _parse_records(self) -> None:
+        """Parse the directory records in the DICOMDIR and build the
+        relationship between them.
         """
-
-        # Define a helper function for organizing the records
-        def get_siblings(record, map_offset_to_record):
-            """Return a list of all siblings of the given directory record,
-            including itself.
-            """
-            sibling_list = [record]
-            current_record = record
-            while (
-                'OffsetOfTheNextDirectoryRecord' in current_record
-                and current_record.OffsetOfTheNextDirectoryRecord
-            ):
-                offset_of_next = current_record.OffsetOfTheNextDirectoryRecord
-                sibling = map_offset_to_record[offset_of_next]
-                sibling_list.append(sibling)
-                current_record = sibling
-            return sibling_list
-
-        # Build the mapping from file offsets to records
-        records = self.DirectoryRecordSequence
-        if not records:
-            return
-
-        map_offset_to_record = {}
-        for record in records:
-            map_offset_to_record[record.seq_item_tell] = record
-        # logging.debug("File offsets: " + map_offset_to_record.keys())
-
-        # Find the children of each record
-        for record in records:
-            record.children = []
-            if 'OffsetOfReferencedLowerLevelDirectoryEntity' in record:
-                child_offset = (record.
-                                OffsetOfReferencedLowerLevelDirectoryEntity)
-                if child_offset:
-                    child = map_offset_to_record[child_offset]
-                    record.children = get_siblings(child, map_offset_to_record)
-
-        self.patient_records = [
-            record for record in records
-            if getattr(record, 'DirectoryRecordType') == 'PATIENT'
-        ]
-
-    def _parse(self) -> None:
-        """Parse the records in the DICOMDIR.
-
-        Builds the relationship tree between the records.
-        """
-
         next_keyword = "OffsetOfTheNextDirectoryRecord"
         child_keyword = "OffsetOfReferencedLowerLevelDirectoryEntity"
 
@@ -193,17 +145,16 @@ class DicomDir(FileDataset):
             if child_offset:
                 record.children = get_siblings(records[child_offset], record)
 
-        self._records = records
-
-        # DICOMDIR may have no records
         if records:
-            # Add the first level of records to the tree root
+            # Add the top-level records to the tree root
             offset = "OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity"
             record = records[self[offset].value]
-            self._root.children.append(record)
+            self.root.append(record)
             while record.next:
                 record = record.next
-                self._root.children.append(record)
+                self.root.append(record)
+
+        self._records = records
 
     @property
     def patient_records(self) -> List[Dataset]:
@@ -212,18 +163,9 @@ class DicomDir(FileDataset):
         Returns
         -------
         list of pydicom.dataset.Dataset
-            The PATIENT type records in the *Directory Record Sequence*.
+            The ``PATIENT`` type records in the *Directory Record Sequence*.
         """
-        #print(self._root.children)
-        return [
-            ii.record for ii in self._root.children
-            if ii.record_type == "PATIENT"
-        ]
-
-    @property
-    def root(self) -> "DirectoryRecord":
-        """Return the root directory record."""
-        return self._root
+        return [ii.record for ii in self.root if ii.record_type == "PATIENT"]
 
 
 class DirectoryRecord:
@@ -515,7 +457,7 @@ class FileSet:
                 return branch
 
         # First record
-        for record in self._dicomdir._root.children:
+        for record in self._dicomdir.root:
             tree[record.key] = build_branch(record)
 
         self._tree = tree
