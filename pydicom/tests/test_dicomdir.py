@@ -12,6 +12,7 @@ from pydicom.dataset import Dataset
 from pydicom.dicomdir import DicomDir, FileSet, FileInstance
 from pydicom.errors import InvalidDicomError
 from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
+from pydicom.tag import Tag
 from pydicom.uid import UID, ExplicitVRLittleEndian
 
 TEST_FILE = get_testdata_file('DICOMDIR')
@@ -87,6 +88,70 @@ class TestDicomDir:
 def dicomdir():
     """Return a DICOMDIR dataset."""
     return dcmread(TEST_FILE)
+
+
+class TestFileInstance:
+    """Tests for FileInstance."""
+    def test_properties(self, dicomdir):
+        """Test the FileInstance properties."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        assert fs == instance.file_set
+        assert "77654033/CR1/6154" in instance.path
+        assert isinstance(instance.path, str)
+        sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
+
+        records = instance._records
+        assert 4 == len(records)
+        patient = records["PATIENT"]
+        study = records["STUDY"]
+        series = records["SERIES"]
+        image = records["IMAGE"]
+        assert sop_instance == image.record.ReferencedSOPInstanceUIDInFile
+
+        assert sop_instance == instance.SOPInstanceUID
+        assert ExplicitVRLittleEndian == instance.TransferSyntaxUID
+        assert "1.2.840.10008.5.1.4.1.1.1" == instance.SOPClassUID
+
+    def test_load(self, dicomdir):
+        """Test FileInstance.load()."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        ds = instance.load()
+        assert isinstance(ds, Dataset)
+        sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
+        assert sop_instance == ds.SOPInstanceUID
+
+    def test_getattr(self, dicomdir):
+        """Test FileInstance.__getattribute__."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        assert "20010101" == instance.StudyDate
+        instance.my_attr = 1234
+        assert 1234 == instance.my_attr
+        msg = r"'FileInstance' object has no attribute 'missing_attr'"
+        with pytest.raises(AttributeError, match=msg):
+            instance.missing_attr
+
+    def test_getitem(self, dicomdir):
+        """Test FileInstance.__getitem__."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        assert "20010101" == instance["StudyDate"].value
+        assert "20010101" == instance[0x00080020].value
+        assert "20010101" == instance[Tag(0x00080020)].value
+        assert "20010101" == instance[(0x0008, 0x0020)].value
+        assert "20010101" == instance["0x00080020"].value
+
+        with pytest.raises(KeyError, match=r"(0000, 0000)"):
+            instance[0x00000000]
+
+    def test_private(self, dicomdir):
+        """Test FileInstance with PRIVATE records."""
+        record = Dataset()
+
+        ds = dicomdir
+        ds.DirectoryRecordSequence.append(record)
 
 
 class TestFileSetLoad:
@@ -172,19 +237,9 @@ class TestFileSetLoad:
         matches = fs.find(StudyDescription="XR C Spine Comp Min 4 Views")
         assert 3 == len(matches)
 
-    def test_instance(self, dicomdir):
-        print(dicomdir.filename)
-        for ii in dicomdir.patient_records:
-            print(ii)
-        #print(dicomdir.patient_records)
-        fs = FileSet(dicomdir)
-        assert 31 == len(fs._instances)
-        instance = fs._instances[0]
-        print(instance._records)
-        print(instance.path)
-        print(instance.TransferSyntaxUID)
-        print(instance.SOPInstanceUID)
-        print(instance.SOPClassUID)
+    def test_instances(self, dicomdir):
+        """That that File-set instances are correct."""
+        pass
 
 
 class TestFileSetNew:

@@ -3,12 +3,13 @@
 
 import os
 from pathlib import Path
-from typing import Optional, Union, List, Generator
+from typing import Optional, Union, List, Generator, Any
 import uuid
 import warnings
 
 from pydicom import config
 from pydicom.datadict import tag_for_keyword
+from pydicom.dataelem import DataElement
 from pydicom.dataset import FileDataset, Dataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
 from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
@@ -170,7 +171,10 @@ class DicomDir(FileDataset):
 
 class DirectoryRecord:
     """Representation of a Directory Record in a DICOMDIR file."""
-    def __init__(self, ds: Dataset, record: Dataset, offset: Optional[int] = None) -> None:
+    def __init__(self,
+                 ds: Dataset,
+                 record: Dataset,
+                 offset: Optional[int] = None) -> None:
         """Create a new directory record.
 
         Parameters
@@ -234,7 +238,7 @@ class DirectoryRecord:
 
 class FileInstance:
     """Representation of a File in a File-set."""
-    def __init__(self, fs):
+    def __init__(self, fs: "FileSet") -> None:
         """Create a new FileInstance.
 
         Parameters
@@ -243,6 +247,7 @@ class FileInstance:
             The File-set this File belongs to.
         """
         # The directory records that make up the instance
+        # {record type or record key for PRIVATE: record}
         self._records = {}
         self._fs = fs
 
@@ -251,44 +256,55 @@ class FileInstance:
         """Return the File-set the File is part of."""
         return self._fs
 
-    def __getattr__(self, name):
-        """Intercept requests for :class:`Dataset` attribute names.
-
-        If `name` matches a DICOM keyword, return the value for the
-        element with the corresponding tag.
+    def __getattribute__(self, name: str) -> Any:
+        """Return the class attribute value for `name`.
 
         Parameters
         ----------
-        name
-            An element keyword or tag or a class attribute name.
+        name : str
+            An element keyword or a class attribute name.
 
         Returns
         -------
-        value
-              If `name` matches a DICOM keyword, returns the corresponding
-              element's value. Otherwise returns the class attribute's
-              value (if present).
+        object
+            If `name` matches a DICOM keyword and the element is
+            present in one of the directory records then returns the
+            corresponding element's value. Otherwise returns the class
+            attribute's value (if present).
         """
         tag = tag_for_keyword(name)
-        if tag is not None:  # `name` isn't a DICOM element keyword
+        if tag is not None:
             tag = Tag(tag)
-            for ds in self._records.values():
-                if tag in ds.record:
-                    return ds.record[tag].value
+            for record in self._records.values():
+                if tag in record.record:
+                    return record.record[tag].value
 
-        return super().__getattribute__(self, name)
+        return super().__getattribute__(name)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[str, int]) -> DataElement:
+        """Return the DataElement with keyword or tag `key`.
+
+        Parameters
+        ----------
+        key : str or int
+            An element keyword or tag.
+
+        Returns
+        -------
+        pydicom.dataelem.DataElement
+            The DataElement corresponding to `key`, if present in one of the
+            directory records.
+        """
         if isinstance(key, BaseTag):
             tag = key
         else:
             tag = Tag(key)
 
-        for ds in self._records.values():
-            if tag in ds.record:
-                return ds.record[tag].value
+        for record in self._records.values():
+            if tag in record.record:
+                return record.record[tag]
 
-        return super().__getitem__(self, key)
+        raise KeyError(tag)
 
     def load(self):
         from pydicom.filereader import dcmread
@@ -335,9 +351,7 @@ class FileSet:
         self._tree = {}
         # The instances belonging to the File-set
         self._instances = []
-
         self._dicomdir = ds or self._create_dicomdir()
-        #self._records = None
 
         if ds:
             self._parse()
@@ -410,7 +424,7 @@ class FileSet:
         def match(instance, **kwargs):
             for kw, val in kwargs.items():
                 try:
-                    assert instance[kw] == val
+                    assert instance[kw].value == val
                 except (AssertionError, AttributeError):
                     return False
 
@@ -436,25 +450,34 @@ class FileSet:
         tree = {}
 
         def build_branch(record):
-                if not record.children:
-                    # If no children we are at the end of the branch
-                    instance = FileInstance(self)
-                    # FIXME: PRIVATE records are not unique
-                    instance._records[record.record_type] = record
-                    parent = record.parent
-                    while parent:
-                        instance._records[parent.record_type] = parent
-                        parent = parent.parent  # Move up one level
+            """Recurse through a record, creating a FileInstance."""
+            if not record.children:
+                # If no children we are at the end of the branch
+                instance = FileInstance(self)
+                # PRIVATE records are not unique in traversal
+                if record.record_type == "PRIVATE":
+                    key = record.key
+                else:
+                    key = record.record_type
+                instance._records[key] = record
+                parent = record.parent
+                while parent:
+                    if parent.record_type == "PRIVATE":
+                        key = parent.key
+                    else:
+                        key = parent.record_type
+                    instance._records[key] = parent
+                    parent = parent.parent  # Move up one level
 
-                    self._instances.append(instance)
+                self._instances.append(instance)
 
-                    return instance
+                return instance
 
-                branch = {}
-                for child in record.children:
-                    branch[child.key] = build_branch(child)
+            branch = {}
+            for child in record.children:
+                branch[child.key] = build_branch(child)
 
-                return branch
+            return branch
 
         # First record
         for record in self._dicomdir.root:
