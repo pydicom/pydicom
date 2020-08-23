@@ -104,7 +104,7 @@ class DicomDir(FileDataset):
         )
 
         self.root = []
-        # {offset, Dataset}
+        # {offset, DirectoryRecord}
         self._records = {}
         self._parse_records()
 
@@ -184,14 +184,14 @@ class DirectoryRecord:
 
         Attributes
         ----------
-        children : list of pydicom.dicomdir.Record
+        children : list of pydicom.dicomdir.DirectoryRecord
             The child records for the current record.
-        next : pydicom.dicomdir.Record or None
+        next : pydicom.dicomdir.DirectoryRecord or None
             The next record at the current level of the directory, or ``None``
             if there is no next record.
-        parent : pydicom.dicomdir.Record or None
-            The parent record, or ``None`` for root-level records.
-        previous : pydicom.dicomdir.Record or None
+        parent : pydicom.dicomdir.DirectoryRecord or None
+            The parent record, or ``None`` for top-level records.
+        previous : pydicom.dicomdir.DirectoryRecord or None
             The previous record at the current level of the directory, or
             ``None`` if there is no previous record.
         """
