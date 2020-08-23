@@ -97,8 +97,12 @@ class DicomDir(FileDataset):
             is_little_endian=is_little_endian
         )
 
-        self.patient_records = []
-        self.parse_records()
+        #self.patient_records = []
+        #self.parse_records()
+
+        self._records = None
+        self._root = DirectoryRecord(self, Dataset())
+        self._parse()
 
     def parse_records(self):
         """Build the hierarchy of given directory records, and structure
@@ -150,10 +154,80 @@ class DicomDir(FileDataset):
             if getattr(record, 'DirectoryRecordType') == 'PATIENT'
         ]
 
+    def _parse(self) -> None:
+        """Parse the records in the DICOMDIR.
 
-# TODO: Move access into DicomDir?
+        Builds the relationship tree between the records.
+        """
+
+        next_keyword = "OffsetOfTheNextDirectoryRecord"
+        child_keyword = "OffsetOfReferencedLowerLevelDirectoryEntity"
+
+        def get_siblings(record, parent):
+            record.parent = parent
+            siblings = [record]
+            next_offset = getattr(record.record, next_keyword, None)
+            while next_offset:
+                siblings.append(records[next_offset])
+                record = records[next_offset]
+                record.parent = parent
+                next_offset = getattr(record.record, next_keyword, None)
+
+            return siblings
+
+        # First pass: get the offsets
+        records = {}
+        for record in self.DirectoryRecordSequence:
+            offset = record.seq_item_tell
+            record = DirectoryRecord(self, record, offset)
+            records[offset] = record
+
+        # Second pass: establish their inter-relationship
+        for offset, record in records.items():
+            next_offset = getattr(record.record, next_keyword, None)
+            if next_offset:
+                record.next = records[next_offset]
+                records[next_offset].previous = record
+
+            child_offset = getattr(record.record, child_keyword, None)
+            if child_offset:
+                record.children = get_siblings(records[child_offset], record)
+
+        self._records = records
+
+        # DICOMDIR may have no records
+        if records:
+            # Add the first level of records to the tree root
+            offset = "OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity"
+            record = records[self[offset].value]
+            self._root.children.append(record)
+            while record.next:
+                record = record.next
+                self._root.children.append(record)
+
+    @property
+    def patient_records(self) -> List[Dataset]:
+        """Return a list of PATIENT directory records.
+
+        Returns
+        -------
+        list of pydicom.dataset.Dataset
+            The PATIENT type records in the *Directory Record Sequence*.
+        """
+        #print(self._root.children)
+        return [
+            ii.record for ii in self._root.children
+            if ii.record_type == "PATIENT"
+        ]
+
+    @property
+    def root(self) -> "DirectoryRecord":
+        """Return the root directory record."""
+        return self._root
+
+
 class DirectoryRecord:
-    """Representation of a Directory Record in a File-set."""
+    """Representation of a Directory Record in a DICOMDIR file."""
     def __init__(self, ds: Dataset, record: Dataset, offset: Optional[int] = None) -> None:
         """Create a new directory record.
 
@@ -187,11 +261,6 @@ class DirectoryRecord:
         self.next = None
         self.previous = None
         self.children = []
-
-    @property
-    def is_instance(self):
-        """Return ``True`` if the record references a SOP Instance."""
-        return "ReferencedFileID" in self.record
 
     @property
     def key(self) -> str:
@@ -229,14 +298,15 @@ class FileInstance:
         Parameters
         ----------
         fs : pydicom.dicomdir.FileSet
-            The File-set this instance belongs to.
+            The File-set this File belongs to.
         """
-        # The record that make up the instance
+        # The directory records that make up the instance
         self._records = {}
         self._fs = fs
 
     @property
-    def file_set(self):
+    def file_set(self) -> "FileSet":
+        """Return the File-set the File is part of."""
         return self._fs
 
     def __getattr__(self, name):
@@ -347,18 +417,18 @@ class FileSet:
         return ds
 
     @property
-    def FileSetID(self) -> Union[str, None]:
+    def ID(self) -> Union[str, None]:
         """Return the File-set ID (if available) or ``None``."""
         return self._dicomdir.FileSetID
 
-    @FileSetID.setter
-    def FileSetID(self, val: Union[str, None]) -> None:
+    @ID.setter
+    def ID(self, val: Union[str, None]) -> None:
         """Set the File-set ID."""
         if val is None or 0 <= len(val) <= 16:
             self._dicomdir.FileSetID = val
 
     @property
-    def UID(self) -> str:
+    def UID(self) -> UID:
         """Return the File-set UID."""
         return self._dicomdir.file_meta.MediaStorageSOPInstanceUID
 
@@ -383,7 +453,7 @@ class FileSet:
         """
         yield from self._instances
 
-    def find(self, **kwargs):
+    def find(self, **kwargs) -> List[FileInstance]:
         """Return matching instances in the File-set
 
         Parameters
@@ -411,56 +481,19 @@ class FileSet:
 
         return matches
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of SOP Instances in the File-set."""
         return len(self._instances)
 
     def _parse(self) -> None:
         """Parse the records in the DICOMDIR.
 
-        Builds the relationship tree between the records.
+        Build up the File instances in the File-set.
         """
-        next_keyword = "OffsetOfTheNextDirectoryRecord"
-        child_keyword = "OffsetOfReferencedLowerLevelDirectoryEntity"
+        # Build up relationship tree for efficient traversing
+        tree = {}
 
-        def get_siblings(record, parent):
-            record.parent = parent
-            siblings = [record]
-            next_offset = getattr(record.record, next_keyword, None)
-            while next_offset:
-                siblings.append(records[next_offset])
-                record = records[next_offset]
-                record.parent = parent
-                next_offset = getattr(record.record, next_keyword, None)
-
-            return siblings
-
-        # First pass: get the offsets
-        records = {}
-        for record in self._dicomdir.DirectoryRecordSequence:
-            offset = record.seq_item_tell
-            record = DirectoryRecord(self._dicomdir, record, offset)
-            records[offset] = record
-
-        # Second pass: establish their inter-relationship
-        for offset, record in records.items():
-            next_offset = getattr(record.record, next_keyword, None)
-            if next_offset:
-                record.next = records[next_offset]
-                records[next_offset].previous = record
-
-            child_offset = getattr(record.record, child_keyword, None)
-            if child_offset:
-                record.children = get_siblings(records[child_offset], record)
-
-        #self._records = records
-
-        # DICOMDIR may have no records
-        if records:
-            # Build up relationship tree for efficient traversing
-            tree = {}
-
-            def build_branch(record):
+        def build_branch(record):
                 if not record.children:
                     # If no children we are at the end of the branch
                     instance = FileInstance(self)
@@ -481,14 +514,11 @@ class FileSet:
 
                 return branch
 
-            # First record
-            record = records[self._dicomdir[0x00041200].value]
+        # First record
+        for record in self._dicomdir._root.children:
             tree[record.key] = build_branch(record)
-            while record.next:
-                record = record.next
-                tree[record.key] = build_branch(record)
 
-            self._tree = tree
+        self._tree = tree
 
     @property
     def path(self) -> str:

@@ -94,7 +94,7 @@ class TestFileSetLoad:
         """Test loading an existing File-set."""
         fs = FileSet(dicomdir)
         assert dicomdir == fs._dicomdir
-        assert "PYDICOM_TEST" == fs.FileSetID
+        assert "PYDICOM_TEST" == fs.ID
         assert "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187" == fs.UID
         assert "dicomdirtests" in fs.path
         assert 31 == len(fs)
@@ -102,8 +102,8 @@ class TestFileSetLoad:
     def test_change_file_set_id(self, dicomdir):
         """Test changing the File-set ID."""
         fs = FileSet(dicomdir)
-        fs.FileSetID = "MYFILESET"
-        assert "MYFILESET" == fs.FileSetID
+        fs.ID = "MYFILESET"
+        assert "MYFILESET" == fs.ID
         assert "MYFILESET" == dicomdir.FileSetID
 
     def test_change_file_set_uid(self, dicomdir):
@@ -173,6 +173,9 @@ class TestFileSetLoad:
 
     def test_instance(self, dicomdir):
         print(dicomdir.filename)
+        for ii in dicomdir.patient_records:
+            print(ii)
+        #print(dicomdir.patient_records)
         fs = FileSet(dicomdir)
         assert 31 == len(fs._instances)
         instance = fs._instances[0]
@@ -203,7 +206,7 @@ class TestFileSetNew:
         # Test FileSet
         assert 'pydicom/tests' in fs.path
         assert 'DICOMDIR' not in fs.path
-        assert fs.FileSetID is None
+        assert fs.ID is None
         assert fs.UID.is_valid
         assert 0 == len(fs)
 
