@@ -243,13 +243,17 @@ class DirectoryRecord:
         s = []
         s.append(f"{self.record_type}")
         if self.record_type == "PATIENT":
-            s.append(f": PatientID={ds.PatientID}, PatientName={ds.PatientName}")
+            s.append(
+                f": PatientID={ds.PatientID}, PatientName={ds.PatientName}"
+            )
         elif self.record_type == "STUDY":
             s.append(f": StudyDate={ds.StudyDate}, StudyTime={ds.StudyTime}")
             if getattr(ds, "StudyDescription", None):
                 s.append(f", StudyDescription={ds.StudyDescription}")
         elif self.record_type == "SERIES":
-            s.append(f": Modality={ds.Modality}, SeriesNumber={ds.SeriesNumber}")
+            s.append(
+                f": Modality={ds.Modality}, SeriesNumber={ds.SeriesNumber}"
+            )
         else:
             s.append(f": {self.key}")
 

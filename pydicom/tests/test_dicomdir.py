@@ -85,6 +85,19 @@ class TestDicomDir:
                            match='Invalid transfer syntax*'):
             dcmread(BIGENDIAN_TEST_FILE)
 
+    def test_record_keys(self, dicomdir):
+        """Test the keys for the directory records."""
+        ds = dicomdir
+        records = ds._records
+        patient = records[396]
+        assert patient.key == "77654033"
+        study = records[510]
+        assert study.key == "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1"
+        series = records[724]
+        assert series.key == "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10"
+        image = records[1090]
+        assert image.key == "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.6"
+
 
 @pytest.fixture
 def dicomdir():
@@ -248,7 +261,7 @@ class TestFileInstance:
 
 
 class TestFileSetLoad:
-    """Tests for a FileSet creating from an existing File-set."""
+    """Tests for a FileSet created from an existing File-set."""
     def test_loading(self, dicomdir):
         """Test loading an existing File-set."""
         fs = FileSet(dicomdir)
