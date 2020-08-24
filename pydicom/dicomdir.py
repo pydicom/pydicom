@@ -146,6 +146,7 @@ class DicomDir(FileDataset):
             if child_offset:
                 record.children = get_siblings(records[child_offset], record)
 
+        self.root = []
         if records:
             # Add the top-level records to the tree root
             offset = "OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity"
@@ -198,6 +199,9 @@ class DirectoryRecord:
         previous : pydicom.dicomdir.DirectoryRecord or None
             The previous record at the current level of the directory, or
             ``None`` if there is no previous record.
+        record : pydicom.dataset.Dataset
+            The directory record dataset from the DICOMDIR's Media Storage
+            Directory instance.
         """
         self._dicomdir = ds
         self.record = record
@@ -233,7 +237,23 @@ class DirectoryRecord:
         return self.record.DirectoryRecordType
 
     def __str__(self) -> str:
-        return f"{self.record_type} ({self._offset}) - {self.key}"
+        """Return a string representation of the directory record."""
+        ds = self.record
+
+        s = []
+        s.append(f"{self.record_type}")
+        if self.record_type == "PATIENT":
+            s.append(f": PatientID={ds.PatientID}, PatientName={ds.PatientName}")
+        elif self.record_type == "STUDY":
+            s.append(f": StudyDate={ds.StudyDate}, StudyTime={ds.StudyTime}")
+            if getattr(ds, "StudyDescription", None):
+                s.append(f", StudyDescription={ds.StudyDescription}")
+        elif self.record_type == "SERIES":
+            s.append(f": Modality={ds.Modality}, SeriesNumber={ds.SeriesNumber}")
+        else:
+            s.append(f": {self.key}")
+
+        return ''.join(s)
 
 
 class FileInstance:
@@ -306,7 +326,10 @@ class FileInstance:
 
         raise KeyError(tag)
 
-    def load(self):
+    def load(self) -> Dataset:
+        """Return the referenced instance as a
+        :class:`~pydicom.dataset.Dataset`.
+        """
         from pydicom.filereader import dcmread
 
         return dcmread(self.path)
@@ -320,20 +343,26 @@ class FileInstance:
         AttributeError
             If the record doesn't reference a SOP Instance.
         """
-        return os.fspath(
-            Path(self.file_set.path) / Path(*self.ReferencedFileID)
-        )
+        if isinstance(self.ReferencedFileID, list):
+            path = Path(*self.ReferencedFileID)
+        else:
+            path = Path(self.ReferencedFileID)
+
+        return os.fspath(Path(self.file_set.path) / path)
 
     @property
-    def SOPClassUID(self):
+    def SOPClassUID(self) -> UID:
+        """Return the *SOP Class UID* of the referenced instance."""
         return self.ReferencedSOPClassUIDInFile
 
     @property
-    def SOPInstanceUID(self):
+    def SOPInstanceUID(self) -> UID:
+        """Return the *SOP Instance UID* of the referenced instance."""
         return self.ReferencedSOPInstanceUIDInFile
 
     @property
-    def TransferSyntaxUID(self):
+    def TransferSyntaxUID(self) -> UID:
+        """Return the *Transfer Syntax UID* of the referenced instance."""
         return self.ReferencedTransferSyntaxUIDInFile
 
 
@@ -412,9 +441,19 @@ class FileSet:
     def find(self, **kwargs) -> List[FileInstance]:
         """Return matching instances in the File-set
 
+        **Limitations**
+
+        * Only elements available within an instances Directory Records are
+          able to be used when performing the search
+        * Only single value matching is supported so neither
+          ``PatientID=['1234567', '7654321']`` or ``PatientID='1234567',
+          PatientID='7654321'`` will work.
+
         Parameters
         ----------
-        kwargs
+        **kwargs
+            Optional search parameters, as element keyword: value (i.e.
+            ``PatientID='1234567', StudyDescription="My study"``.
 
         Returns
         -------
@@ -475,13 +514,13 @@ class FileSet:
 
             branch = {}
             for child in record.children:
-                branch[child.key] = build_branch(child)
+                branch[child] = build_branch(child)
 
             return branch
 
-        # First record
+        # Top-level records
         for record in self._dicomdir.root:
-            tree[record.key] = build_branch(record)
+            tree[record] = build_branch(record)
 
         self._tree = tree
 
@@ -493,10 +532,26 @@ class FileSet:
         return os.fspath(Path(self._dicomdir.filename).resolve().parent)
 
     def __str__(self) -> str:
+        """Return a string representation of the FileSet."""
         def prettify(d, indent=0, indent_char='  '):
+            """Return the record tree as a list of pretty strings
+
+            Parameters
+            ----------
+            d : dict
+                The record tree.
+            indent : int, optional
+                The current indent level, default ``0``.
+            indent_char : str, optional
+                The character(s) to use when indenting, default ``'  '``.
+
+            Returns
+            -------
+            list of str
+            """
             s = []
             for kk, vv in d.items():
-                s.append(indent_char * indent + str(kk))
+                s.append(f"{indent_char * indent}{str(kk)}")
                 if isinstance(vv, dict):
                     s.extend(prettify(vv, indent + 1))
 
@@ -504,13 +559,13 @@ class FileSet:
 
         s = [
             "DICOM File-set",
-            f"  File-set ID: {self.FileSetID or '(no value available)'}",
-            f"  File-set UID: {self.FileSetUID}",
+            f"  File-set ID: {self.ID or '(no value available)'}",
+            f"  File-set UID: {self.UID}",
             f"  Root directory: {self.path}",
         ]
 
         if self._tree:
-            s.append("")
-            s.extend(prettify(self._tree))
+            s.append("  Managed Instances:")
+            s.extend(prettify(self._tree, indent=2))
 
         return '\n'.join(s)

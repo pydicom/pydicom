@@ -11,9 +11,11 @@ from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.dicomdir import DicomDir, FileSet, FileInstance
 from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomBytesIO
+from pydicom.filewriter import write_dataset
 from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
 from pydicom.tag import Tag
-from pydicom.uid import UID, ExplicitVRLittleEndian
+from pydicom.uid import UID, ExplicitVRLittleEndian, generate_uid
 
 TEST_FILE = get_testdata_file('DICOMDIR')
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
@@ -90,6 +92,82 @@ def dicomdir():
     return dcmread(TEST_FILE)
 
 
+@pytest.fixture
+def private(dicomdir):
+    """Return a DICOMDIR dataset with PRIVATE records."""
+    def private_record():
+        record = Dataset()
+        record.OffsetOfReferencedLowerLevelDirectoryEntity = 0
+        record.RecordInUseFlag = 65535
+        record.OffsetOfTheNextDirectoryRecord = 0
+        record.DirectoryRecordType = "PRIVATE"
+        record.PrivateRecordUID = generate_uid()
+
+        return record
+
+    ds = dicomdir
+
+    top = private_record()
+    middle = private_record()
+    bottom = private_record()
+    bottom.ReferencedSOPClassUIDInFile = "1.2.3.4"
+    bottom.ReferencedFileID = "DICOMDIR-nopatient"
+    bottom.ReferencedSOPInstanceUIDInFile = (
+        "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187"
+    )
+    bottom.ReferencedTransferSyntaxUIDInFile = ExplicitVRLittleEndian
+
+    len_top = len(write_record(top))  # 112
+    len_middle = len(write_record(middle))  # 112
+    len_bottom = len(write_record(bottom))  # 238
+    len_last = len(write_record(ds.DirectoryRecordSequence[-1]))  # 248
+
+    # Top PRIVATE
+    # Offset to the top PRIVATE - 10860 + 248 + 8
+    offset = ds.DirectoryRecordSequence[-1].seq_item_tell + len_last + 8
+
+    # Change the last top-level record to point at the top PRIVATE
+    # Original is 3126
+    last = ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
+    record = ds._records[last]
+    record.record.OffsetOfTheNextDirectoryRecord = offset
+
+    # Change the last record offset
+    ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity = offset
+    top.seq_item_tell = offset
+
+    # Offset to the middle PRIVATE
+    offset += len_top + 8
+    top.OffsetOfReferencedLowerLevelDirectoryEntity = offset
+    ds.DirectoryRecordSequence.append(top)
+    middle.seq_item_tell = offset
+
+    # Middle PRIVATE
+    # Offset to the bottom PRIVATE
+    offset += len_middle + 8
+    middle.OffsetOfReferencedLowerLevelDirectoryEntity = offset
+    ds.DirectoryRecordSequence.append(middle)
+
+    # Bottom PRIVATE
+    ds.DirectoryRecordSequence.append(bottom)
+    bottom.seq_item_tell = offset
+
+    # Redo the record parsing to reflect changes
+    ds._parse_records()
+
+    return ds
+
+
+def write_record(ds):
+    """Return `ds` as explicit little encoded bytes."""
+    fp = DicomBytesIO()
+    fp.is_implicit_VR = False
+    fp.is_little_endian = True
+    write_dataset(fp, ds)
+
+    return fp.parent.getvalue()
+
+
 class TestFileInstance:
     """Tests for FileInstance."""
     def test_properties(self, dicomdir):
@@ -97,7 +175,7 @@ class TestFileInstance:
         fs = FileSet(dicomdir)
         instance = fs._instances[0]
         assert fs == instance.file_set
-        assert "77654033/CR1/6154" in instance.path
+        assert os.fspath(Path("77654033/CR1/6154")) in instance.path
         assert isinstance(instance.path, str)
         sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
 
@@ -146,12 +224,27 @@ class TestFileInstance:
         with pytest.raises(KeyError, match=r"(0000, 0000)"):
             instance[0x00000000]
 
-    def test_private(self, dicomdir):
+    def test_private(self, private):
         """Test FileInstance with PRIVATE records."""
-        record = Dataset()
+        ds = private
+        fs = FileSet(ds)
 
-        ds = dicomdir
-        ds.DirectoryRecordSequence.append(record)
+        instances = fs._instances
+        assert 32 == len(instances)
+
+        instance = instances[-1]
+        assert 3 == len(instance._records)
+        for record in instance._records.values():
+            assert record.record_type == "PRIVATE"
+
+        path = os.fspath(Path("dicomdirtests/DICOMDIR-nopatient"))
+        assert path in instances[-1].path
+
+        assert "1.2.3.4" == instance.SOPClassUID
+        assert "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187" == (
+            instance.SOPInstanceUID
+        )
+        assert ExplicitVRLittleEndian == instance.TransferSyntaxUID
 
 
 class TestFileSetLoad:
@@ -237,9 +330,36 @@ class TestFileSetLoad:
         matches = fs.find(StudyDescription="XR C Spine Comp Min 4 Views")
         assert 3 == len(matches)
 
-    def test_instances(self, dicomdir):
-        """That that File-set instances are correct."""
-        pass
+    def test_find(self, dicomdir):
+        """Tests for FileSet.find()."""
+        fs = FileSet(dicomdir)
+        assert 31 == len(fs.find())
+        assert 7 == len(fs.find(PatientID='77654033'))
+        assert 24 == len(fs.find(PatientID='98890234'))
+
+        matches = fs.find(PatientID='98890234', StudyDate="20030505")
+        assert 17 == len(matches)
+        for ii in matches:
+            assert isinstance(ii, FileInstance)
+
+        sop_instances = [ii.SOPInstanceUID for ii in matches]
+        assert 17 == len(list(set(sop_instances)))
+
+    def test_str(self, private):
+        """That FileSet.__str__"""
+        fs = FileSet(private)
+        s = str(fs)
+        assert (
+            "      STUDY: StudyDate=20010101, StudyTime=000000, "
+            "StudyDescription=XR C Spine Comp Min 4 Views"
+        ) in s
+        assert "        SERIES: Modality=MR, SeriesNumber=1" in s
+        assert (
+            "    PATIENT: PatientID=77654033, PatientName=Doe^Archibald" in s
+        )
+        assert (
+            "          IMAGE: 1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.12"
+        ) in s
 
 
 class TestFileSetNew:
@@ -260,8 +380,6 @@ class TestFileSetNew:
         assert ExplicitVRLittleEndian == meta.TransferSyntaxUID
 
         # Test FileSet
-        # TODO: make sure this path is correct (based on cwd?)
-        #assert 'pydicom/tests' in fs.path
         assert 'DICOMDIR' not in fs.path
         assert fs.ID is None
         assert fs.UID.is_valid
