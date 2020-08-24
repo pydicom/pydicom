@@ -343,7 +343,7 @@ class FileInstance:
         AttributeError
             If the record doesn't reference a SOP Instance.
         """
-        if isinstance(self.ReferencedFileID, list):
+        if self["ReferencedFileID"].VM > 1:
             path = Path(*self.ReferencedFileID)
         else:
             path = Path(self.ReferencedFileID)

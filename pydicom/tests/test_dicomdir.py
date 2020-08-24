@@ -275,35 +275,6 @@ class TestFileSetLoad:
         assert new == fs.UID
         assert new == dicomdir.file_meta.MediaStorageSOPInstanceUID
 
-    def test_tree(self, dicomdir):
-        """Test the tree."""
-        fs = FileSet(dicomdir)
-        tree = fs._tree
-        # Patient level
-        assert ['77654033', '98890234'] == list(tree.keys())
-        studies = tree['77654033']
-        assert (
-            [
-                '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1',
-                '1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.1'
-            ] == list(studies.keys())
-        )
-        series = studies['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1']
-        assert (
-            [
-                '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10',
-                '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.6',
-                '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.8'
-            ] == list(series.keys())
-        )
-        images = series['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10']
-        assert (
-            ['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11']
-            == list(images.keys())
-        )
-        instance = images['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11']
-        assert isinstance(instance, FileInstance)
-
     def test_iter(self, dicomdir):
         """Test iter(FileSet)."""
         fs = FileSet(dicomdir)
