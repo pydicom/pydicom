@@ -8,7 +8,7 @@ import uuid
 import warnings
 
 from pydicom import config
-from pydicom.datadict import tag_for_keyword
+from pydicom.datadict import tag_for_keyword, dictionary_VR
 from pydicom.dataelem import DataElement
 from pydicom.dataset import FileDataset, Dataset, FileMetaDataset
 from pydicom.errors import InvalidDicomError
@@ -146,6 +146,9 @@ class DicomDir(FileDataset):
             if child_offset:
                 record.children = get_siblings(records[child_offset], record)
 
+            # Backwards compatibility only
+            record.record.children = [ii.record for ii in record.children]
+
         self.root = []
         if records:
             # Add the top-level records to the tree root
@@ -275,6 +278,44 @@ class FileInstance:
         self._records = {}
         self._fs = fs
 
+    def add_record(self, record: DirectoryRecord) -> None:
+        """Add a directory record to the FileInstance.
+
+        Parameters
+        ----------
+        record : pydicom.dicomdir.DirectoryRecord
+            The record to add.
+        """
+        # PRIVATE records are not unique in traversal
+        if record.record_type == "PRIVATE":
+            key = record.key
+        else:
+            key = record.record_type
+
+        self._records[key] = record
+
+    def __contains__(self, name: Union[str, int]) -> bool:
+        """Return ``True`` if the DataElement with keyword or tag `name` is
+        in one of the corresponding directory records.
+
+        Parameters
+        ----------
+        name : str or int
+            The element keyword or tag to search for.
+
+        Returns
+        -------
+        bool
+            ``True`` if the corresponding element is present, ``False``
+            otherwise.
+        """
+        try:
+            self[name]
+        except KeyError:
+            return False
+
+        return True
+
     @property
     def file_set(self) -> "FileSet":
         """Return the File-set the File is part of."""
@@ -387,7 +428,7 @@ class FileSet:
         self._dicomdir = ds or self._create_dicomdir()
 
         if ds:
-            self._parse()
+            self._parse_tree()
 
     def _create_dicomdir(self) -> Dataset:
         """Return a new DICOMDIR dataset."""
@@ -405,58 +446,26 @@ class FileSet:
 
         return ds
 
-    @property
-    def ID(self) -> Union[str, None]:
-        """Return the File-set ID (if available) or ``None``."""
-        return self._dicomdir.FileSetID
-
-    @ID.setter
-    def ID(self, val: Union[str, None]) -> None:
-        """Set the File-set ID."""
-        if val is None or 0 <= len(val) <= 16:
-            self._dicomdir.FileSetID = val
-
-    @property
-    def UID(self) -> UID:
-        """Return the File-set UID."""
-        return self._dicomdir.file_meta.MediaStorageSOPInstanceUID
-
-    @UID.setter
-    def UID(self, uid: UID) -> None:
-        """Set the File-set UID.
-
-        Parameters
-        ----------
-        uid : pydicom.uid.UID
-            The UID to use as the new File-set UID.
-        """
-        self._dicomdir.file_meta.MediaStorageSOPInstanceUID = uid
-
-    def __iter__(self) -> Generator[FileInstance, None, None]:
-        """Yield all the SOP Instances in the File-set.
-
-        Yields
-        ------
-        pydicom.dataset.Dataset
-            A SOP Instance from the File-set.
-        """
-        yield from self._instances
-
-    def find(self, **kwargs) -> List[FileInstance]:
+    def find(self, load_instances: bool = False, **kwargs) -> List[FileInstance]:
         """Return matching instances in the File-set
 
         **Limitations**
 
-        * Only elements available within an instances Directory Records are
-          able to be used when performing the search
         * Only single value matching is supported so neither
           ``PatientID=['1234567', '7654321']`` or ``PatientID='1234567',
           PatientID='7654321'`` will work.
+        * Repeating group and private elements cannot be used when searching.
 
         Parameters
         ----------
+        load_instances : bool, optional
+            If ``True``, then load the SOP Instances belonging to the
+            File-set and perform the search against their available elements.
+            Otherwise (default) search only the elements available in the
+            corresponding directory records (more efficient, but only a limited
+            number of elements are available).
         **kwargs
-            Optional search parameters, as element keyword: value (i.e.
+            Search parameters, as element keyword=value (i.e.
             ``PatientID='1234567', StudyDescription="My study"``.
 
         Returns
@@ -464,10 +473,13 @@ class FileSet:
         list of pydicom.dicomdir.FileInstance
             A list of matching instances.
         """
-        def match(instance, **kwargs):
+        def match(ds, **kwargs):
+            if load_instances:
+                ds = instance.load()
+
             for kw, val in kwargs.items():
                 try:
-                    assert instance[kw].value == val
+                    assert ds[kw].value == val
                 except (AssertionError, AttributeError):
                     return False
 
@@ -480,11 +492,66 @@ class FileSet:
 
         return matches
 
+    def find_values(
+            self,
+            element: Union[str, int],
+            instances: Optional[List[FileInstance]] = None
+        ) -> List[Any]:
+        """Return a list of unique values for a given element.
+
+        Only elements available within an managed instance's Directory Records
+        are able to be used when performing the search. Elements within the
+        SOP Instance itself are not searched.
+
+        Parameters
+        ----------
+        element : str, int or Tag
+            The keyword or tag of the element to search for.
+        instances : list of pydicom.dicomdir.FileInstance, optional
+            Search within the given instances. If not used then all available
+            instances will be searched.
+
+        Returns
+        -------
+        list of object
+            A list of value(s) for the element available in the instances.
+        """
+        results = []
+        instances = instances or [ii for ii in self if element in ii]
+        for instance in instances:
+            val = instance[element].value
+            # Not very efficient, but we can't use set
+            if val not in results:
+                results.append(val)
+
+        return results
+
+    @property
+    def ID(self) -> Union[str, None]:
+        """Return the File-set ID (if available) or ``None``."""
+        return self._dicomdir.FileSetID
+
+    @ID.setter
+    def ID(self, val: Union[str, None]) -> None:
+        """Set the File-set ID."""
+        if val is None or 0 <= len(val) <= 16:
+            self._dicomdir.FileSetID = val
+
+    def __iter__(self) -> Generator[FileInstance, None, None]:
+        """Yield all the SOP Instances in the File-set.
+
+        Yields
+        ------
+        pydicom.dataset.Dataset
+            A SOP Instance from the File-set.
+        """
+        yield from self._instances
+
     def __len__(self) -> int:
         """Return the number of SOP Instances in the File-set."""
         return len(self._instances)
 
-    def _parse(self) -> None:
+    def _parse_tree(self) -> None:
         """Parse the records in the DICOMDIR.
 
         Build up the File instances in the File-set.
@@ -492,39 +559,34 @@ class FileSet:
         # Build up relationship tree for efficient traversing
         tree = {}
 
-        def build_branch(record):
-            """Recurse through a record, creating a FileInstance."""
+        def recurse_branch(record):
+            """Recurse through a top-level directory record, creating a
+            FileInstance for each of the SOP instances that are underneath.
+            """
+            # If no children we are at the end of the branch
             if not record.children:
-                # If no children we are at the end of the branch
+                # Build up the FileInstance by traversing back to the root
                 instance = FileInstance(self)
-                # PRIVATE records are not unique in traversal
-                if record.record_type == "PRIVATE":
-                    key = record.key
-                else:
-                    key = record.record_type
-                instance._records[key] = record
+                instance.add_record(record)
                 parent = record.parent
                 while parent:
-                    if parent.record_type == "PRIVATE":
-                        key = parent.key
-                    else:
-                        key = parent.record_type
-                    instance._records[key] = parent
+                    instance.add_record(parent)
                     parent = parent.parent  # Move up one level
 
                 self._instances.append(instance)
 
                 return instance
 
+            # Recurse
             branch = {}
             for child in record.children:
-                branch[child] = build_branch(child)
+                branch[child] = recurse_branch(child)
 
             return branch
 
         # Top-level records
         for record in self._dicomdir.root:
-            tree[record] = build_branch(record)
+            tree[record] = recurse_branch(record)
 
         self._tree = tree
 
@@ -573,3 +635,19 @@ class FileSet:
             s.extend(prettify(self._tree, indent=2))
 
         return '\n'.join(s)
+
+    @property
+    def UID(self) -> UID:
+        """Return the File-set UID."""
+        return self._dicomdir.file_meta.MediaStorageSOPInstanceUID
+
+    @UID.setter
+    def UID(self, uid: UID) -> None:
+        """Set the File-set UID.
+
+        Parameters
+        ----------
+        uid : pydicom.uid.UID
+            The UID to use as the new File-set UID.
+        """
+        self._dicomdir.file_meta.MediaStorageSOPInstanceUID = uid

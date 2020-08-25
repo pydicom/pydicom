@@ -237,6 +237,16 @@ class TestFileInstance:
         with pytest.raises(KeyError, match=r"(0000, 0000)"):
             instance[0x00000000]
 
+    def test_contains(self, dicomdir):
+        """Test FileInstance.__contains__."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        assert "StudyDate" in instance
+        assert 0x00080020 in instance
+        assert Tag(0x00080020) in instance
+        assert (0x0008, 0x0020) in instance
+        assert "0x00080020" in instance
+
     def test_private(self, private):
         """Test FileInstance with PRIVATE records."""
         ds = private
@@ -344,6 +354,21 @@ class TestFileSetLoad:
         assert (
             "          IMAGE: 1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.12"
         ) in s
+
+    def test_find_values(self, private):
+        """Test searching the FileSet for element values."""
+        fs = FileSet(private)
+        assert ['77654033', '98890234'] == fs.find_values("PatientID")
+        assert (
+            [
+                'XR C Spine Comp Min 4 Views',
+                'CT, HEAD/BRAIN WO CONTRAST',
+                '',
+                'Carotids',
+                'Brain',
+                'Brain-MRA'
+            ]  == fs.find_values("StudyDescription")
+        )
 
 
 class TestFileSetNew:
