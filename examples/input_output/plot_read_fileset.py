@@ -18,9 +18,27 @@ path = get_testdata_file('DICOMDIR')
 ds = dcmread(path)
 # Load an existing DICOM File-set using its DICOMDIR dataset
 fs = FileSet(ds)
-print(f'Root directory: {fs.path}\n')
 
-# Find available patients
+# A summary of the File-set's contents can be seen when printing
+print(fs)
+
+# Iterating over the FileSet yields FileInstance objects
+for instance in fs:
+    # Load the corresponding SOP Instance dataset
+    ds = instance.load()
+    break
+
+# You can also access the File-set's Patient > Study > Series > Instance
+#   hierarchy (assuming it contains suitable SOP Instances)
+tree = fs.patient_tree
+for patient_id in tree:
+    for study_uid in tree[patient_id]:
+        for series_uid in tree[patient_id][study_uid]:
+            for instance in tree[patient_id][study_uid][series_uid]:
+                ds = instance.load()
+                break
+
+# We can search the File-set
 patients = fs.find_values("PatientID")
 for patient_id in patients:
     # Returns a list of FileInstance, where each one represents an available

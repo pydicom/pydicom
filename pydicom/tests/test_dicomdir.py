@@ -339,6 +339,19 @@ class TestFileSetLoad:
         sop_instances = [ii.SOPInstanceUID for ii in matches]
         assert 17 == len(list(set(sop_instances)))
 
+    def test_find_load_instances(self, private):
+        """Test FileSet.find(load_instances=True)."""
+        fs = FileSet(private)
+        results = fs.find(
+            load_instances=False, PhotometricInterpretation="MONOCHROME1"
+        )
+        assert not results
+
+        results = fs.find(
+            load_instances=True, PhotometricInterpretation="MONOCHROME1"
+        )
+        assert 3 == len(results)
+
     def test_str(self, private):
         """That FileSet.__str__"""
         fs = FileSet(private)
@@ -352,7 +365,8 @@ class TestFileSetLoad:
             "    PATIENT: PatientID=77654033, PatientName=Doe^Archibald" in s
         )
         assert (
-            "          IMAGE: 1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.12"
+            "          IMAGE: SOPInstanceUID="
+            "1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.12"
         ) in s
 
     def test_find_values(self, private):
@@ -369,6 +383,24 @@ class TestFileSetLoad:
                 'Brain-MRA'
             ]  == fs.find_values("StudyDescription")
         )
+
+    def test_patient_tree(self, private):
+        """Test FileSet.patient_tree."""
+        fs = FileSet(private)
+        tree = fs.patient_tree
+
+        assert 2 == len(tree)
+        assert '77654033' in tree
+        assert '98890234' in tree
+        studies = tree['77654033']
+        assert '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1' in studies
+        assert 2 == len(studies)
+        series = studies['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1']
+        assert '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10' in series
+        assert 3 == len(series)
+        images = series['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10']
+        assert 1 == len(images)
+        assert isinstance(images[0], FileInstance)
 
 
 class TestFileSetNew:

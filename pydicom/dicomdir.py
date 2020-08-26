@@ -1,6 +1,7 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
+from copy import deepcopy
 import os
 from pathlib import Path
 from typing import Optional, Union, List, Generator, Any
@@ -257,6 +258,8 @@ class DirectoryRecord:
             s.append(
                 f": Modality={ds.Modality}, SeriesNumber={ds.SeriesNumber}"
             )
+        elif self.record_type == "IMAGE":
+            s.append(f": SOPInstanceUID={self.key}")
         else:
             s.append(f": {self.key}")
 
@@ -480,7 +483,7 @@ class FileSet:
             for kw, val in kwargs.items():
                 try:
                     assert ds[kw].value == val
-                except (AssertionError, AttributeError):
+                except (AssertionError, KeyError):
                     return False
 
             return True
@@ -597,6 +600,39 @@ class FileSet:
         """
         return os.fspath(Path(self._dicomdir.filename).resolve().parent)
 
+    @property
+    def patient_tree(self) -> dict:
+        """Return a dict containing the File-set's SOP Instance hierarchy.
+
+        Returns
+        -------
+        dict
+            A dict containing the hierarchy for SOP Instances that contain
+            patient, study and series information as ``{PatientID:
+            {StudyInstanceUID: {SeriesInstanceUID: [FileInstance, ...]}}}``
+        """
+        tree = {}
+        # The required record types
+        req = set(['PATIENT', 'STUDY', 'SERIES'])
+        for instance in self:
+            records = instance._records
+            if not req.issubset(set(records)):
+                continue
+
+            pat_key = records["PATIENT"].key
+            study_key = records["STUDY"].key
+            series_key = records["SERIES"].key
+
+            images = (
+                tree.setdefault(pat_key, {})
+                .setdefault(study_key, {})
+                .setdefault(series_key, [])
+            )
+            images.append(instance)
+
+        return tree
+
+
     def __str__(self) -> str:
         """Return a string representation of the FileSet."""
         def prettify(d, indent=0, indent_char='  '):
@@ -625,9 +661,9 @@ class FileSet:
 
         s = [
             "DICOM File-set",
+            f"  Root directory: {self.path}",
             f"  File-set ID: {self.ID or '(no value available)'}",
             f"  File-set UID: {self.UID}",
-            f"  Root directory: {self.path}",
         ]
 
         if self._tree:
