@@ -339,16 +339,16 @@ class TestFileSetLoad:
         sop_instances = [ii.SOPInstanceUID for ii in matches]
         assert 17 == len(list(set(sop_instances)))
 
-    def test_find_load_instances(self, private):
-        """Test FileSet.find(load_instances=True)."""
+    def test_find_load(self, private):
+        """Test FileSet.find(load=True)."""
         fs = FileSet(private)
         results = fs.find(
-            load_instances=False, PhotometricInterpretation="MONOCHROME1"
+            load=False, PhotometricInterpretation="MONOCHROME1"
         )
         assert not results
 
         results = fs.find(
-            load_instances=True, PhotometricInterpretation="MONOCHROME1"
+            load=True, PhotometricInterpretation="MONOCHROME1"
         )
         assert 3 == len(results)
 
@@ -382,6 +382,16 @@ class TestFileSetLoad:
                 'Brain',
                 'Brain-MRA'
             ]  == fs.find_values("StudyDescription")
+        )
+
+    def test_find_values_load(self, private):
+        """Test FileSet.find_values(load=True)."""
+        fs = FileSet(private)
+        assert [] == fs.find_values(
+            "PhotometricInterpretation", load=False
+        )
+        assert ['MONOCHROME1', 'MONOCHROME2'] == fs.find_values(
+            "PhotometricInterpretation", load=True
         )
 
     def test_patient_tree(self, private):

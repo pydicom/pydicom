@@ -3,7 +3,7 @@
 Read a DICOM File-set
 =====================
 
-This example shows how to read a DICOM File-set.
+This example shows how to read and interact with a DICOM File-set.
 
 """
 
@@ -21,6 +21,7 @@ fs = FileSet(ds)
 
 # A summary of the File-set's contents can be seen when printing
 print(fs)
+print()
 
 # Iterating over the FileSet yields FileInstance objects
 for instance in fs:
@@ -75,15 +76,16 @@ for patient_id in patients:
 
 # Of course you can just get the instances directly if you know what you want
 series_uid = "1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.118"
-for instance in fs.find(SeriesInstanceUID=series_uid):
-    print(f"Reading SOP instance at {instance.path}")
-    ds = instance.load()
+result = fs.find(SeriesInstanceUID=series_uid)
+print(f"\nFound {len(result)} instances for SeriesInstanceUID={series_uid}")
 
 # We can search the actual stored SOP Instances by using `load_instances=True`
 # This can be useful as the DICOMDIR's directory records only contain a
 #   limited subset of the available elements, however its less efficient
-result = fs.find(
-    SeriesDescription="ANGIO Projected from   C", load_instances=True
+result = fs.find(load_instances=False, PhotometricInterpretation="MONOCHROME1")
+result_load = fs.find(load_instances=True, PhotometricInterpretation="MONOCHROME1")
+print(
+    f"Found {len(result)} instances with "
+    f"PhotometricInterpretation='MONOCHROME1' without loading the stored "
+    f"instances and {len(result_load)} instances with loading"
 )
-for instance in result:
-    ds = instance.load()

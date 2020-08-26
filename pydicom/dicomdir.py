@@ -449,19 +449,20 @@ class FileSet:
 
         return ds
 
-    def find(self, load_instances: bool = False, **kwargs) -> List[FileInstance]:
+    def find(self, load: bool = False, **kwargs) -> List[FileInstance]:
         """Return matching instances in the File-set
 
         **Limitations**
 
         * Only single value matching is supported so neither
           ``PatientID=['1234567', '7654321']`` or ``PatientID='1234567',
-          PatientID='7654321'`` will work.
+          PatientID='7654321'`` will work (although the first example will
+          work if the *Patient ID* is actually multi-values).
         * Repeating group and private elements cannot be used when searching.
 
         Parameters
         ----------
-        load_instances : bool, optional
+        load : bool, optional
             If ``True``, then load the SOP Instances belonging to the
             File-set and perform the search against their available elements.
             Otherwise (default) search only the elements available in the
@@ -477,7 +478,7 @@ class FileSet:
             A list of matching instances.
         """
         def match(ds, **kwargs):
-            if load_instances:
+            if load:
                 ds = instance.load()
 
             for kw, val in kwargs.items():
@@ -498,7 +499,8 @@ class FileSet:
     def find_values(
             self,
             element: Union[str, int],
-            instances: Optional[List[FileInstance]] = None
+            instances: Optional[List[FileInstance]] = None,
+            load: bool = False
         ) -> List[Any]:
         """Return a list of unique values for a given element.
 
@@ -513,6 +515,12 @@ class FileSet:
         instances : list of pydicom.dicomdir.FileInstance, optional
             Search within the given instances. If not used then all available
             instances will be searched.
+        load : bool, optional
+            If ``True``, then load the SOP Instances belonging to the
+            File-set and perform the search against their available elements.
+            Otherwise (default) search only the elements available in the
+            corresponding directory records (more efficient, but only a limited
+            number of elements are available).
 
         Returns
         -------
@@ -520,8 +528,14 @@ class FileSet:
             A list of value(s) for the element available in the instances.
         """
         results = []
-        instances = instances or [ii for ii in self if element in ii]
+        instances = instances or iter(self)
         for instance in instances:
+            if load:
+                instance = instance.load()
+
+            if element not in instance:
+                continue
+
             val = instance[element].value
             # Not very efficient, but we can't use set
             if val not in results:
