@@ -4,7 +4,7 @@
 from copy import deepcopy
 import os
 from pathlib import Path
-from typing import Optional, Union, List, Generator, Any
+from typing import Optional, Union, List, Generator, Any, Tuple
 import uuid
 import warnings
 
@@ -614,38 +614,50 @@ class FileSet:
         """
         return os.fspath(Path(self._dicomdir.filename).resolve().parent)
 
-    @property
-    def patient_tree(self) -> dict:
+    def as_tree(self, hierarchy: Optional[List[str]] = None) -> dict:
         """Return a dict containing the File-set's SOP Instance hierarchy.
+
+        .. warning::
+
+            SOP Instances described using ``PRIVATE`` records are not
+            supported and will not be included in the returned tree.
+
+        Parameters
+        ----------
+        hierarchy : tuple of str, optional
+            Create the tree using the given `hierarchy`, defaults to
+            ``["PATIENT", "STUDY", "SERIES"]`` which returns a tree ordered
+            as ``{PatientID: {StudyInstanceUID: SeriesInstanceUID:
+            [FileInstance, ...]}}``.
 
         Returns
         -------
         dict
-            A dict containing the hierarchy for SOP Instances that contain
-            patient, study and series information as ``{PatientID:
-            {StudyInstanceUID: {SeriesInstanceUID: [FileInstance, ...]}}}``
+            A dict containing the hierarchy of SOP Instances.
         """
         tree = {}
-        # The required record types
-        req = set(['PATIENT', 'STUDY', 'SERIES'])
+
+        def build_branch(d, keys):
+            if len(keys) == 1:
+                return d.setdefault(keys[0], [])
+
+            branch = d.setdefault(keys[0], {})
+            return build_branch(branch, keys[1:])
+
+        hierarchy = hierarchy or ['PATIENT', 'STUDY', 'SERIES']
+        req = set(hierarchy)
         for instance in self:
             records = instance._records
             if not req.issubset(set(records)):
                 continue
 
-            pat_key = records["PATIENT"].key
-            study_key = records["STUDY"].key
-            series_key = records["SERIES"].key
-
-            images = (
-                tree.setdefault(pat_key, {})
-                .setdefault(study_key, {})
-                .setdefault(series_key, [])
+            instances_list = build_branch(
+                tree,
+                [records[rtype].key for rtype in hierarchy]
             )
-            images.append(instance)
+            instances_list.append(instance)
 
         return tree
-
 
     def __str__(self) -> str:
         """Return a string representation of the FileSet."""

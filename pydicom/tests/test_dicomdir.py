@@ -394,10 +394,10 @@ class TestFileSetLoad:
             "PhotometricInterpretation", load=True
         )
 
-    def test_patient_tree(self, private):
+    def test_as_tree(self, private):
         """Test FileSet.patient_tree."""
         fs = FileSet(private)
-        tree = fs.patient_tree
+        tree = fs.as_tree()
 
         assert 2 == len(tree)
         assert '77654033' in tree
@@ -408,9 +408,19 @@ class TestFileSetLoad:
         series = studies['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.1']
         assert '1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10' in series
         assert 3 == len(series)
-        images = series['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10']
-        assert 1 == len(images)
-        assert isinstance(images[0], FileInstance)
+        instances = series['1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.10']
+        assert 1 == len(instances)
+        assert isinstance(instances[0], FileInstance)
+
+        # Lol
+        tree = fs.as_tree(hierarchy=["PATIENT"])
+        assert 2 == len(tree)
+        instances = tree['77654033']
+        assert 7 == len(instances)
+        assert isinstance(instances[0], FileInstance)
+        instances = tree['98890234']
+        assert 24 == len(instances)
+        assert isinstance(instances[0], FileInstance)
 
 
 class TestFileSetNew:

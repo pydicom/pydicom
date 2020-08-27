@@ -2,7 +2,7 @@
 DICOM File-sets and DICOMDIR
 ============================
 
-This tutorial is about the DICOM File-set and covers
+This tutorial is about DICOM File-sets and covers
 
 * An introduction to DICOM File-sets
 * Reading and accessing the records in a DICOMDIR file
@@ -11,35 +11,35 @@ This tutorial is about the DICOM File-set and covers
 It's assumed that you're already familiar with the :doc:`dataset basics
 <dataset_basics>`.
 
-**Prerequisites**
-
-.. code-block:: bash
-
-    python -m pip install -U pydicom>=2.1
-
-.. code-block:: bash
-
-    conda install pydicom>=2.1
-
 **References**
 
 * :dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>`
 * :dcm:`DICOM File Service<part10/chapter_8.html>`
+* :dcm:`Media Formats and Physical Media for Media Interchange
+  <part12/ps3.12.html>`
 
 The DICOM File-set
 ==================
 
-A File-set is a collection of DICOM files (SOP instances written in the
-:dcm:`DICOM File Format<part10/chapter_7.html>`) that share a common naming
-space within which the File IDs - the filenames - are unique.
+A File-set is a collection of DICOM files that share a common naming
+space, and are commonly seen on the DVDs containing DICOM data that
+are given to a patient after a medical procedure (such as an MR or ultrasound).
 
-The DICOMDIR Dataset
---------------------
+The DICOMDIR
+------------
 
-Each File-set contains a single file with the filename `DICOMDIR`, which is
-a Media Storage Directory Storage instance that contains records listing the
-contents of the File-set.
+Every File-set must contain a single file with the filename ``DICOMDIR``, the
+location of which is dependent on the type of media used to store the File-set.
+For the most commonly used media (DVD, CD, USB, PC file system, etc), the
+``DICOMDIR`` file will be in the root directory of the File-set. For other
+media types, :dcm:`Part 12 of the DICOM Standard<part12/ps3.12.html>`
+specifies where the ``DICOMDIR`` must be located.
 
+The ``DICOMDIR`` file is a *Media Storage Directory* instance that follows the
+:dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>` and describes the
+structure of File-set is described in the (0004,1220) *Directory
+Record Sequence* element. Each item in the sequence is a directory record,
+and each directory record describes part of the directory structure.
 
 .. code-block:: python
 
@@ -50,12 +50,20 @@ contents of the File-set.
     >>> ds.file_meta.MediaStorageSOPClassUID.name
     'Media Storage Directory Storage'
 
-The Media Storage Directory SOP Class follows the :dcm:`Basic Directory
-IOD<chtml/part03/chapter_F.html>` and contains the File-set's directory
-structure in the (0004,1220) *Directory Record Sequence* element. The first
-record in the directory is determined through the (0004,1200) *Offset of the
-First Directory Record of the Root Directory Entity* element value, which
-is the byte offset in the encoded DICOMDIR dataset to the corresponding record.
+The first record in the directory is determined through the (0004,1200)
+*Offset of the First Directory Record of the Root Directory Entity* element
+value, which is the byte offset in the encoded DICOMDIR dataset to the
+corresponding record.
+
+.. code-block:: python
+
+    >>> ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
+    396
+
+So the first record for the directory is at offset 396, which for this dataset
+also happens to be the first item in the *Directory Record Sequence*. Having
+the first record as the first item isn't necessary; it could be at any location
+within the sequence.
 
 Each item in the sequence is a directory record of a particular type and
 multiple records per managed SOP Instance are used to build up a hierarchy
@@ -65,8 +73,6 @@ listed in :dcm:`Table F.4-1 in Part 3 of the DICOM Standard
 
 .. code-block:: python
 
-    >>> ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
-    396
     >>> records = ds.DirectoryRecordSequence
     >>> for idx in range(4):
     ...     if idx == 0: print("Offset, Record Type")
@@ -78,11 +84,6 @@ listed in :dcm:`Table F.4-1 in Part 3 of the DICOM Standard
     510, STUDY
     724, SERIES
     856, IMAGE
-
-So the first record for the directory is at offset 396, which is also the
-first item in the *Directory Record Sequence* - a PATIENT record. The first
-record doesn't necessarily have to be the first item, it can be at any location
-within the sequence, nor does it have to be a PATIENT record.
 
 Each record contains two elements that identify it's relationship to other
 records:
@@ -97,15 +98,19 @@ corresponding record as given by the `seq_item_tell` attribute. A value of
 .. code-block:: python
 
     >>> for idx in range(4):
-    ...     if idx == 0: print("Next, Child")
+    ...     if idx == 0: print("idx: offset: type, next, child")
     ...     record = records[idx]
-    ...     print(f"{record[0x00041400].value}, {record[0x00041420].value}")
+    ...     print(
+    ...         f"  {idx}: {record.seq_item_tell}, {record.RecordType}, "
+    ...         f"{record.OffsetOfTheNextDirectoryRecord}, "
+    ...         f"{record.OffsetOfReferencedLowerLevelDirectoryEntity}"
+    ...     )
     ...
-    Next, Child
-    3126, 510
-    1814, 724
-    1090, 856
-    0, 0
+    idx: offset, type, next, child
+      0: 396, PATIENT, 3126, 510
+      1: 510, STUDY, 1814, 724
+      2: 724, SERIES, 1090, 856
+      3: 856, IMAGE, 0, 0
 
 To summarize the above:
 
@@ -142,7 +147,7 @@ a more user-friendly way to interact with it is via the
 Loading existing File-sets
 --------------------------
 
-When loading a File-set, simply pass the DICOMDIR
+When loading a File-set, simply pass a DICOMDIR
 :class:`~pydicom.dataset.Dataset` to :class:`~pydicom.dicomdir.FileSet`:
 
 .. code-block:: python
@@ -241,30 +246,3 @@ keyword parameter:
 
 The cost of the *load* parameter is that it's less efficient due to the
 overhead of having to read every instance in the File-set.
-
-
-Recipe: Copy all SOP Instances in a given series
-................................................
-
-.. code-block:: python
-
-    from pathlib import Path
-    import shutil
-
-    from pydicom import dcmread
-    from pydicom.data import get_testdata_file
-    from pydicom.dicomdir import FileSet
-
-    path = get_testdata_file("DICOMDIR")
-    fs = FileSet(dcmread(path))
-
-    # *load* needed to search 'Series Description'
-    results = fs.find(
-        PatientID='98890234',
-        SeriesDescription='ANGIO Projected from   C',
-        load=True
-    )
-
-    dst = (Path() / 'temp').resolve()
-    for instance in results:
-        shutil.copy(instance.path, dst)

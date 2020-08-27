@@ -31,7 +31,7 @@ for instance in fs:
 
 # You can also access the File-set's Patient > Study > Series > Instance
 #   hierarchy (assuming it contains suitable SOP Instances)
-tree = fs.patient_tree
+tree = fs.as_tree()
 for patient_id in tree:
     for study_uid in tree[patient_id]:
         for series_uid in tree[patient_id][study_uid]:
@@ -79,11 +79,11 @@ series_uid = "1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.118"
 result = fs.find(SeriesInstanceUID=series_uid)
 print(f"\nFound {len(result)} instances for SeriesInstanceUID={series_uid}")
 
-# We can search the actual stored SOP Instances by using `load_instances=True`
+# We can search the actual stored SOP Instances by using `load=True`
 # This can be useful as the DICOMDIR's directory records only contain a
 #   limited subset of the available elements, however its less efficient
-result = fs.find(load_instances=False, PhotometricInterpretation="MONOCHROME1")
-result_load = fs.find(load_instances=True, PhotometricInterpretation="MONOCHROME1")
+result = fs.find(load=False, PhotometricInterpretation="MONOCHROME1")
+result_load = fs.find(load=True, PhotometricInterpretation="MONOCHROME1")
 print(
     f"Found {len(result)} instances with "
     f"PhotometricInterpretation='MONOCHROME1' without loading the stored "

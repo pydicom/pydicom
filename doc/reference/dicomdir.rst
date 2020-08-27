@@ -5,9 +5,12 @@ DICOMDIR (:mod:`pydicom.dicomdir`)
 
 .. currentmodule:: pydicom.dicomdir
 
-Representation of DICOMDIR.
+Representation of DICOM File-sets and DICOMDIR datasets.
 
 .. autosummary::
    :toctree: generated/
 
    DicomDir
+   DirectoryRecord
+   FileInstance
+   FileSet
