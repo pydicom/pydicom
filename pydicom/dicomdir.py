@@ -431,6 +431,10 @@ class FileSet:
         self._dicomdir = ds or self._create_dicomdir()
 
         if ds:
+            if "DirectoryRecordSequence" not in ds:
+                raise ValueError(
+                    "The supplied Dataset is not a DICOMDIR instance"
+                )
             self._parse_tree()
 
     def _create_dicomdir(self) -> Dataset:
@@ -457,7 +461,7 @@ class FileSet:
         * Only single value matching is supported so neither
           ``PatientID=['1234567', '7654321']`` or ``PatientID='1234567',
           PatientID='7654321'`` will work (although the first example will
-          work if the *Patient ID* is actually multi-values).
+          work if the *Patient ID* is actually multi-valued).
         * Repeating group and private elements cannot be used when searching.
 
         Parameters
@@ -477,9 +481,15 @@ class FileSet:
         list of pydicom.dicomdir.FileInstance
             A list of matching instances.
         """
+        has_elements = False
+
         def match(ds, **kwargs):
             if load:
                 ds = instance.load()
+
+            # Check that all query elements are present
+            if all([kw in ds for kw in kwargs]):
+                has_elements = True
 
             for kw, val in kwargs.items():
                 try:
@@ -494,6 +504,13 @@ class FileSet:
             if match(instance, **kwargs):
                 matches.append(instance)
 
+        if not load and not has_elements:
+            warnings.warn(
+                "None of the records in the DICOMDIR dataset contain all "
+                "the query elements, consider using the 'load' parameter "
+                "to expand the search to the corresponding SOP instances"
+            )
+
         return matches
 
     def find_values(
@@ -503,10 +520,6 @@ class FileSet:
             load: bool = False
         ) -> List[Any]:
         """Return a list of unique values for a given element.
-
-        Only elements available within an managed instance's Directory Records
-        are able to be used when performing the search. Elements within the
-        SOP Instance itself are not searched.
 
         Parameters
         ----------
@@ -527,6 +540,7 @@ class FileSet:
         list of object
             A list of value(s) for the element available in the instances.
         """
+        has_element = False
         results = []
         instances = instances or iter(self)
         for instance in instances:
@@ -536,10 +550,18 @@ class FileSet:
             if element not in instance:
                 continue
 
+            has_element = True
             val = instance[element].value
             # Not very efficient, but we can't use set
             if val not in results:
                 results.append(val)
+
+        if not load and not has_element:
+            warnings.warn(
+                "None of the records in the DICOMDIR dataset contain "
+                "the query element, consider using the 'load' parameter "
+                "to expand the search to the corresponding SOP instances"
+            )
 
         return results
 

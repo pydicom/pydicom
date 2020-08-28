@@ -36,8 +36,8 @@ media types, :dcm:`Part 12 of the DICOM Standard<part12/ps3.12.html>`
 specifies where the ``DICOMDIR`` must be located.
 
 The ``DICOMDIR`` file is a *Media Storage Directory* instance that follows the
-:dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>` and describes the
-structure of File-set is described in the (0004,1220) *Directory
+:dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>`. It describes the
+structure of File-set using the (0004,1220) *Directory
 Record Sequence* element. Each item in the sequence is a directory record,
 and each directory record describes part of the directory structure.
 
@@ -120,10 +120,10 @@ To summarize the above:
   (the SERIES record at index 2)
 * The SERIES record has a sibling at offset 1090 and a child at offset 856
   (the IMAGE record at index 3)
-* The IMAGE record has no children (or siblings) and so lies at the bottom of
+* The IMAGE record has no children (or siblings) and so lies at the end of
   this particular branch of the hierarchy
 
-The bottom record usually defines the relative path to the corresponding file:
+The lowest record usually defines the relative path to the corresponding file:
 
 .. code-block:: python
 
@@ -207,6 +207,7 @@ Instances.
     >>> for instance in fs:
     ...     print(instance.PatientName)
     ...     break
+    ...
     Doe^Archibald
 
 The managed instances in the File-set can be searched and then loaded to return
@@ -219,6 +220,7 @@ a :class:`~pydicom.dataset.Dataset`:
     >>> for instance in fs.find(PatientID='77654033'):
     ...     ds = instance.load()
     ...     print(ds.PhotometricInterpretation)
+    ...
     MONOCHROME1
     MONOCHROME1
     MONOCHROME1

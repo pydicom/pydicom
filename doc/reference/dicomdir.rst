@@ -1,7 +1,7 @@
 .. _api_dicomdir:
 
-DICOMDIR (:mod:`pydicom.dicomdir`)
-==================================
+File-sets and DICOMDIR (:mod:`pydicom.dicomdir`)
+================================================
 
 .. currentmodule:: pydicom.dicomdir
 
