@@ -1,6 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test for dicomdir.py"""
 
+from io import BytesIO
 import os
 from pathlib import Path
 
@@ -269,6 +270,31 @@ class TestFileInstance:
         )
         assert ExplicitVRLittleEndian == instance.TransferSyntaxUID
 
+    def test_setattr(self, dicomdir):
+        """Test FileInstance.__setattr__."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        assert "20010101" == instance.StudyDate
+
+        msg = (
+            r"Modifying a FileInstance's corresponding element values "
+            r"is not supported"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            instance.StudyDate = '20010102'
+
+        instance.my_attr = 1234
+        assert 1234 == instance.my_attr
+
+    def test_setitem(self, dicomdir):
+        """Test FileInstance.__getitem__."""
+        fs = FileSet(dicomdir)
+        instance = fs._instances[0]
+        elem = instance["StudyDate"]
+        msg = r"'FileInstance' object does not support item assignment"
+        with pytest.raises(TypeError, match=msg):
+            instance["StudyDate"] = elem
+
 
 class TestFileSetLoad:
     """Tests for a FileSet created from an existing File-set."""
@@ -280,6 +306,37 @@ class TestFileSetLoad:
         assert "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187" == fs.UID
         assert "dicomdirtests" in fs.path
         assert 31 == len(fs)
+
+    def test_loading_raises(self, dicomdir):
+        """Test loading an invalid DICOMDIR raises exceptions."""
+        dicomdir.filename = None
+        msg = (
+            r"Unable to load the File-set as the 'filename' "
+            r"attribute for the DICOMDIR dataset is not a string or "
+            r"Path object"
+        )
+        with pytest.raises(TypeError, match=msg):
+            FileSet(dicomdir)
+
+        dicomdir.filename = BytesIO()
+        with pytest.raises(TypeError, match=msg):
+            FileSet(dicomdir)
+
+        dicomdir.filename = Path() / 'my_invalid_path'
+        msg = (
+            r"Unable to load the File-set as the 'filename' attribute "
+            r"for the DICOMDIR dataset is not a valid path"
+        )
+        with pytest.raises(FileNotFoundError, match=msg):
+            FileSet(dicomdir)
+
+        dicomdir.file_meta.MediaStorageSOPClassUID = '1.2.3.4'
+        msg = (
+            r"Unable to load the File-set as the supplied dataset is "
+            r"not a 'Media Storage Directory' instance"
+        )
+        with pytest.raises(ValueError, match=msg):
+            FileSet(dicomdir)
 
     def test_change_file_set_id(self, dicomdir):
         """Test changing the File-set ID."""
@@ -342,10 +399,16 @@ class TestFileSetLoad:
     def test_find_load(self, private):
         """Test FileSet.find(load=True)."""
         fs = FileSet(private)
-        results = fs.find(
-            load=False, PhotometricInterpretation="MONOCHROME1"
+        msg = (
+            r"None of the records in the DICOMDIR dataset contain all "
+            r"the query elements, consider using the 'load' parameter "
+            r"to expand the search to the corresponding SOP instances"
         )
-        assert not results
+        with pytest.warns(UserWarning, match=msg):
+            results = fs.find(
+                load=False, PhotometricInterpretation="MONOCHROME1"
+            )
+            assert not results
 
         results = fs.find(
             load=True, PhotometricInterpretation="MONOCHROME1"
@@ -381,15 +444,21 @@ class TestFileSetLoad:
                 'Carotids',
                 'Brain',
                 'Brain-MRA'
-            ]  == fs.find_values("StudyDescription")
+            ] == fs.find_values("StudyDescription")
         )
 
     def test_find_values_load(self, private):
         """Test FileSet.find_values(load=True)."""
         fs = FileSet(private)
-        assert [] == fs.find_values(
-            "PhotometricInterpretation", load=False
+        msg = (
+            r"None of the records in the DICOMDIR dataset contain "
+            r"the query element, consider using the 'load' parameter "
+            r"to expand the search to the corresponding SOP instances"
         )
+        with pytest.warns(UserWarning, match=msg):
+            results = fs.find_values("PhotometricInterpretation", load=False)
+            assert not results
+
         assert ['MONOCHROME1', 'MONOCHROME2'] == fs.find_values(
             "PhotometricInterpretation", load=True
         )

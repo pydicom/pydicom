@@ -175,7 +175,10 @@ class DicomDir(FileDataset):
 
 
 class DirectoryRecord:
-    """Representation of a Directory Record in a DICOMDIR file."""
+    """Representation of a Directory Record in a DICOMDIR file.
+
+    .. versionadded:: 2.1
+    """
     def __init__(self,
                  ds: Dataset,
                  record: Dataset,
@@ -267,7 +270,10 @@ class DirectoryRecord:
 
 
 class FileInstance:
-    """Representation of a File in a File-set."""
+    """Representation of a File in a File-set.
+
+    .. versionadded:: 2.1
+    """
     def __init__(self, fs: "FileSet") -> None:
         """Create a new FileInstance.
 
@@ -282,7 +288,7 @@ class FileInstance:
         self._fs = fs
 
     def add_record(self, record: DirectoryRecord) -> None:
-        """Add a directory record to the FileInstance.
+        """Add a directory record to the ``FileInstance``.
 
         Parameters
         ----------
@@ -321,7 +327,7 @@ class FileInstance:
 
     @property
     def file_set(self) -> "FileSet":
-        """Return the File-set the File is part of."""
+        """Return the parent :class:`~pydicom.dicomdir.FileSet`."""
         return self._fs
 
     def __getattribute__(self, name: str) -> Any:
@@ -384,7 +390,8 @@ class FileInstance:
 
     @property
     def path(self) -> str:
-        """Return the path to the SOP Instance referenced by the record.
+        """Return the path to the SOP Instance referenced by the record as
+        :class:`str`.
 
         Raises
         ------
@@ -397,6 +404,22 @@ class FileInstance:
             path = Path(self.ReferencedFileID)
 
         return os.fspath(Path(self.file_set.path) / path)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Set the class attribute value for `name`.
+
+        Raises
+        ------
+        AttributeError
+            If `name` is a valid keyword for a DICOM element.
+        """
+        if tag_for_keyword(name) is not None:
+            raise AttributeError(
+                "Modifying a FileInstance's corresponding element values "
+                "is not supported"
+            )
+
+        return super().__setattr__(name, value)
 
     @property
     def SOPClassUID(self) -> UID:
@@ -415,7 +438,10 @@ class FileInstance:
 
 
 class FileSet:
-    """Representation of a DICOM :dcm:`File-set<part10/chapter_8.html>`."""
+    """Representation of a DICOM :dcm:`File-set<part10/chapter_8.html>`.
+
+    .. versionadded:: 2.1
+    """
     def __init__(self, ds: Optional[Dataset] = None) -> None:
         """Create a new File-set.
 
@@ -431,10 +457,28 @@ class FileSet:
         self._dicomdir = ds or self._create_dicomdir()
 
         if ds:
-            if "DirectoryRecordSequence" not in ds:
+            sop_class = ds.file_meta.MediaStorageSOPClassUID
+            if sop_class != MediaStorageDirectoryStorage:
                 raise ValueError(
-                    "The supplied Dataset is not a DICOMDIR instance"
+                    "Unable to load the File-set as the supplied dataset is "
+                    "not a 'Media Storage Directory' instance"
                 )
+
+            try:
+                Path(ds.filename).resolve(strict=True)
+            except FileNotFoundError:
+                raise FileNotFoundError(
+                    "Unable to load the File-set as the 'filename' attribute "
+                    "for the DICOMDIR dataset is not a valid path"
+                )
+            except TypeError:
+                # Custom message if DICOMDIR from bytes, etc
+                raise TypeError(
+                    "Unable to load the File-set as the 'filename' "
+                    "attribute for the DICOMDIR dataset is not a string or "
+                    "Path object"
+                )
+
             self._parse_tree()
 
     def _create_dicomdir(self) -> Dataset:
@@ -481,15 +525,20 @@ class FileSet:
         list of pydicom.dicomdir.FileInstance
             A list of matching instances.
         """
-        has_elements = False
+        # Flag whether or not the query elements are in the DICOMDIR records
+        has_elements = [False]
 
         def match(ds, **kwargs):
+            if not kwargs:
+                has_elements[0] = True
+                return True
+
             if load:
                 ds = instance.load()
 
             # Check that all query elements are present
             if all([kw in ds for kw in kwargs]):
-                has_elements = True
+                has_elements[0] = True
 
             for kw, val in kwargs.items():
                 try:
@@ -504,7 +553,7 @@ class FileSet:
             if match(instance, **kwargs):
                 matches.append(instance)
 
-        if not load and not has_elements:
+        if not load and not has_elements[0]:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain all "
                 "the query elements, consider using the 'load' parameter "
@@ -514,16 +563,16 @@ class FileSet:
         return matches
 
     def find_values(
-            self,
-            element: Union[str, int],
-            instances: Optional[List[FileInstance]] = None,
-            load: bool = False
-        ) -> List[Any]:
+        self,
+        element: Union[str, int],
+        instances: Optional[List[FileInstance]] = None,
+        load: bool = False
+    ) -> List[Any]:
         """Return a list of unique values for a given element.
 
         Parameters
         ----------
-        element : str, int or Tag
+        element : str, int or pydicom.tag.BaseTag
             The keyword or tag of the element to search for.
         instances : list of pydicom.dicomdir.FileInstance, optional
             Search within the given instances. If not used then all available
