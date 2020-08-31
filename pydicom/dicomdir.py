@@ -533,19 +533,22 @@ class FileSet:
             A list of matching instances.
         """
         # Flag whether or not the query elements are in the DICOMDIR records
-        has_elements = [False]
+        has_elements = False
 
         def match(ds, **kwargs):
+            global has_elements
+
             if not kwargs:
-                has_elements[0] = True
+                has_elements = True
                 return True
 
             if load:
                 ds = instance.load()
 
             # Check that all query elements are present
+
             if all([kw in ds for kw in kwargs]):
-                has_elements[0] = True
+                has_elements = True
 
             for kw, val in kwargs.items():
                 try:
@@ -560,7 +563,7 @@ class FileSet:
             if match(instance, **kwargs):
                 matches.append(instance)
 
-        if not load and not has_elements[0]:
+        if not load and not has_elements:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain all "
                 "the query elements, consider using the 'load' parameter "
