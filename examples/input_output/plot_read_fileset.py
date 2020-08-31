@@ -40,8 +40,8 @@ for patient_id in tree:
                 break
 
 # We can search the File-set
-patients = fs.find_values("PatientID")
-for patient_id in patients:
+patient_ids = fs.find_values("PatientID")
+for patient_id in patient_ids:
     # Returns a list of FileInstance, where each one represents an available
     #   SOP Instance with a matching *Patient ID*
     result = fs.find(PatientID=patient_id)

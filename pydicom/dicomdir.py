@@ -79,7 +79,7 @@ class DicomDir(FileDataset):
         # and it checks class SOP, but in case of direct creation,
         # check here also
         if file_meta:
-            sop_class = file_meta.MediaStorageSOPClassUID
+            sop_class = file_meta.get("MediaStorageSOPClassUID", None)
             if sop_class != MediaStorageDirectoryStorage:
                 raise InvalidDicomError(
                     "The 'Media Storage SOP Class UID' for a DICOMDIR dataset "
@@ -213,6 +213,7 @@ class DirectoryRecord:
         self._dicomdir = ds
         self.record = record
         self._offset = offset
+        self._key = None
 
         self.parent = None
         self.next = None
@@ -222,6 +223,9 @@ class DirectoryRecord:
     @property
     def key(self) -> str:
         """Return a unique key for the record as :class:`str`."""
+        if self._key:
+            return self._key
+
         if self.record_type == "PATIENT":
             # PS3.3, Annex F.5.1: Each Patient ID is unique within a File-set
             return self.record.PatientID
@@ -234,9 +238,11 @@ class DirectoryRecord:
             return self.record.PrivateRecordUID
 
         # PS3.3, Table F.3-3: Required if record references an instance
-        return getattr(
-            self.record, "ReferencedSOPInstanceUIDInFile", str(uuid.uuid4())
-        )
+        if "ReferencedSOPInstanceUIDInFile" in self.record:
+            return self.record.ReferencedSOPInstanceUIDInFile
+
+        self._key = str(uuid.uuid4())
+        return self._key
 
     @property
     def record_type(self) -> str:
@@ -457,7 +463,7 @@ class FileSet:
         self._dicomdir = ds or self._create_dicomdir()
 
         if ds:
-            sop_class = ds.file_meta.MediaStorageSOPClassUID
+            sop_class = ds.file_meta.get("MediaStorageSOPClassUID", None)
             if sop_class != MediaStorageDirectoryStorage:
                 raise ValueError(
                     "Unable to load the File-set as the supplied dataset is "
@@ -468,8 +474,9 @@ class FileSet:
                 Path(ds.filename).resolve(strict=True)
             except FileNotFoundError:
                 raise FileNotFoundError(
-                    "Unable to load the File-set as the 'filename' attribute "
-                    "for the DICOMDIR dataset is not a valid path"
+                    f"Unable to load the File-set as the 'filename' attribute "
+                    f"for the DICOMDIR dataset is not a valid path: "
+                    f"{ds.filename}"
                 )
             except TypeError:
                 # Custom message if DICOMDIR from bytes, etc
@@ -621,9 +628,14 @@ class FileSet:
 
     @ID.setter
     def ID(self, val: Union[str, None]) -> None:
-        """Set the File-set ID."""
+        """Set the File-set ID using a :class:`str`."""
         if val is None or 0 <= len(val) <= 16:
             self._dicomdir.FileSetID = val
+        else:
+            raise ValueError(
+                "A File-set ID must either be empty or a maximum of 16 "
+                "characters long"
+            )
 
     def __iter__(self) -> Generator[FileInstance, None, None]:
         """Yield all the SOP Instances in the File-set.

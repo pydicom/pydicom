@@ -99,6 +99,13 @@ class TestDicomDir:
         image = records[1090]
         assert image.key == "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.6"
 
+        # Test uuid key
+        patient.record.DirectoryRecordType = "IMPLANT"
+        key = patient.key
+        assert key != "77654033"
+        assert '-' in key
+        assert key == patient.key
+
 
 @pytest.fixture
 def dicomdir():
@@ -341,9 +348,30 @@ class TestFileSetLoad:
     def test_change_file_set_id(self, dicomdir):
         """Test changing the File-set ID."""
         fs = FileSet(dicomdir)
-        fs.ID = "MYFILESET"
-        assert "MYFILESET" == fs.ID
-        assert "MYFILESET" == dicomdir.FileSetID
+
+        fs.ID = None
+        assert fs.ID is None
+        assert dicomdir.FileSetID is None
+
+        fs_id = ""
+        fs.ID = fs_id
+        assert fs_id == fs.ID
+        assert fs_id == dicomdir.FileSetID
+
+        fs_id = "1234567890123456"
+        assert 16 == len(fs_id)
+        fs.ID = fs_id
+        assert fs_id == fs.ID
+        assert fs_id == dicomdir.FileSetID
+
+        fs_id += '7'
+        assert 16 < len(fs_id)
+        msg = (
+            r"A File-set ID must either be empty or a maximum of 16 "
+            r"characters long"
+        )
+        with pytest.raises(ValueError, match=msg):
+            fs.ID = fs_id
 
     def test_change_file_set_uid(self, dicomdir):
         """Test changing the File-set ID."""

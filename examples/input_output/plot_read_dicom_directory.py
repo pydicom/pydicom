@@ -7,9 +7,6 @@ This example shows how to read a DICOM File-set's DICOMDIR dataset.
 
 """
 
-# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
-# license : MIT
-
 import os
 from pathlib import Path
 
