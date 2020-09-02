@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Handling of compressed image data &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>Handling of compressed pixel data &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -111,7 +111,7 @@
 <li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling of compressed image data</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Handling of compressed pixel data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#preconditions">Preconditions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#supported-transfer-syntaxes">Supported Transfer Syntaxes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
@@ -187,7 +187,7 @@
         
           <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
         
-      <li>Handling of compressed image data</li>
+      <li>Handling of compressed pixel data</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -204,16 +204,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="handling-of-compressed-image-data">
-<span id="guide-compressed"></span><h1>Handling of compressed image data<a class="headerlink" href="#handling-of-compressed-image-data" title="Permalink to this headline">¶</a></h1>
-<p class="rubric">How to get image data from compressed DICOM images</p>
+  <div class="section" id="handling-of-compressed-pixel-data">
+<span id="guide-compressed"></span><h1>Handling of compressed pixel data<a class="headerlink" href="#handling-of-compressed-pixel-data" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">How to get compressed pixel data</p>
 <div class="section" id="preconditions">
 <h2>Preconditions<a class="headerlink" href="#preconditions" title="Permalink to this headline">¶</a></h2>
-<p>To be able to decompress compressed DICOM image data, you need to have
-one or more packages installed that are able to handle this kind of data.
-<code class="docutils literal notranslate"><span class="pre">pydicom</span></code> detects the installed packages and provides image data handlers
-that use the available packages.</p>
-<p>The following packages can be used with <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>:</p>
+<p>To be able to decompress compressed DICOM pixel data, you need to install
+one or more packages that are able to handle the format the data
+is encoded in.</p>
+<p>The following packages can be used with <em>pydicom</em>:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> - this is the package that supports
 most compressed formats</p></li>
@@ -224,12 +223,12 @@ most compressed formats</p></li>
 and <code class="docutils literal notranslate"><span class="pre">-openjpeg</span></code> plugins</p></li>
 </ul>
 <p>Note that you always need the <a class="reference external" href="http://numpy.org/">NumPy</a> package to be able
-to handle image data.</p>
+to handle pixel data.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>We rely on the image handling capacity of the mentioned
+<p>We rely on the data handling capacity of the mentioned
 packages and cannot guarantee the correctness of the generated uncompressed
-images. Be sure to verify the correctness of generated images using other
+pixel data. Be sure to verify the correctness of the output using other
 means before you use them for medical purposes.</p>
 </div>
 </div>
@@ -417,14 +416,13 @@ handled by the given packages:</p>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>To use decompressed image data from compressed DICOM images, you have two
-options:</p>
+<p>To get uncompressed pixel data you have two options:</p>
 <ul class="simple">
 <li><p>use <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decompress()</span></code></a> on the dataset to convert
 it in-place and work with the pixel data as described before</p></li>
-<li><p>get an uncompressed copy of the pixel data as a NumPy array using
+<li><p>get an uncompressed copy of the pixel data as a NumPy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> using
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> without
-touching the original dataset</p></li>
+changing the original dataset</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
