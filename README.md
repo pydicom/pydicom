@@ -7,7 +7,7 @@
 
 # *pydicom*
 
-*pydicom* is a pure Python package for working with [DICOM](http://medical.nema.org/) files. It let's you read, modify and write DICOM data in an easy "pythonic" way.
+*pydicom* is a pure Python package for working with [DICOM](https://www.dicomstandard.org/) files. It lets you read, modify and write DICOM data in an easy "pythonic" way.
 
 As a pure Python package, *pydicom* can run anywhere Python runs without any other requirements, although if you're working with *Pixel Data* then we recommend you also install [NumPy](http://www.numpy.org).
 
@@ -29,7 +29,7 @@ For more information, including installation instructions for the development ve
 
 ## Documentation
 
-The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/old/pydicom_user_guide.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
+The *pydicom* [user guide](https://pydicom.github.io/pydicom/stable/old/pydicom_user_guide.html), [tutorials](https://pydicom.github.io/pydicom/stable/tutorials/index.html), [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) and [API reference](https://pydicom.github.io/pydicom/stable/reference/index.html) documentation is available for both the [current release](https://pydicom.github.io/pydicom/stable) and the [development version](https://pydicom.github.io/pydicom/dev) on GitHub Pages.
 
 ## *Pixel Data*
 
@@ -66,14 +66,7 @@ array([[175, 180, 166, ..., 203, 207, 216],
 ```
 ### Compressed *Pixel Data*
 #### JPEG, JPEG-LS and JPEG 2000
-Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries, depending on the *Transfer Syntax UID*:
-
-* [Pillow](https://pillow.readthedocs.io/en/stable/)
-* [GDCM](http://gdcm.sourceforge.net/)
-* [CharPyLS](https://github.com/Who8MyLunch/CharPyLS)
-* [pylibjpeg](https://github.com/pydicom/pylibjpeg)
-
-For information on which package is required to decompress a given *Transfer Syntax*, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/dev/old/image_data_handlers.html#guide-compressed).
+Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/dev/old/image_data_handlers.html#guide-compressed).
 
 Compressing data into one of the JPEG formats is not currently supported.
 
