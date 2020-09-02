@@ -1,23 +1,22 @@
 .. _guide_compressed:
 
-Handling of compressed image data
+Handling of compressed pixel data
 ---------------------------------
 
 .. currentmodule:: pydicom
 
-.. rubric:: How to get image data from compressed DICOM images
+.. rubric:: How to get compressed pixel data
 
 .. |chk|   unicode:: U+02713 .. CHECK MARK
 
 
 Preconditions
 .............
-To be able to decompress compressed DICOM image data, you need to have
-one or more packages installed that are able to handle this kind of data.
-``pydicom`` detects the installed packages and provides image data handlers
-that use the available packages.
+To be able to decompress compressed DICOM pixel data, you need to install
+one or more packages that are able to handle the format the data
+is encoded in.
 
-The following packages can be used with ``pydicom``:
+The following packages can be used with *pydicom*:
 
 * `GDCM <http://gdcm.sourceforge.net/>`_ - this is the package that supports
   most compressed formats
@@ -28,11 +27,11 @@ The following packages can be used with ``pydicom``:
   and ``-openjpeg`` plugins
 
 Note that you always need the `NumPy <http://numpy.org/>`_ package to be able
-to handle image data.
+to handle pixel data.
 
-.. caution:: We rely on the image handling capacity of the mentioned
+.. caution:: We rely on the data handling capacity of the mentioned
    packages and cannot guarantee the correctness of the generated uncompressed
-   images. Be sure to verify the correctness of generated images using other
+   pixel data. Be sure to verify the correctness of the output using other
    means before you use them for medical purposes.
 
 Supported Transfer Syntaxes
@@ -95,14 +94,13 @@ handled by the given packages:
 
 Usage
 .....
-To use decompressed image data from compressed DICOM images, you have two
-options:
+To get uncompressed pixel data you have two options:
 
 * use :meth:`~pydicom.dataset.Dataset.decompress` on the dataset to convert
   it in-place and work with the pixel data as described before
-* get an uncompressed copy of the pixel data as a NumPy array using
+* get an uncompressed copy of the pixel data as a NumPy ``ndarray`` using
   :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` without
-  touching the original dataset
+  changing the original dataset
 
 .. note:: Using :meth:`~pydicom.dataset.Dataset.decompress` adapts the
    transfer syntax of the data set, but not the *Photometric Interpretation*.

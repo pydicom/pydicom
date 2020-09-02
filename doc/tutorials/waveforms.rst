@@ -19,7 +19,8 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 .. code-block:: bash
 
-    conda install pydicom>=2.1 numpy matplotlib
+    conda install numpy matplotlib
+    conda install -c conda-forge pydicom>=2.1
 
 **References**
 
