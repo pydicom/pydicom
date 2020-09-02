@@ -759,7 +759,7 @@ def get_expected_length(ds, unit='bytes'):
         pixels, excluding the NULL trailing padding byte for odd length data.
     """
     length = ds.Rows * ds.Columns * ds.SamplesPerPixel
-    length *= getattr(ds, 'NumberOfFrames', 1)
+    length *= get_nr_frames(ds)
 
     if unit == 'pixels':
         return length
@@ -874,6 +874,28 @@ def get_j2k_parameters(codestream):
         pass
 
     return {}
+
+
+def get_nr_frames(ds):
+    """Return NumberOfFrames or 1 if NumberOfFrames is None.
+
+    Parameters
+    ----------
+    ds : dataset.Dataset
+        The :class:`~pydicom.dataset.Dataset` containing the Image Pixel module
+        corresponding to the data in `arr`.
+
+    Returns
+    -------
+    int
+        An integer for the NumberOfFrames or 1 if NumberOfFrames is None
+    """
+    nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
+    if nr_frames is None:
+        nr_frames = 1
+
+    return nr_frames
 
 
 def pixel_dtype(ds, as_float=False):
@@ -1060,7 +1082,7 @@ def reshape_pixel_array(ds, arr):
     if not HAVE_NP:
         raise ImportError("Numpy is required to reshape the pixel array.")
 
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    nr_frames = get_nr_frames(ds)
     nr_samples = ds.SamplesPerPixel
 
     if nr_frames < 1:
