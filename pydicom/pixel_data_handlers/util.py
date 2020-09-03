@@ -893,6 +893,9 @@ def get_nr_frames(ds):
     nr_frames = getattr(ds, 'NumberOfFrames', 1)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if nr_frames is None:
+        warnings.warn("A value of None for (0028,0008) 'Number of Frames' is "
+                      "non-conformant. It's recommended that this value be "
+                      "changed to 1")
         nr_frames = 1
 
     return nr_frames

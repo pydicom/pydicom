@@ -2,6 +2,8 @@
 """Tests for the pixel_data_handlers.util module."""
 
 import os
+import random
+import warnings
 from struct import unpack, pack
 from sys import byteorder
 
@@ -26,7 +28,8 @@ from pydicom.pixel_data_handlers.util import (
     _expand_segmented_lut,
     apply_modality_lut,
     apply_voi_lut,
-    get_j2k_parameters
+    get_j2k_parameters,
+    get_nr_frames
 )
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          UncompressedPixelTransferSyntaxes)
@@ -2016,3 +2019,32 @@ class TestGetJ2KParameters:
         """Test result when no SIZ box present"""
         assert {} == get_j2k_parameters(b'')
         assert {} == get_j2k_parameters(b'\xff\x4f\xff\x51' + b'\x00' * 20)
+
+
+class TestGetNrFrames:
+    """Tests for get_nr_frames."""
+    def test_warning(self):
+        """Test warning when (0028,0008) 'Number of Frames' has a value of
+            None"""
+        ds = Dataset()
+        ds.NumberOfFrames = None
+        with warnings.catch_warnings(record=True) as w:
+            assert 1 == get_nr_frames(ds)
+            assert len(w) == 1
+            assert "(0028,0008)" in str(w[0].message)
+
+    def test_missing(self):
+        """Test return value when (0028,0008) 'Number of Frames' does not
+            exist"""
+        ds = Dataset()
+        with warnings.catch_warnings(record=True) as w:
+            assert 1 == get_nr_frames(ds)
+            assert len(w) == 0
+
+    def test_existing(self):
+        """Test return value when (0028,0008) 'Number of Frames' exists."""
+        ds = Dataset()
+        ds.NumberOfFrames = random.randint(1, 10)
+        with warnings.catch_warnings(record=True) as w:
+            assert ds.NumberOfFrames == get_nr_frames(ds)
+            assert len(w) == 0
