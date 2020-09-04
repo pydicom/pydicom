@@ -3,7 +3,6 @@
 
 import os
 import random
-import warnings
 from struct import unpack, pack
 from sys import byteorder
 
@@ -2023,28 +2022,31 @@ class TestGetJ2KParameters:
 
 class TestGetNrFrames:
     """Tests for get_nr_frames."""
-    def test_warning(self):
+    def test_none(self):
         """Test warning when (0028,0008) 'Number of Frames' has a value of
             None"""
         ds = Dataset()
         ds.NumberOfFrames = None
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            r"A value of None for \(0028,0008\) 'Number of Frames' is "
+            r"non-conformant. It's recommended that this value be "
+            r"changed to 1"
+        )
+        with pytest.warns(UserWarning, match=msg):
             assert 1 == get_nr_frames(ds)
-            assert len(w) == 1
-            assert "(0028,0008)" in str(w[0].message)
 
     def test_missing(self):
         """Test return value when (0028,0008) 'Number of Frames' does not
             exist"""
         ds = Dataset()
-        with warnings.catch_warnings(record=True) as w:
+        with pytest.warns(None) as w:
             assert 1 == get_nr_frames(ds)
-            assert len(w) == 0
+            assert not w
 
     def test_existing(self):
         """Test return value when (0028,0008) 'Number of Frames' exists."""
         ds = Dataset()
         ds.NumberOfFrames = random.randint(1, 10)
-        with warnings.catch_warnings(record=True) as w:
+        with pytest.warns(None) as w:
             assert ds.NumberOfFrames == get_nr_frames(ds)
-            assert len(w) == 0
+            assert not w
