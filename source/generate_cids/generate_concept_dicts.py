@@ -17,6 +17,7 @@ import re
 import sys
 import tempfile
 from pprint import pprint
+import urllib.request as urllib2
 from xml.etree import ElementTree as ET
 
 if sys.version_info[0] < 3:
@@ -63,6 +64,8 @@ FHIR_SYSTEM_TO_DICOM_SCHEME_DESIGNATOR = {
     'http://pubchem.ncbi.nlm.nih.gov': 'PUBCHEM_CID',
     'http://braininfo.rprc.washington.edu/aboutBrainInfo.aspx#NeuroNames': 'NEU',
     'http://www.itis.gov': 'ITIS_TSN',
+    'http://arxiv.org/abs/1612.07003': 'IBSI',
+    'http://www.nlm.nih.gov/research/umls/rxnorm': 'RXNORM',
 }
 
 DOC_LINES = [
@@ -70,7 +73,6 @@ DOC_LINES = [
     '# -*- coding: utf-8 -*-\n',
     '\n',
 ]
-
 
 
 def camel_case(s):
@@ -180,14 +182,26 @@ def get_table_o1():
     body = root.find('w3:body', namespaces=namespaces)
     table = body.findall('.//w3:tbody', namespaces=namespaces)[0]
     rows = table.findall('./w3:tr', namespaces=namespaces)
-    return [
-        (
-            _get_text(row[0].findall('.//w3:a', namespaces=namespaces)[-1]),
-            _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
-            _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0]),
-        )
-        for row in rows
-    ]
+    data = []
+    for ii, row in enumerate(rows):
+        try:
+            data.append((
+                _get_text(
+                    row[0].findall('.//w3:a', namespaces=namespaces)[-1]
+                ),
+                _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
+                _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0]),
+            ))
+        except:
+            data.append((
+                _get_text(
+                    row[0].findall('.//w3:p', namespaces=namespaces)[-1]
+                ),
+                _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
+                _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0])
+            ))
+
+    return data
 
 
 def get_table_d1():
@@ -265,6 +279,7 @@ def write_snomed_mapping(snomed_codes):
         for sct, srt, meaning in snomed_codes:
             f_concepts.write("     '{}': '{}',\n".format(srt, sct))
         f_concepts.write("}")
+
 
 def write_concepts(concepts, cid_concepts, cid_lists, name_for_cid):
     from pprint import pprint

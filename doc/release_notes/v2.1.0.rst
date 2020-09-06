@@ -43,8 +43,9 @@ Enhancements
 Changes
 .......
 * Reading and adding unknown non-private tags now does not raise an exception
-  per default, only when :attr:`~pydicom.config.enforce_valid_values` is set 
+  per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
+* Data dictionaries updated to version 2020c of the DICOM Standard
 
 Fixes
 .....
