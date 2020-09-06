@@ -183,23 +183,12 @@ def get_table_o1():
     table = body.findall('.//w3:tbody', namespaces=namespaces)[0]
     rows = table.findall('./w3:tr', namespaces=namespaces)
     data = []
-    for ii, row in enumerate(rows):
-        try:
-            data.append((
-                _get_text(
-                    row[0].findall('.//w3:a', namespaces=namespaces)[-1]
-                ),
-                _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
-                _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0]),
-            ))
-        except:
-            data.append((
-                _get_text(
-                    row[0].findall('.//w3:p', namespaces=namespaces)[-1]
-                ),
-                _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
-                _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0])
-            ))
+    for row in rows:
+        data.append((
+            _get_text(row[0].findall('.//w3:p', namespaces=namespaces)[-1]),
+            _get_text(row[1].findall('.//w3:p', namespaces=namespaces)[0]),
+            _get_text(row[2].findall('.//w3:p', namespaces=namespaces)[0]),
+        ))
 
     return data
 
