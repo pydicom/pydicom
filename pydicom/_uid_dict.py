@@ -69,6 +69,7 @@ UID_dictionary = {
     '1.2.840.10008.1.4.2.1': ('ICBM 452 T1 Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
+    '1.2.840.10008.1.4.3.2': ('Standard Robotic-Arm Coordinate System Frame of Reference', 'Well-known frame of reference', '', ''),  # noqa
     '1.2.840.10008.1.5.1': ('Hot Iron Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
     '1.2.840.10008.1.5.2': ('PET Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
     '1.2.840.10008.1.5.3': ('Hot Metal Blue Color Palette SOP Instance', 'Well-known SOP Instance', '', ''),  # noqa
@@ -99,6 +100,7 @@ UID_dictionary = {
     '1.2.840.10008.2.16.12': ('Mayo Clinic Non-radiological Images Specific Body Structure Anatomical Surface Region Guide', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.2.16.13': ('Image Biomarker Standardisation Initiative', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.2.16.14': ('Radiomics Ontology', 'Coding Scheme', '', ''),  # noqa
+    '1.2.840.10008.2.16.15': ('RadElement', 'Coding Scheme', '', ''),  # noqa
     '1.2.840.10008.3.1.1.1': ('DICOM Application Context Name', 'Application Context Name', '', ''),  # noqa
     '1.2.840.10008.3.1.2.1.1': ('Detached Patient Management SOP Class', 'SOP Class', '', 'Retired'),  # noqa
     '1.2.840.10008.3.1.2.1.4': ('Detached Patient Management Meta SOP Class', 'Meta SOP Class', '', 'Retired'),  # noqa
@@ -180,6 +182,12 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.9.4.2': ('General Audio Waveform Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.5.1': ('Arterial Pulse Waveform Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.9.6.1': ('Respiratory Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.6.2': ('Multi-channel Respiratory Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.7.1': ('Routine Scalp Electroencephalogram Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.7.2': ('Electromyogram Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.7.3': ('Electrooculogram Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.7.4': ('Sleep Electroencephalogram Waveform Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.9.8.1': ('Body Position Waveform Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.10': ('Standalone Modality LUT Storage', 'SOP Class', '', 'Retired'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11': ('Standalone VOI LUT Storage', 'SOP Class', '', 'Retired'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.1': ('Grayscale Softcopy Presentation State Storage', 'SOP Class', '', ''),  # noqa
@@ -275,6 +283,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.104.1': ('Encapsulated PDF Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.3': ('Encapsulated STL Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.104.4': ('Encapsulated OBJ Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.104.5': ('Encapsulated MTL Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.128': ('Positron Emission Tomography Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.128.1': ('Legacy Converted Enhanced PET Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.129': ('Standalone PET Curve Storage', 'SOP Class', '', 'Retired'),  # noqa
@@ -299,6 +309,13 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.481.11': ('RT Segment Annotation Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.12': ('RT Radiation Set Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.13': ('C-Arm Photon-Electron Radiation Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.14': ('Tomotherapeutic Radiation Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.15': ('Robotic-Arm Radiation Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.16': ('RT Radiation Record Set Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.17': ('RT Radiation Salvage Record Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.18': ('Tomotherapeutic Radiation Record Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.19': ('C-Arm Photon-Electron Radiation Record Storage', 'SOP Class', '', ''),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.20': ('Robotic Radiation Record Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.1': ('DICOS CT Image Storage', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.1': ('DICOS Digital X-Ray Image Storage - For Presentation', 'SOP Class', '', ''),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.2': ('DICOS Digital X-Ray Image Storage - For Processing', 'SOP Class', '', ''),  # noqa

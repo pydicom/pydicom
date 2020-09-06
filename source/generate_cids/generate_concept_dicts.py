@@ -439,6 +439,3 @@ if __name__ == '__main__':
 
         write_concepts(concepts, cid_concepts, cid_lists, name_for_cid)
         write_snomed_mapping(snomed_codes)
-
-
-
