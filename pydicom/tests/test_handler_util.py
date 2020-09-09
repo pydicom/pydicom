@@ -31,7 +31,9 @@ from pydicom.pixel_data_handlers.util import (
     get_nr_frames
 )
 from pydicom.uid import (
-    ExplicitVRLittleEndian, ImplicitVRLittleEndian,UncompressedTransferSyntaxes
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    UncompressedTransferSyntaxes
 )
 
 

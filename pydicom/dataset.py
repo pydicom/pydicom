@@ -1536,10 +1536,6 @@ class Dataset(dict):
 
         .. versionadded:: 1.4
 
-        .. versionchanged:: 2.1
-
-            Added the *handler* keyword parameter.
-
         Parameters
         ----------
         group : int
