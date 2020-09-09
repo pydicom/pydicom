@@ -53,20 +53,6 @@ def is_available():
     return HAVE_NP
 
 
-def supports_transfer_syntax(transfer_syntax):
-    """Return ``True`` if the handler supports the `transfer_syntax`.
-
-    .. versionadded:: 1.4
-
-    Parameters
-    ----------
-    transfer_syntax : uid.UID
-        The Transfer Syntax UID of the *Pixel Data* that is to be used with
-        the handler.
-    """
-    return True
-
-
 def get_expected_length(elem, unit='bytes'):
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.

@@ -128,12 +128,19 @@ class TestNoNumpy_NumpyHandler:
         assert not HAVE_NP
         assert NP_HANDLER is not None
 
-    def test_unsupported_overlay_array_raises(self):
+    def test_overlay_array_raises(self):
         """Test overlay_array raises exception"""
         ds = dcmread(EXPL_1_1_1F)
         msg = r"The following handlers are available to decode"
         with pytest.raises(RuntimeError, match=msg):
             ds.overlay_array(0x6000)
+
+    def test_get_overlay_array_raises(self):
+        """Test get_overlay_array raises exception"""
+        ds = dcmread(EXPL_1_1_1F)
+        msg = r"The overlay data handler requires numpy"
+        with pytest.raises(ImportError, match=msg):
+            get_overlay_array(ds, 0x6000)
 
 
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
