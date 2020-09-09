@@ -30,8 +30,9 @@ from pydicom.pixel_data_handlers.util import (
     get_j2k_parameters,
     get_nr_frames
 )
-from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
-                         UncompressedPixelTransferSyntaxes)
+from pydicom.uid import (
+    ExplicitVRLittleEndian, ImplicitVRLittleEndian,UncompressedTransferSyntaxes
+)
 
 
 # PAL: PALETTE COLOR Photometric Interpretation
@@ -484,7 +485,7 @@ class TestNumpy_ReshapePixelArray:
 
     def test_uncompressed_syntaxes(self):
         """Test that uncompressed syntaxes use the dataset planar conf."""
-        for uid in UncompressedPixelTransferSyntaxes:
+        for uid in UncompressedTransferSyntaxes:
             self.ds.file_meta.TransferSyntaxUID = uid
             self.ds.PlanarConfiguration = 0
             self.ds.NumberOfFrames = 1

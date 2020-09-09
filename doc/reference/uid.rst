@@ -37,6 +37,21 @@ Predefined UIDs
    RLELossless
 
 
+Transfer Syntax Lists
+---------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   AllTransferSyntaxes
+   JPEGTransferSyntaxes
+   JPEGLSTransferSyntaxes
+   JPEG2000TransferSyntaxes
+   MPEGTransferSyntaxes
+   RLETransferSyntaxes
+   UncompressedTransferSyntaxes
+
+
 UID Utilities
 -------------
 

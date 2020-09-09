@@ -250,35 +250,44 @@ HEVCMain10ProfileLevel51 = UID('1.2.840.10008.1.2.4.108')
 RLELossless = UID('1.2.840.10008.1.2.5')
 """1.2.840.10008.1.2.5"""
 
-UncompressedPixelTransferSyntaxes = [
-    ExplicitVRLittleEndian,
+AllTransferSyntaxes = [
     ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
-]
-
-JPEGLSSupportedCompressedPixelTransferSyntaxes = [
+    JPEGBaseline,
+    JPEGExtended,
+    JPEGLosslessP14,
+    JPEGLossless,
     JPEGLSLossless,
     JPEGLSLossy,
-]
-
-PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
-    JPEGLossless,
-    JPEGExtended,
     JPEG2000Lossless,
     JPEG2000,
+    JPEG2000MultiComponentLossless,
+    JPEG2000MultiComponent,
+    MPEG2MainProfileMainLevel,
+    MPEG2MainProfileHighLevel,
+    MPEG4HighProfileLevel41,
+    MPEG4BDCompatibleHighProfileLevel41,
+    MPEG4HighProfileLevel422D,
+    MPEG4HighProfileLevel423D,
+    MPEG4StereoHighProfileLevel42,
+    HEVCMainProfileLevel51,
+    HEVCMain10ProfileLevel51,
+    RLELossless,
 ]
+"""All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
 
-JPEG2000CompressedPixelTransferSyntaxes = [
-    JPEG2000Lossless,
-    JPEG2000,
+JPEGTransferSyntaxes = [
+    JPEGBaseline, JPEGExtended, JPEGLossless, JPEGLosslessP14
 ]
+"""JPEG (ISO/IEC 10918-1) transfer syntaxes"""
 
-JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
-    JPEGExtended,
-]
+JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSLossy]
+"""JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
+
+JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000]
+"""JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [
     MPEG2MainProfileMainLevel,
@@ -291,10 +300,35 @@ MPEGTransferSyntaxes = [
     HEVCMainProfileLevel51,
     HEVCMain10ProfileLevel51,
 ]
+"""MPEG transfer syntaxes."""
 
-RLECompressedLosslessSyntaxes = [
-    RLELossless
+RLETransferSyntaxes = [RLELossless]
+"""RLE transfer syntaxes."""
+
+UncompressedTransferSyntaxes = [
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
 ]
+"""Uncompressed (native) transfer syntaxes."""
+
+# Deprecated
+JPEGLossyCompressedPixelTransferSyntaxes = [
+    JPEGBaseline,
+    JPEGExtended,
+]
+JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
+JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
+PILSupportedCompressedPixelTransferSyntaxes = [
+    JPEGBaseline,
+    JPEGLossless,
+    JPEGExtended,
+    JPEG2000Lossless,
+    JPEG2000,
+]
+RLECompressedLosslessSyntaxes = RLETransferSyntaxes
+UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
 def generate_uid(prefix: str = PYDICOM_ROOT_UID,

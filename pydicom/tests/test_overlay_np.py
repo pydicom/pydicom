@@ -30,12 +30,12 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    AllTransferSyntaxes
 )
 
 try:
@@ -45,8 +45,8 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    from pydicom.overlay_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.overlay_data_handlers.numpy_handler import (
+    from pydicom.overlays import numpy_handler as NP_HANDLER
+    from pydicom.overlays.numpy_handler import (
         get_overlay_array,
         reshape_overlay_array,
         get_expected_length,
@@ -87,15 +87,8 @@ JPEG_2K = get_testdata_file("JPEG2000.dcm")
 RLE = get_testdata_file("MR_small_RLE.dcm")
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
-SUPPORTED_SYNTAXES = [
-    ImplicitVRLittleEndian,
-    ExplicitVRLittleEndian,
-    DeflatedExplicitVRLittleEndian,
-    ExplicitVRBigEndian
-]
-UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
-)
+SUPPORTED_SYNTAXES = AllTransferSyntaxes[:]
+UNSUPPORTED_SYNTAXES = []
 
 
 def test_unsupported_syntaxes():
@@ -117,28 +110,6 @@ REFERENCE_DATA_UNSUPPORTED = [
 ]
 
 
-# Numpy is/isn't available, numpy handler is unavailable
-class TestNoNumpyHandler:
-    """Tests for handling datasets without numpy and the handler."""
-    def setup(self):
-        """Setup the environment."""
-        self.original_handlers = pydicom.config.overlay_data_handlers
-        pydicom.config.overlay_data_handlers = []
-
-    def teardown(self):
-        """Restore the environment."""
-        pydicom.config.overlay_data_handlers = self.original_handlers
-
-    def test_overlay_array_raises(self):
-        """Test overlay_array raises exception for all syntaxes."""
-        ds = dcmread(EXPL_1_1_1F)
-        for uid in ALL_TRANSFER_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            msg = r"as there are no overlay data handlers"
-            with pytest.raises(NotImplementedError, match=msg):
-                ds.overlay_array(0x6000)
-
-
 # Numpy unavailable and the numpy handler is available
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NumpyHandler:
@@ -158,26 +129,11 @@ class TestNoNumpy_NumpyHandler:
         assert NP_HANDLER is not None
 
     def test_unsupported_overlay_array_raises(self):
-        """Test overlay_array raises exception for unsupported syntaxes."""
+        """Test overlay_array raises exception"""
         ds = dcmread(EXPL_1_1_1F)
-        for uid in UNSUPPORTED_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            msg = r"as there are no overlay data handlers"
-            with pytest.raises(NotImplementedError, match=msg):
-                ds.overlay_array(0x6000)
-
-    def test_supported_overlay_array_raises(self):
-        """Test overlay_array raises exception for supported syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
-        for uid in SUPPORTED_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
-                r"The following handlers are available to decode the overlay "
-                r"data however they are missing required dependencies: "
-                r"Numpy Overlay \(req. NumPy\)"
-            )
-            with pytest.raises(RuntimeError, match=exc_msg):
-                ds.overlay_array(0x6000)
+        msg = r"The following handlers are available to decode"
+        with pytest.raises(RuntimeError, match=msg):
+            ds.overlay_array(0x6000)
 
 
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
@@ -215,22 +171,6 @@ class TestNumpy_NumpyHandler:
         assert HAVE_NP
         assert NP_HANDLER is not None
 
-    def test_unsupported_syntax_raises(self):
-        """Test overlay_array raises exception for unsupported syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
-
-        for uid in UNSUPPORTED_SYNTAXES:
-            ds.file_meta.TransferSyntaxUID = uid
-            with pytest.raises((NotImplementedError, RuntimeError)):
-                ds.overlay_array(0x6000)
-
-    @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
-    def test_can_access_unsupported_dataset(self, fpath, data):
-        """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
-
     # Little endian datasets
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
     def test_properties(self, fpath, data):
@@ -240,43 +180,34 @@ class TestNumpy_NumpyHandler:
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds[group, 0x0100].value == data[1]  # OverlayBitsAllocated
 
-        # Check all little endian syntaxes
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.overlay_array(data[7])
-            assert data[5] == arr.shape
-            assert arr.dtype == data[6]
+        arr = ds.overlay_array(data[7])
+        assert data[5] == arr.shape
+        assert arr.dtype == data[6]
 
-            # Odd sized data is padded by a final 0x00 byte
-            rows = ds[group, 0x0010].value
-            columns = ds[group, 0x0011].value
-            nr_frames = ds[group, 0x0015].value
-            size = rows * columns * nr_frames / 8 * data[2]
-            assert len(ds[group, 0x3000].value) == size + size % 2
-            if size % 2:
-                assert ds[group, 0x3000].value[-1] == b'\x00'[0]
+        # Odd sized data is padded by a final 0x00 byte
+        rows = ds[group, 0x0010].value
+        columns = ds[group, 0x0011].value
+        nr_frames = ds[group, 0x0015].value
+        size = rows * columns * nr_frames / 8 * data[2]
+        assert len(ds[group, 0x3000].value) == size + size % 2
+        if size % 2:
+            assert ds[group, 0x3000].value[-1] == b'\x00'[0]
 
     def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
-        # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_1F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.overlay_array(0x6000)
+        arr = ds.overlay_array(0x6000)
 
-            assert arr.flags.writeable
-            assert arr.max() == 1
-            assert arr.min() == 0
-            assert 29 == sum(arr[422, 393:422])
+        assert arr.flags.writeable
+        assert arr.max() == 1
+        assert arr.min() == 0
+        assert 29 == sum(arr[422, 393:422])
 
     @pytest.mark.skip(reason='No dataset available')
     def test_little_1bit_1sample_3frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
-        # Check all little endian syntaxes
         ds = dcmread(EXPL_1_1_3F)
-        for uid in SUPPORTED_SYNTAXES[:3]:
-            ds.file_meta.TransferSyntaxUID = uid
-            arr = ds.overlay_array(0x6000)
+        arr = ds.overlay_array(0x6000)
 
     def test_read_only(self):
         """Test for #717, returned array read-only."""
@@ -320,14 +251,6 @@ class TestNumpy_GetOverlayArray:
         del ds[0x6000, 0x3000]
         assert (0x6000, 0x3000) not in ds
         with pytest.raises(AttributeError, match=r' dataset: OverlayData'):
-            get_overlay_array(ds, 0x6000)
-
-    def test_unsupported_syntax_raises(self):
-        """Test get_overlay_array raises if unsupported Transfer Syntax."""
-        ds = dcmread(EXPL_1_1_1F)
-        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.4.50'
-        with pytest.raises(NotImplementedError,
-                           match=r' the transfer syntax is not supported'):
             get_overlay_array(ds, 0x6000)
 
     def test_bad_length_raises(self):
