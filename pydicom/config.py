@@ -191,7 +191,7 @@ overlay_data_handlers = [overlay_np]
 
 .. versionadded:: 1.4
 
-.. deprecated:: 2.2
+.. deprecated:: 2.1
 
 .. currentmodule:: pydicom.dataset
 

@@ -49,24 +49,25 @@ Changes
 * `pydicom.overlay_data_handlers` is deprecated, use `pydicom.overlays` instead
 * The following lists of UIDs are deprecated:
 
-  * `pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes`: use
+  * ``pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEGTransferSyntaxes`
-  * `pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes`: use
+  * ``pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
-  * `pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes`: use
+  * ``pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
-  * `pydicom.uid.RLECompressedLosslessSyntaxes`: use
+  * ``pydicom.uid.RLECompressedLosslessSyntaxes``: use
     :attr:`~pydicom.uid.RLETransferSyntaxes`
-  * `pydicom.uid.UncompressedPixelTransferSyntaxes`: use
+  * ``pydicom.uid.UncompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
-  * `pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes`
+  * ``pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes``
 
 * Added :attr:`~pydicom.uid.AllTransferSyntaxes`
-* Removed transfer syntax limitations when converting overlays to an `ndarray`
+* Removed transfer syntax limitations when converting overlays to an
+  ``ndarray``
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
   deprecated, the default handler will always be used.
-* The `pydicom.overlay_data_handlers` module has been moved to
-  `pydicom.overlays` and imports using the old module will stop working in
+* The ``pydicom.overlay_data_handlers`` module has been moved to
+  ``pydicom.overlays`` and imports using the old module will stop working in
   v2.2.
 
 Fixes
@@ -81,5 +82,5 @@ Fixes
   connection is available (:pr:`1156`)
 * Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
   a file-like (:issue:`1153`)
-* Raise ``TypeError`` if :func:`~pydicom.dcmread` or :func:`~pydicom.dcmwrite`
-  is called with wrong argument
+* Raise :class:`TypeError` if :func:`~pydicom.filereader.dcmread` or
+  :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
