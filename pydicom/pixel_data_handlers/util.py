@@ -334,7 +334,7 @@ def apply_voi_lut(arr, ds, index=0):
         lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        clipped_iv = np.zeros(arr.shape, dtype=dtype)
         # IVs >= `first_map` are mapped by the VOI LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
