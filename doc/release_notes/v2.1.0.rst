@@ -66,9 +66,6 @@ Changes
   ``ndarray``
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
   deprecated, the default handler will always be used.
-* The ``pydicom.overlay_data_handlers`` module has been moved to
-  ``pydicom.overlays`` and imports using the old module will stop working in
-  v2.2.
 
 Fixes
 .....
