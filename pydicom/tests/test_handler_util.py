@@ -1578,6 +1578,25 @@ class TestNumpy_VOILUT:
         with pytest.raises(NotImplementedError, match=msg):
             apply_voi_lut(ds.pixel_array, ds)
 
+    def test_voi_uint16_array_float(self):
+        """Test warning when array is float and VOI LUT with an 16-bit LUT"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='float64')
+        msg = (
+            r"Applying `apply_voi_lut` to float arrays "
+            r"may lead to incorrect result!"
+        )
+
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_voi_lut(arr, ds)
+            assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
     def test_window_single_view(self):
         """Test windowing with a single view."""
         # 12-bit unsigned
