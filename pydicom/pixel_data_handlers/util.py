@@ -307,6 +307,11 @@ def apply_voi_lut(arr, ds, index=0):
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     if 'VOILUTSequence' in ds:
+        if not np.issubdtype(arr.dtype, np.integer):
+            warnings.warn(
+                "Applying `apply_voi_lut` to float arrays " 
+                "may lead to incorrect result!")
+
         # VOI LUT Sequence contains one or more items
         item = ds.VOILUTSequence[index]
         nr_entries = item.LUTDescriptor[0] or 2**16
