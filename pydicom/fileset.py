@@ -73,8 +73,8 @@ _LAST_OFFSET = "OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity"
 
 
 def generate_filename(
-        prefix: str = "", start: int = 0, alphanumeric: bool = False
-    ) -> Generator[str, None, None]:
+    prefix: str = "", start: int = 0, alphanumeric: bool = False
+) -> Generator[str, None, None]:
     """Yield File IDs for a File-set.
 
     Maximum number of File IDs is:
@@ -1026,8 +1026,8 @@ class FileSet:
         return instance
 
     def add_custom(
-            self, ds_or_path: Union[Dataset, str, PathLike], leaf: RecordNode
-        ) -> None:
+        self, ds_or_path: Union[Dataset, str, PathLike], leaf: RecordNode
+    ) -> None:
         """Stage an instance for addition to the File-set using custom records.
 
         If the instance has been staged for removal then calling
@@ -1371,11 +1371,11 @@ class FileSet:
         return matches
 
     def find_values(
-            self,
-            element: Union[str, int],
-            instances: Optional[List[FileInstance]] = None,
-            load: bool = False
-        ) -> List[Any]:
+        self,
+        element: Union[str, int],
+        instances: Optional[List[FileInstance]] = None,
+        load: bool = False
+    ) -> List[Any]:
         """Return a list of unique values for a given element.
 
         Parameters
@@ -1466,17 +1466,19 @@ class FileSet:
         return any(is_staged)
 
     def __iter__(self) -> FileInstance:
+        """Yield :class:`~pydicom.fileset.FileInstance` from the File-set."""
         yield from self._instances
 
     def __len__(self) -> int:
+        """Return the number of instances in the File-set."""
         return len(self._instances)
 
     def load(
-            self,
-            ds_or_path: Union[Dataset, str, PathLike],
-            include_orphans: bool = True,
-            raise_orphans: bool = False,
-        ) -> None:
+        self,
+        ds_or_path: Union[Dataset, str, PathLike],
+        include_orphans: bool = True,
+        raise_orphans: bool = False,
+    ) -> None:
         """Load an existing File-set.
 
         Existing File-sets that do not use the same directory structure as
@@ -1563,11 +1565,11 @@ class FileSet:
             self._instances.remove(instance)
 
     def _parse_records(
-            self,
-            ds: Dataset,
-            include_orphans: bool,
-            raise_orphans: bool = False
-        ) -> None:
+        self,
+        ds: Dataset,
+        include_orphans: bool,
+        raise_orphans: bool = False
+    ) -> None:
         """Parse the records in an existing DICOMDIR.
 
         Parameters
@@ -1677,8 +1679,8 @@ class FileSet:
         return self._path
 
     def remove(
-            self, instance: Union[FileInstance, List[FileInstance]]
-        ) -> None:
+        self, instance: Union[FileInstance, List[FileInstance]]
+    ) -> None:
         """Stage instance(s) for removal from the File-set.
 
         Parameters
@@ -1884,11 +1886,11 @@ class FileSet:
         self._stage['^'] = True
 
     def write(
-            self,
-            path: Optional[Union[str, PathLike]] = None,
-            dicomdir_only: bool = False,
-            force_implicit: bool = False
-        ) -> None:
+        self,
+        path: Optional[Union[str, PathLike]] = None,
+        dicomdir_only: bool = False,
+        force_implicit: bool = False
+    ) -> None:
         """Write the File-set, or changes to the File-set, to the file system.
 
         Parameters
@@ -2019,11 +2021,11 @@ class FileSet:
         self.load(p, raise_orphans=True)
 
     def _write_dicomdir(
-            self,
-            fp: BinaryIO,
-            copy_safe: bool = False,
-            force_implicit: bool = False
-        ) -> None:
+        self,
+        fp: BinaryIO,
+        copy_safe: bool = False,
+        force_implicit: bool = False
+    ) -> None:
         """Encode and write the File-set's DICOMDIR dataset.
 
         Parameters
@@ -2059,18 +2061,18 @@ class FileSet:
         last_elem = ds[_LAST_OFFSET]
         last_elem.value = 0
 
-        ## Write the preamble, DICM marker and File Meta
+        # Write the preamble, DICM marker and File Meta
         fp.write(b'\x00' * 128 + b'DICM')
         write_file_meta_info(fp, ds.file_meta, enforce_standard=True)
 
-        ## Write the dataset
+        # Write the dataset
         # Write up to the *Offset of the First Directory Record...* element
         write_dataset(fp, ds[:0x00041200])
         tell_offset_first = fp.tell()  # Start of *Offset of the First...*
         # Write up to (but not including) the *Directory Record Sequence*
         write_dataset(fp, ds[0x00041200:0x00041220])
 
-        ## Rebuild and encode the *Directory Record Sequence*
+        # Rebuild and encode the *Directory Record Sequence*
         # Step 1: Determine the offsets for all the records
         offset = fp.tell() + seq_offset  # Start of the first seq. item tag
         for node in self._tree:
@@ -2103,7 +2105,7 @@ class FileSet:
         # Step 3: Encode *Directory Record Sequence* and the rest
         write_dataset(fp, ds[0x00041220:])
 
-        ## Update the first and last record offsets
+        # Update the first and last record offsets
         if self._tree.children:
             first_elem.value = self._tree.children[0]._offset
             last_elem.value = self._tree.children[-1]._offset
@@ -2148,6 +2150,7 @@ def _check_dataset(ds: Dataset, keywords: List[str]) -> None:
             f"The instance's {tag} '{name}' element cannot be empty"
         )
 
+
 def _define_patient(ds: Dataset) -> Dataset:
     """Return a PATIENT directory record from `ds`."""
     _check_dataset(ds, ["PatientID"])
@@ -2157,6 +2160,7 @@ def _define_patient(ds: Dataset) -> Dataset:
     record.PatientID = ds.PatientID
 
     return record
+
 
 def _define_study(ds: Dataset) -> Dataset:
     """Return a STUDY directory record from `ds`."""
@@ -2174,6 +2178,7 @@ def _define_study(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_series(ds: Dataset) -> Dataset:
     """Return a SERIES directory record from `ds`."""
     _check_dataset(ds, ["Modality", "SeriesInstanceUID", "SeriesNumber"])
@@ -2185,6 +2190,7 @@ def _define_series(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_image(ds: Dataset) -> Dataset:
     """Return an IMAGE directory record from `ds`."""
     _check_dataset(ds, ["InstanceNumber"])
@@ -2193,6 +2199,7 @@ def _define_image(ds: Dataset) -> Dataset:
     record.InstanceNumber = ds.InstanceNumber
 
     return record
+
 
 def _define_rt_dose(ds: Dataset) -> Dataset:
     """Return an RT DOSE directory record from `ds`."""
@@ -2203,6 +2210,7 @@ def _define_rt_dose(ds: Dataset) -> Dataset:
     record.DoseSummationType = ds.DoseSummationType
 
     return record
+
 
 def _define_rt_structure_set(ds: Dataset) -> Dataset:
     """Return an RT STRUCTURE SET directory record from `ds`."""
@@ -2216,6 +2224,7 @@ def _define_rt_structure_set(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_rt_plan(ds: Dataset) -> Dataset:
     """Return an RT PLAN directory record from `ds`."""
     _check_dataset(ds, ["InstanceNumber", "RTPlanLabel"])
@@ -2228,6 +2237,7 @@ def _define_rt_plan(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_rt_treatment_record(ds: Dataset) -> Dataset:
     """Return an RT TREAT RECORD directory record from `ds`."""
     _check_dataset(ds, ["InstanceNumber"])
@@ -2238,6 +2248,7 @@ def _define_rt_treatment_record(ds: Dataset) -> Dataset:
     record.TreatmentTime = ds.get("TreatmentTime")
 
     return record
+
 
 def _define_presentation(ds: Dataset) -> Dataset:
     """Return a PRESENTATION directory record from `ds`."""
@@ -2266,6 +2277,7 @@ def _define_presentation(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_sr_document(ds: Dataset) -> Dataset:
     """Return a SR DOCUMENT directory record from `ds`."""
     _check_dataset(
@@ -2292,6 +2304,7 @@ def _define_sr_document(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_key_object_doc(ds: Dataset) -> Dataset:
     """Return a KEY OBJECT DOC directory record from `ds`."""
     _check_dataset(
@@ -2312,6 +2325,7 @@ def _define_key_object_doc(ds: Dataset) -> Dataset:
         record.ContentSequence = ds.ContentSequence
 
     return record
+
 
 def _define_spectroscopy(ds: Dataset) -> Dataset:
     """Return an SPECTROSCOPY directory record from `ds`."""
@@ -2344,6 +2358,7 @@ def _define_spectroscopy(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_hanging_protocol(ds: Dataset) -> Dataset:
     """Return a HANGING PROTOCOL directory record from `ds`."""
     _check_dataset(
@@ -2367,6 +2382,7 @@ def _define_hanging_protocol(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_encap_doc(ds: Dataset) -> Dataset:
     """Return an ENCAP DOC directory record from `ds`."""
     _check_dataset(ds, ["InstanceNumber", "MIMETypeOfEncapsulatedDocument"])
@@ -2385,6 +2401,7 @@ def _define_encap_doc(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_palette(ds: Dataset) -> Dataset:
     """Return a PALETTE directory record from `ds`."""
     _check_dataset(ds, ["ContentLabel"])
@@ -2394,6 +2411,7 @@ def _define_palette(ds: Dataset) -> Dataset:
     record.ContentDescription = ds.get("ContentDescription")
 
     return record
+
 
 def _define_implant(ds: Dataset) -> Dataset:
     """Return a IMPLANT directory record from `ds`."""
@@ -2408,6 +2426,7 @@ def _define_implant(ds: Dataset) -> Dataset:
     record.ImplantPartNumber = ds.ImplantPartNumber
 
     return record
+
 
 def _define_implant_assy(ds: Dataset) -> Dataset:
     """Return a IMPLANT ASSY directory record from `ds`."""
@@ -2426,6 +2445,7 @@ def _define_implant_assy(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_implant_group(ds: Dataset) -> Dataset:
     """Return a IMPLANT GROUP directory record from `ds`."""
     _check_dataset(
@@ -2439,6 +2459,7 @@ def _define_implant_group(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_surface_scan(ds: Dataset) -> Dataset:
     """Return a SURFACE SCAN directory record from `ds`."""
     _check_dataset(ds, ["ContentDate", "ContentTime"])
@@ -2448,6 +2469,7 @@ def _define_surface_scan(ds: Dataset) -> Dataset:
     record.ContentTime = ds.ContentTime
 
     return record
+
 
 def _define_assessment(ds: Dataset) -> Dataset:
     """Return a ASSESSMENT directory record from `ds`."""
@@ -2459,6 +2481,7 @@ def _define_assessment(ds: Dataset) -> Dataset:
     record.InstanceCreationTime = ds.get("InstanceCreationTime")
 
     return record
+
 
 def _define_radiotherapy(ds: Dataset) -> Dataset:
     """Return a RADIOTHERAPY directory record from `ds`."""
@@ -2478,6 +2501,7 @@ def _define_radiotherapy(ds: Dataset) -> Dataset:
 
     return record
 
+
 def _define_generic_content(ds: Dataset) -> Dataset:
     """Return a WAVEFORM/RAW DATA directory record from `ds`."""
     _check_dataset(ds, ["InstanceNumber", "ContentDate", "ContentTime"])
@@ -2488,6 +2512,7 @@ def _define_generic_content(ds: Dataset) -> Dataset:
     record.ContentTime = ds.ContentTime
 
     return record
+
 
 def _define_generic_content_id(ds: Dataset) -> Dataset:
     """Return a generic content identification directory record from `ds`."""
@@ -2506,6 +2531,7 @@ def _define_generic_content_id(ds: Dataset) -> Dataset:
     record.ContentCreatorName = ds.get("ContentCreatorName")
 
     return record
+
 
 def _define_empty(ds: Dataset) -> Dataset:
     """Return an empty directory record from `ds`."""

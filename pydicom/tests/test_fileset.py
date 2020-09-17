@@ -11,8 +11,9 @@ from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.filebase import DicomBytesIO
 from pydicom.fileset import (
-    FileSet, FileInstance, RecordNode, is_conformant_file_id, generate_filename,
-    _define_patient, _define_study, _define_series, _define_image, _PREFIXES
+    FileSet, FileInstance, RecordNode, is_conformant_file_id,
+    generate_filename, _define_patient, _define_study, _define_series,
+    _define_image, _PREFIXES
 )
 from pydicom.filewriter import write_dataset
 from pydicom.tag import Tag, BaseTag
@@ -40,21 +41,18 @@ TINY_ALPHA_FILESET = get_testdata_file("tiny_alpha/DICOMDIR")
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
 BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 
-TEST_FILES = (
-    get_testdata_file('DICOMDIR'),
-    get_testdata_file('DICOMDIR-reordered'),
-    get_testdata_file('DICOMDIR-nooffset')
-)
 
 @pytest.fixture
 def tiny():
     """Return the tiny alphanumeric File-set."""
     return dcmread(TINY_ALPHA_FILESET)
 
+
 @pytest.fixture
 def dicomdir():
     """Return the DICOMDIR dataset."""
     return dcmread(TEST_FILE)
+
 
 @pytest.fixture
 def dicomdir_copy():
@@ -70,15 +68,18 @@ def dicomdir_copy():
 
     return t, dcmread(dst / "DICOMDIR")
 
+
 @pytest.fixture
 def ct():
     """Return a DICOMDIR dataset."""
     return dcmread(get_testdata_file("CT_small.dcm"))
 
+
 @pytest.fixture
 def tdir():
     """Return a TemporaryDirectory instance."""
     return TemporaryDirectory()
+
 
 @pytest.fixture
 def custom_leaf():
@@ -112,6 +113,7 @@ def custom_leaf():
     study.parent = patient
 
     return image
+
 
 @pytest.fixture
 def private(dicomdir):
@@ -192,6 +194,7 @@ def private(dicomdir):
     ds.parse_records()
 
     return ds
+
 
 @pytest.fixture
 def dummy():
@@ -292,6 +295,7 @@ def write_fs(fs, path=None):
     ]
     return dcmread(path / "DICOMDIR"), sorted(paths)
 
+
 def copy_fs(fs, path):
     """Call FileSet.copy(path).
 
@@ -311,6 +315,7 @@ def copy_fs(fs, path):
         if p.is_file() and p.name != 'DICOMDIR'
     ]
     return fs, dcmread(path / "DICOMDIR"), sorted(paths)
+
 
 def temporary_fs(ds):
     """Copy a File-set to a temporary directory."""
@@ -970,7 +975,6 @@ class TestFileSet:
         assert "Root directory: (no value available)" in s
         assert "File-set ID: MYID" in s
         assert f"File-set UID: {fs.UID}" in s
-        #assert "Changes staged for write(): DICOMDIR updates" in s
         assert "Managed instances" not in s
 
         ds, paths = write_fs(fs, tdir.name)
@@ -1002,7 +1006,6 @@ class TestFileSet:
         fs = FileSet()
         assert fs.is_staged
         uid = fs.UID
-        #assert "Changes staged for write(): DICOMDIR updates" in str(fs)
         ds, paths = write_fs(fs, tdir.name)
         assert [] == paths
         assert fs.UID == ds.file_meta.MediaStorageSOPInstanceUID
@@ -1215,8 +1218,6 @@ class TestFileSet:
             "StudyDescription='e+1'" in s
         )
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
-        #assert "+IMAGE: InstanceNumber=1, FileID=(no value available) > " in s
-
         assert 1 == len(fs)
         instances = [ii for ii in fs]
         file_id = Path("PT000000", "ST000000", "SE000000", "IM000000")
@@ -1569,8 +1570,12 @@ class TestFileSet_Load:
 
         new = dcmread(out)
         assert dicomdir.DirectoryRecordSequence == new.DirectoryRecordSequence
-        assert 396 == new.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
-        assert 3126 == new.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
+        assert (
+            396 == new.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
+        )
+        assert (
+            3126 == new.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
+        )
 
     def test_write_new_path(self, dicomdir):
         """Test writing to a new path."""
@@ -1788,8 +1793,8 @@ class TestFileSet_Load:
             ds = dcmread(IMPLICIT_TEST_FILE)
         msg = (
             r"The DICOMDIR dataset uses an invalid transfer syntax "
-            r"'Implicit VR Little Endian' and will be updated to use 'Explicit "
-            r"VR Little Endian'"
+            r"'Implicit VR Little Endian' and will be updated to use "
+            r"'Explicit VR Little Endian'"
         )
         with pytest.warns(UserWarning, match=msg):
             fs = FileSet(ds)
@@ -1851,7 +1856,6 @@ class TestFileSet_Modify:
         tdir, ds = dicomdir_copy
         assert "FileSetDescriptorFileID" not in ds
         fs = FileSet(ds)
-        #assert "Changes staged for write(): 31 moves (~)" in str(fs)
         assert fs._stage['~']
         assert not fs._stage['+']
         assert not fs._stage['-']
@@ -1863,7 +1867,6 @@ class TestFileSet_Modify:
         assert 1 == len(list(t.glob("98892003")))
         ds = dcmread(t / "DICOMDIR")
         assert ["1", "2", "3"] == ds.FileSetDescriptorFileID
-        #assert "Changes staged for write(): 31 moves (~)" in str(fs)
 
     def test_write_dicomdir_only_raises(self, dicomdir_copy, ct):
         """Test FileSet.write() with dicomdir_only raises with +/- changes."""
@@ -2236,7 +2239,6 @@ REFERENCE_1LEVEL = [
     ("IMPLANT GROUP", ImplantTemplateGroupStorage),
     ("PALETTE", ColorPaletteStorage),
 ]
-
 # PATIENT -> STUDY -> SERIES -> record type
 REFERENCE_4LEVEL = [
     # Record type, SOP Class, Modality, Optional element to include
@@ -2264,6 +2266,7 @@ REFERENCE_4LEVEL = [
     ("ASSESSMENT", ContentAssessmentResultsStorage, "ASMT", None),
     ("RADIOTHERAPY", CArmPhotonElectronRadiationStorage, "RTRAD", None),
 ]
+
 
 @pytest.mark.parametrize("rtype, sop", REFERENCE_1LEVEL)
 def test_one_level_record(rtype, sop, dummy, tdir):

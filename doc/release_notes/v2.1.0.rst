@@ -39,8 +39,10 @@ Enhancements
     *Waveform Sequence* element.
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
-* Added :class:`~pydicom.dicomdir.FileSet` class to support loading of DICOM
-  File-sets (:issue:`9`)
+* Implemented full support (loading, accessing, modifying, writing) of
+  DICOM File-sets and their DICOMDIR files via the
+  :class:`~pydicom.dicomdir.FileSet` class (:issue:`9`, :issue:`243`,
+  :issue:`1093`)
 
 Changes
 .......
@@ -61,10 +63,5 @@ Fixes
   connection is available (:pr:`1156`)
 * Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
   a file-like (:issue:`1153`)
-<<<<<<< HEAD
-* Raise ``TypeError`` if :func:`~pydicom.dcmread` or :func:`~pydicom.dcmwrite`
-  is called with wrong argument
-=======
 * Raise :class:`TypeError` if :func:`~pydicom.filereader.dcmread` or
   :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
->>>>>>> f4c84143... Add change to release notes
