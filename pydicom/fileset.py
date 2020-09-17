@@ -346,9 +346,30 @@ class RecordNode:
         return len(fp.getvalue())
 
     @property
+    def _file_id(self) -> Union[PathLike, None]:
+        """Return the Referenced File ID as a :class:`~pathlib.Path`.
+
+        Returns
+        -------
+        PathLike or None
+            The *Referenced File ID* from the directory record as a
+            :class:`pathlib.Path` or ``None`` if the element value is null.
+        """
+        if "ReferencedFileID" in self._record:
+            elem = self._record["ReferencedFileID"]
+            if elem.VM == 1:
+                return Path(self._record.ReferencedFileID)
+            if elem.VM > 1:
+                return Path(*self._record.ReferencedFileID)
+
+            return None
+
+        raise AttributeError("No 'Referenced File ID' in the directory record")
+
+    @property
     def file_set(self) -> "FileSet":
         """Return the tree's :class:`~pydicom.fileset.FileSet`."""
-        return self.root._fs
+        return self.root.file_set
 
     def __getitem__(self, key: Union[str, "RecordNode"]) -> "RecordNode":
         """Return the current node's child using it's
@@ -425,39 +446,16 @@ class RecordNode:
             return None
 
     @property
-    def parent(self) -> "RecordNode":
-        """Return the current node's parent."""
+    def parent(self) -> Union["RecordNode", None]:
+        """Return the current node's parent (if it has one)."""
         return self._parent
 
     @parent.setter
-    def parent(self, obj: Union["RecordNode", None]) -> None:
-        """Set the parent of the current node, or ``None`` if the node is the
-        tree root.
-        """
-        self._parent = obj
-        if obj is not None and self not in obj.children:
-            obj.children.append(self)
-
-    @property
-    def _file_id(self) -> Union[PathLike, None]:
-        """Return the Referenced File ID as a :class:`~pathlib.Path`.
-
-        Returns
-        -------
-        PathLike or None
-            The *Referenced File ID* from the directory record as a
-            :class:`pathlib.Path` or ``None`` if the element value is null.
-        """
-        if "ReferencedFileID" in self._record:
-            elem = self._record["ReferencedFileID"]
-            if elem.VM == 1:
-                return Path(self._record.ReferencedFileID)
-            if elem.VM > 1:
-                return Path(*self._record.ReferencedFileID)
-
-            return None
-
-        raise AttributeError("No 'Referenced File ID' in the directory record")
+    def parent(self, node: "RecordNode") -> None:
+        """Set the parent of the current node."""
+        self._parent = node
+        if node is not None and self not in node.children:
+            node.children.append(self)
 
     def prettify(self, indent_char: str = '  ') -> List[str]:
         """Return the tree structure as a list of pretty strings, starting at
@@ -637,6 +635,11 @@ class RootNode(RecordNode):
         self.instance = None
         self._parent = None
         self._record = None
+
+    @property
+    def file_set(self) -> "FileSet":
+        """Return the tree's :class:`~pydicom.fileset.FileSet`."""
+        return self._fs
 
     @property
     def is_root(self) -> bool:
@@ -926,12 +929,11 @@ class FileSet:
             '+': {},  # instances staged for addition
             '-': {},  # instances staged for removal
             '~': {},  # instances staged for moving
-            '^': False,  # a File-set Idenfitication module element has changed
+            '^': False,  # a File-set Identification module element has changed
         }
         self._stage["path"] = Path(self._stage['t'].name)
 
-        # The DICOMDIR instance, will be `None` for new File-sets until
-        #   FileSet.write() is called
+        # The DICOMDIR instance, not guaranteed to be up-to-date
         self._ds = ds
         # The File-set's managed SOP Instances as list of FileInstance
         self._instances = []
@@ -2697,6 +2699,7 @@ def _single_level_record_type(ds: Dataset) -> str:
         return _SINGLE_LEVEL_SOP_CLASSES[sop_class]
     except KeyError:
         return "PATIENT"
+
 
 def _four_level_record_type(ds: Dataset) -> str:
     """Return the fourth-level *Directory Record Type* for `ds`."""

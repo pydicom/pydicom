@@ -41,7 +41,7 @@ Enhancements
   the image data is converted to signed (:issue:`1149`)
 * Implemented full support (loading, accessing, modifying, writing) of
   DICOM File-sets and their DICOMDIR files via the
-  :class:`~pydicom.dicomdir.FileSet` class (:issue:`9`, :issue:`243`,
+  :class:`~pydicom.fileset.FileSet` class (:issue:`9`, :issue:`243`,
   :issue:`1093`)
 
 Changes
