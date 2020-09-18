@@ -1012,7 +1012,7 @@ class TestFileSet:
 
         s = str(fs)
         assert "DICOM File-set" in s
-        assert f"Root directory: {tdir.name}" in s
+        assert f"Root directory: (no value available)" not in s
         assert "File-set ID: (no value available)" in s
         assert f"File-set UID: {fs.UID}" in s
         assert "Managed instances" not in s
@@ -1155,10 +1155,11 @@ class TestFileSet:
         path = tdir.name
         assert isinstance(path, str)
         ds, paths = write_fs(fs, path)
-        assert path == fs.path
+        assert Path(path).parts[-2:] == Path(fs.path).parts[-2:]
         assert [] == paths
         assert path in ds.filename
-        assert f"Root directory: {path}" in str(fs)
+        root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
+        assert root in str(fs)
         assert not fs.is_staged
 
         # Test with PathLike
@@ -1167,7 +1168,8 @@ class TestFileSet:
         ds, paths = write_fs(fs, path)
         assert [] == paths
         assert os.fspath(path) in ds.filename
-        assert f"Root directory: {os.fspath(path)}" in str(fs)
+        root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
+        assert root in str(fs)
         assert not fs.is_staged
 
     def test_empty_write(self, tdir):
@@ -1290,7 +1292,8 @@ class TestFileSet:
 
         assert not fs.is_staged
         s = str(fs)
-        assert f"Root directory: {tdir.name}" in s
+        root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
+        assert root in s
         assert (
             " IMAGE: InstanceNumber=1, "
             "FileID=PT000000/ST000000/SE000000/IM000000" in s
@@ -1555,6 +1558,94 @@ class TestFileSet:
         fs.add_custom(ct, custom_leaf)
         assert 1 == len(fs)
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
+
+    def test_str_empty(self, tdir):
+        """Test str(FileSet) on an empty File-set."""
+        fs = FileSet()
+        s = str(fs)
+        assert "DICOM File-set" in s
+        assert "Root directory: (no value available)" in s
+        assert "File-set ID: (no value available)" in s
+        assert "File-set UID: 1.2.826.0.1" in s
+        assert "Descriptor file ID: (no value available)" in s
+        assert "Descriptor file character set: (no value available)" in s
+        assert "Changes staged for write(): DICOMDIR creation" in s
+        assert "addition" not in s
+        assert "removal" not in s
+        assert "Managed instances:" not in s
+
+        # Set DICOMDIR elements
+        fs.ID = "TEST ID"
+        fs.descriptor_file_id = "README"
+        fs.descriptor_character_set = "ISO WHATEVER"
+        ds, paths = write_fs(fs, tdir.name)
+        s = str(fs)
+        assert "DICOM File-set" in s
+        assert "Root directory: (no value available)" not in s
+        assert "File-set ID: TEST ID" in s
+        assert "File-set UID: 1.2.826.0.1" in s
+        assert "Descriptor file ID: README" in s
+        assert "Descriptor file character set: ISO WHATEVER" in s
+        assert "Changes staged for write(): DICOMDIR creation" not in s
+        assert "addition" not in s
+        assert "removal" not in s
+        assert "Managed instances:" not in s
+
+    def test_str_additions(self, ct, tdir):
+        """Test str(FileSet) with empty + additions."""
+        fs = FileSet()
+        fs.add(ct)
+        s = str(fs)
+        assert "Changes staged for write(): DICOMDIR creation, 1 addition" in s
+        assert "Managed instances:" in s
+        assert "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
+        assert "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
+        assert "SERIES: Modality=CT, SeriesNumber=1" in s
+        assert "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" not in s
+        assert "STUDY: StudyDate=20040826, StudyTime=185059" not in s
+        assert "SERIES: Modality=MR, SeriesNumber=1" not in s
+
+        fs.add(get_testdata_file("MR_small.dcm"))
+        s = str(fs)
+        assert (
+            "Changes staged for write(): DICOMDIR creation, 2 additions" in s
+        )
+        assert "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
+        assert "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
+        assert "SERIES: Modality=CT, SeriesNumber=1" in s
+        assert "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" in s
+        assert "STUDY: StudyDate=20040826, StudyTime=185059" in s
+        assert "SERIES: Modality=MR, SeriesNumber=1" in s
+
+    def test_clear(self, dicomdir, tdir):
+        """Test FileSet.clear()."""
+        fs = FileSet(dicomdir)
+        fs.ID = "TESTID"
+        fs.descriptor_file_id = "README"
+        fs.descriptor_character_set = "ISO 1"
+        fs, ds, paths = copy_fs(fs, tdir.name)
+        assert "README" == fs.descriptor_file_id
+        assert "ISO 1" == fs.descriptor_character_set
+        assert [] != fs._instances
+        assert fs._id is not None
+        assert fs._path is not None
+        uid = fs._uid
+        assert fs._uid is not None
+        assert fs._ds is not None
+        assert fs._descriptor is not None
+        assert fs._charset is not None
+        assert [] != fs._tree.children
+
+        fs.clear()
+        assert [] == fs._instances
+        assert fs._id is None
+        assert fs._path is None
+        assert uid != fs._uid
+        assert fs._uid.is_valid
+        assert fs._ds is None
+        assert fs._descriptor is None
+        assert fs._charset is None
+        assert [] == fs._tree.children
 
 
 class TestFileSet_Load:
@@ -2089,6 +2180,20 @@ class TestFileSet_Modify:
         fs.remove(instances)
         assert 28 == len(fs)
 
+    def test_add_bad_one_level(self, dummy):
+        """Test adding a bad one-level dataset raises."""
+        ds, opt = dummy
+        ds.SOPClassUID = HangingProtocolStorage
+        del ds.HangingProtocolCreator
+        fs = FileSet()
+        msg = (
+            r"Unable to use the default pydicom 'HANGING PROTOCOL' record "
+            r"creator as the instance is missing a required element or value. "
+            r"Either update the instance or use 'FileSet.add_custom\(\)' "
+            r"instead"
+        )
+        with pytest.raises(ValueError, match=msg):
+            fs.add(ds)
 
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
@@ -2204,13 +2309,13 @@ class TestFileSet_Copy:
         assert 'IM000000' == parts[0][-1]
         assert 'IM000044' == parts[44][-1]
         for ii in range(45):
-            assert ('PT000000', 'ST000000', 'SE000000') == parts[ii][3:-1]
+            assert ('PT000000', 'ST000000', 'SE000000') == parts[ii][-4:-1]
 
         assert (
-            ('PT000001', 'ST000000', 'SE000000', 'IM000000') == parts[45][3:]
+            ('PT000001', 'ST000000', 'SE000000', 'IM000000') == parts[45][-4:]
         )
         assert (
-            ('PT000002', 'ST000000', 'SE000000', 'IM000000') == parts[46][3:]
+            ('PT000002', 'ST000000', 'SE000000', 'IM000000') == parts[46][-4:]
         )
 
         # Test copied fileset

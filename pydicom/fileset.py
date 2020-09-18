@@ -196,7 +196,7 @@ class RecordNode:
 
         # When the record is encoded as part of the *Directory Record Sequence*
         #   this is the offset to the start of the sequence item containing
-        #   the record - not guranteed to be up-to-date
+        #   the record - not guaranteed to be up-to-date
         self._offset = 0
         # The offset to the start of the encoded record's *Offset of the
         #   Next Directory Record* and *Offset of Referenced Lower Level
@@ -1120,6 +1120,8 @@ class FileSet:
         self._ds = None
         self._id = None
         self._uid = generate_uid()
+        self._descriptor = None
+        self._charset = None
 
         # Clean and reset the stage
         self._stage['+'] = {}
@@ -1541,6 +1543,10 @@ class FileSet:
         self.clear()
         self._id = ds.FileSetID
         self._uid = ds.file_meta.MediaStorageSOPInstanceUID
+        self._descriptor = ds.get("FileSetDescriptorFileID", None)
+        self._charset = ds.get(
+            "SpecificCharacterSetOfFileSetDescriptorFile", None
+        )
         self._path = path.parent
         self._ds = ds
 
@@ -1841,24 +1847,36 @@ class FileSet:
             f"  Root directory: {self.path or '(no value available)'}",
             f"  File-set ID: {self.ID or '(no value available)'}",
             f"  File-set UID: {self.UID}",
+            (
+                f"  Descriptor file ID: "
+                f"{self.descriptor_file_id or '(no value available)'}"
+            ),
+            (
+                f"  Descriptor file character set: "
+                f"{self.descriptor_character_set or '(no value available)'}"
+            ),
         ]
         if self.is_staged:
             changes = []
-            if self._stage['+']:
+            if not self._ds:
+                changes.append("DICOMDIR creation")
+            else:
+                changes.append("DICOMDIR update")
+
+            if self._stage['+'] or self._stage['-']:
                 suffix = 's' if len(self._stage['+']) > 1 else ''
                 changes.append(f"{len(self._stage['+'])} addition{suffix}")
             if self._stage['-']:
                 suffix = 's' if len(self._stage['-']) > 1 else ''
                 changes.append(f"{len(self._stage['-'])} removal{suffix}")
-            if self._stage['~']:
-                changes.append("directory structure updates")
 
-            changes.append("DICOMDIR update")
             s.append(f"  Changes staged for write(): {', '.join(changes)}")
 
-        if self._tree.children:
-            s.append("  Managed instances:")
-            s.extend([f"    {ii}" for ii in self._tree.prettify()])
+        if not self._tree.children:
+            return '\n'.join(s)
+
+        s.append("\n  Managed instances:")
+        s.extend([f"    {ii}" for ii in self._tree.prettify()])
 
         return '\n'.join(s)
 
