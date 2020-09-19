@@ -1182,8 +1182,8 @@ class TestFileSet:
         ds, paths = write_fs(fs, path)
         assert Path(path).parts[-2:] == Path(fs.path).parts[-2:]
         assert [] == paths
-        assert path in ds.filename
         root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
+        assert root in ds.filename
         assert root in str(fs)
         assert not fs.is_staged
 
