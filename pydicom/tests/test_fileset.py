@@ -296,7 +296,7 @@ def write_fs(fs, path=None):
     return dcmread(path / "DICOMDIR"), sorted(paths)
 
 
-def copy_fs(fs, path):
+def copy_fs(fs, path, as_implicit=False):
     """Call FileSet.copy(path).
 
     Returns
@@ -309,7 +309,7 @@ def copy_fs(fs, path):
         A list of paths for the non-DICOMDIR files in the new File-set.
     """
     path = Path(path)
-    fs = fs.copy(path)
+    fs = fs.copy(path, force_implicit=as_implicit)
     paths = [
         p for p in path.glob('**/*')
         if p.is_file() and p.name != 'DICOMDIR'
@@ -572,9 +572,27 @@ class TestRecordNode:
         assert leaf.next is None
         assert leaf.previous is None
 
-    def test_add(self, private):
-        # Test instance added at end of children
-        pass
+    def test_add(self, private, ct):
+        """Test instance added at end of children"""
+        fs = FileSet(private)
+        instance = fs._instances[0]
+        parent = instance.node.parent
+        assert 1 == len(parent.children)
+        assert 0 == instance.node.index
+        assert instance.node.next is None
+        assert instance.node.previous is None
+
+        ct.PatientID = instance.PatientID
+        ct.StudyInstanceUID = instance.StudyInstanceUID
+        ct.SeriesInstanceUID = instance.SeriesInstanceUID
+        added = fs.add(ct)
+        assert 2 == len(parent.children)
+        assert 0 == instance.node.index
+        assert added.node == instance.node.next
+        assert instance.node.previous is None
+        assert 1 == added.node.index
+        assert instance.node == added.node.previous
+        assert added.node.next is None
 
     def test_key(self, private):
         """Test the record keys."""
@@ -806,8 +824,9 @@ class TestFileInstance:
         ) == Path(instance.path)
 
     def test_path_move(self, dicomdir):
-        """Test FileInstance.path when staged for moving."""
+        """Test FileInstance.path for an instance to be move."""
         fs = FileSet(dicomdir)
+        assert fs._stage['~']
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_moving
@@ -852,11 +871,14 @@ class TestFileInstance:
         assert ct.SOPInstanceUID == ds.SOPInstanceUID
 
     def test_load_staged_move(self, dicomdir):
-        """Test FileInstance.load() when staged for moving."""
+        """Test FileInstance.load() for an instance to be moved."""
         fs = FileSet(dicomdir)
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_moving
+        assert fs.is_staged
+        # At least one instance needs to be moved
+        assert fs._stage['~']
         ds = instance.load()
         assert isinstance(ds, Dataset)
         sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
@@ -898,8 +920,11 @@ class TestFileInstance:
         assert os.fspath(fileid) == instance.FileID
 
     def test_fileid_move(self, dicomdir):
-        """Test FileInstance.FileID when staged for moving."""
+        """Test FileInstance.FileID for an instance to be moved."""
         fs = FileSet(dicomdir)
+        assert fs.is_staged
+        # At least one instance needs to be moved
+        assert fs._stage['~']
         instance = fs._instances[0]
         assert instance.is_staged
         assert instance.for_moving
@@ -1167,8 +1192,8 @@ class TestFileSet:
         path = Path(tdir.name)
         ds, paths = write_fs(fs, path)
         assert [] == paths
-        assert os.fspath(path) in ds.filename
         root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
+        assert root in ds.filename
         assert root in str(fs)
         assert not fs.is_staged
 
@@ -1294,10 +1319,6 @@ class TestFileSet:
         s = str(fs)
         root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
         assert root in s
-        assert (
-            " IMAGE: InstanceNumber=1, "
-            "FileID=PT000000/ST000000/SE000000/IM000000" in s
-        )
         assert 1 == len(paths)
         # Only want to compare Dataset rather than FileDataset
         assert Dataset(ct) == dcmread(paths[0])
@@ -1559,6 +1580,36 @@ class TestFileSet:
         assert 1 == len(fs)
         assert 1 == len(fs.find(SOPInstanceUID=ct.SOPInstanceUID))
 
+    def test_clear(self, dicomdir, tdir):
+        """Test FileSet.clear()."""
+        fs = FileSet(dicomdir)
+        fs.ID = "TESTID"
+        fs.descriptor_file_id = "README"
+        fs.descriptor_character_set = "ISO 1"
+        fs, ds, paths = copy_fs(fs, tdir.name)
+        assert "README" == fs.descriptor_file_id
+        assert "ISO 1" == fs.descriptor_character_set
+        assert [] != fs._instances
+        assert fs._id is not None
+        assert fs._path is not None
+        uid = fs._uid
+        assert fs._uid is not None
+        assert fs._ds is not None
+        assert fs._descriptor is not None
+        assert fs._charset is not None
+        assert [] != fs._tree.children
+
+        fs.clear()
+        assert [] == fs._instances
+        assert fs._id is None
+        assert fs._path is None
+        assert uid != fs._uid
+        assert fs._uid.is_valid
+        assert fs._ds is None
+        assert fs._descriptor is None
+        assert fs._charset is None
+        assert [] == fs._tree.children
+
     def test_str_empty(self, tdir):
         """Test str(FileSet) on an empty File-set."""
         fs = FileSet()
@@ -1596,12 +1647,17 @@ class TestFileSet:
         fs = FileSet()
         fs.add(ct)
         s = str(fs)
-        assert "Changes staged for write(): DICOMDIR creation, 1 addition" in s
+        assert "write(): DICOMDIR creation, 1 addition" in s
         assert "Managed instances:" in s
-        assert "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
-        assert "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
+        assert (
+            "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
+        )
+        assert (
+            "STUDY: StudyDate=20040119, StudyTime=072730, "
+            "StudyDescription='e+1'"
+        ) in s
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
-        assert "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" not in s
+        assert "PATIENT: PatientID=4MR1" not in s
         assert "STUDY: StudyDate=20040826, StudyTime=185059" not in s
         assert "SERIES: Modality=MR, SeriesNumber=1" not in s
 
@@ -1610,42 +1666,14 @@ class TestFileSet:
         assert (
             "Changes staged for write(): DICOMDIR creation, 2 additions" in s
         )
-        assert "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
-        assert "STUDY: StudyDate=20040119, StudyTime=072730, StudyDescription='e+1'" in s
+        assert "PATIENT: PatientID=1CT1" in s
+        assert "STUDY: StudyDate=20040119, StudyTime=072730" in s
         assert "SERIES: Modality=CT, SeriesNumber=1" in s
-        assert "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" in s
+        assert (
+            "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" in s
+        )
         assert "STUDY: StudyDate=20040826, StudyTime=185059" in s
         assert "SERIES: Modality=MR, SeriesNumber=1" in s
-
-    def test_clear(self, dicomdir, tdir):
-        """Test FileSet.clear()."""
-        fs = FileSet(dicomdir)
-        fs.ID = "TESTID"
-        fs.descriptor_file_id = "README"
-        fs.descriptor_character_set = "ISO 1"
-        fs, ds, paths = copy_fs(fs, tdir.name)
-        assert "README" == fs.descriptor_file_id
-        assert "ISO 1" == fs.descriptor_character_set
-        assert [] != fs._instances
-        assert fs._id is not None
-        assert fs._path is not None
-        uid = fs._uid
-        assert fs._uid is not None
-        assert fs._ds is not None
-        assert fs._descriptor is not None
-        assert fs._charset is not None
-        assert [] != fs._tree.children
-
-        fs.clear()
-        assert [] == fs._instances
-        assert fs._id is None
-        assert fs._path is None
-        assert uid != fs._uid
-        assert fs._uid.is_valid
-        assert fs._ds is None
-        assert fs._descriptor is None
-        assert fs._charset is None
-        assert [] == fs._tree.children
 
 
 class TestFileSet_Load:
@@ -1976,36 +2004,6 @@ class TestFileSet_Modify:
         with pytest.raises(RuntimeError, match=msg):
             fs.write(dicomdir_only=True)
 
-    def test_staging_move(self, dicomdir, tdir):
-        """Test staging when instance is being moved."""
-        fs = FileSet(dicomdir)
-        instance = fs._instances[0]
-        assert instance._flags.move
-        assert not instance._flags.add
-        assert not instance._flags.remove
-
-        # Stage addition -> instance will be moved
-        instance._apply_stage('+')
-        assert instance.for_moving
-        assert not instance._flags.add
-        assert not instance._flags.remove
-
-        # Stage removal -> instance will be removed
-        instance._apply_stage('-')
-        assert not instance.for_moving
-        assert instance.for_removal
-        assert instance._flags.move
-        assert not instance._flags.add
-        assert instance._flags.remove
-
-        # Stage addition -> remove cancelled, revert to move
-        instance._apply_stage('+')
-        assert instance.for_moving
-        assert not instance.for_removal
-        assert instance._flags.move
-        assert not instance._flags.add
-        assert not instance._flags.remove
-
     def test_remove_addition_bad_path(self, dicomdir, ct):
         """Test removing a missing file from the File-set's stage."""
         fs = FileSet(dicomdir)
@@ -2051,7 +2049,6 @@ class TestFileSet_Modify:
         with pytest.raises(NotImplementedError, match=msg):
             fs.write()
 
-    # TODO: more assertions
     def test_write_missing_removal(self, tiny):
         """Test that missing files are ignored when removing during write."""
         tdir, ds = temporary_fs(tiny)
@@ -2061,18 +2058,39 @@ class TestFileSet_Modify:
         fs.remove(instance)
         assert path.exists()
         path.unlink()
+        assert not path.exists()
         ds, paths = write_fs(fs)
         assert [] == fs.find(SOPInstanceUID=instance.SOPInstanceUID)
+        assert 49 == len(fs)
 
-    # TODO: write!
     def test_write_removal_addition_collision(self, tiny):
         """Test re-adding files staged for removal that also collide."""
+        # The colliding files are IM000010 to IM000019 which get
+        #   overwritten by IM00000A to IM00000J
         tdir, ds = temporary_fs(tiny)
         fs = FileSet(ds)
-        instance = fs._instances[0]
-        path = Path(instance.path)
-        fs.remove(instance)
-        fs.add(path)
+        # IM000010 to IM000013
+        instances = fs._instances[36:40]
+        assert "IM000010" == Path(instances[0].path).name
+        assert "IM000011" == Path(instances[1].path).name
+        assert "IM000012" == Path(instances[2].path).name
+        assert "IM000013" == Path(instances[3].path).name
+        fs.remove(instances)
+        assert 46 == len(fs)
+        for instance in instances:
+            path = Path(instance.path)
+            fs.add(path)
+
+        ds, paths = write_fs(fs)
+        assert 50 == len(paths)
+        original = FileSet(tiny)
+        assert len(original) == len(fs)
+        for ref, ii in zip(original, fs):
+            assert ref.path != ii.path
+            assert ref.SOPInstanceUID == ii.SOPInstanceUID
+            rs = ref.load()
+            ts = ii.load()
+            assert Dataset(rs) == ts
 
     def test_write_implicit(self, dicomdir, dicomdir_copy, tdir):
         """Test writing the DICOMDIR using Implicit VR"""
@@ -2195,6 +2213,7 @@ class TestFileSet_Modify:
         with pytest.raises(ValueError, match=msg):
             fs.add(ds)
 
+
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
     def setup(self):
@@ -2205,9 +2224,51 @@ class TestFileSet_Copy:
 
     def test_copy(self, dicomdir, tdir):
         """Test FileSet.copy()"""
+        orig_root = Path(dicomdir.filename).parent
         fs = FileSet(dicomdir)
-        cp = fs.copy(tdir.name)
-        print(cp)
+
+        fs.ID = "NEW ID"
+        uid = fs.UID = generate_uid()
+        fs.descriptor_file_id = "README"
+        fs.descriptor_character_set = "ISO_IR 100"
+        cp, ds, paths = copy_fs(fs, tdir.name)
+        assert 31 == len(paths)
+        assert (
+            ('PT000000', 'ST000000', 'SE000000', 'IM000000')
+        ) == paths[0].parts[-4:]
+        assert (
+            ('PT000001', 'ST000003', 'SE000002', 'IM000006')
+        ) == paths[-1].parts[-4:]
+
+        # Check existing File-set remains the same
+        assert "NEW ID" == fs.ID
+        assert dicomdir.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert uid == fs.UID
+        assert dicomdir.file_meta.MediaStorageSOPInstanceUID == fs.UID
+        assert "README" == fs.descriptor_file_id
+        assert "ISO_IR 100" == fs.descriptor_character_set
+        assert not bool(fs._stage['+'])
+        assert not bool(fs._stage['-'])
+        assert fs.is_staged
+        paths = list(orig_root.glob('98892001/**/*'))
+        paths += list(orig_root.glob('98892003/**/*'))
+        paths += list(orig_root.glob('77654033/**/*'))
+        paths = [p for p in paths if p.is_file()]
+
+        # Test new File-set
+        assert len(fs) == len(cp)
+        for ref, instance in zip(fs, cp):
+            assert ref.SOPInstanceUID == instance.SOPInstanceUID
+
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert not ds.is_implicit_VR
+        assert ds.is_little_endian
+        assert not cp.is_staged
+        assert "NEW ID" == cp.ID
+        assert uid == cp.UID
+        assert ds.file_meta.MediaStorageSOPInstanceUID == cp.UID
+        assert "README" == cp.descriptor_file_id
+        assert "ISO_IR 100" == cp.descriptor_character_set
 
     def test_copy_raises(self, dicomdir, tdir):
         """Test exceptions raised by FileSet.copy()."""
@@ -2217,7 +2278,30 @@ class TestFileSet_Copy:
             fs.copy(fs.path)
 
     def test_copy_implicit(self, dicomdir, tdir):
-        pass
+        """Test copy() with implicit VR."""
+        assert not dicomdir.is_implicit_VR
+        fs = FileSet(dicomdir)
+        with pytest.warns(UserWarning):
+            cp, ds, paths = copy_fs(fs, tdir.name, as_implicit=True)
+
+        # Check existing File-set remains the same
+        assert "PYDICOM_TEST" == fs.ID
+        assert dicomdir.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        assert dicomdir.file_meta.MediaStorageSOPInstanceUID == fs.UID
+        assert fs.descriptor_file_id is None
+        assert fs.descriptor_character_set is None
+        assert not bool(fs._stage['+'])
+        assert not bool(fs._stage['-'])
+
+        assert 31 == len(paths)
+
+        assert len(fs) == len(cp)
+        for ref, instance in zip(fs, cp):
+            assert ref.SOPInstanceUID == instance.SOPInstanceUID
+
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
+        assert ds.is_implicit_VR
+        assert ds.is_little_endian
 
     def test_file_id(self, tiny, tdir):
         """Test that the File IDs character sets switch correctly."""
@@ -2251,6 +2335,11 @@ class TestFileSet_Copy:
         assert [] == fs.find(PatientID="1CT1")
         fs.add(ct)
         cp, ds, paths = copy_fs(fs, tdir.name)
+        assert 51 == len(paths)
+        assert (
+            ('PT000001', 'ST000000', 'SE000000', 'IM000000')
+        ) == paths[-1].parts[-4:]
+        assert 51 == len(cp)
         assert not cp.is_staged
         instances = cp.find(PatientID="1CT1")
         assert 1 == len(instances)
@@ -2258,6 +2347,7 @@ class TestFileSet_Copy:
 
         # Test addition is still staged in original fs
         assert fs.is_staged
+        assert 51 == len(fs)
         assert 1 == len(fs._stage['+'])
         assert ct.SOPInstanceUID in fs._stage['+']
 
@@ -2272,6 +2362,10 @@ class TestFileSet_Copy:
         assert fs.is_staged
 
         cp, ds, paths = copy_fs(fs, tdir.name)
+        assert 49 == len(paths)
+        assert (
+            ('PT000000', 'ST000000', 'SE000000', 'IM000048')
+        ) == paths[-1].parts[-4:]
         assert not cp.is_staged
         names = [p.name for p in paths]
         assert 49 == len(names)

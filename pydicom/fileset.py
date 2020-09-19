@@ -572,8 +572,6 @@ class RecordNode:
             record_type = f"+{self.record_type}"
         elif self.has_instance and self.instance.for_removal:
             record_type = f"-{self.record_type}"
-        elif self.has_instance and self.instance.for_moving:
-            record_type = f"~{self.record_type}"
         else:
             record_type = f"{self.record_type}"
 
@@ -663,7 +661,7 @@ class FileInstance:
         node : pydicom.fileset.RecordNode
             The record that references this instance.
         """
-        self._flags = namedtuple("Flags", ['add', 'remove', 'move'])
+        self._flags = namedtuple("Flags", ['add', 'remove'])
         self._apply_stage('x')
         self._stage_path = None
         self.node = node
@@ -674,34 +672,16 @@ class FileInstance:
         Parameters
         ----------
         flag : str
-            The staging to apply, one of ``'+'``, ``'-'``, ``'~'`` or ``'x'``.
-            This will flag the instance for addition to, removal from, moving
-            within the File-set or reset the staging, respectively.
+            The staging to apply, one of ``'+'``, ``'-'`` or ``'x'``.
+            This will flag the instance for addition to or removal from the
+            File-set, or to reset the staging, respectively.
         """
         # Clear flags
         if flag == 'x':
             self._flags.add = False
             self._flags.remove = False
-            self._flags.move = False
-            self._stage_path = None
-        elif flag == '~':
-            # add + move = add
-            # remove + move = remove
-            if self._flags.remove or self._flags.add:
-                return
-
-            self._flags.move = True
             self._stage_path = None
         elif flag == '+':
-            # move + add = move
-            if self._flags.move:
-                # (move + remove) + add = move
-                if self._flags.remove:
-                    self._flags.remove = False
-
-                self._stage_path = None
-                return
-
             # remove + add = no change
             if self._flags.remove:
                 self._flags.remove = False
@@ -713,10 +693,6 @@ class FileInstance:
                 )
 
         elif flag == '-':
-            # move + remove = remove
-            if self._flags.move:
-                self._stage_path = None
-
             # add + remove = no change
             if self._flags.add:
                 self._flags.add = False
@@ -772,13 +748,10 @@ class FileInstance:
 
     @property
     def for_moving(self) -> bool:
-        """Return ``True`` if the instance has been staged to be moved to a
-        new location within the File-set.
+        """Return ``True`` if the instance will be moved to a new location
+        within the File-set.
         """
-        if self._flags.remove:
-            return False
-
-        return self._flags.move
+        return self.ReferencedFileID != self.FileID.split(os.path.sep)
 
     @property
     def for_removal(self) -> bool:
@@ -928,7 +901,7 @@ class FileSet:
             't': TemporaryDirectory(),
             '+': {},  # instances staged for addition
             '-': {},  # instances staged for removal
-            '~': {},  # instances staged for moving
+            '~': False,  # instances staged for moving
             '^': False,  # a File-set Identification module element has changed
         }
         self._stage["path"] = Path(self._stage['t'].name)
@@ -1126,7 +1099,7 @@ class FileSet:
         # Clean and reset the stage
         self._stage['+'] = {}
         self._stage['-'] = {}
-        self._stage['~'] = {}
+        self._stage['~'] = False
         self._stage['^'] = False
         self._stage['t'].cleanup()
         self._stage['t'] = TemporaryDirectory()
@@ -1240,6 +1213,41 @@ class FileSet:
             )
 
         return ds
+
+    @property
+    def descriptor_character_set(self) -> Union[str, None]:
+        """Return the *Specific Character Set of File-set Descriptor File*
+        (if available) or ``None``.
+        """
+        return self._charset
+
+    @descriptor_character_set.setter
+    def descriptor_character_set(self, val: Union[str, None]) -> None:
+        """Set the *Specific Character Set of File-set Descriptor File*.
+
+        The descriptor file itself is used for user comments related to the
+        File-set (e.g. a README file) and is up the user to create.
+
+        Parameters
+        ----------
+        val : str or None
+            The value to use for the DICOMDIR's (0004,1142) *Specific
+            Character Set of File-set Descriptor File*. See :dcm:`C.12.1.1.2
+            in Part 3 of the DICOM Standard
+            <part03/sect_C.12.html#sect_C.12.1.1.2>` for defined terms.
+
+        See Also
+        --------
+        :attr:`~pydicom.fileset.FileSet.descriptor_file_id` set the descriptor
+        file ID for the file that uses the character set.
+        """
+        if val == self._charset:
+            return
+
+        self._charset = val
+        if self._ds:
+            self._ds.SpecificCharacterSetOfFileSetDescriptorFile = val
+        self._stage['^'] = True
 
     @property
     def descriptor_file_id(self) -> Union[str, None]:
@@ -1541,8 +1549,10 @@ class FileSet:
             )
 
         self.clear()
-        self._id = ds.FileSetID
-        self._uid = ds.file_meta.MediaStorageSOPInstanceUID
+        self._id = ds.get("FileSetID", None)
+        self._uid = ds.file_meta.get(
+            "MediaStorageSOPInstanceUID", generate_uid()
+        )
         self._descriptor = ds.get("FileSetDescriptorFileID", None)
         self._charset = ds.get(
             "SpecificCharacterSetOfFileSetDescriptorFile", None
@@ -1562,12 +1572,10 @@ class FileSet:
                 continue
 
             (self.path / file_id).resolve(strict=True)
-            # If the existing directory structure doesn't match pydicom
-            #   then stage everything to be moved to the new structure
-            file_id = instance.FileID.split(os.path.sep)
-            if instance.ReferencedFileID != file_id:
-                instance._apply_stage('~')
-                self._stage['~'][instance.SOPInstanceUID] = instance
+            # If the instance's existing directory structure doesn't match
+            #   the pydicom semantics then stage for movement
+            if instance.for_moving:
+                self._stage['~'] = True
 
         for instance in bad_instances:
             self._instances.remove(instance)
@@ -1686,43 +1694,6 @@ class FileSet:
 
         return self._path
 
-    def remove(
-        self, instance: Union[FileInstance, List[FileInstance]]
-    ) -> None:
-        """Stage instance(s) for removal from the File-set.
-
-        Parameters
-        ----------
-        instance : pydicom.fileset.FileInstance or a list of FileInstance
-            The instance(s) to remove from the File-set.
-        """
-        if isinstance(instance, list):
-            for item in instance:
-                self.remove(item)
-            return
-
-        if instance not in self._instances:
-            raise ValueError("No such instance in the File-set")
-
-        # If staged for addition, no longer add
-        if instance.SOPInstanceUID in self._stage['+']:
-            leaf = instance.node
-            del leaf.parent[leaf]
-            del self._stage['+'][instance.SOPInstanceUID]
-            # Delete file from stage
-            try:
-                instance._stage_path.unlink()
-            except FileNotFoundError:
-                pass
-            instance._apply_stage('-')
-            self._instances.remove(instance)
-
-        # Stage for removal if not already done
-        elif instance.SOPInstanceUID not in self._stage['-']:
-            instance._apply_stage('-')
-            self._stage['-'][instance.SOPInstanceUID] = instance
-            self._instances.remove(instance)
-
     def _recordify(self, ds: Dataset) -> Generator[Dataset, None, None]:
         """Yield directory records for a SOP Instance.
 
@@ -1804,40 +1775,42 @@ class FileSet:
 
         yield from records
 
-    @property
-    def descriptor_character_set(self) -> Union[str, None]:
-        """Return the *Specific Character Set of File-set Descriptor File*
-        (if available) or ``None``.
-        """
-        return self._charset
-
-    @descriptor_character_set.setter
-    def descriptor_character_set(self, val: Union[str, None]) -> None:
-        """Set the *Specific Character Set of File-set Descriptor File*.
-
-        The descriptor file itself is used for user comments related to the
-        File-set (e.g. a README file) and is up the user to create.
+    def remove(
+        self, instance: Union[FileInstance, List[FileInstance]]
+    ) -> None:
+        """Stage instance(s) for removal from the File-set.
 
         Parameters
         ----------
-        val : str or None
-            The value to use for the DICOMDIR's (0004,1142) *Specific
-            Character Set of File-set Descriptor File*. See :dcm:`C.12.1.1.2
-            in Part 3 of the DICOM Standard
-            <part03/sect_C.12.html#sect_C.12.1.1.2>` for defined terms.
-
-        See Also
-        --------
-        :attr:`~pydicom.fileset.FileSet.descriptor_file_id` set the descriptor
-        file ID for the file that uses the character set.
+        instance : pydicom.fileset.FileInstance or a list of FileInstance
+            The instance(s) to remove from the File-set.
         """
-        if val == self._charset:
+        if isinstance(instance, list):
+            for item in instance:
+                self.remove(item)
             return
 
-        self._charset = val
-        if self._ds:
-            self._ds.SpecificCharacterSetOfFileSetDescriptorFile = val
-        self._stage['^'] = True
+        if instance not in self._instances:
+            raise ValueError("No such instance in the File-set")
+
+        # If staged for addition, no longer add
+        if instance.SOPInstanceUID in self._stage['+']:
+            leaf = instance.node
+            del leaf.parent[leaf]
+            del self._stage['+'][instance.SOPInstanceUID]
+            # Delete file from stage
+            try:
+                instance._stage_path.unlink()
+            except FileNotFoundError:
+                pass
+            instance._apply_stage('-')
+            self._instances.remove(instance)
+
+        # Stage for removal if not already done
+        elif instance.SOPInstanceUID not in self._stage['-']:
+            instance._apply_stage('-')
+            self._stage['-'][instance.SOPInstanceUID] = instance
+            self._instances.remove(instance)
 
     # TODO: Fix str representation
     def __str__(self) -> str:
@@ -1913,6 +1886,12 @@ class FileSet:
     ) -> None:
         """Write the File-set, or changes to the File-set, to the file system.
 
+        .. warning::
+
+            If modifying an existing File-set then it's strongly recommended
+            that you follow standard data management practices and ensure that
+            you have an up-to-date backup of the original data.
+
         Parameters
         ----------
         path : str or PathLike, optional
@@ -1969,7 +1948,7 @@ class FileSet:
             )
 
         if not dicomdir_only:
-            major_change |= bool(self._stage['~'])
+            major_change |= self._stage['~']
 
         if dicomdir_only and not major_change:
             with open(p, 'wb') as f:
@@ -2010,16 +1989,15 @@ class FileSet:
         collisions = fout & fin
         for instance in [ii for ii in self if ii.node._file_id in collisions]:
             self._stage['+'][instance.SOPInstanceUID] = instance
-            instance._flags.move = False
             instance._apply_stage('+')
-            shutil.move(
+            shutil.copyfile(
                 self._path / instance.node._file_id, instance._stage_path
             )
 
         for instance in self:
             dst = self._path / instance.FileID
             dst.parent.mkdir(parents=True, exist_ok=True)
-            if instance in self._stage['+'].values():
+            if instance.SOPInstanceUID in self._stage['+']:
                 src = instance._stage_path
                 fn = shutil.copyfile
             else:
