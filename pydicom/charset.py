@@ -635,12 +635,14 @@ def convert_encodings(encodings):
     """
 
     # If a list if passed, we don't want to modify the list in place so copy it
-    encodings = encodings[:]
+    encodings = encodings or ['']
 
     if isinstance(encodings, str):
         encodings = [encodings]
-    elif not encodings[0]:
-        encodings[0] = 'ISO_IR 6'
+    else:
+        encodings = encodings[:]
+        if not encodings[0]:
+            encodings[0] = 'ISO_IR 6'
 
     py_encodings = []
     for encoding in encodings:
