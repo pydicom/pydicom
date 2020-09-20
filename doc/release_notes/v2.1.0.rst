@@ -61,3 +61,4 @@ Fixes
   a file-like (:issue:`1153`)
 * Raise ``TypeError`` if :func:`~pydicom.dcmread` or :func:`~pydicom.dcmwrite`
   is called with wrong argument
+* Gracefully handle empty Specific Character Set (:issue:`1190`)
