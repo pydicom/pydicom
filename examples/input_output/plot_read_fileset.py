@@ -15,6 +15,7 @@ import warnings
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.fileset import FileSet
+from pydicom.uid import generate_uid
 
 warnings.filterwarnings("ignore")
 
@@ -31,7 +32,7 @@ print()
 for instance in fs:
     # Load the corresponding SOP Instance dataset
     ds = instance.load()
-    break
+    # Do something with each dataset
 
 # We can search the File-set
 patient_ids = fs.find_values("PatientID")
@@ -90,6 +91,17 @@ fs.add(get_testdata_file("MR_small.dcm"))
 result = fs.find(StudyDescription="'XR C Spine Comp Min 4 Views'")
 fs.remove(result)
 
+# To edit the elements in the DICOMDIR's File-set Identification Module
+#   (Part 3, Annex F.3.2.1) use the following properties:
+# (0004,1130) File-set ID
+fs.ID = "MY FILESET"
+# Change the File-set's UID
+fs.UID = generate_uid()
+# (0004,1141) File-set Descriptor File ID
+fs.descriptor_file_id = "README"
+ # (0004,1142) Specific Character Set of File-set Descriptor File
+fs.descriptor_character_set = "ISO_IR 100"
+
 # Changes to the File-set are staged until write() is called
 # Calling write() will update the File-set's directory structure to meet the
 #   semantics used by pydicom File-sets (if required), add/remove instances and
@@ -102,7 +114,7 @@ fs.remove(result)
 #   object unchanged
 tdir = TemporaryDirectory()
 new_fileset = fs.copy(tdir.name)
-print(f"Original File-set still at {fs.path}")
+print(f"\nOriginal File-set still at {fs.path}")
 root = Path(new_fileset.path)
 print(f"File-set copied to {root} and contains the following files:")
 # Note how the original File-set directory layout has been changed to

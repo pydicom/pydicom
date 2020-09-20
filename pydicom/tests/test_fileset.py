@@ -505,7 +505,7 @@ class TestRecordNode:
 
         # Test __iter__
         gen = iter(root)
-        assert "PatientID=98890234" in str(next(gen))
+        assert "PatientID='98890234'" in str(next(gen))
         assert "StudyDate=20010101" in str(next(gen))
         assert "SeriesNumber=4" in str(next(gen))
         assert "InstanceNumber=1" in str(next(gen))
@@ -631,6 +631,21 @@ class TestRecordNode:
         assert uid == node.key
         assert node.has_instance
 
+    def test_key_raises(self, dummy):
+        """Test missing required element raises."""
+        ds, opt = dummy
+        ds.SOPClassUID = ColorPaletteStorage
+        fs = FileSet()
+        instance = fs.add(ds)
+        del instance.node._record.ReferencedSOPInstanceUIDInFile
+
+        msg = (
+            r"Invalid 'PALETTE' record - missing required element "
+            r"'Referenced SOP Instance UID in File'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            instance.node.key
+
     def test_bad_record(self, private):
         """Test a bad directory record raises an exception when loading."""
         del private.DirectoryRecordSequence[0].PatientID
@@ -694,6 +709,15 @@ class TestRecordNode:
         ds.save_as(p / "DICOMDIR")
         fs = FileSet(ds)
         assert fs._instances[0].node._file_id == Path("01")
+
+    def test_file_id_missing(self, ct):
+        """Test RecordNode._file_id if no Referenced File ID."""
+        fs = FileSet()
+        instance = fs.add(ct)
+        del instance.node._record.ReferencedFileID
+        msg = r"No 'Referenced File ID' in the directory record"
+        with pytest.raises(AttributeError, match=msg):
+            instance.node._file_id
 
 
 class TestFileInstance:
@@ -895,6 +919,29 @@ class TestFileInstance:
         assert isinstance(ds, Dataset)
         sop_instance = "1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11"
         assert sop_instance == ds.SOPInstanceUID
+
+    def test_for_moving(self, dummy, ct, tdir):
+        """Test FileInstance.for_moving."""
+        ds, opt = dummy
+        ds.SOPClassUID = ColorPaletteStorage
+        fs = FileSet()
+        # Single level File ID
+        instance = fs.add(ds)
+        assert instance.for_addition
+        assert not instance.for_removal
+        assert not instance.for_moving
+
+        # Four level File ID
+        instance = fs.add(ct)
+        assert instance.for_addition
+        assert not instance.for_removal
+        assert not instance.for_moving
+
+        ds, paths = write_fs(fs, tdir.name)
+        for instance in fs:
+            assert not instance.for_addition
+            assert not instance.for_removal
+            assert not instance.for_moving
 
     def test_fileid(self, ct, tdir):
         """Test FileInstance.FileID when not staged."""
@@ -1238,8 +1285,9 @@ class TestFileSet:
         s = str(fs)
         assert "Managed instances" in s
         assert (
-            "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
-        )
+            "PATIENT: PatientID='1CT1', "
+            "PatientName='CompressedSamples^CT1'"
+        ) in s
         assert (
             "STUDY: StudyDate=20040119, StudyTime=072730, "
             "StudyDescription='e+1'" in s
@@ -1349,8 +1397,6 @@ class TestFileSet:
         assert not fs.is_staged
         fs.add(get_testdata_file("CT_small.dcm"))
         assert fs.is_staged
-        s = str(fs)
-        assert "+IMAGE: InstanceNumber=1, FileID=(no value available)" in s
 
     def test_add_add(self, ct, tdir):
         """Test calling FileSet.add() on the same Dataset."""
@@ -1359,8 +1405,6 @@ class TestFileSet:
         fs.add(ct)
         assert fs.is_staged
         assert 1 == len(fs)
-        s = str(fs)
-        assert "+IMAGE: InstanceNumber=1, FileID=(no value available)" in s
 
         ds, paths = write_fs(fs, tdir.name)
         assert 4 == len(ds.DirectoryRecordSequence)
@@ -1376,7 +1420,6 @@ class TestFileSet:
         instance = next(iter(fs))
         assert isinstance(instance, FileInstance)
         fs.remove(instance)
-        assert "-IMAGE: InstanceNumber=1" in str(fs)
         assert 0 == len(fs)
         with pytest.raises(StopIteration):
             next(iter(fs))
@@ -1386,7 +1429,14 @@ class TestFileSet:
         assert 0 == ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
         assert 0 == ds.OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity
         assert [] == paths
-        assert "Managed instances" not in str(fs)
+
+    def test_remove_iter(self, tiny):
+        """Test FileSet.remove() with iter(FileSet)."""
+        fs = FileSet(tiny)
+        for instance in fs:
+            fs.remove(instance)
+
+        assert 0 == len(fs)
 
     def test_remove_remove(self, ct, tdir):
         """Test removing an instance that's already removed."""
@@ -1642,38 +1692,147 @@ class TestFileSet:
         assert "removal" not in s
         assert "Managed instances:" not in s
 
-    def test_str_additions(self, ct, tdir):
+    def test_str(self, ct, dummy, tdir):
         """Test str(FileSet) with empty + additions."""
         fs = FileSet()
         fs.add(ct)
-        s = str(fs)
-        assert "write(): DICOMDIR creation, 1 addition" in s
-        assert "Managed instances:" in s
-        assert (
-            "PATIENT: PatientID=1CT1, PatientName=CompressedSamples^CT1" in s
-        )
-        assert (
-            "STUDY: StudyDate=20040119, StudyTime=072730, "
-            "StudyDescription='e+1'"
-        ) in s
-        assert "SERIES: Modality=CT, SeriesNumber=1" in s
-        assert "PATIENT: PatientID=4MR1" not in s
-        assert "STUDY: StudyDate=20040826, StudyTime=185059" not in s
-        assert "SERIES: Modality=MR, SeriesNumber=1" not in s
-
         fs.add(get_testdata_file("MR_small.dcm"))
-        s = str(fs)
-        assert (
-            "Changes staged for write(): DICOMDIR creation, 2 additions" in s
+
+        for p in list(Path(TINY_ALPHA_FILESET).parent.glob('**/*'))[::2]:
+            if p.is_file() and p.name not in ['DICOMDIR', 'README']:
+                fs.add(p)
+
+        instance = fs._instances[-1]
+        ds = dcmread(get_testdata_file("rtdose.dcm"))
+        ds.PatientID = '12345678'
+        ds.InstanceNumber = '1'
+        ds.StudyInstanceUID = instance.StudyInstanceUID
+        ds.SeriesInstanceUID = instance.SeriesInstanceUID
+        fs.add(ds)
+
+        ds = dcmread(get_testdata_file("rtplan.dcm"))
+        ds.PatientID = '12345678'
+        ds.InstanceNumber = '1'
+        ds.StudyInstanceUID = instance.StudyInstanceUID
+        ds.SeriesInstanceUID = instance.SeriesInstanceUID
+        fs.add(ds)
+
+        ds, opt = dummy
+        ds.SOPClassUID = ColorPaletteStorage
+        fs.add(ds)
+
+        ref = (
+            "DICOM File-set\n"
+            "  Root directory: (no value available)\n"
+            "  File-set ID: (no value available)\n"
+            f"  File-set UID: {fs.UID}\n"
+            "  Descriptor file ID: (no value available)\n"
+            "  Descriptor file character set: (no value available)\n"
+            "  Changes staged for write(): DICOMDIR creation, 30 additions\n"
+            "\n"
+            "  Managed instances:\n"
+            "    PATIENT: PatientID='1CT1', "
+            "PatientName='CompressedSamples^CT1'\n"
+            "      STUDY: StudyDate=20040119, StudyTime=072730, "
+            "StudyDescription='e+1'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 1 SOP Instance (1 addition)\n"
+            "    PATIENT: PatientID='4MR1', "
+            "PatientName='CompressedSamples^MR1'\n"
+            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
+            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "          IMAGE: 1 SOP Instance (1 addition)\n"
+            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
+            "      STUDY: StudyDate=20200913, StudyTime=161900, "
+            "StudyDescription='Testing File-set'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 25 SOP Instances (25 additions)\n"
+            "          RT DOSE: 1 SOP Instance (1 addition)\n"
+            "          RT PLAN: 1 SOP Instance (1 addition)\n"
+            "    PALETTE: 1 SOP Instance (to be added)"
         )
-        assert "PATIENT: PatientID=1CT1" in s
-        assert "STUDY: StudyDate=20040119, StudyTime=072730" in s
-        assert "SERIES: Modality=CT, SeriesNumber=1" in s
-        assert (
-            "PATIENT: PatientID=4MR1, PatientName=CompressedSamples^MR1" in s
+
+        assert ref == str(fs)
+
+        ds, paths = write_fs(fs, tdir.name)
+
+        ref = (
+            "  File-set ID: (no value available)\n"
+            f"  File-set UID: {fs.UID}\n"
+            "  Descriptor file ID: (no value available)\n"
+            "  Descriptor file character set: (no value available)\n"
+            "\n"
+            "  Managed instances:\n"
+            "    PATIENT: PatientID='1CT1', "
+            "PatientName='CompressedSamples^CT1'\n"
+            "      STUDY: StudyDate=20040119, StudyTime=072730, "
+            "StudyDescription='e+1'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 1 SOP Instance\n"
+            "    PATIENT: PatientID='4MR1', "
+            "PatientName='CompressedSamples^MR1'\n"
+            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
+            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "          IMAGE: 1 SOP Instance\n"
+            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
+            "      STUDY: StudyDate=20200913, StudyTime=161900, "
+            "StudyDescription='Testing File-set'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 25 SOP Instances\n"
+            "          RT DOSE: 1 SOP Instance\n"
+            "          RT PLAN: 1 SOP Instance\n"
+            "    PALETTE: 1 SOP Instance"
         )
-        assert "STUDY: StudyDate=20040826, StudyTime=185059" in s
-        assert "SERIES: Modality=MR, SeriesNumber=1" in s
+
+        assert ref in str(fs)
+
+        for instance in fs:
+            fs.remove(instance)
+
+        for p in list(Path(TINY_ALPHA_FILESET).parent.glob('**/*'))[1:40:2]:
+            if p.is_file() and p.name not in ['DICOMDIR', 'README']:
+                fs.add(p)
+
+        ref = (
+            "  File-set ID: (no value available)\n"
+            f"  File-set UID: {fs.UID}\n"
+            "  Descriptor file ID: (no value available)\n"
+            "  Descriptor file character set: (no value available)\n"
+            "  Changes staged for write(): DICOMDIR update, 18 additions, "
+            "30 removals\n"
+            "\n"
+            "  Managed instances:\n"
+            "    PATIENT: PatientID='1CT1', "
+            "PatientName='CompressedSamples^CT1'\n"
+            "      STUDY: StudyDate=20040119, StudyTime=072730, "
+            "StudyDescription='e+1'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
+            "    PATIENT: PatientID='4MR1', "
+            "PatientName='CompressedSamples^MR1'\n"
+            "      STUDY: StudyDate=20040826, StudyTime=185059\n"
+            "        SERIES: Modality=MR, SeriesNumber=1\n"
+            "          IMAGE: 0 SOP Instances (1 initial, 1 removal)\n"
+            "    PATIENT: PatientID='12345678', PatientName='Citizen^Jan'\n"
+            "      STUDY: StudyDate=20200913, StudyTime=161900, "
+            "StudyDescription='Testing File-set'\n"
+            "        SERIES: Modality=CT, SeriesNumber=1\n"
+            "          IMAGE: 18 SOP Instances (25 initial, 18 additions, "
+            "25 removals)\n"
+            "          RT DOSE: 0 SOP Instances (1 initial, 1 removal)\n"
+            "          RT PLAN: 0 SOP Instances (1 initial, 1 removal)\n"
+            "    PALETTE: 1 SOP Instance (to be removed)"
+        )
+
+        assert ref in str(fs)
+
+    def test_str_update_structure(self, dicomdir):
+        """Test that the update structure comment appears."""
+        fs = FileSet(dicomdir)
+        assert (
+            "Changes staged for write(): DICOMDIR update, directory "
+            "structure update"
+        ) in str(fs)
 
 
 class TestFileSet_Load:
@@ -1944,6 +2103,13 @@ class TestFileSet_Load:
         assert len(ref) == len(fs)
         for ii, rr in zip(fs, ref):
             assert ii.SOPInstanceUID == rr.SOPInstanceUID
+
+    def test_load_dicomdir_no_uid(self, dicomdir):
+        """Test loading DICOMDIR with no UID"""
+        del dicomdir.file_meta.MediaStorageSOPInstanceUID
+        fs = FileSet(dicomdir)
+        assert fs.UID.is_valid
+        assert fs.UID == dicomdir.file_meta.MediaStorageSOPInstanceUID
 
 
 class TestFileSet_Modify:

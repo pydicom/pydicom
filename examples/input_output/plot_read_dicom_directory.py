@@ -3,7 +3,14 @@
 Read a DICOMDIR dataset
 =======================
 
-This example shows how to read a DICOM File-set's DICOMDIR dataset.
+This example shows how to read a DICOM :File-set's DICOMDIR dataset.
+
+.. note::
+
+    The :class:`~pydicom.fileset.FileSet` class is a much better way of working
+    with DICOM File-sets and allows creation and modification of DICOMDIR
+    files. See the :doc:`DICOM File-set example<plot_read_fileset>` or the
+    `File-set tutorial <../../tutorials/filesets.html>`_.
 
 """
 

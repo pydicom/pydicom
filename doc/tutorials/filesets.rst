@@ -107,8 +107,11 @@ within the sequence.
 .. warning::
 
     It's strongly recommended that you avoid making changes to a DICOMDIR
-    dataset unless you know what you're doing. Even minor changes may
-    require recalculating the offsets for each directory record.
+    dataset directly unless you know what you're doing. Even minor changes may
+    require recalculating the offsets for each directory record. Use the
+    :meth:`FileSet.add()<pydicom.fileset.FileSet.add>` and
+    :meth:`FileSet.remove()<pydicom.fileset.FileSet.remove>` methods (see
+    below) instead.
 
 Let's take a quick look at how some of our records are related. The first four
 items in our *Directory Records Sequence* are:
@@ -179,7 +182,7 @@ When loading a File-set, simply pass a DICOMDIR
 
 .. code-block:: python
 
-    >>> from pydicom.dicomdir import FileSet
+    >>> from pydicom.fileset import FileSet
     >>> fs = FileSet(ds)  # or FileSet(path)
 
 An overview of the File-set's contents is shown when printing:
@@ -188,38 +191,49 @@ An overview of the File-set's contents is shown when printing:
 
     >>> print(fs)
     DICOM File-set
-    Root directory: /home/user/env/lib/python3.7/site-packages/pydicom/data/test_files/dicomdirtests
-    File-set ID: PYDICOM_TEST
-    File-set UID: 1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187
-    Managed Instances:
-      PATIENT: PatientID=77654033, PatientName=Doe^Archibald
-        STUDY: StudyDate=20010101, StudyTime=000000, StudyDescription=XR C Spine Comp Min 4 Views
-          SERIES: Modality=CR, SeriesNumber=1
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.11
-          SERIES: Modality=CR, SeriesNumber=2
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.7
-          SERIES: Modality=CR, SeriesNumber=3
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196527414.5534.0.9
-        STUDY: StudyDate=19950903, StudyTime=173032, StudyDescription=CT, HEAD/BRAIN WO CONTRAST
-          SERIES: Modality=CT, SeriesNumber=2
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.93
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.94
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.95
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196530851.28319.0.96
-      PATIENT: PatientID=98890234, PatientName=Doe^Peter
-       STUDY: StudyDate=20010101, StudyTime=000000
-          SERIES: Modality=CT, SeriesNumber=4
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.3
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1194734704.16302.0.5
-          ...
-          SERIES: Modality=MR, SeriesNumber=700
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.121
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.120
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.122
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.119
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.123
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.125
-            IMAGE: SOPInstanceUID=1.3.6.1.4.1.5962.1.1.0.0.0.1196533885.18148.0.124
+      Root directory: /home/user/env/lib/python3.7/site-packages/pydicom/data/test_files/dicomdirtests
+      File-set ID: PYDICOM_TEST
+      File-set UID: 1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187
+      Descriptor file ID: (no value available)
+      Descriptor file character set: (no value available)
+      Changes staged for write(): DICOMDIR update, directory structure update
+
+      Managed instances:
+        PATIENT: PatientID='77654033', PatientName='Doe^Archibald'
+          STUDY: StudyDate=20010101, StudyTime=000000, StudyDescription='XR C Spine Comp Min 4 Views'
+            SERIES: Modality=CR, SeriesNumber=1
+              IMAGE: 1 SOP Instance
+            SERIES: Modality=CR, SeriesNumber=2
+              IMAGE: 1 SOP Instance
+            SERIES: Modality=CR, SeriesNumber=3
+              IMAGE: 1 SOP Instance
+          STUDY: StudyDate=19950903, StudyTime=173032, StudyDescription='CT, HEAD/BRAIN WO CONTRAST'
+            SERIES: Modality=CT, SeriesNumber=2
+              IMAGE: 4 SOP Instances
+        PATIENT: PatientID='98890234', PatientName='Doe^Peter'
+          STUDY: StudyDate=20010101, StudyTime=000000
+            SERIES: Modality=CT, SeriesNumber=4
+              IMAGE: 2 SOP Instances
+            SERIES: Modality=CT, SeriesNumber=5
+              IMAGE: 5 SOP Instances
+          STUDY: StudyDate=20030505, StudyTime=050743, StudyDescription='Carotids'
+            SERIES: Modality=MR, SeriesNumber=1
+              IMAGE: 1 SOP Instance
+            SERIES: Modality=MR, SeriesNumber=2
+              IMAGE: 1 SOP Instance
+          STUDY: StudyDate=20030505, StudyTime=025109, StudyDescription='Brain'
+            SERIES: Modality=MR, SeriesNumber=1
+              IMAGE: 1 SOP Instance
+            SERIES: Modality=MR, SeriesNumber=2
+              IMAGE: 3 SOP Instances
+          STUDY: StudyDate=20030505, StudyTime=045357, StudyDescription='Brain-MRA'
+            SERIES: Modality=MR, SeriesNumber=1
+              IMAGE: 1 SOP Instance
+            SERIES: Modality=MR, SeriesNumber=2
+              IMAGE: 3 SOP Instances
+            SERIES: Modality=MR, SeriesNumber=700
+              IMAGE: 7 SOP Instances
+
 
 The :class:`~pydicom.fileset.FileSet` class treats a File-set as a flat
 collection of SOP Instances, abstracting away the need to dig down into the
@@ -327,7 +341,7 @@ Removing instances
 Applying the changes
 ....................
 
-The changes won't take affect until you call :func`FileSet.write()
+The changes won't take affect until you call :meth:`FileSet.write()
 <pydicom.fileset.FileSet.write>`. When adding instances to an
 existing File-set, the instances will not be consolidated within the
 directory structure. To reduce the memory requirements, an additional datasets
@@ -335,7 +349,7 @@ will be staged to a temporary directory.
 
 .. code-block:: python
 
-    >>> fs.write(Path()) # Save the file-set to a new location
+    >>> fs.write() # Save the file-set to a new location
 
 
 Creating a new File-set
@@ -347,4 +361,4 @@ You can create a new File-set:
 
     >>> fs = FileSet())
     >>> fs.add(get_testdata_file("CT_small.dcm"))
-    >>> fs.write(Path())
+    >>> fs.write()

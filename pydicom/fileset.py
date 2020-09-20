@@ -418,21 +418,25 @@ class RecordNode:
         if rtype == "PATIENT":
             # PS3.3, Annex F.5.1: Each Patient ID is unique within a File-set
             return self._record.PatientID
-        if rtype == "STUDY" and "StudyInstanceUID" in self._record:
+        if rtype == "STUDY":
             # PS3.3, Annex F.5.2: Type 1C
-            return self._record.StudyInstanceUID
+            if "StudyInstanceUID" in self._record:
+                return self._record.StudyInstanceUID
+            else:
+                return self._record.ReferencedSOPInstanceUIDInFile
         if rtype == "SERIES":
             return self._record.SeriesInstanceUID
         if rtype == "PRIVATE":
             return self._record.PrivateRecordUID
 
         # PS3.3, Table F.3-3: Required if record references an instance
-        if "ReferencedSOPInstanceUIDInFile" in self._record:
+        try:
             return self._record.ReferencedSOPInstanceUIDInFile
-
-        raise ValueError(
-            f"Invalid '{rtype}' record - missing required element"
-        )
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Invalid '{rtype}' record - missing required element "
+                "'Referenced SOP Instance UID in File'"
+            ) from exc
 
     @property
     def next(self) -> Union["RecordNode", None]:
@@ -466,9 +470,67 @@ class RecordNode:
         indent_char : str, optional
             The characters to use to indent each level of the tree.
         """
+        def leaf_summary(node, indent_char):
+            """Summarize the leaves at the current level."""
+            # Examples:
+            #   IMAGE: 15 SOP Instances (10 initial, 9 additions, 4 removals)
+            #   RTDOSE: 1 SOP Instance
+            out = []
+            if not node.children:
+                indent = indent_char * node.depth
+                sibs = [ii for ii in node.parent if ii.has_instance]
+                # Split into record types
+                rtypes = {ii.record_type for ii in sibs}
+                for record_type in sorted(rtypes):
+                    # nr = initial + additions
+                    nr = [ii for ii in sibs if ii.record_type == record_type]
+                    add = len([ii for ii in nr if ii.instance.for_addition])
+                    rm = len([ii for ii in nr if ii.instance.for_removal])
+                    nr = len(nr)
+                    initial = nr - add
+                    result = nr - rm
+
+                    changes = []
+                    if (add or rm) and initial > 0:
+                        changes.append(f"{initial} initial")
+                    if add:
+                        plural = 's' if add > 1 else ''
+                        changes.append(f"{add} addition{plural}")
+                    if rm:
+                        plural = 's' if rm > 1 else ''
+                        changes.append(f"{rm} removal{plural}")
+
+                    summary = (
+                        f"{indent}{record_type}: {result} "
+                        f"SOP Instance{'' if result == 1 else 's'}"
+                    )
+                    if changes:
+                        summary += f" ({', '.join(changes)})"
+
+                    out.append(summary)
+
+
+            return out
+
         s = []
         for node in self:
-            s.append(f"{indent_char * node.depth}{str(node)}")
+            indent = indent_char * node.depth
+            if node.children:
+                s.append(f"{indent}{str(node)}")
+                # Summarise any leaves at the next level
+                for child in node.children:
+                    if child.has_instance:
+                        s.extend(leaf_summary(child, indent_char))
+                        break
+            elif node.depth == 0 and node.has_instance:
+                # Single-level records
+                line = f"{indent}{node.record_type}: 1 SOP Instance"
+                if node.instance.for_addition:
+                    line += " (to be added)"
+                elif node.instance.for_removal:
+                    line += " (to be removed)"
+
+                s.append(line)
 
         return s
 
@@ -567,17 +629,14 @@ class RecordNode:
             return "ROOT"
 
         ds = self._record
-
-        if self.has_instance and self.instance.for_addition:
-            record_type = f"+{self.record_type}"
-        elif self.has_instance and self.instance.for_removal:
-            record_type = f"-{self.record_type}"
-        else:
-            record_type = f"{self.record_type}"
+        record_type = f"{self.record_type}"
 
         s = []
         if self.record_type == "PATIENT":
-            s += [f"PatientID={ds.PatientID}", f"PatientName={ds.PatientName}"]
+            s += [
+                f"PatientID='{ds.PatientID}'",
+                f"PatientName='{ds.PatientName}'"
+            ]
         elif self.record_type == "STUDY":
             s += [f"StudyDate={ds.StudyDate}", f"StudyTime={ds.StudyTime}"]
             if getattr(ds, "StudyDescription", None):
@@ -588,13 +647,6 @@ class RecordNode:
             s.append(f"InstanceNumber={ds.InstanceNumber}")
         else:
             s.append(f"{self.key}")
-
-        try:
-            _file_id = self._file_id
-            path = os.fspath(_file_id) if _file_id else "(no value available)"
-            s.append(f"FileID={path}")
-        except AttributeError:
-            pass
 
         return f"{record_type}: {', '.join(s)}"
 
@@ -751,6 +803,12 @@ class FileInstance:
         """Return ``True`` if the instance will be moved to a new location
         within the File-set.
         """
+        if self.for_addition:
+            return False
+
+        if self["ReferencedFileID"].VM == 1:
+            return [self.ReferencedFileID] != self.FileID.split(os.path.sep)
+
         return self.ReferencedFileID != self.FileID.split(os.path.sep)
 
     @property
@@ -1479,7 +1537,7 @@ class FileSet:
 
     def __iter__(self) -> FileInstance:
         """Yield :class:`~pydicom.fileset.FileInstance` from the File-set."""
-        yield from self._instances
+        yield from self._instances[:]
 
     def __len__(self) -> int:
         """Return the number of instances in the File-set."""
@@ -1550,9 +1608,11 @@ class FileSet:
 
         self.clear()
         self._id = ds.get("FileSetID", None)
-        self._uid = ds.file_meta.get(
-            "MediaStorageSOPInstanceUID", generate_uid()
-        )
+        uid = ds.file_meta.get("MediaStorageSOPInstanceUID")
+        if not uid:
+            uid = generate_uid()
+            ds.file_meta.MediaStorageSOPInstanceUID = uid
+        self._uid = uid
         self._descriptor = ds.get("FileSetDescriptorFileID", None)
         self._charset = ds.get(
             "SpecificCharacterSetOfFileSetDescriptorFile", None
@@ -1812,7 +1872,6 @@ class FileSet:
             self._stage['-'][instance.SOPInstanceUID] = instance
             self._instances.remove(instance)
 
-    # TODO: Fix str representation
     def __str__(self) -> str:
         """Return a string representation of the FileSet."""
         s = [
@@ -1836,7 +1895,10 @@ class FileSet:
             else:
                 changes.append("DICOMDIR update")
 
-            if self._stage['+'] or self._stage['-']:
+            if self._stage['~']:
+                changes.append("directory structure update")
+
+            if self._stage['+']:
                 suffix = 's' if len(self._stage['+']) > 1 else ''
                 changes.append(f"{len(self._stage['+'])} addition{suffix}")
             if self._stage['-']:
@@ -1980,7 +2042,7 @@ class FileSet:
         # We need to be careful not to overwrite the source file
         #   for a different (later) instance
         # Check for collisions between the new and old File IDs
-        #   and move any to the stage
+        #   and copy any to the stage
         fout = {Path(ii.FileID) for ii in self}
         fin = {
             ii.node._file_id for ii in self
