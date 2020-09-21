@@ -846,6 +846,7 @@ class TestFileInstance:
         assert (
             Path(fs._stage['path']) / Path(instance.SOPInstanceUID)
         ) == Path(instance.path)
+        assert isinstance(instance.path, str)
 
     def test_path_move(self, dicomdir):
         """Test FileInstance.path for an instance to be move."""
@@ -857,6 +858,7 @@ class TestFileInstance:
         assert (
             Path(fs.path) / Path(*instance.ReferencedFileID)
         ) == Path(instance.path)
+        assert isinstance(instance.path, str)
 
     def test_path_removal(self, dicomdir, tdir):
         """Test FileInstance.FileID when staged for removal."""
@@ -868,6 +870,7 @@ class TestFileInstance:
         assert (
             Path(fs.path) / Path(*instance.ReferencedFileID)
         ) == Path(instance.path)
+        assert isinstance(instance.path, str)
 
     def test_load(self, ct, tdir):
         """Test FileInstance.load() when not staged."""
@@ -1595,17 +1598,19 @@ class TestFileSet:
     def test_add_custom_bad_leaf(self, ct, tdir, custom_leaf):
         """Test FileSet.add_custom() with a bad leaf record."""
         del custom_leaf._record.ReferencedSOPClassUIDInFile
+        del custom_leaf._record.ReferencedFileID
+        del custom_leaf._record.ReferencedSOPInstanceUIDInFile
+        del custom_leaf._record.ReferencedTransferSyntaxUIDInFile
 
         fs = FileSet()
-        msg = (
-            r"The directory record for the leaf node is missing the "
-            r"following required elements: ReferencedSOPClassUIDInFile"
+        instance = fs.add_custom(ct, custom_leaf)
+        assert 1 == len(fs)
+        assert ct.SOPClassUID == instance.ReferencedSOPClassUIDInFile
+        assert instance.ReferencedFileID is None
+        assert ct.SOPInstanceUID == instance.ReferencedSOPInstanceUIDInFile
+        assert ct.file_meta.TransferSyntaxUID == (
+            instance.ReferencedTransferSyntaxUIDInFile
         )
-        with pytest.raises(ValueError, match=msg):
-            fs.add_custom(ct, custom_leaf)
-        assert 0 == len(fs)
-        with pytest.warns(UserWarning):
-            assert [] == fs.find(SOPInstanceUID=ct.SOPInstanceUID)
 
     def test_add_custom_add_add(self, ct, tdir, custom_leaf):
         """Test add_custom() if the instance is already in the File-set."""

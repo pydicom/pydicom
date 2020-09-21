@@ -1115,19 +1115,13 @@ class FileSet:
         if have_instance:
             return have_instance[0]
 
-        # Check the leaf node's record contains the required elements
-        keywords = [
-            "ReferencedFileID",
-            "ReferencedSOPClassUIDInFile",
-            "ReferencedSOPInstanceUIDInFile",
-            "ReferencedTransferSyntaxUIDInFile"
-        ]
-        missing = [kw for kw in keywords if kw not in leaf._record]
-        if missing:
-            raise ValueError(
-                "The directory record for the leaf node is missing the "
-                f"following required elements: {', '.join(missing)}"
-            )
+        # Ensure the leaf node's record contains the required elements
+        leaf._record.ReferencedFileID = None
+        leaf._record.ReferencedSOPClassUIDInFile = ds.SOPClassUID
+        leaf._record.ReferencedSOPInstanceUIDInFile = key
+        leaf._record.ReferencedTransferSyntaxUIDInFile = (
+            ds.file_meta.TransferSyntaxUID
+        )
 
         instance = FileInstance(leaf)
         leaf.instance = instance
@@ -1861,7 +1855,7 @@ class FileSet:
             del self._stage['+'][instance.SOPInstanceUID]
             # Delete file from stage
             try:
-                instance.path.unlink()
+                Path(instance.path).unlink()
             except FileNotFoundError:
                 pass
             instance._apply_stage('-')

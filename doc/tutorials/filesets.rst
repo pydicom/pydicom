@@ -229,9 +229,10 @@ parameter:
     >>> len(fs.find(PatientID='77654033', PhotometricInterpretation='MONOCHROME1', load=True))
     3
 
-
+Modifying a File-set
+--------------------
 :class:`~pydicom.fileset.FileSet` and staging
----------------------------------------------
+.............................................
 
 Before we go any further we need to discuss how the
 :class:`~pydicom.fileset.FileSet` class manages changes to the File-set.
@@ -279,29 +280,56 @@ contain at least one of the following:
 * ``M removals``:  *M* instances will be removed from the File-set
 
 
-Modifying an existing File-set
-------------------------------
-
 Adding instances
 ................
-Adding instances is done through either the
-:meth:`~pydicom.fileset.FileSet.add` or
-:meth:`~pydicom.fileset.FileSet.add_custom` methods.
 
-:meth:`~pydicom.fileset.FileSet.add` is for normal DICOM SOP Instances and
-takes either the instances as a :class:`~pydicom.dataset.Dataset` or the
-path to an instance, and returns the instance as a
-:class:`~pydicom.fileset.FileInstance`.
+New SOP instances are added to the File-set with the
+:meth:`~pydicom.fileset.FileSet.add` and
+:meth:`~pydicom.fileset.FileSet.add_custom` methods. The
+:meth:`~pydicom.fileset.FileSet.add` method takes the instance
+as a :class:`~pydicom.dataset.Dataset` or the path to the instance and uses
+the default directory record creation functions of the FileSet class to build
+the corresponding hierarchy, returning the added instance as
+a :class:`~pydicom.fileset.FileInstance`. Which get staged for addition to
+the File-set. (FIXME: reword, explain staging directory)
 
 .. code-block:: python
 
-    >>> instance = fs.add(get_testdata_file("CT_small.dcm"))
+    >>> path = get_testdata_file("CT_small.dcm")
+    >>> instance = fs.add(path)
     >>> instance.path
     '/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
     >>> instance.is_staged
     True
     >>> instance.for_addition
     True
+
+Alternatively, if you want to use PRIVATE records or use your own directory
+record creators, you can use the
+:meth:`~pydicom.fileset.FileSet.add_custom` method, which also takes the
+instance or path to the instance but also requires the leaf node of the hierarcy
+as a RecordNode object. (FIXME: explain leaf node or reword)
+
+>>> from pydicom.dataset import Dataset
+>>> from pydicom.fileset import RecordNode
+>>> ds = dcmread(get_testdata_file("MR_small.dcm"))
+>>> record = Dataset()
+>>> record.DirectoryRecordType = "PRIVATE"
+>>> record.PrivateRecordUID = generate_uid()
+>>> leaf_node = RecordNode(record)
+>>> record = Dataset()
+>>> record.DirectoryRecordType = "PATIENT"
+>>> record.PatientID = ds.PatientID
+>>> record.PatientName = ds.PatientName
+>>> top_node = RecordNode(record)
+>>> leaf_node.parent = top_node
+>>> instance = fs.add_custom(ds, leaf_node)
+>>> instance.path
+'/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
+>>> instance.is_staged
+True
+>>> instance.for_addition
+True
 
 When instances are staged for addition they're stored in a temporary directory.
 
