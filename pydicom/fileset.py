@@ -1946,6 +1946,7 @@ class FileSet:
         self,
         path: Optional[Union[str, PathLike]] = None,
         dicomdir_only: bool = False,
+        use_existing: bool = False,
         force_implicit: bool = False
     ) -> None:
         """Write the File-set, or changes to the File-set, to the file system.
@@ -1956,6 +1957,32 @@ class FileSet:
             that you follow standard data management practices and ensure that
             you have an up-to-date backup of the original data.
 
+        By default, for both new or existing File-sets, *pydicom* uses the
+        following directory structure semantics when writing out changes:
+
+        * For instances defined using the standard four-levels of directory
+          records (i.e. PATIENT/STUDY/SERIES + one of the record types
+          such as IMAGE or RT DOSE): ``PTxxxxxx/STxxxxxx/SExxxxxx/`` with a
+          filename such as ``IMxxxxxx`` (for IMAGE), where the first two
+          characters are dependent on the record type and ``xxxxxx`` is a
+          numeric or alphanumeric index.
+        * For instances defined using the standard one-level directory record
+          (i.e. PALETTE, IMPLANT): a filename such as ``PAxxxxxx`` (for
+          PALETTE).
+        * For instances defined using PRIVATE directory records then the
+          structure will be along the lines of ``P0xxxxxx/P1xxxxxx/P2xxxxxx``
+          for PRIVATE/PRIVATE/PRIVATE, ``PTxxxxxx/STxxxxxx/P2xxxxxx`` for
+          PATIENT/STUDY/PRIVATE.
+
+        When instances have only been removed from an existing File-set then
+        you can use the `use_existing` keyword parameter to keep the existing
+        directory structure and only update the DICOMDIR file.
+
+        When no instances have been added to or removed from an existing
+        File-set then you can use the `dicomdir_only` keyword parameter to
+        keep the existing directory structure and only update the DICOMDIR
+        file.
+
         Parameters
         ----------
         path : str or PathLike, optional
@@ -1965,9 +1992,16 @@ class FileSet:
             If ``True`` and no instances have been added or removed from the
             File-set, then only update the DICOMDIR file (default ``False``).
             This is useful when you only want to update one of the elements in
-            the File-set Identification Module such as (0004,1130) *File-set
-            ID*. Modifying the DICOMDIR dataset directly is not recommended as
-            the offsets in the directory records will all need to be updated.
+            the :dcm:`File-set Identification Module
+            <part03/sect_F.3.2.html#sect_F.3.2.1>` such as (0004,1130)
+            *File-set ID*. Modifying the DICOMDIR dataset directly is not
+            recommended as the offsets in the directory records will all need
+            to be updated.
+        use_existing : bool, optional
+            If ``True`` and no instances have been added to the File-set
+            (removals are OK), then keep the current directory structure rather
+            than converting everything to the semantics used by *pydicom* for
+            File-sets (default ``False``).
         force_implicit : bool, optional
             If ``True`` force the DICOMDIR file to be encoded using *Implicit
             VR Little Endian* which is non-conformant to the DICOM Standard
@@ -1975,9 +2009,12 @@ class FileSet:
 
         Raises
         ------
-        RuntimeError
-            If `dicomdir_only` is ``True`` but instances have been staged for
-            addition to - or removal from - the File-set.
+        ValueError
+
+            * If `dicomdir_only` is ``True`` but instances have been staged for
+              addition to - or removal from - the File-set.
+            * If `use_existing` is ``True`` but instances have been staged
+              for addition to the File-set.
         """
         if not path and self.path is None:
             raise ValueError(
@@ -2006,7 +2043,7 @@ class FileSet:
         #   * only moves are required and `dicomdir_only` is True
         major_change = bool(self._stage['+']) or bool(self._stage['-'])
         if dicomdir_only and major_change:
-            raise RuntimeError(
+            raise ValueError(
                 "'Fileset.write()' called with 'dicomdir_only' but changes to "
                 "the File-set's managed instances are staged"
             )
@@ -2022,6 +2059,12 @@ class FileSet:
             self._ds = dcmread(p)
             self._stage['^'] = False
             return
+
+        if use_existing and bool(self._stage['+']):
+            raise ValueError(
+                "'Fileset.write()' called with 'use_existing' but additions "
+                "to the File-set's managed instances are staged"
+            )
 
         # Worst case scenario if all instances in one directory
         if len(self) > 10**6:
@@ -2040,6 +2083,18 @@ class FileSet:
             except FileNotFoundError:
                 pass
             self._tree.remove(instance.node)
+
+        if use_existing:
+            # Just update the DICOMDIR file
+            with open(p, 'wb') as f:
+                f = DicomFileLike(f)
+                self._write_dicomdir(f, force_implicit=force_implicit)
+
+            self._ds = dcmread(p)
+            self._stage['^'] = False
+            self._stage['-'] = {}
+
+            return
 
         # We need to be careful not to overwrite the source file
         #   for a different (later) instance

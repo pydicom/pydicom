@@ -2182,7 +2182,7 @@ class TestFileSet_Modify:
             r"'Fileset.write\(\)' called with 'dicomdir_only' but changes to "
             r"the File-set's managed instances are staged"
         )
-        with pytest.raises(RuntimeError, match=msg):
+        with pytest.raises(ValueError, match=msg):
             fs.write(dicomdir_only=True)
 
     def test_remove_addition_bad_path(self, dicomdir, ct):
@@ -2291,6 +2291,38 @@ class TestFileSet_Modify:
         assert len(ref) == len(fs)
         for ii, rr in zip(fs, ref):
             assert ii.SOPInstanceUID == rr.SOPInstanceUID
+
+    def test_write_use_existing(self, dicomdir_copy):
+        """Test write() with use_existing."""
+        tdir, ds = dicomdir_copy
+        assert 52 == len(ds.DirectoryRecordSequence)
+        fs = FileSet(ds)
+        orig_paths = [p for p in fs._path.glob('**/*') if p.is_file()]
+        instance = fs._instances[0]
+        assert Path(instance.path) in orig_paths
+        fs.remove(instance)
+        fs.write(use_existing=True)
+        assert 50 == len(fs._ds.DirectoryRecordSequence)
+        paths = [p for p in fs._path.glob('**/*') if p.is_file()]
+
+        assert Path(instance.path) not in paths
+        assert sorted(orig_paths)[1:] == sorted(paths)
+        assert {} == fs._stage['-']
+        assert not fs._stage['^']
+        assert {} == fs._stage['+']
+        assert fs._stage['~']
+
+    def test_write_use_existing_raises(self, dicomdir, ct):
+        """Test write() with use_existing raises if additions."""
+        fs = FileSet(dicomdir)
+        fs.remove(fs._instances[0])
+        fs.add(ct)
+        msg = (
+            r"'Fileset.write\(\)' called with 'use_existing' but additions "
+            r"to the File-set's managed instances are staged"
+        )
+        with pytest.raises(ValueError, match=msg):
+            fs.write(use_existing=True)
 
     def test_add_instance_missing(self, tdir):
         """Test adding an instance missing a required value."""
