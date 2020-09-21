@@ -2151,8 +2151,8 @@ class TestFileSet_Modify:
         ds = dcmread(Path(fs.path) / "DICOMDIR")
         assert ["1", "2", "3"] == ds.FileSetDescriptorFileID
 
-    def test_write_dicomdir_only(self, dicomdir_copy):
-        """Test FileSet.write() with dicomdir_only."""
+    def test_write_dicomdir_use_existing(self, dicomdir_copy):
+        """Test FileSet.write() with use_existing."""
         tdir, ds = dicomdir_copy
         assert "FileSetDescriptorFileID" not in ds
         fs = FileSet(ds)
@@ -2160,7 +2160,7 @@ class TestFileSet_Modify:
         assert not fs._stage['+']
         assert not fs._stage['-']
         fs.descriptor_file_id = ["1", "2", "3"]
-        fs.write(dicomdir_only=True)
+        fs.write(use_existing=True)
         t = Path(tdir.name)
         # File IDs haven't changed
         assert [] == list(t.glob("PT000000"))
@@ -2168,8 +2168,8 @@ class TestFileSet_Modify:
         ds = dcmread(t / "DICOMDIR")
         assert ["1", "2", "3"] == ds.FileSetDescriptorFileID
 
-    def test_write_dicomdir_only_raises(self, dicomdir_copy, ct):
-        """Test FileSet.write() with dicomdir_only raises with +/- changes."""
+    def test_write_dicomdir_use_existing_raises(self, dicomdir_copy, ct):
+        """Test FileSet.write() with use_existing raises with +/- changes."""
         tdir, ds = dicomdir_copy
         assert "FileSetDescriptorFileID" not in ds
         fs = FileSet(ds)
@@ -2179,11 +2179,11 @@ class TestFileSet_Modify:
         assert not fs._stage['-']
         fs.descriptor_file_id = ["1", "2", "3"]
         msg = (
-            r"'Fileset.write\(\)' called with 'dicomdir_only' but changes to "
+            r"'Fileset.write\(\)' called with 'use_existing' but additions to "
             r"the File-set's managed instances are staged"
         )
         with pytest.raises(ValueError, match=msg):
-            fs.write(dicomdir_only=True)
+            fs.write(use_existing=True)
 
     def test_remove_addition_bad_path(self, dicomdir, ct):
         """Test removing a missing file from the File-set's stage."""
@@ -2278,7 +2278,7 @@ class TestFileSet_Modify:
         tdir, ds = dicomdir_copy
         fs = FileSet(ds)
         with pytest.warns(UserWarning):
-            fs.write(force_implicit=True, dicomdir_only=True)
+            fs.write(force_implicit=True, use_existing=True)
         with pytest.warns(UserWarning):
             ds = dcmread(Path(fs.path) / "DICOMDIR")
         assert ImplicitVRLittleEndian == ds.file_meta.TransferSyntaxUID

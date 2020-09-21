@@ -1988,15 +1988,6 @@ class FileSet:
         path : str or PathLike, optional
             The absolute path to the root of the File-set. Required for new
             File-sets if the path hasn't already been set.
-        dicomdir_only : bool, optional
-            If ``True`` and no instances have been added or removed from the
-            File-set, then only update the DICOMDIR file (default ``False``).
-            This is useful when you only want to update one of the elements in
-            the :dcm:`File-set Identification Module
-            <part03/sect_F.3.2.html#sect_F.3.2.1>` such as (0004,1130)
-            *File-set ID*. Modifying the DICOMDIR dataset directly is not
-            recommended as the offsets in the directory records will all need
-            to be updated.
         use_existing : bool, optional
             If ``True`` and no instances have been added to the File-set
             (removals are OK), then keep the current directory structure rather
@@ -2010,11 +2001,8 @@ class FileSet:
         Raises
         ------
         ValueError
-
-            * If `dicomdir_only` is ``True`` but instances have been staged for
-              addition to - or removal from - the File-set.
-            * If `use_existing` is ``True`` but instances have been staged
-              for addition to the File-set.
+            If `use_existing` is ``True`` but instances have been staged
+            for addition to the File-set.
         """
         if not path and self.path is None:
             raise ValueError(
@@ -2038,33 +2026,17 @@ class FileSet:
         # Path to the DICOMDIR file
         p = self._path / 'DICOMDIR'
 
-        # Write just the DICOMDIR if:
-        #   * only the File-set Idenfitication module elements have changed, or
-        #   * only moves are required and `dicomdir_only` is True
-        major_change = bool(self._stage['+']) or bool(self._stage['-'])
-        if dicomdir_only and major_change:
-            raise ValueError(
-                "'Fileset.write()' called with 'dicomdir_only' but changes to "
-                "the File-set's managed instances are staged"
-            )
-
-        if not dicomdir_only:
-            major_change |= self._stage['~']
-
-        if dicomdir_only and not major_change:
-            with open(p, 'wb') as f:
-                f = DicomFileLike(f)
-                self._write_dicomdir(f, force_implicit=force_implicit)
-
-            self._ds = dcmread(p)
-            self._stage['^'] = False
-            return
-
-        if use_existing and bool(self._stage['+']):
+        # Re-use the existing directory structure if only moves or removals
+        #   are required and `use_existing` is True
+        major_change = bool(self._stage['+'])
+        if use_existing and major_change:
             raise ValueError(
                 "'Fileset.write()' called with 'use_existing' but additions "
                 "to the File-set's managed instances are staged"
             )
+
+        if not use_existing:
+            major_change |= self._stage['~']
 
         # Worst case scenario if all instances in one directory
         if len(self) > 10**6:
@@ -2084,15 +2056,12 @@ class FileSet:
                 pass
             self._tree.remove(instance.node)
 
-        if use_existing:
-            # Just update the DICOMDIR file
+        if use_existing and not major_change:
             with open(p, 'wb') as f:
                 f = DicomFileLike(f)
                 self._write_dicomdir(f, force_implicit=force_implicit)
 
-            self._ds = dcmread(p)
-            self._stage['^'] = False
-            self._stage['-'] = {}
+            self.load(p, raise_orphans=True)
 
             return
 
