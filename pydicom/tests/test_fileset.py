@@ -2301,10 +2301,11 @@ class TestFileSet_Modify:
         instance = fs._instances[0]
         assert Path(instance.path) in orig_paths
         fs.remove(instance)
+        orig_file_ids = [ii.ReferencedFileID for ii in fs]
         fs.write(use_existing=True)
         assert 50 == len(fs._ds.DirectoryRecordSequence)
         paths = [p for p in fs._path.glob('**/*') if p.is_file()]
-
+        assert orig_file_ids == [ii.ReferencedFileID for ii in fs]
         assert Path(instance.path) not in paths
         assert sorted(orig_paths)[1:] == sorted(paths)
         assert {} == fs._stage['-']

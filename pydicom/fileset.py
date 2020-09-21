@@ -1974,14 +1974,10 @@ class FileSet:
           for PRIVATE/PRIVATE/PRIVATE, ``PTxxxxxx/STxxxxxx/P2xxxxxx`` for
           PATIENT/STUDY/PRIVATE.
 
-        When instances have only been removed from an existing File-set then
-        you can use the `use_existing` keyword parameter to keep the existing
-        directory structure and only update the DICOMDIR file.
-
-        When no instances have been added to or removed from an existing
-        File-set then you can use the `dicomdir_only` keyword parameter to
-        keep the existing directory structure and only update the DICOMDIR
-        file.
+        When only changes to the DICOMDIR file are required or instances have
+        only been removed from an existing File-set then you can use the
+        `use_existing` keyword parameter to keep the existing directory
+        structure and only update the DICOMDIR file.
 
         Parameters
         ----------
@@ -1990,9 +1986,10 @@ class FileSet:
             File-sets if the path hasn't already been set.
         use_existing : bool, optional
             If ``True`` and no instances have been added to the File-set
-            (removals are OK), then keep the current directory structure rather
-            than converting everything to the semantics used by *pydicom* for
-            File-sets (default ``False``).
+            (removals are OK), then only update the DICOMDIR file, keeping
+            the current directory structure rather than converting everything
+            to the semantics used by *pydicom* for File-sets (default
+            ``False``).
         force_implicit : bool, optional
             If ``True`` force the DICOMDIR file to be encoded using *Implicit
             VR Little Endian* which is non-conformant to the DICOM Standard
