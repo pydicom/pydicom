@@ -509,7 +509,6 @@ class RecordNode:
 
                     out.append(summary)
 
-
             return out
 
         s = []
@@ -1054,7 +1053,7 @@ class FileSet:
         self._stage['+'][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
         instance._apply_stage('+')
-        ds.save_as(instance._stage_path, write_like_original=False)
+        ds.save_as(instance.path, write_like_original=False)
 
         return instance
 
@@ -1139,7 +1138,7 @@ class FileSet:
         self._stage['+'][instance.SOPInstanceUID] = instance
         self._instances.append(instance)
         instance._apply_stage('+')
-        ds.save_as(instance._stage_path, write_like_original=False)
+        ds.save_as(instance.path, write_like_original=False)
 
         return instance
 
@@ -1169,7 +1168,7 @@ class FileSet:
 
         Changes staged to the original :class:`~pydicom.fileset.FileSet` will
         be applied to the new File-set. The original
-        :class:`~pydicom.fileset.FileSet` will be remain staged.
+        :class:`~pydicom.fileset.FileSet` will remain staged.
 
         Parameters
         ----------
@@ -1211,15 +1210,9 @@ class FileSet:
         file_ids = []
         for instance in self:
             file_ids.append(instance.ReferencedFileID)
-            if instance.SOPInstanceUID in self._stage['+']:
-                # Additions get copied from the stage
-                src = instance._stage_path
-            else:
-                src = instance.path
-
             dst = path / Path(instance.FileID)
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(src, dst)
+            shutil.copyfile(instance.path, dst)
             instance.node._record.ReferencedFileID = (
                 instance.FileID.split(os.path.sep)
             )
@@ -1631,7 +1624,16 @@ class FileSet:
                 bad_instances.append(instance)
                 continue
 
-            (self.path / file_id).resolve(strict=True)
+            try:
+                (self.path / file_id).resolve(strict=True)
+            except FileNotFoundError:
+                bad_instances.append(instance)
+                warnings.warn(
+                    "The referenced SOP Instance for the directory record at "
+                    f"offset {instance.node._offset} does not exist: "
+                    f"{self.path / file_id}"
+                )
+                continue
             # If the instance's existing directory structure doesn't match
             #   the pydicom semantics then stage for movement
             if instance.for_moving:
@@ -1860,7 +1862,7 @@ class FileSet:
             del self._stage['+'][instance.SOPInstanceUID]
             # Delete file from stage
             try:
-                instance._stage_path.unlink()
+                instance.path.unlink()
             except FileNotFoundError:
                 pass
             instance._apply_stage('-')
@@ -2053,14 +2055,14 @@ class FileSet:
             self._stage['+'][instance.SOPInstanceUID] = instance
             instance._apply_stage('+')
             shutil.copyfile(
-                self._path / instance.node._file_id, instance._stage_path
+                self._path / instance.node._file_id, instance.path
             )
 
         for instance in self:
             dst = self._path / instance.FileID
             dst.parent.mkdir(parents=True, exist_ok=True)
             if instance.SOPInstanceUID in self._stage['+']:
-                src = instance._stage_path
+                src = instance.path
                 fn = shutil.copyfile
             else:
                 src = self._path / instance.node._file_id

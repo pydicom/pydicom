@@ -99,7 +99,7 @@ fs.ID = "MY FILESET"
 fs.UID = generate_uid()
 # (0004,1141) File-set Descriptor File ID
 fs.descriptor_file_id = "README"
- # (0004,1142) Specific Character Set of File-set Descriptor File
+# (0004,1142) Specific Character Set of File-set Descriptor File
 fs.descriptor_character_set = "ISO_IR 100"
 
 # Changes to the File-set are staged until write() is called

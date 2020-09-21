@@ -1972,6 +1972,21 @@ class TestFileSet_Load:
         assert [] == fs.find(SOPInstanceUID=uid)
         assert 30 == len(fs)
 
+    def test_bad_file_id(self, dicomdir):
+        """Test loading a record with a bad File ID."""
+        item = dicomdir.DirectoryRecordSequence[5]
+        item.ReferencedFileID[-1] = "MISSING"
+        uid = item.ReferencedSOPInstanceUIDInFile
+        msg = (
+            r"The referenced SOP Instance for the directory record at offset "
+            r"1220 does not exist:"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            fs = FileSet(dicomdir)
+
+        assert [] == fs.find(SOPInstanceUID=uid)
+        assert 30 == len(fs)
+
     def test_load_orphans_raise(self, private):
         """Test loading orphaned records raises exception."""
         ds = private
