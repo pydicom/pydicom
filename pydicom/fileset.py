@@ -915,10 +915,9 @@ class FileInstance:
             staged file in the temporary staging directory.
         """
         if self.for_addition:
-            return self._stage_path
+            return os.fspath(self._stage_path)
 
-        root = Path(self.file_set.path)
-        return os.fspath(root / self.node._file_id)
+        return os.fspath(Path(self.file_set.path) / self.node._file_id)
 
     @property
     def SOPClassUID(self) -> UID:
@@ -1953,7 +1952,7 @@ class FileSet:
 
         .. warning::
 
-            If modifying an existing File-set then it's strongly recommended
+            If modifying an existing File-set it's strongly recommended
             that you follow standard data management practices and ensure that
             you have an up-to-date backup of the original data.
 
@@ -1975,15 +1974,16 @@ class FileSet:
           PATIENT/STUDY/PRIVATE.
 
         When only changes to the DICOMDIR file are required or instances have
-        only been removed from an existing File-set then you can use the
+        only been removed from an existing File-set you can use the
         `use_existing` keyword parameter to keep the existing directory
         structure and only update the DICOMDIR file.
 
         Parameters
         ----------
         path : str or PathLike, optional
-            The absolute path to the root of the File-set. Required for new
-            File-sets if the path hasn't already been set.
+            For new File-sets, the absolute path to the root directory where
+            the File-set will be written. Using `path` with an existing
+            File-set will raise :class:`ValueError`.
         use_existing : bool, optional
             If ``True`` and no instances have been added to the File-set
             (removals are OK), then only update the DICOMDIR file, keeping

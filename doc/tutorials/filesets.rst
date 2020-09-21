@@ -4,10 +4,11 @@ DICOM File-sets and DICOMDIR
 
 This tutorial is about DICOM File-sets and covers
 
-* An introduction to DICOM File-sets
-* Reading and accessing the records in a DICOMDIR file
+* An introduction to DICOM File-sets and the DICOMDIR file
 * Loading a File-set using the :class:`~pydicom.fileset.FileSet` class and
   accessing its managed SOP instances
+* Modifying an existing File-set
+* Creating a new File-set
 
 It's assumed that you're already familiar with the :doc:`dataset basics
 <dataset_basics>`.
@@ -28,13 +29,13 @@ are given to a patient after a medical procedure (such as an MR or
 ultrasound), but are also used elsewhere. The specification for File-sets is
 given in :dcm:`Part 10 of the DICOM Standard<part10/chapter_8.html>`.
 
-The DICOMDIR
-------------
+The DICOMDIR file
+-----------------
 
 .. note::
 
     Despite its name, a DICOMDIR file is not a file system directory and
-    is read using :func:`~pydicom.filereader.dcmread` like any other DICOM
+    can be read using :func:`~pydicom.filereader.dcmread` like any other DICOM
     dataset
 
 Every File-set must contain a single file with the filename ``DICOMDIR``, the
@@ -43,6 +44,13 @@ For the most commonly used media (DVD, CD, USB, PC file system, etc), the
 DICOMDIR file will be in the root directory of the File-set. For other
 media types, :dcm:`Part 12 of the DICOM Standard<part12/ps3.12.html>`
 specifies where the DICOMDIR must be located.
+
+.. warning::
+
+    It's **strongly recommended** that you avoid making changes to a DICOMDIR
+    dataset directly unless you know what you're doing. Even minor changes may
+    require recalculating the offsets for each directory record. Use the
+    :class:`~pydicom.fileset.FileSet` methods (see below) instead.
 
 The DICOMDIR file is used to summarize the contents of the File-set, and is a
 *Media Storage Directory* instance that follows the
@@ -58,14 +66,12 @@ The DICOMDIR file is used to summarize the contents of the File-set, and is a
     'Media Storage Directory Storage'
 
 The most important element in a DICOMDIR is the (0004,1220) *Directory
-Record Sequence*. Each item in the sequence is a *directory record*,
+Record Sequence*; each item in the sequence is a *directory record*,
 and one or more records are used to briefly describe the available SOP
-Instances and their location within the File-set's directory structure.
-
-At a minimum, every directory record has a (0004,1430) *Directory Record Type*
-and two elements that identify it's relationship to other records; (0004,1400)
-*Offset of the Next Directory Record* and (0004,1420) *Offset of Referenced
-Lower-level Directory Record*:
+Instances and their location within the File-set's directory structure. Each
+record has a *record type* given by the (0004,1430) *Directory Record Type*
+element, and different records are related to each other using the hierarchy
+given in :dcm:`Table F.4-1<part03/sect_F.4.html#table_F.4-1>`.
 
 .. code-block:: python
 
@@ -78,111 +84,33 @@ Lower-level Directory Record*:
     (0010, 0010) Patient's Name                      PN: 'Doe^Archibald'
     (0010, 0020) Patient ID                          LO: '77654033'
 
-The *Directory Record Type* specifies the *type* of the record, which is
-in turn affects what additional elements are available in the record. For a
-``'PATIENT'`` directory record we should also expect to see *Patient's Name*
-and *Patient ID* elements. The full list of available record types is defined
-in :dcm:`Annex F.5 of Part 3 of the DICOM Standard<part03/sect_F.5.html>`.
-
-Different record types are related to each other using the hierarchy given in
-:dcm:`Table F.4-1<part03/sect_F.4.html#table_F.4-1>` and the first record
-in the directory is determined through the (0004,1200)
-*Offset of the First Directory Record of the Root Directory Entity* element.
-This is the byte offset in the encoded DICOMDIR dataset to the corresponding
-record. The byte offset for each record is given by the sequence item's
-`seq_item_tell` attribute:
-
-.. code-block:: python
-
-    >>> ds.OffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity
-    396
-    >>> print(ds.DirectoryRecordSequence[0].seq_item_tell)
-    396
-
-So the first record for the directory is at offset 396, which for this dataset
-also happens to be the first item in the *Directory Record Sequence*. Having
-the first record as the first item isn't necessary; it could be at any location
-within the sequence.
-
-.. warning::
-
-    It's strongly recommended that you avoid making changes to a DICOMDIR
-    dataset directly unless you know what you're doing. Even minor changes may
-    require recalculating the offsets for each directory record. Use the
-    :meth:`FileSet.add()<pydicom.fileset.FileSet.add>` and
-    :meth:`FileSet.remove()<pydicom.fileset.FileSet.remove>` methods (see
-    below) instead.
-
-Let's take a quick look at how some of our records are related. The first four
-items in our *Directory Records Sequence* are:
-
-.. code-block:: python
-
-    >>> records = ds.DirectoryRecordSequence
-    >>> for idx in range(4):
-    ...     if idx == 0: print("idx: offset, type, next, child")
-    ...     record = records[idx]
-    ...     print(
-    ...         f"  {idx}: {record.seq_item_tell}, {record.DirectoryRecordType}, "
-    ...         f"{record.OffsetOfTheNextDirectoryRecord}, "
-    ...         f"{record.OffsetOfReferencedLowerLevelDirectoryEntity}"
-    ...     )
-    ...
-    idx: offset, type, next, child
-      0: 396, PATIENT, 3126, 510
-      1: 510, STUDY, 1814, 724
-      2: 724, SERIES, 1090, 856
-      3: 856, IMAGE, 0, 0
-
-* The PATIENT record has a sibling at offset 3126 and a child at offset 510
-  (the STUDY record at index 1)
-* The STUDY record has a sibling at offset 1814 and a child at 724
-  (the SERIES record at index 2)
-* The SERIES record has a sibling at offset 1090 and a child at offset 856
-  (the IMAGE record at index 3)
-* The IMAGE record has no children or siblings (as a value of ``0`` indicates
-  no next or lower record) and so lies at the end of this particular branch of
-  the hierarchy
-
-So our first four records are ordered as:
-
-* 396 PATIENT
-
-  * 510 STUDY
-
-   * 724 SERIES
-
-     * 856 IMAGE
-
-The lowest record usually defines the relative path to the corresponding file
-using the (0004,1500) *Referenced File ID*:
-
-.. code-block:: python
-
-    >>> records[3].ReferencedFileID
-    ['77654033', 'CR1', '6154']
-
-So, relative to the DICOMDIR file, the referenced file is at
-``77654033/CR1/6154``, i.e. two directories below, with a filename of ``6154``.
+Here we see a ``'PATIENT'`` record, which from :dcm:`Table F.5-1
+<part03/sect_F.5.html#table_F.5-1>` we see must also contain *Patient's Name*
+and *Patient ID* elements. The full list of available record types and their
+requirements is in :dcm:`Annex F.5 of Part 3 of the DICOM Standard
+<part03/sect_F.5.html>`.
 
 FileSet
 =======
 
-While you can access everything within a File-set using the DICOMDIR dataset,
-a more user-friendly way to interact with it is via the
+While it's possible to access everything within a File-set using the DICOMDIR
+dataset, making changes to an existing File-set becomes complicated very
+quickly. A more user-friendly way to interact with one is via the
 :class:`~pydicom.fileset.FileSet` class.
 
 
 Loading existing File-sets
 --------------------------
 
-When loading a File-set, simply pass a DICOMDIR
-:class:`~pydicom.dataset.Dataset` or the path to the DICOMDIR file to
+To loading a existing File-set simply pass a DICOMDIR
+:class:`~pydicom.dataset.Dataset`, or the path to the DICOMDIR file to
 :class:`~pydicom.fileset.FileSet`:
 
 .. code-block:: python
 
     >>> from pydicom.fileset import FileSet
+    >>> path = get_testdata_file("DICOMDIR")
+    >>> ds = dcmread(path)
     >>> fs = FileSet(ds)  # or FileSet(path)
 
 An overview of the File-set's contents is shown when printing:
@@ -302,32 +230,80 @@ parameter:
     3
 
 
+:class:`~pydicom.fileset.FileSet` and staging
+---------------------------------------------
+
+Before we go any further we need to discuss how the
+:class:`~pydicom.fileset.FileSet` class manages changes to the File-set.
+Modifications to the File-set are first *staged*, which means that although
+the :class:`~pydicom.fileset.FileSet` instance behaves as though you've applied
+them, nothing will actually change on the file system itself until
+you explicitly call :meth:`FileSet.write()<pydicom.fileset.FileSet.write>`.
+This includes changes such as:
+
+* Adding SOP instances using the :meth:`FileSet.add()
+  <pydicom.fileset.FileSet.add>` or :meth:`FileSet.add_custom()
+  <pydicom.fileset.FileSet.add_custom>` methods
+* Removing SOP instances with :meth:`FileSet.remove()
+  <pydicom.fileset.FileSet.remove>`
+* Changing one of the following properties:
+  :attr:`~pydicom.fileset.FileSet.ID`, :attr:`~pydicom.fileset.FileSet.UID`,
+  :attr:`~pydicom.fileset.FileSet.descriptor_file_id` and
+  :attr:`~pydicom.fileset.FileSet.descriptor_character_set`.
+* Moving instances from the current directory structure to the one used by
+  *pydicom*.
+
+You can tell if changes are staged with the
+:attr:`~pydicom.fileset.FileSet.is_staged` property:
+
+.. code-block:: python
+
+    >>> fs.is_staged
+    True
+
+You may also have noticed this line in the ``print(fs)`` output shown above:
+
+.. code-block:: text
+
+  Changes staged for write(): DICOMDIR update, directory structure update
+
+This appears when the :class:`~pydicom.fileset.FileSet` is staged and will
+contain at least one of the following:
+
+* ``DICOMDIR update`` or ``DICOMDIR creation``: the DICOMDIR file will be
+  updated or created
+* ``directory structure update``: one or more of the instances in the
+  existing File-set will be moved over to use the *pydicom* File-set
+  directory structure
+* ``N additions``: *N* instances will be added to the File-set
+* ``M removals``:  *M* instances will be removed from the File-set
+
+
 Modifying an existing File-set
 ------------------------------
-
-Changes to the File-set are staged until FileSet.write() is called, meaning
-the File-set recorded on the file system won't be changed until you explicitly
-write out the changes. These changes include adding and removing managed
-instances or changing one of the following attributes:
-:attr:`~pydicom.fileset.FileSet.ID`, :attr:`~pydicom.fileset.FileSet.UID`,
-:attr:`~pydicom.fileset.FileSet.descriptor_file_id` or
-:attr:`~pydicom.fileset.FileSet.descriptor_character_set`.
 
 Adding instances
 ................
 Adding instances is done through either the
 :meth:`~pydicom.fileset.FileSet.add` or
 :meth:`~pydicom.fileset.FileSet.add_custom` methods.
+
 :meth:`~pydicom.fileset.FileSet.add` is for normal DICOM SOP Instances and
 takes either the instances as a :class:`~pydicom.dataset.Dataset` or the
-path to an instance as :class:`str` or :class:`pathlib.Path`:
+path to an instance, and returns the instance as a
+:class:`~pydicom.fileset.FileInstance`.
 
 .. code-block:: python
 
-    >>> path = get_testdata_file("DICOMDIR")
-    >>> fs = FileSet(dcmread(path))
-    >>> fs.add(get_testdata_file("CT_small.dcm"))
-    >>> fs.add(dcmread(get_testdata_file("MR_small.dcm")))
+    >>> instance = fs.add(get_testdata_file("CT_small.dcm"))
+    >>> instance.path
+    '/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322'
+    >>> instance.is_staged
+    True
+    >>> instance.for_addition
+    True
+
+When instances are staged for addition they're stored in a temporary directory.
 
 When adding instances to a File-set
 :meth:`~pydicom.fileset.FileSet.add_custom` let's you add privately defined
@@ -341,24 +317,30 @@ Removing instances
 Applying the changes
 ....................
 
-The changes won't take affect until you call :meth:`FileSet.write()
-<pydicom.fileset.FileSet.write>`. When adding instances to an
-existing File-set, the instances will not be consolidated within the
-directory structure. To reduce the memory requirements, an additional datasets
-will be staged to a temporary directory.
 
 .. code-block:: python
 
-    >>> fs.write() # Save the file-set to a new location
+    >>> fs.write()
 
 
 Creating a new File-set
 -----------------------
 
-You can create a new File-set:
+You can create a new File-set and add and remove instances in the same manner
+as existing File-sets:
 
 .. code-block:: python
 
     >>> fs = FileSet())
     >>> fs.add(get_testdata_file("CT_small.dcm"))
-    >>> fs.write()
+
+The File-set UID will be generated automatically:
+
+When it comes time to write() you must supply the `path` parameter, which is
+the path where the File-set will be written:
+
+.. code-block:: python
+
+    >>> from tempfile import TemporaryDirectory
+    >>> t = TemporaryDirectory()
+    >>> fs.write(t.name)
