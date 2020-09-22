@@ -937,13 +937,16 @@ class FileInstance:
 
 class FileSet:
     """Representation of a DICOM File-set."""
-    def __init__(self, ds: Optional[Dataset] = None) -> None:
+    def __init__(
+        self, ds: Optional[Union[Dataset, str, PathLike]] = None
+    ) -> None:
         """Create or load a File-set.
 
         Parameters
         ----------
-        ds : pydicom.dataset.Dataset, optional
-            If loading a File-set, this is the DICOMDIR dataset.
+        ds : pydicom.dataset.Dataset, str or PathLike, optional
+            If loading a File-set, this is the DICOMDIR dataset or the path
+            to the DICOMDIR file.
         """
         # The nominal path to the root of the File-set
         self._path = None
@@ -989,12 +992,13 @@ class FileSet:
         """Stage an instance for addition to the File-set.
 
         If the instance has been staged for removal then calling
-        :meth:`~pydicom.fileset.FileSet.add` will cancel the staging.
+        :meth:`~pydicom.fileset.FileSet.add` will cancel the staging
+        and the instance will not be removed.
 
         Parameters
         ----------
         ds_or_path : pydicom.dataset.Dataset, str or PathLike
-            The SOP Instance to add to the File-set, either as a pydicom
+            The SOP Instance to add to the File-set, either as a
             :class:`~pydicom.dataset.Dataset` or the path to an instance
             written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
             :class:`str` or pathlike.
@@ -1080,7 +1084,8 @@ class FileSet:
         * (0004,1512) *Referenced Transfer Syntax UID in File*
 
         If the instance has been staged for removal then calling
-        :meth:`~pydicom.fileset.FileSet.add_custom` will cancel the staging.
+        :meth:`~pydicom.fileset.FileSet.add_custom` will cancel the staging
+        and the instance will not be removed.
 
         Examples
         --------
@@ -1120,7 +1125,7 @@ class FileSet:
         Parameters
         ----------
         ds_or_path : pydicom.dataset.Dataset, str or PathLike
-            The instance to add to the File-set, either as a pydicom
+            The instance to add to the File-set, either as a
             :class:`~pydicom.dataset.Dataset` or the path to an instance
             written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
             :class:`str` or pathlike.
@@ -1439,7 +1444,7 @@ class FileSet:
 
         Returns
         -------
-        list of pydicom.dicomdir.FileInstance
+        list of pydicom.fileset.FileInstance
             A list of matching instances.
         """
         if not kwargs:
@@ -1491,7 +1496,7 @@ class FileSet:
         ----------
         element : str, int or pydicom.tag.BaseTag
             The keyword or tag of the element to search for.
-        instances : list of pydicom.dicomdir.FileInstance, optional
+        instances : list of pydicom.fileset.FileInstance, optional
             Search within the given instances. If not used then all available
             instances will be searched.
         load : bool, optional
@@ -1599,9 +1604,9 @@ class FileSet:
         Parameters
         ----------
         ds_or_path : pydicom.dataset.Dataset, str or PathLike
-            An existing File-set's DICOMDIR, either as a pydicom
+            An existing File-set's DICOMDIR, either as a
             :class:`~pydicom.dataset.Dataset` or the path to the DICOMDIR file
-            as :class:`str` or :class:`pathlib.Path`.
+            as :class:`str` or pathlike.
         include_orphans : bool, optional
             If ``True`` (default) include instances referenced by orphaned
             directory records in the File-set.
@@ -1890,6 +1895,10 @@ class FileSet:
     ) -> None:
         """Stage instance(s) for removal from the File-set.
 
+        If the instance has been staged for addition to the File-set, calling
+        :meth:`~pydicom.fileset.FileSet.remove` will cancel the staging and
+        the instance will not be added.
+
         Parameters
         ----------
         instance : pydicom.fileset.FileInstance or a list of FileInstance
@@ -2001,7 +2010,7 @@ class FileSet:
 
         .. warning::
 
-            If modifying an existing File-set it's strongly recommended
+            If modifying an existing File-set it's **strongly recommended**
             that you follow standard data management practices and ensure that
             you have an up-to-date backup of the original data.
 
