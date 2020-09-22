@@ -432,6 +432,73 @@ you only need to call :meth:`~pydicom.fileset.FileSet.write`:
     /tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/IM000000
 
 
+For existing File-sets that don't use the same directory structure semantics
+as :class:`~pydicom.fileset.FileSet`, calling
+:meth:`~pydicom.fileset.FileSet.write` will move SOP instances over to the
+new structure. However, if the only modification you've made is to remove SOP
+instances or change :attr:`~pydicom.fileset.FileSet.ID`,
+:attr:`~pydicom.fileset.FileSet.UID`,
+:attr:`~pydicom.fileset.FileSet.descriptor_file_id` or
+:attr:`~pydicom.fileset.FileSet.descriptor_character_set`, then you can pass
+the *use_existing* keyword parameter to keep the existing directory structure
+and update the DICOMDIR file.
+
+First we need to copy the existing example File-set to a temporary directory
+so we don't accidentally modify it:
+
+.. code-block:: python
+
+    >>> from shutil import copytree, copyfile
+    >>> t = TemporaryDirectory()
+    >>> dst = Path(t.name)
+    >>> src = Path(get_testdata_file("DICOMDIR")).parent
+    >>> copyfile(src / "DICOMDIR", dst / "DICOMDIR")
+    >>> copytree(src / "77654033", dst / "77654033")
+    >>> copytree(src / "98892001", dst / "98892001")
+    >>> copytree(src / "98892003", dst / "98892003")
+
+Now we load the File-set from the temporary directory, remove instances and
+write out the changes with *use_existing* to keep the current directory
+structure:
+
+.. code-block:: python
+
+    >>> fs = FileSet(dst / "DICOMDIR")
+    >>> instances = fs.find(PatientID="98890234")
+    >>> fs.remove(instances)
+    >>> fs.write(use_existing=True)  # Keep the current directory structure
+    >>> for path in sorted([p for p in dst.glob('**/*') if p.is_file()]):
+    ...     print(path)
+    ...
+    /tmp/tmpu068kdwp/DICOMDIR
+    /tmp/tmpu068kdwp/77654033/CR1/6154
+    /tmp/tmpu068kdwp/77654033/CR2/6247
+    /tmp/tmpu068kdwp/77654033/CR3/6278
+    /tmp/tmpu068kdwp/77654033/CT2/17106
+    /tmp/tmpu068kdwp/77654033/CT2/17136
+    /tmp/tmpu068kdwp/77654033/CT2/17166
+    /tmp/tmpu068kdwp/77654033/CT2/17196
+
+If you'd just called :meth:`~pydicom.fileset.FileSet.write` without
+*use_existing* then it would've moved the SOP instances to the new
+directory structure:
+
+.. code-block:: python
+
+    >>> fs.write()
+    >>> for path in sorted([p for p in dst.glob('**/*') if p.is_file()]):
+    ...     print(path)
+    ...
+    /tmp/tmpu068kdwp/DICOMDIR
+    /tmp/tmpu068kdwp/PT000000/ST000000/SE000000/IM000000
+    /tmp/tmpu068kdwp/PT000000/ST000000/SE000001/IM000000
+    /tmp/tmpu068kdwp/PT000000/ST000000/SE000002/IM000000
+    /tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000000
+    /tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000001
+    /tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000002
+    /tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000003
+
+
 Conclusion
 ==========
 
