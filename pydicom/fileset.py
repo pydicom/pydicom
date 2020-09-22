@@ -997,7 +997,7 @@ class FileSet:
             The SOP Instance to add to the File-set, either as a pydicom
             :class:`~pydicom.dataset.Dataset` or the path to an instance
             written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
-            :class:`str` or :class:`pathlib.Path`.
+            :class:`str` or pathlike.
 
         Returns
         -------
@@ -1061,8 +1061,61 @@ class FileSet:
     ) -> None:
         """Stage an instance for addition to the File-set using custom records.
 
+        This method allows you to add a SOP instance and customize the
+        directory records that will be used when writing the DICOMDIR file. It
+        must be used when you require PRIVATE records and may be used instead
+        of modifying :attr:`~pydicom.fileset.DIRECTORY_RECORDERS` with your
+        own record definition functions when the default functions aren't
+        suitable.
+
+        The following elements will be added automatically to the supplied
+        directory records if required and not present:
+
+        * (0004,1400) *Offset of the Next Directory Record*
+        * (0004,1410) *Record In-use Flag*
+        * (0004,1420) *Offset of Referenced Lower-Level Directory Entity*
+        * (0004,1500) *Referenced File ID*
+        * (0004,1510) *Referenced SOP Class UID in File*
+        * (0004,1511) *Referenced SOP Instance UID in File*
+        * (0004,1512) *Referenced Transfer Syntax UID in File*
+
         If the instance has been staged for removal then calling
         :meth:`~pydicom.fileset.FileSet.add_custom` will cancel the staging.
+
+        Examples
+        --------
+
+        Add a SOP Instance using a two record hierarchy of PATIENT -> PRIVATE
+
+        .. code-block:: python
+
+            from pydicom import dcmread, Dataset
+            from pydicom.data import get_testdata_file
+            from pydicom.fileset import FileSet, RecordNode
+            from pydicom.uid import generate_uid
+
+            # The instance to be added
+            ds = dcmread(get_testdata_file("CT_small.dcm"))
+
+            # Define the leaf node (the PRIVATE record)
+            record = Dataset()
+            record.DirectoryRecordType = "PRIVATE"
+            record.PrivateRecordUID = generate_uid()
+            leaf_node = RecordNode(record)
+
+            # Define the top node (the PATIENT record)
+            record = Dataset()
+            record.DirectoryRecordType = "PATIENT"
+            record.PatientID = ds.PatientID
+            record.PatientName = ds.PatientName
+            top_node = RecordNode(record)
+
+            # Set the node relationship
+            leaf_node.parent = top_node
+
+            # Add the instance to the File-set
+            fs = FileSet()
+            instance = fs.add_custom(ds, leaf_node)
 
         Parameters
         ----------
@@ -1070,7 +1123,7 @@ class FileSet:
             The instance to add to the File-set, either as a pydicom
             :class:`~pydicom.dataset.Dataset` or the path to an instance
             written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
-            :class:`str` or :class:`pathlib.Path`.
+            :class:`str` or pathlike.
         leaf : pydicom.fileset.RecordNode
             The leaf node for the instance, should have its ancestors nodes set
             correctly as well as their corresponding directory records. Should
@@ -1776,10 +1829,11 @@ class FileSet:
                 record = DIRECTORY_RECORDERS[record_type](ds)
             except ValueError as exc:
                 raise ValueError(
-                    f"Unable to use the default pydicom '{record_type}' "
+                    f"Unable to use the default '{record_type}' "
                     "record creator as the instance is missing a "
-                    "required element or value. Either update the instance "
-                    "or use 'FileSet.add_custom()' instead"
+                    "required element or value. Either update the instance, "
+                    "define your own record creation function or use "
+                    "'FileSet.add_custom()' instead"
                 ) from exc
 
             record.OffsetOfTheNextDirectoryRecord = 0
@@ -1804,10 +1858,11 @@ class FileSet:
                 record = DIRECTORY_RECORDERS[record_type](ds)
             except ValueError as exc:
                 raise ValueError(
-                    f"Unable to use the default pydicom '{record_type}' "
+                    f"Unable to use the default '{record_type}' "
                     "record creator as the instance is missing a "
-                    "required element or value. Either update the instance "
-                    "or use 'FileSet.add_custom()' instead"
+                    "required element or value. Either update the instance, "
+                    "define your own record creation function or use "
+                    "'FileSet.add_custom()' instead"
                 ) from exc
 
             record.OffsetOfTheNextDirectoryRecord = 0
@@ -2653,8 +2708,11 @@ DIRECTORY_RECORDERS = {
 The functions are used to create non-PRIVATE records for a given SOP Instance
 as ``{"RECORD TYPE": callable}``, where ``"RECORD TYPE"`` should match one of
 the allowable values - except PRIVATE - for (0004,1430) *Directory Record
-Type*. To customize the record creation you can update this with your own
-function:
+Type*. By overriding the function for a given record type you can customize
+the directory records that will be included in the DICOMDIR file.
+
+Example
+-------
 
 .. code-block:: python
 
