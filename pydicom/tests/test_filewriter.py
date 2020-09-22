@@ -1095,7 +1095,6 @@ class TestCorrectAmbiguousVRElement:
         ds = Dataset()
         elem = RawDataElement(0x00280106, 'US or SS', 0, None, 0, True, True)
         ds[0x00280106] = elem
-        #ds.PixelRepresentation = 0
         out = correct_ambiguous_vr_element(elem, ds, True)
         assert type(out) == DataElement
         assert out.VR == 'US'
@@ -1104,7 +1103,6 @@ class TestCorrectAmbiguousVRElement:
         elem = RawDataElement(0x00283006, 'US or SS', 0, None, 0, True, True)
         assert out.value is None
         ds[0x00283006] = elem
-        #ds.PixelRepresentation = 0
         out = correct_ambiguous_vr_element(elem, ds, True)
         assert type(out) == DataElement
         assert out.VR == 'US'
