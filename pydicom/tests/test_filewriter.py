@@ -1090,6 +1090,28 @@ class TestCorrectAmbiguousVRElement:
         assert out.VR == 'US'
         assert out.value == 0xfffe
 
+    def test_empty_value(self):
+        """Regression test for #1193: empty value raises exception."""
+        ds = Dataset()
+        elem = RawDataElement(0x00280106, 'US or SS', 0, None, 0, True, True)
+        ds[0x00280106] = elem
+        #ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert type(out) == DataElement
+        assert out.VR == 'US'
+
+        ds.LUTDescriptor = [1, 1, 1]
+        elem = RawDataElement(0x00283006, 'US or SS', 0, None, 0, True, True)
+        assert out.value is None
+        ds[0x00283006] = elem
+        #ds.PixelRepresentation = 0
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert type(out) == DataElement
+        assert out.VR == 'US'
+        assert out.value is None
+
+
+
 
 class TestWriteAmbiguousVR:
     """Attempt to write data elements with ambiguous VR."""
