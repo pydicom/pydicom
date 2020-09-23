@@ -1589,8 +1589,8 @@ class TestNumpy_VOILUT:
         item.LUTData = [0, 127, 32768, 65535]
         arr = np.asarray([0, 1, 2, 3, 255], dtype='float64')
         msg = (
-            r"Applying `apply_voi_lut` to float arrays "
-            r"may lead to incorrect result!"
+            r"Applying a VOI LUT on a float input array may give "
+            r"incorrect results"
         )
 
         with pytest.warns(UserWarning, match=msg):

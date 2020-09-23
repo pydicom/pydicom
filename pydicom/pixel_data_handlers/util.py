@@ -309,8 +309,9 @@ def apply_voi_lut(arr, ds, index=0):
     if 'VOILUTSequence' in ds:
         if not np.issubdtype(arr.dtype, np.integer):
             warnings.warn(
-                "Applying `apply_voi_lut` to float arrays "
-                "may lead to incorrect result!")
+                "Applying a VOI LUT on a float input array may give "
+                "incorrect results"
+            )
 
         # VOI LUT Sequence contains one or more items
         item = ds.VOILUTSequence[index]

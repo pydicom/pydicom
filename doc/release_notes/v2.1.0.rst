@@ -61,5 +61,5 @@ Fixes
   a file-like (:issue:`1153`)
 * Raise ``TypeError`` if :func:`~pydicom.dcmread` or :func:`~pydicom.dcmwrite`
   is called with wrong argument
-* Allowed :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI lookup to float array
-* Added warning if :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` is applied to float array
+* Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
+  lookup to an input float array
