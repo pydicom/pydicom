@@ -63,3 +63,5 @@ Fixes
   is called with wrong argument
 * Gracefully handle empty Specific Character Set (:issue:`1190`)
 * Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
+* Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
+  lookup to an input float array
