@@ -140,6 +140,15 @@ class TestCharset:
         pydicom.charset.decode_element(elem, [])
         assert 'iso8859' in elem.value.encodings
 
+    def test_empty_charset(self):
+        """Empty charset defaults to ISO IR 6"""
+        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        pydicom.charset.decode_element(elem, [''])
+        assert ('iso8859',) == elem.value.encodings
+        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
+        pydicom.charset.decode_element(elem, None)
+        assert ('iso8859',) == elem.value.encodings
+
     def test_bad_encoded_single_encoding(self, allow_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
@@ -188,6 +197,15 @@ class TestCharset:
         `convert_encodings`"""
         encodings = ['iso_ir_126', 'iso_ir_144']
         assert encodings == pydicom.charset.convert_encodings(encodings)
+
+    def test_convert_empty_encoding(self):
+        """Test that empty encodings are handled as default encoding"""
+        encodings = ''
+        assert ['iso8859'] == pydicom.charset.convert_encodings(encodings)
+        encodings = ['']
+        assert ['iso8859'] == pydicom.charset.convert_encodings(encodings)
+        encodings = None
+        assert ['iso8859'] == pydicom.charset.convert_encodings(encodings)
 
     def test_bad_decoded_multi_byte_encoding(self, allow_invalid_values):
         """Test handling bad encoding for single encoding"""

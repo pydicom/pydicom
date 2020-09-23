@@ -81,3 +81,5 @@ Fixes
   a file-like (:issue:`1153`)
 * Raise :class:`TypeError` if :func:`~pydicom.filereader.dcmread` or
   :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
+* Gracefully handle empty Specific Character Set (:issue:`1190`)
+* Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
