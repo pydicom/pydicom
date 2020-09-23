@@ -87,6 +87,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
             elem.VR = 'SS'
             byte_type = 'h'
 
+        if elem.VM == 0:
+            return elem
+
         # Need to handle type check for elements with VM > 1
         elem_value = elem.value if elem.VM == 1 else elem.value[0]
         if not isinstance(elem_value, int):
@@ -115,6 +118,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # As per PS3.3 C.11.1.1.1
         if ds.LUTDescriptor[0] == 1:
             elem.VR = 'US'
+            if elem.VM == 0:
+                return elem
+
             elem_value = elem.value if elem.VM == 1 else elem.value[0]
             if not isinstance(elem_value, int):
                 elem.value = convert_numbers(elem.value, is_little_endian, 'H')
