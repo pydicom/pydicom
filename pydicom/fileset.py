@@ -2002,7 +2002,6 @@ class FileSet:
     def write(
         self,
         path: Optional[Union[str, PathLike]] = None,
-        dicomdir_only: bool = False,
         use_existing: bool = False,
         force_implicit: bool = False
     ) -> None:
