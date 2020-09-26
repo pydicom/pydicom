@@ -945,7 +945,7 @@ class FileSet:
         Parameters
         ----------
         ds : pydicom.dataset.Dataset, str or PathLike, optional
-            If loading a File-set, this is the DICOMDIR dataset or the path
+            If loading a File-set, the DICOMDIR dataset or the path
             to the DICOMDIR file.
         """
         # The nominal path to the root of the File-set
@@ -998,10 +998,8 @@ class FileSet:
         Parameters
         ----------
         ds_or_path : pydicom.dataset.Dataset, str or PathLike
-            The SOP Instance to add to the File-set, either as a
-            :class:`~pydicom.dataset.Dataset` or the path to an instance
-            written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
-            :class:`str` or pathlike.
+            The instance to add to the File-set, either as a
+            :class:`~pydicom.dataset.Dataset` or the path to the instance.
 
         Returns
         -------
@@ -1126,9 +1124,7 @@ class FileSet:
         ----------
         ds_or_path : pydicom.dataset.Dataset, str or PathLike
             The instance to add to the File-set, either as a
-            :class:`~pydicom.dataset.Dataset` or the path to an instance
-            written in the :dcm:`DICOM File Format<part10/chapter_7.html>` as
-            :class:`str` or pathlike.
+            :class:`~pydicom.dataset.Dataset` or the path to the instance.
         leaf : pydicom.fileset.RecordNode
             The leaf node for the instance, should have its ancestors nodes set
             correctly as well as their corresponding directory records. Should
@@ -1214,7 +1210,7 @@ class FileSet:
         self._stage['path'] = Path(self._stage['t'].name)
 
     def copy(self, path, force_implicit: bool = False) -> "FileSet":
-        """Copy the File-set to a new root directory and return the new
+        """Copy the File-set to a new root directory and return the copied
         File-set.
 
         Changes staged to the original :class:`~pydicom.fileset.FileSet` will

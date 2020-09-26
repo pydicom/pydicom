@@ -7,8 +7,7 @@ This tutorial is about DICOM File-sets and covers
 * An introduction to DICOM File-sets and the DICOMDIR file
 * Loading a File-set using the :class:`~pydicom.fileset.FileSet` class and
   accessing its managed SOP instances
-* Modifying an existing File-set
-* Creating a new File-set
+* Creating a new File-set and modifying existing ones
 
 It's assumed that you're already familiar with the :doc:`dataset basics
 <dataset_basics>`.
@@ -26,8 +25,8 @@ The DICOM File-set
 A File-set is a collection of DICOM files that share a common naming
 space. Most people have probably interacted with a File-set without being aware
 of it; one place they're frequently used is on the CDs/DVDs containing DICOM
-data that are given to a patient after a medical procedure, such as an MR or
-ultrasound.
+data that are given to a patient after a medical procedure (such as an MR or
+ultrasound).
 
 The specification for File-sets is given in :dcm:`Part 10 of the DICOM
 Standard<part10/chapter_8.html>`.
@@ -70,8 +69,8 @@ The DICOMDIR file is used to summarize the contents of the File-set, and is a
 
 The most important element in a DICOMDIR is the (0004,1220) *Directory
 Record Sequence*; each item in the sequence is a *directory record*,
-and one or more records are used to briefly describe the available SOP
-Instances and their location within the File-set's directory structure. Each
+and one or more records are used to briefly describe an available SOP
+Instance and its location within the File-set's directory structure. Each
 record has a *record type* given by the (0004,1430) *Directory Record Type*
 element, and different records are related to each other using the hierarchy
 given in :dcm:`Table F.4-1<part03/sect_F.4.html#table_F.4-1>`.
@@ -97,8 +96,8 @@ FileSet
 =======
 
 While it's possible to access everything within a File-set using the DICOMDIR
-dataset, making changes to an existing File-set becomes complicated very
-quickly due to the need to add and remove directory records, recalculate the
+dataset, making changes to an existing File-set quickly becomes complicated
+due to the need to add and remove directory records, recalculate the
 byte offsets for existing records and manage the corresponding file
 system changes. A more user-friendly way to interact with one is via the
 :class:`~pydicom.fileset.FileSet` class.
@@ -108,7 +107,7 @@ Loading existing File-sets
 --------------------------
 
 To load an existing File-set just pass a DICOMDIR
-:class:`~pydicom.dataset.Dataset`, or the path to the DICOMDIR file to
+:class:`~pydicom.dataset.Dataset` or the path to the DICOMDIR file to
 :class:`~pydicom.fileset.FileSet`:
 
 .. code-block:: python
@@ -237,16 +236,16 @@ parameter:
 Creating a new File-set
 -----------------------
 
-You can create a new File-set simply by creating a new
+You can create a new File-set by creating a new
 :class:`~pydicom.fileset.FileSet` instance:
 
 .. code-block:: python
 
     >>> fs = FileSet()
 
-This will actually create a completely conformant (but empty) File-set, but
-that's not very interesting so next we'll see how we go about adding SOP
-instances to it.
+This will create a completely conformant File-set, however it won't contain
+any SOP instances. Since empty File-sets aren't very useful, our next step
+will be to add some.
 
 Modifying a File-set
 --------------------
@@ -270,8 +269,9 @@ This includes changes such as:
   :attr:`~pydicom.fileset.FileSet.ID`, :attr:`~pydicom.fileset.FileSet.UID`,
   :attr:`~pydicom.fileset.FileSet.descriptor_file_id` and
   :attr:`~pydicom.fileset.FileSet.descriptor_character_set`.
-* Moving SOP instances from the current directory structure to the one used by
-  *pydicom*.
+* When the :class:`~pydicom.fileset.FileSet` class determines it needs to move
+  SOP instances from an existing File-set's directory structure to the
+  structure used by *pydicom*.
 
 You can tell if changes are staged with the
 :attr:`~pydicom.fileset.FileSet.is_staged` property:
@@ -365,6 +365,15 @@ When this occurs you have three choices:
   :attr:`~pydicom.fileset.DIRECTORY_RECORDERS`
 * Use the :meth:`~pydicom.fileset.FileSet.add_custom` method
 
+From the exception message above we've got an empty *Instance Number*, so
+let's update the instance and try adding it again:
+
+.. code-block:: python
+
+    >>> ds = dcmread(path)
+    >>> ds.InstanceNumber = "1"
+    >>> fs.add(ds)
+
 
 Removing instances
 ..................
@@ -377,13 +386,13 @@ SOP instances can be removed from the File-set with the
 .. code-block:: python
 
     >>> len(fs)
-    1
+    2
     >>> instances = fs.find(PatientID="1CT1")
     >>> len(instances)
     1
     >>> fs.remove(instances)
     >>> len(fs)
-    0
+    1
 
 Applying the changes
 --------------------
@@ -414,11 +423,13 @@ path where the File-set root directory will be located:
     ...     print(path)
     ...
     /tmp/tmpsqz8rhgb/DICOMDIR
-    /tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/IM000000
+    /tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/RD000000
     /tmp/tmpsqz8rhgb/PT000001/ST000000/SE000000/IM000000
+    /tmp/tmpsqz8rhgb/PT000002/ST000000/SE000000/IM000000
 
 The root directory for existing File-sets cannot be changed, so for those
-you only need to call :meth:`~pydicom.fileset.FileSet.write`:
+you only need to call :meth:`~pydicom.fileset.FileSet.write` without any
+arguments:
 
 .. code-block:: python
 
@@ -429,7 +440,8 @@ you only need to call :meth:`~pydicom.fileset.FileSet.write`:
     ...     print(path)
     ...
     /tmp/tmpsqz8rhgb/DICOMDIR
-    /tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/IM000000
+    /tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/RD000000
+    /tmp/tmpsqz8rhgb/PT000001/ST000000/SE000000/IM000000
 
 
 For existing File-sets that don't use the same directory structure semantics
