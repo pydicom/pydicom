@@ -89,7 +89,6 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
                 url, os.fspath(fpath), reporthook=t.update_to
             )
     else:
-        print(f"Downloading {fpath.name}...")
         urllib.request.urlretrieve(url, os.fspath(fpath))
 
 
@@ -143,7 +142,8 @@ def data_path_with_download(
     filename: str,
     check_hash: bool = True,
     redownload_on_hash_mismatch: bool = True,
-    url: Optional[str] = None
+    url: Optional[str] = None,
+    quiet: bool = True
 ) -> os.PathLike:
     """Return the absolute path to the cached file with `filename`.
 

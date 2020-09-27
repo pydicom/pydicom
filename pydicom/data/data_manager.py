@@ -156,7 +156,8 @@ def fetch_data_files():
 
     if error:
         raise RuntimeError(
-            f"Error downloading the following files: {', '.join(error)}"
+            "An error occurred downloading the following files: "
+            f"{', '.join(error)}"
         )
 
 
