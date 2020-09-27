@@ -14,8 +14,6 @@ import urllib.request
 import urllib.error
 import warnings
 
-from . import retry
-
 try:
     import tqdm
 
@@ -25,29 +23,23 @@ try:
                 self.total = tsize
             self.update(b * bsize - self.n)
 
+    USE_PROGRESS_BAR = True
 except ImportError:
-    @contextlib.contextmanager
-    def DownloadProgressBar(*args, **kwargs):
-        try:
-            class dummy:
-                def update_to(*args, **kwargs):  # pylint: disable = no-method-argument
-                    pass
+    USE_PROGRESS_BAR = False
 
-            yield dummy
-        finally:
-            pass
+from . import retry
 
 
 HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
 
 
-def calculate_file_hash(fpath: pathlib.Path) -> str:
+def calculate_file_hash(fpath: os.PathLike) -> str:
     """Return the SHA256 checksum for the file at `fpath`.
 
     Parameters
     ----------
-    fpath : pathlib.Path
+    fpath : os.PathLike
         The absolute path to the file that is to be checksummed.
 
     Returns
@@ -66,40 +58,44 @@ def calculate_file_hash(fpath: pathlib.Path) -> str:
     return hasher.hexdigest()
 
 
-def get_config_dir() -> str:
+def get_config_dir() -> os.PathLike:
     """Return the path to the pydicom config directory, creating it if required
 
     The config directory will be named ``.pydicom`` and will be created in the
     local user's home directory.
     """
-    config_dir = pathlib.Path.home().joinpath(".pydicom")
+    config_dir = pathlib.Path.home() / ".pydicom"
     config_dir.mkdir(exist_ok=True)
 
     return config_dir
 
 
 @retry.retry(urllib.error.HTTPError)
-def download_with_progress(url: str, fpath: pathlib.Path) -> None:
+def download_with_progress(url: str, fpath: os.PathLike) -> None:
     """Download the file at `url` to `fpath` with a progress bar.
 
     Parameters
     ----------
     url : str
         The URL to download the file from.
-    fpath : pathlib.Path
+    fpath : os.PathLike
         The absolute path where the file will be written to.
     """
-    with DownloadProgressBar(
-        unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
-    ) as t:
-        urllib.request.urlretrieve(
-            url, os.fspath(fpath), reporthook=t.update_to
-        )
+    if USE_PROGRESS_BAR:
+        with DownloadProgressBar(
+            unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+        ) as t:
+            urllib.request.urlretrieve(
+                url, os.fspath(fpath), reporthook=t.update_to
+            )
+    else:
+        print(f"Downloading {fpath.name}...")
+        urllib.request.urlretrieve(url, os.fspath(fpath))
 
 
-def get_data_dir() -> str:
+def get_data_dir() -> os.PathLike:
     """Return the path to the cache directory, creating it if required."""
-    data_dir = get_config_dir().joinpath("data")
+    data_dir = get_config_dir() / "data"
     data_dir.mkdir(exist_ok=True)
 
     return data_dir
@@ -148,7 +144,7 @@ def data_path_with_download(
     check_hash: bool = True,
     redownload_on_hash_mismatch: bool = True,
     url: Optional[str] = None
-) -> pathlib.Path:
+) -> os.PathLike:
     """Return the absolute path to the cached file with `filename`.
 
     If the file isn't available in the cache then it will be downloaded.
@@ -167,7 +163,7 @@ def data_path_with_download(
 
     Returns
     -------
-    pathlib.Path
+    os.PathLike
         The absolute path to the file.
     """
     if _SIMULATE_NETWORK_OUTAGE:

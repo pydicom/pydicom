@@ -55,7 +55,7 @@ import warnings
 
 from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
-    get_url_map
+    get_url_map, get_data_dir
 )
 
 
@@ -139,6 +139,25 @@ def online_test_file_dummy_paths() -> Dict[str, str]:
     }
 
     return dummy_path_map
+
+
+def fetch_data_files():
+    """Download missing test files to the local cache."""
+    cache = get_data_dir()
+    paths = {cache / fname: fname for fname in list(get_url_map().keys())}
+
+    error = []
+    for p in paths:
+        # Download missing files or files that don't match the hash
+        try:
+            data_path_with_download(p.name)
+        except Exception as exc:
+            error.append(p.name)
+
+    if error:
+        raise RuntimeError(
+            f"Error downloading the following files: {', '.join(error)}"
+        )
 
 
 def get_files(
