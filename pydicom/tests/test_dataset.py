@@ -12,7 +12,7 @@ from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import (
-    Dataset, FileDataset, validate_file_meta, FileMetaDataset, _RE_CAMEL_CASE
+    Dataset, FileDataset, validate_file_meta, FileMetaDataset
 )
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
