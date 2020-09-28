@@ -46,6 +46,9 @@ Changes
   per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
 * Data dictionaries updated to version 2020c of the DICOM Standard
+* Invalid values used with the :class:`~pydicom.dataset.Dataset`
+  :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
+  returning ``False`` (:issue:`1200`)
 
 Fixes
 .....

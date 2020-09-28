@@ -171,7 +171,12 @@ class TestDataset:
     def test_membership(self):
         """Dataset: can test if item present by 'if <name> in dataset'."""
         assert 'TreatmentMachineName' in self.ds
-        assert 'Dummyname' not in self.ds
+        msg = (
+            r"Invalid value used with the 'in' operator: must be "
+            r"an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            'Dummyname' not in self.ds
 
     def test_contains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'."""
@@ -182,9 +187,20 @@ class TestDataset:
         assert (0x10, 0x5f) not in self.ds
         assert 'CommandGroupLength' in self.ds
         # Use a negative tag to cause an exception
-        assert (-0x0010, 0x0010) not in self.ds
+        msg = (
+            r"Invalid value used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            (-0x0010, 0x0010) in self.ds
+
+        # Overflowing tag
+        with pytest.raises(ValueError, match=msg):
+            0x100100010 in self.ds
+
         # Random non-existent property
-        assert 'random name' not in self.ds
+        with pytest.raises(ValueError, match=msg):
+            assert 'random name' in self.ds
 
     def test_clear(self):
         assert 1 == len(self.ds)
@@ -278,8 +294,11 @@ class TestDataset:
         assert 2 == len(self.ds)
 
     def test_setdefault_invalid_keyword(self):
-        with pytest.raises(ValueError, match="'FooBar' is not a valid int or"
-                                             " DICOM keyword"):
+        msg = (
+            r"Invalid value used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
             self.ds.setdefault('FooBar', 'foo')
 
     def test_get_exists1(self):
@@ -1563,7 +1582,7 @@ class TestDatasetElements:
         assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
 
         assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
-        assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
+        assert 'MediaStorageSOPInstanceUID' not in self.ds.file_meta
         with pytest.raises(ValueError,
                            match='Missing required File Meta .*'):
             self.ds.fix_meta_info(enforce_standard=True)

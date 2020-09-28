@@ -117,7 +117,7 @@ class TestCodify:
         # ControlPointSequence
         elem = DataElement(0x300A0111, 'SQ', [])
         elem.value.append(Dataset())
-        elem[0].PatientID = '1234'
+        elem.value[0].PatientID = '1234'
         out = "\n"
         out += "# Control Point Sequence\n"
         out += "cp_sequence = Sequence()\n"

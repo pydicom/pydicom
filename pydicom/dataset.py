@@ -475,13 +475,12 @@ class Dataset(dict):
             ``False`` otherwise.
         """
         try:
-            tag = Tag(name)
-        except (ValueError, OverflowError):
-            return False
-        # Test against None as (0000,0000) is a possible tag
-        if tag is not None:
-            return tag in self._dict
-        return name in self._dict  # will no doubt raise an exception
+            return Tag(name) in self._dict
+        except Exception as exc:
+            raise ValueError(
+                "Invalid value used with the 'in' operator: must be an "
+                "element tag as a 2-tuple or int, or an element keyword"
+            ) from exc
 
     def decode(self):
         """Apply character set decoding to the elements in the
