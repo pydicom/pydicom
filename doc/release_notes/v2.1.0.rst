@@ -39,6 +39,9 @@ Enhancements
     *Waveform Sequence* element.
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
+* Added a warning when setting :class:`~pydicom.dataset.Dataset` attributes
+  using camel case variable names that aren't a known element keyword
+  (:issue:`1014`)
 
 Changes
 .......

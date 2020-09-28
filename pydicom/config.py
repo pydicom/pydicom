@@ -292,6 +292,27 @@ using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
 
+WARN_INVALID_KEYWORD = True
+"""Warn when setting a :class:`~pydicom.dataset.Dataset` camel case attribute
+that's not a known element keyword.
+
+.. versionadded:: 2.1
+
+If ``True`` (default), then warn when an element value is set using
+`Dataset.__setattr__()` and the keyword is camel case but doesn't match an
+known DICOM element keyword.
+
+Examples
+--------
+
+>>> ds = Dataset()
+>>> ds.PatientName = "Citizen^Jan"  # OK
+>>> ds.PatientsName = "Citizen^Jan"
+../pydicom/dataset.py:1895: UserWarning: Camel case attribute 'PatientsName'
+used which is not in the element keyword data dictionary
+
+"""
+
 
 def debug(debug_on=True, default_handler=True):
     """Turn on/off debugging of DICOM file reading and writing.

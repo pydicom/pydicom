@@ -1,15 +1,18 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataset module."""
+
 import copy
+import warnings
 
 import pytest
 
 import pydicom
+from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.dataset import (
-    Dataset, FileDataset, validate_file_meta, FileMetaDataset
+    Dataset, FileDataset, validate_file_meta, FileMetaDataset, _RE_CAMEL_CASE
 )
 from pydicom.encaps import encapsulate
 from pydicom.filebase import DicomBytesIO
@@ -164,7 +167,12 @@ class TestDataset:
     def test_set_non_dicom(self):
         """Dataset: can set class instance property (non-dicom)."""
         ds = Dataset()
-        ds.SomeVariableName = 42
+        msg = (
+            r"Camel case attribute 'SomeVariableName' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.SomeVariableName = 42
         assert hasattr(ds, 'SomeVariableName')
         assert 42 == ds.SomeVariableName
 
@@ -377,7 +385,12 @@ class TestDataset:
         ds = self.ds
         ds.PatientName = "name"
         ds.PatientID = "id"
-        ds.NonDicomVariable = "junk"
+        msg = (
+            r"Camel case attribute 'NonDicomVariable' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.NonDicomVariable = "junk"
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
         expected = ['PatientID',
@@ -391,7 +404,12 @@ class TestDataset:
         ds = self.ds
         ds.PatientName = "name"
         ds.PatientID = "id"
-        ds.NonDicomVariable = "junk"
+        msg = (
+            r"Camel case attribute 'NonDicomVariable' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.NonDicomVariable = "junk"
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
         assert 'PatientID' in ds
@@ -546,11 +564,17 @@ class TestDataset:
         """Dataset: equality returns correct value with extra members """
         # Non-element class members are ignored in equality testing
         d = Dataset()
-        d.SOPEustaceUID = '1.2.3.4'
+        msg = (
+            r"Camel case attribute 'SOPEustaceUID' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            d.SOPEustaceUID = '1.2.3.4'
         assert d == d
 
         e = Dataset()
-        e.SOPEustaceUID = '1.2.3.5'
+        with pytest.warns(UserWarning, match=msg):
+            e.SOPEustaceUID = '1.2.3.5'
         assert d == e
 
     def test_equality_inheritance(self):
@@ -1896,3 +1920,71 @@ class TestFileMeta:
         assert ds_copy.is_implicit_VR
         assert ds_copy.is_little_endian
         assert ds_copy.read_encoding == "utf-8"
+
+
+CAMEL_CASE = (
+    [  # Shouldn't warn
+        "Rows", "_Rows", "Rows_", "rows", "_rows", "__rows", "rows_", "ro_ws",
+        "rowds", "BitsStored", "bits_Stored", "Bits_Stored", "bits_stored",
+        "_BitsStored", "BitsStored_", "B_itsStored", "BitsS_tored",
+        "12LeadECG", "file_meta", "filename", "is_implicit_VR",
+        "is_little_endian", "preamble", "timestamp", "fileobj_type",
+        "patient_records", "_parent_encoding", "_dict", "is_decompressed",
+        "read_little_endian", "read_implicit_vr", "read_encoding", "parent",
+        "_private_blocks", "default_element_format", "indent_chars",
+        "default_sequence_element_format", "PatientName"
+    ],
+    [  # Should warn
+        "bitsStored", "BitSStored", "TwelveLeadECG", "SOPInstanceUId",
+        "PatientsName", "Rowds"
+    ]
+)
+
+@pytest.fixture
+def setattr_dont_warn():
+    """Turn off Dataset.__setattr__() warnings for close keyword matches."""
+    config.WARN_INVALID_KEYWORD = False
+    yield
+    config.WARN_INVALID_KEYWORD = True
+
+
+def test_setattr_warns():
+    """"Test warnings for Dataset.__setattr__() for close matches."""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    for s in CAMEL_CASE[1]:
+        msg = (
+            r"Camel case attribute '" + s + r"' used which is not in the "
+            r"element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+
+
+def test_setattr_no_warning(setattr_dont_warn):
+    """Test no warnings with config.WARN_INVALID_KEYWORD = False"""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    ds = Dataset()
+    for s in CAMEL_CASE[1]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+            assert len(record) == 0
