@@ -25,4 +25,5 @@ Configuration Options (:mod:`pydicom.config`)
    use_DS_decimal
    use_IS_numpy
    use_DS_numpy
-
+   APPLY_J2K_CORRECTIONS
+   WARN_INVALID_KEYWORD
