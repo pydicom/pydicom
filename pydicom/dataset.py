@@ -476,6 +476,11 @@ class Dataset(dict):
         """
         try:
             return Tag(name) in self._dict
+        except OverflowError as exc:
+            raise OverflowError(
+                "Invalid element tag value: tags have a maximum value of "
+                "(0xFFFF, 0xFFFF)"
+            ) from exc
         except Exception as exc:
             raise ValueError(
                 "Invalid value used with the 'in' operator: must be an "

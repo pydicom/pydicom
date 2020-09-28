@@ -118,15 +118,17 @@ class TestCodify:
         elem = DataElement(0x300A0111, 'SQ', [])
         elem.value.append(Dataset())
         elem.value[0].PatientID = '1234'
-        out = "\n"
-        out += "# Control Point Sequence\n"
-        out += "cp_sequence = Sequence()\n"
-        out += "ds.ControlPointSequence = cp_sequence\n"
-        out += "\n"
-        out += "# Control Point Sequence: Control Point 1\n"
-        out += "cp1 = Dataset()\n"
-        out += "cp1.PatientID = '1234'\n"
-        out += "cp_sequence.append(cp1)"
+        out = (
+            "\n"
+            "# Control Point Sequence\n"
+            "cp_sequence = Sequence()\n"
+            "ds.ControlPointSequence = cp_sequence\n"
+            "\n"
+            "# Control Point Sequence: Control Point 1\n"
+            "cp1 = Dataset()\n"
+            "cp1.PatientID = '1234'\n"
+            "cp_sequence.append(cp1)"
+        )
 
         assert out == code_dataelem(elem)
 

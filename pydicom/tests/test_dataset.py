@@ -194,13 +194,17 @@ class TestDataset:
         with pytest.raises(ValueError, match=msg):
             (-0x0010, 0x0010) in self.ds
 
-        # Overflowing tag
-        with pytest.raises(ValueError, match=msg):
-            0x100100010 in self.ds
-
         # Random non-existent property
         with pytest.raises(ValueError, match=msg):
             assert 'random name' in self.ds
+
+        # Overflowing tag
+        msg = (
+            r"Invalid element tag value: tags have a maximum value of "
+            r"\(0xFFFF, 0xFFFF\)"
+        )
+        with pytest.raises(OverflowError, match=msg):
+            0x100100010 in self.ds
 
     def test_clear(self):
         assert 1 == len(self.ds)
