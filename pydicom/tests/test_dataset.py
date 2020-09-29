@@ -1944,9 +1944,9 @@ CAMEL_CASE = (
 @pytest.fixture
 def setattr_dont_warn():
     """Turn off Dataset.__setattr__() warnings for close keyword matches."""
-    config.WARN_INVALID_KEYWORD = False
+    config.WARN_ON_INVALID_KEYWORD = False
     yield
-    config.WARN_INVALID_KEYWORD = True
+    config.WARN_ON_INVALID_KEYWORD = True
 
 
 def test_setattr_warns():
@@ -1972,7 +1972,7 @@ def test_setattr_warns():
 
 
 def test_setattr_no_warning(setattr_dont_warn):
-    """Test no warnings with config.WARN_INVALID_KEYWORD = False"""
+    """Test no warnings with config.WARN_ON_INVALID_KEYWORD = False"""
     with pytest.warns(None) as record:
         ds = Dataset()
         assert len(record) == 0

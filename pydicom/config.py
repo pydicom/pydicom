@@ -292,7 +292,7 @@ using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
 
-WARN_INVALID_KEYWORD = True
+WARN_ON_INVALID_KEYWORD = True
 """Warn when setting a :class:`~pydicom.dataset.Dataset` camel case attribute
 that's not a known element keyword.
 

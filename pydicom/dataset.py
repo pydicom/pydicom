@@ -1891,7 +1891,7 @@ class Dataset(dict):
             self._set_file_meta(value)
         else:
             # Warn if `name` is camel case but not a keyword
-            if config.WARN_INVALID_KEYWORD and _RE_CAMEL_CASE.match(name):
+            if config.WARN_ON_INVALID_KEYWORD and _RE_CAMEL_CASE.match(name):
                 warnings.warn(
                     f"Camel case attribute '{name}' used which is not in the "
                     "element keyword data dictionary"
