@@ -14,7 +14,7 @@ STORAGE_REGEX = re.compile('.*(Storage|Storage SOP Class|Storage - '
 
 
 def is_storage_class(attributes):
-    return (attributes[2] == 'SOP Class' and
+    return (attributes[1] == 'SOP Class' and
             STORAGE_REGEX.match(attributes[0]) and
             attributes[3] != 'Retired')
 
@@ -66,11 +66,11 @@ def replace_bad_characters(name):
     return name.translate(translate_table)
 
 
-def uid_line(uid, name):
+def uid_line(uid, keyword):
     """Return the UID class definition line to be written into the python file.
     """
     # add a line break after UID to avoid too long lines
-    return "{} = UID(\n    '{}')\n".format(sop_class_name(name), uid)
+    return f"{keyword} = UID(\n    '{uid}')\n"
 
 
 def generate_uids(filename):
@@ -84,7 +84,7 @@ def generate_uids(filename):
 
         for uid, attribs in sorted(UID_dictionary.items()):
             if is_storage_class(attribs):
-                uid_file.write(uid_line(uid, attribs[0]))
+                uid_file.write(uid_line(uid, attribs[4]))
 
 
 if __name__ == "__main__":

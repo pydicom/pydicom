@@ -226,8 +226,7 @@ if __name__ == "__main__":
             f'{os.path.basename(__file__)}"""\n'
         )
         f.write(
-            '# Each dict entry is UID: (Name, Keyword, Type, Info, Retired, '
-            'Keyword)'
+            '# Each dict entry is UID: (Name, Type, Info, Retired, Keyword)'
         )
         write_dict(f, DICT_NAME, attrs)
 
