@@ -6,7 +6,7 @@ import uuid
 import random
 import hashlib
 import re
-from typing import List, Optional, TypeVar, Type
+from typing import List, Optional
 
 from pydicom._uid_dict import UID_dictionary
 
@@ -28,9 +28,6 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 """Regex for a valid UID prefix"""
 
 
-U = TypeVar('U', bound='UID')
-
-
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
@@ -50,7 +47,7 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls: Type[U], val: str) -> U:
+    def __new__(cls: "UID", val: str) -> "UID":
         """Setup new instance of the class.
 
         Parameters
