@@ -1,11 +1,28 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
+import sys
 import uuid
 
 import pytest
 
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
+
+
+def test_jpeglossless_warning():
+    """Test warning when importing JPEGLossless for Python 3.7+."""
+    if sys.version_info[:2] < (3, 7):
+        from pydicom.uid import JPEGLossless
+        assert '1.2.840.10008.1.2.4.70' == JPEGLossless
+    else:
+        msg = (
+            r"In pydicom v2.2 the UID for 'JPEGLossless' will change "
+            r"from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
+            r"match its UID keyword. Use 'JPEGLosslessSV1' instead"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            from pydicom.uid import JPEGLossless
+            assert '1.2.840.10008.1.2.4.70' == JPEGLossless
 
 
 class TestGenerateUID:

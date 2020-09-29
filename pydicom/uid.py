@@ -6,9 +6,22 @@ import uuid
 import random
 import hashlib
 import re
+import sys
 from typing import List, Optional, TypeVar, Type
+import warnings
 
 from pydicom._uid_dict import UID_dictionary
+
+
+def __getattr__(name):
+    if name == "JPEGLossless":
+        warnings.warn(
+            "In pydicom v2.2 the UID for 'JPEGLossless' will change "
+            "from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
+            "match its UID keyword. Use 'JPEGLosslessSV1' instead"
+        )
+        return globals()["JPEGLosslessSV1"]
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
@@ -318,7 +331,8 @@ UncompressedTransferSyntaxes = [
 # Deprecated
 JPEGBaseline = JPEGBaseline8Bit
 JPEGExtended = JPEGExtended12Bit
-JPEGLossless = JPEGLosslessSV1
+if sys.version_info[:2] < (3, 7):
+    JPEGLossless = JPEGLosslessSV1
 JPEGLSLossy = JPEGLSNearLossless
 JPEG2000MultiComponentLossless = JPEG2000MCLossless
 JPEG2000MultiComponent = JPEG2000MC
