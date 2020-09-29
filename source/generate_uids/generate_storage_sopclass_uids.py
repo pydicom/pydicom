@@ -14,7 +14,7 @@ STORAGE_REGEX = re.compile('.*(Storage|Storage SOP Class|Storage - '
 
 
 def is_storage_class(attributes):
-    return (attributes[1] == 'SOP Class' and
+    return (attributes[2] == 'SOP Class' and
             STORAGE_REGEX.match(attributes[0]) and
             attributes[3] != 'Retired')
 

@@ -18,15 +18,14 @@ The results are sorted in ascending order of the Tag.
 Based on Rickard Holmberg's docbook_to_uiddict2013.py.
 """
 
+import argparse
 import os
+from pathlib import Path
+import urllib.request as urllib2
 import xml.etree.ElementTree as ET
 
-try:
-    import urllib2
-    # python2
-except ImportError:
-    import urllib.request as urllib2
-    # python3
+from pydicom import _version
+
 
 PYDICOM_DICT_FILENAME = '../../pydicom/_uid_dict.py'
 DICT_NAME = 'UID_dictionary'
@@ -44,12 +43,18 @@ def write_dict(fp, dict_name, attributes):
     attributes : list of str
         List of attributes of the dict entries.
     """
-    uid_entry = "('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}')"
+    uid_entry = (
+        "('{UID Name}', '{UID Type}', '{UID Info}', '{Retired}', "
+        "'{UID Keyword}')"
+    )
     entry_format = "'{UID Value}': %s" % (uid_entry)
 
-    fp.write("\n%s = {\n    " % dict_name)
-    fp.write(",  # noqa\n    ".join(entry_format.format(**attr)
-                                    for attr in attributes))
+    fp.write(f"\n{dict_name} = {{\n    ")
+    fp.write(
+        ",  # noqa\n    ".join(
+            entry_format.format(**attr) for attr in attributes
+        )
+    )
     fp.write("  # noqa\n}\n")
 
 
@@ -82,7 +87,7 @@ def parse_docbook_table(book_root, caption):
                     <td><para>Value 1</para></td>
                     <td><para>Value 2</para></td>
                     etc...
-                Some rows are
+                Some rows have
                     <td><para><emphasis>Value 1</emphasis></para></td>
                     <td><para><emphasis>Value 2</emphasis></para></td>
                     etc...
@@ -103,77 +108,127 @@ def parse_docbook_table(book_root, caption):
                     {header1 : val1, header2 : val2, ...} representing the
                     information for the row.
                 """
-                cell_values = []
+                # Value, name, keyword, type | info, retired
+                cell_values = [] * 6
                 for cell in row.iter('%spara' % (br)):
                     # If we have an emphasis tag under the para tag
                     emph_value = cell.find('%semphasis' % (br))
                     if emph_value is not None:
-
                         # If there is a text value add it, otherwise add ""
                         if emph_value.text is not None:
                             # 200b is a zero width space
-                            cell_values.append(emph_value.text.strip()
-                                               .replace("\u200b", ""))
+                            cell_values.append(
+                                emph_value.text.strip().replace("\u200b", "")
+                            )
                         else:
                             cell_values.append("")
 
                     # Otherwise just grab the para tag text
                     else:
                         if cell.text is not None:
-                            cell_values.append(cell.text.strip()
-                                               .replace("\u200b", ""))
+                            cell_values.append(
+                                cell.text.strip().replace("\u200b", "")
+                            )
                         else:
                             cell_values.append("")
 
-                cell_values[3] = ''
                 cell_values.append('')
 
                 if '(Retired)' in cell_values[1]:
-                    cell_values[4] = 'Retired'
-                    cell_values[1] = cell_values[1].replace('(Retired)',
-                                                            '').strip()
+                    cell_values[5] = 'Retired'
+                    cell_values[1] = (
+                        cell_values[1].replace('(Retired)', '').strip()
+                    )
 
                 if ':' in cell_values[1]:
-                    cell_values[3] = cell_values[1].split(':')[-1].strip()
+                    cell_values[4] = cell_values[1].split(':')[-1].strip()
                     cell_values[1] = cell_values[1].split(':')[0].strip()
 
                 return {key: value for key,
                         value in zip(column_names, cell_values)}
 
             # Get all the Element data from the table
-            column_names = ['UID Value',
-                            'UID Name',
-                            'UID Type',
-                            'UID Info',
-                            'Retired']
+            column_names = [
+                'UID Value', 'UID Name', 'UID Keyword', 'UID Type', 'UID Info',
+                'Retired',
+            ]
 
-            row_attrs = [parse_row(column_names, row)
-                         for row in table.find('%stbody' % (br))
-                         .iter('%str' % (br))]
+            row_attrs = [
+                parse_row(column_names, row)
+                for row in table.find('%stbody' % (br)).iter('%str' % (br))
+            ]
 
             return row_attrs
 
 
-attrs = []
+def setup_argparse():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate a new _uid_dict.py file from Part 6 of the "
+            "DICOM Standard"
+        ),
+        usage="generate_uid_dict.py [options]"
+    )
 
-url_base = "http://medical.nema.org/medical/dicom/current/source/docbook"
-url = '%s/part06/part06.xml' % (url_base)
-response = urllib2.urlopen(url)
-tree = ET.parse(response)
-root = tree.getroot()
+    opts = parser.add_argument_group('Options')
+    opts.add_argument(
+        "--local",
+        help=(
+            "The path to the directory containing the XML files (used instead "
+            "of downloading them)"
+        ),
+        type=str
+    )
 
-attrs += parse_docbook_table(root, "UID Values")
+    return parser.parse_args()
 
-for attr in attrs:
-    attr['UID Name'] = attr['UID Name'].replace('&', 'and')
-    attr['UID Value'] = attr['UID Value'].replace('\u00ad', '')
 
-py_file = open(PYDICOM_DICT_FILENAME, "w")
-py_file.write('"""DICOM UID dictionary auto-generated by %s"""\n'
-              % (os.path.basename(__file__)))
+if __name__ == "__main__":
+    args = setup_argparse()
+    USE_DOWNLOAD = True
+    if args.local:
+        USE_DOWNLOAD = False
 
-write_dict(py_file, DICT_NAME, attrs)
+    attrs = []
 
-py_file.close()
+    if not USE_DOWNLOAD:
+        local_dir = Path(args.local)
+        part_06 = (local_dir / 'part06.xml').resolve(strict=True)
+    else:
+        url = "http://medical.nema.org/medical/dicom/current/source/docbook"
+        url_06 = f'{url}/part06/part06.xml'
+        print(f"Downloading '{url_06}'")
+        part_06 = urllib2.urlopen(url_06)
+        print("Download complete, processing...")
 
-print("Finished, wrote %d UIDs" % len(attrs))
+    tree = ET.parse(part_06)
+    root = tree.getroot()
+
+    # Check the version is up to date
+    dcm_version = root.find('{http://docbook.org/ns/docbook}subtitle')
+    dcm_version = dcm_version.text.split()[2]
+    lib_version = getattr(_version, '__dicom_version__', None)
+    if lib_version != dcm_version:
+        print(
+            "Warning: 'pydicom._version.__dicom_version__' needs to be "
+            f"updated to '{dcm_version}'"
+        )
+
+    attrs += parse_docbook_table(root, "UID Values")
+
+    for attr in attrs:
+        attr['UID Name'] = attr['UID Name'].replace('&', 'and')
+        attr['UID Value'] = attr['UID Value'].replace('\u00ad', '')
+
+    with open(PYDICOM_DICT_FILENAME, "w") as f:
+        f.write(
+            '"""DICOM UID dictionary auto-generated by '
+            f'{os.path.basename(__file__)}"""\n'
+        )
+        f.write(
+            '# Each dict entry is UID: (Name, Keyword, Type, Info, Retired, '
+            'Keyword)'
+        )
+        write_dict(f, DICT_NAME, attrs)
+
+    print(f"Finished, wrote {len(attrs)} UIDs")
