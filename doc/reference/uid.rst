@@ -11,30 +11,30 @@ Predefined UIDs
 .. autosummary::
    :toctree: generated/
 
-   ImplicitVRLittleEndian,
-   ExplicitVRLittleEndian,
-   DeflatedExplicitVRLittleEndian,
-   ExplicitVRBigEndian,
-   JPEGBaseline8Bit,
-   JPEGExtended12Bit,
-   JPEGLosslessP14,
-   JPEGLosslessSV1,
-   JPEGLSLossless,
-   JPEGLSNearLossless,
-   JPEG2000Lossless,
-   JPEG2000,
-   JPEG2000MCLossless,
-   JPEG2000MC,
-   MPEG2MPML,
-   MPEG2MPHL,
-   MPEG4HP41,
-   MPEG4HP41BD,
-   MPEG4HP422D,
-   MPEG4HP423D,
-   MPEG4HP42STEREO,
-   HEVCMP51,
-   HEVCM10P51,
-   RLELossless,
+   ImplicitVRLittleEndian
+   ExplicitVRLittleEndian
+   DeflatedExplicitVRLittleEndian
+   ExplicitVRBigEndian
+   JPEGBaseline8Bit
+   JPEGExtended12Bit
+   JPEGLosslessP14
+   JPEGLosslessSV1
+   JPEGLSLossless
+   JPEGLSNearLossless
+   JPEG2000Lossless
+   JPEG2000
+   JPEG2000MCLossless
+   JPEG2000MC
+   MPEG2MPML
+   MPEG2MPHL
+   MPEG4HP41
+   MPEG4HP41BD
+   MPEG4HP422D
+   MPEG4HP423D
+   MPEG4HP42STEREO
+   HEVCMP51
+   HEVCM10P51
+   RLELossless
 
 
 Transfer Syntax Lists

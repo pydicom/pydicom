@@ -49,29 +49,29 @@ Changes
 * Data dictionaries updated to version 2020c of the DICOM Standard
 * The following UID constants are deprecated and will be removed in v2.2:
 
-  * `JPEGBaseline`: use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead
-  * `JPEGExtended`: use :attr:`~pydicom.uid.JPEGExtended12Bit` instead
-  * `JPEGLossless`: use :attr:`~pydicom.uid.JPEGLosslessSV1` instead
-  * `JPEGLSLossy`: use :attr:`~pydicom.uid.JPEGLSNearLossless` instead
-  * `JPEG2000MultiComponentLossless`: use
-     :attr:`~pydicom.uid.JPEG2000MCLossless` instead
-  * `JPEG2000MultiComponent`: use :attr:`~pydicom.uid.JPEG2000MC` instead
+  * ``JPEGBaseline`` (use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead)
+  * ``JPEGExtended`` (use :attr:`~pydicom.uid.JPEGExtended12Bit` instead)
+  * ``JPEGLossless`` (use :attr:`~pydicom.uid.JPEGLosslessSV1` instead)
+  * ``JPEGLSLossy`` (use :attr:`~pydicom.uid.JPEGLSNearLossless` instead)
+  * ``JPEG2000MultiComponentLossless`` (use
+    :attr:`~pydicom.uid.JPEG2000MCLossless` instead)
+  * ``JPEG2000MultiComponent`` (use :attr:`~pydicom.uid.JPEG2000MC` instead)
 
-* Starting in v2.2 the value for `JPEGLossless` will change from
+* Starting in v2.2 the value for ``JPEGLossless`` will change from
   1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword
 * The following lists of UIDs are deprecated and will be removed in v2.2:
 
-  * ``pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes``: use
+  * ``JPEGLossyCompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEGTransferSyntaxes`
-  * ``pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
+  * ``JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
-  * ``pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes``: use
+  * ``JPEG2000CompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
-  * ``pydicom.uid.RLECompressedLosslessSyntaxes``: use
+  * ``RLECompressedLosslessSyntaxes``: use
     :attr:`~pydicom.uid.RLETransferSyntaxes`
-  * ``pydicom.uid.UncompressedPixelTransferSyntaxes``: use
+  * ``UncompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
-  * ``pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes``
+  * ``PILSupportedCompressedPixelTransferSyntaxes``
 
 Fixes
 .....
