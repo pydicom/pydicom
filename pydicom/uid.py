@@ -6,13 +6,9 @@ import uuid
 import random
 import hashlib
 import re
-<<<<<<< HEAD
 import sys
-from typing import List, Optional, TypeVar, Type
-import warnings
-=======
 from typing import List, Optional
->>>>>>> 4bdaefaaff1e0335cc97d23c9f512194b14e8f7c
+import warnings
 
 from pydicom._uid_dict import UID_dictionary
 
