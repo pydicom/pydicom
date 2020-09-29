@@ -78,6 +78,7 @@
       ~UID.is_retired
       ~UID.is_transfer_syntax
       ~UID.is_valid
+      ~UID.keyword
       ~UID.name
       ~UID.type
    

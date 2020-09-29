@@ -229,6 +229,8 @@ in <code class="xref py py-mod docutils literal notranslate"><span class="pre">p
 </li>
 <li><p>When JPEG 2000 image data is unsigned and the <em>Pixel Representation</em> is 1
 the image data is converted to signed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1149">#1149</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.keyword" title="pydicom.uid.UID.keyword"><code class="xref py py-attr docutils literal notranslate"><span class="pre">keyword</span></code></a> property for the new UID keywords
+in version 2020d of the DICOM Standard</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
@@ -237,7 +239,13 @@ the image data is converted to signed (<a class="reference external" href="https
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
 per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
-<li><p>Data dictionaries updated to version 2020c of the DICOM Standard</p></li>
+<li><p>Data dictionaries updated to version 2020d of the DICOM Standard</p></li>
+<li><p>Updated a handful of the SOP Class variable names in
+<code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code>
+to use the new UID keywords. Variables with <code class="docutils literal notranslate"><span class="pre">Multiframe</span></code> in them
+become <code class="docutils literal notranslate"><span class="pre">MultiFrame</span></code>, those with <code class="docutils literal notranslate"><span class="pre">and</span></code> in them become <code class="docutils literal notranslate"><span class="pre">And</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceQRStorage</span></code> becomes
+<code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceStorage</span></code>.</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">

@@ -222,7 +222,7 @@
 <h1>pydicom.uid.UID<a class="headerlink" href="#pydicom-uid-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.uid.UID">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">UID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d1fc3bb2/pydicom/uid.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">UID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4bdaefaa/pydicom/uid.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">UID</span>
@@ -429,10 +429,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.is_valid" title="pydicom.uid.UID.is_valid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code></a></p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>self</cite> is a valid UID, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.name" title="pydicom.uid.UID.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.keyword" title="pydicom.uid.UID.keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">keyword</span></code></a></p></td>
+<td><p>Return the UID keyword from the UID dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.name" title="pydicom.uid.UID.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Return the UID name from the UID dictionary.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.uid.UID.type" title="pydicom.uid.UID.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.type" title="pydicom.uid.UID.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a></p></td>
 <td><p>Return the UID type from the UID dictionary.</p></td>
 </tr>
 </tbody>
@@ -497,6 +500,12 @@ private.</p>
 <dt id="pydicom.uid.UID.is_valid">
 <em class="property">property </em><code class="sig-name descname">is_valid</code><a class="headerlink" href="#pydicom.uid.UID.is_valid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>self</cite> is a valid UID, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pydicom.uid.UID.keyword">
+<em class="property">property </em><code class="sig-name descname">keyword</code><a class="headerlink" href="#pydicom.uid.UID.keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the UID keyword from the UID dictionary.</p>
 </dd></dl>
 
 <dl class="py method">
