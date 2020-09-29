@@ -10,7 +10,6 @@ from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, get_j2k_parameters
 )
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     JPEGBaseline,
@@ -20,7 +19,8 @@ from pydicom.uid import (
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
-    JPEG2000
+    JPEG2000,
+    AllTransferSyntaxes
 )
 
 try:
@@ -63,7 +63,7 @@ SUPPORTED_SYNTAXES = [
     JPEG2000
 ]
 UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
 )
 
 # Transfer syntaxes supported by other handlers

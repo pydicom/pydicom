@@ -209,59 +209,123 @@ DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
 """1.2.840.10008.1.2.1.99"""
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
 """1.2.840.10008.1.2.2"""
-JPEGBaseline = UID('1.2.840.10008.1.2.4.50')
+JPEGBaseline8Bit = UID('1.2.840.10008.1.2.4.50')
 """1.2.840.10008.1.2.4.50"""
-JPEGExtended = UID('1.2.840.10008.1.2.4.51')
+JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
 """1.2.840.10008.1.2.4.51"""
-JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')
+JPEGLossless = UID('1.2.840.10008.1.2.4.57')
 """1.2.840.10008.1.2.4.57"""
-JPEGLossless = UID('1.2.840.10008.1.2.4.70')
+JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')
 """1.2.840.10008.1.2.4.70"""
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
 """1.2.840.10008.1.2.4.80"""
-JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
+JPEGLSNearLossless = UID('1.2.840.10008.1.2.4.81')
 """1.2.840.10008.1.2.4.81"""
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 """1.2.840.10008.1.2.4.90"""
 JPEG2000 = UID('1.2.840.10008.1.2.4.91')
 """1.2.840.10008.1.2.4.91"""
-JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
+JPEG2000MCLossless = UID('1.2.840.10008.1.2.4.92')
 """1.2.840.10008.1.2.4.92"""
-JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
+JPEG2000MC = UID('1.2.840.10008.1.2.4.93')
 """1.2.840.10008.1.2.4.93"""
-MPEG2MainProfileMainLevel = UID('1.2.840.10008.1.2.4.100')
+MPEG2MPML = UID('1.2.840.10008.1.2.4.100')
 """1.2.840.10008.1.2.4.100"""
-MPEG2MainProfileHighLevel = UID('1.2.840.10008.1.2.4.101')
+MPEG2MPHL = UID('1.2.840.10008.1.2.4.101')
 """1.2.840.10008.1.2.4.101"""
-MPEG4HighProfileLevel41 = UID('1.2.840.10008.1.2.4.102')
+MPEG4HP41 = UID('1.2.840.10008.1.2.4.102')
 """1.2.840.10008.1.2.4.102"""
-MPEG4BDCompatibleHighProfileLevel41 = UID('1.2.840.10008.1.2.4.103')
+MPEG4HP41BD = UID('1.2.840.10008.1.2.4.103')
 """1.2.840.10008.1.2.4.103"""
-MPEG4HighProfileLevel422D = UID('1.2.840.10008.1.2.4.104')
+MPEG4HP422D = UID('1.2.840.10008.1.2.4.104')
 """1.2.840.10008.1.2.4.104"""
-MPEG4HighProfileLevel423D = UID('1.2.840.10008.1.2.4.105')
+MPEG4HP423D = UID('1.2.840.10008.1.2.4.105')
 """1.2.840.10008.1.2.4.105"""
-MPEG4StereoHighProfileLevel42 = UID('1.2.840.10008.1.2.4.106')
+MPEG4HP42STEREO = UID('1.2.840.10008.1.2.4.106')
 """1.2.840.10008.1.2.4.106"""
-HEVCMainProfileLevel51 = UID('1.2.840.10008.1.2.4.107')
+HEVCMP51 = UID('1.2.840.10008.1.2.4.107')
 """1.2.840.10008.1.2.4.107"""
-HEVCMain10ProfileLevel51 = UID('1.2.840.10008.1.2.4.108')
+HEVCM10P51 = UID('1.2.840.10008.1.2.4.108')
 """1.2.840.10008.1.2.4.108"""
 RLELossless = UID('1.2.840.10008.1.2.5')
 """1.2.840.10008.1.2.5"""
 
-UncompressedPixelTransferSyntaxes = [
+AllTransferSyntaxes = [
+    ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
+    JPEGLossless,
+    JPEGLosslessSV1,
+    JPEGLSLossless,
+    JPEGLSNearLossless,
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MCLossless,
+    JPEG2000MC,
+    MPEG2MPML,
+    MPEG2MPHL,
+    MPEG4HP41,
+    MPEG4HP41BD,
+    MPEG4HP422D,
+    MPEG4HP423D,
+    MPEG4HP42STEREO,
+    HEVCMP51,
+    HEVCM10P51,
+    RLELossless,
+]
+"""All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
+
+JPEGTransferSyntaxes = [
+    JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLossless, JPEGLosslessSV1
+]
+"""JPEG (ISO/IEC 10918-1) transfer syntaxes"""
+
+JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
+"""JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
+
+JPEG2000TransferSyntaxes = [
+    JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC
+]
+"""JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
+
+MPEGTransferSyntaxes = [
+    MPEG2MPML,
+    MPEG2MPHL,
+    MPEG4HP41,
+    MPEG4HP41BD,
+    MPEG4HP422D,
+    MPEG4HP423D,
+    MPEG4HP42STEREO,
+    HEVCMP51,
+    HEVCM10P51,
+]
+"""MPEG transfer syntaxes."""
+
+RLETransferSyntaxes = [RLELossless]
+"""RLE transfer syntaxes."""
+
+UncompressedTransferSyntaxes = [
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
 ]
+"""Uncompressed (native) transfer syntaxes."""
 
-JPEGLSSupportedCompressedPixelTransferSyntaxes = [
-    JPEGLSLossless,
-    JPEGLSLossy,
-]
+# Deprecated
+JPEGBaseline = JPEGBaseline8Bit
+JPEGExtended = JPEGExtended12Bit
+JPEGLosslessP14 = JPEGLossless
+JPEGLSLossy = JPEGLSNearLossless
+JPEG2000MultiComponentLossless = JPEG2000MCLossless
+JPEG2000MultiComponent = JPEG2000MC
 
+JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseline, JPEGExtended,]
+JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
+JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
 PILSupportedCompressedPixelTransferSyntaxes = [
     JPEGBaseline,
     JPEGLossless,
@@ -269,32 +333,8 @@ PILSupportedCompressedPixelTransferSyntaxes = [
     JPEG2000Lossless,
     JPEG2000,
 ]
-
-JPEG2000CompressedPixelTransferSyntaxes = [
-    JPEG2000Lossless,
-    JPEG2000,
-]
-
-JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
-    JPEGExtended,
-]
-
-MPEGTransferSyntaxes = [
-    MPEG2MainProfileMainLevel,
-    MPEG2MainProfileHighLevel,
-    MPEG4HighProfileLevel41,
-    MPEG4BDCompatibleHighProfileLevel41,
-    MPEG4HighProfileLevel422D,
-    MPEG4HighProfileLevel423D,
-    MPEG4StereoHighProfileLevel42,
-    HEVCMainProfileLevel51,
-    HEVCMain10ProfileLevel51,
-]
-
-RLECompressedLosslessSyntaxes = [
-    RLELossless
-]
+RLECompressedLosslessSyntaxes = RLETransferSyntaxes
+UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
 def generate_uid(prefix: str = PYDICOM_ROOT_UID,

@@ -11,30 +11,45 @@ Predefined UIDs
 .. autosummary::
    :toctree: generated/
 
-   ImplicitVRLittleEndian
-   ExplicitVRLittleEndian
-   DeflatedExplicitVRLittleEndian
-   ExplicitVRBigEndian
-   JPEGBaseline
-   JPEGExtended
-   JPEGLosslessP14
-   JPEGLossless
-   JPEGLSLossless
-   JPEGLSLossy
-   JPEG2000Lossless
-   JPEG2000
-   JPEG2000MultiComponentLossless
-   JPEG2000MultiComponent
-   MPEG2MainProfileMainLevel
-   MPEG2MainProfileHighLevel
-   MPEG4HighProfileLevel41
-   MPEG4BDCompatibleHighProfileLevel41
-   MPEG4HighProfileLevel422D
-   MPEG4HighProfileLevel423D
-   MPEG4StereoHighProfileLevel42
-   HEVCMainProfileLevel51
-   HEVCMain10ProfileLevel51
-   RLELossless
+   ImplicitVRLittleEndian,
+   ExplicitVRLittleEndian,
+   DeflatedExplicitVRLittleEndian,
+   ExplicitVRBigEndian,
+   JPEGBaseline8Bit,
+   JPEGExtended12Bit,
+   JPEGLossless,
+   JPEGLosslessSV1,
+   JPEGLSLossless,
+   JPEGLSNearLossless,
+   JPEG2000Lossless,
+   JPEG2000,
+   JPEG2000MCLossless,
+   JPEG2000MC,
+   MPEG2MPML,
+   MPEG2MPHL,
+   MPEG4HP41,
+   MPEG4HP41BD,
+   MPEG4HP422D,
+   MPEG4HP423D,
+   MPEG4HP42STEREO,
+   HEVCMP51,
+   HEVCM10P51,
+   RLELossless,
+
+
+Transfer Syntax Lists
+---------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   AllTransferSyntaxes
+   JPEGTransferSyntaxes
+   JPEGLSTransferSyntaxes
+   JPEG2000TransferSyntaxes
+   MPEGTransferSyntaxes
+   RLETransferSyntaxes
+   UncompressedTransferSyntaxes
 
 
 UID Utilities

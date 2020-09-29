@@ -30,12 +30,12 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
+    AllTransferSyntaxes,
 )
 
 try:
@@ -94,7 +94,7 @@ SUPPORTED_SYNTAXES = [
     ExplicitVRBigEndian
 ]
 UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
 )
 
 
@@ -132,7 +132,7 @@ class TestNoNumpyHandler:
     def test_overlay_array_raises(self):
         """Test overlay_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_1_1_1F)
-        for uid in ALL_TRANSFER_SYNTAXES:
+        for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             msg = r"as there are no overlay data handlers"
             with pytest.raises(NotImplementedError, match=msg):

@@ -80,12 +80,12 @@ from pydicom.pixel_data_handlers.util import (
     pixel_dtype, get_expected_length, reshape_pixel_array, get_j2k_parameters
 )
 from pydicom.uid import (
-    JPEGBaseline,
-    JPEGExtended,
-    JPEGLosslessP14,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
     JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
-    JPEGLSLossy,
+    JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
     UID
@@ -100,12 +100,12 @@ if HAVE_PYLIBJPEG:
     _DECODERS = get_pixel_data_decoders()
 
 _LIBJPEG_SYNTAXES = [
-    JPEGBaseline,
-    JPEGExtended,
-    JPEGLosslessP14,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
     JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
-    JPEGLSLossy
+    JPEGLSNearLossless
 ]
 _OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
 SUPPORTED_TRANSFER_SYNTAXES = _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES

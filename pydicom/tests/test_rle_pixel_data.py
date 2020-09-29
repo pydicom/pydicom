@@ -32,8 +32,7 @@ import pydicom.config
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
-from pydicom.uid import RLELossless, UID
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
+from pydicom.uid import RLELossless, UID, AllTransferSyntaxes
 
 try:
     import numpy as np
@@ -131,7 +130,7 @@ RLE = get_testdata_file("MR_small_RLE.dcm")
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
 UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
 )
 
 
@@ -222,7 +221,7 @@ class TestNoNumpy_NoRLEHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
-        for uid in ALL_TRANSFER_SYNTAXES:
+        for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
@@ -325,7 +324,7 @@ class TestNumpy_NoRLEHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(EXPL_16_1_1F)
-        for uid in ALL_TRANSFER_SYNTAXES:
+        for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
