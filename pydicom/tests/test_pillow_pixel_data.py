@@ -11,7 +11,7 @@ from pydicom.pixel_data_handlers.util import (
 )
 from pydicom.uid import (
     JPEGBaseline,
-    JPEGLossless,
+    JPEGLosslessP14,
     JPEGExtended,
     JPEG2000,
     JPEG2000Lossless,
@@ -205,7 +205,7 @@ class TestNoNumpy_NoPillowHandler:
 
 JPGB = JPEGBaseline
 JPGE = JPEGExtended
-JPGL = JPEGLossless
+JPGL = JPEGLosslessP14
 J2KI = JPEG2000
 J2KR = JPEG2000Lossless
 REFERENCE_DATA = [

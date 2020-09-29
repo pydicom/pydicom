@@ -39,6 +39,7 @@ Enhancements
     *Waveform Sequence* element.
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
+* Added :attr:`~pydicom.uid.AllTransferSyntaxes`
 
 Changes
 .......
@@ -46,8 +47,19 @@ Changes
   per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
 * Data dictionaries updated to version 2020c of the DICOM Standard
-* `pydicom.overlay_data_handlers` is deprecated, use `pydicom.overlays` instead
-* The following lists of UIDs are deprecated:
+* The following UID constants are deprecated and will be removed in v2.2:
+
+  * `JPEGBaseline`: use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead
+  * `JPEGExtended`: use :attr:`~pydicom.uid.JPEGExtended12Bit` instead
+  * `JPEGLossless`: use :attr:`~pydicom.uid.JPEGLosslessSV1` instead
+  * `JPEGLSLossy`: use :attr:`~pydicom.uid.JPEGLSNearLossless` instead
+  * `JPEG2000MultiComponentLossless`: use
+     :attr:`~pydicom.uid.JPEG2000MCLossless` instead
+  * `JPEG2000MultiComponent`: use :attr:`~pydicom.uid.JPEG2000MC` instead
+
+* Starting in v2.2 the value for `JPEGLossless` will change from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword
+* The following lists of UIDs are deprecated and will be removed in v2.2:
 
   * ``pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.JPEGTransferSyntaxes`
@@ -60,21 +72,6 @@ Changes
   * ``pydicom.uid.UncompressedPixelTransferSyntaxes``: use
     :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
   * ``pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes``
-
-* The UID constant for 1.2.840.10008.1.2.4.70 `JPEGLossless` has changed to
-  `JPEGLosslessSV1`.
-
-* The following UID constants are deprecated:
-
-  * `JPEGBaseline`: use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead
-  * `JPEGExtended`: use :attr:`~pydicom.uid.JPEGExtended12Bit` instead
-  * `JPEGLosslessP14`: use :attr:`~pydicom.uid.JPEGLossless` instead
-  * `JPEGLSLossy`: use :attr:`~pydicom.uid.JPEGLSNearLossless` instead
-  * `JPEG2000MultiComponentLossless`: use
-     :attr:`~pydicom.uid.JPEG2000MCLossless` instead
-  * `JPEG2000MultiComponent`: use :attr:`~pydicom.uid.JPEG2000MC` instead
-
-* Added :attr:`~pydicom.uid.AllTransferSyntaxes`
 
 Fixes
 .....

@@ -15,7 +15,7 @@ from pydicom.uid import (
     JPEGBaseline,
     JPEGExtended,
     JPEGLosslessP14,
-    JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
@@ -56,7 +56,7 @@ SUPPORTED_SYNTAXES = [
     JPEGBaseline,
     JPEGExtended,
     JPEGLosslessP14,
-    JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
@@ -102,7 +102,7 @@ JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
 
 JPGB = JPEGBaseline
 JPGE = JPEGExtended
-JPGL = JPEGLossless
+JPGL = JPEGLosslessSV1
 
 JPG_REFERENCE_DATA = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)

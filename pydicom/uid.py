@@ -213,7 +213,7 @@ JPEGBaseline8Bit = UID('1.2.840.10008.1.2.4.50')
 """1.2.840.10008.1.2.4.50"""
 JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
 """1.2.840.10008.1.2.4.51"""
-JPEGLossless = UID('1.2.840.10008.1.2.4.57')
+JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')  # needs to be updated
 """1.2.840.10008.1.2.4.57"""
 JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')
 """1.2.840.10008.1.2.4.70"""
@@ -257,7 +257,7 @@ AllTransferSyntaxes = [
     ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
-    JPEGLossless,
+    JPEGLosslessP14,
     JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSNearLossless,
@@ -279,7 +279,7 @@ AllTransferSyntaxes = [
 """All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
 
 JPEGTransferSyntaxes = [
-    JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLossless, JPEGLosslessSV1
+    JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1
 ]
 """JPEG (ISO/IEC 10918-1) transfer syntaxes"""
 
@@ -318,17 +318,16 @@ UncompressedTransferSyntaxes = [
 # Deprecated
 JPEGBaseline = JPEGBaseline8Bit
 JPEGExtended = JPEGExtended12Bit
-JPEGLosslessP14 = JPEGLossless
+JPEGLossless = JPEGLosslessSV1
 JPEGLSLossy = JPEGLSNearLossless
 JPEG2000MultiComponentLossless = JPEG2000MCLossless
 JPEG2000MultiComponent = JPEG2000MC
-
 JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseline, JPEGExtended,]
 JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
 JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
 PILSupportedCompressedPixelTransferSyntaxes = [
     JPEGBaseline,
-    JPEGLossless,
+    JPEGLosslessP14,
     JPEGExtended,
     JPEG2000Lossless,
     JPEG2000,
