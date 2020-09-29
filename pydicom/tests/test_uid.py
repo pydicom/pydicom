@@ -97,8 +97,7 @@ class TestGenerateUID:
 
 class TestUID:
     """Test DICOM UIDs"""
-    @classmethod
-    def setup_class(self):
+    def setup(self):
         """Set default UID"""
         self.uid = UID('1.2.840.10008.1.2')
 
@@ -307,11 +306,14 @@ class TestUID:
         assert uid == b
         assert a == b
 
+    def test_keyword(self):
+        """Test the keyword property."""
+        assert "ImplicitVRLittleEndian" == self.uid.keyword
+
 
 class TestUIDPrivate:
     """Test private UIDs"""
-    @classmethod
-    def setup_class(self):
+    def setup(self):
         """Set default UID"""
         self.uid = UID('9.9.999.90009.1.2')
 
@@ -390,3 +392,7 @@ class TestUIDPrivate:
     def test_is_private(self):
         """Test that UID.is_private works with private UIDs."""
         assert self.uid.is_private
+
+    def test_keyword(self):
+        """Test the keyword property."""
+        assert "" == self.uid.keyword

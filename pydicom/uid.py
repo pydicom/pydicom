@@ -6,9 +6,13 @@ import uuid
 import random
 import hashlib
 import re
+<<<<<<< HEAD
 import sys
 from typing import List, Optional, TypeVar, Type
 import warnings
+=======
+from typing import List, Optional
+>>>>>>> 4bdaefaaff1e0335cc97d23c9f512194b14e8f7c
 
 from pydicom._uid_dict import UID_dictionary
 
@@ -41,9 +45,6 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 """Regex for a valid UID prefix"""
 
 
-U = TypeVar('U', bound='UID')
-
-
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
@@ -63,7 +64,7 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls: Type[U], val: str) -> U:
+    def __new__(cls: "UID", val: str) -> "UID":
         """Setup new instance of the class.
 
         Parameters
@@ -160,9 +161,17 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
+    def keyword(self) -> str:
+        """Return the UID keyword from the UID dictionary."""
+        if str(self) in UID_dictionary:
+            return UID_dictionary[self][4]
+
+        return ''
+
+    @property
     def name(self) -> str:
         """Return the UID name from the UID dictionary."""
-        uid_string = str.__str__(self)
+        uid_string = str(self)
         if uid_string in UID_dictionary:
             return UID_dictionary[self][0]
 
@@ -171,7 +180,7 @@ class UID(str):
     @property
     def type(self) -> str:
         """Return the UID type from the UID dictionary."""
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return UID_dictionary[self][1]
 
         return ''
@@ -179,7 +188,7 @@ class UID(str):
     @property
     def info(self) -> str:
         """Return the UID info from the UID dictionary."""
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return UID_dictionary[self][2]
 
         return ''
@@ -189,7 +198,7 @@ class UID(str):
         """Return ``True`` if the UID is retired, ``False`` otherwise or if
         private.
         """
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return bool(UID_dictionary[self][3])
 
         return False
@@ -199,10 +208,7 @@ class UID(str):
         """Return ``True`` if the UID isn't an officially registered DICOM
         UID.
         """
-        if self[:13] == '1.2.840.10008':
-            return False
-
-        return True
+        return self[:14] != '1.2.840.10008.'
 
     @property
     def is_valid(self) -> bool:
