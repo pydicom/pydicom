@@ -54,7 +54,7 @@ def Tag(
     ----------
     arg : int or str or 2-tuple of int
 
-        * If :class:`int` then the either the group number or the combined
+        * If :class:`int` then either the group number or the combined
           group and element numbers of the tag
         * If :class:`str` then the corresponding element's keyword
         * If :class:`tuple` then the (group, element) numbers as
