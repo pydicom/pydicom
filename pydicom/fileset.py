@@ -2795,7 +2795,7 @@ _FOUR_LEVEL_SOP_CLASSES = {
     sop.XRayRadiationDoseSRStorage: "SR DOCUMENT",
     sop.SpectaclePrescriptionReportStorage: "SR DOCUMENT",
     sop.ColonCADSRStorage: "SR DOCUMENT",
-    sop.MacularGridThicknessandVolumeReportStorage: "SR DOCUMENT",
+    sop.MacularGridThicknessAndVolumeReportStorage: "SR DOCUMENT",
     sop.ImplantationPlanSRStorage: "SR DOCUMENT",
     sop.Comprehensive3DSRStorage: "SR DOCUMENT",
     sop.RadiopharmaceuticalRadiationDoseSRStorage: "SR DOCUMENT",
