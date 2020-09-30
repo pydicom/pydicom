@@ -39,8 +39,8 @@ corresponding (5400,1010) *Waveform Data* element.
 (5400, 1010) Waveform Data                       OW: Array of 240000 elements
 
 
-``Dataset.waveform_generator``
-------------------------------
+``Dataset.waveform_array``
+--------------------------
 
 .. warning::
 
