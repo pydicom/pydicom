@@ -287,11 +287,7 @@ class RecordNode:
     @property
     def depth(self) -> int:
         "Return the number of nodes to the level below the tree root"
-        ii = 0
-        for node in self.reverse():
-            ii += 1
-
-        return ii - 1
+        return len(list(self.reverse())) - 1
 
     def _encode_record(self, force_implicit: bool = False) -> int:
         """Encode the node's directory record.
@@ -1567,13 +1563,7 @@ class FileSet:
     @property
     def is_staged(self) -> bool:
         """Return ``True`` if the File-set is new or has changes staged."""
-        is_staged = [
-            self._stage['+'],
-            self._stage['-'],
-            self._stage['~'],
-            self._stage['^'],
-        ]
-        return any(is_staged)
+        return any(self._stage[c] for c in '+-^~')
 
     def __iter__(self) -> FileInstance:
         """Yield :class:`~pydicom.fileset.FileInstance` from the File-set."""
