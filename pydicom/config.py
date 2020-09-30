@@ -292,19 +292,22 @@ using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
 
-WARN_ON_INVALID_KEYWORD = True
-"""Warn when setting a :class:`~pydicom.dataset.Dataset` camel case attribute
-that's not a known element keyword.
+INVALID_KEYWORD_BEHAVIOUR = "WARN"
+"""Set the behaviour when setting a :class:`~pydicom.dataset.Dataset` camel
+case attribute that's not a known element keyword.
 
 .. versionadded:: 2.1
 
-If ``True`` (default), then warn when an element value is set using
+If ``"WARN"`` (default), then warn when an element value is set using
 `Dataset.__setattr__()` and the keyword is camel case but doesn't match an
-known DICOM element keyword.
+known DICOM element keyword. If ``"RAISE"`` then raise a :class:`ValueError`
+exception. If ``"IGNORE"`` then allow neither warn nor raise.
 
 Examples
 --------
 
+>>> from pydicom import config
+>>> config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
 >>> ds = Dataset()
 >>> ds.PatientName = "Citizen^Jan"  # OK
 >>> ds.PatientsName = "Citizen^Jan"

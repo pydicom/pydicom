@@ -1891,11 +1891,15 @@ class Dataset(dict):
             self._set_file_meta(value)
         else:
             # Warn if `name` is camel case but not a keyword
-            if config.WARN_ON_INVALID_KEYWORD and _RE_CAMEL_CASE.match(name):
-                warnings.warn(
+            if _RE_CAMEL_CASE.match(name):
+                msg = (
                     f"Camel case attribute '{name}' used which is not in the "
                     "element keyword data dictionary"
                 )
+                if config.INVALID_KEYWORD_BEHAVIOUR == "WARN":
+                    warnings.warn(msg)
+                elif config.INVALID_KEYWORD_BEHAVIOUR == "ERROR":
+                    raise ValueError(msg)
 
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute

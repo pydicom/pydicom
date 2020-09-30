@@ -1942,11 +1942,18 @@ CAMEL_CASE = (
 
 
 @pytest.fixture
-def setattr_dont_warn():
-    """Turn off Dataset.__setattr__() warnings for close keyword matches."""
-    config.WARN_ON_INVALID_KEYWORD = False
+def setattr_raise():
+    """Raise on Dataset.__setattr__() close keyword matches."""
+    config.INVALID_KEYWORD_BEHAVIOUR = "ERROR"
     yield
-    config.WARN_ON_INVALID_KEYWORD = True
+    config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
+
+@pytest.fixture
+def setattr_ignore():
+    """Ignore Dataset.__setattr__() close keyword matches."""
+    config.INVALID_KEYWORD_BEHAVIOUR = "IGNORE"
+    yield
+    config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
 
 
 def test_setattr_warns():
@@ -1971,8 +1978,30 @@ def test_setattr_warns():
             setattr(ds, s, None)
 
 
-def test_setattr_no_warning(setattr_dont_warn):
-    """Test no warnings with config.WARN_ON_INVALID_KEYWORD = False"""
+def test_setattr_raises(setattr_raise):
+    """"Test exceptions for Dataset.__setattr__() for close matches."""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    for s in CAMEL_CASE[1]:
+        msg = (
+            r"Camel case attribute '" + s + r"' used which is not in the "
+            r"element keyword data dictionary"
+        )
+        with pytest.raises(ValueError, match=msg):
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+
+
+def test_setattr_no_warning(setattr_ignore):
+    """Test config.INVALID_KEYWORD_BEHAVIOUR = 'IGNORE'"""
     with pytest.warns(None) as record:
         ds = Dataset()
         assert len(record) == 0
