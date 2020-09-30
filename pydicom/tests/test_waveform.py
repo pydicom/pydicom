@@ -4,13 +4,6 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
-from pydicom.uid import (
-    ImplicitVRLittleEndian,
-    ExplicitVRLittleEndian,
-    DeflatedExplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-)
 
 try:
     import numpy as np

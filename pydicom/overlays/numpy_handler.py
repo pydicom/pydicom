@@ -40,7 +40,6 @@ except ImportError:
 from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
 
 if TYPE_CHECKING:
-    from pydicom.dataelem import DataElement
     from pydicom.dataset import Dataset
 
 
@@ -56,7 +55,7 @@ def is_available() -> bool:
     return HAVE_NP
 
 
-def get_expected_length(elem: "DataElement", unit: str = 'bytes') -> int:
+def get_expected_length(elem: dict, unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -104,9 +103,7 @@ def get_expected_length(elem: "DataElement", unit: str = 'bytes') -> int:
     return length // 8 + (length % 8 > 0)
 
 
-def reshape_overlay_array(
-    elem: "DataElement", arr: "np.ndarray"
-) -> "np.ndarray":
+def reshape_overlay_array(elem: dict, arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     .. versionadded:: 1.4

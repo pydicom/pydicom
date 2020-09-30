@@ -17,7 +17,8 @@ from pydicom.fileutil import path_from_pathlike
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
-from pydicom.uid import DeflatedExplicitVRLittleEndian
+from pydicom.uid import (UncompressedPixelTransferSyntaxes,
+                         DeflatedExplicitVRLittleEndian)
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 

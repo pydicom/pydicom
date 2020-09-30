@@ -30,13 +30,7 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
-from pydicom.uid import (
-    ImplicitVRLittleEndian,
-    ExplicitVRLittleEndian,
-    DeflatedExplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-)
+from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRLittleEndian
 
 try:
     import numpy as np
@@ -65,49 +59,6 @@ EXPL_1_1_3F = None
 # No Overlay Data
 # 16/16, 1 sample/pixel, 1 frame
 EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
-
-# Transfer syntaxes supported by other handlers
-# JPEG Baseline (Process 1)
-JPEG_BASELINE_1 = get_testdata_file("SC_rgb_jpeg_dcmtk.dcm")
-# JPEG Baseline (Process 2 and 4)
-JPEG_EXTENDED_2 = get_testdata_file("JPEG-lossy.dcm")
-# JPEG Lossless (Process 14)
-JPEG_LOSSLESS_14 = None
-# JPEG Lossless (Process 14, Selection Value 1)
-JPEG_LOSSLESS_14_1 = get_testdata_file("SC_rgb_jpeg_gdcm.dcm")
-# JPEG-LS Lossless
-JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-# JPEG-LS Lossy
-JPEG_LS_LOSSY = None
-# JPEG2k Lossless
-JPEG_2K_LOSSLESS = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
-# JPEG2k
-JPEG_2K = get_testdata_file("JPEG2000.dcm")
-# RLE Lossless
-RLE = get_testdata_file("MR_small_RLE.dcm")
-
-# Transfer Syntaxes (non-retired + Explicit VR Big Endian)
-SUPPORTED_SYNTAXES = ALL_TRANSFER_SYNTAXES[:]
-UNSUPPORTED_SYNTAXES = []
-
-
-def test_unsupported_syntaxes():
-    """Test that UNSUPPORTED_SYNTAXES is as expected."""
-    for syntax in SUPPORTED_SYNTAXES:
-        assert syntax not in UNSUPPORTED_SYNTAXES
-
-
-REFERENCE_DATA_UNSUPPORTED = [
-    (JPEG_BASELINE_1, ('1.2.840.10008.1.2.4.50', 'Lestrade^G')),
-    (JPEG_EXTENDED_2, ('1.2.840.10008.1.2.4.51', 'CompressedSamples^NM1')),
-    # (JPEG_LOSSLESS_14, ('1.2.840.10008.1.2.4.57')),  # No dataset available
-    (JPEG_LOSSLESS_14_1, ('1.2.840.10008.1.2.4.70', 'Lestrade^G')),
-    (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
-    # (JPEG_LS_LOSSY, ('1.2.840.10008.1.2.4.81')),  # No dataset available
-    (JPEG_2K_LOSSLESS, ('1.2.840.10008.1.2.4.90', '')),
-    (JPEG_2K, ('1.2.840.10008.1.2.4.91', 'CompressedSamples^NM1')),
-    (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
-]
 
 
 # Numpy unavailable and the numpy handler is available
