@@ -4,13 +4,6 @@ Data* to a :class:`numpy.ndarray`.
 
 .. versionadded:: 2.1
 
-**Supported transfer syntaxes**
-
-* 1.2.840.10008.1.2 : Implicit VR Little Endian
-* 1.2.840.10008.1.2.1 : Explicit VR Little Endian
-* 1.2.840.10008.1.2.1.99 : Deflated Explicit VR Little Endian
-* 1.2.840.10008.1.2.2 : Explicit VR Big Endian
-
 **Supported data**
 
 The numpy handler supports the conversion of data in the (5400,0100)
@@ -37,27 +30,18 @@ given in the table below.
 
 from typing import TYPE_CHECKING, Generator
 
-if TYPE_CHECKING:
-    from pydicom.dataset import Dataset
-
 try:
     import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
-import pydicom.uid
-from pydicom.uid import UID
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'Numpy Waveform'
 DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
-SUPPORTED_TRANSFER_SYNTAXES = [
-    pydicom.uid.ExplicitVRLittleEndian,
-    pydicom.uid.ImplicitVRLittleEndian,
-    pydicom.uid.DeflatedExplicitVRLittleEndian,
-    pydicom.uid.ExplicitVRBigEndian,
-]
 WAVEFORM_DTYPES = {
     (8, 'SB'): 'int8',
     (8, 'UB'): 'uint8',
@@ -80,21 +64,9 @@ def is_available() -> bool:
     return HAVE_NP
 
 
-def supports_transfer_syntax(transfer_syntax: UID) -> bool:
-    """Return ``True`` if the handler supports the `transfer_syntax`.
-
-    .. versionadded:: 2.1
-
-    Parameters
-    ----------
-    transfer_syntax : uid.UID
-        The Transfer Syntax UID of the *Pixel Data* that is to be used with
-        the handler.
-    """
-    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
-
-
-def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndarray", None, None]:  # noqa
+def generate_multiplex(
+    ds: "Dataset", as_raw: bool = True
+) -> Generator["np.ndarray", None, None]:
     """Yield an :class:`~numpy.ndarray` for each multiplex group in the
     *Waveform Sequence*.
 
@@ -118,14 +90,6 @@ def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndar
         The waveform data for a multiplex group as an :class:`~numpy.ndarray`
         with shape (samples, channels).
     """
-    transfer_syntax = ds.file_meta.TransferSyntaxUID
-    # The check of transfer syntax must be first
-    if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
-        raise NotImplementedError(
-            "Unable to convert the waveform data as the transfer syntax "
-            "is not supported by the waveform data handler"
-        )
-
     if 'WaveformSequence' not in ds:
         raise AttributeError(
             "No (5400,0100) Waveform Sequence element found in the dataset"
@@ -174,7 +138,9 @@ def generate_multiplex(ds: "Dataset", as_raw: bool = True) -> Generator["np.ndar
         yield arr
 
 
-def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarray":  # noqa
+def multiplex_array(
+    ds: "Dataset", index: int, as_raw: bool = True
+) -> "np.ndarray":
     """Return an :class:`~numpy.ndarray` for the multiplex group in the
     *Waveform Sequence* at `index`.
 
@@ -200,14 +166,6 @@ def multiplex_array(ds: "Dataset", index: int, as_raw: bool = True) -> "np.ndarr
         The waveform data for a multiplex group as an :class:`~numpy.ndarray`
         with shape (samples, channels).
     """
-    transfer_syntax = ds.file_meta.TransferSyntaxUID
-    # The check of transfer syntax must be first
-    if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
-        raise NotImplementedError(
-            "Unable to convert the waveform data as the transfer syntax "
-            "is not supported by the waveform data handler"
-        )
-
     if 'WaveformSequence' not in ds:
         raise AttributeError(
             "No (5400,0100) Waveform Sequence element found in the dataset"

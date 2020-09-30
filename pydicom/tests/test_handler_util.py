@@ -30,11 +30,8 @@ from pydicom.pixel_data_handlers.util import (
     get_j2k_parameters,
     get_nr_frames
 )
-from pydicom.uid import (
-    ExplicitVRLittleEndian,
-    ImplicitVRLittleEndian,
-    UncompressedTransferSyntaxes
-)
+from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
+                         UncompressedPixelTransferSyntaxes)
 
 
 # PAL: PALETTE COLOR Photometric Interpretation
@@ -487,7 +484,7 @@ class TestNumpy_ReshapePixelArray:
 
     def test_uncompressed_syntaxes(self):
         """Test that uncompressed syntaxes use the dataset planar conf."""
-        for uid in UncompressedTransferSyntaxes:
+        for uid in UncompressedPixelTransferSyntaxes:
             self.ds.file_meta.TransferSyntaxUID = uid
             self.ds.PlanarConfiguration = 0
             self.ds.NumberOfFrames = 1
@@ -1580,6 +1577,25 @@ class TestNumpy_VOILUT:
         msg = r"'17' bits per LUT entry is not supported"
         with pytest.raises(NotImplementedError, match=msg):
             apply_voi_lut(ds.pixel_array, ds)
+
+    def test_voi_uint16_array_float(self):
+        """Test warning when array is float and VOI LUT with an 16-bit LUT"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='float64')
+        msg = (
+            r"Applying a VOI LUT on a float input array may give "
+            r"incorrect results"
+        )
+
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_voi_lut(arr, ds)
+            assert [0, 127, 32768, 65535, 65535] == out.tolist()
 
     def test_window_single_view(self):
         """Test windowing with a single view."""

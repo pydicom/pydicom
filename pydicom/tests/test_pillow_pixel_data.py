@@ -9,13 +9,13 @@ from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, get_j2k_parameters
 )
+from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     JPEGBaseline,
     JPEGLossless,
     JPEGExtended,
     JPEG2000,
     JPEG2000Lossless,
-    AllTransferSyntaxes
 )
 
 
@@ -112,7 +112,7 @@ if HAVE_JPEG2K:
 
 SUPPORTED_SYNTAXES = JPEG_SUPPORTED_SYNTAXES + JPEG2K_SUPPORTED_SYNTAXES
 UNSUPPORTED_SYNTAXES = list(
-    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
+    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
 )
 
 
@@ -189,7 +189,7 @@ class TestNoNumpy_NoPillowHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(IMPL)
-        for uid in AllTransferSyntaxes:
+        for uid in ALL_TRANSFER_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
                                match="UID of '{}'".format(uid)):

@@ -1643,13 +1643,6 @@ class Dataset(dict):
         :func:`~pydicom.waveforms.numpy_handler.generate_multiplex`
         :func:`~pydicom.waveforms.numpy_handler.multiplex_array`
         """
-        transfer_syntax = self.file_meta.TransferSyntaxUID
-        if not wave_handler.supports_transfer_syntax(transfer_syntax):
-            raise NotImplementedError(
-                f"Unable to decode waveform data with a transfer syntax UID "
-                f"of '{transfer_syntax}' ({transfer_syntax.name})"
-            )
-
         if not wave_handler.is_available():
             raise RuntimeError("The waveform data handler requires numpy")
 

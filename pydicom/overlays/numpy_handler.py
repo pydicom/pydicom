@@ -28,6 +28,7 @@ table below.
 
 """
 
+from typing import TYPE_CHECKING
 import warnings
 
 try:
@@ -37,15 +38,17 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
-from pydicom.uid import AllTransferSyntaxes
+
+if TYPE_CHECKING:
+    from pydicom.dataelem import DataElement
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'Numpy Overlay'
 DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
-SUPPORTED_TRANSFER_SYNTAXES = AllTransferSyntaxes[:]
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met.
 
     .. versionadded:: 1.4
@@ -53,7 +56,7 @@ def is_available():
     return HAVE_NP
 
 
-def get_expected_length(elem, unit='bytes'):
+def get_expected_length(elem: "DataElement", unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -101,7 +104,9 @@ def get_expected_length(elem, unit='bytes'):
     return length // 8 + (length % 8 > 0)
 
 
-def reshape_overlay_array(elem, arr):
+def reshape_overlay_array(
+    elem: "DataElement", arr: "np.ndarray"
+) -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     .. versionadded:: 1.4
@@ -163,7 +168,7 @@ def reshape_overlay_array(elem, arr):
     return arr.reshape(nr_rows, nr_columns)
 
 
-def get_overlay_array(ds, group):
+def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the *Overlay Data*.
 
     .. versionadded:: 1.4
