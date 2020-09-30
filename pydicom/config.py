@@ -292,7 +292,7 @@ using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
 
-INVALID_KEYWORD_BEHAVIOUR = "WARN"
+INVALID_KEYWORD_BEHAVIOR = "WARN"
 """Control the behaviour when setting a :class:`~pydicom.dataset.Dataset`
 attribute that's not a known element keyword.
 
@@ -307,7 +307,7 @@ Examples
 --------
 
 >>> from pydicom import config
->>> config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
+>>> config.INVALID_KEYWORD_BEHAVIOR = "WARN"
 >>> ds = Dataset()
 >>> ds.PatientName = "Citizen^Jan"  # OK
 >>> ds.PatientsName = "Citizen^Jan"

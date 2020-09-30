@@ -1944,17 +1944,17 @@ CAMEL_CASE = (
 @pytest.fixture
 def setattr_raise():
     """Raise on Dataset.__setattr__() close keyword matches."""
-    config.INVALID_KEYWORD_BEHAVIOUR = "ERROR"
+    config.INVALID_KEYWORD_BEHAVIOR = "ERROR"
     yield
-    config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
+    config.INVALID_KEYWORD_BEHAVIOR = "WARN"
 
 
 @pytest.fixture
 def setattr_ignore():
     """Ignore Dataset.__setattr__() close keyword matches."""
-    config.INVALID_KEYWORD_BEHAVIOUR = "IGNORE"
+    config.INVALID_KEYWORD_BEHAVIOR = "IGNORE"
     yield
-    config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
+    config.INVALID_KEYWORD_BEHAVIOR = "WARN"
 
 
 def test_setattr_warns():
@@ -2002,7 +2002,7 @@ def test_setattr_raises(setattr_raise):
 
 
 def test_setattr_no_warning(setattr_ignore):
-    """Test config.INVALID_KEYWORD_BEHAVIOUR = 'IGNORE'"""
+    """Test config.INVALID_KEYWORD_BEHAVIOR = 'IGNORE'"""
     with pytest.warns(None) as record:
         ds = Dataset()
         assert len(record) == 0

@@ -1896,9 +1896,9 @@ class Dataset(dict):
                     f"Camel case attribute '{name}' used which is not in the "
                     "element keyword data dictionary"
                 )
-                if config.INVALID_KEYWORD_BEHAVIOUR == "WARN":
+                if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
                     warnings.warn(msg)
-                elif config.INVALID_KEYWORD_BEHAVIOUR == "ERROR":
+                elif config.INVALID_KEYWORD_BEHAVIOR == "ERROR":
                     raise ValueError(msg)
 
             # name not in dicom dictionary - setting a non-dicom instance
