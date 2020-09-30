@@ -96,7 +96,7 @@ CTPerformedProcedureProtocolStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.2')
 ProtocolApprovalStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.3')
-UltrasoundMultiframeImageStorage = UID(
+UltrasoundMultiFrameImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.3.1')
 ParametricMapStorage = UID(
     '1.2.840.10008.5.1.4.1.1.30')
@@ -162,7 +162,7 @@ DICOS2DAITStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.4')
 DICOS3DAITStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.5')
-DICOSQuadrupoleResonanceQRStorage = UID(
+DICOSQuadrupoleResonanceStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.6')
 UltrasoundImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.6.1')
@@ -170,7 +170,7 @@ EnhancedUSVolumeStorage = UID(
     '1.2.840.10008.5.1.4.1.1.6.2')
 EddyCurrentImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.601.1')
-EddyCurrentMultiframeImageStorage = UID(
+EddyCurrentMultiFrameImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.601.2')
 RawDataStorage = UID(
     '1.2.840.10008.5.1.4.1.1.66')
@@ -194,13 +194,13 @@ SurfaceScanPointCloudStorage = UID(
     '1.2.840.10008.5.1.4.1.1.68.2')
 SecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7')
-MultiframeSingleBitSecondaryCaptureImageStorage = UID(
+MultiFrameSingleBitSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.1')
-MultiframeGrayscaleByteSecondaryCaptureImageStorage = UID(
+MultiFrameGrayscaleByteSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.2')
-MultiframeGrayscaleWordSecondaryCaptureImageStorage = UID(
+MultiFrameGrayscaleWordSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.3')
-MultiframeTrueColorSecondaryCaptureImageStorage = UID(
+MultiFrameTrueColorSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.4')
 VLEndoscopicImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.77.1.1')
@@ -250,7 +250,7 @@ OphthalmicAxialMeasurementsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.78.7')
 IntraocularLensCalculationsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.78.8')
-MacularGridThicknessandVolumeReportStorage = UID(
+MacularGridThicknessAndVolumeReportStorage = UID(
     '1.2.840.10008.5.1.4.1.1.79.1')
 OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.80.1')

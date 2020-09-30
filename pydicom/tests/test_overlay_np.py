@@ -30,12 +30,12 @@ import pytest
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
+from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
-    AllTransferSyntaxes
 )
 
 try:
@@ -87,7 +87,7 @@ JPEG_2K = get_testdata_file("JPEG2000.dcm")
 RLE = get_testdata_file("MR_small_RLE.dcm")
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
-SUPPORTED_SYNTAXES = AllTransferSyntaxes[:]
+SUPPORTED_SYNTAXES = ALL_TRANSFER_SYNTAXES[:]
 UNSUPPORTED_SYNTAXES = []
 
 

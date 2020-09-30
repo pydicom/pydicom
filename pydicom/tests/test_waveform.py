@@ -40,38 +40,16 @@ def test_waveform_array_raises():
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestDataset:
-    """Tests for dataset.waveform_generator"""
-    def test_simple(self):
-        """Simple functionality test."""
-        ds = dcmread(ECG)
-        arr = ds.waveform_array(index=0)
-        arr = ds.waveform_array(index=1)
-
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = r"Unable to decode waveform data with a transfer syntax UID"
-        with pytest.raises(NotImplementedError, match=msg):
-            ds.waveform_array(0)
+def test_simple():
+    """Simple functionality test."""
+    ds = dcmread(ECG)
+    arr = ds.waveform_array(index=0)
+    arr = ds.waveform_array(index=1)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerGenerateMultiplex:
     """Tests for the waveform numpy_handler.generate_multiplex."""
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = (
-            r"Unable to convert the waveform data as the transfer syntax "
-            r"is not supported by the waveform data handler"
-        )
-        gen = generate_multiplex(ds)
-        with pytest.raises(NotImplementedError, match=msg):
-            next(gen)
-
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)
@@ -123,17 +101,6 @@ class TestHandlerGenerateMultiplex:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerMultiplexArray:
     """Tests for the waveform numpy_handler.multiplex_array."""
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = (
-            r"Unable to convert the waveform data as the transfer syntax "
-            r"is not supported by the waveform data handler"
-        )
-        with pytest.raises(NotImplementedError, match=msg):
-            multiplex_array(ds, 0)
-
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)

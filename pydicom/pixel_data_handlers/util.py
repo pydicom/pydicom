@@ -307,6 +307,12 @@ def apply_voi_lut(arr, ds, index=0):
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     if 'VOILUTSequence' in ds:
+        if not np.issubdtype(arr.dtype, np.integer):
+            warnings.warn(
+                "Applying a VOI LUT on a float input array may give "
+                "incorrect results"
+            )
+
         # VOI LUT Sequence contains one or more items
         item = ds.VOILUTSequence[index]
         nr_entries = item.LUTDescriptor[0] or 2**16
@@ -334,7 +340,7 @@ def apply_voi_lut(arr, ds, index=0):
         lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        clipped_iv = np.zeros(arr.shape, dtype=dtype)
         # IVs >= `first_map` are mapped by the VOI LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map

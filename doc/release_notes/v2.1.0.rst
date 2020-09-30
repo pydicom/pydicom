@@ -39,31 +39,27 @@ Enhancements
     *Waveform Sequence* element.
 * When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
   the image data is converted to signed (:issue:`1149`)
+* Added :attr:`~pydicom.uid.UID.keyword` property for the new UID keywords
+  in version 2020d of the DICOM Standard
 
 Changes
 .......
 * Reading and adding unknown non-private tags now does not raise an exception
   per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
-* Data dictionaries updated to version 2020c of the DICOM Standard
+* Data dictionaries updated to version 2020d of the DICOM Standard
+* Updated a handful of the SOP Class variable names in
+  ``_storage_sopclass_uids``
+  to use the new UID keywords. Variables with ``Multiframe`` in them
+  become ``MultiFrame``, those with ``and`` in them become ``And``, and
+  ``DICOSQuadrupoleResonanceQRStorage`` becomes
+  ``DICOSQuadrupoleResonanceStorage``.
+* Invalid values used with the :class:`~pydicom.dataset.Dataset`
+  :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
+  returning ``False`` (:issue:`1200`)
 * `pydicom.overlay_data_handlers` is deprecated, use `pydicom.overlays` instead
-* The following lists of UIDs are deprecated:
-
-  * ``pydicom.uid.JPEGLossyCompressedPixelTransferSyntaxes``: use
-    :attr:`~pydicom.uid.JPEGTransferSyntaxes`
-  * ``pydicom.uid.JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
-    :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
-  * ``pydicom.uid.JPEG2000CompressedPixelTransferSyntaxes``: use
-    :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
-  * ``pydicom.uid.RLECompressedLosslessSyntaxes``: use
-    :attr:`~pydicom.uid.RLETransferSyntaxes`
-  * ``pydicom.uid.UncompressedPixelTransferSyntaxes``: use
-    :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
-  * ``pydicom.uid.PILSupportedCompressedPixelTransferSyntaxes``
-
-* Added :attr:`~pydicom.uid.AllTransferSyntaxes`
 * Removed transfer syntax limitations when converting overlays to an
-  ``ndarray``
+  ``ndarray`` (:issue:`1181`)
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
   deprecated, the default handler will always be used.
 
@@ -83,3 +79,5 @@ Fixes
   :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
 * Gracefully handle empty Specific Character Set (:issue:`1190`)
 * Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
+* Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
+  lookup to an input float array
