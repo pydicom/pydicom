@@ -293,7 +293,7 @@ values within the dataset when applying corrections.
 """
 
 INVALID_KEYWORD_BEHAVIOR = "WARN"
-"""Control the behaviour when setting a :class:`~pydicom.dataset.Dataset`
+"""Control the behavior when setting a :class:`~pydicom.dataset.Dataset`
 attribute that's not a known element keyword.
 
 .. versionadded:: 2.1

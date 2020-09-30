@@ -44,7 +44,7 @@ Enhancements
 * Added testing of the variable names used when setting
   :class:`~pydicom.dataset.Dataset` attributes and
   :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR` config option to allow
-  customizing the behaviour when a camel case variable name is used that isn't
+  customizing the behavior when a camel case variable name is used that isn't
   a known element keyword (:issue:`1014`)
 
 Changes
