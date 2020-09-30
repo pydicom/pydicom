@@ -171,9 +171,9 @@ def code_sequence(dataelem,
         #    use that; if one with 'Number', use that, else start at 1
         index_keyword = seq_keyword.replace("Sequence", "") + "Index"
         number_keyword = seq_keyword.replace("Sequence", "") + "Number"
-        if index_keyword in ds:
+        if hasattr(ds, index_keyword):
             index_str = str(getattr(ds, index_keyword))
-        elif number_keyword in ds:
+        elif hasattr(ds, number_keyword):
             index_str = str(getattr(ds, number_keyword))
         else:
             index_str = str(i + 1)

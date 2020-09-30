@@ -55,6 +55,9 @@ Changes
   become ``MultiFrame``, those with ``and`` in them become ``And``, and
   ``DICOSQuadrupoleResonanceQRStorage`` becomes
   ``DICOSQuadrupoleResonanceStorage``.
+* Invalid values used with the :class:`~pydicom.dataset.Dataset`
+  :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
+  returning ``False`` (:issue:`1200`)
 * Data dictionaries updated to version 2020c of the DICOM Standard
 * The following UID constants are deprecated and will be removed in v2.2:
 
