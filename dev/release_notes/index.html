@@ -398,6 +398,9 @@ to use the new UID keywords. Variables with <code class="docutils literal notran
 become <code class="docutils literal notranslate"><span class="pre">MultiFrame</span></code>, those with <code class="docutils literal notranslate"><span class="pre">and</span></code> in them become <code class="docutils literal notranslate"><span class="pre">And</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceQRStorage</span></code> becomes
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceStorage</span></code>.</p></li>
+<li><p>Invalid values used with the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
+<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> now raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> rather than
+returning <code class="docutils literal notranslate"><span class="pre">False</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
