@@ -293,15 +293,15 @@ values within the dataset when applying corrections.
 """
 
 INVALID_KEYWORD_BEHAVIOUR = "WARN"
-"""Set the behaviour when setting a :class:`~pydicom.dataset.Dataset` camel
-case attribute that's not a known element keyword.
+"""Control the behaviour when setting a :class:`~pydicom.dataset.Dataset`
+attribute that's not a known element keyword.
 
 .. versionadded:: 2.1
 
 If ``"WARN"`` (default), then warn when an element value is set using
-`Dataset.__setattr__()` and the keyword is camel case but doesn't match an
+``Dataset.__setattr__()`` and the keyword is camel case but doesn't match a
 known DICOM element keyword. If ``"RAISE"`` then raise a :class:`ValueError`
-exception. If ``"IGNORE"`` then allow neither warn nor raise.
+exception. If ``"IGNORE"`` then neither warn nor raise.
 
 Examples
 --------

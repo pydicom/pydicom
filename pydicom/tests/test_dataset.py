@@ -1948,6 +1948,7 @@ def setattr_raise():
     yield
     config.INVALID_KEYWORD_BEHAVIOUR = "WARN"
 
+
 @pytest.fixture
 def setattr_ignore():
     """Ignore Dataset.__setattr__() close keyword matches."""
