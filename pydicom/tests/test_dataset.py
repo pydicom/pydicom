@@ -164,7 +164,7 @@ class TestDataset:
         self.ds.TreatmentMachineName = "unit999"  # change existing value
         assert "unit999" == self.ds[0x300a, 0x00b2].value
 
-    def test_set_non_dicom(self):
+    def test_set_non_dicom(self, setattr_warn):
         """Dataset: can set class instance property (non-dicom)."""
         ds = Dataset()
         msg = (
@@ -380,7 +380,7 @@ class TestDataset:
         assert callable(ds.group_dataset)
         assert 'group_dataset' in dir(ds)
 
-    def test_dir(self):
+    def test_dir(self, setattr_warn):
         """Dataset.dir() returns sorted list of named data_elements."""
         ds = self.ds
         ds.PatientName = "name"
@@ -399,7 +399,7 @@ class TestDataset:
                     'XRayTubeCurrent']
         assert expected == ds.dir()
 
-    def test_dir_filter(self):
+    def test_dir_filter(self, setattr_warn):
         """Test Dataset.dir(*filters) works OK."""
         ds = self.ds
         ds.PatientName = "name"
@@ -560,7 +560,7 @@ class TestDataset:
         # Make sure Dataset.__eq__() is being used, not dict__eq__()
         assert not d == {'SOPInstanceUID': '1.2.3.4'}
 
-    def test_equality_unknown(self):
+    def test_equality_unknown(self, setattr_warn):
         """Dataset: equality returns correct value with extra members """
         # Non-element class members are ignored in equality testing
         d = Dataset()
@@ -1957,7 +1957,15 @@ def setattr_ignore():
     config.INVALID_KEYWORD_BEHAVIOR = "WARN"
 
 
-def test_setattr_warns():
+@pytest.fixture
+def setattr_warn():
+    """Warn on Dataset.__setattr__() close keyword matches."""
+    config.INVALID_KEYWORD_BEHAVIOR = "WARN"
+    yield
+    config.INVALID_KEYWORD_BEHAVIOR = "WARN"
+
+
+def test_setattr_warns(setattr_warn):
     """"Test warnings for Dataset.__setattr__() for close matches."""
     with pytest.warns(None) as record:
         ds = Dataset()
@@ -2001,7 +2009,7 @@ def test_setattr_raises(setattr_raise):
             setattr(ds, s, None)
 
 
-def test_setattr_no_warning(setattr_ignore):
+def test_setattr_ignore(setattr_ignore):
     """Test config.INVALID_KEYWORD_BEHAVIOR = 'IGNORE'"""
     with pytest.warns(None) as record:
         ds = Dataset()
