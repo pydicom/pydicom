@@ -44,43 +44,43 @@ corresponding (5400,1010) *Waveform Data* element.
 
 .. warning::
 
-   :attr:`Dataset.waveform_generator
-   <pydicom.dataset.Dataset.waveform_generator>` requires `NumPy
-   <http://numpy.org/>`_.
+   :attr:`Dataset.waveform_array<pydicom.dataset.Dataset.waveform_array>`
+   requires `NumPy <http://numpy.org/>`_.
 
 The *Waveform Data* element contains the raw bytes exactly as found in the
 file. To get the waveforms in a more useful form you can use the
-:attr:`~pydicom.dataset.Dataset.waveform_generator` property to return a
-`generator object
-<https://docs.python.org/3/glossary.html#term-generator-iterator>`_ that yields
-a :class:`numpy.ndarray` with shape (samples, channels) for each multiplex
-group in the *Waveform Sequence*.
+:attr:`~pydicom.dataset.Dataset.waveform_array` method to return a
+a :class:`numpy.ndarray` with shape (samples, channels) for the multiplex
+group at `index` in the *Waveform Sequence*.
 
-  >>> generator = ds.waveform_generator
-  >>> multiplex_1 = next(generator)
+  >>> multiplex_1 = ds.waveform_array(0)
   >>> multiplex_1
+  array([[ 100.  ,  112.5 ,   12.5 , ...,  -25.  ,  -68.75,  -50.  ],
+         [  81.25,  106.25,   25.  , ...,  -25.  ,  -75.  ,  -50.  ],
+         [  62.5 ,  100.  ,   37.5 , ...,  -25.  ,  -81.25,  -50.  ],
+         ...,
+         [  25.  ,  131.25,  106.25, ..., -137.5 , -150.  , -100.  ],
+         [  21.25,  137.5 ,  116.25, ..., -137.5 , -150.  , -106.25],
+         [  25.  ,  137.5 ,  112.5 , ..., -137.5 , -150.  , -112.5 ]])
+  >>> multiplex_1.shape
+  (10000, 12)
+  >>> multiplex_2 = ds.waveform_array(1)
+  >>> multiplex_2.shape
+  (1200, 12)
+
+If the *Channel Sensitivity Correction Factor* is available for a given channel
+then it will be applied to the raw channel data. If you need the raw data
+without any corrections then you can use the
+:func:`~pydicom.waveforms.numpy_handler.multiplex_array`
+function with the *as_raw* keyword parameter instead:
+
+  >>> from pydicom.waveforms import multiplex_array
+  >>> arr = multiplex_array(ds, 0, as_raw=True)
+  >>> arr
   array([[  80,   90,   10, ...,  -20,  -55,  -40],
          [  65,   85,   20, ...,  -20,  -60,  -40],
          [  50,   80,   30, ...,  -20,  -65,  -40],
          ...,
          [  20,  105,   85, ..., -110, -120,  -80],
          [  17,  110,   93, ..., -110, -120,  -85],
-         [  20,  110,   90, ..., -110, -120,  -90]], dtype=float)
-  >>> multiplex_1.shape
-  (10000, 12)
-  >>> multiplex_2 = next(generator)
-  >>> multiplex_2.shape
-  (1200, 12)
-  >>> next(generator)
-  Traceback (most recent call last):
-    File "<stdin>", line 1, in <module>
-  StopIteration
-
-If the *Channel Sensitivity Correction Factor* is available for a given channel
-then it will be applied to the raw channel data. If you need the raw data
-without any corrections then you can use the
-:func:`~pydicom.waveform_data_handlers.numpy_handler.generate_multiplex`
-function with the *as_raw* keyword parameter instead:
-
-  >>> from pydicom.waveform_generator.numpy_handler import generate_multiplex
-  >>> generator = generate_multiplex(ds, as_raw=True)
+         [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)
