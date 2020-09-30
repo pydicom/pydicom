@@ -22,6 +22,8 @@ def __getattr__(name):
         )
         return globals()["JPEGLosslessSV1"]
 
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
@@ -230,7 +232,7 @@ JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
 """1.2.840.10008.1.2.4.51"""
 JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')  # needs to be updated
 """1.2.840.10008.1.2.4.57"""
-JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')
+JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')  # Old JPEGLossless
 """1.2.840.10008.1.2.4.70"""
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
 """1.2.840.10008.1.2.4.80"""
