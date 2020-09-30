@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Define Tag class to hold a DICOM (group, element) tag and related functions.
 
 The 4 bytes of the DICOM tag are stored as an 'int'. Tags are
@@ -7,12 +7,13 @@ stored as a single number and separated to (group, element) as required.
 # NOTE: Tags must be not be stored as a tuple internally, as some code logic
 #       (e.g. in filewriter.write_AT) checks if a value is a multi-value
 #       element
-import traceback
 from contextlib import contextmanager
+import traceback
+from typing import Tuple, Optional, Union, ContextManager
 
 
 @contextmanager
-def tag_in_exception(tag):
+def tag_in_exception(tag: "BaseTag") -> ContextManager[None]:
     """Use `tag` within a context.
 
     Used to include the tag details in the traceback message when an exception
@@ -25,43 +26,40 @@ def tag_in_exception(tag):
     """
     try:
         yield
-    except Exception as ex:
+    except Exception as exc:
         stack_trace = traceback.format_exc()
-        msg = 'With tag {0} got exception: {1}\n{2}'.format(
-            tag,
-            str(ex),
-            stack_trace)
-        raise type(ex)(msg)
+        msg = f"With tag {tag} got exception: {str(exc)}\n{stack_trace}"
+        raise type(exc)(msg) from exc
 
 
-def Tag(arg, arg2=None):
+def Tag(
+    arg: Union[int, str, Tuple[int]],
+    arg2: Optional[int] = None
+) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
     General function for creating a :class:`BaseTag` in any of the standard
     forms:
 
     * ``Tag(0x00100015)``
-    * ``Tag('0x00100015')``
     * ``Tag((0x10, 0x50))``
-    * ``Tag(('0x10', '0x50'))``
     * ``Tag(0x0010, 0x0015)``
-    * ``Tag(0x10, 0x15)``
-    * ``Tag(2341, 0x10)``
-    * ``Tag('0xFE', '0x0010')``
     * ``Tag("PatientName")``
 
     .. versionchanged:: 1.3
 
-        Added support for creating a ``BaseTag`` using an element keyword
+        Added support for creating a :class:`!BaseTag` using an element keyword
 
     Parameters
     ----------
-    arg : int or str or 2-tuple/list
-        If :class:`int` or :class:`str`, then either the group or the combined
-        group/element number of the DICOM tag. If :class:`tuple` or
-        :class:`list` then the (group, element) numbers as :class:`!int` or
-        :class:`!str`.
-    arg2 : int or str, optional
+    arg : int or str or 2-tuple of int
+
+        * If :class:`int` then either the group number or the combined
+          group and element numbers of the tag
+        * If :class:`str` then the corresponding element's keyword
+        * If :class:`tuple` then the (group, element) numbers as
+          ``(:class:`!int`, :class:`!int`)``.
+    arg2 : int, optional
         The element number of the DICOM tag, required when `arg` only contains
         the group number of the tag.
 
@@ -132,11 +130,11 @@ class BaseTag(int):
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
-    def __le__(self, other):
+    def __le__(self, other) -> bool:
         """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
@@ -147,15 +145,15 @@ class BaseTag(int):
 
         return int(self) < int(other)
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bool:
         """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -166,7 +164,7 @@ class BaseTag(int):
 
         return int(self) == int(other)
 
-    def __ne__(self, other):
+    def __ne__(self, other) -> bool:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
@@ -177,31 +175,31 @@ class BaseTag(int):
     #              datamodel.html#object.__hash__
     __hash__ = int.__hash__
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the tag value as a hex string '(gggg, eeee)'."""
         return "({0:04x}, {1:04x})".format(self.group, self.element)
 
     __repr__ = __str__
 
     @property
-    def group(self):
+    def group(self) -> int:
         """Return the tag's group number as :class:`int`."""
         return self >> 16
 
     @property
-    def element(self):
+    def element(self) -> int:
         """Return the tag's element number as :class:`int`."""
         return self & 0xffff
 
     elem = element  # alternate syntax
 
     @property
-    def is_private(self):
+    def is_private(self) -> bool:
         """Return ``True`` if the tag is private (has an odd group number)."""
         return self.group % 2 == 1
 
     @property
-    def is_private_creator(self):
+    def is_private_creator(self) -> bool:
         """Return ``True`` if the tag is a private creator.
 
         .. versionadded:: 1.1
@@ -209,7 +207,7 @@ class BaseTag(int):
         return self.is_private and 0x0010 <= self.element < 0x0100
 
 
-def TupleTag(group_elem):
+def TupleTag(group_elem: Tuple[int]) -> BaseTag:
     """Fast factory for :class:`BaseTag` object with known safe (group, elem)
     :class:`tuple`
     """
