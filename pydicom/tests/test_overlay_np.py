@@ -25,6 +25,9 @@ There are the following possibilities:
 * OverlayColumns
 """
 
+from importlib import reload
+import typing
+
 import pytest
 
 import pydicom
@@ -197,6 +200,13 @@ class TestNumpy_NumpyHandler:
         assert arr.max() == 1
         assert arr.min() == 0
         assert 29 == sum(arr[422, 393:422])
+
+    def test_typing_imports(self, monkeypatch):
+        """Test the imports required for typing are OK."""
+        assert not hasattr(NP_HANDLER, "Dataset")
+        monkeypatch.setattr(typing, "TYPE_CHECKING", True)
+        reload(NP_HANDLER)
+        assert hasattr(NP_HANDLER, "Dataset")
 
 
 # Tests for numpy_handler module with Numpy available

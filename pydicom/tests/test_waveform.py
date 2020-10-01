@@ -1,4 +1,8 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+
+from importlib import reload
+import typing
+
 import pytest
 
 import pydicom
@@ -38,6 +42,15 @@ def test_simple():
     ds = dcmread(ECG)
     arr = ds.waveform_array(index=0)
     arr = ds.waveform_array(index=1)
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+def test_typing_imports(monkeypatch):
+    """Test the imports required for typing are OK."""
+    assert not hasattr(NP_HANDLER, "Dataset")
+    monkeypatch.setattr(typing, "TYPE_CHECKING", True)
+    reload(NP_HANDLER)
+    assert hasattr(NP_HANDLER, "Dataset")
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
