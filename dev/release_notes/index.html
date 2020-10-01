@@ -383,6 +383,11 @@ in <code class="xref py py-mod docutils literal notranslate"><span class="pre">p
 the image data is converted to signed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1149">#1149</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.keyword" title="pydicom.uid.UID.keyword"><code class="xref py py-attr docutils literal notranslate"><span class="pre">keyword</span></code></a> property for the new UID keywords
 in version 2020d of the DICOM Standard</p></li>
+<li><p>Added testing of the variable names used when setting
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> attributes and
+<a class="reference internal" href="../reference/generated/pydicom.config.INVALID_KEYWORD_BEHAVIOR.html#pydicom.config.INVALID_KEYWORD_BEHAVIOR" title="pydicom.config.INVALID_KEYWORD_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEYWORD_BEHAVIOR</span></code></a> config option to allow
+customizing the behavior when a camel case variable name is used that isn’t
+a known element keyword (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1014">#1014</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">

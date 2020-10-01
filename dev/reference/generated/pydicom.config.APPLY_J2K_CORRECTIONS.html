@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filewriter.write_OWvalue &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>pydicom.config.APPLY_J2K_CORRECTIONS &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.filewriter.write_PN" href="pydicom.filewriter.write_PN.html" />
-    <link rel="prev" title="pydicom.filewriter.write_OBvalue" href="pydicom.filewriter.write_OBvalue.html" /> 
+    <link rel="next" title="pydicom.config.INVALID_KEYWORD_BEHAVIOR" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html" />
+    <link rel="prev" title="pydicom.config.use_DS_numpy" href="pydicom.config.use_DS_numpy.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -111,7 +111,26 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.debug.html">pydicom.config.debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
@@ -121,37 +140,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr.html">pydicom.filewriter.correct_ambiguous_vr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr_element.html">pydicom.filewriter.correct_ambiguous_vr_element</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.dcmwrite.html">pydicom.filewriter.dcmwrite</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.multi_string.html">pydicom.filewriter.multi_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_ATvalue.html">pydicom.filewriter.write_ATvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_DA.html">pydicom.filewriter.write_DA</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_dataset.html">pydicom.filewriter.write_dataset</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_data_element.html">pydicom.filewriter.write_data_element</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_DT.html">pydicom.filewriter.write_DT</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_file_meta_info.html">pydicom.filewriter.write_file_meta_info</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_numbers.html">pydicom.filewriter.write_numbers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_number_string.html">pydicom.filewriter.write_number_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_OBvalue.html">pydicom.filewriter.write_OBvalue</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.filewriter.write_OWvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_PN.html">pydicom.filewriter.write_PN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_sequence.html">pydicom.filewriter.write_sequence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_sequence_item.html">pydicom.filewriter.write_sequence_item</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_string.html">pydicom.filewriter.write_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_text.html">pydicom.filewriter.write_text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_TM.html">pydicom.filewriter.write_TM</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_UI.html">pydicom.filewriter.write_UI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_UN.html">pydicom.filewriter.write_UN</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -217,11 +206,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../fileio.html">Dataset IO</a> &raquo;</li>
+          <li><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a> &raquo;</li>
         
-          <li><a href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a> &raquo;</li>
-        
-      <li>pydicom.filewriter.write_OWvalue</li>
+      <li>pydicom.config.APPLY_J2K_CORRECTIONS</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -238,13 +225,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-filewriter-write-owvalue">
-<h1>pydicom.filewriter.write_OWvalue<a class="headerlink" href="#pydicom-filewriter-write-owvalue" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="pydicom.filewriter.write_OWvalue">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">write_OWvalue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">data_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0c367d2e/pydicom/filewriter.py#L258"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_OWvalue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a data_element with VR of ‘other word’ (OW).</p>
-<p>Note: This <strong>does not currently do the byte swapping</strong> for Endian state.</p>
+  <div class="section" id="pydicom-config-apply-j2k-corrections">
+<h1>pydicom.config.APPLY_J2K_CORRECTIONS<a class="headerlink" href="#pydicom-config-apply-j2k-corrections" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt id="pydicom.config.APPLY_J2K_CORRECTIONS">
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">APPLY_J2K_CORRECTIONS</code><em class="property"> = True</em><a class="headerlink" href="#pydicom.config.APPLY_J2K_CORRECTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the information within JPEG 2000 data to correct the returned pixel data</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.</span></p>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), then for handlers that support JPEG 2000 pixel data,
+use the component precision and sign to correct the returned ndarray when
+using the pixel data handlers. If <code class="docutils literal notranslate"><span class="pre">False</span></code> then only rely on the element
+values within the dataset when applying corrections.</p>
 </dd></dl>
 
 </div>
@@ -257,10 +250,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pydicom.filewriter.write_PN.html" class="btn btn-neutral float-right" title="pydicom.filewriter.write_PN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html" class="btn btn-neutral float-right" title="pydicom.config.INVALID_KEYWORD_BEHAVIOR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.filewriter.write_OBvalue.html" class="btn btn-neutral float-left" title="pydicom.filewriter.write_OBvalue" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.config.use_DS_numpy.html" class="btn btn-neutral float-left" title="pydicom.config.use_DS_numpy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
