@@ -7,8 +7,6 @@ A DataElement has a tag,
               and a value.
 """
 
-from __future__ import annotations
-
 import base64
 from collections import namedtuple
 import json
