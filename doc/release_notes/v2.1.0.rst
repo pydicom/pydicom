@@ -41,6 +41,11 @@ Enhancements
   the image data is converted to signed (:issue:`1149`)
 * Added :attr:`~pydicom.uid.UID.keyword` property for the new UID keywords
   in version 2020d of the DICOM Standard
+* Added testing of the variable names used when setting
+  :class:`~pydicom.dataset.Dataset` attributes and
+  :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR` config option to allow
+  customizing the behavior when a camel case variable name is used that isn't
+  a known element keyword (:issue:`1014`)
 * Added :attr:`~pydicom.uid.AllTransferSyntaxes`
 
 Changes
