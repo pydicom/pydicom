@@ -57,6 +57,9 @@ Changes
 * Invalid values used with the :class:`~pydicom.dataset.Dataset`
   :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
   returning ``False`` (:issue:`1200`)
+* The `file_value_tell` keyword parameter for
+  :class:`~pydicom.dataelem.DataElement` is deprecated and will be removed in
+  v2.2
 
 Fixes
 .....

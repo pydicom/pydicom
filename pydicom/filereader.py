@@ -116,10 +116,10 @@ def data_element_generator(fp,
     element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
 
-    tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else []
+    tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
     has_tag_set = bool(tag_set)
     if has_tag_set:
-        tag_set.add(Tag(0x00080005))
+        tag_set.add(Tag(0x00080005))  # Specific Character Set
 
     while True:
         # Read tag, VR, length, get ready to read value

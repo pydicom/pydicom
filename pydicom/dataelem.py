@@ -159,7 +159,7 @@ class DataElement:
 
     def __init__(
         self,
-        tag : Union[int, str, Tuple[int]],
+        tag: Union[int, str, Tuple[int]],
         VR: str,
         value: Any,
         file_value_tell: Optional[int] = None,
@@ -167,6 +167,11 @@ class DataElement:
         already_converted: bool = False
     ) -> None:
         """Create a new :class:`DataElement`.
+
+        .. deprecated:: 2.1
+
+            The `file_value_tell` keyword parameter is deprecated and will be
+            removed in v2.2
 
         Parameters
         ----------
@@ -590,18 +595,6 @@ class DataElement:
         else:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
-
-    def __unicode__(self) -> str:
-        """Return unicode representation of the element."""
-        if isinstance(self.value, str):
-            # start with the string rep then replace the value part
-            #   with the unicode
-            strVal = str(self)
-            strVal = strVal.replace(self.repval, "")
-            uniVal = str(strVal) + self.value
-            return uniVal
-        else:
-            return str(self)
 
     def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
