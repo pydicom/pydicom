@@ -14,7 +14,7 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 **References**
 
-* :dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>`
+* :dcm:`Basic Directory IOD<part03/chapter_F.html>`
 * :dcm:`DICOM File Service<part10/chapter_8.html>`
 * :dcm:`Media Formats and Physical Media for Media Interchange
   <part12/ps3.12.html>`
@@ -56,7 +56,7 @@ specifies where the DICOMDIR must be located.
 
 The DICOMDIR file is used to summarize the contents of the File-set, and is a
 *Media Storage Directory* instance that follows the
-:dcm:`Basic Directory IOD<chtml/part03/chapter_F.html>`.
+:dcm:`Basic Directory IOD<part03/chapter_F.html>`.
 
 .. code-block:: python
 
