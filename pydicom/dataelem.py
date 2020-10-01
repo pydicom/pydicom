@@ -37,6 +37,7 @@ if config.have_numpy:
 if TYPE_CHECKING:
     from pydicom.dataset import Dataset
 
+
 BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
@@ -145,7 +146,7 @@ class DataElement:
     showVR : bool
         For string display, include the element's VR just before it's value
         (default ``True``).
-    tag : BaseTag
+    tag : pydicom.tag.BaseTag
         The element's tag.
     VR : str
         The element's Value Representation.
@@ -237,7 +238,7 @@ class DataElement:
         ----------
         dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
-        tag : BaseTag or int
+        tag : pydicom.tag.BaseTag or int
             The data element tag.
         vr : str
             The data element value representation.
@@ -445,7 +446,7 @@ class DataElement:
         return self.VM == 0
 
     @property
-    def empty_value(self) -> Any:
+    def empty_value(self) -> Union[bytes, list, None, str]:
         """Return the value for an empty element.
 
         .. versionadded:: 1.4
