@@ -9,9 +9,12 @@ A DataElement has a tag,
 
 
 import base64
-import json
-import warnings
 from collections import namedtuple
+import json
+from typing import (
+    Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict
+)
+import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -30,6 +33,9 @@ from pydicom.valuerep import PersonName
 
 if config.have_numpy:
     import numpy
+
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
@@ -150,20 +156,22 @@ class DataElement:
     showVR = True
     is_raw = False
 
-    def __init__(self,
-                 tag,
-                 VR,
-                 value,
-                 file_value_tell=None,
-                 is_undefined_length=False,
-                 already_converted=False):
+    def __init__(
+        self,
+        tag : Union[int, str, Tuple[int]],
+        VR: str,
+        value: Any,
+        file_value_tell: Optional[int] = None,
+        is_undefined_length: bool = False,
+        already_converted: bool = False
+    ) -> None:
         """Create a new :class:`DataElement`.
 
         Parameters
         ----------
-        tag : int or or str or list or tuple
+        tag : int or str or 2-tuple of int
             The DICOM (group, element) tag in any form accepted by
-            :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
+            :func:`~pydicom.tag.Tag` such as ``'PatientName'``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
         VR : str
             The 2 character DICOM value representation (see DICOM Standard,
@@ -182,7 +190,7 @@ class DataElement:
             method. Default is ``None``.
         is_undefined_length : bool
             Used internally to store whether the length field for this element
-            was ``0xFFFFFFFFL``, i.e. 'undefined length'. Default is ``False``.
+            was ``0xFFFFFFFF``, i.e. 'undefined length'. Default is ``False``.
         already_converted : bool
             Used to determine whether or not the element's value requires
             conversion to a value with VM > 1. Default is ``False``.
@@ -212,8 +220,15 @@ class DataElement:
         self.private_creator = None
 
     @classmethod
-    def from_json(cls, dataset_class, tag, vr, value, value_key,
-                  bulk_data_uri_handler=None):
+    def from_json(
+        cls: "DataElement",
+        dataset_class: "Dataset",
+        tag: Union[BaseTag, int],
+        vr: str,
+        value: Any,
+        value_key: Union[str, None],
+        bulk_data_uri_handler: Optional[Callable[[str], Any]] = None
+    ) -> None:
         """Return a :class:`DataElement` from JSON.
 
         .. versionadded:: 1.3
@@ -253,7 +268,11 @@ class DataElement:
                 )
             )
 
-    def to_json_dict(self, bulk_data_element_handler, bulk_data_threshold):
+    def to_json_dict(
+        self,
+        bulk_data_element_handler: Union[Callable[["DataElement"], str], None],
+        bulk_data_threshold: int
+    ) -> Dict[str, Any]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
@@ -338,8 +357,12 @@ class DataElement:
             )
         return json_element
 
-    def to_json(self, bulk_data_threshold=1024, bulk_data_element_handler=None,
-                dump_handler=None):
+    def to_json(
+        self,
+        bulk_data_threshold: int = 1024,
+        bulk_data_element_handler: Optional[Callable[[str], Any]] = None,
+        dump_handler: Optional[Callable[[dict], str]] = None
+    ) -> Dict[str, Any]:
         """Return a JSON representation of the :class:`DataElement`.
 
         .. versionadded:: 1.3
@@ -378,12 +401,12 @@ class DataElement:
             self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
 
     @property
-    def value(self):
+    def value(self) -> Any:
         """Return the element's value."""
         return self._value
 
     @value.setter
-    def value(self, val):
+    def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
@@ -401,7 +424,7 @@ class DataElement:
         self._value = self._convert_value(val)
 
     @property
-    def VM(self):
+    def VM(self) -> int:
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
@@ -414,7 +437,7 @@ class DataElement:
         return len(self.value)
 
     @property
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """Return ``True`` if the element has no value.
 
         .. versionadded:: 1.4
@@ -422,7 +445,7 @@ class DataElement:
         return self.VM == 0
 
     @property
-    def empty_value(self):
+    def empty_value(self) -> Any:
         """Return the value for an empty element.
 
         .. versionadded:: 1.4
@@ -436,7 +459,7 @@ class DataElement:
         """
         return empty_value_for_VR(self.VR)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clears the value, e.g. sets it to the configured empty value.
 
         .. versionadded:: 1.4
@@ -445,7 +468,7 @@ class DataElement:
         """
         self._value = self.empty_value
 
-    def _convert_value(self, val):
+    def _convert_value(self, val: Any) -> Any:
         """Convert `val` to an appropriate type and return the result.
 
         Uses the element's VR in order to determine the conversion method and
@@ -466,7 +489,7 @@ class DataElement:
         else:
             return MultiValue(self._convert, val)
 
-    def _convert(self, val):
+    def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
@@ -502,7 +525,7 @@ class DataElement:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -531,11 +554,11 @@ class DataElement:
 
         return NotImplemented
 
-    def __ne__(self, other):
+    def __ne__(self, other: Any) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return :class:`str` representation of the element."""
         repVal = self.repval or ''
         if self.showVR:
@@ -548,7 +571,7 @@ class DataElement:
         return s
 
     @property
-    def repval(self):
+    def repval(self) -> str:
         """Return a :class:`str` representation of the element's value."""
         long_VRs = {"OB", "OD", "OF", "OW", "UN", "UT"}
         if set(self.VR.split(" or ")) & long_VRs:
@@ -567,7 +590,7 @@ class DataElement:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
 
-    def __unicode__(self):
+    def __unicode__(self) -> str:
         """Return unicode representation of the element."""
         if isinstance(self.value, str):
             # start with the string rep then replace the value part
@@ -579,7 +602,7 @@ class DataElement:
         else:
             return str(self)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]
@@ -588,7 +611,7 @@ class DataElement:
                             "(not a Sequence)")
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the DICOM dictionary name for the element as :class:`str`.
 
         For officially registered DICOM Data Elements this will be the *Name*
@@ -600,7 +623,7 @@ class DataElement:
         """
         return self.description()
 
-    def description(self):
+    def description(self) -> str:
         """Return the DICOM dictionary name for the element as :class:`str`."""
         if self.tag.is_private:
             name = "Private tag data"  # default
@@ -627,7 +650,7 @@ class DataElement:
         return name
 
     @property
-    def is_retired(self):
+    def is_retired(self) -> bool:
         """Return the element's retired status as :class:`bool`.
 
         For officially registered DICOM Data Elements this will be ``True`` if
@@ -641,7 +664,7 @@ class DataElement:
             return False
 
     @property
-    def keyword(self):
+    def keyword(self) -> str:
         """Return the element's keyword (if known) as :class:`str`.
 
         For officially registered DICOM Data Elements this will be the
@@ -654,7 +677,7 @@ class DataElement:
         else:
             return ''
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return the representation of the element."""
         if self.VR == "SQ":
             return repr(self.value)
