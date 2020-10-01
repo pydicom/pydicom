@@ -804,7 +804,7 @@ def dcmread(
     -------
     FileDataset or DicomDir
         An instance of :class:`~pydicom.dataset.FileDataset` that represents
-        a parsed DICOM file, unless the dataset is a *Basic Storage Directory*
+        a parsed DICOM file, unless the dataset is a *Media Storage Directory*
         instance in which case it will be a
         :class:`~pydicom.dicomdir.DicomDir`.
 
