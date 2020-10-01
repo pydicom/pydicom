@@ -7,12 +7,14 @@ A DataElement has a tag,
               and a value.
 """
 
+from __future__ import annotations
 
 import base64
 from collections import namedtuple
 import json
 from typing import (
-    Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict
+    Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
+    TypeVar, Type
 )
 import warnings
 
@@ -94,6 +96,9 @@ def _is_bytes(val):
 # double '\' because it is used as escape chr in Python
 _backslash_str = "\\"
 _backslash_byte = b"\\"
+
+
+_DataElement = TypeVar("_DataElement", bound="DataElement")
 
 
 class DataElement:
@@ -227,14 +232,14 @@ class DataElement:
 
     @classmethod
     def from_json(
-        cls: "DataElement",
+        cls: Type[_DataElement],
         dataset_class: "Dataset",
         tag: Union[BaseTag, int],
         vr: str,
         value: Any,
         value_key: Union[str, None],
         bulk_data_uri_handler: Optional[Callable[[str], Any]] = None
-    ) -> None:
+    ) -> _DataElement:
         """Return a :class:`DataElement` from JSON.
 
         .. versionadded:: 1.3
