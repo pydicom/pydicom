@@ -3,7 +3,7 @@
 
 from os import PathLike
 from struct import pack
-from typing import Union, BinaryIO
+from typing import Union, BinaryIO, Any
 import warnings
 import zlib
 
@@ -799,7 +799,7 @@ def _write_dataset(fp, dataset, write_like_original):
 
 
 def dcmwrite(
-    filename: Union[str, PathLike, BinaryIO],
+    filename: Union[str, 'PathLike[Any]', BinaryIO],
     dataset: Dataset,
     write_like_original: bool = True
 ) -> None:

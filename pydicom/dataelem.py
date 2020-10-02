@@ -12,7 +12,7 @@ from collections import namedtuple
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type
+    TypeVar, Type, List
 )
 import warnings
 
@@ -269,7 +269,7 @@ class DataElement:
                                              value_key, bulk_data_uri_handler)
         elem_value = converter.get_element_values()
         try:
-            return DataElement(tag=tag, value=elem_value, VR=vr)
+            return cls(tag=tag, value=elem_value, VR=vr)
         except Exception:
             raise ValueError(
                 'Data element "{}" could not be loaded from JSON: {}'.format(
@@ -370,7 +370,7 @@ class DataElement:
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[str], Any]] = None,
-        dump_handler: Optional[Callable[[dict], str]] = None
+        dump_handler: Optional[Callable[[Dict], str]] = None
     ) -> Dict[str, Any]:
         """Return a JSON representation of the :class:`DataElement`.
 
@@ -454,7 +454,7 @@ class DataElement:
         return self.VM == 0
 
     @property
-    def empty_value(self) -> Union[bytes, list, None, str]:
+    def empty_value(self) -> Union[bytes, List[str], None, str]:
         """Return the value for an empty element.
 
         .. versionadded:: 1.4
