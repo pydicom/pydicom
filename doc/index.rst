@@ -47,6 +47,7 @@ If you're new to *pydicom* then start here:
   :doc:`Introduction to pydicom<old/getting_started>`
 * **Basics**: :doc:`Read, access, modify, write</tutorials/dataset_basics>`
 * **Intermediate**: :doc:`Waveform decoding and encoding</tutorials/waveforms>`
+  | :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
 
 
 :doc:`User Guide <old/pydicom_user_guide>`
