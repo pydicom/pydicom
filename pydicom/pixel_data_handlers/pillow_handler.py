@@ -32,7 +32,7 @@ from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
 from pydicom.uid import (
-    UID, JPEG2000, JPEG2000Lossless, JPEGBaseline, JPEGExtended
+    UID, JPEG2000, JPEG2000Lossless, JPEGBaseline8Bit, JPEGExtended12Bit
 )
 
 
@@ -40,7 +40,7 @@ logger = logging.getLogger('pydicom')
 
 
 PillowJPEG2000TransferSyntaxes = [JPEG2000, JPEG2000Lossless]
-PillowJPEGTransferSyntaxes = [JPEGBaseline, JPEGExtended]
+PillowJPEGTransferSyntaxes = [JPEGBaseline8Bit, JPEGExtended12Bit]
 PillowSupportedTransferSyntaxes = (
     PillowJPEGTransferSyntaxes + PillowJPEG2000TransferSyntaxes
 )
@@ -131,10 +131,10 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             f"cannot be read because Pillow lacks the JPEG 2000 plugin"
         )
 
-    if transfer_syntax == JPEGExtended and ds.BitsAllocated != 8:
+    if transfer_syntax == JPEGExtended12Bit and ds.BitsAllocated != 8:
         raise NotImplementedError(
-            f"{JPEGExtended} - {JPEGExtended.name} only supported by Pillow "
-            f"if Bits Allocated = 8"
+            f"{JPEGExtended12Bit} - {JPEGExtended12Bit.name} only supported "
+            "by Pillow if Bits Allocated = 8"
         )
 
     pixel_bytes = bytearray()

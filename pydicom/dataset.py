@@ -22,6 +22,7 @@ from itertools import takewhile
 import json
 import os
 import os.path
+import re
 from typing import Generator, TYPE_CHECKING
 import warnings
 
@@ -1893,6 +1894,17 @@ class Dataset(dict):
         elif name == "file_meta":
             self._set_file_meta(value)
         else:
+            # Warn if `name` is camel case but not a keyword
+            if _RE_CAMEL_CASE.match(name):
+                msg = (
+                    f"Camel case attribute '{name}' used which is not in the "
+                    "element keyword data dictionary"
+                )
+                if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
+                    warnings.warn(msg)
+                elif config.INVALID_KEYWORD_BEHAVIOR == "ERROR":
+                    raise ValueError(msg)
+
             # name not in dicom dictionary - setting a non-dicom instance
             # attribute
             # XXX note if user mis-spells a dicom data_element - no error!!!
@@ -2503,3 +2515,11 @@ class FileMetaDataset(Dataset):
             )
 
         super().__setitem__(key, value)
+
+
+_RE_CAMEL_CASE = re.compile(
+    # Ensure mix of upper and lowercase and digits, no underscores
+    # If first character is lowercase ensure at least one uppercase char
+    "(?P<start>(^[A-Za-z])((?=.+?[A-Z])[A-Za-z0-9]+)|(^[A-Z])([A-Za-z0-9]+))"
+    "(?P<last>[A-za-z0-9][^_]$)"  # Last character is alphanumeric
+)

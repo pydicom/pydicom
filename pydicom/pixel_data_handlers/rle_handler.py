@@ -56,9 +56,7 @@ DEPENDENCIES = {
     'numpy': ('http://www.numpy.org/', 'NumPy'),
 }
 
-SUPPORTED_TRANSFER_SYNTAXES = [
-    pydicom.uid.RLELossless
-]
+SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
 def is_available():

@@ -97,6 +97,7 @@ _backslash_byte = b"\\"
 
 
 _DataElement = TypeVar("_DataElement", bound="DataElement")
+_Dataset = TypeVar("_Dataset", bound="Dataset")
 
 
 class DataElement:
@@ -231,7 +232,7 @@ class DataElement:
     @classmethod
     def from_json(
         cls: Type[_DataElement],
-        dataset_class: "Dataset",
+        dataset_class: Type[_Dataset],
         tag: Union[BaseTag, int],
         vr: str,
         value: Any,
