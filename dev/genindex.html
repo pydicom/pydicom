@@ -237,6 +237,12 @@
 </li>
         <li><a href="reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.__init__">(pydicom.filebase.DicomIO method)</a>
 </li>
+        <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.__init__">(pydicom.fileset.FileInstance method)</a>
+</li>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.__init__">(pydicom.fileset.FileSet method)</a>
+</li>
+        <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.__init__">(pydicom.fileset.RecordNode method)</a>
+</li>
         <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.__init__">(pydicom.multival.MultiValue method)</a>
 </li>
         <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence.__init__">(pydicom.sequence.Sequence method)</a>
@@ -269,6 +275,14 @@
       <li><a href="reference/generated/pydicom.fileutil.absorb_delimiter_item.html#pydicom.fileutil.absorb_delimiter_item">absorb_delimiter_item() (in module pydicom.fileutil)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add">add() (pydicom.dataset.Dataset method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add">(pydicom.fileset.FileSet method)</a>
+</li>
+        <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.add">(pydicom.fileset.RecordNode method)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add_custom">add_custom() (pydicom.fileset.FileSet method)</a>
 </li>
       <li><a href="reference/generated/pydicom.datadict.add_dict_entries.html#pydicom.datadict.add_dict_entries">add_dict_entries() (in module pydicom.datadict)</a>
 </li>
@@ -286,10 +300,12 @@
 </li>
       <li><a href="reference/generated/pydicom.config.allow_DS_float.html#pydicom.config.allow_DS_float">allow_DS_float (in module pydicom.config)</a>
 </li>
-      <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.append">append() (pydicom.multival.MultiValue method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.ancestors">ancestors() (pydicom.fileset.RecordNode property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.append">append() (pydicom.multival.MultiValue method)</a>
+</li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.apply_color_lut.html#pydicom.pixel_data_handlers.apply_color_lut">apply_color_lut() (in module pydicom.pixel_data_handlers)</a>
 
       <ul>
@@ -334,12 +350,18 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.children">children (pydicom.fileset.RecordNode attribute)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.clear">clear() (pydicom.dataelem.DataElement method)</a>
 
       <ul>
         <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.clear">(pydicom.dataset.Dataset method)</a>
 </li>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.clear">(pydicom.fileset.FileSet method)</a>
+</li>
       </ul></li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.component">component() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.components">components() (pydicom.valuerep.PersonName property)</a>
 </li>
       <li><a href="reference/generated/pydicom.values.convert_AE_string.html#pydicom.values.convert_AE_string">convert_AE_string() (in module pydicom.values)</a>
@@ -368,10 +390,10 @@
 </li>
       <li><a href="reference/generated/pydicom.values.convert_OWvalue.html#pydicom.values.convert_OWvalue">convert_OWvalue() (in module pydicom.values)</a>
 </li>
-      <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.convert_pixel_data">convert_pixel_data() (pydicom.dataset.Dataset method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.convert_pixel_data">convert_pixel_data() (pydicom.dataset.Dataset method)</a>
+</li>
       <li><a href="reference/generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN">convert_PN() (in module pydicom.values)</a>
 </li>
       <li><a href="reference/generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string">convert_single_string() (in module pydicom.values)</a>
@@ -395,7 +417,11 @@
       <li><a href="reference/generated/pydicom.values.convert_value.html#pydicom.values.convert_value">convert_value() (in module pydicom.values)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.copy">copy() (pydicom.dataset.Dataset method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.copy">(pydicom.fileset.FileSet method)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.filewriter.correct_ambiguous_vr.html#pydicom.filewriter.correct_ambiguous_vr">correct_ambiguous_vr() (in module pydicom.filewriter)</a>
 </li>
       <li><a href="reference/generated/pydicom.filewriter.correct_ambiguous_vr_element.html#pydicom.filewriter.correct_ambiguous_vr_element">correct_ambiguous_vr_element() (in module pydicom.filewriter)</a>
@@ -458,13 +484,19 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.default_sequence_element_format">default_sequence_element_format (pydicom.dataset.Dataset attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.DeflatedExplicitVRLittleEndian.html#pydicom.uid.DeflatedExplicitVRLittleEndian">DeflatedExplicitVRLittleEndian (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.encaps.defragment_data.html#pydicom.encaps.defragment_data">defragment_data() (in module pydicom.encaps)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.depth">depth() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.description">description() (pydicom.dataelem.DataElement method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set">descriptor_character_set() (pydicom.fileset.FileSet property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id">descriptor_file_id() (pydicom.fileset.FileSet property)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.descripWidth">descripWidth (pydicom.dataelem.DataElement attribute)</a>
 </li>
@@ -491,6 +523,8 @@
       <li><a href="reference/generated/pydicom.datadict.dictionary_VR.html#pydicom.datadict.dictionary_VR">dictionary_VR() (in module pydicom.datadict)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.dir">dir() (pydicom.dataset.Dataset method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.DIRECTORY_RECORDERS.html#pydicom.fileset.DIRECTORY_RECORDERS">DIRECTORY_RECORDERS (in module pydicom.fileset)</a>
 </li>
       <li><a href="reference/generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS">DS() (in module pydicom.valuerep)</a>
 </li>
@@ -546,7 +580,17 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.file_meta">file_meta (pydicom.dataset.FileDataset attribute)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.file_set">file_set() (pydicom.fileset.FileInstance property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.file_set">(pydicom.fileset.RecordNode property)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset">FileDataset (class in pydicom.dataset)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.FileID">FileID() (pydicom.fileset.FileInstance property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance">FileInstance (class in pydicom.fileset)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset">FileMetaDataset (class in pydicom.dataset)</a>
 </li>
@@ -554,13 +598,25 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.fileobj_type">fileobj_type (pydicom.dataset.FileDataset attribute)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet">FileSet (class in pydicom.fileset)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find">find() (pydicom.fileset.FileSet method)</a>
+</li>
       <li><a href="reference/generated/pydicom.fileutil.find_bytes.html#pydicom.fileutil.find_bytes">find_bytes() (in module pydicom.fileutil)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileutil.find_delimiter.html#pydicom.fileutil.find_delimiter">find_delimiter() (in module pydicom.fileutil)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find_values">find_values() (pydicom.fileset.FileSet method)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.fix_meta_info">fix_meta_info() (pydicom.dataset.Dataset method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.for_addition">for_addition() (pydicom.fileset.FileInstance property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.for_moving">for_moving() (pydicom.fileset.FileInstance property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.for_removal">for_removal() (pydicom.fileset.FileInstance property)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.formatted_lines">formatted_lines() (pydicom.dataset.Dataset method)</a>
 </li>
@@ -578,6 +634,8 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.generate_filename.html#pydicom.fileset.generate_filename">generate_filename() (in module pydicom.fileset)</a>
+</li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.pylibjpeg_handler.html#pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames">generate_frames() (in module pydicom.pixel_data_handlers.pylibjpeg_handler)</a>
 </li>
       <li><a href="reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.generate_multiplex">generate_multiplex() (in module pydicom.waveforms.numpy_handler)</a>
@@ -656,10 +714,12 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/generated/pydicom.uid.HEVCMain10ProfileLevel51.html#pydicom.uid.HEVCMain10ProfileLevel51">HEVCMain10ProfileLevel51 (in module pydicom.uid)</a>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.has_instance">has_instance() (pydicom.fileset.RecordNode property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.uid.HEVCMain10ProfileLevel51.html#pydicom.uid.HEVCMain10ProfileLevel51">HEVCMain10ProfileLevel51 (in module pydicom.uid)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.HEVCMainProfileLevel51.html#pydicom.uid.HEVCMainProfileLevel51">HEVCMainProfileLevel51 (in module pydicom.uid)</a>
 </li>
   </ul></td>
@@ -668,15 +728,21 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.ID">ID() (pydicom.fileset.FileSet property)</a>
+</li>
       <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.ideographic">ideographic() (pydicom.valuerep.PersonName property)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.ImplicitVRLittleEndian.html#pydicom.uid.ImplicitVRLittleEndian">ImplicitVRLittleEndian (in module pydicom.uid)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.indent_chars">indent_chars (pydicom.dataset.Dataset attribute)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.index">index() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.info">info() (pydicom.uid.UID property)</a>
 </li>
       <li><a href="reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue.insert">insert() (pydicom.multival.MultiValue method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.instance">instance (pydicom.fileset.RecordNode attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.INVALID_KEYWORD_BEHAVIOR.html#pydicom.config.INVALID_KEYWORD_BEHAVIOR">INVALID_KEYWORD_BEHAVIOR (in module pydicom.config)</a>
 </li>
@@ -703,6 +769,8 @@
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_compressed">is_compressed() (pydicom.uid.UID property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.is_conformant_file_id.html#pydicom.fileset.is_conformant_file_id">is_conformant_file_id() (in module pydicom.fileset)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_deflated">is_deflated() (pydicom.uid.UID property)</a>
 </li>
@@ -736,9 +804,11 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.is_original_encoding">is_original_encoding() (pydicom.dataset.Dataset property)</a>
 </li>
-      <li><a href="reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.is_private">is_private() (pydicom.tag.BaseTag property)</a>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.is_private">is_private() (pydicom.fileset.FileInstance property)</a>
 
       <ul>
+        <li><a href="reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.is_private">(pydicom.tag.BaseTag property)</a>
+</li>
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_private">(pydicom.uid.UID property)</a>
 </li>
       </ul></li>
@@ -748,6 +818,14 @@
 
       <ul>
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_retired">(pydicom.uid.UID property)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.is_root">is_root() (pydicom.fileset.RecordNode property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.is_staged">is_staged() (pydicom.fileset.FileInstance property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.is_staged">(pydicom.fileset.FileSet property)</a>
 </li>
       </ul></li>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_transfer_syntax">is_transfer_syntax() (pydicom.uid.UID property)</a>
@@ -798,16 +876,18 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.key">key() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.keys">keys() (pydicom.dataset.Dataset method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.keyword">keyword() (pydicom.dataelem.DataElement property)</a>
 
       <ul>
         <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.keyword">(pydicom.uid.UID property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.datadict.keyword_for_tag.html#pydicom.datadict.keyword_for_tag">keyword_for_tag() (in module pydicom.datadict)</a>
 </li>
   </ul></td>
@@ -818,10 +898,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement.length">length (pydicom.dataelem.RawDataElement attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.fileutil.length_of_undefined_length.html#pydicom.fileutil.length_of_undefined_length">length_of_undefined_length() (in module pydicom.fileutil)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.load">load() (pydicom.fileset.FileInstance method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.load">(pydicom.fileset.FileSet method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -915,11 +1001,15 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.next">next() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike.no_read">no_read() (pydicom.filebase.DicomFileLike method)</a>
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike.no_seek">no_seek() (pydicom.filebase.DicomFileLike method)</a>
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike.no_write">no_write() (pydicom.filebase.DicomFileLike method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.node">node (pydicom.fileset.FileInstance attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -941,10 +1031,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.pack_bits">pack_bits() (in module pydicom.pixel_data_handlers.numpy_handler)</a>
 </li>
-      <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence.parent">parent() (pydicom.sequence.Sequence property)</a>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.parent">parent() (pydicom.fileset.RecordNode property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence.parent">(pydicom.sequence.Sequence property)</a>
 </li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir.parse_records">parse_records() (pydicom.dicomdir.DicomDir method)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.path">path() (pydicom.fileset.FileInstance property)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.path">(pydicom.fileset.FileSet property)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName">PersonName (class in pydicom.valuerep)</a>
 </li>
       <li><a href="reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode">PersonNameUnicode (in module pydicom.valuerep)</a>
@@ -963,6 +1063,10 @@
 </li>
       <li><a href="reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset.preamble">preamble (pydicom.dataset.FileDataset attribute)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.prettify">prettify() (pydicom.fileset.RecordNode method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.previous">previous() (pydicom.fileset.RecordNode property)</a>
+</li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.private_block">private_block() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock.private_creator">private_creator (pydicom.dataset.PrivateBlock attribute)</a>
@@ -975,6 +1079,8 @@
 </li>
       <li><a href="reference/generated/pydicom.datadict.private_dictionary_VR.html#pydicom.datadict.private_dictionary_VR">private_dictionary_VR() (in module pydicom.datadict)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock">PrivateBlock (class in pydicom.dataset)</a>
 </li>
       <li>
@@ -984,8 +1090,6 @@
         <li><a href="reference/index.html#module-pydicom">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pydicom.overlay_data_handlers.numpy_handler
 
@@ -1089,20 +1193,30 @@
 </li>
       <li><a href="reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.read_leUL">read_leUL() (pydicom.filebase.DicomIO method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.filebase.DicomIO.html#pydicom.filebase.DicomIO.read_leUS">read_leUS() (pydicom.filebase.DicomIO method)</a>
 </li>
       <li><a href="reference/generated/pydicom.filereader.read_partial.html#pydicom.filereader.read_partial">read_partial() (in module pydicom.filereader)</a>
 </li>
       <li><a href="reference/generated/pydicom.filereader.read_preamble.html#pydicom.filereader.read_preamble">read_preamble() (in module pydicom.filereader)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.filereader.read_sequence.html#pydicom.filereader.read_sequence">read_sequence() (in module pydicom.filereader)</a>
 </li>
       <li><a href="reference/generated/pydicom.filereader.read_sequence_item.html#pydicom.filereader.read_sequence_item">read_sequence_item() (in module pydicom.filereader)</a>
 </li>
       <li><a href="reference/generated/pydicom.fileutil.read_undefined_length_value.html#pydicom.fileutil.read_undefined_length_value">read_undefined_length_value() (in module pydicom.fileutil)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.record_type">record_type() (pydicom.fileset.RecordNode property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode">RecordNode (class in pydicom.fileset)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.remove">remove() (pydicom.fileset.FileSet method)</a>
+
+      <ul>
+        <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.remove">(pydicom.fileset.RecordNode method)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.remove_private_tags">remove_private_tags() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.datadict.repeater_has_keyword.html#pydicom.datadict.repeater_has_keyword">repeater_has_keyword() (in module pydicom.datadict)</a>
@@ -1117,9 +1231,13 @@
 </li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.reshape_pixel_array">reshape_pixel_array() (in module pydicom.pixel_data_handlers.util)</a>
 </li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.reverse">reverse() (pydicom.fileset.RecordNode method)</a>
+</li>
       <li><a href="reference/generated/pydicom.pixel_data_handlers.rle_handler.html#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame">rle_encode_frame() (in module pydicom.pixel_data_handlers.rle_handler)</a>
 </li>
       <li><a href="reference/generated/pydicom.uid.RLELossless.html#pydicom.uid.RLELossless">RLELossless (in module pydicom.uid)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode.root">root() (pydicom.fileset.RecordNode property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1149,13 +1267,17 @@
         <li><a href="reference/generated/pydicom.pixel_data_handlers.rle_handler.html#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB">(in module pydicom.pixel_data_handlers.rle_handler)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.config.show_file_meta.html#pydicom.config.show_file_meta">show_file_meta (in module pydicom.config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.showVR">showVR (pydicom.dataelem.DataElement attribute)</a>
 </li>
       <li><a href="reference/generated/pydicom.misc.size_in_bytes.html#pydicom.misc.size_in_bytes">size_in_bytes() (in module pydicom.misc)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.SOPClassUID">SOPClassUID() (pydicom.fileset.FileInstance property)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.SOPInstanceUID">SOPInstanceUID() (pydicom.fileset.FileInstance property)</a>
 </li>
       <li><a href="reference/generated/pydicom.overlay_data_handlers.numpy_handler.html#pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax">supports_transfer_syntax() (in module pydicom.overlay_data_handlers.numpy_handler)</a>
 
@@ -1197,14 +1319,14 @@
 </li>
       <li><a href="reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM">TM (class in pydicom.valuerep)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.to_json">to_json() (pydicom.dataelem.DataElement method)</a>
 
       <ul>
         <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json">(pydicom.dataset.Dataset method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.to_json_dict">to_json_dict() (pydicom.dataelem.DataElement method)</a>
 
       <ul>
@@ -1214,6 +1336,8 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.top">top() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.trait_names">trait_names() (pydicom.dataset.Dataset method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.TransferSyntaxUID">TransferSyntaxUID() (pydicom.fileset.FileInstance property)</a>
 </li>
       <li><a href="reference/generated/pydicom.tag.TupleTag.html#pydicom.tag.TupleTag">TupleTag() (in module pydicom.tag)</a>
 </li>
@@ -1227,12 +1351,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/pydicom.uid.UID.html#pydicom.uid.UID">UID (class in pydicom.uid)</a>
 </li>
-      <li><a href="reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.unpack_bits">unpack_bits() (in module pydicom.pixel_data_handlers.numpy_handler)</a>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID">UID() (pydicom.fileset.FileSet property)</a>
 </li>
-      <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update">update() (pydicom.dataset.Dataset method)</a>
+      <li><a href="reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.unpack_bits">unpack_bits() (in module pydicom.pixel_data_handlers.numpy_handler)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update">update() (pydicom.dataset.Dataset method)</a>
+</li>
       <li><a href="reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal">use_DS_decimal (in module pydicom.config)</a>
 </li>
       <li><a href="reference/generated/pydicom.config.use_DS_numpy.html#pydicom.config.use_DS_numpy">use_DS_numpy (in module pydicom.config)</a>
@@ -1278,6 +1404,8 @@
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.walk">walk() (pydicom.dataset.Dataset method)</a>
 </li>
       <li><a href="reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array">waveform_array() (pydicom.dataset.Dataset method)</a>
+</li>
+      <li><a href="reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write">write() (pydicom.fileset.FileSet method)</a>
 </li>
       <li><a href="reference/generated/pydicom.filewriter.write_ATvalue.html#pydicom.filewriter.write_ATvalue">write_ATvalue() (in module pydicom.filewriter)</a>
 </li>

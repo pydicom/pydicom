@@ -118,6 +118,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
@@ -242,7 +243,7 @@
 <h1>pydicom.filewriter.correct_ambiguous_vr_element<a class="headerlink" href="#pydicom-filewriter-correct-ambiguous-vr-element" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.filewriter.correct_ambiguous_vr_element">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1bafc4a5/pydicom/filewriter.py#L140"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9506ac12/pydicom/filewriter.py#L140"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempt to correct the ambiguous VR element <cite>elem</cite>.</p>
 <p>When it’s not possible to correct the VR, the element will be returned
 unchanged. Currently the only ambiguous VR elements not corrected for are

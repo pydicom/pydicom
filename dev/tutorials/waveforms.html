@@ -45,8 +45,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Contributing a source code change" href="contributing_code.html" />
-    <link rel="prev" title="Introduction to JSON support" href="dicom_json.html" /> 
+    <link rel="next" title="DICOM File-sets and DICOMDIR" href="filesets.html" />
+    <link rel="prev" title="Dataset basics: read, access, modify, write" href="dataset_basics.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -111,14 +111,15 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
 <li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Waveforms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#waveforms-in-dicom">Waveforms in DICOM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#decoding-waveform-data">Decoding <em>Waveform Data</em></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#encoding-waveform-data">Encoding <em>Waveform Data</em></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
 </ul>
@@ -373,7 +374,7 @@ using signed 16-bit integers, but you can use signed or unsigned 8, 16, 32 or
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">WaveformOriginality</span> <span class="o">=</span> <span class="s2">&quot;ORIGINAL&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">NumberOfWaveformChannels</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">NumberOfWaveformSamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">SamplingFrequency</span> <span class="o">=</span> <span class="s2">&quot;1000&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">SamplingFrequency</span> <span class="o">=</span> <span class="mf">1000.0</span>
 </pre></div>
 </div>
 <p>To find out which elements we need to add to our new multiplex, we check the
@@ -438,10 +439,10 @@ Interpretation</em> element values to match our data representation type:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contributing_code.html" class="btn btn-neutral float-right" title="Contributing a source code change" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="filesets.html" class="btn btn-neutral float-right" title="DICOM File-sets and DICOMDIR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="dicom_json.html" class="btn btn-neutral float-left" title="Introduction to JSON support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="dataset_basics.html" class="btn btn-neutral float-left" title="Dataset basics: read, access, modify, write" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

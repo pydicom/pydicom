@@ -279,12 +279,12 @@ These examples illustrate the use of pydicom to read DICOM data.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read DICOM directory.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read a DICOM :File-set&#x27;s DICOMDIR dataset.">
 
 .. only:: html
 
  .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_dicom_directory_thumb.png
-     :alt: Read DICOM directory
+     :alt: Read a DICOMDIR dataset
 
      :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py`
 
@@ -297,6 +297,27 @@ These examples illustrate the use of pydicom to read DICOM data.
    :hidden:
 
    /auto_examples/input_output/plot_read_dicom_directory
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read and interact with a DICOM File-set.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/input_output/images/thumb/sphx_glr_plot_read_fileset_thumb.png
+     :alt: Read a DICOM File-set
+
+     :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/input_output/plot_read_fileset
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

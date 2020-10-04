@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Read DICOM directory" href="plot_read_dicom_directory.html" />
+    <link rel="next" title="Read a DICOMDIR dataset" href="plot_read_dicom_directory.html" />
     <link rel="prev" title="Format the output of the data set printing" href="plot_printing_dataset.html" /> 
 </head>
 
@@ -120,7 +120,8 @@
 <li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Write DICOM data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read DICOM directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
@@ -207,32 +208,32 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmp9gu8ifcf.dcm
+Writing test file /tmp/tmppm_p0z2w.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmp4tu_bjw6.dcm
-Load file /tmp/tmp9gu8ifcf.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpq2vs23vr.dcm
+Load file /tmp/tmppm_p0z2w.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20201003&#39;
-(0008, 0033) Content Time                        TM: &#39;074513.184556&#39;
+(0008, 0023) Content Date                        DA: &#39;20201004&#39;
+(0008, 0033) Content Time                        TM: &#39;001303.849636&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp9gu8ifcf.dcm ...
-Load file /tmp/tmp4tu_bjw6.dcm ...
+Remove file /tmp/tmppm_p0z2w.dcm ...
+Load file /tmp/tmpq2vs23vr.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20201003&#39;
-(0008, 0033) Content Time                        TM: &#39;074513.184556&#39;
+(0008, 0023) Content Date                        DA: &#39;20201004&#39;
+(0008, 0033) Content Time                        TM: &#39;001303.849636&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp4tu_bjw6.dcm ...
+Remove file /tmp/tmpq2vs23vr.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -325,7 +326,7 @@ Remove file /tmp/tmp4tu_bjw6.dcm ...
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="plot_read_dicom_directory.html" class="btn btn-neutral float-right" title="Read DICOM directory" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="plot_read_dicom_directory.html" class="btn btn-neutral float-right" title="Read a DICOMDIR dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="plot_printing_dataset.html" class="btn btn-neutral float-left" title="Format the output of the data set printing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

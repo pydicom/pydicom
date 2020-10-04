@@ -19,7 +19,8 @@ fpath = get_testdata_file("waveform_ecg.dcm")
 ds = dcmread(fpath)
 
 # Plot the first channel of each multiplex
-#   We could also use ds.waveform_array()
+ch_idx = 0
+# We could also use ds.waveform_array()
 fig, axes = plt.subplots(len(ds.WaveformSequence))
 generator = generate_multiplex(ds, as_raw=False)
 for ax, mplx, arr in zip(axes, ds.WaveformSequence, generator):
@@ -28,7 +29,6 @@ for ax, mplx, arr in zip(axes, ds.WaveformSequence, generator):
     sampling_fq = mplx.SamplingFrequency  # in Hz
     mplx_label = mplx.MultiplexGroupLabel
 
-    ch_idx = 0
     ch_item = mplx.ChannelDefinitionSequence[ch_idx]
 
     x = np.arange(0, nr_samples / sampling_fq, 1 / sampling_fq)
