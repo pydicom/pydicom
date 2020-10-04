@@ -33,10 +33,10 @@ default_encoding = "iso8859"
 )
 class TestTM:
     """Unit tests for pickling TM"""
-
     def test_pickling(self):
         # Check that a pickled TM is read back properly
         x = pydicom.valuerep.TM("212223")
+        assert time(21, 22, 23) == x
         x.original_string = "hello"
         assert "hello" == x.original_string
         assert time(21, 22, 23) == x
@@ -49,10 +49,10 @@ class TestTM:
 
 class TestDT:
     """Unit tests for pickling DT"""
-
     def test_pickling(self):
         # Check that a pickled DT is read back properly
         x = pydicom.valuerep.DT("19111213212123")
+        assert datetime(1911, 12, 13, 21, 21, 23) == x
         x.original_string = "hello"
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
@@ -63,10 +63,10 @@ class TestDT:
 
 class TestDA:
     """Unit tests for pickling DA"""
-
     def test_pickling(self):
         # Check that a pickled DA is read back properly
         x = pydicom.valuerep.DA("19111213")
+        assert date(1911, 12, 13) == x
         x.original_string = "hello"
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
@@ -180,7 +180,12 @@ class TestIS:
         assert x.real == x2.real
 
     def test_overflow(self, enforce_valid_values):
-        with pytest.raises(OverflowError, match="Value exceeds DICOM limits*"):
+        msg = (
+            r"Elements with a VR of IS must have a value between -2\*\*31 "
+            r"and \(2\*\*31 - 1\). Set 'config.enforce_valid_values' to False "
+            r"to override the value check"
+        )
+        with pytest.raises(OverflowError, match=msg):
             pydicom.valuerep.IS(3103050000)
 
     def test_str(self):
