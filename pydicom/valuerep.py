@@ -2,13 +2,10 @@
 """Special classes for DICOM value representations (VR)"""
 
 import datetime
-#from datetime import (date, datetime, time, timedelta, timezone)
 from decimal import Decimal
 import re
 import sys
-from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any
-)
+from typing import TypeVar, Type, Tuple, Optional, List, Dict, Union, Any
 import warnings
 
 # don't import datetime_conversion directly
@@ -25,7 +22,6 @@ _IS = TypeVar("_IS", bound="IS")
 _DSfloat = TypeVar("_DSfloat", bound="DSfloat")
 _DSdecimal = TypeVar("_DSdecimal", bound="DSdecimal")
 _PersonName = TypeVar("_PersonName", bound="PersonName")
-
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"
@@ -114,17 +110,15 @@ class DA(_DateTimeBase, datetime.date):
                 day = int(val[8:10])
                 return super().__new__(cls, year, month, day)
 
-            try:
-                return super().__new__(cls, val)
-            except TypeError as exc:
-                raise ValueError(
-                    f"Unable to convert '{val}' to 'DA' object"
-                ) from exc
-
         if isinstance(val, datetime.date):
             return super().__new__(cls, val.year, val.month, val.day)
 
-        return super().__new__(cls, val)
+        try:
+            return super().__new__(cls, val)
+        except TypeError as exc:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'DA' object"
+            ) from exc
 
     def __init__(self, val: Union[str, _DA, None]) -> None:
         """Create a new **DA** element value."""
@@ -211,15 +205,7 @@ class DT(_DateTimeBase, datetime.datetime):
 
         if isinstance(val, datetime.datetime):
             return super().__new__(
-                cls,
-                val.year,
-                val.month,
-                val.day,
-                val.hour,
-                val.minute,
-                val.second,
-                val.microsecond,
-                val.tzinfo
+                cls, *val.timetuple()[:6], val.microsecond, val.tzinfo
             )
 
         return super().__new__(cls, val)
