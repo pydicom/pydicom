@@ -7,8 +7,7 @@ DICOMDIR-bigEnd:
 created from DICOMDIR using dcmodify by changing the transfer syntax to Explicit Big Endian
 
 DICOMDIR-implicit: 
-created from DICOMDIR using dcmodify by changing the transfer syntax to Implicit Little Endian
-and manually adapting the offsets
+Created from DICOMDIR using pydicom's `FileSet.write(force_implicit=True)`
 
 DICOMDIR-nooffset:
 created from DICOMDIR by removing some of the 0-offset tags
