@@ -13,14 +13,33 @@ import warnings
 from pydicom._uid_dict import UID_dictionary
 
 
+_deprecations = {
+    "JPEGBaseline": "JPEGBaseline8Bit",
+    "JPEGExtended": "JPEGExtended12Bit",
+    "JPEGLossless": "JPEGLosslessSV1",
+    "JPEGLSLossy": "JPEGLSNearLossless",
+    "JPEG2000MultiComponentLossless": "JPEG2000MCLossless",
+    "JPEG2000MultiComponent": "JPEG2000MC",
+}
+
+
 def __getattr__(name):
-    if name == "JPEGLossless":
-        warnings.warn(
-            "In pydicom v2.2 the UID for 'JPEGLossless' will change "
-            "from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
-            "match its UID keyword. Use 'JPEGLosslessSV1' instead"
-        )
-        return globals()["JPEGLosslessSV1"]
+    if name in _deprecations:
+        replacement = _deprecations[name]
+        if name == "JPEGLossless":
+            warnings.warn(
+                "In pydicom v3.0 the UID for 'JPEGLossless' will change "
+                "from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
+                f"match its UID keyword. Use '{replacement}' instead"
+            )
+        else:
+            warnings.warn(
+                f"The UID constant '{name}' is deprecated and will be removed "
+                f"in pydicom v2.2, use '{replacement}' instead",
+                DeprecationWarning
+            )
+
+        return globals()[replacement]
 
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
@@ -333,20 +352,23 @@ UncompressedTransferSyntaxes = [
 """Uncompressed (native) transfer syntaxes."""
 
 # Deprecated
-JPEGBaseline = JPEGBaseline8Bit
-JPEGExtended = JPEGExtended12Bit
 if sys.version_info[:2] < (3, 7):
+    JPEGBaseline = JPEGBaseline8Bit
+    JPEGExtended = JPEGExtended12Bit
     JPEGLossless = JPEGLosslessSV1
-JPEGLSLossy = JPEGLSNearLossless
-JPEG2000MultiComponentLossless = JPEG2000MCLossless
-JPEG2000MultiComponent = JPEG2000MC
-JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseline, JPEGExtended]
+    JPEGLSLossy = JPEGLSNearLossless
+    JPEG2000MultiComponentLossless = JPEG2000MCLossless
+    JPEG2000MultiComponent = JPEG2000MC
+JPEGLossyCompressedPixelTransferSyntaxes = [
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit
+]
 JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
 JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
 PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
+    JPEGBaseline8Bit,
     JPEGLosslessP14,
-    JPEGExtended,
+    JPEGExtended12Bit,
     JPEG2000Lossless,
     JPEG2000,
 ]
