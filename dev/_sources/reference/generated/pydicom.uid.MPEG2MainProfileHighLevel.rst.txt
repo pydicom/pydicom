@@ -1,6 +1,0 @@
-﻿pydicom.uid.MPEG2MainProfileHighLevel
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MPEG2MainProfileHighLevel

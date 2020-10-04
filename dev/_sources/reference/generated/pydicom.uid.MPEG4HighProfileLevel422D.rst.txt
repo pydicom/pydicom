@@ -1,6 +1,0 @@
-﻿pydicom.uid.MPEG4HighProfileLevel422D
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MPEG4HighProfileLevel422D

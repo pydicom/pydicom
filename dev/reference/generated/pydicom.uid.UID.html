@@ -126,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../uid.html#predefined-uids">Predefined UIDs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-lists">Transfer Syntax Lists</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../uid.html#uid-utilities">UID Utilities</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pydicom.uid.generate_uid.html">pydicom.uid.generate_uid</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.uid.PYDICOM_ROOT_UID.html">pydicom.uid.PYDICOM_ROOT_UID</a></li>
@@ -223,7 +224,7 @@
 <h1>pydicom.uid.UID<a class="headerlink" href="#pydicom-uid-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.uid.UID">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">UID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9506ac12/pydicom/uid.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">UID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/uid.py#L65"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">UID</span>

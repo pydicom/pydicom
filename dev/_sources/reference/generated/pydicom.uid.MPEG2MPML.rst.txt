@@ -1,0 +1,6 @@
+﻿pydicom.uid.MPEG2MPML
+=====================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MPEG2MPML

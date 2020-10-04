@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pydicom.uid.JPEGBaseline8Bit &mdash; pydicom 2.1.0.dev0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="pydicom.uid.JPEGExtended12Bit" href="pydicom.uid.JPEGExtended12Bit.html" />
+    <link rel="prev" title="pydicom.uid.ExplicitVRBigEndian" href="pydicom.uid.ExplicitVRBigEndian.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../uid.html#predefined-uids">Predefined UIDs</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ImplicitVRLittleEndian.html">pydicom.uid.ImplicitVRLittleEndian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ExplicitVRLittleEndian.html">pydicom.uid.ExplicitVRLittleEndian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.DeflatedExplicitVRLittleEndian.html">pydicom.uid.DeflatedExplicitVRLittleEndian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.ExplicitVRBigEndian.html">pydicom.uid.ExplicitVRBigEndian</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.uid.JPEGBaseline8Bit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEGExtended12Bit.html">pydicom.uid.JPEGExtended12Bit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEGLosslessP14.html">pydicom.uid.JPEGLosslessP14</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEGLosslessSV1.html">pydicom.uid.JPEGLosslessSV1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEGLSLossless.html">pydicom.uid.JPEGLSLossless</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEGLSNearLossless.html">pydicom.uid.JPEGLSNearLossless</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEG2000Lossless.html">pydicom.uid.JPEG2000Lossless</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEG2000.html">pydicom.uid.JPEG2000</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEG2000MCLossless.html">pydicom.uid.JPEG2000MCLossless</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.JPEG2000MC.html">pydicom.uid.JPEG2000MC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG2MPML.html">pydicom.uid.MPEG2MPML</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG2MPHL.html">pydicom.uid.MPEG2MPHL</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG4HP41.html">pydicom.uid.MPEG4HP41</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG4HP41BD.html">pydicom.uid.MPEG4HP41BD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG4HP422D.html">pydicom.uid.MPEG4HP422D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG4HP423D.html">pydicom.uid.MPEG4HP423D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.MPEG4HP42STEREO.html">pydicom.uid.MPEG4HP42STEREO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.HEVCMP51.html">pydicom.uid.HEVCMP51</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.HEVCM10P51.html">pydicom.uid.HEVCM10P51</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.uid.RLELossless.html">pydicom.uid.RLELossless</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#transfer-syntax-lists">Transfer Syntax Lists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../uid.html#uid-utilities">UID Utilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.uid.JPEGBaseline8Bit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-uid-jpegbaseline8bit">
+<h1>pydicom.uid.JPEGBaseline8Bit<a class="headerlink" href="#pydicom-uid-jpegbaseline8bit" title="Permalink to this headline">¶</a></h1>
+<dl class="py data">
+<dt id="pydicom.uid.JPEGBaseline8Bit">
+<code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">JPEGBaseline8Bit</code><em class="property"> = '1.2.840.10008.1.2.4.50'</em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/uid.py#L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.JPEGBaseline8Bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>1.2.840.10008.1.2.4.50</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pydicom.uid.JPEGExtended12Bit.html" class="btn btn-neutral float-right" title="pydicom.uid.JPEGExtended12Bit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pydicom.uid.ExplicitVRBigEndian.html" class="btn btn-neutral float-left" title="pydicom.uid.ExplicitVRBigEndian" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

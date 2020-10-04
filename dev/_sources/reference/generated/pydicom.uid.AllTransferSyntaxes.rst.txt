@@ -1,0 +1,6 @@
+﻿pydicom.uid.AllTransferSyntaxes
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: AllTransferSyntaxes

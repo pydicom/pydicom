@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGLSNearLossless
+==============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGLSNearLossless

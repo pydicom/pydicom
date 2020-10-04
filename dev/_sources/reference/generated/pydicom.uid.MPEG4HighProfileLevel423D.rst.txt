@@ -1,6 +1,0 @@
-﻿pydicom.uid.MPEG4HighProfileLevel423D
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MPEG4HighProfileLevel423D
