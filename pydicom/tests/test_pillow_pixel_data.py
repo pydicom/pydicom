@@ -9,13 +9,13 @@ from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, get_j2k_parameters
 )
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
-    JPEGBaseline,
-    JPEGLossless,
-    JPEGExtended,
+    JPEGBaseline8Bit,
+    JPEGLosslessSV1,
+    JPEGExtended12Bit,
     JPEG2000,
     JPEG2000Lossless,
+    AllTransferSyntaxes,
 )
 
 
@@ -104,7 +104,7 @@ JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 JPEG_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG:
-    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended]
+    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline8Bit, JPEGExtended12Bit]
 
 JPEG2K_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG2K:
@@ -112,7 +112,7 @@ if HAVE_JPEG2K:
 
 SUPPORTED_SYNTAXES = JPEG_SUPPORTED_SYNTAXES + JPEG2K_SUPPORTED_SYNTAXES
 UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
 )
 
 
@@ -189,7 +189,7 @@ class TestNoNumpy_NoPillowHandler:
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
         ds = dcmread(IMPL)
-        for uid in ALL_TRANSFER_SYNTAXES:
+        for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
                                match="UID of '{}'".format(uid)):
@@ -203,9 +203,9 @@ class TestNoNumpy_NoPillowHandler:
             ds.decompress('pillow')
 
 
-JPGB = JPEGBaseline
-JPGE = JPEGExtended
-JPGL = JPEGLossless
+JPGB = JPEGBaseline8Bit
+JPGE = JPEGExtended12Bit
+JPGL = JPEGLosslessSV1
 J2KI = JPEG2000
 J2KR = JPEG2000Lossless
 REFERENCE_DATA = [
