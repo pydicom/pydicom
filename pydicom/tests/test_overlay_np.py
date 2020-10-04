@@ -261,6 +261,13 @@ class TestNumpy_GetOverlayArray:
         with pytest.warns(UserWarning, match=msg):
             get_overlay_array(ds, 0x6000)
 
+    def test_old_import(self):
+        """Test that can import using the old path."""
+        from pydicom.overlay_data_handlers import numpy_handler as np_old
+        ds = dcmread(EXPL_1_1_1F)
+        arr = np_old.get_overlay_array(ds, 0x6000)
+        assert 0 == arr[0, 0]
+
 
 if HAVE_NP:
     RESHAPE_ARRAYS = {
