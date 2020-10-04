@@ -50,6 +50,7 @@ Enhancements
   DICOM File-sets and their DICOMDIR files via the
   :class:`~pydicom.fileset.FileSet` class (:issue:`9`, :issue:`243`,
   :issue:`1093`)
+* Added :attr:`~pydicom.uid.AllTransferSyntaxes`
 
 Changes
 .......
@@ -66,6 +67,32 @@ Changes
 * Invalid values used with the :class:`~pydicom.dataset.Dataset`
   :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
   returning ``False`` (:issue:`1200`)
+* Data dictionaries updated to version 2020c of the DICOM Standard
+* The following UID constants are deprecated and will be removed in v2.2:
+
+  * ``JPEGBaseline`` (use :attr:`~pydicom.uid.JPEGBaseline8Bit` instead)
+  * ``JPEGExtended`` (use :attr:`~pydicom.uid.JPEGExtended12Bit` instead)
+  * ``JPEGLossless`` (use :attr:`~pydicom.uid.JPEGLosslessSV1` instead)
+  * ``JPEGLSLossy`` (use :attr:`~pydicom.uid.JPEGLSNearLossless` instead)
+  * ``JPEG2000MultiComponentLossless`` (use
+    :attr:`~pydicom.uid.JPEG2000MCLossless` instead)
+  * ``JPEG2000MultiComponent`` (use :attr:`~pydicom.uid.JPEG2000MC` instead)
+
+* In v3.0 the value for ``JPEGLossless`` will change from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword
+* The following lists of UIDs are deprecated and will be removed in v2.2:
+
+  * ``JPEGLossyCompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEGTransferSyntaxes`
+  * ``JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
+  * ``JPEG2000CompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
+  * ``RLECompressedLosslessSyntaxes``: use
+    :attr:`~pydicom.uid.RLETransferSyntaxes`
+  * ``UncompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
+  * ``PILSupportedCompressedPixelTransferSyntaxes``
 
 Fixes
 .....

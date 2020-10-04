@@ -10,17 +10,17 @@ from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, get_j2k_parameters
 )
-from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     JPEGBaseline,
     JPEGExtended,
     JPEGLosslessP14,
-    JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
-    JPEG2000
+    JPEG2000,
+    AllTransferSyntaxes
 )
 
 try:
@@ -56,14 +56,14 @@ SUPPORTED_SYNTAXES = [
     JPEGBaseline,
     JPEGExtended,
     JPEGLosslessP14,
-    JPEGLossless,
+    JPEGLosslessSV1,
     JPEGLSLossless,
     JPEGLSLossy,
     JPEG2000Lossless,
     JPEG2000
 ]
 UNSUPPORTED_SYNTAXES = list(
-    set(ALL_TRANSFER_SYNTAXES) ^ set(SUPPORTED_SYNTAXES)
+    set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
 )
 
 # Transfer syntaxes supported by other handlers
@@ -102,7 +102,7 @@ JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
 
 JPGB = JPEGBaseline
 JPGE = JPEGExtended
-JPGL = JPEGLossless
+JPGL = JPEGLosslessSV1
 
 JPG_REFERENCE_DATA = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype)

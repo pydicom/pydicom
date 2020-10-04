@@ -43,18 +43,17 @@ DEPENDENCIES = {
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [
-    pydicom.uid.JPEGBaseline,
-    pydicom.uid.JPEGExtended,
+    pydicom.uid.JPEGBaseline8Bit,
+    pydicom.uid.JPEGExtended12Bit,
     pydicom.uid.JPEGLosslessP14,
-    pydicom.uid.JPEGLossless,
+    pydicom.uid.JPEGLosslessSV1,
     pydicom.uid.JPEGLSLossless,
-    pydicom.uid.JPEGLSLossy,
+    pydicom.uid.JPEGLSNearLossless,
     pydicom.uid.JPEG2000Lossless,
     pydicom.uid.JPEG2000,
 ]
 
-should_convert_these_syntaxes_to_RGB = [
-    pydicom.uid.JPEGBaseline, ]
+should_convert_these_syntaxes_to_RGB = [pydicom.uid.JPEGBaseline8Bit]
 
 
 def is_available() -> bool:
