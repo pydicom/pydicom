@@ -92,6 +92,9 @@ class DA(_DateTimeBase, datetime.date):
             A string conformant to the DA definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
+        if val is None:
+            return None
+
         if isinstance(val, str):
             if val == '':
                 return None  # empty date
@@ -115,7 +118,7 @@ class DA(_DateTimeBase, datetime.date):
 
         try:
             return super().__new__(cls, val)
-        except TypeError as exc:
+        except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'DA' object"
             ) from exc
@@ -169,18 +172,19 @@ class DT(_DateTimeBase, datetime.datetime):
             A string conformant to the DT definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
+        if val is None:
+            return None
+
         if isinstance(val, str):
             if val == '':
                 return None
 
             match = cls._regex_dt.match(val)
             if not match or len(val) > 26:
-                try:
-                    return super().__new__(cls, val)
-                except TypeError as exc:
-                    raise ValueError(
-                        f"Unable to convert '{val}' to 'DT' object"
-                    ) from exc
+                raise ValueError(
+                    f"Unable to convert non-conformant value '{val}' to 'DT' "
+                    "object"
+                )
 
             dt_match = match.group(2)
             args = [
@@ -201,6 +205,13 @@ class DT(_DateTimeBase, datetime.datetime):
             tz_match = match.group(5)
             args.append(cls._utc_offset(tz_match) if tz_match else None)
 
+            if args[5] == 60:
+                warnings.warn(
+                    "'datetime.datetime' doesn't allow a value of '60' for "
+                    "the seconds component, changing to '59'"
+                )
+                args[5] = 59
+
             return super().__new__(cls, *args)
 
         if isinstance(val, datetime.datetime):
@@ -208,7 +219,12 @@ class DT(_DateTimeBase, datetime.datetime):
                 cls, *val.timetuple()[:6], val.microsecond, val.tzinfo
             )
 
-        return super().__new__(cls, val)
+        try:
+            return super().__new__(cls, val)
+        except Exception as exc:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'DT' object"
+            ) from exc
 
     def __init__(self, val: Union[str, _DT]) -> None:
         if isinstance(val, str):
@@ -222,7 +238,12 @@ class TM(_DateTimeBase, datetime.time):
 
     Note that the :class:`datetime.time` base class is immutable.
     """
-    _regex_tm = re.compile(r"(\d{2,6})(\.(\d{1,6}))?")
+    _RE_TIME = re.compile(
+        r"(?P<h>^([01][0-9]|2[0-3]))"
+        r"((?P<m>([0-5][0-9]))?"
+        r"(?(5)(?P<s>([0-5][0-9]|60))?)"
+        r"(?(7)(\.(?P<ms>([0-9]{1,6})?))?))$"
+    )
 
     def __new__(cls: Type[_TM], val: Union[str, _TM]) -> Optional[_TM]:
         """Create an instance of TM object from a string.
@@ -236,27 +257,34 @@ class TM(_DateTimeBase, datetime.time):
             A string conformant to the TM definition in the DICOM Standard,
             Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
         """
+        if val is None:
+            return None
+
         if isinstance(val, str):
             if val == '':
                 return None  # empty time
 
-            match = cls._regex_tm.match(val)
-            if not match or len(val) > 14:
-                try:
-                    return super().__new__(cls, val)
-                except TypeError as exc:
-                    raise ValueError(
-                        f"Unable to convert {val} to 'TM' object"
-                    ) from exc
+            match = cls._RE_TIME.match(val)
+            if not match:
+                raise ValueError(
+                    f"Unable to convert non-conformant value '{val}' to 'TM' "
+                    "object"
+                )
 
-            tm_match = match.group(1)
-            hour = int(tm_match[0:2])
-            minute = 0 if len(tm_match) < 4 else int(tm_match[2:4])
-            second = 0 if len(tm_match) < 6 else int(tm_match[4:6])
+            hour = int(match.group('h'))
+            minute = 0 if match.group('m') is None else int(match.group('m'))
+            second = 0 if match.group('s') is None else int(match.group('s'))
+
+            if second == 60:
+                warnings.warn(
+                    "'datetime.time' doesn't allow a value of '60' for the "
+                    "seconds component, changing to '59'"
+                )
+                second = 59
 
             microsecond = 0
-            if len(tm_match) >= 6 and match.group(3):
-                microsecond = int(match.group(3).rstrip().ljust(6, '0'))
+            if match.group('ms'):
+                microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
             return super().__new__(cls, hour, minute, second, microsecond)
 
@@ -265,7 +293,12 @@ class TM(_DateTimeBase, datetime.time):
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
-        return super().__new__(cls, val)
+        try:
+            return super().__new__(cls, val)
+        except Exception as exc:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'TM' object"
+            ) from exc
 
     def __init__(self, val: Union[str, _TM]) -> None:
         if isinstance(val, str):
