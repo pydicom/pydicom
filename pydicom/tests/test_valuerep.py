@@ -5,6 +5,7 @@
 import copy
 from datetime import datetime, date, time, timedelta, timezone
 from decimal import Decimal
+import sys
 
 from pydicom.tag import Tag
 from pydicom.values import convert_value
@@ -722,3 +723,18 @@ class TestDateTime:
         # Assert `tm` equals to no `time`
         tm = valuerep.TM("")
         assert tm is None
+
+
+def test_person_name_unicode_warns():
+    """Test deprecation warning for PersonNameUnicode."""
+    if sys.version_info[:2] < (3, 7):
+        from pydicom.valuerep import PersonNameUnicode
+    else:
+        msg = (
+            r"'PersonNameUnicode' is deprecated and will be removed in "
+            r"pydicom v2.2, use 'PersonName' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            from pydicom.valuerep import PersonNameUnicode
+
+        assert PersonNameUnicode == PersonName
