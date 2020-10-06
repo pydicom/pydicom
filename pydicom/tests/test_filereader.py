@@ -1571,7 +1571,7 @@ class TestDataElementGenerator:
 def test_read_dicomdir_deprecated():
     """Test deprecation warning for read_dicomdir()."""
     msg = (
-        r"'read_dicomdir\(\)' is deprecated and will be removed in v2.2, use "
+        r"'read_dicomdir\(\)' is deprecated and will be removed in v3.0, use "
         r"'dcmread\(\)' instead"
     )
     with pytest.warns(DeprecationWarning, match=msg):

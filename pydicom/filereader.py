@@ -894,7 +894,7 @@ def read_dicomdir(filename="DICOMDIR"):
 
     .. deprecated:: 2.1
 
-        ``read_dicomdir()`` is deprecated and will be removed in v2.2. Use
+        ``read_dicomdir()`` is deprecated and will be removed in v3.0. Use
         :func:`~pydicom.filereader.dcmread` instead.
 
     Parameters
@@ -913,7 +913,7 @@ def read_dicomdir(filename="DICOMDIR"):
     """
     # dcmread will return a DicomDir instance if file is one.
     warnings.warn(
-        "'read_dicomdir()' is deprecated and will be removed in v2.2, use "
+        "'read_dicomdir()' is deprecated and will be removed in v3.0, use "
         "'dcmread()' instead",
         DeprecationWarning
     )
