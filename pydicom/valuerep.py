@@ -65,7 +65,7 @@ class _DateTimeBase:
         return super().__reduce__() + (self.__getstate__(),)
 
     def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-        return self.__reduce__()
+        return super().__reduce__() + (self.__getstate__(),)
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
