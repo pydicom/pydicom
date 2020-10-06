@@ -313,7 +313,37 @@ Examples
 >>> ds.PatientsName = "Citizen^Jan"
 ../pydicom/dataset.py:1895: UserWarning: Camel case attribute 'PatientsName'
 used which is not in the element keyword data dictionary
+"""
 
+INVALID_KEY_BEHAVIOR = "WARN"
+"""Control the behavior when invalid keys are used with
+:meth:`~pydicom.dataset.Dataset.__contains__` (e.g. ``'invalid' in ds``).
+
+.. versionadded:: 2.1
+
+Invalid keys are objects that cannot be converted to a
+:class:`~pydicom.tag.BaseTag`, such as unknown element keywords or invalid
+element tags like ``0x100100010``.
+
+If ``"WARN"`` (default), then warn when an invalid key is used, if ``"RAISE"``
+then raise a :class:`ValueError` exception. If ``"IGNORE"`` then neither warn
+nor raise.
+
+Examples
+--------
+
+>>> from pydicom import config
+>>> config.INVALID_KEY_BEHAVIOR = "RAISE"
+>>> ds = Dataset()
+>>> 'PatientName' in ds  # OK
+False
+>>> 'PatientsName' in ds
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File ".../pydicom/dataset.py", line 494, in __contains__
+    raise ValueError(msg) from exc
+ValueError: Invalid value used with the 'in' operator: must be an
+element tag as a 2-tuple or int, or an element keyword
 """
 
 

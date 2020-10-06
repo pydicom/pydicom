@@ -519,6 +519,13 @@ class TestDataElement:
         assert 0 == elem.VM
         assert elem.value == []
 
+    def test_is_private(self):
+        """Test the is_private property."""
+        elem = DataElement(0x00090010, 'UN', None)
+        assert elem.is_private
+        elem = DataElement(0x00080010, 'UN', None)
+        assert not elem.is_private
+
 
 class TestRawDataElement:
 
