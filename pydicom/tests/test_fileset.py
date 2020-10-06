@@ -36,6 +36,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian, generate_uid, ImplicitVRLittleEndian
 )
 
+
 TEST_FILE = get_testdata_file('DICOMDIR')
 TINY_ALPHA_FILESET = get_testdata_file("tiny_alpha/DICOMDIR")
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
@@ -440,6 +441,7 @@ class TestGenerateFilename:
             next(generate_filename('A' * 8))
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestRecordNode:
     """Tests for RecordNode."""
     def test_root(self, private):
@@ -720,6 +722,7 @@ class TestRecordNode:
             instance.node._file_id
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileInstance:
     """Tests for FileInstance."""
     def test_getattr(self, dicomdir):
@@ -1015,6 +1018,7 @@ class TestFileInstance:
         assert ExplicitVRLittleEndian == instance.TransferSyntaxUID
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet:
     """Tests for FileSet."""
     def test_empty(self):
@@ -1841,6 +1845,7 @@ class TestFileSet:
         ) in str(fs)
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Load:
     """Tests for a loaded File-set."""
     def test_write_dicomdir(self, dicomdir):
@@ -2133,6 +2138,7 @@ class TestFileSet_Load:
         assert fs.UID == dicomdir.file_meta.MediaStorageSOPInstanceUID
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Modify:
     """Tests for a modified File-set."""
     def setup(self):
@@ -2436,6 +2442,7 @@ class TestFileSet_Modify:
             fs.add(ds)
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
     def setup(self):
@@ -2689,6 +2696,7 @@ REFERENCE_4LEVEL = [
 ]
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 @pytest.mark.parametrize("rtype, sop", REFERENCE_1LEVEL)
 def test_one_level_record(rtype, sop, dummy, tdir):
     """Test adding instances that require a single level hierarchy."""
@@ -2717,6 +2725,7 @@ def test_one_level_record(rtype, sop, dummy, tdir):
     fs.add(ds)
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 @pytest.mark.parametrize("rtype, sop, modality, kw", REFERENCE_4LEVEL)
 def test_four_level_record(rtype, sop, modality, kw, dummy, tdir):
     """Test adding instances that require the 4-level hierarchy."""

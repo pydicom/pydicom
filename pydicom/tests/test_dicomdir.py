@@ -19,6 +19,7 @@ TEST_FILES = (
 )
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestDicomDir:
     """Test dicomdir.DicomDir class"""
 
@@ -72,3 +73,13 @@ class TestDicomDir:
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
             dcmread(BIGENDIAN_TEST_FILE)
+
+
+def test_deprecation_warning():
+    msg = (
+        r"The 'DicomDir' class is deprecated and will be removed in v3.0, "
+        r"after which 'dcmread\(\)' will return a normal 'FileDataset' "
+        r"instance for 'Media Storage Directory' SOP Instances."
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        ds = dcmread(TEST_FILE)

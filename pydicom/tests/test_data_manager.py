@@ -10,7 +10,7 @@ import shutil
 import pytest
 
 from pydicom.data import (
-    get_charset_files, get_testdata_files, get_palette_files
+    get_charset_files, get_testdata_files, get_palette_files, fetch_data_files
 )
 from pydicom.data.data_manager import (
     DATA_ROOT, get_testdata_file, EXTERNAL_DATA_SOURCES
@@ -24,6 +24,14 @@ from pydicom.data.download import (
 EXT_PYDICOM = False
 if 'pydicom-data' in EXTERNAL_DATA_SOURCES:
     EXT_PYDICOM = True
+
+
+@pytest.fixture
+def download_failure():
+    """Simulate a download failure."""
+    download._SIMULATE_NETWORK_OUTAGE = True
+    yield
+    download._SIMULATE_NETWORK_OUTAGE = False
 
 
 class TestGetData:
@@ -123,8 +131,6 @@ class TestExternalDataSource:
 
         if 'mylib' in EXTERNAL_DATA_SOURCES:
             del EXTERNAL_DATA_SOURCES['mylib']
-
-        download._SIMULATE_NETWORK_OUTAGE = False
 
     def as_posix(self, path):
         """Return `path` as a posix path"""
@@ -247,12 +253,8 @@ class TestExternalDataSource:
 @pytest.mark.skipif(EXT_PYDICOM, reason="pydicom-data installed")
 class TestDownload:
     """Tests for the download module."""
-    def teardown(self):
-        download._SIMULATE_NETWORK_OUTAGE = False
-
-    def test_get_testdata_file_network_outage(self):
+    def test_get_testdata_file_network_outage(self, download_failure):
         """Test a network outage when using get_testdata_file."""
-        download._SIMULATE_NETWORK_OUTAGE = True
         fname = "693_UNCI.dcm"
         msg = (
             r"A download failure occurred while attempting to "
@@ -261,15 +263,34 @@ class TestDownload:
         with pytest.warns(UserWarning, match=msg):
             assert get_testdata_file(fname) is None
 
-    def test_get_testdata_files_network_outage(self):
+    def test_get_testdata_files_network_outage(self, download_failure):
         """Test a network outage when using get_testdata_files."""
-        download._SIMULATE_NETWORK_OUTAGE = True
         msg = (
             r"One or more download failures occurred, the list of matching "
             r"file paths may be incomplete"
         )
         with pytest.warns(UserWarning, match=msg):
             assert [] == get_testdata_files("693_UN*")
+
+
+def test_fetch_data_files():
+    """Test fetch_data_files()."""
+    # Remove a single file from the cache
+    cache = get_data_dir()
+    path = cache / "693_J2KR.dcm"
+    if path.exists():
+        path.unlink()
+
+    assert not path.exists()
+    fetch_data_files()
+    assert path.exists()
+
+
+def test_fetch_data_files_download_failure(download_failure):
+    """Test fetch_data_files() with download failures."""
+    msg = r"An error occurred downloading the following files:"
+    with pytest.raises(RuntimeError, match=msg):
+        fetch_data_files()
 
 
 def test_hashes():

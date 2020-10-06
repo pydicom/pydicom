@@ -12,12 +12,12 @@ from pydicom.pixel_data_handlers.util import (
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
-    JPEGBaseline,
-    JPEGExtended,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
     JPEGLosslessP14,
     JPEGLosslessSV1,
     JPEGLSLossless,
-    JPEGLSLossy,
+    JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
     AllTransferSyntaxes
@@ -53,12 +53,12 @@ TEST_JPEG2K = TEST_HANDLER and HAVE_OJ  # Run 15444 JPEG 2000 tests
 
 
 SUPPORTED_SYNTAXES = [
-    JPEGBaseline,
-    JPEGExtended,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
     JPEGLosslessP14,
     JPEGLosslessSV1,
     JPEGLSLossless,
-    JPEGLSLossy,
+    JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000
 ]
@@ -100,8 +100,8 @@ JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPGExtended.dcm")  # Fixed version
 JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
 
-JPGB = JPEGBaseline
-JPGE = JPEGExtended
+JPGB = JPEGBaseline8Bit
+JPGE = JPEGExtended12Bit
 JPGL = JPEGLosslessSV1
 
 JPG_REFERENCE_DATA = [
@@ -183,7 +183,7 @@ JPG_MATCHING_DATASETS = [
 
 
 # JPEG-LS - ISO/IEC 14495 Standard
-JLSL = JPEGLSLossy
+JLSL = JPEGLSNearLossless
 JLSN = JPEGLSLossless
 JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 JLS_REFERENCE_DATA = [

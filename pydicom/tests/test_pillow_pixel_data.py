@@ -10,9 +10,9 @@ from pydicom.pixel_data_handlers.util import (
     convert_color_space, get_j2k_parameters
 )
 from pydicom.uid import (
-    JPEGBaseline,
+    JPEGBaseline8Bit,
     JPEGLosslessSV1,
-    JPEGExtended,
+    JPEGExtended12Bit,
     JPEG2000,
     JPEG2000Lossless,
     AllTransferSyntaxes,
@@ -104,7 +104,7 @@ JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 JPEG_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG:
-    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended]
+    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline8Bit, JPEGExtended12Bit]
 
 JPEG2K_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG2K:
@@ -203,8 +203,8 @@ class TestNoNumpy_NoPillowHandler:
             ds.decompress('pillow')
 
 
-JPGB = JPEGBaseline
-JPGE = JPEGExtended
+JPGB = JPEGBaseline8Bit
+JPGE = JPEGExtended12Bit
 JPGL = JPEGLosslessSV1
 J2KI = JPEG2000
 J2KR = JPEG2000Lossless

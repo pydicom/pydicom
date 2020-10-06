@@ -184,14 +184,14 @@ displaying the file meta information data elements
 logger = logging.getLogger('pydicom')
 logger.addHandler(logging.NullHandler())
 
-import pydicom.overlay_data_handlers.numpy_handler as overlay_np  # noqa
+import pydicom.overlays.numpy_handler as overlay_np  # noqa
 
-overlay_data_handlers = [
-    overlay_np,
-]
+overlay_data_handlers = [overlay_np]
 """Handlers for converting (60xx,3000) *Overlay Data*
 
 .. versionadded:: 1.4
+
+.. deprecated:: 2.1
 
 .. currentmodule:: pydicom.dataset
 
@@ -199,11 +199,7 @@ This is an ordered list of *Overlay Data* handlers that the
 :meth:`~Dataset.overlay_array` method will use to try to extract a correctly
 sized numpy array from an *Overlay Data* element.
 
-Handlers shall have three methods:
-
-def supports_transfer_syntax(ds)
-    Return ``True`` if the handler supports the transfer syntax indicated in
-    :class:`Dataset` `ds`, ``False`` otherwise.
+Handlers have two required methods:
 
 def is_available():
     Return ``True`` if the handler's dependencies are installed, ``False``
@@ -214,15 +210,19 @@ def get_overlay_array(ds, group):
     *Overlay Data* with element tag `group`, in :class:`Dataset` `ds` or raise
     an exception.
 
+And two required attributes:
+
+DEPENDENCIES : dict
+    A dict containing the dependencies of the handler as
+    {'package_import_name': ('http://package.com/url', 'Package Name')}
+HANDLER_NAME : str
+    The name of the handler, e.g. 'Numpy Overlay'
 
 The first handler that both announces that it supports the transfer syntax
 and does not raise an exception is the handler that will provide the
 data.
 
 If all handlers fail to convert the data only the last exception is raised.
-
-If none raise an exception, but they all refuse to support the transfer
-syntax, then a :class:`NotImplementedError` is raised.
 """
 
 import pydicom.pixel_data_handlers.numpy_handler as np_handler  # noqa
@@ -313,7 +313,37 @@ Examples
 >>> ds.PatientsName = "Citizen^Jan"
 ../pydicom/dataset.py:1895: UserWarning: Camel case attribute 'PatientsName'
 used which is not in the element keyword data dictionary
+"""
 
+INVALID_KEY_BEHAVIOR = "WARN"
+"""Control the behavior when invalid keys are used with
+:meth:`~pydicom.dataset.Dataset.__contains__` (e.g. ``'invalid' in ds``).
+
+.. versionadded:: 2.1
+
+Invalid keys are objects that cannot be converted to a
+:class:`~pydicom.tag.BaseTag`, such as unknown element keywords or invalid
+element tags like ``0x100100010``.
+
+If ``"WARN"`` (default), then warn when an invalid key is used, if ``"RAISE"``
+then raise a :class:`ValueError` exception. If ``"IGNORE"`` then neither warn
+nor raise.
+
+Examples
+--------
+
+>>> from pydicom import config
+>>> config.INVALID_KEY_BEHAVIOR = "RAISE"
+>>> ds = Dataset()
+>>> 'PatientName' in ds  # OK
+False
+>>> 'PatientsName' in ds
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File ".../pydicom/dataset.py", line 494, in __contains__
+    raise ValueError(msg) from exc
+ValueError: Invalid value used with the 'in' operator: must be an
+element tag as a 2-tuple or int, or an element keyword
 """
 
 
