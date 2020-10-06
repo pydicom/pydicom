@@ -112,7 +112,7 @@
 <li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Working with Waveform Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dataset-waveform-generator"><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset-waveform-array"><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_array</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
@@ -234,46 +234,49 @@ corresponding (5400,1010) <em>Waveform Data</em> element.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="dataset-waveform-generator">
-<h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code><a class="headerlink" href="#dataset-waveform-generator" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dataset-waveform-array">
+<h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_array</span></code><a class="headerlink" href="#dataset-waveform-array" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.waveform_generator</span></code> requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
+<p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.waveform_array</span></code></a>
+requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 </div>
 <p>The <em>Waveform Data</em> element contains the raw bytes exactly as found in the
 file. To get the waveforms in a more useful form you can use the
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform_generator</span></code> property to return a
-<a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator-iterator">generator object</a> that yields
-a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with shape (samples, channels) for each multiplex
-group in the <em>Waveform Sequence</em>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_generator</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform_array</span></code></a> method to return a
+a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with shape (samples, channels) for the multiplex
+group at <cite>index</cite> in the <em>Waveform Sequence</em>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_array</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span>
+<span class="go">array([[ 100.  ,  112.5 ,   12.5 , ...,  -25.  ,  -68.75,  -50.  ],</span>
+<span class="go">       [  81.25,  106.25,   25.  , ...,  -25.  ,  -75.  ,  -50.  ],</span>
+<span class="go">       [  62.5 ,  100.  ,   37.5 , ...,  -25.  ,  -81.25,  -50.  ],</span>
+<span class="go">       ...,</span>
+<span class="go">       [  25.  ,  131.25,  106.25, ..., -137.5 , -150.  , -100.  ],</span>
+<span class="go">       [  21.25,  137.5 ,  116.25, ..., -137.5 , -150.  , -106.25],</span>
+<span class="go">       [  25.  ,  137.5 ,  112.5 , ..., -137.5 , -150.  , -112.5 ]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(10000, 12)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1200, 12)</span>
+</pre></div>
+</div>
+<p>If the <em>Channel Sensitivity Correction Factor</em> is available for a given channel
+then it will be applied to the raw channel data. If you need the raw data
+without any corrections then you can use the
+<a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiplex_array()</span></code></a>
+function with the <em>as_raw</em> keyword parameter instead:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveforms</span> <span class="kn">import</span> <span class="n">multiplex_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">multiplex_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
 <span class="go">array([[  80,   90,   10, ...,  -20,  -55,  -40],</span>
 <span class="go">       [  65,   85,   20, ...,  -20,  -60,  -40],</span>
 <span class="go">       [  50,   80,   30, ...,  -20,  -65,  -40],</span>
 <span class="go">       ...,</span>
 <span class="go">       [  20,  105,   85, ..., -110, -120,  -80],</span>
 <span class="go">       [  17,  110,   93, ..., -110, -120,  -85],</span>
-<span class="go">       [  20,  110,   90, ..., -110, -120,  -90]], dtype=float)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_1</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(10000, 12)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex_2</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(1200, 12)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
-<span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
-<span class="gr">StopIteration</span>
-</pre></div>
-</div>
-<p>If the <em>Channel Sensitivity Correction Factor</em> is available for a given channel
-then it will be applied to the raw channel data. If you need the raw data
-without any corrections then you can use the
-<code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code>
-function with the <em>as_raw</em> keyword parameter instead:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveform_generator.numpy_handler</span> <span class="kn">import</span> <span class="n">generate_multiplex</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">generator</span> <span class="o">=</span> <span class="n">generate_multiplex</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">       [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)</span>
 </pre></div>
 </div>
 </div>

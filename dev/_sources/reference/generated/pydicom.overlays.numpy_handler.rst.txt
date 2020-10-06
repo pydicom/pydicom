@@ -1,7 +1,7 @@
-﻿pydicom.overlay\_data\_handlers.numpy\_handler
-==============================================
+﻿pydicom.overlays.numpy\_handler
+===============================
 
-.. automodule:: pydicom.overlay_data_handlers.numpy_handler
+.. automodule:: pydicom.overlays.numpy_handler
 
    
    
@@ -17,7 +17,6 @@
       get_overlay_array
       is_available
       reshape_overlay_array
-      supports_transfer_syntax
    
    
 

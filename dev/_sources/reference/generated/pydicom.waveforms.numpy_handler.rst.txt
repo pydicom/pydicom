@@ -16,7 +16,6 @@
       generate_multiplex
       is_available
       multiplex_array
-      supports_transfer_syntax
    
    
 

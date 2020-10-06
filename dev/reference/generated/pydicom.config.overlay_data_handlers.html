@@ -231,19 +231,19 @@
 <h1>pydicom.config.overlay_data_handlers<a class="headerlink" href="#pydicom-config-overlay-data-handlers" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
 <dt id="pydicom.config.overlay_data_handlers">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">overlay_data_handlers</code><em class="property"> = [&lt;module 'pydicom.overlay_data_handlers.numpy_handler' from '/home/circleci/project/pydicom/overlay_data_handlers/numpy_handler.py'&gt;]</em><a class="headerlink" href="#pydicom.config.overlay_data_handlers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">overlay_data_handlers</code><em class="property"> = [&lt;module 'pydicom.overlays.numpy_handler' from '/home/circleci/project/pydicom/overlays/numpy_handler.py'&gt;]</em><a class="headerlink" href="#pydicom.config.overlay_data_handlers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handlers for converting (60xx,3000) <em>Overlay Data</em></p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
 </div>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 2.1.</span></p>
+</div>
 <p>This is an ordered list of <em>Overlay Data</em> handlers that the
 <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlay_array()</span></code></a> method will use to try to extract a correctly
 sized numpy array from an <em>Overlay Data</em> element.</p>
-<p>Handlers shall have three methods:</p>
+<p>Handlers have two required methods:</p>
 <dl class="simple">
-<dt>def supports_transfer_syntax(ds)</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the transfer syntax indicated in
-<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <cite>ds</cite>, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
-</dd>
 <dt>def is_available():</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler’s dependencies are installed, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
@@ -252,12 +252,18 @@ otherwise.</p>
 an exception.</p>
 </dd>
 </dl>
+<p>And two required attributes:</p>
+<dl class="simple">
+<dt>DEPENDENCIES<span class="classifier">dict</span></dt><dd><p>A dict containing the dependencies of the handler as
+{‘package_import_name’: (‘<a class="reference external" href="http://package.com/url">http://package.com/url</a>’, ‘Package Name’)}</p>
+</dd>
+<dt>HANDLER_NAME<span class="classifier">str</span></dt><dd><p>The name of the handler, e.g. ‘Numpy Overlay’</p>
+</dd>
+</dl>
 <p>The first handler that both announces that it supports the transfer syntax
 and does not raise an exception is the handler that will provide the
 data.</p>
 <p>If all handlers fail to convert the data only the last exception is raised.</p>
-<p>If none raise an exception, but they all refuse to support the transfer
-syntax, then a <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotImplementedError</span></code></a> is raised.</p>
 </dd></dl>
 
 </div>

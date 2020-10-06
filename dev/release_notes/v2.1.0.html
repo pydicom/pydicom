@@ -295,6 +295,11 @@ become <code class="docutils literal notranslate"><span class="pre">MultiFrame</
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir" title="pydicom.dicomdir.DicomDir"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomDir</span></code></a> and the <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module are
 deprecated and will be removed in v3.0. Use <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>
 instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1211">#1211</a>)</p></li>
+<li><p><cite>pydicom.overlay_data_handlers</cite> is deprecated, use <cite>pydicom.overlays</cite> instead</p></li>
+<li><p>Removed transfer syntax limitations when converting overlays to an
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1181">#1181</a>)</p></li>
+<li><p>The <a class="reference internal" href="../reference/generated/pydicom.config.overlay_data_handlers.html#pydicom.config.overlay_data_handlers" title="pydicom.config.overlay_data_handlers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code></a> config option is
+deprecated, the default handler will always be used.</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">

@@ -117,7 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlay_data_handlers</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../handlers.overlay_data.html">Overlay Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.overlays</span></code>)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../handlers.pixel_data.html">Pixel Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.pixel_data_handlers</span></code>)</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../handlers.waveform_data.html">Waveform Data Handlers (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.waveforms</span></code>)</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.waveforms.numpy_handler</a></li>
@@ -224,13 +224,6 @@ Data</em> to a <a class="reference external" href="https://numpy.org/doc/stable/
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
 </div>
-<p><strong>Supported transfer syntaxes</strong></p>
-<ul class="simple">
-<li><p>1.2.840.10008.1.2 : Implicit VR Little Endian</p></li>
-<li><p>1.2.840.10008.1.2.1 : Explicit VR Little Endian</p></li>
-<li><p>1.2.840.10008.1.2.1.99 : Deflated Explicit VR Little Endian</p></li>
-<li><p>1.2.840.10008.1.2.2 : Explicit VR Big Endian</p></li>
-</ul>
 <p><strong>Supported data</strong></p>
 <p>The numpy handler supports the conversion of data in the (5400,0100)
 <em>Waveform Sequence</em> element to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> provided the
@@ -293,14 +286,11 @@ SL, UL, SV, UV</p></td>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiplex_array</span></code></a>(ds, index[, as_raw])</p></td>
 <td><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group in the <em>Waveform Sequence</em> at <cite>index</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.waveforms.numpy_handler.supports_transfer_syntax" title="pydicom.waveforms.numpy_handler.supports_transfer_syntax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supports_transfer_syntax</span></code></a>(transfer_syntax)</p></td>
-<td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p></td>
-</tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt id="pydicom.waveforms.numpy_handler.generate_multiplex">
-<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">generate_multiplex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>np.ndarray<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/162a5493/pydicom/waveforms/numpy_handler.py#L97"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.generate_multiplex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">generate_multiplex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span>np.ndarray<span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ba93db18/pydicom/waveforms/numpy_handler.py#L67"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.generate_multiplex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for each multiplex group in the
 <em>Waveform Sequence</em>.</p>
 <div class="versionadded">
@@ -326,7 +316,7 @@ with shape (samples, channels).</p>
 
 <dl class="py function">
 <dt id="pydicom.waveforms.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/162a5493/pydicom/waveforms/numpy_handler.py#L75"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ba93db18/pydicom/waveforms/numpy_handler.py#L59"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
@@ -335,7 +325,7 @@ with shape (samples, channels).</p>
 
 <dl class="py function">
 <dt id="pydicom.waveforms.numpy_handler.multiplex_array">
-<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">multiplex_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/162a5493/pydicom/waveforms/numpy_handler.py#L177"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.multiplex_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">multiplex_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">as_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/ba93db18/pydicom/waveforms/numpy_handler.py#L141"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.multiplex_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group in the
 <em>Waveform Sequence</em> at <cite>index</cite>.</p>
 <div class="versionadded">
@@ -359,21 +349,6 @@ with shape (samples, channels).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pydicom.waveforms.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.waveforms.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/162a5493/pydicom/waveforms/numpy_handler.py#L83"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.waveforms.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
-<div class="versionadded">
-<p><span class="versionmodified added">New in version 2.1.</span></p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>transfer_syntax</strong> (<a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><em>uid.UID</em></a>) – The Transfer Syntax UID of the <em>Pixel Data</em> that is to be used with
-the handler.</p>
 </dd>
 </dl>
 </dd></dl>
