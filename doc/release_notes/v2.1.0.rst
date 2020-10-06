@@ -46,6 +46,10 @@ Enhancements
   :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR` config option to allow
   customizing the behavior when a camel case variable name is used that isn't
   a known element keyword (:issue:`1014`)
+* Added :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR` config option to allow
+  customizing the behavior when an invalid key is used with the
+  :class:`~pydicom.dataset.Dataset` :func:`in<operator.__contains__>` operator
+  (:issue:`1200`)
 * Implemented full support (loading, accessing, modifying, writing) of
   DICOM File-sets and their DICOMDIR files via the
   :class:`~pydicom.fileset.FileSet` class (:issue:`9`, :issue:`243`,
@@ -64,9 +68,6 @@ Changes
   become ``MultiFrame``, those with ``and`` in them become ``And``, and
   ``DICOSQuadrupoleResonanceQRStorage`` becomes
   ``DICOSQuadrupoleResonanceStorage``.
-* Invalid values used with the :class:`~pydicom.dataset.Dataset`
-  :func:`in<operator.__contains__>` now raise :class:`ValueError` rather than
-  returning ``False`` (:issue:`1200`)
 * Data dictionaries updated to version 2020c of the DICOM Standard
 * The following UID constants are deprecated and will be removed in v2.2:
 
@@ -112,3 +113,7 @@ Fixes
 * Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
 * Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
   lookup to an input float array
+* Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
+  adding working correctly when the `default` value is ``None`` and not
+  adding private elements when :attr:`~pydicom.config.enforce_valid_values` is
+  ``True`` (:issue:`1215`)

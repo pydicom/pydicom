@@ -85,12 +85,16 @@ def Tag(
         elif isinstance(arg[0], int):
             valid = isinstance(arg[1], int)
         if not valid:
-            raise ValueError("Both arguments for Tag must be the same type, "
-                             "either string or int.")
+            raise TypeError(
+                f"Unable to create an element tag from '{arg}': both "
+                "arguments must be the same type and str or int"
+            )
 
         if arg[0] > 0xFFFF or arg[1] > 0xFFFF:
-            raise OverflowError("Groups and elements of tags must each "
-                                "be <=2 byte integers")
+            raise OverflowError(
+                f"Unable to create an element tag from '{arg}': the group "
+                "and element values are limited to a maximum of 2-bytes each"
+            )
 
         long_value = (arg[0] << 16) | arg[1]
 
@@ -99,25 +103,35 @@ def Tag(
         try:
             long_value = int(arg, 16)
             if long_value > 0xFFFFFFFF:
-                raise OverflowError("Tags are limited to 32-bit length; "
-                                    "tag {0!r}"
-                                    .format(long_value))
+                raise OverflowError(
+                    f"Unable to create an element tag from '{long_value}': "
+                    "the combined group and element values  are limited to a "
+                    "maximum of 4-bytes"
+                )
         except ValueError:
             # Try a DICOM keyword
             from pydicom.datadict import tag_for_keyword
             long_value = tag_for_keyword(arg)
             if long_value is None:
-                raise ValueError("'{}' is not a valid int or DICOM keyword"
-                                 .format(arg))
+                raise ValueError(
+                    f"Unable to create an element tag from '{arg}': "
+                    "unknown DICOM element keyword or an invalid int"
+                )
     # Single int parameter
     else:
         long_value = arg
         if long_value > 0xFFFFFFFF:
-            raise OverflowError("Tags are limited to 32-bit length; tag {0!r}"
-                                .format(long_value))
+            raise OverflowError(
+                f"Unable to create an element tag from '{long_value}': the "
+                "combined group and element values are limited to a maximum "
+                "of 4-bytes"
+            )
 
     if long_value < 0:
-        raise ValueError("Tags must be positive.")
+        raise ValueError(
+            f"Unable to create an element tag from '{long_value}': tags must "
+            "be positive"
+        )
 
     return BaseTag(long_value)
 
