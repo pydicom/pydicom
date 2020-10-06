@@ -1,16 +1,13 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+
+from importlib import reload
+import typing
+
 import pytest
 
 import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-from pydicom.uid import (
-    ImplicitVRLittleEndian,
-    ExplicitVRLittleEndian,
-    DeflatedExplicitVRLittleEndian,
-    ExplicitVRBigEndian,
-    AllTransferSyntaxes
-)
 
 try:
     import numpy as np
@@ -40,38 +37,25 @@ def test_waveform_array_raises():
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestDataset:
-    """Tests for dataset.waveform_generator"""
-    def test_simple(self):
-        """Simple functionality test."""
-        ds = dcmread(ECG)
-        arr = ds.waveform_array(index=0)
-        arr = ds.waveform_array(index=1)
+def test_simple():
+    """Simple functionality test."""
+    ds = dcmread(ECG)
+    arr = ds.waveform_array(index=0)
+    arr = ds.waveform_array(index=1)
 
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = r"Unable to decode waveform data with a transfer syntax UID"
-        with pytest.raises(NotImplementedError, match=msg):
-            ds.waveform_array(0)
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+def test_typing_imports(monkeypatch):
+    """Test the imports required for typing are OK."""
+    assert not hasattr(NP_HANDLER, "Dataset")
+    monkeypatch.setattr(typing, "TYPE_CHECKING", True)
+    reload(NP_HANDLER)
+    assert hasattr(NP_HANDLER, "Dataset")
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerGenerateMultiplex:
     """Tests for the waveform numpy_handler.generate_multiplex."""
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = (
-            r"Unable to convert the waveform data as the transfer syntax "
-            r"is not supported by the waveform data handler"
-        )
-        gen = generate_multiplex(ds)
-        with pytest.raises(NotImplementedError, match=msg):
-            next(gen)
-
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)
@@ -123,17 +107,6 @@ class TestHandlerGenerateMultiplex:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerMultiplexArray:
     """Tests for the waveform numpy_handler.multiplex_array."""
-    def test_unsupported_syntax_raises(self):
-        """Test that an unsupported syntax raises exception."""
-        ds = dcmread(ECG)
-        ds.file_meta.TransferSyntaxUID = '1.2.3.4'
-        msg = (
-            r"Unable to convert the waveform data as the transfer syntax "
-            r"is not supported by the waveform data handler"
-        )
-        with pytest.raises(NotImplementedError, match=msg):
-            multiplex_array(ds, 0)
-
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)
