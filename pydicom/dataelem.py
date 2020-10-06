@@ -627,6 +627,11 @@ class DataElement:
         return name
 
     @property
+    def is_private(self):
+        """Return ``True`` if the element's tag is private."""
+        return self.tag.is_private
+
+    @property
     def is_retired(self):
         """Return the element's retired status as :class:`bool`.
 

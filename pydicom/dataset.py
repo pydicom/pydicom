@@ -23,7 +23,7 @@ import json
 import os
 import os.path
 import re
-from typing import Generator, TYPE_CHECKING
+from typing import Generator, TYPE_CHECKING, Optional, Tuple, Union
 import warnings
 
 if TYPE_CHECKING:
@@ -39,9 +39,9 @@ from pydicom import datadict, jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR
-from pydicom.datadict import (tag_for_keyword, keyword_for_tag,
-                              repeater_has_keyword)
+from pydicom.datadict import (
+    dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
+)
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.fileutil import path_from_pathlike
 from pydicom.pixel_data_handlers.util import (
@@ -453,7 +453,9 @@ class Dataset(dict):
             return self[tag]
         return None
 
-    def __contains__(self, name):
+    def __contains__(
+        self, name: Union[int, str, Tuple[int, int], BaseTag]
+    ) -> bool:
         """Simulate dict.__contains__() to handle DICOM keywords.
 
         Examples
@@ -477,16 +479,21 @@ class Dataset(dict):
         """
         try:
             return Tag(name) in self._dict
-        except OverflowError as exc:
-            raise OverflowError(
-                "Invalid element tag value: tags have a maximum value of "
-                "(0xFFFF, 0xFFFF)"
-            ) from exc
         except Exception as exc:
-            raise ValueError(
+            msg = (
                 "Invalid value used with the 'in' operator: must be an "
                 "element tag as a 2-tuple or int, or an element keyword"
-            ) from exc
+            )
+            if isinstance(exc, OverflowError):
+                msg = (
+                    "Invalid element tag value used with the 'in' operator: "
+                    "tags have a maximum value of (0xFFFF, 0xFFFF)"
+                )
+
+            if config.INVALID_KEY_BEHAVIOR == "WARN":
+                warnings.warn(msg)
+            elif config.INVALID_KEY_BEHAVIOR == "RAISE":
+                raise ValueError(msg) from exc
 
     def decode(self):
         """Apply character set decoding to the elements in the
@@ -853,9 +860,12 @@ class Dataset(dict):
         if isinstance(key, BaseTag):
             tag = key
         else:
-            tag = Tag(key)
-        data_elem = self._dict[tag]
+            try:
+                tag = Tag(key)
+            except Exception as exc:
+                raise KeyError(f"'{key}'") from exc
 
+        data_elem = self._dict[tag]
         if isinstance(data_elem, DataElement):
             if data_elem.VR == 'SQ' and data_elem.value:
                 # let a sequence know its parent dataset, as sequence items
@@ -1225,7 +1235,11 @@ class Dataset(dict):
     def popitem(self):
         return self._dict.popitem()
 
-    def setdefault(self, key, default=None):
+    def setdefault(
+        self,
+        key: Union[int, str, Tuple[int, int], BaseTag],
+        default: Optional[object] = None
+    ) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
 
         Examples
@@ -1244,57 +1258,53 @@ class Dataset(dict):
 
         Parameters
         ----------
-        key : int or str or 2-tuple
+        key : int, str or 2-tuple of int
 
             * If :class:`tuple` - the group and element number of the DICOM tag
             * If :class:`int` - the combined group/element number
             * If :class:`str` - the DICOM keyword of the tag
-
-        default : type, optional
-            The default value that is inserted and returned if no data
-            element exists for the given key. If it is not of type
-            :class:`~pydicom.dataelem.DataElement`, one will be
-            constructed instead for the given tag and `default` as value.
-            This is only possible for known tags (e.g. tags found via the
-            dictionary lookup).
+        default : pydicom.dataelem.DataElement or object, optional
+            The :class:`~pydicom.dataelem.DataElement` to use with `key`, or
+            the value of the :class:`~pydicom.dataelem.DataElement` to use with
+            `key` (default ``None``).
 
         Returns
         -------
-        DataElement or type
-            The data element for `key` if it exists, or the default value if
-            it is a :class:`~pydicom.dataelem.DataElement` or
-            ``None``, or a :class:`~pydicom.dataelem.DataElement`
-            constructed with `default` as value.
+        pydicom.dataelem.DataElement or object
+            The :class:`~pydicom.dataelem.DataElement` for `key`.
 
         Raises
         ------
+        ValueError
+            If `key` is not convertible to a valid tag or a known element
+            keyword.
         KeyError
-            If the `key` is not a valid tag or keyword.
-            If `key` is an unknown non-private tag and
-            `config.enforce_valid_values` is set.
-            If no tag exists for `key`, default is not a
-            :class:`~pydicom.dataelem.DataElement` and not
-            ``None``, and `key` is not a known DICOM tag.
+            If :attr:`~pydicom.config.enforce_valid_values` is ``True`` and
+            `key` is an unknown non-private tag.
         """
-        if key in self:
-            return self[key]
-        if default is not None:
-            if not isinstance(default, DataElement):
-                tag = Tag(key)
+        tag = Tag(key)
+        if tag in self:
+            return self[tag]
+
+        if not isinstance(default, DataElement):
+            if tag.is_private:
+                vr = 'UN'
+            else:
                 try:
-                    vr = datadict.dictionary_VR(tag)
+                    vr = dictionary_VR(tag)
                 except KeyError:
-                    msg = "Unknown DICOM tag ({:04x}, {:04x})".format(
-                        tag.group, tag.element)
                     if config.enforce_valid_values:
-                        msg += " can't look up VR"
-                        raise KeyError(msg)
+                        raise KeyError(f"Unknown DICOM tag {tag}")
                     else:
                         vr = 'UN'
-                        msg += " - setting VR to 'UN'"
-                        warnings.warn(msg)
-                default = DataElement(Tag(key), vr, default)
-            self[key] = default
+                        warnings.warn(
+                            f"Unknown DICOM tag {tag} - setting VR to 'UN'"
+                        )
+
+            default = DataElement(tag, vr, default)
+
+        self[key] = default
+
         return default
 
     def convert_pixel_data(self, handler_name=''):
@@ -1921,51 +1931,65 @@ class Dataset(dict):
 
         self.__dict__["file_meta"] = value
 
-    def __setitem__(self, key, value):
-        """Operator for Dataset[key] = value.
-
-        Check consistency, and deal with private tags.
+    def __setitem__(
+        self,
+        key: Union[int, str, Tuple[int, int], BaseTag],
+        elem: Union[DataElement, RawDataElement]
+    ) -> None:
+        """Operator for ``Dataset[key] = elem``.
 
         Parameters
         ----------
         key : int or Tuple[int, int] or str
-            The tag for the element to be added to the Dataset.
-        value : dataelem.DataElement or dataelem.RawDataElement
+            The tag for the element to be added to the :class:`Dataset`.
+        elem : dataelem.DataElement or dataelem.RawDataElement
             The element to add to the :class:`Dataset`.
 
         Raises
         ------
         NotImplementedError
-            If `key` is a ``slice``.
+            If `key` is a :class:`slice`.
         ValueError
-            If the `key` value doesn't match ``DataElement.tag``.
+            If the `key` value doesn't match the corresponding
+            :attr:`DataElement.tag<pydicom.dataelem.tag>`.
         """
         if isinstance(key, slice):
-            raise NotImplementedError('Slicing is not supported for setting '
-                                      'Dataset elements.')
+            raise NotImplementedError(
+                'Slicing is not supported when setting Dataset items'
+            )
 
-        # OK if is subclass, e.g. DeferredDataElement
-        if not isinstance(value, (DataElement, RawDataElement)):
-            raise TypeError("Dataset contents must be DataElement instances.")
-        if isinstance(value.tag, BaseTag):
-            tag = value.tag
+        try:
+            key = Tag(key)
+        except Exception as exc:
+            raise ValueError(
+                f"Unable to convert the key '{key}' to an element tag"
+            ) from exc
+
+        if not isinstance(elem, (DataElement, RawDataElement)):
+            raise TypeError("Dataset items must be 'DataElement' instances")
+
+        if isinstance(elem.tag, BaseTag):
+            elem_tag = elem.tag
         else:
-            tag = Tag(value.tag)
-        if key != tag:
-            raise ValueError("DataElement.tag must match the dictionary key")
+            elem_tag = Tag(elem.tag)
 
-        data_element = value
-        if tag.is_private:
+        if key != elem_tag:
+            raise ValueError(
+                f"The key '{key}' doesn't match the 'DataElement' tag "
+                f"'{elem_tag}'"
+            )
+
+        if elem_tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
-            logger.debug("Setting private tag %r" % tag)
-            private_block = tag.elem >> 8
-            private_creator_tag = Tag(tag.group, private_block)
-            if private_creator_tag in self and tag != private_creator_tag:
-                if data_element.is_raw:
-                    data_element = DataElement_from_raw(
-                        data_element, self._character_set)
-                data_element.private_creator = self[private_creator_tag].value
-        self._dict[tag] = data_element
+            logger.debug(f"Setting private tag {elem_tag}")
+            private_block = elem_tag.elem >> 8
+            private_creator_tag = Tag(elem_tag.group, private_block)
+            if private_creator_tag in self and elem_tag != private_creator_tag:
+                if elem.is_raw:
+                    elem = DataElement_from_raw(elem, self._character_set)
+                elem.private_creator = self[private_creator_tag].value
+
+        self._dict[elem_tag] = elem
 
     def _slice_dataset(self, start, stop, step):
         """Return the element tags in the Dataset that match the slice.

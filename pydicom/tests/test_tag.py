@@ -275,10 +275,12 @@ class TestTag:
         pytest.raises(ValueError, Tag, ('0x0', '-0x1'))
         pytest.raises(ValueError, Tag, ('-0x1', '0x0'))
         # Can't have second parameter
-        pytest.raises(ValueError, Tag, (0x01, 0x02), 0x01)
-        pytest.raises(ValueError, Tag, (0x01, 0x02), '0x01')
-        pytest.raises(ValueError, Tag, ('0x01', '0x02'), '0x01')
-        pytest.raises(ValueError, Tag, ('0x01', '0x02'), 0x01)
+        msg = r"Unable to create an element tag from '\(\(1, 2\), 1\)'"
+        with pytest.raises(TypeError, match=msg):
+             Tag((0x01, 0x02), 0x01)
+        pytest.raises(TypeError, Tag, (0x01, 0x02), '0x01')
+        pytest.raises(TypeError, Tag, ('0x01', '0x02'), '0x01')
+        pytest.raises(TypeError, Tag, ('0x01', '0x02'), 0x01)
 
     def test_tag_single_list(self):
         """Test creating a Tag from a single list."""
@@ -295,7 +297,12 @@ class TestTag:
         pytest.raises(ValueError, Tag, ['0x10'])
 
         # Must be int or string
-        pytest.raises(ValueError, Tag, [1., 2.])
+        msg = (
+            r"Unable to create an element tag from '\[1.0, 2.0\]': both "
+            r"arguments must be the same type and str or int"
+        )
+        with pytest.raises(TypeError, match=msg):
+             Tag([1., 2.])
 
         # Must be 32-bit
         pytest.raises(OverflowError, Tag, [65536, 0])
@@ -307,10 +314,13 @@ class TestTag:
         pytest.raises(ValueError, Tag, ('0x0', '-0x1'))
         pytest.raises(ValueError, Tag, ('-0x1', '0x0'))
         # Can't have second parameter
-        pytest.raises(ValueError, Tag, [0x01, 0x02], 0x01)
-        pytest.raises(ValueError, Tag, [0x01, 0x02], '0x01')
-        pytest.raises(ValueError, Tag, ['0x01', '0x02'], '0x01')
-        pytest.raises(ValueError, Tag, ['0x01', '0x02'], 0x01)
+        msg = r"Unable to create an element tag from '\(\[1, 2\], 1\)'"
+        with pytest.raises(TypeError, match=msg):
+             Tag([0x01, 0x02], 0x01)
+
+        pytest.raises(TypeError, Tag, [0x01, 0x02], '0x01')
+        pytest.raises(TypeError, Tag, ['0x01', '0x02'], '0x01')
+        pytest.raises(TypeError, Tag, ['0x01', '0x02'], 0x01)
 
     def test_tag_single_str(self):
         """Test creating a Tag from a single str."""
@@ -342,8 +352,8 @@ class TestTag:
         pytest.raises(ValueError, Tag, '0', '-0x01')
         pytest.raises(ValueError, Tag, '-1', '-0x01')
         # Must both be str
-        pytest.raises(ValueError, Tag, '0x01', 0)
-        pytest.raises(ValueError, Tag, 0, '0x01')
+        pytest.raises(TypeError, Tag, '0x01', 0)
+        pytest.raises(TypeError, Tag, 0, '0x01')
 
     def test_tag_double_int(self):
         """Test creating a Tag from a two ints."""

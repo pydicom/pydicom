@@ -23,7 +23,7 @@ from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
-    JPEGBaseline,
+    JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID
 )
 
@@ -183,8 +183,8 @@ class TestDataset:
             r"Invalid value used with the 'in' operator: must be "
             r"an element tag as a 2-tuple or int, or an element keyword"
         )
-        with pytest.raises(ValueError, match=msg):
-            'Dummyname' not in self.ds
+        with pytest.warns(UserWarning, match=msg):
+            assert 'Dummyname' not in self.ds
 
     def test_contains(self):
         """Dataset: can test if item present by 'if <tag> in dataset'."""
@@ -199,20 +199,20 @@ class TestDataset:
             r"Invalid value used with the 'in' operator: must "
             r"be an element tag as a 2-tuple or int, or an element keyword"
         )
-        with pytest.raises(ValueError, match=msg):
-            (-0x0010, 0x0010) in self.ds
+        with pytest.warns(UserWarning, match=msg):
+            assert (-0x0010, 0x0010) not in self.ds
 
         # Random non-existent property
-        with pytest.raises(ValueError, match=msg):
-            assert 'random name' in self.ds
+        with pytest.warns(UserWarning, match=msg):
+            assert 'random name' not in self.ds
 
         # Overflowing tag
         msg = (
-            r"Invalid element tag value: tags have a maximum value of "
-            r"\(0xFFFF, 0xFFFF\)"
+            r"Invalid element tag value used with the 'in' operator: "
+            r"tags have a maximum value of \(0xFFFF, 0xFFFF\)"
         )
-        with pytest.raises(OverflowError, match=msg):
-            0x100100010 in self.ds
+        with pytest.warns(UserWarning, match=msg):
+            assert 0x100100010 not in self.ds
 
     def test_clear(self):
         assert 1 == len(self.ds)
@@ -293,25 +293,49 @@ class TestDataset:
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
-        with pytest.warns(UserWarning, match=r'\(0011, 0010\)'):
-            self.ds.setdefault((0x0011, 0x0010), "Test")
 
     def test_setdefault_keyword(self):
+        """Test setdefault()."""
+        assert 'WindowWidth' not in self.ds
+        elem = self.ds.setdefault('WindowWidth', None)
+        assert elem.value is None
+        assert self.ds.WindowWidth is None
+        elem = self.ds.setdefault('WindowWidth', 1024)
+        assert elem.value is None
+        assert self.ds.WindowWidth is None
+
+        assert 'TreatmentMachineName' in self.ds
+        assert 'unit001' == self.ds.TreatmentMachineName
         elem = self.ds.setdefault('TreatmentMachineName', 'foo')
         assert 'unit001' == elem.value
+
         elem = self.ds.setdefault(
             'PatientName', DataElement(0x00100010, 'PN', "Test")
         )
         assert 'Test' == elem.value
-        assert 2 == len(self.ds)
+        assert 3 == len(self.ds)
 
     def test_setdefault_invalid_keyword(self):
+        """Test setdefault() with an invalid keyword raises."""
         msg = (
-            r"Invalid value used with the 'in' operator: must "
-            r"be an element tag as a 2-tuple or int, or an element keyword"
+            r"Unable to create an element tag from 'FooBar': unknown "
+            r"DICOM element keyword"
         )
         with pytest.raises(ValueError, match=msg):
             self.ds.setdefault('FooBar', 'foo')
+
+    def test_setdefault_private(self):
+        """Test setdefault() with a private tag."""
+        elem = self.ds.setdefault(0x00090020, None)
+        assert elem.is_private
+        assert elem.value is None
+        assert 'UN' == elem.VR
+        assert 0x00090020 in self.ds
+        elem.VR = 'PN'
+        elem = self.ds.setdefault(0x00090020, 'test')
+        assert elem.is_private
+        assert elem.value is None
+        assert 'PN' == elem.VR
 
     def test_get_exists1(self):
         """Dataset: dataset.get() returns an existing item by name."""
@@ -1262,7 +1286,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
         ds['PixelData'].VR = 'OB'
         msg = (
@@ -1279,7 +1303,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         ds['PixelData'].VR = 'OB'
         ds.save_as(fp)
@@ -1291,7 +1315,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.save_as(fp)
 
     def test_save_as_no_file_meta(self):
@@ -1346,7 +1370,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
         elem.VR = 'OB'
@@ -1563,6 +1587,24 @@ class TestDataset:
         ds.PatientName = 'TestC'
         ds2.update(ds)
         assert 'TestC' == ds2.PatientName
+
+    def test_getitem_invalid_key_raises(self):
+        """Test that __getitem__ raises KeyError on invalid key."""
+        ds = Dataset()
+        with pytest.raises(KeyError, match=r"'invalid'"):
+            ds['invalid']
+
+    def test_setitem_invalid_key(self):
+        """Test that __setitem__ behavior."""
+        a = {}
+        with pytest.raises(KeyError, match=r"'invalid'"):
+            a['invalid']
+
+        ds = Dataset()
+        ds.PatientName = 'Citizen^Jan'
+        msg = r"Unable to convert the key 'invalid' to an element tag"
+        with pytest.raises(ValueError, match=msg):
+            ds['invalid'] = ds['PatientName']
 
 
 class TestDatasetElements:
