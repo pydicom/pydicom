@@ -5,18 +5,18 @@
 
 Computation times
 =================
-**00:00.425** total execution time for **auto_examples_input_output** files:
+**00:00.387** total execution time for **auto_examples_input_output** files:
 
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``plot_read_fileset.py``)                 | 00:00.265 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_input_output_plot_read_fileset.py` (``plot_read_fileset.py``)                 | 00:00.244 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)                     | 00:00.129 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom.py` (``plot_read_dicom.py``)                     | 00:00.113 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py` (``plot_read_dicom_directory.py``) | 00:00.015 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_input_output_plot_read_dicom_directory.py` (``plot_read_dicom_directory.py``) | 00:00.014 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)                   | 00:00.007 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py` (``plot_write_dicom.py``)                   | 00:00.008 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``plot_printing_dataset.py``)         | 00:00.007 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_input_output_plot_printing_dataset.py` (``plot_printing_dataset.py``)         | 00:00.006 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_input_output_plot_read_rtplan.py` (``plot_read_rtplan.py``)                   | 00:00.003 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
