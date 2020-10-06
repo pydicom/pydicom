@@ -306,7 +306,7 @@ class TestIS:
     """Unit tests for IS"""
     def test_empty_value(self):
         assert IS(None) is None
-        assert "" == IS("")
+        assert IS("") is None
 
     def test_valid_value(self):
         assert 42 == IS(42)
@@ -426,6 +426,7 @@ class TestDecimalString:
         # to a valid 16-character string
         long_str = "-0.000000981338674"
         ds = valuerep.DS(long_str)
+        assert isinstance(ds, valuerep.DSdecimal)
         assert len(str(ds)) <= 16
 
     def test_invalid_decimal_strings(self, enforce_valid_values):
@@ -617,7 +618,8 @@ class TestPersonName:
 
         # Test that next() doesn't work without instantiating an iterator
         pn4 = PersonName("SomeName")
-        with pytest.raises(AttributeError):
+        msg = r"'PersonName' object is not an iterator"
+        with pytest.raises(TypeError, match=msg):
             next(pn4)
 
     def test_iterator(self):
@@ -631,6 +633,11 @@ class TestPersonName:
         # Ensure that multiple iterators can be created on the same variable
         for i, c in enumerate(pn1):
             assert name_str[i] == c
+
+        gen = iter(PersonName(name_str))
+        print(gen)
+        for ii in gen:
+            print(ii)
 
     def test_contains(self):
         """Test that characters can be check if they are within the name"""

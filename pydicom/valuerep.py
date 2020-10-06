@@ -5,7 +5,9 @@ import datetime
 from decimal import Decimal
 import re
 import sys
-from typing import TypeVar, Type, Tuple, Optional, List, Dict, Union, Any
+from typing import (
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator
+)
 import warnings
 
 # don't import datetime_conversion directly
@@ -80,7 +82,9 @@ class DA(_DateTimeBase, datetime.date):
 
     Note that the :class:`datetime.date` base class is immutable.
     """
-    def __new__(cls: Type[_DA], val: Union[str, _DA]) -> Optional[_DA]:
+    def __new__(
+        cls: Type[_DA], val: Union[None, str, _DA, datetime.date]
+    ) -> Optional[_DA]:
         """Create an instance of DA object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -96,7 +100,7 @@ class DA(_DateTimeBase, datetime.date):
             return None
 
         if isinstance(val, str):
-            if val == '':
+            if val.strip() == '':
                 return None  # empty date
 
             if len(val) == 8:
@@ -123,7 +127,7 @@ class DA(_DateTimeBase, datetime.date):
                 f"Unable to convert '{val}' to 'DA' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _DA, None]) -> None:
+    def __init__(self, val: Union[str, _DA, datetime.date]) -> None:
         """Create a new **DA** element value."""
         if isinstance(val, str):
             self.original_string = val
@@ -160,7 +164,9 @@ class DT(_DateTimeBase, datetime.datetime):
 
         return datetime.timezone(datetime.timedelta(seconds=offset),name=value)
 
-    def __new__(cls: Type[_DT], val: Union[str, _DT]) -> Optional[_DT]:
+    def __new__(
+        cls: Type[_DT], val: Union[None, str, _DT, datetime.datetime]
+    ) -> Optional[_DT]:
         """Create an instance of DT object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -176,7 +182,7 @@ class DT(_DateTimeBase, datetime.datetime):
             return None
 
         if isinstance(val, str):
-            if val == '':
+            if val.strip() == '':
                 return None
 
             match = cls._regex_dt.match(val)
@@ -226,7 +232,7 @@ class DT(_DateTimeBase, datetime.datetime):
                 f"Unable to convert '{val}' to 'DT' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _DT]) -> None:
+    def __init__(self, val: Union[str, _DT, datetime.datetime]) -> None:
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
@@ -245,7 +251,9 @@ class TM(_DateTimeBase, datetime.time):
         r"(?(7)(\.(?P<ms>([0-9]{1,6})?))?))$"
     )
 
-    def __new__(cls: Type[_TM], val: Union[str, _TM]) -> Optional[_TM]:
+    def __new__(
+        cls: Type[_TM], val: Union[None, str, _TM, datetime.time]
+    ) -> Optional[_TM]:
         """Create an instance of TM object from a string.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -261,7 +269,7 @@ class TM(_DateTimeBase, datetime.time):
             return None
 
         if isinstance(val, str):
-            if val == '':
+            if val.strip() == '':
                 return None  # empty time
 
             match = cls._RE_TIME.match(val)
@@ -300,7 +308,7 @@ class TM(_DateTimeBase, datetime.time):
                 f"Unable to convert '{val}' to 'TM' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _TM]) -> None:
+    def __init__(self, val: Union[str, _TM, datetime.time]) -> None:
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
@@ -314,7 +322,9 @@ class DSfloat(float):
     not an instance of this class.
 
     """
-    def __init__(self, val: Union[str, int, float, _DSfloat]) -> None:
+    def __init__(
+        self, val: Union[str, int, float, Decimal]
+    ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
         """
@@ -347,7 +357,7 @@ class DSdecimal(Decimal):
     """
     def __new__(
         cls: Type[_DSdecimal],
-        val: Union[str, int, float, _DSdecimal]
+        val: Union[str, int, float, Decimal]
     ) -> Optional[_DSdecimal]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -357,47 +367,34 @@ class DSdecimal(Decimal):
         val : str or numeric
             A string or a number type which can be converted to a decimal.
         """
-        # Store this value here so that if the input string is actually a valid
-        # string but decimal.Decimal transforms it to an invalid string it will
-        # still be initialized properly
-        enforce_length = config.enforce_valid_values
-        # DICOM allows spaces around the string,
-        # but python doesn't, so clean it
-        if isinstance(val, str):
-            val = val.strip()
-            # If the input string is actually invalid that we relax the valid
-            # value constraint for this particular instance
-            if len(val) <= 16:
-                enforce_length = False
-
-            if val == '':
-                return None
-
         if isinstance(val, float) and not config.allow_DS_float:
-            msg = (
+            raise TypeError(
                 "'DS' cannot be instantiated with a float value unless "
                 "'config.allow_DS_float' is set to True. You should convert "
                 "the value to a string with the desired number of digits, "
                 "or use 'Decimal.quantize()' and pass a 'Decimal' instance."
             )
-            raise TypeError(msg)
 
-        if not isinstance(val, Decimal):
-            val = super().__new__(cls, val)
+        if isinstance(val, str):
+            val = val.strip()
+            if val == '':
+                return None
 
-        if len(str(val)) > 16 and enforce_length:
-            msg = (
+        val = super().__new__(cls, val)
+        if len(str(val)) > 16 and config.enforce_valid_values:
+            raise OverflowError(
                 "Values for elements with a VR of 'DS' values must be <= 16 "
                 "characters long. Use a smaller string, set "
                 "'config.enforce_valid_values' to False to override the "
                 "length check, or use 'Decimal.quantize()' and initialize "
                 "with a 'Decimal' instance."
             )
-            raise OverflowError(msg)
 
         return val
 
-    def __init__(self, val: Union[str, int, float, _DSdecimal]) -> None:
+    def __init__(
+        self, val: Union[str, int, float, Decimal]
+    ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
         write ``'123'``, but :class:`DS` will use the original.
@@ -428,7 +425,9 @@ else:
     DSclass = DSfloat
 
 
-def DS(val: Union[None, str]) -> Union[str, None, DSfloat, DSdecimal]:
+def DS(
+    val: Union[None, str, int, float, Decimal]
+) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
     Checks for blank string; if so, returns that, else calls :class:`DSfloat`
@@ -457,23 +456,23 @@ class IS(int):
 
     def __new__(
         cls: Type[_IS], val: Union[None, str, int, float, Decimal]
-    ) -> Union[None, str, _IS]:
+    ) -> Optional[_IS]:
         """Create instance if new integer string"""
         if val is None:
             return val
 
         if isinstance(val, str) and val.strip() == '':
-            return ''
+            return None
 
-        newval = super().__new__(cls, val)
+        newval: _IS = super().__new__(cls, val)
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
+        #   IS('1.23') will raise ValueError
         if isinstance(val, (float, Decimal)) and newval != val:
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        check_newval = (newval < -2 ** 31 or newval >= 2 ** 31)
-        if check_newval and config.enforce_valid_values:
+        if not -2**31 < newval < 2**31 and config.enforce_valid_values:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
@@ -482,7 +481,7 @@ class IS(int):
 
         return newval
 
-    def __init__(self, val: Union[str, _IS]) -> None:
+    def __init__(self, val: Union[str, int, float, Decimal]) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val
@@ -608,7 +607,7 @@ class PersonName:
     # Is this supposed to be mutable or immutable?
     def __new__(
         cls: Type[_PersonName], *args, **kwargs
-    ) -> Union[None, _PersonName]:
+    ) -> Optional[_PersonName]:
         # Handle None value by returning None instead of a PersonName object
         if len(args) and args[0] is None:
             return None
@@ -776,23 +775,13 @@ class PersonName:
         """Return a string representation of the name."""
         return '='.join(self.components).__str__()
 
-    def __next__(self) -> str:
-        """Return the next character in the name."""
-        # Get next character or stop iteration
-        if self._i < self._rep_len:
-            c = self._str_rep[self._i]
-            self._i += 1
-            return c
-
-        raise StopIteration
-
-    def __iter__(self) -> str:
+    def __iter__(self) -> Generator[str, None, None]:
         """Iterate through the name."""
-        # Get string rep. and length, initialize index counter
-        self._str_rep = self.__str__()
-        self._rep_len = len(self._str_rep)
-        self._i = 0
-        return self
+        yield from self.__str__()
+
+    def __len__(self) -> int:
+        """Return the length of the person name."""
+        return len(self.__str__())
 
     def __contains__(self, x: str) -> bool:
         """Return ``True`` if `x` is in the name."""
@@ -806,7 +795,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Optional[List[str]] = None) -> _PersonName:
+    def decode(self, encodings: Optional[List[str]] = None) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -878,9 +867,7 @@ class PersonName:
         if self.original_string is None:
             return (
                 bool(self._components)
-                and (
-                    len(self._components) > 1 or bool(self._components[0])
-                )
+                and (len(self._components) > 1 or bool(self._components[0]))
             )
 
         return bool(self.original_string)
