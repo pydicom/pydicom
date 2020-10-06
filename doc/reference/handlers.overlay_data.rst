@@ -1,9 +1,9 @@
 .. _api_handlers_overlaydata:
 
-Overlay Data Handlers (:mod:`pydicom.overlay_data_handlers`)
+Overlay Data Handlers (:mod:`pydicom.overlays`)
 ============================================================
 
-.. currentmodule:: pydicom.overlay_data_handlers
+.. currentmodule:: pydicom.overlays
 
 .. autosummary::
    :toctree: generated/

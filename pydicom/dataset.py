@@ -17,6 +17,7 @@ Dataset (dict subclass)
 import copy
 from bisect import bisect_left
 import io
+from importlib.util import find_spec as have_package
 import inspect  # for __dir__
 from itertools import takewhile
 import json
@@ -51,9 +52,6 @@ from pydicom.tag import Tag, BaseTag, tag_in_exception
 from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
                          ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
 from pydicom.waveforms import numpy_handler as wave_handler
-
-
-from importlib.util import find_spec as have_package
 
 
 class PrivateBlock:
@@ -1553,6 +1551,11 @@ class Dataset(dict):
 
         .. versionadded:: 1.4
 
+        Parameters
+        ----------
+        group : int
+            The group number of the overlay data.
+
         Returns
         -------
         numpy.ndarray
@@ -1565,39 +1568,20 @@ class Dataset(dict):
                 "between 0x6000 and 0x60FF (inclusive)"
             )
 
-        # Find all possible handlers that support the transfer syntax
-        transfer_syntax = self.file_meta.TransferSyntaxUID
-        possible_handlers = [hh for hh in pydicom.config.overlay_data_handlers
-                             if hh.supports_transfer_syntax(transfer_syntax)]
+        from pydicom.config import overlay_data_handlers
 
-        # No handlers support the transfer syntax
-        if not possible_handlers:
-            raise NotImplementedError(
-                "Unable to decode overlay data with a transfer syntax UID of "
-                "'{0}' ({1}) as there are no overlay data handlers "
-                "available that support it. Please see the pydicom "
-                "documentation for information on supported transfer syntaxes "
-                .format(self.file_meta.TransferSyntaxUID,
-                        self.file_meta.TransferSyntaxUID.name)
-            )
-
-        # Handlers that both support the transfer syntax and have their
-        #   dependencies met
         available_handlers = [
-            hh for hh in possible_handlers if hh.is_available()
+            hh for hh in overlay_data_handlers if hh.is_available()
         ]
-
-        # There are handlers that support the transfer syntax but none of them
-        #   can be used as missing dependencies
         if not available_handlers:
-            # For each of the possible handlers we want to find which
+            # For each of the handlers we want to find which
             #   dependencies are missing
             msg = (
                 "The following handlers are available to decode the overlay "
                 "data however they are missing required dependencies: "
             )
             pkg_msg = []
-            for hh in possible_handlers:
+            for hh in overlay_data_handlers:
                 hh_deps = hh.DEPENDENCIES
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
@@ -1613,7 +1597,7 @@ class Dataset(dict):
         last_exception = None
         for handler in available_handlers:
             try:
-                # Use the handler to get a 1D numpy array of the pixel data
+                # Use the handler to get an ndarray of the pixel data
                 return handler.get_overlay_array(self, group)
             except Exception as exc:
                 logger.debug(
@@ -1674,13 +1658,6 @@ class Dataset(dict):
         :func:`~pydicom.waveforms.numpy_handler.generate_multiplex`
         :func:`~pydicom.waveforms.numpy_handler.multiplex_array`
         """
-        transfer_syntax = self.file_meta.TransferSyntaxUID
-        if not wave_handler.supports_transfer_syntax(transfer_syntax):
-            raise NotImplementedError(
-                f"Unable to decode waveform data with a transfer syntax UID "
-                f"of '{transfer_syntax}' ({transfer_syntax.name})"
-            )
-
         if not wave_handler.is_available():
             raise RuntimeError("The waveform data handler requires numpy")
 
