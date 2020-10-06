@@ -207,7 +207,7 @@ For example:</p>
 <code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
 </ul>
 </li>
-<li><p>Added a new pixel data handler based on pylibjpeg which supports all
+<li><p>Added a new pixel data handler based on <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> which supports all
 (non-retired) JPEG transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1127">#1127</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.apply_rescale.html#pydicom.pixel_data_handlers.apply_rescale" title="pydicom.pixel_data_handlers.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_rescale()</span></code></a>,
 <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.apply_windowing.html#pydicom.pixel_data_handlers.apply_windowing" title="pydicom.pixel_data_handlers.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a>  aliases</p></li>
@@ -253,6 +253,10 @@ DICOM File-sets and their DICOMDIR files via the
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
 per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
+<li><p>Invalid values used with the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
+<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator now raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>
+rather than returning <code class="docutils literal notranslate"><span class="pre">False</span></code>, if you need the old behavior use
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#hasattr" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">hasattr()</span></code></a> instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Data dictionaries updated to version 2020d of the DICOM Standard</p></li>
 <li><p>Updated a handful of the SOP Class variable names in
 <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code>
@@ -260,16 +264,15 @@ to use the new UID keywords. Variables with <code class="docutils literal notran
 become <code class="docutils literal notranslate"><span class="pre">MultiFrame</span></code>, those with <code class="docutils literal notranslate"><span class="pre">and</span></code> in them become <code class="docutils literal notranslate"><span class="pre">And</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceQRStorage</span></code> becomes
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceStorage</span></code>.</p></li>
-<li><p>Data dictionaries updated to version 2020c of the DICOM Standard</p></li>
 <li><p>The following UID constants are deprecated and will be removed in v2.2:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEGBaseline</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGBaseline8Bit.html#pydicom.uid.JPEGBaseline8Bit" title="pydicom.uid.JPEGBaseline8Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGBaseline8Bit</span></code></a> instead)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEGExtended</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGExtended12Bit.html#pydicom.uid.JPEGExtended12Bit" title="pydicom.uid.JPEGExtended12Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGExtended12Bit</span></code></a> instead)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLossless</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLosslessSV1.html#pydicom.uid.JPEGLosslessSV1" title="pydicom.uid.JPEGLosslessSV1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLosslessSV1</span></code></a> instead)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLSLossy</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLSNearLossless.html#pydicom.uid.JPEGLSNearLossless" title="pydicom.uid.JPEGLSNearLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLossless</span></code></a> instead)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponentLossless</span></code> (use
-<a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MCLossless.html#pydicom.uid.JPEG2000MCLossless" title="pydicom.uid.JPEG2000MCLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MCLossless</span></code></a> instead)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponent</span></code> (use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MC.html#pydicom.uid.JPEG2000MC" title="pydicom.uid.JPEG2000MC"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MC</span></code></a> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGBaseline</span></code>: use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGBaseline8Bit.html#pydicom.uid.JPEGBaseline8Bit" title="pydicom.uid.JPEGBaseline8Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGBaseline8Bit</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGExtended</span></code>: use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGExtended12Bit.html#pydicom.uid.JPEGExtended12Bit" title="pydicom.uid.JPEGExtended12Bit"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGExtended12Bit</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLossless</span></code>: use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLosslessSV1.html#pydicom.uid.JPEGLosslessSV1" title="pydicom.uid.JPEGLosslessSV1"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLosslessSV1</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEGLSLossy</span></code>: use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEGLSNearLossless.html#pydicom.uid.JPEGLSNearLossless" title="pydicom.uid.JPEGLSNearLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGLSNearLossless</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponentLossless</span></code>: use
+<a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MCLossless.html#pydicom.uid.JPEG2000MCLossless" title="pydicom.uid.JPEG2000MCLossless"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MCLossless</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JPEG2000MultiComponent</span></code>: use <a class="reference internal" href="../reference/generated/pydicom.uid.JPEG2000MC.html#pydicom.uid.JPEG2000MC" title="pydicom.uid.JPEG2000MC"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEG2000MC</span></code></a></p></li>
 </ul>
 </li>
 <li><p>In v3.0 the value for <code class="docutils literal notranslate"><span class="pre">JPEGLossless</span></code> will change from
@@ -289,6 +292,9 @@ become <code class="docutils literal notranslate"><span class="pre">MultiFrame</
 <li><p><code class="docutils literal notranslate"><span class="pre">PILSupportedCompressedPixelTransferSyntaxes</span></code></p></li>
 </ul>
 </li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir" title="pydicom.dicomdir.DicomDir"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomDir</span></code></a> and the <code class="docutils literal notranslate"><span class="pre">dicomdir</span></code> module are
+deprecated and will be removed in v3.0. Use <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>
+instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1211">#1211</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
