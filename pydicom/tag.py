@@ -115,7 +115,7 @@ def Tag(
             if long_value is None:
                 raise ValueError(
                     f"Unable to create an element tag from '{arg}': "
-                    "unknown DICOM element keyword"
+                    "unknown DICOM element keyword or an invalid int"
                 )
     # Single int parameter
     else:

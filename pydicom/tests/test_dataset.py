@@ -223,6 +223,12 @@ class TestDataset:
         with pytest.raises(ValueError, match=msg):
             'invalid' in self.ds
 
+    def test_contains_ignore(self, contains_ignore):
+        """Test ignoring invalid keys."""
+        with pytest.warns(None) as record:
+            assert 'invalid' not in self.ds
+            assert len(record) == 0
+
     def test_clear(self):
         assert 1 == len(self.ds)
         self.ds.clear()
