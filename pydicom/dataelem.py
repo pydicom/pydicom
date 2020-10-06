@@ -628,7 +628,10 @@ class DataElement:
 
     @property
     def is_private(self):
-        """Return ``True`` if the element's tag is private."""
+        """Return ``True`` if the element's tag is private.
+
+        .. versionadded:: 2.1
+        """
         return self.tag.is_private
 
     @property

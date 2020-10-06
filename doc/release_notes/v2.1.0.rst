@@ -48,7 +48,7 @@ Enhancements
   a known element keyword (:issue:`1014`)
 * Added :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR` config option to allow
   customizing the behavior when an invalid key is used with the
-  :class:`~pydicom.dataset.Dataset` :func:`in<operator.__contains__>`
+  :class:`~pydicom.dataset.Dataset` :func:`in<operator.__contains__>` operator
   (:issue:`1200`)
 * Implemented full support (loading, accessing, modifying, writing) of
   DICOM File-sets and their DICOMDIR files via the
@@ -114,7 +114,6 @@ Fixes
 * Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
   lookup to an input float array
 * Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
-  adding working correctly when the `default` value is ``None`` (:issue:`1215`)
-* Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
-  adding private elements when :attr:`config.enforce_valid_values` is ``True``
-  (:issue:`1215`)
+  adding working correctly when the `default` value is ``None`` and not
+  adding private elements when :attr:`~pydicom.config.enforce_valid_values` is
+  ``True`` (:issue:`1215`)

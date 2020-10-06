@@ -1912,7 +1912,7 @@ class Dataset(dict):
                 )
                 if config.INVALID_KEYWORD_BEHAVIOR == "WARN":
                     warnings.warn(msg)
-                elif config.INVALID_KEYWORD_BEHAVIOR == "ERROR":
+                elif config.INVALID_KEYWORD_BEHAVIOR == "RAISE":
                     raise ValueError(msg)
 
             # name not in dicom dictionary - setting a non-dicom instance

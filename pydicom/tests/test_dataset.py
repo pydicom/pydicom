@@ -176,7 +176,7 @@ class TestDataset:
         assert hasattr(ds, 'SomeVariableName')
         assert 42 == ds.SomeVariableName
 
-    def test_membership(self):
+    def test_membership(self, contains_warn):
         """Dataset: can test if item present by 'if <name> in dataset'."""
         assert 'TreatmentMachineName' in self.ds
         msg = (
@@ -186,7 +186,7 @@ class TestDataset:
         with pytest.warns(UserWarning, match=msg):
             assert 'Dummyname' not in self.ds
 
-    def test_contains(self):
+    def test_contains(self, contains_warn):
         """Dataset: can test if item present by 'if <tag> in dataset'."""
         self.ds.CommandGroupLength = 100  # (0000,0000)
         assert (0x300a, 0xb2) in self.ds
@@ -213,6 +213,15 @@ class TestDataset:
         )
         with pytest.warns(UserWarning, match=msg):
             assert 0x100100010 not in self.ds
+
+    def test_contains_raises(self, contains_raise):
+        """Test raising exception for invalid key."""
+        msg = (
+            r"Invalid value used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            'invalid' in self.ds
 
     def test_clear(self):
         assert 1 == len(self.ds)
@@ -1987,6 +1996,31 @@ class TestFileMeta:
         assert ds_copy.read_encoding == "utf-8"
 
 
+@pytest.fixture
+def contains_raise():
+    """Raise on invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "RAISE"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
+
+
+@pytest.fixture
+def contains_ignore():
+    """Ignore invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "IGNORE"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
+
+
+@pytest.fixture
+def contains_warn():
+    """Warn on invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "WARN"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
 CAMEL_CASE = (
     [  # Shouldn't warn
         "Rows", "_Rows", "Rows_", "rows", "_rows", "__rows", "rows_", "ro_ws",
@@ -2010,7 +2044,7 @@ CAMEL_CASE = (
 def setattr_raise():
     """Raise on Dataset.__setattr__() close keyword matches."""
     original = config.INVALID_KEYWORD_BEHAVIOR
-    config.INVALID_KEYWORD_BEHAVIOR = "ERROR"
+    config.INVALID_KEYWORD_BEHAVIOR = "RAISE"
     yield
     config.INVALID_KEYWORD_BEHAVIOR = original
 
