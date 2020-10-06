@@ -12,7 +12,7 @@ from collections import namedtuple
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type, List
+    TypeVar, Type, List, NamedTuple
 )
 import warnings
 
@@ -330,7 +330,7 @@ class DataElement:
                     bulk_data_threshold=bulk_data_threshold,
                     dump_handler=lambda d: d
                 )
-                for ds in self
+                for ds in self.value
             ]
             json_element['Value'] = value
         elif self.VR == 'PN':
@@ -687,13 +687,20 @@ class DataElement:
         """Return the representation of the element."""
         if self.VR == "SQ":
             return repr(self.value)
-        else:
-            return str(self)
+
+        return str(self)
 
 
-msg = 'tag VR length value value_tell is_implicit_VR is_little_endian'
-RawDataElement = namedtuple('RawDataElement', msg)
-RawDataElement.is_raw = True
+class RawDataElement(NamedTuple):
+    """Container for the data from a raw (mostly) undecoded element."""
+    tag: BaseTag
+    VR: str
+    length: int
+    value: bytes
+    value_tell: int
+    is_implicit_VR: bool
+    is_little_endian: bool
+    is_raw: bool = True
 
 
 # The first and third values of the following elements are always US
