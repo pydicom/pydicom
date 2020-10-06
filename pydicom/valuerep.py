@@ -472,7 +472,7 @@ class IS(int):
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -2**31 < newval < 2**31 and config.enforce_valid_values:
+        if not -2**31 <= newval < 2**31 and config.enforce_valid_values:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
@@ -604,7 +604,6 @@ def _encode_personname(components, encodings):
 
 class PersonName:
     """Representation of the value for an element with VR **PN**."""
-    # Is this supposed to be mutable or immutable?
     def __new__(
         cls: Type[_PersonName], *args, **kwargs
     ) -> Optional[_PersonName]:
