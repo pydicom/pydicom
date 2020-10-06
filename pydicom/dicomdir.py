@@ -12,6 +12,11 @@ class DicomDir(FileDataset):
 
     Derived from :class:`~pydicom.dataset.FileDataset`, but additional methods
     are available, specific to the Directory structure
+
+    .. deprecated:: 2.1
+
+        ``DicomDir`` is deprecated and will be removed in *pydicom* v3.0,
+        use :class:`~pydicom.fileset.FileSet` instead.
     """
 
     def __init__(self,

@@ -748,6 +748,12 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
+        warnings.warn(
+            "The 'DicomDir' class is deprecated and will be removed in v3.0, "
+            "after which 'dcmread()' will return a normal 'FileDataset' "
+            "instance for 'Media Storage Directory' SOP Instances.",
+            DeprecationWarning
+        )
         dataset_class = DicomDir
     else:
         dataset_class = FileDataset
@@ -889,6 +895,11 @@ def read_dicomdir(filename="DICOMDIR"):
 
     This is a wrapper around :func:`dcmread` which gives a default file name.
 
+    .. deprecated:: 2.1
+
+        ``read_dicomdir()`` is deprecated and will be removed in v3.0. Use
+        :func:`~pydicom.filereader.dcmread` instead.
+
     Parameters
     ----------
     filename : str, optional
@@ -904,6 +915,11 @@ def read_dicomdir(filename="DICOMDIR"):
         Raised if filename is not a DICOMDIR file.
     """
     # dcmread will return a DicomDir instance if file is one.
+    warnings.warn(
+        "'read_dicomdir()' is deprecated and will be removed in v3.0, use "
+        "'dcmread()' instead",
+        DeprecationWarning
+    )
 
     # Read the file as usual.
     ds = dcmread(filename)
