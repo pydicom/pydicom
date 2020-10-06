@@ -277,7 +277,7 @@ class TestTag:
         # Can't have second parameter
         msg = r"Unable to create an element tag from '\(\(1, 2\), 1\)'"
         with pytest.raises(TypeError, match=msg):
-             Tag((0x01, 0x02), 0x01)
+            Tag((0x01, 0x02), 0x01)
         pytest.raises(TypeError, Tag, (0x01, 0x02), '0x01')
         pytest.raises(TypeError, Tag, ('0x01', '0x02'), '0x01')
         pytest.raises(TypeError, Tag, ('0x01', '0x02'), 0x01)
@@ -302,7 +302,7 @@ class TestTag:
             r"arguments must be the same type and str or int"
         )
         with pytest.raises(TypeError, match=msg):
-             Tag([1., 2.])
+            Tag([1., 2.])
 
         # Must be 32-bit
         pytest.raises(OverflowError, Tag, [65536, 0])
@@ -316,7 +316,7 @@ class TestTag:
         # Can't have second parameter
         msg = r"Unable to create an element tag from '\(\[1, 2\], 1\)'"
         with pytest.raises(TypeError, match=msg):
-             Tag([0x01, 0x02], 0x01)
+            Tag([0x01, 0x02], 0x01)
 
         pytest.raises(TypeError, Tag, [0x01, 0x02], '0x01')
         pytest.raises(TypeError, Tag, ['0x01', '0x02'], '0x01')
