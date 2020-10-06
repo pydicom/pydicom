@@ -19,7 +19,7 @@ from pydicom import config
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
-from pydicom.filereader import dcmread, read_dataset
+from pydicom.filereader import dcmread, read_dataset, read_dicomdir
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
@@ -1566,3 +1566,13 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+
+
+def test_read_dicomdir_deprecated():
+    """Test deprecation warning for read_dicomdir()."""
+    msg = (
+        r"'read_dicomdir\(\)' is deprecated and will be removed in v3.0, use "
+        r"'dcmread\(\)' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        ds = read_dicomdir(get_testdata_file("DICOMDIR"))
