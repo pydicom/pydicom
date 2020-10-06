@@ -224,7 +224,7 @@
 <h1>pydicom.uid.generate_uid<a class="headerlink" href="#pydicom-uid-generate-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.uid.generate_uid">
-<code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">generate_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'1.2.826.0.1.3680043.8.498.'</span></em>, <em class="sig-param"><span class="n">entropy_srcs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/uid.py#L379"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.generate_uid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">generate_uid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'1.2.826.0.1.3680043.8.498.'</span></em>, <em class="sig-param"><span class="n">entropy_srcs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/uid.py#L379"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.generate_uid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a 64 character UID which starts with <cite>prefix</cite>.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 1.3: </span>When <cite>prefix</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code> a conformant UUID suffix of up to
@@ -233,12 +233,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The UID prefix to use when creating the UID. Default is the <em>pydicom</em>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The UID prefix to use when creating the UID. Default is the <em>pydicom</em>
 root UID <code class="docutils literal notranslate"><span class="pre">'1.2.826.0.1.3680043.8.498.'</span></code>. If not used then a prefix of
 <code class="docutils literal notranslate"><span class="pre">'2.25.'</span></code> will be used with the integer form of a UUID generated
-using the <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.uuid4" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code></a> algorithm.</p></li>
+using the <a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.uuid4" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code></a> algorithm.</p></li>
 <li><p><strong>entropy_srcs</strong> (<em>list of str</em><em>, </em><em>optional</em>) – If <cite>prefix</cite> is used then the <cite>prefix</cite> will be appended with a
-SHA512 hash of the supplied <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> which means the result is
+SHA512 hash of the supplied <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> which means the result is
 deterministic and should make the original data unrecoverable. If
 <cite>entropy_srcs</cite> isn’t used then random data will be appended instead
 (default). If <cite>prefix</cite> is not used then <cite>entropy_srcs</cite> has no effect.</p></li>
@@ -251,7 +251,7 @@ deterministic and should make the original data unrecoverable. If
 <dd class="field-odd"><p><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID">pydicom.uid.UID</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>prefix</cite> is invalid or greater than 63 characters.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>prefix</cite> is invalid or greater than 63 characters.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

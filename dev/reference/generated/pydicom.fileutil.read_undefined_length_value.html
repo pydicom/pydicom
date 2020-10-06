@@ -227,7 +227,7 @@
 <h1>pydicom.fileutil.read_undefined_length_value<a class="headerlink" href="#pydicom-fileutil-read-undefined-length-value" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.fileutil.read_undefined_length_value">
-<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">read_undefined_length_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">delimiter_tag</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">read_size</span><span class="o">=</span><span class="default_value">8192</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileutil.py#L92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">read_undefined_length_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">delimiter_tag</span></em>, <em class="sig-param"><span class="n">defer_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">read_size</span><span class="o">=</span><span class="default_value">8192</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileutil.py#L92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read until <cite>delimiter_tag</cite> and return the value up to that point.</p>
 <p>On completion, the file will be set to the first byte after the delimiter
 and its following four zero bytes.</p>
@@ -235,21 +235,21 @@ and its following four zero bytes.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fp</strong> (<em>file-like</em>) – The file-like to read.</p></li>
-<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if file transfer syntax is little endian, else <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if file transfer syntax is little endian, else <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 <li><p><strong>delimiter_tag</strong> (<a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><em>BaseTag</em></a>) – Tag used as end marker for reading</p></li>
-<li><p><strong>defer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – Size to avoid loading large elements in memory. See
+<li><p><strong>defer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Size to avoid loading large elements in memory. See
 <a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> for more parameter info.</p></li>
-<li><p><strong>read_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of bytes to read at one time.</p></li>
+<li><p><strong>read_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Number of bytes to read at one time.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>delimiter</strong> – The file delimiter.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#EOFError" title="(in Python v3.8)"><strong>EOFError</strong></a> – If EOF is reached before delimiter found.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#EOFError" title="(in Python v3.9)"><strong>EOFError</strong></a> – If EOF is reached before delimiter found.</p>
 </dd>
 </dl>
 </dd></dl>

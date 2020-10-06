@@ -305,7 +305,7 @@ values</p></th>
 </table>
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.get_expected_length">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">'bytes'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/overlay_data_handlers/numpy_handler.py#L86"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">'bytes'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/overlay_data_handlers/numpy_handler.py#L86"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Overlay
 Data</em>.</p>
 <div class="versionadded">
@@ -349,10 +349,10 @@ optional</p></th>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>elem</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> with the keys as the element keywords and values the
+<li><p><strong>elem</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> with the keys as the element keywords and values the
 corresponding element values (such as <code class="docutils literal notranslate"><span class="pre">{'OverlayRows':</span> <span class="pre">512,</span> <span class="pre">...}</span></code>)
 for the elements listed in the table above.</p></li>
-<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">'bytes'</span></code> then returns the expected length of the <em>Overlay Data</em>
+<li><p><strong>unit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">'bytes'</span></code> then returns the expected length of the <em>Overlay Data</em>
 in whole bytes and NOT including an odd length trailing NULL padding
 byte. If <code class="docutils literal notranslate"><span class="pre">'pixels'</span></code> then returns the expected length of the <em>Overlay
 Data</em> in terms of the total number of pixels (default <code class="docutils literal notranslate"><span class="pre">'bytes'</span></code>).</p></li>
@@ -363,14 +363,14 @@ Data</em> in terms of the total number of pixels (default <code class="docutils 
 pixels, excluding the NULL trailing padding byte for odd length data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.get_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/overlay_data_handlers/numpy_handler.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">group</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/overlay_data_handlers/numpy_handler.py#L196"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Overlay Data</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -380,7 +380,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> containing an Overlay Plane module and the
 <em>Overlay Data</em> to be converted.</p></li>
-<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The group part of the <em>Overlay Data</em> element tag, e.g. <code class="docutils literal notranslate"><span class="pre">0x6000</span></code>,
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The group part of the <em>Overlay Data</em> element tag, e.g. <code class="docutils literal notranslate"><span class="pre">0x6000</span></code>,
 <code class="docutils literal notranslate"><span class="pre">0x6010</span></code>, etc. Must be between 0x6000 and 0x60FF.</p></li>
 </ul>
 </dd>
@@ -392,8 +392,8 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If <cite>ds</cite> is missing a required element.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the actual length of the overlay data doesn’t match the expected
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.9)"><strong>AttributeError</strong></a> – If <cite>ds</cite> is missing a required element.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the actual length of the overlay data doesn’t match the expected
     length.</p></li>
 </ul>
 </dd>
@@ -402,7 +402,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/overlay_data_handlers/numpy_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/overlay_data_handlers/numpy_handler.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -411,7 +411,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/overlay_data_handlers/numpy_handler.py#L134"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/overlay_data_handlers/numpy_handler.py#L134"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -454,7 +454,7 @@ values</p></th>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>elem</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> with the keys as the element keywords and values the
+<li><p><strong>elem</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> with the keys as the element keywords and values the
 corresponding element values (such as <code class="docutils literal notranslate"><span class="pre">{'OverlayRows':</span> <span class="pre">512,</span> <span class="pre">...}</span></code>)
 for the elements listed in the table above.</p></li>
 <li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – A 1D array containing the overlay data.</p></li>
@@ -483,7 +483,7 @@ and <a class="reference external" href="http://dicom.nema.org/medical/dicom/curr
 
 <dl class="py function">
 <dt id="pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/overlay_data_handlers/numpy_handler.py#L72"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlay_data_handlers.numpy_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/overlay_data_handlers/numpy_handler.py#L72"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlay_data_handlers.numpy_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>

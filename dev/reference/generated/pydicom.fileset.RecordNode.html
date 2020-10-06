@@ -219,7 +219,7 @@
 <h1>pydicom.fileset.RecordNode<a class="headerlink" href="#pydicom-fileset-recordnode" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.fileset.RecordNode">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.fileset.</code><code class="sig-name descname">RecordNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L169"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.fileset.</code><code class="sig-name descname">RecordNode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L169"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of a DICOMDIR’s directory record.</p>
 <dl class="py attribute">
 <dt id="pydicom.fileset.RecordNode.children">
@@ -240,14 +240,14 @@
 Instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">FileInstance</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">FileInstance</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L181"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L181"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <code class="docutils literal notranslate"><span class="pre">RecordNode</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -291,7 +291,7 @@ Instance.</p>
 <td><p>Return a list of the current node’s ancestors, ordered from nearest to furthest.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.component" title="pydicom.fileset.RecordNode.component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">component</span></code></a></p></td>
-<td><p>Return a File ID component as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for the current node.</p></td>
+<td><p>Return a File ID component as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for the current node.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.depth" title="pydicom.fileset.RecordNode.depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">depth</span></code></a></p></td>
 <td><p>Return the number of nodes to the level below the tree root</p></td>
@@ -309,7 +309,7 @@ Instance.</p>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the current node is the tree’s root node.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.key" title="pydicom.fileset.RecordNode.key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">key</span></code></a></p></td>
-<td><p>Return a unique key for the node’s record as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p></td>
+<td><p>Return a unique key for the node’s record as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.next" title="pydicom.fileset.RecordNode.next"><code class="xref py py-obj docutils literal notranslate"><span class="pre">next</span></code></a></p></td>
 <td><p>Return the node after the current one (if any), or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
@@ -321,7 +321,7 @@ Instance.</p>
 <td><p>Return the node before the current one (if any), or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.record_type" title="pydicom.fileset.RecordNode.record_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record_type</span></code></a></p></td>
-<td><p>Return the record’s <em>Directory Record Type</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p></td>
+<td><p>Return the record’s <em>Directory Record Type</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.fileset.RecordNode.root" title="pydicom.fileset.RecordNode.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
 <td><p>Return the tree’s root node.</p></td>
@@ -330,7 +330,7 @@ Instance.</p>
 </table>
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">leaf</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">leaf</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L207"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a leaf to the tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -351,7 +351,7 @@ to furthest.</p>
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.component">
 <em class="property">property </em><code class="sig-name descname">component</code><a class="headerlink" href="#pydicom.fileset.RecordNode.component" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a File ID component as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for the current node.</p>
+<dd><p>Return a File ID component as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for the current node.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -387,7 +387,7 @@ to furthest.</p>
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.key">
 <em class="property">property </em><code class="sig-name descname">key</code><a class="headerlink" href="#pydicom.fileset.RecordNode.key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a unique key for the node’s record as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
+<dd><p>Return a unique key for the node’s record as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -404,12 +404,12 @@ to furthest.</p>
 
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.prettify">
-<code class="sig-name descname">prettify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent_char</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span> <span class="o">=</span> <span class="default_value">'  '</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L460"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.prettify" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">prettify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent_char</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'  '</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L460"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.prettify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tree structure as a list of pretty strings, starting at
 the current node (unless the current node is the root node).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>indent_char</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The characters to use to indent each level of the tree.</p>
+<dd class="field-odd"><p><strong>indent_char</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The characters to use to indent each level of the tree.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -423,12 +423,12 @@ the current node (unless the current node is the root node).</p>
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.record_type">
 <em class="property">property </em><code class="sig-name descname">record_type</code><a class="headerlink" href="#pydicom.fileset.RecordNode.record_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the record’s <em>Directory Record Type</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
+<dd><p>Return the record’s <em>Directory Record Type</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.remove">
-<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L589"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L589"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a leaf from the tree</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -440,7 +440,7 @@ the current node (unless the current node is the root node).</p>
 
 <dl class="py method">
 <dt id="pydicom.fileset.RecordNode.reverse">
-<code class="sig-name descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileset.py#L603"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.reverse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileset.py#L603"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield nodes up to the level below the tree’s root node.</p>
 </dd></dl>
 

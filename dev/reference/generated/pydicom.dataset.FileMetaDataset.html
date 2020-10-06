@@ -218,7 +218,7 @@
 <h1>pydicom.dataset.FileMetaDataset<a class="headerlink" href="#pydicom-dataset-filemetadataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.dataset.FileMetaDataset">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">FileMetaDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/dataset.py#L2433"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">FileMetaDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/dataset.py#L2457"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains a collection (dictionary) of group 2 DICOM Data Elements.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.0.</span></p>
@@ -227,15 +227,15 @@
 Group 2 (File Meta Information) data elements</p>
 <dl class="py method">
 <dt id="pydicom.dataset.FileMetaDataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/dataset.py#L2442"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/dataset.py#L2466"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a FileMetaDataset</p>
 <p>Parameters are as per <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>; this overrides the super class
 only to check that all are group 2 data elements</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If any data elements are not group 2.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If any data elements are not group 2.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -288,7 +288,7 @@ only to check that all are group 2 data elements</p>
 <td><p>Ensure the file meta info exists and has the correct values for transfer syntax and media storage UIDs.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">formatted_lines</span></code>([element_format, …])</p></td>
-<td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for each element.</p></td>
+<td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for each element.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code>(json_dataset[, bulk_data_uri_handler])</p></td>
 <td><p>Add elements to the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from DICOM JSON format.</p></td>
@@ -309,19 +309,19 @@ only to check that all are group 2 data elements</p>
 <td><p>Return a <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing only elements of a certain group.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">items</span></code>()</p></td>
-<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> items to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> items to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterall</span></code>()</p></td>
 <td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, yielding all the elements.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">keys</span></code>()</p></td>
-<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlay_array</span></code>(group)</p></td>
 <td><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>(key, *args)</p></td>
-<td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.pop" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.pop()</span></code></a> with support for tags and keywords.</p></td>
+<td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.pop" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.pop()</span></code></a> with support for tags and keywords.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">popitem</span></code>()</p></td>
 <td><p>Remove and return a (key, value) pair as a 2-tuple.</p></td>
@@ -342,7 +342,7 @@ only to check that all are group 2 data elements</p>
 <td><p>Set the values for the original transfer syntax and encoding.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setdefault</span></code>(key[, default])</p></td>
-<td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.setdefault()</span></code></a> with support for tags and keywords.</p></td>
+<td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.setdefault()</span></code></a> with support for tags and keywords.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json</span></code>([bulk_data_threshold, …])</p></td>
 <td><p>Return a JSON representation of the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
@@ -351,19 +351,19 @@ only to check that all are group 2 data elements</p>
 <td><p>Return a dictionary representation of the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> conforming to the DICOM JSON Model as described in the DICOM Standard, Part 18, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">Annex F</a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">top</span></code>()</p></td>
-<td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> representation of the top level elements.</p></td>
+<td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> representation of the top level elements.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trait_names</span></code>()</p></td>
-<td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of valid names for auto-completion code.</p></td>
+<td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of valid names for auto-completion code.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(dictionary)</p></td>
-<td><p>Extend <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> to handle DICOM tags and keywords.</p></td>
+<td><p>Extend <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> to handle DICOM tags and keywords.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.FileMetaDataset.validate" title="pydicom.dataset.FileMetaDataset.validate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validate</span></code></a>(init_value)</p></td>
 <td><p>Raise errors if initialization value is not acceptable for file_meta</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code>()</p></td>
-<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> values to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.8)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a>.</p></td>
+<td><p>Return the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> values to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">walk</span></code>(callback[, recursive])</p></td>
 <td><p>Iterate through the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset's</span></code></a> elements and run <cite>callback</cite> on each.</p></td>
@@ -399,16 +399,16 @@ only to check that all are group 2 data elements</p>
 </table>
 <dl class="py method">
 <dt id="pydicom.dataset.FileMetaDataset.validate">
-<em class="property">static </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">init_value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/dataset.py#L2458"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">init_value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/dataset.py#L2482"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.FileMetaDataset.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raise errors if initialization value is not acceptable for file_meta</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>init_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <a class="reference external" href="tag:data">tag:data</a> element pairs to initialize a file meta dataset</p>
+<dd class="field-odd"><p><strong>init_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>Dataset</em></a>) – The <a class="reference external" href="tag:data">tag:data</a> element pairs to initialize a file meta dataset</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If any data elements passed are not group 2.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If the passed argument is not a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If any data elements passed are not group 2.</p></li>
 </ul>
 </dd>
 </dl>

@@ -223,7 +223,7 @@
 <h1>pydicom.datadict.add_private_dict_entry<a class="headerlink" href="#pydicom-datadict-add-private-dict-entry" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.datadict.add_private_dict_entry">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_private_dict_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">private_creator</span></em>, <em class="sig-param"><span class="n">tag</span></em>, <em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">VM</span><span class="o">=</span><span class="default_value">'1'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/datadict.py#L148"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_private_dict_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_private_dict_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">private_creator</span></em>, <em class="sig-param"><span class="n">tag</span></em>, <em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">description</span></em>, <em class="sig-param"><span class="n">VM</span><span class="o">=</span><span class="default_value">'1'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/datadict.py#L148"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_private_dict_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the private DICOM dictionary with a new entry.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -231,16 +231,16 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>private_creator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The private creator for the new entry.</p></li>
-<li><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The tag number for the new dictionary entry. Note that the
+<li><p><strong>private_creator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The private creator for the new entry.</p></li>
+<li><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The tag number for the new dictionary entry. Note that the
 2 high bytes of the element part of the tag are ignored.</p></li>
-<li><p><strong>VR</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – DICOM value representation.</p></li>
-<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The descriptive name used in printing the entry.</p></li>
-<li><p><strong>VM</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – DICOM value multiplicity. If not specified, then <code class="docutils literal notranslate"><span class="pre">'1'</span></code> is used.</p></li>
+<li><p><strong>VR</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – DICOM value representation.</p></li>
+<li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The descriptive name used in printing the entry.</p></li>
+<li><p><strong>VM</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – DICOM value multiplicity. If not specified, then <code class="docutils literal notranslate"><span class="pre">'1'</span></code> is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the tag is a non-private tag.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the tag is a non-private tag.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

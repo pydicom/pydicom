@@ -388,6 +388,10 @@ in version 2020d of the DICOM Standard</p></li>
 <a class="reference internal" href="../reference/generated/pydicom.config.INVALID_KEYWORD_BEHAVIOR.html#pydicom.config.INVALID_KEYWORD_BEHAVIOR" title="pydicom.config.INVALID_KEYWORD_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEYWORD_BEHAVIOR</span></code></a> config option to allow
 customizing the behavior when a camel case variable name is used that isn’t
 a known element keyword (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1014">#1014</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.config.INVALID_KEY_BEHAVIOR.html#pydicom.config.INVALID_KEY_BEHAVIOR" title="pydicom.config.INVALID_KEY_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEY_BEHAVIOR</span></code></a> config option to allow
+customizing the behavior when an invalid key is used with the
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Implemented full support (loading, accessing, modifying, writing) of
 DICOM File-sets and their DICOMDIR files via the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/9">#9</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/243">#243</a>,
@@ -408,9 +412,6 @@ to use the new UID keywords. Variables with <code class="docutils literal notran
 become <code class="docutils literal notranslate"><span class="pre">MultiFrame</span></code>, those with <code class="docutils literal notranslate"><span class="pre">and</span></code> in them become <code class="docutils literal notranslate"><span class="pre">And</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceQRStorage</span></code> becomes
 <code class="docutils literal notranslate"><span class="pre">DICOSQuadrupoleResonanceStorage</span></code>.</p></li>
-<li><p>Invalid values used with the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
-<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> now raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> rather than
-returning <code class="docutils literal notranslate"><span class="pre">False</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Data dictionaries updated to version 2020c of the DICOM Standard</p></li>
 <li><p>The following UID constants are deprecated and will be removed in v2.2:</p>
 <ul>
@@ -455,12 +456,16 @@ pixel data to avoid erroring out on embedded sequence delimiter
 connection is available (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1156">#1156</a>)</p></li>
 <li><p>Fixed GDCM &lt; v2.8.8 not returning the pixel array for datasets not read from
 a file-like (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1153">#1153</a>)</p></li>
-<li><p>Raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
+<li><p>Raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> is called with wrong argument</p></li>
 <li><p>Gracefully handle empty Specific Character Set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1190">#1190</a>)</p></li>
 <li><p>Fixed empty ambiguous VR elements raising an exception (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1193">#1193</a>)</p></li>
 <li><p>Allow <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> to apply VOI
 lookup to an input float array</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.setdefault" title="pydicom.dataset.Dataset.setdefault"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.setdefault()</span></code></a> not
+adding working correctly when the <cite>default</cite> value is <code class="docutils literal notranslate"><span class="pre">None</span></code> and not
+adding private elements when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
+<code class="docutils literal notranslate"><span class="pre">True</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1215">#1215</a>)</p></li>
 </ul>
 </div>
 </div>

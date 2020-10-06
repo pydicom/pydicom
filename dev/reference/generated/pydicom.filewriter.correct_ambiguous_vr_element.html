@@ -243,7 +243,7 @@
 <h1>pydicom.filewriter.correct_ambiguous_vr_element<a class="headerlink" href="#pydicom-filewriter-correct-ambiguous-vr-element" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.filewriter.correct_ambiguous_vr_element">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/filewriter.py#L139"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">correct_ambiguous_vr_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/filewriter.py#L139"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.correct_ambiguous_vr_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Attempt to correct the ambiguous VR element <cite>elem</cite>.</p>
 <p>When it’s not possible to correct the VR, the element will be returned
 unchanged. Currently the only ambiguous VR elements not corrected for are
@@ -255,7 +255,7 @@ using the <a class="reference internal" href="pydicom.values.convert_numbers.htm
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>elem</strong> (<a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><em>dataelem.DataElement</em></a>) – The element with an ambiguous VR.</p></li>
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The dataset containing <cite>elem</cite>.</p></li>
-<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – The byte ordering of the values in the dataset.</p></li>
+<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – The byte ordering of the values in the dataset.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

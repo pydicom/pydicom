@@ -220,7 +220,7 @@
 <h1>pydicom.pixel_data_handlers.convert_color_space<a class="headerlink" href="#pydicom-pixel-data-handlers-convert-color-space" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.convert_color_space">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">current</span></em>, <em class="sig-param"><span class="n">desired</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/util.py#L436"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.convert_color_space" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">convert_color_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">current</span></em>, <em class="sig-param"><span class="n">desired</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/util.py#L436"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.convert_color_space" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert the image(s) in <cite>arr</cite> from one color space to another.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 1.4: </span>Added support for <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code></p>
@@ -231,10 +231,10 @@
 <li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – The image(s) as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> with
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.19)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a> (frames, rows, columns, 3)
 or (rows, columns, 3).</p></li>
-<li><p><strong>current</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The current color space, should be a valid value for (0028,0004)
+<li><p><strong>current</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The current color space, should be a valid value for (0028,0004)
 <em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'YBR_FULL_422'</span></code>.</p></li>
-<li><p><strong>desired</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The desired color space, should be a valid value for (0028,0004)
+<li><p><strong>desired</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The desired color space, should be a valid value for (0028,0004)
 <em>Photometric Interpretation</em>. One of <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>,
 <code class="docutils literal notranslate"><span class="pre">'YBR_FULL_422'</span></code>.</p></li>
 </ul>

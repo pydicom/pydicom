@@ -231,16 +231,16 @@
 <h1>pydicom.datadict.add_dict_entries<a class="headerlink" href="#pydicom-datadict-add-dict-entries" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.datadict.add_dict_entries">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_dict_entries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_entries_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/datadict.py#L99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_dict_entries" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">add_dict_entries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">new_entries_dict</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/datadict.py#L99"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.add_dict_entries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the DICOM dictionary with new non-private entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>new_entries_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> of form:
+<dd class="field-odd"><p><strong>new_entries_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> of form:
 <code class="docutils literal notranslate"><span class="pre">{tag:</span> <span class="pre">(VR,</span> <span class="pre">VM,</span> <span class="pre">description,</span> <span class="pre">is_retired,</span> <span class="pre">keyword),</span> <span class="pre">...}</span></code>
 where parameters are as described in <a class="reference internal" href="pydicom.datadict.add_dict_entry.html#pydicom.datadict.add_dict_entry" title="pydicom.datadict.add_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_dict_entry()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If one of the entries is a private tag.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If one of the entries is a private tag.</p>
 </dd>
 </dl>
 <div class="admonition seealso">

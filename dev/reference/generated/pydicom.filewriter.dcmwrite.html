@@ -243,7 +243,7 @@
 <h1>pydicom.filewriter.dcmwrite<a class="headerlink" href="#pydicom-filewriter-dcmwrite" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.filewriter.dcmwrite">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">write_like_original</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/filewriter.py#L799"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">dcmwrite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">write_like_original</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/filewriter.py#L799"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.dcmwrite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write <cite>dataset</cite> to the <cite>filename</cite> specified.</p>
 <p>If <cite>write_like_original</cite> is <code class="docutils literal notranslate"><span class="pre">True</span></code> then <cite>dataset</cite> will be written as is
 (after minimal validation checking) and may or may not contain all or parts
@@ -331,10 +331,10 @@ value for <code class="docutils literal notranslate"><span class="pre">dataset.f
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em>) – Name of file or the file-like to write the new DICOM file to.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>PathLike</em><em> or </em><em>file-like</em>) – Name of file or the file-like to write the new DICOM file to.</p></li>
 <li><p><strong>dataset</strong> (<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><em>pydicom.dataset.FileDataset</em></a>) – Dataset holding the DICOM information; e.g. an object read with
 <a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p></li>
-<li><p><strong>write_like_original</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), preserves the following information from
+<li><p><strong>write_like_original</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), preserves the following information from
 the Dataset (and may result in a non-conformant file):</p>
 <ul>
 <li><p>preamble – if the original file has no preamble then none will be
@@ -357,9 +357,9 @@ with explicit lengths for all elements.</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If either <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> or <code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.9)"><strong>AttributeError</strong></a> – If either <code class="docutils literal notranslate"><span class="pre">dataset.is_implicit_VR</span></code> or <code class="docutils literal notranslate"><span class="pre">dataset.is_little_endian</span></code>
     have not been set.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If group 2 elements are in <code class="docutils literal notranslate"><span class="pre">dataset</span></code> rather than
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If group 2 elements are in <code class="docutils literal notranslate"><span class="pre">dataset</span></code> rather than
     <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code>, or if a preamble is given but is not 128 bytes
     long, or if Transfer Syntax is a compressed type and pixel data is not
     compressed.</p></li>

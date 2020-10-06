@@ -224,7 +224,7 @@
 <h1>pydicom.encaps.generate_pixel_data_fragment<a class="headerlink" href="#pydicom-encaps-generate-pixel-data-fragment" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.generate_pixel_data_fragment">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/encaps.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/encaps.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield the encapsulated pixel data fragments.</p>
 <p>For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) <em>Pixel
 Data</em> element is encoded in an encapsulated format.</p>
@@ -258,7 +258,7 @@ item. <code class="docutils literal notranslate"><span class="pre">fp.is_little_
 <dd class="field-even"><p><em>bytes</em> – A pixel data fragment.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the data contains an item with an undefined length or an unknown
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the data contains an item with an undefined length or an unknown
     tag.</p>
 </dd>
 </dl>

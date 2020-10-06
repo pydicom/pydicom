@@ -252,7 +252,7 @@ package to decode <em>Pixel Data</em>.</p>
 </table>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.jpeg_ls_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L73"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L73"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>Pixel Data</em> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -263,9 +263,9 @@ package to decode <em>Pixel Data</em>.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.8)"><strong>ImportError</strong></a> – If the required packages are not available.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.8)"><strong>NotImplementedError</strong></a> – If the transfer syntax is not supported.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If the pixel data type is unsupported.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.9)"><strong>ImportError</strong></a> – If the required packages are not available.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><strong>NotImplementedError</strong></a> – If the transfer syntax is not supported.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If the pixel data type is unsupported.</p></li>
 </ul>
 </dd>
 </dl>
@@ -273,13 +273,13 @@ package to decode <em>Pixel Data</em>.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.jpeg_ls_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L37"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L37"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.jpeg_ls_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L42"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L42"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -287,7 +287,7 @@ RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.jpeg_ls_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L51"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dicom_dataset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L51"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -295,7 +295,7 @@ to RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.jpeg_ls_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L61"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.jpeg_ls_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/jpeg_ls_handler.py#L61"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.jpeg_ls_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

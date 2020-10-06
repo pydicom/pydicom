@@ -226,13 +226,13 @@
 <h1>pydicom.dataelem.DataElement_from_raw<a class="headerlink" href="#pydicom-dataelem-dataelement-from-raw" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.dataelem.DataElement_from_raw">
-<code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">DataElement_from_raw</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_data_element</span></em>, <em class="sig-param"><span class="n">encoding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/dataelem.py#L677"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement_from_raw" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">DataElement_from_raw</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_data_element</span></em>, <em class="sig-param"><span class="n">encoding</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/dataelem.py#L685"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.DataElement_from_raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> created from <cite>raw_data_element</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>raw_data_element</strong> (<em>RawDataElement namedtuple</em>) – The raw data to convert to a <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a>.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – The character encoding of the raw data.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The character encoding of the raw data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -242,7 +242,7 @@
 <dd class="field-odd"><p><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">DataElement</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If <cite>raw_data_element</cite> belongs to an unknown non-private tag and
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.9)"><strong>KeyError</strong></a> – If <cite>raw_data_element</cite> belongs to an unknown non-private tag and
     <cite>config.enforce_valid_values</cite> is set.</p>
 </dd>
 </dl>

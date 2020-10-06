@@ -221,7 +221,7 @@
 <h1>pydicom.encaps.encapsulate<a class="headerlink" href="#pydicom-encaps-encapsulate" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.encapsulate">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">encapsulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span></em>, <em class="sig-param"><span class="n">fragments_per_frame</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">has_bot</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/encaps.py#L638"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.encapsulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">encapsulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span></em>, <em class="sig-param"><span class="n">fragments_per_frame</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">has_bot</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/encaps.py#L638"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.encapsulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return encapsulated <cite>frames</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -242,8 +242,8 @@ final fragment of each frame may be padded with <code class="docutils literal no
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>frames</strong> (<em>list of bytes</em>) – The frame data to encapsulate, one frame per item.</p></li>
-<li><p><strong>fragments_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – The number of fragments to use for each frame (default <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
-<li><p><strong>has_bot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> to include values in the Basic Offset Table, <code class="docutils literal notranslate"><span class="pre">False</span></code>
+<li><p><strong>fragments_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – The number of fragments to use for each frame (default <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
+<li><p><strong>has_bot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> to include values in the Basic Offset Table, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise (default <code class="docutils literal notranslate"><span class="pre">True</span></code>). If <cite>fragments_per_frame</cite> is not <code class="docutils literal notranslate"><span class="pre">1</span></code>
 then it’s strongly recommended that this be <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
@@ -252,7 +252,7 @@ then it’s strongly recommended that this be <code class="docutils literal notr
 <dd class="field-even"><p>The encapsulated pixel data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 <p class="rubric">References</p>

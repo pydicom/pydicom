@@ -220,7 +220,7 @@
 <h1>pydicom.pixel_data_handlers.apply_windowing<a class="headerlink" href="#pydicom-pixel-data-handlers-apply-windowing" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.apply_windowing">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">apply_windowing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/util.py#L263"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_windowing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">apply_windowing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/util.py#L263"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_windowing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -237,7 +237,7 @@ of <code class="docutils literal notranslate"><span class="pre">np.uint8</span><
 (0028,1051) <em>Window Width</em> are present then returns an array of
 <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>. If neither are present then <cite>arr</cite> will be returned
 unchanged.</p></li>
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Where the VOI LUT Module contains multiple possible views, this is
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Where the VOI LUT Module contains multiple possible views, this is
 the index of the view to return (default <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
 </ul>
 </dd>

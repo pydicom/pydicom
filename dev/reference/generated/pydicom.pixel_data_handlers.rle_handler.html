@@ -316,7 +316,7 @@ values</p></th>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to RGB.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rle_encode_frame</span></code></a>(arr)</p></td>
-<td><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> image frame as RLE encoded <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p></td>
+<td><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> image frame as RLE encoded <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB" title="pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></code></a>(ds)</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed to RGB.</p></td>
@@ -328,14 +328,14 @@ values</p></th>
 </table>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.get_pixeldata">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">rle_segment_order</span><span class="o">=</span><span class="default_value">'&gt;'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L97"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">get_pixeldata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">rle_segment_order</span><span class="o">=</span><span class="default_value">'&gt;'</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L97"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Pixel Data</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> containing an Image Pixel module and the RLE
 encoded <em>Pixel Data</em> to be converted.</p></li>
-<li><p><strong>rle_segment_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The order of segments used by the RLE decoder when dealing with <em>Bits
+<li><p><strong>rle_segment_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The order of segments used by the RLE decoder when dealing with <em>Bits
 Allocated</em> &gt; 8. Each RLE segment contains 8-bits of the pixel data,
 and segments are supposed to be ordered from MSB to LSB. A value of
 <code class="docutils literal notranslate"><span class="pre">'&gt;'</span></code> means interpret the segments as being in big endian order
@@ -352,9 +352,9 @@ is non-conformant.</p></li>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.8)"><strong>AttributeError</strong></a> – If <cite>ds</cite> is missing a required element.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.8)"><strong>NotImplementedError</strong></a> – If <cite>ds</cite> contains pixel data in an unsupported format.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the actual length of the pixel data doesn’t match the expected
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AttributeError" title="(in Python v3.9)"><strong>AttributeError</strong></a> – If <cite>ds</cite> is missing a required element.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><strong>NotImplementedError</strong></a> – If <cite>ds</cite> contains pixel data in an unsupported format.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the actual length of the pixel data doesn’t match the expected
     length.</p></li>
 </ul>
 </dd>
@@ -363,13 +363,13 @@ is non-conformant.</p></li>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.is_available">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L62"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L62"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L79"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">needs_to_convert_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L79"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -377,9 +377,9 @@ RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">rle_encode_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L377"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">rle_encode_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L377"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> image frame as RLE encoded
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
 </div>
@@ -394,14 +394,14 @@ specified by the DICOM Standard, Part 5,
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_G.html">Annex G</a>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.8)">bytearray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)">bytearray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">should_change_PhotometricInterpretation_to_RGB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L88"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -409,7 +409,7 @@ to RGB.</p>
 
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/pixel_data_handlers/rle_handler.py#L67"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.rle_handler.</code><code class="sig-name descname">supports_transfer_syntax</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transfer_syntax</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/pixel_data_handlers/rle_handler.py#L67"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.rle_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>transfer_syntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

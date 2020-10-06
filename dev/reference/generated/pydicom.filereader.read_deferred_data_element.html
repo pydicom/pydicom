@@ -232,16 +232,16 @@
 <h1>pydicom.filereader.read_deferred_data_element<a class="headerlink" href="#pydicom-filereader-read-deferred-data-element" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.filereader.read_deferred_data_element">
-<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_deferred_data_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileobj_type</span></em>, <em class="sig-param"><span class="n">filename_or_obj</span></em>, <em class="sig-param"><span class="n">timestamp</span></em>, <em class="sig-param"><span class="n">raw_data_elem</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/filereader.py#L927"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_deferred_data_element" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.filereader.</code><code class="sig-name descname">read_deferred_data_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileobj_type</span></em>, <em class="sig-param"><span class="n">filename_or_obj</span></em>, <em class="sig-param"><span class="n">timestamp</span></em>, <em class="sig-param"><span class="n">raw_data_elem</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/filereader.py#L927"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filereader.read_deferred_data_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the previously deferred value from the file into memory
 and return a raw data element.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fileobj_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a>) – The type of the original file object.</p></li>
-<li><p><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>file-like</em>) – The filename of the original file if one exists, or the file-like
+<li><p><strong>fileobj_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><em>type</em></a>) – The type of the original file object.</p></li>
+<li><p><strong>filename_or_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>file-like</em>) – The filename of the original file if one exists, or the file-like
 object where the data element persists.</p></li>
-<li><p><strong>timestamp</strong> (<em>time</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The time the original file has been read, if not a file-like.</p></li>
+<li><p><strong>timestamp</strong> (<em>time</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – The time the original file has been read, if not a file-like.</p></li>
 <li><p><strong>raw_data_elem</strong> (<a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><em>dataelem.RawDataElement</em></a>) – The raw data element with no value set.</p></li>
 </ul>
 </dd>
@@ -253,10 +253,10 @@ object where the data element persists.</p></li>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.8)"><strong>IOError</strong></a> – If <cite>filename_or_obj</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.8)"><strong>IOError</strong></a> – If <cite>filename_or_obj</cite> is a filename and the corresponding file does
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.9)"><strong>IOError</strong></a> – If <cite>filename_or_obj</cite> is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IOError" title="(in Python v3.9)"><strong>IOError</strong></a> – If <cite>filename_or_obj</cite> is a filename and the corresponding file does
     not exist.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the VR or tag of <cite>raw_data_elem</cite> does not match the read value.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the VR or tag of <cite>raw_data_elem</cite> does not match the read value.</p></li>
 </ul>
 </dd>
 </dl>

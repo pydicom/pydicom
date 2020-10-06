@@ -227,15 +227,15 @@
 <h1>pydicom.fileutil.find_delimiter<a class="headerlink" href="#pydicom-fileutil-find-delimiter" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.fileutil.find_delimiter">
-<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">find_delimiter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">delimiter</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">read_size</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">rewind</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/fileutil.py#L313"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.find_delimiter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">find_delimiter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">delimiter</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">read_size</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">rewind</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/fileutil.py#L313"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.find_delimiter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return file position where 4-byte delimiter is located.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The delimiter to search for.</p></li>
-<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if little endian, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></li>
-<li><p><strong>read_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – See <a class="reference internal" href="pydicom.fileutil.find_bytes.html#pydicom.fileutil.find_bytes" title="pydicom.fileutil.find_bytes"><code class="xref py py-func docutils literal notranslate"><span class="pre">find_bytes()</span></code></a> for parameter info.</p></li>
-<li><p><strong>rewind</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to rewind to initial position after searching.</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The delimiter to search for.</p></li>
+<li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if little endian, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></li>
+<li><p><strong>read_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – See <a class="reference internal" href="pydicom.fileutil.find_bytes.html#pydicom.fileutil.find_bytes" title="pydicom.fileutil.find_bytes"><code class="xref py py-func docutils literal notranslate"><span class="pre">find_bytes()</span></code></a> for parameter info.</p></li>
+<li><p><strong>rewind</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Flag to rewind to initial position after searching.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -243,7 +243,7 @@
 delimiter, otherwise the byte offset to the delimiter.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>

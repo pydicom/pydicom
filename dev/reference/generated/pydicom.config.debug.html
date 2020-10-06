@@ -128,6 +128,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
 </ul>
 </li>
@@ -230,17 +231,17 @@
 <h1>pydicom.config.debug<a class="headerlink" href="#pydicom-config-debug" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.config.debug">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug_on</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">default_handler</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/config.py#L320"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.debug" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">debug</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug_on</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">default_handler</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/config.py#L350"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.debug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turn on/off debugging of DICOM file reading and writing.</p>
 <p>When debugging is on, file location and details about the elements read at
 that location are logged to the ‘pydicom’ logger using Python’s
-<a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a>
+<a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a>
 module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>debug_on</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then turn on debugging, <code class="docutils literal notranslate"><span class="pre">False</span></code> to turn off.</p></li>
-<li><p><strong>default_handler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then use <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.StreamHandler</span></code></a> as the
+<li><p><strong>debug_on</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then turn on debugging, <code class="docutils literal notranslate"><span class="pre">False</span></code> to turn off.</p></li>
+<li><p><strong>default_handler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then use <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.StreamHandler</span></code></a> as the
 handler for log messages.</p></li>
 </ul>
 </dd>

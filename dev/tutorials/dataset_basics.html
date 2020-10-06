@@ -234,7 +234,7 @@
 <em>pydicom</em>: <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/data/test_files/CT_small.dcm">CT_small.dcm</a>.
 Starting with version 1.4 you can get the path to the file
 by using the <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a> function to return the
-path as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (your path may vary):</p>
+path as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (your path may vary):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span>
@@ -340,7 +340,7 @@ no matter what the contents of the file are:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
+<p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
@@ -459,7 +459,7 @@ on you’ll see how you can use the keyword to do more than accessing the value.
 </pre></div>
 </div>
 <p>The items for multi-valued elements can be accessed using the standard Python
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="go">&#39;PRIMARY&#39;</span>
 </pre></div>
@@ -512,7 +512,7 @@ elements:</p>
 </div>
 <p>The main difference between sequence and non-sequence elements is that their
 value is a list of zero or more  <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> objects,
-which can be accessed using the standard Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+which can be accessed using the standard Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">)</span>
 <span class="go">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -591,8 +591,8 @@ value:</p>
 <span class="go">(0010, 0010) Patient&#39;s Name                      PN: &#39;Citizen^Snips&#39;</span>
 </pre></div>
 </div>
-<p>Multi-valued elements can be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> or modified using the
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<p>Multi-valued elements can be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> or modified using the
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ORIGINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">,</span> <span class="s1">&#39;LOCALIZER&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
 <span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;LOCALIZER&#39;]</span>
@@ -647,7 +647,7 @@ written to file, but will have an empty value and zero length.</p>
 value to use for the new element.</p>
 <p>Let’s say we wanted to add the (0028,1050) <em>Window Center</em> standard element. We
 already know the tag is (0028,1050), but how we get the VR and how do we
-know the Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> to use for the value?</p>
+know the Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> to use for the value?</p>
 <p>There are two ways to get an element’s VR:</p>
 <ul class="simple">
 <li><p>You can use <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6 of the DICOM Standard</a>
@@ -660,8 +660,8 @@ function to look it up</p></li>
 <span class="go">&#39;DS&#39;</span>
 </pre></div>
 </div>
-<p>The Python type to use for a given VR is given by <a class="reference internal" href="../guides/element_value_types.html"><span class="doc">this table</span></a>. For <strong>DS</strong> we can use a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>,
-<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, so to add the new element:</p>
+<p>The Python type to use for a given VR is given by <a class="reference internal" href="../guides/element_value_types.html"><span class="doc">this table</span></a>. For <strong>DS</strong> we can use a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, so to add the new element:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add_new</span><span class="p">([</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">],</span> <span class="s1">&#39;DS&#39;</span><span class="p">,</span> <span class="s2">&quot;100.0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
@@ -682,7 +682,7 @@ and <em>pydicom</em> will do the lookup for you:</p>
 </pre></div>
 </div>
 <p>Notice how we can also use the element keyword with the Python
-<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator to see if a standard element is in
+<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator to see if a standard element is in
 the dataset? This also works with element tags, so private and repeating group
 elements are also covered:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
@@ -712,7 +712,7 @@ you can use the same methods on them as well.</p>
 </div>
 <div class="section" id="deleting-elements">
 <h3>Deleting elements<a class="headerlink" href="#deleting-elements" title="Permalink to this headline">¶</a></h3>
-<p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
+<p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
 operator in combination with the element tag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span>
@@ -726,7 +726,7 @@ operator in combination with the element tag:</p>
 </pre></div>
 </div>
 <p>And you can remove items from sequences and multi-valued elements using your
-preferred <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> method:</p>
+preferred <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
 <span class="go">2</span>

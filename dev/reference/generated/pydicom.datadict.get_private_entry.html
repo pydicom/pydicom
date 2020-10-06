@@ -223,14 +223,14 @@
 <h1>pydicom.datadict.get_private_entry<a class="headerlink" href="#pydicom-datadict-get-private-entry" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.datadict.get_private_entry">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">get_private_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span></em>, <em class="sig-param"><span class="n">private_creator</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a289cd2b/pydicom/datadict.py#L495"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.get_private_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">get_private_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span></em>, <em class="sig-param"><span class="n">private_creator</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1d37170/pydicom/datadict.py#L495"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.get_private_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an entry from the private dictionary corresponding to <cite>tag</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The tag for the element whose entry is to be retrieved. Only entries
+<li><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The tag for the element whose entry is to be retrieved. Only entries
 in the private dictionary will be checked.</p></li>
-<li><p><strong>private_creator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the private creator.</p></li>
+<li><p><strong>private_creator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the private creator.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -240,7 +240,7 @@ in the private dictionary will be checked.</p></li>
 <dd class="field-odd"><p>tuple of str</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.8)"><strong>KeyError</strong></a> – If the tag or private creator is not present in the private dictionary.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.9)"><strong>KeyError</strong></a> – If the tag or private creator is not present in the private dictionary.</p>
 </dd>
 </dl>
 <div class="admonition seealso">
