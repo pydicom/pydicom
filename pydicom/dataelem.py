@@ -8,7 +8,6 @@ A DataElement has a tag,
 """
 
 import base64
-from collections import namedtuple
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
@@ -46,7 +45,7 @@ BINARY_VR_VALUES = [
 
 def empty_value_for_VR(
     VR: str, raw: bool = False
-) -> Optional[Union[bytes, List[str], str]]:
+) -> Union[bytes, List[str], str, None]:
     """Return the value for an empty element for `VR`.
 
     .. versionadded:: 1.4
@@ -712,7 +711,7 @@ def DataElement_from_raw(
 
     Parameters
     ----------
-    raw_data_element : RawDataElement namedtuple
+    raw_data_element : RawDataElement
         The raw data to convert to a :class:`DataElement`.
     encoding : list of str, optional
         The character encoding of the raw data.
