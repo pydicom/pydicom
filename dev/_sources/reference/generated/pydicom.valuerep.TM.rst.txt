@@ -36,7 +36,6 @@
       ~TM.microsecond
       ~TM.min
       ~TM.minute
-      ~TM.original_string
       ~TM.resolution
       ~TM.second
       ~TM.tzinfo

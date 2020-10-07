@@ -41,7 +41,6 @@
       ~DA.max
       ~DA.min
       ~DA.month
-      ~DA.original_string
       ~DA.resolution
       ~DA.year
    

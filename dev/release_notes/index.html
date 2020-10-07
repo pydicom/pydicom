@@ -405,10 +405,6 @@ DICOM File-sets and their DICOMDIR files via the
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
 per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1161">#1161</a>)</p></li>
-<li><p>Invalid values used with the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
-<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator now raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>
-rather than returning <code class="docutils literal notranslate"><span class="pre">False</span></code>, if you need the old behavior use
-<a class="reference external" href="https://docs.python.org/3/library/functions.html#hasattr" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">hasattr()</span></code></a> instead (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Data dictionaries updated to version 2020d of the DICOM Standard</p></li>
 <li><p>Updated a handful of the SOP Class variable names in
 <code class="docutils literal notranslate"><span class="pre">_storage_sopclass_uids</span></code>

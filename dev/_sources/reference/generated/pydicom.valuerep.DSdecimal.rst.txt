@@ -77,7 +77,6 @@
    .. autosummary::
    
       ~DSdecimal.imag
-      ~DSdecimal.original_string
       ~DSdecimal.real
    
    

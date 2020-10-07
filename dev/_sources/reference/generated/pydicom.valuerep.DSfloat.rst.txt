@@ -29,7 +29,6 @@
    .. autosummary::
    
       ~DSfloat.imag
-      ~DSfloat.original_string
       ~DSfloat.real
    
    

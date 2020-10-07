@@ -62,10 +62,6 @@ Changes
 * Reading and adding unknown non-private tags now does not raise an exception
   per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
-* Invalid values used with the :class:`~pydicom.dataset.Dataset`
-  :func:`in<operator.__contains__>` operator now raise :class:`ValueError`
-  rather than returning ``False``, if you need the old behavior use
-  :func:`hasattr` instead (:issue:`1200`)
 * Data dictionaries updated to version 2020d of the DICOM Standard
 * Updated a handful of the SOP Class variable names in
   ``_storage_sopclass_uids``

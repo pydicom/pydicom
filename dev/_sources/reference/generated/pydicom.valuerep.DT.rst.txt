@@ -59,7 +59,6 @@
       ~DT.min
       ~DT.minute
       ~DT.month
-      ~DT.original_string
       ~DT.resolution
       ~DT.second
       ~DT.tzinfo
