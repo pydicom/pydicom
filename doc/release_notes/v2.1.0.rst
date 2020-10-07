@@ -106,9 +106,6 @@ Changes
   ``ndarray`` (:issue:`1181`)
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
   deprecated, the default handler will always be used.
-* The `file_value_tell` keyword parameter for
-  :class:`~pydicom.dataelem.DataElement` is deprecated and will be removed in
-  v2.2
 
 Fixes
 .....

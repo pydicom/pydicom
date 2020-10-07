@@ -174,11 +174,6 @@ class DataElement:
     ) -> None:
         """Create a new :class:`DataElement`.
 
-        .. deprecated:: 2.1
-
-            The `file_value_tell` keyword parameter is deprecated and will be
-            removed in v2.2
-
         Parameters
         ----------
         tag : int or str or 2-tuple of int
@@ -195,11 +190,8 @@ class DataElement:
             * a number
             * a :class:`list` or :class:`tuple` with all strings or all numbers
             * a multi-value string with backslash separator
-
-        file_value_tell : int or None
-            Used internally by :class:`~pydicom.dataset.Dataset` to
-            store the write position for the ``ReplaceDataElementValue()``
-            method. Default is ``None``.
+        file_value_tell : int, optional
+            The byte offset to the start of the encoded element value.
         is_undefined_length : bool
             Used internally to store whether the length field for this element
             was ``0xFFFFFFFF``, i.e. 'undefined length'. Default is ``False``.
