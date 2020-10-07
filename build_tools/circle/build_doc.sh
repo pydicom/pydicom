@@ -92,7 +92,7 @@ sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
     texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended\
     latexmk
 
-python3 -m venv venv
+python3.8 -m venv venv
 . venv/bin/activate
 python --version
 pip install wheel setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme numpydoc sphinx-gallery sphinx-issues~=1.0 sphinx-copybutton --progress-bar off
