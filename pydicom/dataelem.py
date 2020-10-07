@@ -44,7 +44,9 @@ BINARY_VR_VALUES = [
 ]
 
 
-def empty_value_for_VR(VR, raw=False):
+def empty_value_for_VR(
+    VR: str, raw: bool = False
+) -> Optional[Union[bytes, List[str], str]]:
     """Return the value for an empty element for `VR`.
 
     .. versionadded:: 1.4
@@ -86,7 +88,7 @@ def empty_value_for_VR(VR, raw=False):
     return None
 
 
-def _is_bytes(val):
+def _is_bytes(val: object) -> bool:
     """Return True only if `val` is of type `bytes`."""
     return isinstance(val, bytes)
 
@@ -165,7 +167,7 @@ class DataElement:
         self,
         tag: Union[int, str, Tuple[int]],
         VR: str,
-        value: Any,
+        value: object,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False
@@ -235,9 +237,9 @@ class DataElement:
         dataset_class: Type[_Dataset],
         tag: Union[BaseTag, int],
         vr: str,
-        value: Any,
+        value: object,
         value_key: Union[str, None],
-        bulk_data_uri_handler: Optional[Callable[[str], Any]] = None
+        bulk_data_uri_handler: Optional[Callable[[str], object]] = None
     ) -> _DataElement:
         """Return a :class:`DataElement` from JSON.
 
@@ -280,9 +282,9 @@ class DataElement:
 
     def to_json_dict(
         self,
-        bulk_data_element_handler: Union[Callable[["DataElement"], str], None],
+        bulk_data_element_handler: Optional[Callable[["DataElement"], str]],
         bulk_data_threshold: int
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
@@ -370,20 +372,20 @@ class DataElement:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[str], Any]] = None,
-        dump_handler: Optional[Callable[[Dict], str]] = None
-    ) -> Dict[str, Any]:
+        bulk_data_element_handler: Optional[Callable[["DataElement"], str]] = None,  # noqa
+        dump_handler: Optional[Callable[[Dict[object, object]], str]] = None
+    ) -> Dict[str, object]:
         """Return a JSON representation of the :class:`DataElement`.
 
         .. versionadded:: 1.3
 
         Parameters
         ----------
-        bulk_data_element_handler: callable or None
+        bulk_data_element_handler: callable, optional
             Callable that accepts a bulk data element and returns the
             "BulkDataURI" for retrieving the value of the data element
             via DICOMweb WADO-RS
-        bulk_data_threshold: int
+        bulk_data_threshold: int, optional
             Size of base64 encoded data element above which a value will be
             provided in form of a "BulkDataURI" rather than "InlineBinary".
             Ignored if no bulk data handler is given.
@@ -408,15 +410,16 @@ class DataElement:
             dump_handler = json_dump
 
         return dump_handler(
-            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+            self.to_json_dict(bulk_data_element_handler, bulk_data_threshold)
+        )
 
     @property
-    def value(self) -> Any:
+    def value(self) -> object:
         """Return the element's value."""
         return self._value
 
     @value.setter
-    def value(self, val: Any) -> None:
+    def value(self, val: object) -> None:
         """Convert (if necessary) and set the value of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
@@ -478,7 +481,7 @@ class DataElement:
         """
         self._value = self.empty_value
 
-    def _convert_value(self, val: Any) -> Any:
+    def _convert_value(self, val: object) -> object:
         """Convert `val` to an appropriate type and return the result.
 
         Uses the element's VR in order to determine the conversion method and
@@ -499,7 +502,7 @@ class DataElement:
         else:
             return MultiValue(self._convert, val)
 
-    def _convert(self, val: Any) -> Any:
+    def _convert(self, val: object) -> object:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
@@ -535,7 +538,7 @@ class DataElement:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -564,7 +567,7 @@ class DataElement:
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
@@ -600,7 +603,7 @@ class DataElement:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
 
-    def __getitem__(self, key: int) -> Any:
+    def __getitem__(self, key: int) -> object:
         """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]
@@ -710,14 +713,16 @@ class RawDataElement(NamedTuple):
 _LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
 
 
-def DataElement_from_raw(raw_data_element, encoding=None):
+def DataElement_from_raw(
+    raw_data_element: RawDataElement, encoding: Optional[List[str]] = None
+) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
     Parameters
     ----------
     raw_data_element : RawDataElement namedtuple
         The raw data to convert to a :class:`DataElement`.
-    encoding : str, optional
+    encoding : list of str, optional
         The character encoding of the raw data.
 
     Returns
