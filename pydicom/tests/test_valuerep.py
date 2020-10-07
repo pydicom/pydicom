@@ -5,6 +5,10 @@
 import copy
 from datetime import datetime, date, time, timedelta, timezone
 from decimal import Decimal
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import sys
 
 from pydicom.tag import Tag
@@ -20,10 +24,6 @@ import pytest
 
 from pydicom.valuerep import PersonName
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
 
 badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
@@ -31,10 +31,6 @@ default_encoding = "iso8859"
 
 class TestTM:
     """Unit tests for pickling TM"""
-    @pytest.mark.skipif(
-        platform.python_implementation() == "PyPy",
-        reason="PyPy3 has trouble with this pickle",
-    )
     def test_pickling(self):
         # Check that a pickled TM is read back properly
         x = pydicom.valuerep.TM("212223")

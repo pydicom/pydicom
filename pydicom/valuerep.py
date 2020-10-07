@@ -3,6 +3,7 @@
 
 import datetime
 from decimal import Decimal
+import platform
 import re
 import sys
 from typing import (
@@ -313,6 +314,16 @@ class TM(_DateTimeBase, datetime.time):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
+
+    if platform.python_implementation() == "PyPy":
+        # Workaround for CPython/PyPy bug in time.__reduce_ex__()
+        #   caused by returning (time, ...) rather than (self.__class__, ...)
+        def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
+            return (
+                self.__class__,
+                super()._getstate(protocol),
+                self.__getstate__()
+            )
 
 
 class DSfloat(float):
