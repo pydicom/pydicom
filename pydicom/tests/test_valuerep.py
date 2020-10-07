@@ -29,12 +29,12 @@ badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
 
 
-@pytest.mark.skipif(
-    platform.python_implementation() == "PyPy",
-    reason="PyPy has trouble with this pickle",
-)
 class TestTM:
     """Unit tests for pickling TM"""
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy3 has trouble with this pickle",
+    )
     def test_pickling(self):
         # Check that a pickled TM is read back properly
         x = pydicom.valuerep.TM("212223")
@@ -634,10 +634,8 @@ class TestPersonName:
         for i, c in enumerate(pn1):
             assert name_str[i] == c
 
-        gen = iter(PersonName(name_str))
-        print(gen)
-        for ii in gen:
-            print(ii)
+        for s in iter(PersonName(name_str)):
+            pass
 
     def test_contains(self):
         """Test that characters can be check if they are within the name"""

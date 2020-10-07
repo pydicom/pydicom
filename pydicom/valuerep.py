@@ -61,11 +61,8 @@ class _DateTimeBase:
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
 
-    def __reduce__(self) -> Union[str, Tuple[Any, ...]]:
-        return super().__reduce__() + (self.__getstate__(),)
-
     def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-        return super().__reduce__() + (self.__getstate__(),)
+        return super().__reduce_ex__(protocol) + (self.__getstate__(),)
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
