@@ -159,7 +159,10 @@ class DT(_DateTimeBase, datetime.datetime):
         offset = (hour + minute) * 60  # Convert minutes to seconds
         offset = -offset if value[0] == '-' else offset
 
-        return datetime.timezone(datetime.timedelta(seconds=offset),name=value)
+        return datetime.timezone(
+            datetime.timedelta(seconds=offset),
+            name=value
+        )
 
     def __new__(
         cls: Type[_DT], val: Union[None, str, _DT, datetime.datetime]
