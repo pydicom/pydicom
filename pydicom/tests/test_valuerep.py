@@ -733,7 +733,7 @@ def test_person_name_unicode_warns():
     else:
         msg = (
             r"'PersonNameUnicode' is deprecated and will be removed in "
-            r"pydicom v2.2, use 'PersonName' instead"
+            r"pydicom v3.0, use 'PersonName' instead"
         )
         with pytest.warns(DeprecationWarning, match=msg):
             from pydicom.valuerep import PersonNameUnicode

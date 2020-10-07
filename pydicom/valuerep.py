@@ -888,7 +888,7 @@ def __getattr__(name):
     if name == "PersonNameUnicode":
         warnings.warn(
             "'PersonNameUnicode' is deprecated and will be removed in "
-            "pydicom v2.2, use 'PersonName' instead",
+            "pydicom v3.0, use 'PersonName' instead",
             DeprecationWarning
         )
         return globals()['PersonName']
