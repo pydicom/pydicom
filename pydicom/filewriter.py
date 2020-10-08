@@ -1,10 +1,11 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-
+from os import PathLike
+from struct import pack
+from typing import Union, BinaryIO, Any
 import warnings
 import zlib
-from struct import pack
 
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
@@ -796,7 +797,11 @@ def _write_dataset(fp, dataset, write_like_original):
     write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
 
 
-def dcmwrite(filename, dataset, write_like_original=True):
+def dcmwrite(
+    filename: Union[str, 'PathLike[Any]', BinaryIO],
+    dataset: Dataset,
+    write_like_original: bool = True
+) -> None:
     """Write `dataset` to the `filename` specified.
 
     If `write_like_original` is ``True`` then `dataset` will be written as is
