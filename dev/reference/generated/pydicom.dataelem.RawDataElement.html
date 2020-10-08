@@ -226,8 +226,9 @@
 <h1>pydicom.dataelem.RawDataElement<a class="headerlink" href="#pydicom-dataelem-rawdataelement" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.dataelem.RawDataElement">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">RawDataElement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span></em>, <em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">length</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">value_tell</span></em>, <em class="sig-param"><span class="n">is_implicit_VR</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fe4c99b2/pydicom/dataelem.py#L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.RawDataElement" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataelem.</code><code class="sig-name descname">RawDataElement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a></span></em>, <em class="sig-param"><span class="n">VR</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">length</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em>, <em class="sig-param"><span class="n">value_tell</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">is_implicit_VR</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span></em>, <em class="sig-param"><span class="n">is_little_endian</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span></em>, <em class="sig-param"><span class="n">is_raw</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d757ef97/pydicom/dataelem.py#L688"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataelem.RawDataElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container for the data from a raw (mostly) undecoded element.</p>
+<dl class="py method">
 <dt id="pydicom.dataelem.RawDataElement.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.dataelem.RawDataElement.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
@@ -267,8 +268,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.is_little_endian" title="pydicom.dataelem.RawDataElement.is_little_endian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_little_endian</span></code></a></p></td>
 <td><p>Alias for field number 6</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_raw</span></code></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.is_raw" title="pydicom.dataelem.RawDataElement.is_raw"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_raw</span></code></a></p></td>
+<td><p>Alias for field number 7</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataelem.RawDataElement.length" title="pydicom.dataelem.RawDataElement.length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">length</span></code></a></p></td>
 <td><p>Alias for field number 2</p></td>
@@ -286,43 +287,49 @@
 </table>
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.VR">
-<code class="sig-name descname">VR</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.VR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">VR</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.VR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.is_implicit_VR">
-<code class="sig-name descname">is_implicit_VR</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_implicit_VR</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 5</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.is_little_endian">
-<code class="sig-name descname">is_little_endian</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_little_endian" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_little_endian</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_little_endian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 6</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="pydicom.dataelem.RawDataElement.is_raw">
+<code class="sig-name descname">is_raw</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.is_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.length">
-<code class="sig-name descname">length</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">length</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.tag">
-<code class="sig-name descname">tag</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tag</code><em class="property">: <a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.value">
-<code class="sig-name descname">value</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">value</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 3</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="pydicom.dataelem.RawDataElement.value_tell">
-<code class="sig-name descname">value_tell</code><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value_tell" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">value_tell</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#pydicom.dataelem.RawDataElement.value_tell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 4</p>
 </dd></dl>
 

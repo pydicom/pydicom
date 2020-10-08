@@ -218,7 +218,7 @@
 <h1>pydicom.dataset.PrivateBlock<a class="headerlink" href="#pydicom-dataset-privateblock" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.dataset.PrivateBlock">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">PrivateBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">private_creator_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fe4c99b2/pydicom/dataset.py#L57"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">PrivateBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">private_creator_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d757ef97/pydicom/dataset.py#L57"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper class for a private block in the <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -274,7 +274,7 @@ that the 2 low order hex digits of the element are always 0.</p>
 
 <dl class="py method">
 <dt id="pydicom.dataset.PrivateBlock.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">private_creator_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fe4c99b2/pydicom/dataset.py#L80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">dataset</span></em>, <em class="sig-param"><span class="n">private_creator_element</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d757ef97/pydicom/dataset.py#L80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes an object corresponding to a private tag block.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -308,7 +308,7 @@ must be an odd number.</p></li>
 </table>
 <dl class="py method">
 <dt id="pydicom.dataset.PrivateBlock.add_new">
-<code class="sig-name descname">add_new</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element_offset</span></em>, <em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fe4c99b2/pydicom/dataset.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.add_new" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_new</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element_offset</span></em>, <em class="sig-param"><span class="n">VR</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d757ef97/pydicom/dataset.py#L167"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.add_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a private element to the parent <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <p>Adds the private tag with the given <cite>VR</cite> and <cite>value</cite> to the parent
 <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> at the tag ID defined by the private block and the
@@ -328,7 +328,7 @@ for a description.</p></li>
 
 <dl class="py method">
 <dt id="pydicom.dataset.PrivateBlock.get_tag">
-<code class="sig-name descname">get_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element_offset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fe4c99b2/pydicom/dataset.py#L98"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.get_tag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_tag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element_offset</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/d757ef97/pydicom/dataset.py#L98"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.PrivateBlock.get_tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the private tag ID for the given <cite>element_offset</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
