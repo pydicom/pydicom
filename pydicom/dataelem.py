@@ -164,7 +164,7 @@ class DataElement:
 
     def __init__(
         self,
-        tag: Union[int, str, Tuple[int]],
+        tag: Union[int, str, Tuple[int, int]],
         VR: str,
         value: object,
         file_value_tell: Optional[int] = None,
