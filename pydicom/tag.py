@@ -13,9 +13,7 @@ from typing import Tuple, Optional, Union, Any, Iterator
 
 
 @contextmanager
-def tag_in_exception(
-    tag: "BaseTag"
-) -> Iterator[None]:
+def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
     """Use `tag` within a context.
 
     Used to include the tag details in the traceback message when an exception
@@ -35,8 +33,7 @@ def tag_in_exception(
 
 
 def Tag(
-    arg: Union[int, str, Tuple[int, int]],
-    arg2: Optional[int] = None
+    arg: Union[int, str, Tuple[int, int]], arg2: Optional[int] = None
 ) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
@@ -146,11 +143,11 @@ class BaseTag(int):
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
-    def __le__(self, other: Any) -> bool:
+    def __le__(self, other: object) -> bool:
         """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
-    def __lt__(self, other: Any) -> bool:
+    def __lt__(self, other: object) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
@@ -161,15 +158,15 @@ class BaseTag(int):
 
         return int(self) < int(other)
 
-    def __ge__(self, other: Any) -> bool:
+    def __ge__(self, other: object) -> bool:
         """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
-    def __gt__(self, other: Any) -> bool:
+    def __gt__(self, other: object) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -180,7 +177,7 @@ class BaseTag(int):
 
         return int(self) == int(other)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
