@@ -713,6 +713,7 @@ def DataElement_from_raw(raw_data_element, encoding=None):
     if config.data_element_callback:
         data_elem = config.data_element_callback
         raw = data_elem(raw_data_element,
+                        encoding=encoding,
                         **config.data_element_callback_kwargs)
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
