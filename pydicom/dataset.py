@@ -714,6 +714,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @overload
     def get(self, key: str, default: Optional[object] = None) -> object:
         pass
+
     @overload
     def get(
         self,
@@ -721,6 +722,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         default: Optional[object] = None
     ) -> DataElement:
         pass
+
     def get(
         self,
         key: Union[str, Union[int, Tuple[int, int], BaseTag]],
@@ -843,9 +845,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @overload
     def __getitem__(self, key: slice) -> "Dataset":
         pass
+
     @overload
     def __getitem__(self, key: TagType) -> DataElement:
         pass
+
     def __getitem__(
         self, key: Union[slice, TagType]
     ) -> Union["Dataset", DataElement]:
@@ -1095,9 +1099,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @overload
     def get_item(self, key: slice) -> "Dataset":
         pass
+
     @overload
     def get_item(self, key: TagType) -> DataElement:
         pass
+        
     def get_item(
         self, key: Union[slice, TagType]
     ) -> Union["Dataset", DataElement, RawDataElement, None]:
