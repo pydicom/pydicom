@@ -157,11 +157,7 @@ def add_dict_entries(
 
 
 def add_private_dict_entry(
-    private_creator: str,
-    tag: int,
-    VR: str,
-    description: str,
-    VM: str = '1'
+    private_creator: str, tag: int, VR: str, description: str, VM: str = '1'
 ) -> None:
     """Update the private DICOM dictionary with a new entry.
 
