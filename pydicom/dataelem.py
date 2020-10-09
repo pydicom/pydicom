@@ -220,7 +220,8 @@ class DataElement:
             self.value = value  # calls property setter which will convert
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
-        self.private_creator = None
+        self.private_creator: Optional[str] = None
+        self.parent: Optional["Dataset"] = None
 
     @classmethod
     def from_json(

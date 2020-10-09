@@ -24,7 +24,7 @@ import json
 import os
 import os.path
 import re
-from types import ModuleType
+from types import ModuleType, TracebackType
 from typing import (
     Generator, TYPE_CHECKING, Optional, Tuple, Union, List, ItemsView,
     KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr,
@@ -82,7 +82,12 @@ class PrivateBlock:
         that the 2 low order hex digits of the element are always 0.
     """
 
-    def __init__(self, key, dataset, private_creator_element):
+    def __init__(
+        self,
+        key: Tuple[int, str],
+        dataset: "Dataset",
+        private_creator_element: int
+    ) -> None:
         """Initializes an object corresponding to a private tag block.
 
         Parameters
@@ -100,7 +105,7 @@ class PrivateBlock:
         self.dataset = dataset
         self.block_start = private_creator_element << 8
 
-    def get_tag(self, element_offset):
+    def get_tag(self, element_offset: int) -> BaseTag:
         """Return the private tag ID for the given `element_offset`.
 
         Parameters
@@ -122,13 +127,13 @@ class PrivateBlock:
             raise ValueError('Element offset must be less than 256')
         return Tag(self.group, self.block_start + element_offset)
 
-    def __contains__(self, element_offset):
+    def __contains__(self, element_offset: int) -> bool:
         """Return ``True`` if the tag with given `element_offset` is in
         the parent :class:`Dataset`.
         """
         return self.get_tag(element_offset) in self.dataset
 
-    def __getitem__(self, element_offset):
+    def __getitem__(self, element_offset: int) -> DataElement:
         """Return the data element in the parent dataset for the given element
         offset.
 
@@ -151,7 +156,7 @@ class PrivateBlock:
         """
         return self.dataset.__getitem__(self.get_tag(element_offset))
 
-    def __delitem__(self, element_offset):
+    def __delitem__(self, element_offset: int) -> None:
         """Delete the tag with the given `element_offset` from the dataset.
 
         Parameters
@@ -169,7 +174,7 @@ class PrivateBlock:
         """
         del self.dataset[self.get_tag(element_offset)]
 
-    def add_new(self, element_offset, VR, value):
+    def add_new(self, element_offset: int, VR: str, value: object) -> None:
         """Add a private element to the parent :class:`Dataset`.
 
         Adds the private tag with the given `VR` and `value` to the parent
@@ -209,9 +214,10 @@ def _dict_equal(
 
 
 _Dataset = TypeVar("_Dataset", bound="Dataset")
+_DatasetValue = Union[DataElement, RawDataElement]
 
 
-class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
+class Dataset(Dict[BaseTag, _DatasetValue]):
     """Contains a collection (dictionary) of DICOM Data Elements.
 
     Behaves like a :class:`dict`.
@@ -363,11 +369,13 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
     """
     indent_chars = "   "
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+        self, *args: Dict[BaseTag, _DatasetValue], **kwargs: object
+    ) -> None:
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
         if not args:
-            self._dict: Dict[BaseTag, Union[DataElement, RawDataElement]] = {}
+            self._dict: Dict[BaseTag, _DatasetValue] = {}
         elif isinstance(args[0], Dataset):
             self._dict = args[0]._dict
         else:
@@ -391,9 +399,9 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         self.parent: Optional["Dataset"] = None
 
         # known private creator blocks
-        self._private_blocks: Dict[int, PrivateBlock] = {}
+        self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}
 
-        self._pixel_id = {}
+        self._pixel_id: Dict[str, int] = {}
 
     def __enter__(self) -> "Dataset":
         """Method invoked on entry to a with statement."""
@@ -403,7 +411,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         self,
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
-        exc_tb
+        exc_tb: Optional[TracebackType]
     ) -> bool:
         """Method invoked on exit from a with statement."""
         # Returning False will re-raise any exceptions that occur
@@ -657,7 +665,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
 
         Parameters
         ----------
-        filters : list of str
+        filters : str
             Zero or more string arguments to the function. Used for
             case-insensitive match to any part of the DICOM keyword.
 
@@ -758,7 +766,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         except KeyError:
             return default
 
-    def items(self) -> ItemsView[BaseTag, Union[DataElement, RawDataElement]]:
+    def items(self) -> ItemsView[BaseTag, _DatasetValue]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -781,7 +789,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         """
         return self._dict.keys()
 
-    def values(self) -> ValuesView[Union[DataElement, RawDataElement]]:
+    def values(self) -> ValuesView[_DatasetValue]:
         """Return the :class:`Dataset` values to simulate :meth:`dict.values`.
 
         Returns
@@ -827,13 +835,10 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
     def _character_set(self) -> str:
         """The character set used to encode text values."""
         char_set = self.get(BaseTag(0x00080005), None)
-
         if not char_set:
-            char_set = self._parent_encoding
-        else:
-            char_set = convert_encodings(char_set.value)
+            return self._parent_encoding
 
-        return char_set
+        return convert_encodings(char_set.value)
 
     @overload
     def __getitem__(self, key: slice) -> "Dataset":
@@ -973,7 +978,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
             If the private creator tag is not found in the given group and
             the `create` parameter is ``False``.
         """
-        def new_block(element):
+        def new_block(element: int) -> PrivateBlock:
             block = PrivateBlock(key, self, element)
             self._private_blocks[key] = block
             return block
@@ -990,8 +995,13 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
                 'Tag must be private if private creator is given')
 
         # find block with matching private creator
-        data_el = next((el for el in self[(group, 0x10):(group, 0x100)]
-                        if el.value == private_creator), None)
+        data_el = next(
+            (
+                el for el in self[(group, 0x10):(group, 0x100)]
+                if el.value == private_creator
+            ),
+            None
+        )
         if data_el is not None:
             return new_block(data_el.tag.element)
 
@@ -1002,8 +1012,10 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
 
         # private creator not existing - find first unused private block
         # and add the private creator
-        first_free_el = next(el for el in range(0x10, 0x100)
-                             if Tag(group, el) not in self._dict)
+        first_free_el = next(
+            el for el in range(0x10, 0x100)
+            if Tag(group, el) not in self._dict
+        )
         self.add_new(Tag(group, first_free_el), 'LO', private_creator)
         return new_block(first_free_el)
 
@@ -1126,13 +1138,13 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         elements of type ``RawDataElement`` are kept.
         """
         tags = self._slice_dataset(slce.start, slce.stop, slce.step)
-        dataset = Dataset({tag: self.get_item(tag) for tag in tags})
-        dataset.is_little_endian = self.is_little_endian
-        dataset.is_implicit_VR = self.is_implicit_VR
-        dataset.set_original_encoding(self.read_implicit_vr,
-                                      self.read_little_endian,
-                                      self.read_encoding)
-        return dataset
+        ds = Dataset({tag: self.get_item(tag) for tag in tags})
+        ds.is_little_endian = self.is_little_endian
+        ds.is_implicit_VR = self.is_implicit_VR
+        ds.set_original_encoding(
+            self.read_implicit_vr, self.read_little_endian, self.read_encoding
+        )
+        return ds
 
     @property
     def is_original_encoding(self) -> bool:
@@ -1144,11 +1156,13 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         This includes properties related to endianess, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
-        return (self.is_implicit_VR is not None and
-                self.is_little_endian is not None and
-                self.read_implicit_vr == self.is_implicit_VR and
-                self.read_little_endian == self.is_little_endian and
-                self.read_encoding == self._character_set)
+        return (
+            self.is_implicit_VR is not None
+            and self.is_little_endian is not None
+            and self.read_implicit_vr == self.is_implicit_VR
+            and self.read_little_endian == self.is_little_endian
+            and self.read_encoding == self._character_set
+        )
 
     def set_original_encoding(
         self,
@@ -1237,6 +1251,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
             yield self.get_item(tag)
 
     def __len__(self) -> int:
+        """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
     def __ne__(self, other: object) -> bool:
@@ -1247,7 +1262,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
 
-    def pop(self, key: TagType, *args: object) -> DataElement:
+    def pop(self, key: TagType, *args: object) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
 
         Removes the element for `key` if it exists and returns it,
@@ -1277,12 +1292,19 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
             If the tag does not exist and no default is given.
         """
         try:
-            tag = Tag(key)
+            key = Tag(key)
         except Exception:
-            return self._dict.pop(key, *args)
-        return self._dict.pop(tag, *args)
+            pass
 
-    def popitem(self) -> Tuple[BaseTag, Union[DataElement, RawDataElement]]:
+        return self._dict.pop(key, *args)
+
+    def popitem(self) -> Tuple[BaseTag, _DatasetValue]:
+        """Emulate :meth:`dict.popitem`.
+
+        Returns
+        -------
+        tuple of (BaseTag, DataElement)
+        """
         return self._dict.popitem()
 
     def setdefault(
@@ -1586,8 +1608,10 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         # According to the dicom standard PS3.5 section A.4,
         # all compressed files must have been explicit VR, little endian
         # First check if was a compressed file
-        if (hasattr(self, 'file_meta') and
-                self.file_meta.TransferSyntaxUID.is_compressed):
+        if (
+            hasattr(self, 'file_meta')
+            and self.file_meta.TransferSyntaxUID.is_compressed
+        ):
             # Check that current file as read does match expected
             if not self.is_little_endian or self.is_implicit_VR:
                 msg = ("Current dataset does not match expected ExplicitVR "
@@ -1933,10 +1957,10 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
             self[tag] = data_element
         elif repeater_has_keyword(name):
             # Check if `name` is repeaters element
-            raise ValueError('{} is a DICOM repeating group '
-                             'element and must be added using '
-                             'the add() or add_new() methods.'
-                             .format(name))
+            raise ValueError(
+                f"'{name}' is a DICOM repeating group element and must be "
+                "added using the add() or add_new() methods."
+            )
         elif name == "file_meta":
             self._set_file_meta(value)
         else:
@@ -1956,9 +1980,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
             # XXX note if user mis-spells a dicom data_element - no error!!!
             object.__setattr__(self, name, value)
 
-    def _set_file_meta(
-        self, value: Optional[Union["Dataset", "FileMetaDataset"]]
-    ) -> None:
+    def _set_file_meta(self, value: Optional["Dataset"]) -> None:
         if value is not None and not isinstance(value, FileMetaDataset):
             FileMetaDataset.validate(value)
             warnings.warn(
@@ -1970,9 +1992,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         self.__dict__["file_meta"] = value
 
     def __setitem__(
-        self,
-        key: Union[slice, TagType],
-        elem: Union[DataElement, RawDataElement]
+        self, key: Union[slice, TagType], elem: _DatasetValue
     ) -> None:
         """Operator for ``Dataset[key] = elem``.
 
@@ -2108,7 +2128,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         return dir(self)
 
     def update(
-        self, dictionary: Union[Dict[BaseTag, DataElement], "Dataset"]
+        self, dictionary: Union[Dict[str, object], Dict[TagType, DataElement]]
     ) -> None:
         """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
@@ -2275,7 +2295,7 @@ class Dataset(Dict[BaseTag, Union[DataElement, RawDataElement]]):
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[DataElement], bytes]] = None,  # noqa
-        dump_handler: Optional[Callable[[Dict], str]] = None
+        dump_handler: Optional[Callable[["Dataset"], str]] = None
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
 
@@ -2363,7 +2383,7 @@ class FileDataset(Dataset):
         filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
         dataset: Dataset,
         preamble: Optional[bytes] = None,
-        file_meta: Optional["FileMetaDataset"] = None,
+        file_meta: Optional[Dataset] = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True
     ) -> None:
@@ -2527,7 +2547,9 @@ class FileMetaDataset(Dataset):
     Group 2 (File Meta Information) data elements
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+        self, *args: Dict[BaseTag, _DatasetValue], **kwargs: object
+    ) -> None:
         """Initialize a FileMetaDataset
 
         Parameters are as per :class:`Dataset`; this overrides the super class
@@ -2544,9 +2566,7 @@ class FileMetaDataset(Dataset):
         FileMetaDataset.validate(self._dict)
 
     @staticmethod
-    def validate(
-        init_value: Union[Dict[BaseTag, DataElement], Dataset]
-    ) -> None:
+    def validate(init_value: Dict[BaseTag, _DatasetValue]) -> None:
         """Raise errors if initialization value is not acceptable for file_meta
 
         Parameters
@@ -2579,8 +2599,7 @@ class FileMetaDataset(Dataset):
             raise ValueError(msg.format(non_group2))
 
     def __setitem__(
-        self, key: Union[slice, TagType],
-        value: Union[DataElement, RawDataElement]
+        self, key: Union[slice, TagType], value: _DatasetValue
     ) -> None:
         """Override parent class to only allow setting of group 2 elements.
 
