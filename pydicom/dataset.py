@@ -1103,7 +1103,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @overload
     def get_item(self, key: TagType) -> DataElement:
         pass
-        
+
     def get_item(
         self, key: Union[slice, TagType]
     ) -> Union["Dataset", DataElement, RawDataElement, None]:
