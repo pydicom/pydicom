@@ -735,9 +735,12 @@ def DataElement_from_raw(
 
     # If user has hooked into conversion of raw values, call his/her routine
     if config.data_element_callback:
-        data_elem = config.data_element_callback
-        raw = data_elem(raw_data_element,
-                        **config.data_element_callback_kwargs)
+        raw = config.data_element_callback(
+            raw_data_element,
+            encoding=encoding,
+            **config.data_element_callback_kwargs
+        )
+
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
