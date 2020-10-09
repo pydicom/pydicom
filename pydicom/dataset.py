@@ -2050,7 +2050,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self._dict[elem_tag] = elem
 
     def _slice_dataset(
-        self, start: Optional[TagType],
+        self,
+        start: Optional[TagType],
         stop: Optional[TagType],
         step: Optional[int]
     ) -> List[BaseTag]:
@@ -2147,8 +2148,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.
 
-        Unlike ``Dataset.__iter__()``, this *does* recurse into sequences,
-        and so yields all elements as if the file were "flattened".
+        Unlike ``iter(Dataset)``, this *does* recurse into sequences,
+        and so yields all elements as if dataset were "flattened".
 
         Yields
         ------
