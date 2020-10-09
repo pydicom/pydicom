@@ -102,9 +102,12 @@ class TestDict:
         assert 'Test One' == entry[2]  # description
 
     def test_add_private_entry_raises_for_non_private_tag(self):
-        with pytest.raises(ValueError,
-                           match='Non-private tags cannot be '
-                                 'added using "add_private_dict_entries"'):
+        msg = (
+            r"Non-private tags cannot be added using "
+            r"'add_private_dict_entries\(\)' \- use "
+            r"'add_dict_entries\(\)' instead"
+        )
+        with pytest.raises(ValueError, match=msg):
             add_private_dict_entry('ACME 3.1', 0x10021101, 'DS', 'Test One')
 
     def test_add_private_entries(self):
@@ -127,9 +130,12 @@ class TestDict:
             0x10021001: ('UL', '1', 'Test One', '', 'TestOne'),
             0x10011002: ('DS', '3', 'Test Two', '', 'TestTwo'),
         }
-        with pytest.raises(ValueError,
-                           match='Non-private tags cannot be '
-                                 'added using "add_private_dict_entries"'):
+        msg = (
+            r"Non-private tags cannot be added using "
+            r"'add_private_dict_entries\(\)' \- use "
+            r"'add_dict_entries\(\)' instead"
+        )
+        with pytest.raises(ValueError, match=msg):
             add_private_dict_entries('ACME 3.1', new_dict_items)
 
     def test_dictionary_VM(self):
