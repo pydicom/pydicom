@@ -110,6 +110,6 @@ if __name__ == "__main__":
     py_file = open(output_file, "w")
     py_file.write('"""' + PYDICOM_DICT_DOCSTRING + '"""')
     py_file.write('\n')
-    py_file.write("from typing import Dict, Tuple\n")
+    py_file.write("from typing import Dict, Tuple\n\n")
     write_dict(py_file, PYDICOM_DICT_NAME, entries)
     py_file.close()

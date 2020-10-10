@@ -101,8 +101,7 @@ def add_dict_entry(
     >>> ds.TestTwo = ['1', '2', '3']
 
     """
-    new_dict_val = (VR, VM, description, is_retired, keyword)
-    add_dict_entries({tag: new_dict_val})
+    add_dict_entries({tag: (VR, VM, description, is_retired, keyword)})
 
 
 def add_dict_entries(
@@ -151,9 +150,7 @@ def add_dict_entries(
     DicomDictionary.update(new_entries_dict)
 
     # Update the reverse mapping from name to tag
-    new_names_dict = dict([(val[4], tag)
-                           for tag, val in new_entries_dict.items()])
-    keyword_dict.update(new_names_dict)
+    keyword_dict.update({val[4]: tag for tag, val in new_entries_dict.items()})
 
 
 def add_private_dict_entry(
@@ -238,7 +235,7 @@ def add_private_dict_entries(
         )
 
     new_entries = {
-        '{:04x}xx{:02x}'.format(tag >> 16, tag & 0xff): value
+        f"{tag >> 16:04x}xx{tag & 0xff:02x}": value
         for tag, value in new_entries_dict.items()
     }
     private_dictionaries.setdefault(private_creator, {}).update(new_entries)
@@ -285,7 +282,7 @@ def get_entry(tag: TagType) -> Tuple[str, str, str, str, str]:
             mask_x = mask_match(tag)
             if mask_x:
                 return RepeatersDictionary[mask_x]
-        raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
+        raise KeyError(f"Tag {tag} not found in DICOM dictionary")
 
 
 def dictionary_is_retired(tag: TagType) -> bool:

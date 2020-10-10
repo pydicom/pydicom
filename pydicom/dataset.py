@@ -2588,7 +2588,7 @@ class FileMetaDataset(Dataset):
         ValueError
             If any data elements passed are not group 2.
         """
-        if not init_value:
+        if init_value is None:
             return
 
         if not isinstance(init_value, (Dataset, dict)):
