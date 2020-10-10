@@ -134,3 +134,17 @@ class TestMultiValue:
         assert '[1, 2, 3]' == str(multival)
         multival = MultiValue(float, [1.1, 2.2, 3.3])
         assert '[1.1, 2.2, 3.3]' == str(multival)
+
+    def test_setitem(self):
+        """Test MultiValue.__setitem__()."""
+        mv = MultiValue(int, [1, 2, 3])
+        with pytest.raises(TypeError, match="'int' object is not iterable"):
+            mv[1:1] = 4
+
+        assert [1, 2, 3] == mv
+        mv[1:1] = [4]
+        assert [1, 4, 2, 3] == mv
+        mv[1:2] = [5, 6]
+        assert [1, 5, 6, 2, 3] == mv
+        mv[1:3] = [7, 8]
+        assert [1, 7, 8, 2, 3] == mv
