@@ -1,9 +1,9 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-from os import PathLike
+import os
 from struct import pack
-from typing import Union, BinaryIO, Any
+from typing import Union, BinaryIO, AnyStr
 import warnings
 import zlib
 
@@ -798,7 +798,7 @@ def _write_dataset(fp, dataset, write_like_original):
 
 
 def dcmwrite(
-    filename: Union[str, 'PathLike[Any]', BinaryIO],
+    filename: Union[str, "os.PathLike[AnyStr]", BinaryIO],
     dataset: Dataset,
     write_like_original: bool = True
 ) -> None:

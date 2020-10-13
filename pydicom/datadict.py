@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 
+from typing import Tuple, Optional, Dict, Union
+
 from pydicom.config import logger
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag, BaseTag, TagType
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
 from pydicom._dicom_dict import DicomDictionary
@@ -15,18 +17,18 @@ from pydicom._private_dict import private_dictionaries
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
-masks = {}
+masks: Dict[str, Tuple[int, int]] = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits
     # are identical (XOR result = 0 if bits same)
     # then AND those out with 0 bits at the "x"
     # ("we don't care") location using mask2
     mask1 = int(mask_x.replace("x", "0"), 16)
-    mask2 = int("".join(["F0" [c == "x"] for c in mask_x]), 16)
+    mask2 = int("".join(["F0"[c == "x"] for c in mask_x]), 16)
     masks[mask_x] = (mask1, mask2)
 
 
-def mask_match(tag):
+def mask_match(tag: int) -> Optional[str]:
     """Return the repeaters tag mask for `tag`.
 
     Parameters
@@ -36,7 +38,7 @@ def mask_match(tag):
 
     Returns
     -------
-    int or None
+    str or None
         If the tag is in the repeaters dictionary then returns the
         corresponding masked tag, otherwise returns ``None``.
     """
@@ -46,7 +48,14 @@ def mask_match(tag):
     return None
 
 
-def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
+def add_dict_entry(
+    tag: int,
+    VR: str,
+    keyword: str,
+    description: str,
+    VM: str = '1',
+    is_retired: str = ''
+) -> None:
     """Update the DICOM dictionary with a new non-private entry.
 
     Parameters
@@ -92,11 +101,12 @@ def add_dict_entry(tag, VR, keyword, description, VM='1', is_retired=''):
     >>> ds.TestTwo = ['1', '2', '3']
 
     """
-    new_dict_val = (VR, VM, description, is_retired, keyword)
-    add_dict_entries({tag: new_dict_val})
+    add_dict_entries({tag: (VR, VM, description, is_retired, keyword)})
 
 
-def add_dict_entries(new_entries_dict):
+def add_dict_entries(
+    new_entries_dict: Dict[int, Tuple[str, str, str, str, str]]
+) -> None:
     """Update the DICOM dictionary with new non-private entries.
 
     Parameters
@@ -140,12 +150,12 @@ def add_dict_entries(new_entries_dict):
     DicomDictionary.update(new_entries_dict)
 
     # Update the reverse mapping from name to tag
-    new_names_dict = dict([(val[4], tag)
-                           for tag, val in new_entries_dict.items()])
-    keyword_dict.update(new_names_dict)
+    keyword_dict.update({val[4]: tag for tag, val in new_entries_dict.items()})
 
 
-def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
+def add_private_dict_entry(
+    private_creator: str, tag: int, VR: str, description: str, VM: str = '1'
+) -> None:
     """Update the private DICOM dictionary with a new entry.
 
     .. versionadded:: 1.3
@@ -178,11 +188,14 @@ def add_private_dict_entry(private_creator, tag, VR, description, VM='1'):
     add_private_dict_entries
         Add or update multiple entries at once.
     """
-    new_dict_val = (VR, VM, description)
+    new_dict_val = (VR, VM, description, '')
     add_private_dict_entries(private_creator, {tag: new_dict_val})
 
 
-def add_private_dict_entries(private_creator, new_entries_dict):
+def add_private_dict_entries(
+    private_creator: str,
+    new_entries_dict: Dict[int, Tuple[str, str, str, str]]
+) -> None:
     """Update pydicom's private DICOM tag dictionary with new entries.
 
     .. versionadded:: 1.3
@@ -192,8 +205,8 @@ def add_private_dict_entries(private_creator, new_entries_dict):
     private_creator: str
         The private creator for all entries in `new_entries_dict`.
     new_entries_dict : dict
-        :class:`dict` of form ``{tag: (VR, VM, description), ...}`` where
-        parameters are as described in :func:`add_private_dict_entry`.
+        :class:`dict` of form ``{tag: (VR, VM, description, is_retired), ...}``
+        where parameters are as described in :func:`add_private_dict_entry`.
 
     Raises
     ------
@@ -217,16 +230,18 @@ def add_private_dict_entries(private_creator, new_entries_dict):
 
     if not all([BaseTag(tag).is_private for tag in new_entries_dict]):
         raise ValueError(
-            'Non-private tags cannot be added using "add_private_dict_entries"'
-            ' - use "add_dict_entries" instead')
+            "Non-private tags cannot be added using "
+            "'add_private_dict_entries()' - use 'add_dict_entries()' instead"
+        )
 
-    new_entries = {'{:04x}xx{:02x}'.format(tag >> 16, tag & 0xff): value
-                   for tag, value in new_entries_dict.items()}
-    private_dictionaries.setdefault(
-        private_creator, {}).update(new_entries)
+    new_entries = {
+        f"{tag >> 16:04x}xx{tag & 0xff:02x}": value
+        for tag, value in new_entries_dict.items()
+    }
+    private_dictionaries.setdefault(private_creator, {}).update(new_entries)
 
 
-def get_entry(tag):
+def get_entry(tag: TagType) -> Tuple[str, str, str, str, str]:
     """Return an entry from the DICOM dictionary as a tuple.
 
     If the `tag` is not in the main DICOM dictionary, then the repeating
@@ -267,10 +282,10 @@ def get_entry(tag):
             mask_x = mask_match(tag)
             if mask_x:
                 return RepeatersDictionary[mask_x]
-        raise KeyError("Tag {0} not found in DICOM dictionary".format(tag))
+        raise KeyError(f"Tag {tag} not found in DICOM dictionary")
 
 
-def dictionary_is_retired(tag):
+def dictionary_is_retired(tag: TagType) -> bool:
     """Return ``True`` if the element corresponding to `tag` is retired.
 
     Only performs the lookup for official DICOM elements.
@@ -296,7 +311,7 @@ def dictionary_is_retired(tag):
     return False
 
 
-def dictionary_VR(tag):
+def dictionary_VR(tag: TagType) -> str:
     """Return the VR of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
@@ -320,7 +335,7 @@ def dictionary_VR(tag):
     return get_entry(tag)[0]
 
 
-def dictionary_VM(tag):
+def dictionary_VM(tag: TagType) -> str:
     """Return the VM of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
@@ -344,7 +359,7 @@ def dictionary_VM(tag):
     return get_entry(tag)[1]
 
 
-def dictionary_description(tag):
+def dictionary_description(tag: TagType) -> str:
     """Return the description of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
@@ -367,7 +382,7 @@ def dictionary_description(tag):
     return get_entry(tag)[2]
 
 
-def dictionary_keyword(tag):
+def dictionary_keyword(tag: TagType) -> str:
     """Return the keyword of the element corresponding to `tag`.
 
     Only performs the lookup for official DICOM elements.
@@ -390,7 +405,7 @@ def dictionary_keyword(tag):
     return get_entry(tag)[4]
 
 
-def dictionary_has_tag(tag):
+def dictionary_has_tag(tag: TagType) -> bool:
     """Return ``True`` if `tag` is in the official DICOM data dictionary.
 
     Parameters
@@ -407,7 +422,7 @@ def dictionary_has_tag(tag):
     return (tag in DicomDictionary)
 
 
-def keyword_for_tag(tag):
+def keyword_for_tag(tag: TagType) -> str:
     """Return the keyword of the element corresponding to `tag`.
 
     Parameters
@@ -429,12 +444,12 @@ def keyword_for_tag(tag):
 
 
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
-logger.debug("Reversing DICOM dictionary so can look up tag from a keyword...")
-keyword_dict = dict([(dictionary_keyword(tag), tag)
-                     for tag in DicomDictionary])
+keyword_dict: Dict[str, int] = {
+    dictionary_keyword(tag): tag for tag in DicomDictionary
+}
 
 
-def tag_for_keyword(keyword):
+def tag_for_keyword(keyword: str) -> Optional[int]:
     """Return the tag of the element corresponding to `keyword`.
 
     Only performs the lookup for official DICOM elements.
@@ -453,7 +468,7 @@ def tag_for_keyword(keyword):
     return keyword_dict.get(keyword)
 
 
-def repeater_has_tag(tag):
+def repeater_has_tag(tag: int) -> bool:
     """Return ``True`` if `tag` is in the DICOM repeaters data dictionary.
 
     Parameters
@@ -473,7 +488,7 @@ def repeater_has_tag(tag):
 REPEATER_KEYWORDS = [val[4] for val in RepeatersDictionary.values()]
 
 
-def repeater_has_keyword(keyword):
+def repeater_has_keyword(keyword: str) -> bool:
     """Return ``True`` if `keyword` is in the DICOM repeaters data dictionary.
 
     Parameters
@@ -492,7 +507,9 @@ def repeater_has_keyword(keyword):
 
 # PRIVATE DICTIONARY handling
 # functions in analogy with those of main DICOM dict
-def get_private_entry(tag, private_creator):
+def get_private_entry(
+    tag: TagType, private_creator: str
+) -> Tuple[str, str, str, str]:
     """Return an entry from the private dictionary corresponding to `tag`.
 
     Parameters
@@ -520,36 +537,39 @@ def get_private_entry(tag, private_creator):
     """
     if not isinstance(tag, BaseTag):
         tag = Tag(tag)
+
     try:
         private_dict = private_dictionaries[private_creator]
-    except KeyError:
-        msg = "Private creator {0} ".format(private_creator)
-        msg += "not in private dictionary"
-        raise KeyError(msg)
+    except KeyError as exc:
+        raise KeyError(
+            f"Private creator '{private_creator}' not in the private "
+            "dictionary"
+        ) from exc
 
     # private elements are usually agnostic for
     # "block" (see PS3.5-2008 7.8.1 p44)
     # Some elements in _private_dict are explicit;
     # most have "xx" for high-byte of element
-    # Try exact key first, but then try with "xx" in block position
-    try:
-        dict_entry = private_dict[tag]
-    except KeyError:
-        #  so here put in the "xx" in the block position for key to look up
-        group_str = "%04x" % tag.group
-        elem_str = "%04x" % tag.elem
-        key = "%sxx%s" % (group_str, elem_str[-2:])
-        if key not in private_dict:
-            key = "%sxxxx%s" % (group_str[:2], elem_str[-2:])
-            if key not in private_dict:
-                msg = ("Tag {0} not in private dictionary "
-                       "for private creator {1}".format(key, private_creator))
-                raise KeyError(msg)
-        dict_entry = private_dict[key]
+    #  so here put in the "xx" in the block position for key to look up
+    group_str = f"{tag.group:04x}"
+    elem_str = f"{tag.elem:04x}"
+    keys = [
+        f"{group_str}{elem_str}",
+        f"{group_str}xx{elem_str[-2:]}",
+        f"{group_str[:2]}xxxx{elem_str[-2:]}"
+    ]
+    keys = [k for k in keys if k in private_dict]
+    if not keys:
+        raise KeyError(
+            f"Tag '{tag}' not in private dictionary "
+            f"for private creator '{private_creator}'"
+        )
+    dict_entry = private_dict[keys[0]]
+
     return dict_entry
 
 
-def private_dictionary_VR(tag, private_creator):
+def private_dictionary_VR(tag: TagType, private_creator: str) -> str:
     """Return the VR of the private element corresponding to `tag`.
 
     Parameters
@@ -573,7 +593,7 @@ def private_dictionary_VR(tag, private_creator):
     return get_private_entry(tag, private_creator)[0]
 
 
-def private_dictionary_VM(tag, private_creator):
+def private_dictionary_VM(tag: TagType, private_creator: str) -> str:
     """Return the VM of the private element corresponding to `tag`.
 
     Parameters
@@ -597,7 +617,7 @@ def private_dictionary_VM(tag, private_creator):
     return get_private_entry(tag, private_creator)[1]
 
 
-def private_dictionary_description(tag, private_creator):
+def private_dictionary_description(tag: TagType, private_creator: str) -> str:
     """Return the description of the private element corresponding to `tag`.
 
     Parameters

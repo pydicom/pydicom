@@ -6,7 +6,7 @@
 from io import BytesIO
 import os
 from struct import (Struct, unpack)
-from typing import BinaryIO, Union, Optional, List, Tuple, Any
+from typing import BinaryIO, Union, Optional, List, Tuple, AnyStr
 import warnings
 import zlib
 
@@ -766,7 +766,7 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
 
 def dcmread(
-    fp: Union[str, 'os.PathLike[Any]', BinaryIO],
+    fp: Union[str, "os.PathLike[AnyStr]", BinaryIO],
     defer_size: Optional[Union[str, int]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,

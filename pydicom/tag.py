@@ -32,9 +32,11 @@ def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
         raise type(exc)(msg) from exc
 
 
-def Tag(
-    arg: Union[int, str, Tuple[int, int]], arg2: Optional[int] = None
-) -> "BaseTag":
+# Type that can be used where a parameter is a tag or keyword
+TagType = Union[int, str, Tuple[int, int], "BaseTag"]
+
+
+def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
     General function for creating a :class:`BaseTag` in any of the standard

@@ -3,6 +3,7 @@
 
 from struct import unpack
 from sys import byteorder
+from typing import Dict
 import warnings
 
 try:
@@ -787,7 +788,7 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
-def get_image_pixel_ids(ds):
+def get_image_pixel_ids(ds) -> Dict[str, int]:
     """Return a dict of the pixel data affecting element's :func:`id` values.
 
     .. versionadded:: 1.4
