@@ -8,6 +8,11 @@ try:
 except ImportError:
     from collections import MutableSequence
 
+from typing import (
+    Iterable, Union, List, overload, Iterator, Optional, Callable, Any,
+    Sequence, cast
+)
+
 
 class MultiValue(MutableSequence):
     """Class to hold any multi-valued DICOM value, or any list of items that
@@ -23,7 +28,11 @@ class MultiValue(MutableSequence):
     than an instance of their classes.
     """
 
-    def __init__(self, type_constructor, iterable):
+    def __init__(
+        self,
+        type_constructor: Callable[[object], object],
+        iterable: Iterable[object]
+    ) -> None:
         """Initialize the list of values
 
         Parameters
@@ -38,56 +47,79 @@ class MultiValue(MutableSequence):
         """
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
-        def number_string_type_constructor(x):
+        def nr_str_constructor(x: object) -> object:
             return self.type_constructor(x) if x != '' else x
 
         self._list = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):
-            type_constructor = number_string_type_constructor
+            type_constructor = nr_str_constructor
+
         for x in iterable:
             self._list.append(type_constructor(x))
 
-    def insert(self, position, val):
+    def insert(self, position: int, val: object) -> None:
         self._list.insert(position, self.type_constructor(val))
 
-    def append(self, val):
+    def append(self, val: object) -> None:
         self._list.append(self.type_constructor(val))
 
-    def __setitem__(self, i, val):
+    @overload
+    def __setitem__(self, i: int, val: object) -> None: pass
+
+    @overload
+    def __setitem__(self, i: slice, val: Sequence[object]) -> None: pass
+
+    def __setitem__(
+        self, i: Union[slice, int], val: Union[Sequence[object], object]
+    ) -> None:
         """Set an item of the list, making sure it is of the right VR type"""
         if isinstance(i, slice):
+            val = cast(Sequence[object], val)
             val = [self.type_constructor(v) for v in val]
             self._list.__setitem__(i, val)
         else:
             self._list.__setitem__(i, self.type_constructor(val))
 
-    def __str__(self):
+    def __str__(self) -> str:
         if not self:
             return ''
-        lines = ["'{}'".format(x) if isinstance(x, (str, bytes))
-                 else str(x) for x in self]
-        return "[" + ", ".join(lines) + "]"
+        lines = [
+            f"'{x}'" if isinstance(x, (str, bytes)) else str(x) for x in self
+        ]
+        return f"[{', '.join(lines)}]"
 
     __repr__ = __str__
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._list)
 
-    def __getitem__(self, index):
+    @overload
+    def __getitem__(self, index: int) -> object: pass
+
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[object]: pass
+
+    def __getitem__(
+        self, index: Union[slice, int]
+    ) -> Union[Sequence[object], object]:
         return self._list[index]
 
-    def __delitem__(self, index):
+    def __delitem__(self, index: Union[slice, int]) -> None:
         del self._list[index]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[object]:
         return iter(self._list)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self._list == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return self._list != other
 
-    def sort(self, key=None, reverse=False):
+    def sort(
+        self,
+        key: Optional[Callable[[object], object]] = None,
+        reverse: bool = False
+    ) -> None:
         self._list.sort(key=key, reverse=reverse)
