@@ -106,6 +106,10 @@ class TestSequence:
         for ds in seq:
             assert isinstance(ds.parent, weakref.ReferenceType)
 
+        msg = r"Can only assign an iterable of 'Dataset'"
+        with pytest.raises(TypeError, match=msg):
+            seq[1:1] = ds_d
+
     def test_extending(self):
         """Test Sequence.extend()."""
         ds_a = Dataset()

@@ -536,7 +536,10 @@ def MultiString(
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made
     # in PET files we are converting
-    splitup = val.rstrip().split("\\")
+    while val and val.endswith((' ', '\x00')):
+        val = val[:-1]
+
+    splitup = val.split("\\")
     if len(splitup) == 1:
         val = splitup[0]
         return valtype(val) if val else val
