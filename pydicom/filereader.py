@@ -383,8 +383,14 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     return ds
 
 
-def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
-                  offset=0):
+def read_sequence(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    bytelength: int,
+    encoding: Union[str, List[str]],
+    offset: int = 0
+) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
     """

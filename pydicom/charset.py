@@ -2,6 +2,7 @@
 """Handle alternate character sets for character strings."""
 import codecs
 import re
+from typing import List, Set
 import warnings
 
 from pydicom import config
@@ -277,7 +278,9 @@ custom_encoders = {
 }
 
 
-def decode_string(value, encodings, delimiters):
+def decode_string(
+    value: bytes, encodings: List[str], delimiters: Set[int]
+) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
     .. versionadded:: 1.2
@@ -317,17 +320,20 @@ def decode_string(value, encodings, delimiters):
         except LookupError:
             if config.enforce_valid_values:
                 raise
-            warnings.warn("Unknown encoding '{}' - "
-                          "using default encoding instead"
-                          .format(first_encoding))
+            warnings.warn(
+                f"Unknown encoding '{first_encoding}' - using default "
+                "encoding instead"
+            )
             first_encoding = default_encoding
             return value.decode(first_encoding)
         except UnicodeError:
             if config.enforce_valid_values:
                 raise
-            warnings.warn("Failed to decode byte string with encoding '{}' - "
-                          "using replacement characters in decoded "
-                          "string".format(first_encoding))
+            warnings.warn(
+                "Failed to decode byte string with encoding "
+                f"'{first_encoding}' - using replacement characters in "
+                "decoded string"
+            )
             return value.decode(first_encoding, errors='replace')
 
     # Each part of the value that starts with an escape sequence is decoded
@@ -340,15 +346,19 @@ def decode_string(value, encodings, delimiters):
     # the substring until the first escape character, and subsequent
     # substrings starting with an escape character.
     regex = b'(^[^\x1b]+|[\x1b][^\x1b]*)'
-    fragments = re.findall(regex, value)
+    fragments: List[bytes] = re.findall(regex, value)
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
-    return ''.join([_decode_fragment(fragment, encodings, delimiters)
-                     for fragment in fragments])
+    return ''.join([
+        _decode_fragment(fragment, encodings, delimiters)
+        for fragment in fragments
+    ])
 
 
-def _decode_fragment(byte_str, encodings, delimiters):
+def _decode_fragment(
+    byte_str: bytes, encodings: List[str], delimiters: Set[int]
+) -> str:
     """Decode a byte string encoded with a single encoding.
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
@@ -369,7 +379,7 @@ def _decode_fragment(byte_str, encodings, delimiters):
 
     Returns
     -------
-    text type
+    str
         The decoded unicode string. If the value could not be decoded,
         and `config.enforce_valid_values` is not set, a warning is issued,
         and the value is decoded using the first encoding with replacement
@@ -397,13 +407,17 @@ def _decode_fragment(byte_str, encodings, delimiters):
     except UnicodeError:
         if config.enforce_valid_values:
             raise
-        warnings.warn("Failed to decode byte string with encodings: {} - "
-                      "using replacement characters in decoded "
-                      "string".format(', '.join(encodings)))
+        warnings.warn(
+            "Failed to decode byte string with encodings: "
+            f"{', '.join(encodings)} - using replacement characters in "
+            "decoded string"
+        )
         return byte_str.decode(encodings[0], errors='replace')
 
 
-def _decode_escaped_fragment(byte_str, encodings, delimiters):
+def _decode_escaped_fragment(
+    byte_str: bytes, encodings: List[str], delimiters: Set[int]
+) -> str:
     """Decodes a byte string starting with an escape sequence.
     See `_decode_fragment` for parameter description and more information.
     """
@@ -415,29 +429,33 @@ def _decode_escaped_fragment(byte_str, encodings, delimiters):
             # Python strips the escape sequences for this encoding.
             # Any delimiters must be handled correctly by `byte_str`.
             return byte_str.decode(encoding)
-        else:
-            # Python doesn't know about the escape sequence -
-            # we have to strip it before decoding
-            byte_str = byte_str[seq_length:]
 
-            # If a delimiter occurs in the string, it resets the encoding.
-            # The following returns the first occurrence of a delimiter in
-            # the byte string, or None if it does not contain any.
-            index = next((index for index, ch in enumerate(byte_str)
-                          if ch in delimiters), None)
-            if index is not None:
-                # the part of the string after the first delimiter
-                # is decoded with the first encoding
-                return (byte_str[:index].decode(encoding) +
-                        byte_str[index:].decode(encodings[0]))
-            # No delimiter - use the encoding defined by the escape code
-            return byte_str.decode(encoding)
+        # Python doesn't know about the escape sequence -
+        # we have to strip it before decoding
+        byte_str = byte_str[seq_length:]
+
+        # If a delimiter occurs in the string, it resets the encoding.
+        # The following returns the first occurrence of a delimiter in
+        # the byte string, or None if it does not contain any.
+        index = next(
+            (idx for idx, ch in enumerate(byte_str) if ch in delimiters),
+            None
+        )
+        if index is not None:
+            # the part of the string after the first delimiter
+            # is decoded with the first encoding
+            return (byte_str[:index].decode(encoding) +
+                    byte_str[index:].decode(encodings[0]))
+
+        # No delimiter - use the encoding defined by the escape code
+        return byte_str.decode(encoding)
 
     # unknown escape code - use first encoding
     msg = "Found unknown escape sequence in encoded string value"
     if config.enforce_valid_values:
         raise ValueError(msg)
-    warnings.warn(msg + " - using encoding {}".format(encodings[0]))
+
+    warnings.warn(msg + f" - using encoding {encodings[0]}")
     return byte_str.decode(encodings[0], errors='replace')
 
 
