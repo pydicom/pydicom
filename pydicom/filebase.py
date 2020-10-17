@@ -147,14 +147,14 @@ class DicomIO:
         if value:  # Little Endian
             self.read_US = self.read_leUS
             self.read_UL = self.read_leUL
-            setattr(self, "write_US", self.write_leUS)
-            setattr(self, "write_UL", self.write_leUL)
+            self.write_US = self.write_leUS
+            self.write_UL = self.write_leUL
             self.read_tag = self.read_le_tag
         else:  # Big Endian
             self.read_US = self.read_beUS
             self.read_UL = self.read_beUL
-            setattr(self, "write_US", self.write_beUS)
-            setattr(self, "write_UL", self.write_beUL)
+            self.write_US = self.write_beUS
+            self.write_UL = self.write_beUL
             self.read_tag = self.read_be_tag
 
     @property
