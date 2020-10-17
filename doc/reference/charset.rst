@@ -11,6 +11,6 @@ Character encoding and decoding functions.
    :toctree: generated/
 
    convert_encodings
-   decode
+   decode_element
    decode_string
    encode_string

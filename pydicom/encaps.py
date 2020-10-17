@@ -1,16 +1,17 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from struct import pack
+from typing import List, Generator, Optional, Tuple
 import warnings
 
 import pydicom.config
-from pydicom.filebase import DicomBytesIO
+from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 
 
 # Functions for parsing encapsulated data
-def get_frame_offsets(fp):
+def get_frame_offsets(fp: DicomFileLike) -> Tuple[bool, List[int]]:
     """Return a list of the fragment offsets from the Basic Offset Table.
 
     **Basic Offset Table**
@@ -49,7 +50,7 @@ def get_frame_offsets(fp):
 
     Parameters
     ----------
-    fp : filebase.DicomBytesIO
+    fp : filebase.DicomFileLike
         The encapsulated pixel data positioned at the start of the Basic Offset
         Table. ``fp.is_little_endian`` should be set to ``True``.
 
@@ -95,7 +96,7 @@ def get_frame_offsets(fp):
     return bool(length), offsets
 
 
-def get_nr_fragments(fp):
+def get_nr_fragments(fp: DicomFileLike) -> int:
     """Return the number of fragments in `fp`.
 
     .. versionadded:: 1.4
@@ -132,7 +133,9 @@ def get_nr_fragments(fp):
     return nr_fragments
 
 
-def generate_pixel_data_fragment(fp):
+def generate_pixel_data_fragment(
+    fp: DicomFileLike
+) -> Generator[bytes, None, None]:
     """Yield the encapsulated pixel data fragments.
 
     For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) *Pixel
@@ -168,7 +171,7 @@ def generate_pixel_data_fragment(fp):
 
     Parameters
     ----------
-    fp : filebase.DicomBytesIO
+    fp : filebase.DicomFileLike
         The encoded (7FE0,0010) *Pixel Data* element value, positioned at the
         start of the item tag for the first item after the Basic Offset Table
         item. ``fp.is_little_endian`` should be set to ``True``.
@@ -218,7 +221,9 @@ def generate_pixel_data_fragment(fp):
                              .format(tag, fp.tell() - 4))
 
 
-def generate_pixel_data_frame(bytestream, nr_frames=None):
+def generate_pixel_data_frame(
+    bytestream: bytes, nr_frames: Optional[int] = None
+) -> Generator[bytes, None, None]:
     """Yield an encapsulated pixel data frame.
 
     Parameters
@@ -245,7 +250,9 @@ def generate_pixel_data_frame(bytestream, nr_frames=None):
         yield b''.join(fragmented_frame)
 
 
-def generate_pixel_data(bytestream, nr_frames=None):
+def generate_pixel_data(
+    bytestream: bytes, nr_frames: Optional[int] = None
+) -> Generator[Tuple[bytes, ...], None, None]:
     """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -390,12 +397,12 @@ def generate_pixel_data(bytestream, nr_frames=None):
             )
 
 
-def decode_data_sequence(data):
+def decode_data_sequence(data: bytes) -> List[bytes]:
     """Read encapsulated data and return a list of strings.
 
     Parameters
     ----------
-    data : bytes or str
+    data : bytes
         The encapsulated data, typically the value from ``Dataset.PixelData``.
 
     Returns
@@ -423,12 +430,12 @@ def decode_data_sequence(data):
         return seq
 
 
-def defragment_data(data):
+def defragment_data(data: bytes) -> bytes:
     """Read encapsulated data and return the fragments as one continuous bytes.
 
     Parameters
     ----------
-    data : list of bytes
+    data : bytes
         The encapsulated pixel data fragments.
 
     Returns
@@ -440,7 +447,7 @@ def defragment_data(data):
 
 
 # read_item modeled after filereader.ReadSequenceItem
-def read_item(fp):
+def read_item(fp: DicomFileLike) -> Optional[bytes]:
     """Read and return a single Item in the fragmented data stream.
 
     Parameters
@@ -502,7 +509,9 @@ def read_item(fp):
 
 
 # Functions for encapsulating data
-def fragment_frame(frame, nr_fragments=1):
+def fragment_frame(
+    frame: bytes, nr_fragments: int = 1
+) -> Generator[bytes, None, None]:
     """Yield one or more fragments from `frame`.
 
     .. versionadded:: 1.2
@@ -564,20 +573,20 @@ def fragment_frame(frame, nr_fragments=1):
     yield fragment
 
 
-def itemise_fragment(fragment):
-    """Return an itemised `fragment`.
+def itemize_fragment(fragment: bytes) -> bytes:
+    """Return an itemized `fragment`.
 
     .. versionadded:: 1.2
 
     Parameters
     ----------
     fragment : bytes
-        The fragment to itemise.
+        The fragment to itemize.
 
     Returns
     -------
     bytes
-        The itemised fragment.
+        The itemized fragment.
 
     Notes
     -----
@@ -596,10 +605,12 @@ def itemise_fragment(fragment):
     return item
 
 
-itemize_fragment = itemise_fragment
+itemise_fragment = itemize_fragment
 
 
-def itemise_frame(frame, nr_fragments=1):
+def itemize_frame(
+    frame: bytes, nr_fragments: int = 1
+) -> Generator[bytes, None, None]:
     """Yield items generated from `frame`.
 
     .. versionadded:: 1.2
@@ -614,7 +625,7 @@ def itemise_frame(frame, nr_fragments=1):
     Yields
     ------
     bytes
-        An itemised fragment of the frame, encoded as little endian.
+        An itemized fragment of the frame, encoded as little endian.
 
     Notes
     -----
@@ -632,10 +643,12 @@ def itemise_frame(frame, nr_fragments=1):
         yield itemise_fragment(fragment)
 
 
-itemize_frame = itemise_frame
+itemise_frame = itemize_frame
 
 
-def encapsulate(frames, fragments_per_frame=1, has_bot=True):
+def encapsulate(
+    frames: List[bytes], fragments_per_frame: int = 1, has_bot: bool = True
+) -> bytes:
     """Return encapsulated `frames`.
 
     .. versionadded:: 1.2
