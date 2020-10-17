@@ -771,7 +771,6 @@ def _handle_illegal_standalone_encodings(
         )
         return py_encodings[:1]
 
-
     for i, encoding in reversed(list(enumerate(encodings[1:]))):
         if encoding in STAND_ALONE_ENCODINGS:
             warnings.warn(

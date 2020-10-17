@@ -5,13 +5,19 @@ from io import BytesIO
 from struct import unpack, pack
 from types import TracebackType
 from typing import (
-    Tuple, Optional, NoReturn, BinaryIO, Callable, Type, Union, cast, TextIO
+    Tuple, Optional, NoReturn, BinaryIO, Callable, Type, Union, cast, TextIO,
+    TYPE_CHECKING
 )
-from typing_extensions import Protocol
+if TYPE_CHECKING:
+    # Typing backports
+    from typing_extensions import Protocol  # added in 3.8
+else:
+    Protocol = object
 
 from pydicom.tag import Tag, BaseTag, TagType
 
 
+# Customise the type hints for read() and seek()
 class Reader(Protocol):
     def __call__(self, size: int = -1) -> bytes: ...
 
