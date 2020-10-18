@@ -58,15 +58,15 @@ class JsonDataElementConverter:
     """
 
     def __init__(
-        self, 
-        dataset_class, 
-        tag, 
-        vr, 
-        value, 
+        self,
+        dataset_class,
+        tag,
+        vr,
+        value,
         value_key,
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], object], 
+                Callable[[BaseTag, str, str], object],
                 Callable[[str], object]
             ]
         ] = None
