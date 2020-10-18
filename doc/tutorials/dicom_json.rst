@@ -94,3 +94,14 @@ the stored ``BulkDataURI``:
   >>>     "00091002": {"vr": "OB", "BulkDataURI": "https://my.wado.org/123"}
   >>> }
   >>> ds = Dataset.from_json(json_data, bulk_data_uri_handler=bulk_data_reader)
+
+or, if you need to also know the tag and the vr, in addition to the stored
+``BulkDataURI``:
+
+  >>> def bulk_data_reader(tag, vr, bulk_data_uri):
+  >>>     return data_retrieved_via_uri(bulk_data_uri)
+  >>>
+  >>> json_data = {
+  >>>     "00091002": {"vr": "OB", "BulkDataURI": "https://my.wado.org/123"}
+  >>> }
+  >>> ds = Dataset.from_json(json_data, bulk_data_uri_handler=bulk_data_reader)

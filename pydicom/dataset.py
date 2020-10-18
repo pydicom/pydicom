@@ -2218,7 +2218,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def from_json(
         cls: Type[_Dataset],
         json_dataset: Union[Dict[str, bytes], str],
-        bulk_data_uri_handler: Optional[Callable[[bytes], object]] = None
+        bulk_data_uri_handler: Optional[
+            Union[
+                Callable[[BaseTag, str, str], object],
+                Callable[[str], object]
+            ]
+        ] = None
     ) -> _Dataset:
         """Add elements to the :class:`Dataset` from DICOM JSON format.
 
@@ -2232,7 +2237,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             :class:`dict` or :class:`str` representing a DICOM Data Set
             formatted based on the DICOM JSON Model.
         bulk_data_uri_handler : callable, optional
-            Callable function that accepts the "BulkDataURI" of the JSON
+            Callable function that accepts either the tag, vr and "BulkDataURI"
+            or just the "BulkDataURI" of the JSON
             representation of a data element and returns the actual value of
             data element (retrieved via DICOMweb WADO-RS).
 
@@ -2263,7 +2269,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], bytes]] = None  # noqa
+        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None  # noqa
     ) -> _Dataset:
         """Return a dictionary representation of the :class:`Dataset`
         conforming to the DICOM JSON Model as described in the DICOM
@@ -2301,7 +2307,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], bytes]] = None,  # noqa
+        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
         dump_handler: Optional[Callable[["Dataset"], str]] = None
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
