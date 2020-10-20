@@ -231,7 +231,12 @@ class DataElement:
         vr: str,
         value: object,
         value_key: Union[str, None],
-        bulk_data_uri_handler: Optional[Callable[[str], object]] = None
+        bulk_data_uri_handler: Optional[
+            Union[
+                Callable[[BaseTag, str, str], object],
+                Callable[[str], object]
+            ]
+        ] = None
     ) -> _DataElement:
         """Return a :class:`DataElement` from JSON.
 
@@ -251,7 +256,8 @@ class DataElement:
             Key of the data element that contains the value
             (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
         bulk_data_uri_handler: callable or None
-            Callable function that accepts the "BulkDataURI" of the JSON
+            Callable function that accepts either the tag, vr and "BulkDataURI"
+            or just the "BulkDataURI" of the JSON
             representation of a data element and returns the actual value of
             that data element (retrieved via DICOMweb WADO-RS)
 
@@ -260,8 +266,14 @@ class DataElement:
         DataElement
         """
         # TODO: test wado-rs retrieve wrapper
-        converter = JsonDataElementConverter(dataset_class, tag, vr, value,
-                                             value_key, bulk_data_uri_handler)
+        converter = JsonDataElementConverter(
+            dataset_class,
+            tag,
+            vr,
+            value,
+            value_key,
+            bulk_data_uri_handler
+        )
         elem_value = converter.get_element_values()
         try:
             return cls(tag=tag, value=elem_value, VR=vr)
