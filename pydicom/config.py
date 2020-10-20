@@ -405,9 +405,6 @@ if _use_future_env:
             "PYDICOM_FUTURE. Use True or False."
         )
 
-if _use_future:
-    future_behavior()
-
 
 def future_behavior() -> None:
     """Imitate the behavior for the next major version of *pydicom*.
@@ -427,3 +424,7 @@ def future_behavior() -> None:
     global _use_future
 
     _use_future = True
+
+
+if _use_future:
+    future_behavior()
