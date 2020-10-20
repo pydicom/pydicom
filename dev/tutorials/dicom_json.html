@@ -293,6 +293,17 @@ the stored <code class="docutils literal notranslate"><span class="pre">BulkData
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">bulk_data_uri_handler</span><span class="o">=</span><span class="n">bulk_data_reader</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>or, if you need to also know the tag and the vr, in addition to the stored
+<code class="docutils literal notranslate"><span class="pre">BulkDataURI</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">bulk_data_reader</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">bulk_data_uri</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">data_retrieved_for_tag_and_vr_via_uri</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">bulk_data_uri</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;00091002&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;vr&quot;</span><span class="p">:</span> <span class="s2">&quot;OB&quot;</span><span class="p">,</span> <span class="s2">&quot;BulkDataURI&quot;</span><span class="p">:</span> <span class="s2">&quot;https://my.wado.org/123&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">bulk_data_uri_handler</span><span class="o">=</span><span class="n">bulk_data_reader</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
