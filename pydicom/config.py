@@ -4,6 +4,7 @@
 # doc strings following items are picked up by sphinx for documentation
 
 import logging
+import os
 
 
 have_numpy = True
@@ -71,8 +72,10 @@ def DS_numpy(use_numpy=True):
     global use_DS_numpy
 
     if use_DS_decimal and use_numpy:
-        raise ValueError("Cannot use numpy arrays to read DS elements"
-                         "if `use_DS_decimal` is True")
+        raise ValueError(
+            "Cannot use numpy arrays to read DS elements"
+            "if `use_DS_decimal` is True"
+        )
     use_DS_numpy = use_numpy
 
 
@@ -100,10 +103,12 @@ def DS_decimal(use_Decimal_boolean=True):
     use_DS_decimal = use_Decimal_boolean
 
     if use_DS_decimal and use_DS_numpy:
-        raise ValueError("Cannot set use_DS_decimal True "
-                         "if use_DS_numpy is True")
+        raise ValueError(
+            "Cannot set use_DS_decimal True " "if use_DS_numpy is True"
+        )
 
     import pydicom.valuerep
+
     if use_DS_decimal:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
     else:
@@ -181,7 +186,7 @@ displaying the file meta information data elements
 """
 
 # Logging system and debug function to change logging level
-logger = logging.getLogger('pydicom')
+logger = logging.getLogger("pydicom")
 logger.addHandler(logging.NullHandler())
 
 import pydicom.overlays.numpy_handler as overlay_np  # noqa
@@ -385,3 +390,40 @@ def debug(debug_on=True, default_handler=True):
 
 # force level=WARNING, in case logging default is set differently (issue 103)
 debug(False, False)
+
+_use_future = False
+_use_future_env = os.getenv("PYDICOM_FUTURE")
+
+if _use_future_env:
+    if _use_future_env.lower() in ["true", "yes", "on"]:
+        _use_future = True
+    elif _use_future_env.lower() in ["false", "no", "off"]:
+        _use_future = False
+    else:
+        raise ValueError(
+            "Unknown setting for environment variable "
+            "PYDICOM_FUTURE. Use True or False."
+        )
+
+if _use_future:
+    future_behavior()
+
+
+def future_behavior() -> None:
+    """Imitate the behavior for the next major version of *pydicom*.
+
+    This can be used to ensure your code is "future-proof" for known
+    upcoming changes in the next major version of *pydicom*. Typically,
+    deprecations become errors, and default values of config flags may change.
+
+    .. versionadded:: 2.1
+
+    See also
+    --------
+    :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR
+    :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR
+
+    """
+    global _use_future
+
+    _use_future = True
