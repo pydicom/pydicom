@@ -7,7 +7,7 @@ import random
 import hashlib
 import re
 import sys
-from typing import List, Optional
+from typing import List, Optional, TypeVar, Type, Union
 import warnings
 
 from pydicom._uid_dict import UID_dictionary
@@ -62,6 +62,9 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 """Regex for a valid UID prefix"""
 
 
+_UID = TypeVar("_UID", bound="UID")
+
+
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
@@ -81,7 +84,7 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls: "UID", val: str) -> "UID":
+    def __new__(cls: Type[_UID], val: str) -> _UID:
         """Setup new instance of the class.
 
         Parameters
@@ -376,7 +379,7 @@ RLECompressedLosslessSyntaxes = RLETransferSyntaxes
 UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
-def generate_uid(prefix: str = PYDICOM_ROOT_UID,
+def generate_uid(prefix: Union[str, None] = PYDICOM_ROOT_UID,
                  entropy_srcs: Optional[List[str]] = None) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
@@ -387,7 +390,7 @@ def generate_uid(prefix: str = PYDICOM_ROOT_UID,
 
     Parameters
     ----------
-    prefix : str, optional
+    prefix : str or None, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
         root UID ``'1.2.826.0.1.3680043.8.498.'``. If not used then a prefix of
         ``'2.25.'`` will be used with the integer form of a UUID generated

@@ -59,16 +59,16 @@ Enhancements
 * Added option to turn on *pydicom* future breaking behavior to allow user code
   to check itself against the next major version release.  Set environment
   variable "PYDICOM_FUTURE" to "True" or call :func:`~pydicom.config.future_behavior`
+* Added another signature to the `bulk_data_uri_handler` in `from_json` to
+  allow for the communication of not just the URI but also the tag and VR
+  to the handler. Previous handlers will work as expected, new signature
+  handlers will get the additional information.
 
 Changes
 .......
 * Reading and adding unknown non-private tags now does not raise an exception
   per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
   (:issue:`1161`)
-* Invalid values used with the :class:`~pydicom.dataset.Dataset`
-  :func:`in<operator.__contains__>` operator now raise :class:`ValueError`
-  rather than returning ``False``, if you need the old behavior use
-  :func:`hasattr` instead (:issue:`1200`)
 * Data dictionaries updated to version 2020d of the DICOM Standard
 * Updated a handful of the SOP Class variable names in
   ``_storage_sopclass_uids``
