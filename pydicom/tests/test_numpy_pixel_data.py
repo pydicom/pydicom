@@ -1353,7 +1353,9 @@ class TestNumpy_PackBits:
              [1, 1, 1, 1, 1, 1, 1, 1]]
         )
         assert 3 == len(pack_bits(arr, pad=False))
-        assert 4 == len(pack_bits(arr, pad=True))
+        b = pack_bits(arr, pad=True)
+        assert 4 == len(b)
+        assert b'\x00' == b[-1]
 
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_PARTIAL)
     def test_pack_partial(self, input, output):
