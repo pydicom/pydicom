@@ -1,15 +1,17 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Define the Sequence class, which contains a sequence DataElement's items.
 
 Sequence is a list of pydicom Dataset objects.
 """
+from typing import Iterable, Optional, List, cast, Union, overload
+from typing import Sequence as SeqType
 import weakref
 
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
 
 
-def validate_dataset(elem):
+def validate_dataset(elem: object) -> object:
     """Check that `elem` is a :class:`~pydicom.dataset.Dataset` instance."""
     if not isinstance(elem, Dataset):
         raise TypeError('Sequence contents must be Dataset instances.')
@@ -28,7 +30,7 @@ class Sequence(MultiValue):
     :class:`~pydicom.multival.MultiValue` super class.
     """
 
-    def __init__(self, iterable=None):
+    def __init__(self, iterable: Optional[Iterable[Dataset]] = None) -> None:
         """Initialize a list of :class:`~pydicom.dataset.Dataset`.
 
         Parameters
@@ -47,17 +49,25 @@ class Sequence(MultiValue):
             raise TypeError('The Sequence constructor requires an iterable')
 
         # the parent dataset
-        self._parent = None
-
-        # If no inputs are provided, we create an empty Sequence
-        if not iterable:
-            iterable = list()
+        self._parent: "Optional[weakref.ReferenceType[Dataset]]" = None
 
         # validate_dataset is used as a pseudo type_constructor
-        super(Sequence, self).__init__(validate_dataset, iterable)
+        self._list: List[Dataset] = []
+        # If no inputs are provided, we create an empty Sequence
+        super().__init__(validate_dataset, iterable or [])
+
+    def append(self, val: Dataset) -> None:
+        """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
+        super().append(val)
+        val.parent = self._parent
+
+    def insert(self, position: int, val: Dataset) -> None:
+        """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
+        super().insert(position, val)
+        val.parent = self._parent
 
     @property
-    def parent(self):
+    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
         """Return a weak reference to the parent
         :class:`~pydicom.dataset.Dataset`.
 
@@ -70,7 +80,7 @@ class Sequence(MultiValue):
         return self._parent
 
     @parent.setter
-    def parent(self, value):
+    def parent(self, value: Dataset) -> None:
         """Set the parent :class:`~pydicom.dataset.Dataset` and pass it to all
         :class:`Sequence` items.
 
@@ -81,22 +91,29 @@ class Sequence(MultiValue):
             for item in self._list:
                 item.parent = self._parent
 
-    def __setitem__(self, i, val):
+    @overload
+    def __setitem__(self, i: int, val: Dataset) -> None: pass
+
+    @overload
+    def __setitem__(self, i: slice, val: SeqType[Dataset]) -> None: pass
+
+    def __setitem__(
+        self, i: Union[slice, int], val: Union[SeqType[Dataset], Dataset]
+    ) -> None:
         """Set the parent :class:`~pydicom.dataset.Dataset` to the new
         :class:`Sequence` item
         """
-        super(Sequence, self).__setitem__(i, val)
-        val.parent = self._parent
+        super().__setitem__(i, val)
+        if isinstance(i, slice):
+            for ds in val:
+                ds.parent = self._parent
+        else:
+            val.parent = self._parent
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String description of the Sequence."""
-        lines = [str(x) for x in self]
-        return "[" + "".join(lines) + "]"
+        return f"[{''.join([str(x) for x in self])}]"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """String representation of the Sequence."""
-        formatstr = "<%(classname)s, length %(count)d>"
-        return formatstr % {
-            'classname': self.__class__.__name__,
-            'count': len(self)
-        }
+        return f"<{self.__class__.__name__}, length {len(self)}>"

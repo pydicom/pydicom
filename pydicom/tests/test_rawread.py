@@ -22,7 +22,7 @@ class TestRawReaderExplVRTests:
         infile = BytesIO(hex2bytes(bytes_input))
         expected = ((2, 1), 'OB',
                     2, b'\00\01',
-                    0xc, False, True)
+                    0xc, False, True, True)
 
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -39,7 +39,7 @@ class TestRawReaderExplVRTests:
         # upon the VR value, thus it will remain a byte string since that is
         # the input
         expected = ((8, 0x212a), 'IS', 2,
-                    b'1 ', 0x8, False, True)
+                    b'1 ', 0x8, False, True, True)
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
                                         is_little_endian=True)
@@ -55,7 +55,7 @@ class TestRawReaderExplVRTests:
         infile = BytesIO(hex2bytes(hexstr))
         expected = ((0x7fe0, 0x10), 'OB',
                     0xffffffff, b'ABCDEFGHIJ',
-                    0xc, False, True)
+                    0xc, False, True, True)
 
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -90,7 +90,7 @@ class TestRawReaderImplVR:
 
         expected = ((8, 0x212a),
                     None, 2, b'1 ',
-                    0x8, True, True)
+                    0x8, True, True, True)
 
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
@@ -107,7 +107,7 @@ class TestRawReaderImplVR:
         infile = BytesIO(hex2bytes(hexstr))
         expected = ((0x7fe0, 0x10), 'OB or OW',
                     0xffffffff, b'ABCDEFGHIJ',
-                    0x8, True, True)
+                    0x8, True, True, True)
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=True,
                                         is_little_endian=True)
@@ -155,7 +155,8 @@ class TestRawReaderImplVR:
             b'\xfe\xff\x00\xe0\x18\x00\x00\x00ABCDEFGHIJKLMNOPQRSTUVWX',
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,        # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -199,7 +200,8 @@ class TestRawReaderImplVR:
              b'\xfe\xff\x00\xe0\x14\x00\x00\x00ABCDEFGHIJKLMNOPQRST'),
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,        # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -236,7 +238,8 @@ class TestRawReaderImplVR:
             b'\xfe\xff\x00\xe0\xff\xff\xff\xffABCDEFGHIJKLMNOPQRSTUVWX',
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,        # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -274,7 +277,8 @@ class TestRawReaderImplVR:
             b'\xfe\xff\x00\xe0\x50\x00\x00\x00ABCDEFGHIJKLMNOPQRSTUVWX',
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,        # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -329,7 +333,8 @@ class TestRawReaderImplVR:
             None,        # extracted data
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,        # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,
@@ -364,7 +369,8 @@ class TestRawReaderImplVR:
             b'\xfe\xff\x00\xe0\x10\x00\x00\x00ABCDEFGHIJKLMNOP',
             12,          # value starts 12 bytes after beginning of element
             False,       # is Implicit VR
-            True         # is Little Endian
+            True,         # is Little Endian
+            True
         )
         de_gen = data_element_generator(infile,
                                         is_implicit_VR=False,

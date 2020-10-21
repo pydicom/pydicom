@@ -2521,12 +2521,7 @@ class TestWriteText:
         # data element with decoded value
         elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp'
-        if 'PyPy' in python_implementation():
-            # PyPy seems to have a different implementation of
-            # replacement mode with regard to escape sequences
-            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
-        else:
-            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
+        expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
         with pytest.warns(UserWarning, match=msg):
             # encode with one invalid encoding
             write_text(fp, elem, encodings=['iso-2022-jp'])

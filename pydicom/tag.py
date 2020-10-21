@@ -9,11 +9,11 @@ stored as a single number and separated to (group, element) as required.
 #       element
 from contextlib import contextmanager
 import traceback
-from typing import Tuple, Optional, Union, ContextManager
+from typing import Tuple, Optional, Union, Any, Iterator
 
 
 @contextmanager
-def tag_in_exception(tag: "BaseTag") -> ContextManager[None]:
+def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
     """Use `tag` within a context.
 
     Used to include the tag details in the traceback message when an exception
@@ -32,10 +32,11 @@ def tag_in_exception(tag: "BaseTag") -> ContextManager[None]:
         raise type(exc)(msg) from exc
 
 
-def Tag(
-    arg: Union[int, str, Tuple[int]],
-    arg2: Optional[int] = None
-) -> "BaseTag":
+# Type that can be used where a parameter is a tag or keyword
+TagType = Union[int, str, Tuple[int, int], "BaseTag"]
+
+
+def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
     General function for creating a :class:`BaseTag` in any of the standard
@@ -144,11 +145,11 @@ class BaseTag(int):
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
-    def __le__(self, other) -> bool:
+    def __le__(self, other: object) -> bool:
         """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: object) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, BaseTag):
@@ -159,15 +160,15 @@ class BaseTag(int):
 
         return int(self) < int(other)
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: object) -> bool:
         """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: object) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -178,7 +179,7 @@ class BaseTag(int):
 
         return int(self) == int(other)
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 
@@ -221,7 +222,7 @@ class BaseTag(int):
         return self.is_private and 0x0010 <= self.element < 0x0100
 
 
-def TupleTag(group_elem: Tuple[int]) -> BaseTag:
+def TupleTag(group_elem: Tuple[int, int]) -> BaseTag:
     """Fast factory for :class:`BaseTag` object with known safe (group, elem)
     :class:`tuple`
     """

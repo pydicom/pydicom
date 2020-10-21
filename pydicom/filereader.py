@@ -6,6 +6,7 @@
 from io import BytesIO
 import os
 from struct import (Struct, unpack)
+from typing import BinaryIO, Union, Optional, List, Tuple, AnyStr
 import warnings
 import zlib
 
@@ -115,15 +116,10 @@ def data_element_generator(fp,
     element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
 
-    tag_set = set()
-    if specific_tags is not None:
-        for tag in specific_tags:
-            if isinstance(tag, str):
-                tag = Tag(tag_for_keyword(tag))
-            if isinstance(tag, BaseTag):
-                tag_set.add(tag)
-        tag_set.add(Tag(0x08, 0x05))
-    has_tag_set = len(tag_set) > 0
+    tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
+    has_tag_set = bool(tag_set)
+    if has_tag_set:
+        tag_set.add(Tag(0x00080005))  # Specific Character Set
 
     while True:
         # Read tag, VR, length, get ready to read value
@@ -769,8 +765,13 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     return new_dataset
 
 
-def dcmread(fp, defer_size=None, stop_before_pixels=False,
-            force=False, specific_tags=None):
+def dcmread(
+    fp: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+    defer_size: Optional[Union[str, int]] = None,
+    stop_before_pixels: bool = False,
+    force: bool = False,
+    specific_tags: Optional[List[Union[int, str, Tuple[int]]]] = None
+) -> Union[FileDataset, DicomDir]:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
@@ -799,7 +800,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         :class:`~pydicom.errors.InvalidDicomError` if the file is
         missing the *File Meta Information* header. Set to ``True`` to force
         reading even if no *File Meta Information* header is found.
-    specific_tags : list or None, optional
+    specific_tags : list of (int or str or 2-tuple of int), optional
         If not ``None``, only the tags in the list are returned. The list
         elements can be tags or tag names. Note that the element (0008,0005)
         *Specific Character Set* is always returned if present - this ensures
@@ -807,9 +808,11 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
 
     Returns
     -------
-    FileDataset
+    FileDataset or DicomDir
         An instance of :class:`~pydicom.dataset.FileDataset` that represents
-        a parsed DICOM file.
+        a parsed DICOM file, unless the dataset is a *Media Storage Directory*
+        instance in which case it will be a
+        :class:`~pydicom.dicomdir.DicomDir`.
 
     Raises
     ------
