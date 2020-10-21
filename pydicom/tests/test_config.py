@@ -139,3 +139,8 @@ class TestFuture:
         ds = Dataset()
         with pytest.raises(TypeError):
             ds.file_meta = Dataset()
+
+    def test_invalid_keyword_raise(self, future_setter):
+        ds = Dataset()
+        with pytest.raises(ValueError):
+            ds.bitsStored = 42

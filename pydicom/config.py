@@ -421,9 +421,10 @@ def future_behavior() -> None:
     :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR
 
     """
-    global _use_future
+    global _use_future, INVALID_KEYWORD_BEHAVIOR
 
     _use_future = True
+    INVALID_KEYWORD_BEHAVIOR = "RAISE"
 
 
 if _use_future:
