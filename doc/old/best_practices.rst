@@ -83,22 +83,12 @@ using the :func:`~pydicom.config.future_behavior` function:
   from pydicom import config
   config.future_behavior()
 
-If you needed to turn the future behavior off again at run-time, you could
-force re-import of the `config` module:
+If you needed to turn the future behavior off again at run-time, call
+:func:`~pydicom.config.future_behavior` with False:
 
 .. code-block:: python
 
-  from pydicom import config
-  config.enforce_valid_values = True
-  # execute code with flag on...
-  # Reload config in its original state
-  import importlib
-  importlib.reload(config)
-
-.. Note::
-  
-  Re-importing `pydicom.config` will not disable the future behavior if the
-  ``PYDICOM_FUTURE`` environment variable has been set to "True".
+  config.future_behavior(False)
 
 
 Limiting the *pydicom* major version in your package
@@ -108,7 +98,7 @@ Another way to avoid breaking changes in future *pydicom* versions is to
 limit the version of *pydicom* that your code uses.
 
 If you follow standard Python packaging recommendations, you can add a line
-to you `requirements.txt` file to limit the *pydicom* version to the currentmodule
+to your `requirements.txt` file to limit the *pydicom* version to the current
 major version.  E.g. a line like:
 
 .. code-block::

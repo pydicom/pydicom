@@ -115,16 +115,15 @@ class TestDebug:
 def future_setter(request, monkeypatch):
     if request.param == "config":
         config.future_behavior()
+        yield
     else:
         monkeypatch.setenv("PYDICOM_FUTURE", "True")
         importlib.reload(config)
-
+        yield
+    
+    config.future_behavior(False)
 
 class TestFuture:
-    def teardown(self):
-        # shouldn't need this, but monkeypatch env wasn't resetting
-        config._use_future = False
-
     def test_reload(self):
         importlib.reload(config)
         assert not config._use_future

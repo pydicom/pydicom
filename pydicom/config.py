@@ -5,7 +5,7 @@
 
 import logging
 import os
-
+from typing import Optional
 
 have_numpy = True
 try:
@@ -395,9 +395,9 @@ _use_future = False
 _use_future_env = os.getenv("PYDICOM_FUTURE")
 
 if _use_future_env:
-    if _use_future_env.lower() in ["true", "yes", "on"]:
+    if _use_future_env.lower() in ["true", "yes", "on", "1"]:
         _use_future = True
-    elif _use_future_env.lower() in ["false", "no", "off"]:
+    elif _use_future_env.lower() in ["false", "no", "off", "0"]:
         _use_future = False
     else:
         raise ValueError(
@@ -406,14 +406,20 @@ if _use_future_env:
         )
 
 
-def future_behavior() -> None:
+def future_behavior(enable_future: Optional[bool] = True) -> None:
     """Imitate the behavior for the next major version of *pydicom*.
+
+    .. versionadded:: 2.1
 
     This can be used to ensure your code is "future-proof" for known
     upcoming changes in the next major version of *pydicom*. Typically,
     deprecations become errors, and default values of config flags may change.
 
-    .. versionadded:: 2.1
+    Parameters
+    ----------
+    enable_future: bool
+        Set ``True`` (default) to emulate future pydicom behavior,
+        ``False`` to reset to current pydicom behavior.
 
     See also
     --------
@@ -423,8 +429,12 @@ def future_behavior() -> None:
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR
 
-    _use_future = True
-    INVALID_KEYWORD_BEHAVIOR = "RAISE"
+    if enable_future:
+        _use_future = True
+        INVALID_KEYWORD_BEHAVIOR = "RAISE"
+    else:
+        _use_future = False
+        INVALID_KEYWORD_BEHAVIOR = "WARN"
 
 
 if _use_future:
