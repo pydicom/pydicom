@@ -120,8 +120,9 @@ def future_setter(request, monkeypatch):
         monkeypatch.setenv("PYDICOM_FUTURE", "True")
         importlib.reload(config)
         yield
-    
+
     config.future_behavior(False)
+
 
 class TestFuture:
     def test_reload(self):
