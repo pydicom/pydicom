@@ -417,8 +417,8 @@ def future_behavior() -> None:
 
     See also
     --------
-    :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR
-    :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR
+    :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR`
+    :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR`
 
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR
