@@ -574,13 +574,14 @@ def _decode_personname(components, encodings):
         given encodings, they are decoded with the first encoding using
         replacement characters for bytes that cannot be decoded.
     """
-    from pydicom.charset import decode_string
+    from pydicom.charset import decode_bytes
 
     if isinstance(components[0], str):
         comps = components
     else:
-        comps = [decode_string(comp, encodings, PN_DELIMS)
-                 for comp in components]
+        comps = [
+            decode_bytes(comp, encodings, PN_DELIMS) for comp in components
+        ]
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:
         comps.pop()

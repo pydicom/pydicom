@@ -11,7 +11,7 @@ from typing import Sequence as SequenceType
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.charset import default_encoding, decode_string
+from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.filereader import read_sequence
@@ -453,15 +453,11 @@ def convert_PN(
     def get_valtype(x: bytes) -> PersonName:
         return PersonName(x, encodings).decode()
 
-    if byte_string.endswith((b' ', b'\x00')):
-        byte_string = byte_string[:-1]
+    b_split = byte_string.rstrip(b'\x00 ').split(b'\\')
+    if len(b_split) == 1:
+        return get_valtype(b_split[0])
 
-    splitup = byte_string.split(b"\\")
-
-    if len(splitup) == 1:
-        return get_valtype(splitup[0])
-
-    return MultiValue(get_valtype, splitup)
+    return MultiValue(get_valtype, b_split)
 
 
 def convert_string(
@@ -521,7 +517,7 @@ def convert_text(
 def convert_single_string(
     byte_string: bytes, encodings: Optional[List[str]] = None
 ) -> str:
-    """Return decoded text, ignoring backslashes.
+    """Return decoded text, ignoring backslashes and trailing spaces.
 
     Parameters
     ----------
@@ -532,14 +528,12 @@ def convert_single_string(
 
     Returns
     -------
-    str or list of str
+    str
         The decoded text.
     """
     encodings = encodings or [default_encoding]
-    value = decode_string(byte_string, encodings, TEXT_VR_DELIMS)
-    while value and value.endswith((' ', '\0')):
-        value = value[:-1]
-    return value
+    value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
+    return value.rstrip('\0 ')
 
 
 def convert_SQ(
@@ -641,14 +635,11 @@ def convert_UI(
     Returns
     -------
     uid.UID or list of uid.UID
-        The decoded 'UI' element value without a trailing null.
+        The decoded 'UI' element value without trailing nulls or spaces.
     """
-    # Strip off 0-byte padding for even length (if there)
+    # Convert to str and remove any trailing nulls or spaces
     value = byte_string.decode(default_encoding)
-    while value and value.endswith((' ', '\0')):
-        value = value[:-1]
-
-    return MultiString(value, pydicom.uid.UID)
+    return MultiString(value.rstrip('\0 '), pydicom.uid.UID)
 
 
 def convert_UN(
@@ -656,7 +647,7 @@ def convert_UN(
     is_little_endian: bool,
     struct_format: Optional[str] = None
 ) -> bytes:
-    """Return encoded 'UN' value as :class:`bytes`."""
+    """Return the encoded 'UN' value as :class:`bytes`."""
     return byte_string
 
 
@@ -665,7 +656,7 @@ def convert_UR_string(
     is_little_endian: bool,
     struct_format: Optional[str] = None
 ) -> str:
-    """Return encoded 'UR' value.
+    """Return a decoded 'UR' value.
 
     Elements with VR of 'UR' may not be multi-valued and trailing spaces are
     non-significant.
@@ -692,7 +683,7 @@ def convert_value(
     raw_data_element: RawDataElement,
     encodings: Optional[List[str]] = None
 ) -> Union[object, SequenceType[object]]:
-    """Return encoded element value using the appropriate decoder.
+    """Return the element value decoded using the appropriate decoder.
 
     Parameters
     ----------

@@ -56,7 +56,7 @@ class MultiValue(MutableSequence[_ItemType]):
 
         self._list = list()
         self.type_constructor = type_constructor
-        if type_constructor in [DSfloat, IS, DSdecimal]:
+        if type_constructor in (DSfloat, IS, DSdecimal):
             type_constructor = DS_IS_constructor
 
         for x in iterable:
@@ -69,7 +69,9 @@ class MultiValue(MutableSequence[_ItemType]):
         del self._list[index]
 
     def extend(self, val: Iterable[_T]) -> None:
-        """Extend a :class:`~pydicom.dataset.Dataset` to the sequence."""
+        """Extend the :class:`~pydicom.multival.MultiValue` using an iterable
+        of objects.
+        """
         self._list.extend([self.type_constructor(x) for x in val])
 
     def __iadd__(self, other: Iterable[_T]) -> MutableSequence[_ItemType]:
@@ -131,9 +133,9 @@ class MultiValue(MutableSequence[_ItemType]):
     def __str__(self) -> str:
         if not self:
             return ''
-        lines = [
+        lines = (
             f"{x!r}" if isinstance(x, (str, bytes)) else str(x) for x in self
-        ]
+        )
         return f"[{', '.join(lines)}]"
 
     __repr__ = __str__

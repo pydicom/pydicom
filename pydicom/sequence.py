@@ -63,7 +63,9 @@ class Sequence(MultiValue[Dataset]):
         val.parent = self._parent
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
-        """Extend a :class:`~pydicom.dataset.Dataset` to the sequence."""
+        """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
+        of :class:`~pydicom.dataset.Dataset` instances.
+        """
         if isinstance(val, Dataset):  # type: ignore[unreachable]
             raise TypeError(f"An iterable of 'Dataset' is required")
 
