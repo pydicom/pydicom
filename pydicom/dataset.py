@@ -1988,6 +1988,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     def _set_file_meta(self, value: Optional["Dataset"]) -> None:
         if value is not None and not isinstance(value, FileMetaDataset):
+            if config._use_future:
+                raise TypeError(
+                    "Pydicom Future: Dataset.file_meta must be an instance "
+                    "of FileMetaDataset"
+                )
+
             FileMetaDataset.validate(value)
             warnings.warn(
                 "Starting in pydicom 3.0, Dataset.file_meta must be a "
