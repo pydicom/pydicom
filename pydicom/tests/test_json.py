@@ -151,8 +151,8 @@ class TestAT:
     def test_invalid_tag_in_json(self):
         ds_json = ('{"000910AG": {"vr": "AT", "Value": ["00091000"]}, '
                    '"00091002": {"vr": "AT", "Value": ["00100010"]}}')
-        with pytest.raises(ValueError, match='Data element "000910AG" could '
-                                             'not be loaded from JSON:'):
+        with pytest.raises(ValueError, match="Data element '000910AG' could "
+                                             "not be loaded from JSON:"):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
             assert 0x00100010 == ds[0x00091002].value

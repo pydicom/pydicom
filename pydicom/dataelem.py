@@ -205,9 +205,12 @@ class DataElement:
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
-        if (VR == 'UN' and not tag.is_private and
-                config.replace_un_with_known_vr and
-                (is_undefined_length or value is None or len(value) < 0xffff)):
+        if (
+            VR == 'UN'
+            and not tag.is_private
+            and config.replace_un_with_known_vr
+            and (is_undefined_length or value is None or len(value) < 0xffff)
+        ):
             try:
                 VR = dictionary_VR(tag)
             except KeyError:
@@ -267,22 +270,16 @@ class DataElement:
         """
         # TODO: test wado-rs retrieve wrapper
         converter = JsonDataElementConverter(
-            dataset_class,
-            tag,
-            vr,
-            value,
-            value_key,
-            bulk_data_uri_handler
+            dataset_class, tag, vr, value, value_key, bulk_data_uri_handler
         )
         elem_value = converter.get_element_values()
         try:
             return cls(tag=tag, value=elem_value, VR=vr)
-        except Exception:
+        except Exception as exc:
             raise ValueError(
-                'Data element "{}" could not be loaded from JSON: {}'.format(
-                    tag, elem_value
-                )
-            )
+                f"Data element '{tag}' could not be loaded from JSON: "
+                f"{elem_value}"
+            ) from exc
 
     def to_json_dict(
         self,
@@ -316,16 +313,16 @@ class DataElement:
             if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
-                if (bulk_data_element_handler is not None and
-                        len(encoded_value) > bulk_data_threshold):
-                    json_element['BulkDataURI'] = bulk_data_element_handler(
-                        self
+                if (
+                    bulk_data_element_handler is not None
+                    and len(encoded_value) > bulk_data_threshold
+                ):
+                    json_element['BulkDataURI'] = (
+                        bulk_data_element_handler(self)
                     )
                 else:
                     logger.info(
-                        'encode bulk data element "{}" inline'.format(
-                            self.name
-                        )
+                        f"encode bulk data element '{self.name}' inline"
                     )
                     json_element['InlineBinary'] = encoded_value
         elif self.VR == 'SQ':
@@ -673,8 +670,8 @@ class DataElement:
         """
         if dictionary_has_tag(self.tag):
             return dictionary_is_retired(self.tag)
-        else:
-            return False
+
+        return False
 
     @property
     def keyword(self) -> str:
@@ -687,8 +684,8 @@ class DataElement:
         """
         if dictionary_has_tag(self.tag):
             return dictionary_keyword(self.tag)
-        else:
-            return ''
+
+        return ''
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
@@ -701,7 +698,7 @@ class DataElement:
 class RawDataElement(NamedTuple):
     """Container for the data from a raw (mostly) undecoded element."""
     tag: BaseTag
-    VR: str
+    VR: Optional[str]
     length: int
     value: bytes
     value_tell: int
@@ -783,8 +780,11 @@ def DataElement_from_raw(
           config.replace_un_with_known_vr):
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
-        if (raw.length == 0xffffffff or raw.value is None or
-                len(raw.value) < 0xffff):
+        if (
+            raw.length == 0xffffffff
+            or raw.value is None
+            or len(raw.value) < 0xffff
+        ):
             try:
                 VR = dictionary_VR(raw.tag)
             except KeyError:

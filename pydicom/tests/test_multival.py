@@ -128,12 +128,17 @@ class TestMultiValue:
         """MultiValue: test print output"""
         multival = MultiValue(IS, [])
         assert '' == str(multival)
+        multival.extend(['1', 2, 3, 4])
+        assert "[1, 2, 3, 4]" == str(multival)
         multival = MultiValue(str, [1, 2, 3])
         assert "['1', '2', '3']" == str(multival)
         multival = MultiValue(int, [1, 2, 3])
         assert '[1, 2, 3]' == str(multival)
         multival = MultiValue(float, [1.1, 2.2, 3.3])
         assert '[1.1, 2.2, 3.3]' == str(multival)
+        mv = MultiValue(IS, [])
+        mv._list = ['1234', b'\x01\x00']
+        assert "['1234', b'\\x01\\x00']" == str(mv)
 
     def test_setitem(self):
         """Test MultiValue.__setitem__()."""

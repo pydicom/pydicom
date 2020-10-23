@@ -7,8 +7,10 @@ import platform
 import re
 import sys
 from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator, AnyStr,
+    Callable, Iterator, overload
 )
+from typing import Sequence as SequenceType
 import warnings
 
 # don't import datetime_conversion directly
@@ -18,6 +20,7 @@ from pydicom.uid import UID
 
 
 # Types
+_T = TypeVar('_T')
 _DA = TypeVar("_DA", bound="DA")
 _DT = TypeVar("_DT", bound="DT")
 _TM = TypeVar("_TM", bound="TM")
@@ -38,7 +41,7 @@ extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
 # in (0008,0005) Specific Character Set
 # See PS-3.5 (2011), section 6.1.2 Graphic Characters
 # and PN, but it is handled separately.
-text_VRs = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
+text_VRs: Tuple[str, ...] = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
@@ -510,30 +513,33 @@ class IS(int):
         return f'"{super().__repr__()}"'
 
 
-def MultiString(val, valtype=str):
+def MultiString(
+    val: str,
+    valtype: Optional[Union[Type[_T], Callable[[object], _T]]] = None
+) -> Union[_T, SequenceType[_T]]:
     """Split a bytestring by delimiters if there are any
 
     Parameters
     ----------
-    val : bytes or str
-        DICOM byte string to split up.
-    valtype
+    val : str
+        The string to split up.
+    valtype : type or callable, optional
         Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
         overwrite to a specific type.
 
     Returns
     -------
-    valtype or list of valtype
+    valtype or MultiValue of valtype
         The split value as `valtype` or a :class:`list` of `valtype`.
     """
+    valtype = str if valtype is None else valtype
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made
     # in PET files we are converting
-
-    while val and (val.endswith(' ') or val.endswith('\x00')):
+    while val and val.endswith((' ', '\x00')):
         val = val[:-1]
-    splitup = val.split("\\")
 
+    splitup = val.split("\\")
     if len(splitup) == 1:
         val = splitup[0]
         return valtype(val) if val else val
@@ -568,13 +574,14 @@ def _decode_personname(components, encodings):
         given encodings, they are decoded with the first encoding using
         replacement characters for bytes that cannot be decoded.
     """
-    from pydicom.charset import decode_string
+    from pydicom.charset import decode_bytes
 
     if isinstance(components[0], str):
         comps = components
     else:
-        comps = [decode_string(comp, encodings, PN_DELIMS)
-                 for comp in components]
+        comps = [
+            decode_bytes(comp, encodings, PN_DELIMS) for comp in components
+        ]
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:
         comps.pop()

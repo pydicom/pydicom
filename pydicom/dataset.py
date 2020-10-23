@@ -31,6 +31,7 @@ from typing import (
     Callable, TypeVar, Type, overload
 )
 import warnings
+import weakref
 
 if TYPE_CHECKING:
     try:
@@ -396,7 +397,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self.is_implicit_VR: Optional[bool] = None
 
         # the parent data set, if this dataset is a sequence item
-        self.parent: Optional["Dataset"] = None
+        self.parent: "Optional[weakref.ReferenceType[Dataset]]" = None
 
         # known private creator blocks
         self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}

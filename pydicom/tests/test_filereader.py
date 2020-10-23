@@ -1168,6 +1168,15 @@ class TestReadDataElement:
         ds = dcmread(self.fp, force=True)
         assert "TEST  12" == ds.DestinationAE
 
+        # Test multivalue read correctly
+        ds.DestinationAE = ["TEST  12  ", "  TEST2", "   TEST 3  "]
+
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        fp.seek(0)
+        ds = dcmread(fp, force=True)
+        assert ["TEST  12", "TEST2", "TEST 3"] == ds.DestinationAE
+
     def test_read_OV_implicit_little(self):
         """Check reading element with VR of OV encoded as implicit"""
         ds = dcmread(self.fp, force=True)
