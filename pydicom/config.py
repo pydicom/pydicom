@@ -406,7 +406,7 @@ if _use_future_env:
         )
 
 
-def future_behavior(enable_future: Optional[bool] = True) -> None:
+def future_behavior(enable_future: bool = True) -> None:
     """Imitate the behavior for the next major version of *pydicom*.
 
     .. versionadded:: 2.1
