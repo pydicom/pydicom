@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Best Practices &mdash; pydicom 2.1.0.dev0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Python 2 Support" href="python2_support.html" />
+    <link rel="prev" title="Private Data Elements" href="private_data_elements.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing_files.html">Writing DICOM Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_pixel_data.html">Working with Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enforcing-valid-dicom">Enforcing Valid DICOM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#future-proofing-your-code">Future-proofing your code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limiting-the-pydicom-major-version-in-your-package">Limiting the <em>pydicom</em> major version in your package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python2_support.html">Python 2 Support</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
+        
+      <li>Best Practices</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="best-practices">
+<span id="id1"></span><h1>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h1>
+<p class="rubric">Future-proof your code, and help ensure valid DICOM</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>There are some features of <em>pydicom</em> that allow you to help check your code
+for more strict DICOM practices, and to future-proof against major
+<em>pydicom</em> version changes.</p>
+<p>It is recommended that you turn on two features if you can:
+enforcement of valid DICOM, and a flag to enable “future” pydicom changes.</p>
+</div>
+<div class="section" id="enforcing-valid-dicom">
+<h2>Enforcing Valid DICOM<a class="headerlink" href="#enforcing-valid-dicom" title="Permalink to this headline">¶</a></h2>
+<p><em>pydicom</em> has a configuration option to help enforce valid DICOM:
+<a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a>.</p>
+<p>If set to <cite>True</cite>, some non-standard DICOM will result in <em>pydicom</em> raising
+an error rather than assuming a default behavior or issuing a warning.</p>
+<p>This flag does not guarantee strict DICOM results, but is a help for
+some specific situations that have been added to <em>pydicom</em> over time.</p>
+<p>In some cases, especially if you are dealing with files that do not
+strictly adhere to the DICOM Standard, you may need to disable this flag.</p>
+<p>To turn on the flag in your code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="n">config</span><span class="o">.</span><span class="n">enforce_valid_values</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>Note that you <em>must not</em> use
+<code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">pydicom.config</span> <span class="pre">import</span> <span class="pre">enforce_valid_values</span></code>.
+That makes the <cite>enforce_valid_values</cite> variable local only to that module,
+so <em>pydicom</em> would not see your change to its value.</p>
+</div>
+<div class="section" id="future-proofing-your-code">
+<h2>Future-proofing your code<a class="headerlink" href="#future-proofing-your-code" title="Permalink to this headline">¶</a></h2>
+<p><em>pydicom</em>, like all software, must balance its evolution with not breaking
+existing code using the library. Sometimes, major changes are necessary
+to make significant improvements to the library.</p>
+<p>To help you protect your code against future changes, <em>pydicom</em> allows you
+to flag that it should behave as it will for any known upcoming
+major changes.</p>
+<p>Running your code with this turned on will help identify any parts of
+your code that are not compatible with the known changes in the next major
+version of <em>pydicom</em>.</p>
+<p>The simplest way to set this behavior is to set an environment variable
+<code class="docutils literal notranslate"><span class="pre">PYDICOM_FUTURE</span></code> to “True”. For example to temporarily turn it on in the
+current terminal session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SET</span> <span class="n">PYDICOM_FUTURE</span><span class="o">=</span><span class="kc">True</span>           <span class="p">(</span><span class="n">Windows</span><span class="p">)</span>
+
+<span class="n">export</span> <span class="n">PYDICOM_FUTURE</span><span class="o">=</span><span class="kc">True</span>        <span class="p">(</span><span class="n">many</span> <span class="n">linux</span> <span class="n">environments</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you wish to turn off the behavior, you can
+either remove the environment variable, or set it to “False”. See your
+operating system documentation for more details on setting or removing
+environment variables.</p>
+<p>The other way to enable the future behavior is to turn it on at run-time
+using the <a class="reference internal" href="../reference/generated/pydicom.config.future_behavior.html#pydicom.config.future_behavior" title="pydicom.config.future_behavior"><code class="xref py py-func docutils literal notranslate"><span class="pre">future_behavior()</span></code></a> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="n">config</span><span class="o">.</span><span class="n">future_behavior</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you needed to turn the future behavior off again at run-time, call
+<a class="reference internal" href="../reference/generated/pydicom.config.future_behavior.html#pydicom.config.future_behavior" title="pydicom.config.future_behavior"><code class="xref py py-func docutils literal notranslate"><span class="pre">future_behavior()</span></code></a> with False:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">future_behavior</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="limiting-the-pydicom-major-version-in-your-package">
+<h2>Limiting the <em>pydicom</em> major version in your package<a class="headerlink" href="#limiting-the-pydicom-major-version-in-your-package" title="Permalink to this headline">¶</a></h2>
+<p>Another way to avoid breaking changes in future <em>pydicom</em> versions is to
+limit the version of <em>pydicom</em> that your code uses.</p>
+<p>If you follow standard Python packaging recommendations, you can add a line
+to your <cite>requirements.txt</cite> file to limit the <em>pydicom</em> version to the current
+major version.  E.g. a line like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="o">&gt;=</span><span class="mf">2.0</span><span class="p">,</span><span class="o">&lt;</span><span class="mf">3.0</span>
+</pre></div>
+</div>
+<p>in the <cite>requirements.txt</cite> file will ensure that those installing your package
+will get the same major version (in the example, version 2) of <em>pydicom</em>
+that you have developed the code for. This works best if your package is
+installed in a virtual environment.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="python2_support.html" class="btn btn-neutral float-right" title="Python 2 Support" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="private_data_elements.html" class="btn btn-neutral float-left" title="Private Data Elements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

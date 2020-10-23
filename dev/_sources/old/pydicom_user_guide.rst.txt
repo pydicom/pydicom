@@ -14,4 +14,5 @@ pydicom User Guide
    image_data_handlers.rst
    viewing_images.rst
    private_data_elements.rst
+   best_practices.rst
    python2_support.rst

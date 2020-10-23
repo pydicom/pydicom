@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.fileutil.read_delimiter_item &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>pydicom.config.future_behavior &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.fileutil.read_undefined_length_value" href="pydicom.fileutil.read_undefined_length_value.html" />
-    <link rel="prev" title="pydicom.fileutil.length_of_undefined_length" href="pydicom.fileutil.length_of_undefined_length.html" /> 
+    <link rel="next" title="pydicom.config.overlay_data_handlers" href="pydicom.config.overlay_data_handlers.html" />
+    <link rel="prev" title="pydicom.config.enforce_valid_values" href="pydicom.config.enforce_valid_values.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -111,7 +111,28 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.datetime_conversion.html">pydicom.config.datetime_conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.debug.html">pydicom.config.debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.enforce_valid_values.html">pydicom.config.enforce_valid_values</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.future_behavior</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.overlay_data_handlers.html">pydicom.config.overlay_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.pixel_data_handlers.html">pydicom.config.pixel_data_handlers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.reset_data_element_callback.html">pydicom.config.reset_data_element_callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.show_file_meta.html">pydicom.config.show_file_meta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_decimal.html">pydicom.config.DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.DS_numpy.html">pydicom.config.DS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
@@ -122,21 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.absorb_delimiter_item.html">pydicom.fileutil.absorb_delimiter_item</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.find_bytes.html">pydicom.fileutil.find_bytes</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.find_delimiter.html">pydicom.fileutil.find_delimiter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.length_of_undefined_length.html">pydicom.fileutil.length_of_undefined_length</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.fileutil.read_delimiter_item</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.read_undefined_length_value.html">pydicom.fileutil.read_undefined_length_value</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -202,11 +209,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../fileio.html">Dataset IO</a> &raquo;</li>
+          <li><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a> &raquo;</li>
         
-          <li><a href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a> &raquo;</li>
-        
-      <li>pydicom.fileutil.read_delimiter_item</li>
+      <li>pydicom.config.future_behavior</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -223,13 +228,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-fileutil-read-delimiter-item">
-<h1>pydicom.fileutil.read_delimiter_item<a class="headerlink" href="#pydicom-fileutil-read-delimiter-item" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-config-future-behavior">
+<h1>pydicom.config.future_behavior<a class="headerlink" href="#pydicom-config-future-behavior" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.fileutil.read_delimiter_item">
-<code class="sig-prename descclassname">pydicom.fileutil.</code><code class="sig-name descname">read_delimiter_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">delimiter</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/fileutil.py#L381"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileutil.read_delimiter_item" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read and ignore an expected delimiter.</p>
-<p>If the delimiter is not found or correctly formed, a warning is logged.</p>
+<dt id="pydicom.config.future_behavior">
+<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">future_behavior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">enable_future</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/config.py#L409"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.future_behavior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imitate the behavior for the next major version of <em>pydicom</em>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.</span></p>
+</div>
+<p>This can be used to ensure your code is “future-proof” for known
+upcoming changes in the next major version of <em>pydicom</em>. Typically,
+deprecations become errors, and default values of config flags may change.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>enable_future</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Set <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) to emulate future pydicom behavior,
+<code class="docutils literal notranslate"><span class="pre">False</span></code> to reset to current pydicom behavior.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html#pydicom.config.INVALID_KEYWORD_BEHAVIOR" title="pydicom.config.INVALID_KEYWORD_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEYWORD_BEHAVIOR</span></code></a>, <a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html#pydicom.config.INVALID_KEY_BEHAVIOR" title="pydicom.config.INVALID_KEY_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEY_BEHAVIOR</span></code></a></p>
+</div>
 </dd></dl>
 
 </div>
@@ -242,10 +262,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pydicom.fileutil.read_undefined_length_value.html" class="btn btn-neutral float-right" title="pydicom.fileutil.read_undefined_length_value" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.config.overlay_data_handlers.html" class="btn btn-neutral float-right" title="pydicom.config.overlay_data_handlers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.fileutil.length_of_undefined_length.html" class="btn btn-neutral float-left" title="pydicom.fileutil.length_of_undefined_length" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.config.enforce_valid_values.html" class="btn btn-neutral float-left" title="pydicom.config.enforce_valid_values" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

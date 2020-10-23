@@ -397,6 +397,9 @@ DICOM File-sets and their DICOMDIR files via the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/9">#9</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/243">#243</a>,
 <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1093">#1093</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.uid.AllTransferSyntaxes.html#pydicom.uid.AllTransferSyntaxes" title="pydicom.uid.AllTransferSyntaxes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">AllTransferSyntaxes</span></code></a></p></li>
+<li><p>Added option to turn on <em>pydicom</em> future breaking behavior to allow user code
+to check itself against the next major version release.  Set environment
+variable “PYDICOM_FUTURE” to “True” or call <a class="reference internal" href="../reference/generated/pydicom.config.future_behavior.html#pydicom.config.future_behavior" title="pydicom.config.future_behavior"><code class="xref py py-func docutils literal notranslate"><span class="pre">future_behavior()</span></code></a></p></li>
 <li><p>Added another signature to the <cite>bulk_data_uri_handler</cite> in <cite>from_json</cite> to
 allow for the communication of not just the URI but also the tag and VR
 to the handler. Previous handlers will work as expected, new signature

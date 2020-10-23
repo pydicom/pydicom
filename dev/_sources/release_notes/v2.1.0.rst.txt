@@ -56,6 +56,9 @@ Enhancements
   :class:`~pydicom.fileset.FileSet` class (:issue:`9`, :issue:`243`,
   :issue:`1093`)
 * Added :attr:`~pydicom.uid.AllTransferSyntaxes`
+* Added option to turn on *pydicom* future breaking behavior to allow user code
+  to check itself against the next major version release.  Set environment
+  variable "PYDICOM_FUTURE" to "True" or call :func:`~pydicom.config.future_behavior`
 * Added another signature to the `bulk_data_uri_handler` in `from_json` to
   allow for the communication of not just the URI but also the tag and VR
   to the handler. Previous handlers will work as expected, new signature
