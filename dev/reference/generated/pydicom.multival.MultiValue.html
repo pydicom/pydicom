@@ -224,7 +224,7 @@
 <h1>pydicom.multival.MultiValue<a class="headerlink" href="#pydicom-multival-multivalue" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.multival.MultiValue">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.multival.</code><code class="sig-name descname">MultiValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_constructor</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/multival.py#L17"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pydicom.multival.</code><code class="sig-name descname">MultiValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwds</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/multival.py#L17"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to hold any multi-valued DICOM value, or any list of items that
 are all of the same type.</p>
 <p>This class enforces that any items added to the list are of the correct
@@ -236,16 +236,20 @@ converted.</p>
 than an instance of their classes.</p>
 <dl class="py method">
 <dt id="pydicom.multival.MultiValue.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_constructor</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/multival.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the list of values</p>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_constructor</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>_T<span class="p">]</span><span class="p">, </span>_ItemType<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>_T<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/multival.py#L31"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> from an iterable and ensure each
+item in the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> has the same type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>type_constructor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><em>type</em></a>) – A constructor for the required type for all list items. Could be
-the class, or a factory function. For DICOM multi-value data
-elements, this will be the class or type corresponding to the VR.</p></li>
+<li><p><strong>type_constructor</strong> (<em>callable</em>) – A constructor for the required type for all items. Could be
+the class, or a factory function. Takes a single parameter and
+returns the input as the desired type (or raises an appropriate
+exception).</p></li>
 <li><p><strong>iterable</strong> (<em>iterable</em>) – An iterable (e.g. <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>) of items to
-initialize the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> list.</p></li>
+initialize the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> list. Each item in the iterable
+is passed to <cite>type_constructor</cite> and the returned value added to
+the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -259,7 +263,7 @@ initialize the <a class="reference internal" href="#pydicom.multival.MultiValue"
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.multival.MultiValue.__init__" title="pydicom.multival.MultiValue.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(type_constructor, iterable)</p></td>
-<td><p>Initialize the list of values</p></td>
+<td><p>Create a new <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> from an iterable and ensure each item in the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> has the same type.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.multival.MultiValue.append" title="pydicom.multival.MultiValue.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a>(val)</p></td>
 <td><p>S.append(value) – append value to the end of the sequence</p></td>
@@ -270,8 +274,8 @@ initialize the <a class="reference internal" href="#pydicom.multival.MultiValue"
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code>(values)</p></td>
-<td><p>S.extend(iterable) – extend sequence by appending elements from the iterable</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.multival.MultiValue.extend" title="pydicom.multival.MultiValue.extend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code></a>(val)</p></td>
+<td><p>Extend the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> using an iterable of objects.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value, [start, [stop]])</p></td>
 <td><p>Raises ValueError if the value is not present.</p></td>
@@ -295,13 +299,20 @@ initialize the <a class="reference internal" href="#pydicom.multival.MultiValue"
 </table>
 <dl class="py method">
 <dt id="pydicom.multival.MultiValue.append">
-<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/multival.py#L64"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.append" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n">_T</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/multival.py#L65"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>S.append(value) – append value to the end of the sequence</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="pydicom.multival.MultiValue.extend">
+<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>_T<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/multival.py#L71"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the <a class="reference internal" href="#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></a> using an iterable
+of objects.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pydicom.multival.MultiValue.insert">
-<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">position</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/multival.py#L61"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.insert" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">position</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n">_T</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/multival.py#L96"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.multival.MultiValue.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>S.insert(index, value) – insert value before index</p>
 </dd></dl>
 

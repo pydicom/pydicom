@@ -243,23 +243,23 @@
 <h1>pydicom.values.convert_string<a class="headerlink" href="#pydicom-values-convert-string" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.values.convert_string">
-<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">byte_string</span></em>, <em class="sig-param"><span class="n">is_little_endian</span></em>, <em class="sig-param"><span class="n">struct_format</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/17706feb/pydicom/values.py#L404"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">byte_string</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em>, <em class="sig-param"><span class="n">is_little_endian</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span></em>, <em class="sig-param"><span class="n">struct_format</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Sequence<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/995ac649/pydicom/values.py#L463"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a decoded string VR value.</p>
-<p>String VRs are ‘AS’, ‘CS’ and optionally (depending on
+<p>String VRs are ‘AE’, AS’, ‘CS’ and optionally (depending on
 <a class="reference internal" href="../config.html#api-config"><span class="std std-ref">pydicom.config</span></a>) ‘DA’, ‘DT’, and ‘TM’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>byte_string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The encoded text VR element value.</p></li>
+<li><p><strong>byte_string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – The encoded text VR element value.</p></li>
 <li><p><strong>is_little_endian</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – <code class="docutils literal notranslate"><span class="pre">True</span></code> if the value is encoded as little endian, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p></li>
-<li><p><strong>struct_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used.</p></li>
+<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Not used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The decoded value(s).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a> or list of str</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a> or MultiValue of str</p>
 </dd>
 </dl>
 </dd></dl>
