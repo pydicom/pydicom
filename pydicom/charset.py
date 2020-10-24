@@ -114,7 +114,7 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
 
     Returns
     -------
-    byte string
+    bytes
         The encoded string. If some characters in value could not be encoded to
         JIS X 0201, and `errors` is not set to 'strict', they are replaced to
         '?'.
@@ -168,19 +168,20 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
 
 
 def _encode_to_jis_x_0208(value: str, errors: str = 'strict') -> bytes:
-    """Convert a unicode string into JIS X 0208 byte string."""
+    """Convert a unicode string into JIS X 0208 encoded bytes."""
     return _encode_to_given_charset(value, 'ISO 2022 IR 87', errors=errors)
 
 
 def _encode_to_jis_x_0212(value: str, errors: str = 'strict') -> bytes:
-    """Convert a unicode string into JIS X 0212 byte string."""
+    """Convert a unicode string into JIS X 0212 encoded bytes."""
     return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
 
 
 def _encode_to_given_charset(
     value: str, character_set: str, errors: str = 'strict'
 ) -> bytes:
-    """Convert a unicode string into given character set.
+    """Encode a unicode string using the given character set.
+
     The escape sequence which is located at the end of the encoded value has
     to vary depending on the value 1 of SpecificCharacterSet. So we have to
     trim it and append the correct escape sequence manually.
@@ -197,7 +198,7 @@ def _encode_to_given_charset(
 
     Returns
     -------
-    byte string
+    bytes
         The encoded string. If some characters in value could not be encoded to
         given character_set, it depends on the behavior of corresponding python
         encoder.
@@ -370,6 +371,7 @@ def _decode_fragment(
     byte_str: bytes, encodings: List[str], delimiters: Set[int]
 ) -> str:
     """Decode a byte string encoded with a single encoding.
+
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
     otherwise the first value in encodings.
@@ -379,7 +381,7 @@ def _decode_fragment(
     Parameters
     ----------
     byte_str : bytes
-        The raw string to be decoded.
+        The encoded string to be decoded.
     encodings: list of str
         The list of Python encodings as converted from the values in the
         Specific Character Set tag.
@@ -429,6 +431,7 @@ def _decode_escaped_fragment(
     byte_str: bytes, encodings: List[str], delimiters: Set[int]
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
+
     See `_decode_fragment` for parameter description and more information.
     """
     # all 4-character escape codes start with one of two character sets
@@ -574,7 +577,7 @@ def _encode_string_parts(value: str, encodings: List[str]) -> bytes:
                 best_encoding = encoding
                 max_index = len(unencoded_part)
                 break
-            except UnicodeEncodeError as err:
+            except (UnicodeDecodeError, UnicodeEncodeError) as err:
                 if err.start > max_index:
                     # err.start is the index of first char we failed to encode
                     max_index = err.start
@@ -607,9 +610,11 @@ def _encode_string_parts(value: str, encodings: List[str]) -> bytes:
 def _encode_string_impl(
     value: str, encoding: str, errors: str = 'strict'
 ) -> bytes:
-    """Convert a unicode string into a byte string. If given encoding is in
-    custom_encoders, use a corresponding custom_encoder. If given encoding
-    is not in custom_encoders, use a corresponding python handled encoder.
+    """Convert a unicode string into a byte string.
+
+    If given encoding is in `custom_encoders`, use a corresponding
+    `custom_encoder`. If given encoding is not in `custom_encoders`, use a
+    corresponding python handled encoder.
     """
     if encoding in custom_encoders:
         return custom_encoders[encoding](value, errors=errors)
