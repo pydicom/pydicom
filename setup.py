@@ -41,7 +41,8 @@ CLASSIFIERS = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "Topic :: Scientific/Engineering :: Physics",
-    "Topic :: Software Development :: Libraries"]
+    "Topic :: Software Development :: Libraries"
+]
 
 KEYWORDS = "dicom python medical imaging"
 
@@ -69,37 +70,44 @@ def data_files_inventory():
     data_roots = ['pydicom/data']
     for data_root in data_roots:
         for root, subfolder, files in os.walk(data_root):
-            files = [x.replace('pydicom/', '') for x in glob(root + '/*')
-                     if not os.path.isdir(x)]
-            data_files = data_files + files
+            files = [
+                x.replace('pydicom/', '') for x in glob(root + '/*')
+                if not os.path.isdir(x)
+            ]
+            files = [f for f in files if not f.endswith('.pyc')]
+            data_files += files
     return data_files
 
 
-PACKAGE_DATA = {'pydicom': data_files_inventory()}
+PACKAGE_DATA = {
+    'pydicom': data_files_inventory() + ['py.typed']
+}
 
-opts = dict(name=NAME,
-            python_requires='>=3.6',
-            version=VERSION,
-            maintainer=MAINTAINER,
-            maintainer_email=MAINTAINER_EMAIL,
-            author=AUTHOR,
-            author_email=AUTHOR_EMAIL,
-            description=description,
-            long_description=LONG_DESCRIPTION,
-            long_description_content_type='text/markdown',
-            url=URL,
-            download_url=DOWNLOAD_URL,
-            license=LICENSE,
-            keywords=KEYWORDS,
-            classifiers=CLASSIFIERS,
-            packages=find_packages(),
-            py_modules=_py_modules,
-            package_data=PACKAGE_DATA,
-            include_package_data=True,
-            install_requires=REQUIRES,
-            setup_requires=SETUP_REQUIRES,
-            tests_require=TESTS_REQUIRE,
-            zip_safe=False)
+opts = dict(
+    name=NAME,
+    python_requires='>=3.6',
+    version=VERSION,
+    maintainer=MAINTAINER,
+    maintainer_email=MAINTAINER_EMAIL,
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    description=description,
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
+    url=URL,
+    download_url=DOWNLOAD_URL,
+    license=LICENSE,
+    keywords=KEYWORDS,
+    classifiers=CLASSIFIERS,
+    packages=find_packages(),
+    py_modules=_py_modules,
+    package_data=PACKAGE_DATA,
+    include_package_data=True,
+    install_requires=REQUIRES,
+    setup_requires=SETUP_REQUIRES,
+    tests_require=TESTS_REQUIRE,
+    zip_safe=False
+)
 
 if __name__ == '__main__':
     setup(**opts)
