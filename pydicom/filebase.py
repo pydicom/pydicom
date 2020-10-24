@@ -6,7 +6,7 @@ from struct import unpack, pack
 from types import TracebackType
 from typing import (
     Tuple, Optional, NoReturn, BinaryIO, Callable, Type, Union, cast, TextIO,
-    TYPE_CHECKING
+    TYPE_CHECKING, Any
 )
 if TYPE_CHECKING:
     # Typing backports
@@ -36,7 +36,7 @@ class DicomIO:
     # default
     defer_size = None
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         # start with this by default
         self._implicit_VR = True
         self.write: Callable[[bytes], int]
@@ -168,7 +168,10 @@ class DicomIO:
 
 class DicomFileLike(DicomIO):
     def __init__(
-        self, file_like_obj: Union[TextIO, BinaryIO, BytesIO], *args, **kwargs
+        self,
+        file_like_obj: Union[TextIO, BinaryIO, BytesIO],
+        *args: Any,
+        **kwargs: Any
     ) -> None:
         super().__init__(*args, **kwargs)
         self.parent = file_like_obj
@@ -205,12 +208,12 @@ class DicomFileLike(DicomIO):
         self.close()
 
 
-def DicomFile(*args, **kwargs) -> DicomFileLike:
+def DicomFile(*args: Any, **kwargs: Any) -> DicomFileLike:
     return DicomFileLike(open(*args, **kwargs))
 
 
 class DicomBytesIO(DicomFileLike):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(BytesIO(*args, **kwargs))
 
     def getvalue(self) -> bytes:
