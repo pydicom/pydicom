@@ -61,7 +61,7 @@ Enhancements
   to the handler. Previous handlers will work as expected, new signature
   handlers will get the additional information.
 * :func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits` can now be used
-  with 2 or 3D input arrays and will pad the packed data to even length by
+  with 2D or 3D input arrays and will pad the packed data to even length by
   default.
 
 Changes
