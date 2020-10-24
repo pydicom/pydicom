@@ -265,17 +265,15 @@ related <em>Pixel Data</em>. The actual offset between them can be determined fr
 the top left pixels are aligned and a value of <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0]</span></code> indicates that the
 overlay pixels start 1 row above and 1 row to the left of the image pixels.</p>
 <p>NumPy can be used to modify the pixels, but if the changes are to be saved,
-they must be bit-packed and written back to the correct element:</p>
+they must be bit-packed (using something like
+<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="pydicom.pixel_data_handlers.numpy_handler.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a>) and written
+back to the correct element:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a line</span>
 <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Pack the data</span>
 <span class="kn">from</span> <span class="nn">pydicom.pixel_data_handlers.numpy_handler</span> <span class="kn">import</span> <span class="n">pack_bits</span>
 <span class="n">packed_bytes</span> <span class="o">=</span> <span class="n">pack_bits</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
-
-<span class="c1"># Pad the value if odd-length</span>
-<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_bytes</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
-    <span class="n">packed_bytes</span> <span class="o">+=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span>
 
 <span class="c1"># Update the element value</span>
 <span class="n">ds</span><span class="p">[</span><span class="mh">0x6000</span><span class="p">,</span> <span class="mh">0x3000</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">packed_bytes</span>
