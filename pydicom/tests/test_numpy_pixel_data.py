@@ -1326,7 +1326,7 @@ class TestNumpy_PackBits:
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
     def test_pack(self, input, output):
         """Test packing data."""
-        assert output == pack_bits(np.asarray(input))
+        assert output == pack_bits(np.asarray(input), pad=False)
 
     def test_non_binary_input(self):
         """Test non-binary input raises exception."""
@@ -1334,20 +1334,33 @@ class TestNumpy_PackBits:
                            match=r"Only binary arrays \(containing ones or"):
             pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
 
-    def test_non_array_input(self):
-        """Test non 1D input raises exception."""
-        with pytest.raises(ValueError, match='Only 1D arrays are supported'):
-            pack_bits(
-                np.asarray(
-                    [[0, 0, 0, 0, 0, 0, 0, 0],
-                     [1, 0, 1, 0, 1, 0, 1, 0]]
-                )
-            )
+    def test_ndarray_input(self):
+        """Test non 1D input gets ravelled."""
+        arr = np.asarray(
+            [[0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 0, 1, 0, 1, 0, 1, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1]]
+        )
+        assert (3, 8) == arr.shape
+        b = pack_bits(arr, pad=False)
+        assert b'\x00\x55\xff' == b
+
+    def test_padding(self):
+        """Test odd length packed data is padded."""
+        arr = np.asarray(
+            [[0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 0, 1, 0, 1, 0, 1, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1]]
+        )
+        assert 3 == len(pack_bits(arr, pad=False))
+        b = pack_bits(arr, pad=True)
+        assert 4 == len(b)
+        assert 0 == b[-1]
 
     @pytest.mark.parametrize('output, input', REFERENCE_PACK_PARTIAL)
     def test_pack_partial(self, input, output):
         """Test packing data that isn't a full byte long."""
-        assert output == pack_bits(np.asarray(input))
+        assert output == pack_bits(np.asarray(input), pad=False)
 
     def test_functional(self):
         """Test against a real dataset."""

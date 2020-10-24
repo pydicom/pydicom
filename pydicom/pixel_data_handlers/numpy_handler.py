@@ -108,12 +108,17 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def pack_bits(arr):
+def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
 
     .. versionadded:: 1.2
 
     Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
+
+    .. versionchanged:: 2.1
+
+        Added the `pad` keyword parameter and changed to allow `arr` to be
+        2 or 3D.
 
     Parameters
     ----------
@@ -122,7 +127,13 @@ def pack_bits(arr):
         only contain integer values of 0 and 1 and must have an 'uint'  or
         'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
         that the length of `arr` be a multiple of 8 (i.e. that any empty
-        bit-padding to round out the byte has already been added).
+        bit-padding to round out the byte has already been added). The input
+        `arr` should either be shaped as (rows, columns) or (frames, rows,
+        columns) or the equivalent 1D array used to ensure that the packed
+        data is in the correct order.
+    pad : bool, optional
+        If ``True`` (default) then add a null byte to the end of the packed
+        data to ensure even length, otherwise no padding will be added.
 
     Returns
     -------
@@ -150,7 +161,7 @@ def pack_bits(arr):
         )
 
     if len(arr.shape) > 1:
-        raise ValueError("Only 1D arrays are supported.")
+        arr = arr.ravel()
 
     # The array length must be a multiple of 8, pad the end
     if arr.shape[0] % 8:
@@ -161,7 +172,11 @@ def pack_bits(arr):
     arr = np.fliplr(arr)
     arr = np.packbits(arr.astype('uint8'))
 
-    return arr.tobytes()
+    packed: bytes = arr.tobytes()
+    if pad:
+        return packed + b'\x00' if len(packed) % 2 else packed
+
+    return packed
 
 
 def unpack_bits(bytestream):
