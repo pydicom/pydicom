@@ -8,10 +8,10 @@ from typing import (
     Tuple, Optional, NoReturn, BinaryIO, Callable, Type, Union, cast, TextIO,
     TYPE_CHECKING, Any
 )
-if TYPE_CHECKING:
-    # Typing backports
-    from typing_extensions import Protocol  # added in 3.8
-else:
+
+try:
+    from typing import Protocol  # added in 3.8
+except ImportError:
     Protocol = object
 
 from pydicom.tag import Tag, BaseTag, TagType
