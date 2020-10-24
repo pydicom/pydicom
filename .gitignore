@@ -51,3 +51,6 @@ pydicom/.mypy_cache/*
 
 # vscode
 .vscode/*
+
+# virtualenv
+env/

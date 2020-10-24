@@ -286,7 +286,7 @@ custom_encoders = {
 }
 
 
-def decode_string(
+def decode_bytes(
     value: bytes, encodings: List[str], delimiters: Set[int]
 ) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
@@ -296,8 +296,7 @@ def decode_string(
     Parameters
     ----------
     value : bytes
-        The encoded byte string in the DICOM element value. Should be
-        :class:`bytes`
+        The encoded byte string in the DICOM element value.
     encodings : list of str
         The encodings needed to decode the string as a list of Python
         encodings, converted from the encodings in (0008,0005) *Specific
@@ -362,6 +361,9 @@ def decode_string(
         _decode_fragment(fragment, encodings, delimiters)
         for fragment in fragments
     ])
+
+
+decode_string = decode_bytes
 
 
 def _decode_fragment(
@@ -822,17 +824,15 @@ def decode_element(
         if elem.VM == 1:
             if isinstance(elem.value, str):
                 return
-            # elem.value: bytes
-            elem.value = decode_string(elem.value, encodings, TEXT_VR_DELIMS)
+            elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS)
         else:
             output = list()
             for value in elem.value:
                 if isinstance(value, str):
                     output.append(value)
                 else:
-                    # elem.value: Iterable[bytes]
                     output.append(
-                        decode_string(value, encodings, TEXT_VR_DELIMS)
+                        decode_bytes(value, encodings, TEXT_VR_DELIMS)
                     )
 
             elem.value = output
