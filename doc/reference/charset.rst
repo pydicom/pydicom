@@ -12,5 +12,5 @@ Character encoding and decoding functions.
 
    convert_encodings
    decode_element
-   decode_string
+   decode_bytes
    encode_string
