@@ -398,7 +398,7 @@ def generate_pixel_data(
 
 
 def decode_data_sequence(data: bytes) -> List[bytes]:
-    """Read encapsulated data and return a list of strings.
+    """Read encapsulated data and return a list of bytes.
 
     Parameters
     ----------
