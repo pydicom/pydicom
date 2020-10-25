@@ -3,7 +3,7 @@
 
 from struct import unpack
 from sys import byteorder
-from typing import Dict
+from typing import Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast
 import warnings
 
 try:
@@ -15,8 +15,15 @@ except ImportError:
 from pydicom.data import get_palette_files
 from pydicom.uid import UID
 
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
-def apply_color_lut(arr, ds=None, palette=None):
+
+def apply_color_lut(
+    arr: "np.ndarray",
+    ds: Optional["Dataset"] = None,
+    palette: Optional[Union[str, UID]] = None
+) -> "np.ndarray":
     """Apply a color palette lookup table to `arr`.
 
     .. versionadded:: 1.4
@@ -187,7 +194,7 @@ def apply_color_lut(arr, ds=None, palette=None):
     return out
 
 
-def apply_modality_lut(arr, ds):
+def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     """Apply a modality lookup table or rescale operation to `arr`.
 
     .. versionadded:: 1.4
@@ -261,10 +268,19 @@ def apply_modality_lut(arr, ds):
     return arr
 
 
-def apply_voi_lut(arr, ds, index=0):
+def apply_voi_lut(
+    arr: "np.ndarray",
+    ds: "Dataset",
+    index: int = 0,
+    prefer_lut: bool = True
+) -> "np.ndarray":
     """Apply a VOI lookup table or windowing operation to `arr`.
 
     .. versionadded:: 1.4
+
+    .. versionchanged:: 2.1
+
+        Added the `prefer_lut` keyword parameter
 
     Parameters
     ----------
@@ -280,13 +296,171 @@ def apply_voi_lut(arr, ds, index=0):
         ``np.float64``. If neither are present then `arr` will be returned
         unchanged.
     index : int, optional
-        Where the VOI LUT Module contains multiple possible views, this is
+        Where the VOI LUT Module contains multiple altervative views, this is
         the index of the view to return (default ``0``).
+    prefer_lut : bool
+        When the VOI LUT Module contains both *Window Width*/*Window Center*
+        and *VOI LUT Sequence*, if ``True`` (default) then apply the VOI LUT,
+        otherwise apply the windowing operation.
 
     Returns
     -------
     numpy.ndarray
         An array with applied VOI LUT or windowing operation.
+
+    Notes
+    -----
+    When the dataset requires a modality LUT or rescale operation as part of
+    the Modality LUT module then that must be applied before any windowing
+    operation.
+
+    See Also
+    --------
+    :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut`
+    :func:`~pydicom.pixel_data_handlers.util.apply_voi`
+    :func:`~pydicom.pixel_data_handlers.util.apply_windowing`
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
+      <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
+      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
+    """
+    if "VOILUTSequence" not in ds and "WindowCenter" not in ds:
+        return arr
+
+    if 'VOILUTSequence' in ds and 'WindowCenter' in ds:
+        if prefer_lut:
+            return apply_voi(arr, ds, index)
+
+        return apply_windowing(arr, ds, index)
+
+    if 'VOILUTSequence' in ds:
+        return apply_voi(arr, ds, index)
+
+    if 'WindowCenter' in ds:
+        return apply_windowing(arr, ds, index)
+
+
+def apply_voi(
+    arr: "np.ndarray", ds: "Dataset", index: int = 0
+) -> "np.ndarray":
+    """Apply a VOI lookup table to `arr`.
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the VOI LUT to.
+    ds : dataset.Dataset
+        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
+        If (0028,3010) *VOI LUT Sequence* is present then returns an array
+        of ``np.uint8`` or ``np.uint16``, depending on the 3rd value of
+        (0028,3002) *LUT Descriptor*, otherwise `arr` will be returned
+        unchanged.
+    index : int, optional
+        Where the VOI LUT Module contains multiple alternative views, this is
+        the index of the view to return (default ``0``).
+
+    Returns
+    -------
+    numpy.ndarray
+        An array with applied VOI LUT.
+
+    Notes
+    -----
+    When the dataset requires a modality LUT or rescale operation as part of
+    the Modality LUT module then that must be applied before any windowing
+    operation.
+
+    See Also
+    --------
+    :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut`
+    :func:`~pydicom.pixel_data_handlers.util.apply_windowing`
+
+    References
+    ----------
+    * DICOM Standard, Part 3, :dcm:`Annex C.11.2
+      <part03/sect_C.11.html#sect_C.11.2>`
+    * DICOM Standard, Part 3, :dcm:`Annex C.8.11.3.1.5
+      <part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5>`
+    * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
+      <part04/sect_N.2.html#sect_N.2.1.1>`
+    """
+    if "VOILUTSequence" not in ds:
+        return arr
+
+    if not np.issubdtype(arr.dtype, np.integer):
+        warnings.warn(
+            "Applying a VOI LUT on a float input array may give "
+            "incorrect results"
+        )
+
+    # VOI LUT Sequence contains one or more items
+    item = ds.VOILUTSequence[index]
+    nr_entries = item.LUTDescriptor[0] or 2**16
+    first_map = item.LUTDescriptor[1]
+
+    # PS3.3 C.8.11.3.1.5: may be 8, 10-16
+    nominal_depth = item.LUTDescriptor[2]
+    if nominal_depth in list(range(10, 17)):
+        dtype = 'uint16'
+    elif nominal_depth == 8:
+        dtype = 'uint8'
+    else:
+        raise NotImplementedError(
+            f"'{nominal_depth}' bits per LUT entry is not supported"
+        )
+
+    # Ambiguous VR, US or OW
+    if item['LUTData'].VR == 'OW':
+        endianness = '<' if ds.is_little_endian else '>'
+        unpack_fmt = f'{endianness}{nr_entries}H'
+        lut_data = unpack(unpack_fmt, item.LUTData)
+    else:
+        lut_data = item.LUTData
+    lut_data = np.asarray(lut_data, dtype=dtype)
+
+    # IVs < `first_map` get set to first LUT entry (i.e. index 0)
+    clipped_iv = np.zeros(arr.shape, dtype=dtype)
+    # IVs >= `first_map` are mapped by the VOI LUT
+    # `first_map` may be negative, positive or 0
+    mapped_pixels = arr >= first_map
+    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
+    # IVs > number of entries get set to last entry
+    np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+
+    return lut_data[clipped_iv]
+
+
+def apply_windowing(
+    arr: "np.ndarray", ds: "Dataset", index: int = 0
+) -> "np.ndarray":
+    """Apply a windowing operation to `arr`.
+
+    .. versionadded:: 2.1
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`~numpy.ndarray` to apply the windowing operation to.
+    ds : dataset.Dataset
+        A dataset containing a :dcm:`VOI LUT Module<part03/sect_C.11.2.html>`.
+        If (0028,1050) *Window Center* and (0028,1051) *Window Width* are
+        present then returns an array of ``np.float64``, otherwise `arr` will
+        be returned unchanged.
+    index : int, optional
+        Where the VOI LUT Module contains multiple alternative views, this is
+        the index of the view to return (default ``0``).
+
+    Returns
+    -------
+    numpy.ndarray
+        An array with applied windowing operation.
 
     Notes
     -----
@@ -307,134 +481,94 @@ def apply_voi_lut(arr, ds, index=0):
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if 'VOILUTSequence' in ds:
-        if not np.issubdtype(arr.dtype, np.integer):
-            warnings.warn(
-                "Applying a VOI LUT on a float input array may give "
-                "incorrect results"
-            )
+    if "WindowWidth" not in ds and "WindowCenter" not in ds:
+        return arr
 
-        # VOI LUT Sequence contains one or more items
-        item = ds.VOILUTSequence[index]
-        nr_entries = item.LUTDescriptor[0] or 2**16
-        first_map = item.LUTDescriptor[1]
+    if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
+        raise ValueError(
+            "When performing a windowing operation only 'MONOCHROME1' and "
+            "'MONOCHROME2' are allowed for (0028,0004) Photometric "
+            "Interpretation"
+        )
 
-        # PS3.3 C.8.11.3.1.5: may be 8, 10-16
-        nominal_depth = item.LUTDescriptor[2]
-        if nominal_depth in list(range(10, 17)):
-            dtype = 'uint16'
-        elif nominal_depth == 8:
-            dtype = 'uint8'
-        else:
-            raise NotImplementedError(
-                "'{}' bits per LUT entry is not supported"
-                .format(nominal_depth)
-            )
+    # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
+    voi_func = cast(str, getattr(ds, 'VOILUTFunction', 'LINEAR')).upper()
+    # VR DS, VM 1-n
+    elem = ds['WindowCenter']
+    center = elem.value[index] if elem.VM > 1 else elem.value
+    elem = ds['WindowWidth']
+    width = elem.value[index] if elem.VM > 1 else elem.value
 
-        # Ambiguous VR, US or OW
-        if item['LUTData'].VR == 'OW':
-            endianness = '<' if ds.is_little_endian else '>'
-            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
-            lut_data = unpack(unpack_fmt, item.LUTData)
-        else:
-            lut_data = item.LUTData
-        lut_data = np.asarray(lut_data, dtype=dtype)
+    # The output range depends on whether or not a modality LUT or rescale
+    #   operation has been applied
+    if 'ModalityLUTSequence' in ds:
+        # Unsigned - see PS3.3 C.11.1.1.1
+        y_min = 0
+        bit_depth = ds.ModalityLUTSequence[0].LUTDescriptor[2]
+        y_max = 2**bit_depth - 1
+    elif ds.PixelRepresentation == 0:
+        # Unsigned
+        y_min = 0
+        y_max = 2**ds.BitsStored - 1
+    else:
+        # Signed
+        y_min = -2**(ds.BitsStored - 1)
+        y_max = 2**(ds.BitsStored - 1) - 1
 
-        # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-        clipped_iv = np.zeros(arr.shape, dtype=dtype)
-        # IVs >= `first_map` are mapped by the VOI LUT
-        # `first_map` may be negative, positive or 0
-        mapped_pixels = arr >= first_map
-        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-        # IVs > number of entries get set to last entry
-        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+    if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
+        # Otherwise its the actual data range
+        y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
+        y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
 
-        return lut_data[clipped_iv]
-    elif 'WindowCenter' in ds and 'WindowWidth' in ds:
-        if ds.PhotometricInterpretation not in ['MONOCHROME1', 'MONOCHROME2']:
-            raise ValueError(
-                "When performing a windowing operation only 'MONOCHROME1' and "
-                "'MONOCHROME2' are allowed for (0028,0004) Photometric "
-                "Interpretation"
-            )
+    y_range = y_max - y_min
+    arr = arr.astype('float64')
 
-        # May be LINEAR (default), LINEAR_EXACT, SIGMOID or not present, VM 1
-        voi_func = getattr(ds, 'VOILUTFunction', 'LINEAR').upper()
-        # VR DS, VM 1-n
-        elem = ds['WindowCenter']
-        center = elem.value[index] if elem.VM > 1 else elem.value
-        elem = ds['WindowWidth']
-        width = elem.value[index] if elem.VM > 1 else elem.value
-
-        # The output range depends on whether or not a modality LUT or rescale
-        #   operation has been applied
-        if 'ModalityLUTSequence' in ds:
-            # Unsigned - see PS3.3 C.11.1.1.1
-            y_min = 0
-            bit_depth = ds.ModalityLUTSequence[0].LUTDescriptor[2]
-            y_max = 2**bit_depth - 1
-        elif ds.PixelRepresentation == 0:
-            # Unsigned
-            y_min = 0
-            y_max = 2**ds.BitsStored - 1
-        else:
-            # Signed
-            y_min = -2**(ds.BitsStored - 1)
-            y_max = 2**(ds.BitsStored - 1) - 1
-
-        if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
-            # Otherwise its the actual data range
-            y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
-            y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
-
-        y_range = y_max - y_min
-        arr = arr.astype('float64')
-
-        if voi_func in ['LINEAR', 'LINEAR_EXACT']:
-            # PS3.3 C.11.2.1.2.1 and C.11.2.1.3.2
-            if voi_func == 'LINEAR':
-                if width < 1:
-                    raise ValueError(
-                        "The (0028,1051) Window Width must be greater than or "
-                        "equal to 1 for a 'LINEAR' windowing operation"
-                    )
-                center -= 0.5
-                width -= 1
-            elif width <= 0:
+    if voi_func in ['LINEAR', 'LINEAR_EXACT']:
+        # PS3.3 C.11.2.1.2.1 and C.11.2.1.3.2
+        if voi_func == 'LINEAR':
+            if width < 1:
                 raise ValueError(
-                    "The (0028,1051) Window Width must be greater than 0 "
-                    "for a 'LINEAR_EXACT' windowing operation"
+                    "The (0028,1051) Window Width must be greater than or "
+                    "equal to 1 for a 'LINEAR' windowing operation"
                 )
-
-            below = arr <= (center - width / 2)
-            above = arr > (center + width / 2)
-            between = np.logical_and(~below, ~above)
-
-            arr[below] = y_min
-            arr[above] = y_max
-            if between.any():
-                arr[between] = (
-                    ((arr[between] - center) / width + 0.5) * y_range + y_min
-                )
-        elif voi_func == 'SIGMOID':
-            # PS3.3 C.11.2.1.3.1
-            if width <= 0:
-                raise ValueError(
-                    "The (0028,1051) Window Width must be greater than 0 "
-                    "for a 'SIGMOID' windowing operation"
-                )
-
-            arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
-        else:
+            center -= 0.5
+            width -= 1
+        elif width <= 0:
             raise ValueError(
-                "Unsupported (0028,1056) VOI LUT Function value '{}'"
-                .format(voi_func)
+                "The (0028,1051) Window Width must be greater than 0 "
+                "for a 'LINEAR_EXACT' windowing operation"
             )
+
+        below = arr <= (center - width / 2)
+        above = arr > (center + width / 2)
+        between = np.logical_and(~below, ~above)
+
+        arr[below] = y_min
+        arr[above] = y_max
+        if between.any():
+            arr[between] = (
+                ((arr[between] - center) / width + 0.5) * y_range + y_min
+            )
+    elif voi_func == 'SIGMOID':
+        # PS3.3 C.11.2.1.3.1
+        if width <= 0:
+            raise ValueError(
+                "The (0028,1051) Window Width must be greater than 0 "
+                "for a 'SIGMOID' windowing operation"
+            )
+
+        arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
+    else:
+        raise ValueError(
+            f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'"
+        )
 
     return arr
 
 
-def convert_color_space(arr, current, desired):
+def convert_color_space(
+    arr: "np.ndarray", current: str, desired: str
+) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
 
     .. versionchanged:: 1.4
@@ -501,7 +635,7 @@ def convert_color_space(arr, current, desired):
     return converter(arr)
 
 
-def _convert_RGB_to_YBR_FULL(arr):
+def _convert_RGB_to_YBR_FULL(arr: "np.ndarray") -> "np.ndarray":
     """Return an ndarray converted from RGB to YBR_FULL color space.
 
     Parameters
@@ -543,7 +677,7 @@ def _convert_RGB_to_YBR_FULL(arr):
     return arr.astype(orig_dtype)
 
 
-def _convert_YBR_FULL_to_RGB(arr):
+def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
     """Return an ndarray converted from YBR_FULL to RGB color space.
 
     Parameters
@@ -585,7 +719,9 @@ def _convert_YBR_FULL_to_RGB(arr):
     return arr.astype(orig_dtype)
 
 
-def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
+def dtype_corrected_for_endianness(
+    is_little_endian: bool, numpy_dtype: "np.dtype"
+) -> "np.dtype":
     """Return a :class:`numpy.dtype` corrected for system and :class:`Dataset`
     endianness.
 
@@ -618,7 +754,12 @@ def dtype_corrected_for_endianness(is_little_endian, numpy_dtype):
     return numpy_dtype
 
 
-def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
+def _expand_segmented_lut(
+    data: Tuple[int, ...],
+    fmt: str,
+    nr_segments: Optional[int] = None,
+    last_value: Optional[int] = None
+) -> List[int]:
     """Return a list containing the expanded lookup table data.
 
     Parameters
@@ -652,7 +793,7 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
     # Little endian: e.g. 0x0302 0x0100, big endian, e.g. 0x0203 0x0001
     indirect_ii = [3, 2, 1, 0] if '<' in fmt else [2, 3, 0, 1]
 
-    lut = []
+    lut: List[int] = []
     offset = 0
     segments_read = 0
     # Use `offset + 1` to account for possible trailing null
@@ -722,7 +863,7 @@ def _expand_segmented_lut(data, fmt, nr_segments=None, last_value=None):
     return lut
 
 
-def get_expected_length(ds, unit='bytes'):
+def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Pixel
     Data*.
 
@@ -765,14 +906,14 @@ def get_expected_length(ds, unit='bytes'):
         The expected length of the *Pixel Data* in either whole bytes or
         pixels, excluding the NULL trailing padding byte for odd length data.
     """
-    length = ds.Rows * ds.Columns * ds.SamplesPerPixel
+    length: int = ds.Rows * ds.Columns * ds.SamplesPerPixel
     length *= get_nr_frames(ds)
 
     if unit == 'pixels':
         return length
 
     # Correct for the number of bytes per pixel
-    bits_allocated = ds.BitsAllocated
+    bits_allocated = cast(int, ds.BitsAllocated)
     if bits_allocated == 1:
         # Determine the nearest whole number of bytes needed to contain
         #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
@@ -788,7 +929,7 @@ def get_expected_length(ds, unit='bytes'):
     return length
 
 
-def get_image_pixel_ids(ds) -> Dict[str, int]:
+def get_image_pixel_ids(ds: "Dataset") -> Dict[str, int]:
     """Return a dict of the pixel data affecting element's :func:`id` values.
 
     .. versionadded:: 1.4
@@ -845,7 +986,7 @@ def get_image_pixel_ids(ds) -> Dict[str, int]:
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
-def get_j2k_parameters(codestream):
+def get_j2k_parameters(codestream: bytes) -> Dict[str, object]:
     """Return a dict containing JPEG 2000 component parameters.
 
     .. versionadded:: 2.1
@@ -883,7 +1024,7 @@ def get_j2k_parameters(codestream):
     return {}
 
 
-def get_nr_frames(ds):
+def get_nr_frames(ds: "Dataset") -> int:
     """Return NumberOfFrames or 1 if NumberOfFrames is None.
 
     Parameters
@@ -897,7 +1038,7 @@ def get_nr_frames(ds):
     int
         An integer for the NumberOfFrames or 1 if NumberOfFrames is None
     """
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
+    nr_frames: Optional[int] = getattr(ds, 'NumberOfFrames', 1)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if nr_frames is None:
         warnings.warn("A value of None for (0028,0008) 'Number of Frames' is "
@@ -908,7 +1049,7 @@ def get_nr_frames(ds):
     return nr_frames
 
 
-def pixel_dtype(ds, as_float=False):
+def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
     Suitable for use with IODs containing the Image Pixel module (with
@@ -1009,7 +1150,7 @@ def pixel_dtype(ds, as_float=False):
     return dtype
 
 
-def reshape_pixel_array(ds, arr):
+def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     +------------------------------------------+-----------+----------+
