@@ -224,7 +224,7 @@
 <h1>pydicom.encaps.get_frame_offsets<a class="headerlink" href="#pydicom-encaps-get-frame-offsets" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.get_frame_offsets">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">get_frame_offsets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/db8ade72/pydicom/encaps.py#L13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.get_frame_offsets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">get_frame_offsets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike">pydicom.filebase.DicomFileLike</a></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><span class="p">, </span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c2c6145d/pydicom/encaps.py#L14"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.get_frame_offsets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of the fragment offsets from the Basic Offset Table.</p>
 <p><strong>Basic Offset Table</strong></p>
 <p>The Basic Offset Table Item must be present and have a tag (FFFE,E000) and
@@ -254,7 +254,7 @@ an empty Basic Offset Table and one containing offset values.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><em>filebase.DicomBytesIO</em></a>) – The encapsulated pixel data positioned at the start of the Basic Offset
+<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><em>filebase.DicomFileLike</em></a>) – The encapsulated pixel data positioned at the start of the Basic Offset
 Table. <code class="docutils literal notranslate"><span class="pre">fp.is_little_endian</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>
 <dt class="field-even">Returns</dt>

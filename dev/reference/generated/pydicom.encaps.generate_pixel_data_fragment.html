@@ -224,7 +224,7 @@
 <h1>pydicom.encaps.generate_pixel_data_fragment<a class="headerlink" href="#pydicom-encaps-generate-pixel-data-fragment" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.generate_pixel_data_fragment">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/db8ade72/pydicom/encaps.py#L135"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">generate_pixel_data_fragment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike">pydicom.filebase.DicomFileLike</a></span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c2c6145d/pydicom/encaps.py#L136"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.generate_pixel_data_fragment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield the encapsulated pixel data fragments.</p>
 <p>For compressed (encapsulated) Transfer Syntaxes, the (7FE0,0010) <em>Pixel
 Data</em> element is encoded in an encapsulated format.</p>
@@ -250,7 +250,7 @@ returned fragments.</p>
 <p>The encoding of the data shall be little endian.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomBytesIO.html#pydicom.filebase.DicomBytesIO" title="pydicom.filebase.DicomBytesIO"><em>filebase.DicomBytesIO</em></a>) – The encoded (7FE0,0010) <em>Pixel Data</em> element value, positioned at the
+<dd class="field-odd"><p><strong>fp</strong> (<a class="reference internal" href="pydicom.filebase.DicomFileLike.html#pydicom.filebase.DicomFileLike" title="pydicom.filebase.DicomFileLike"><em>filebase.DicomFileLike</em></a>) – The encoded (7FE0,0010) <em>Pixel Data</em> element value, positioned at the
 start of the item tag for the first item after the Basic Offset Table
 item. <code class="docutils literal notranslate"><span class="pre">fp.is_little_endian</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
 </dd>

@@ -112,8 +112,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.convert_encodings.html">pydicom.charset.convert_encodings</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.decode.html">pydicom.charset.decode</a></li>
-<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.decode_string.html">pydicom.charset.decode_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.decode_element.html">pydicom.charset.decode_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.decode_bytes.html">pydicom.charset.decode_bytes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.charset.encode_string.html">pydicom.charset.encode_string</a></li>
 </ul>
 </li>
@@ -223,10 +223,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.charset.convert_encodings.html#pydicom.charset.convert_encodings" title="pydicom.charset.convert_encodings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_encodings</span></code></a>(encodings)</p></td>
 <td><p>Convert DICOM <cite>encodings</cite> into corresponding Python encodings.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.charset.decode.html#pydicom.charset.decode" title="pydicom.charset.decode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code></a>(data_element, dicom_character_set)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.charset.decode_element.html#pydicom.charset.decode_element" title="pydicom.charset.decode_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode_element</span></code></a>(elem, dicom_character_set)</p></td>
 <td><p>Apply the DICOM character encoding to a data element</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.charset.decode_string.html#pydicom.charset.decode_string" title="pydicom.charset.decode_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode_string</span></code></a>(value, encodings, delimiters)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.charset.decode_bytes.html#pydicom.charset.decode_bytes" title="pydicom.charset.decode_bytes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode_bytes</span></code></a>(value, encodings, delimiters)</p></td>
 <td><p>Decode an encoded byte <cite>value</cite> into a unicode string using <cite>encodings</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.charset.encode_string.html#pydicom.charset.encode_string" title="pydicom.charset.encode_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encode_string</span></code></a>(value, encodings)</p></td>

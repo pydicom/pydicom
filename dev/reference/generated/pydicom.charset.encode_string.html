@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Configuration Options (pydicom.config)" href="../config.html" />
-    <link rel="prev" title="pydicom.charset.decode_string" href="pydicom.charset.decode_string.html" /> 
+    <link rel="prev" title="pydicom.charset.decode_bytes" href="pydicom.charset.decode_bytes.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -112,8 +112,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.charset.convert_encodings.html">pydicom.charset.convert_encodings</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pydicom.charset.decode.html">pydicom.charset.decode</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pydicom.charset.decode_string.html">pydicom.charset.decode_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.charset.decode_element.html">pydicom.charset.decode_element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.charset.decode_bytes.html">pydicom.charset.decode_bytes</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.charset.encode_string</a></li>
 </ul>
 </li>
@@ -217,7 +217,7 @@
 <h1>pydicom.charset.encode_string<a class="headerlink" href="#pydicom-charset-encode-string" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.charset.encode_string">
-<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">encode_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">encodings</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/db8ade72/pydicom/charset.py#L464"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.encode_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.charset.</code><code class="sig-name descname">encode_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">encodings</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/c2c6145d/pydicom/charset.py#L475"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.charset.encode_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode a unicode string <cite>value</cite> into <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> using <cite>encodings</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -262,7 +262,7 @@ encoding with replacement characters, resulting in data loss.</p>
         <a href="../config.html" class="btn btn-neutral float-right" title="Configuration Options (pydicom.config)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.charset.decode_string.html" class="btn btn-neutral float-left" title="pydicom.charset.decode_string" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.charset.decode_bytes.html" class="btn btn-neutral float-left" title="pydicom.charset.decode_bytes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
