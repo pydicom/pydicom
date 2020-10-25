@@ -490,11 +490,3 @@ class TestCharset:
                                 "s in encoded string"):
             encoded = pydicom.charset.encode_string('あaｱア', ['shift_jis'])
             assert b'?a??' == encoded
-
-    def test_deprecated_decode(self):
-        """Test we get a deprecation warning when using charset.decode()."""
-        # elem.value is PersonName
-        elem = DataElement(0x00100010, 'PN', 'CITIZEN')
-        msg = r"'charset.decode\(\)' is deprecated"
-        with pytest.warns(DeprecationWarning, match=msg):
-            pydicom.charset.decode(elem, ['ISO 2022 IR 126'])

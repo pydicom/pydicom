@@ -1,12 +1,17 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
+
 import codecs
 import re
-from typing import List, Set
+from typing import List, Set, Dict, Optional, Union, TYPE_CHECKING
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS
+from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
+
+if TYPE_CHECKING:
+    from pydicom.dataelem import DataElement
+
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
 default_encoding = "iso8859"
@@ -89,12 +94,10 @@ ENCODINGS_TO_CODES['shift_jis'] = ESC + b')I'
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
-handled_encodings = ('iso2022_jp',
-                     'iso2022_jp_2',
-                     'iso_ir_58')
+handled_encodings = ('iso2022_jp', 'iso2022_jp_2', 'iso_ir_58')
 
 
-def _encode_to_jis_x_0201(value, errors='strict'):
+def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
     """Convert a unicode string into JIS X 0201 byte string using shift_jis
     encodings.
     shift_jis is a superset of jis_x_0201. So we can regard the encoded value
@@ -102,7 +105,7 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     Parameters
     ----------
-    value : text type
+    value : str
         The unicode string as presented to the user.
     errors : str
         The behavior of a character which could not be encoded. If 'strict' is
@@ -111,7 +114,7 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     Returns
     -------
-    byte string
+    bytes
         The encoded string. If some characters in value could not be encoded to
         JIS X 0201, and `errors` is not set to 'strict', they are replaced to
         '?'.
@@ -163,18 +166,22 @@ def _encode_to_jis_x_0201(value, errors='strict'):
 
     return encoded
 
-def _encode_to_jis_x_0208(value, errors='strict'):
-    """Convert a unicode string into JIS X 0208 byte string."""
+
+def _encode_to_jis_x_0208(value: str, errors: str = 'strict') -> bytes:
+    """Convert a unicode string into JIS X 0208 encoded bytes."""
     return _encode_to_given_charset(value, 'ISO 2022 IR 87', errors=errors)
 
 
-def _encode_to_jis_x_0212(value, errors='strict'):
-    """Convert a unicode string into JIS X 0212 byte string."""
+def _encode_to_jis_x_0212(value: str, errors: str = 'strict') -> bytes:
+    """Convert a unicode string into JIS X 0212 encoded bytes."""
     return _encode_to_given_charset(value, 'ISO 2022 IR 159', errors=errors)
 
 
-def _encode_to_given_charset(value, character_set, errors='strict'):
-    """Convert a unicode string into given character set.
+def _encode_to_given_charset(
+    value: str, character_set: str, errors: str = 'strict'
+) -> bytes:
+    """Encode a unicode string using the given character set.
+
     The escape sequence which is located at the end of the encoded value has
     to vary depending on the value 1 of SpecificCharacterSet. So we have to
     trim it and append the correct escape sequence manually.
@@ -191,7 +198,7 @@ def _encode_to_given_charset(value, character_set, errors='strict'):
 
     Returns
     -------
-    byte string
+    bytes
         The encoded string. If some characters in value could not be encoded to
         given character_set, it depends on the behavior of corresponding python
         encoder.
@@ -233,7 +240,9 @@ def _encode_to_given_charset(value, character_set, errors='strict'):
     return encoded
 
 
-def _get_escape_sequence_for_encoding(encoding, encoded=None):
+def _get_escape_sequence_for_encoding(
+    encoding: str, encoded: Optional[bytes] = None
+) -> bytes:
     """ Return an escape sequence corresponding to the given encoding. If
     encoding is 'shift_jis', return 'ESC)I' or 'ESC(J' depending on the first
     byte of encoded.
@@ -248,7 +257,7 @@ def _get_escape_sequence_for_encoding(encoding, encoded=None):
 
     Returns
     -------
-    string
+    bytes
         Escape sequence for encoded value.
     """
 
@@ -362,6 +371,7 @@ def _decode_fragment(
     byte_str: bytes, encodings: List[str], delimiters: Set[int]
 ) -> str:
     """Decode a byte string encoded with a single encoding.
+
     If `byte_str` starts with an escape sequence, the encoding corresponding
     to this sequence is used for decoding if present in `encodings`,
     otherwise the first value in encodings.
@@ -371,7 +381,7 @@ def _decode_fragment(
     Parameters
     ----------
     byte_str : bytes
-        The raw string to be decoded.
+        The encoded string to be decoded.
     encodings: list of str
         The list of Python encodings as converted from the values in the
         Specific Character Set tag.
@@ -421,6 +431,7 @@ def _decode_escaped_fragment(
     byte_str: bytes, encodings: List[str], delimiters: Set[int]
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
+
     See `_decode_fragment` for parameter description and more information.
     """
     # all 4-character escape codes start with one of two character sets
@@ -461,7 +472,7 @@ def _decode_escaped_fragment(
     return byte_str.decode(encodings[0], errors='replace')
 
 
-def encode_string(value, encodings):
+def encode_string(value: str, encodings: List[str]) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
     .. versionadded:: 1.2
@@ -524,7 +535,7 @@ def encode_string(value, encodings):
         return _encode_string_impl(value, encodings[0], errors='replace')
 
 
-def _encode_string_parts(value, encodings):
+def _encode_string_parts(value: str, encodings: List[str]) -> bytes:
     """Convert a unicode string into a byte string using the given
     list of encodings.
     This is invoked if `encode_string` failed to encode `value` with a single
@@ -534,15 +545,15 @@ def _encode_string_parts(value, encodings):
 
     Parameters
     ----------
-    value : text type
+    value : str
         The unicode string as presented to the user.
-    encodings : list
+    encodings : list of str
         The encodings needed to encode the string as a list of Python
         encodings, converted from the encodings in Specific Character Set.
 
     Returns
     -------
-    byte string
+    bytes
         The encoded string, including the escape sequences needed to switch
         between different encodings.
 
@@ -554,7 +565,7 @@ def _encode_string_parts(value, encodings):
     """
     encoded = bytearray()
     unencoded_part = value
-    best_encoding = None
+    best_encoding: str
     while unencoded_part:
         # find the encoding that can encode the longest part of the rest
         # of the string still to be encoded
@@ -566,40 +577,49 @@ def _encode_string_parts(value, encodings):
                 best_encoding = encoding
                 max_index = len(unencoded_part)
                 break
-            except UnicodeError as e:
-                if e.start > max_index:
-                    # e.start is the index of first character failed to encode
-                    max_index = e.start
+            except (UnicodeDecodeError, UnicodeEncodeError) as err:
+                if err.start > max_index:
+                    # err.start is the index of first char we failed to encode
+                    max_index = err.start
                     best_encoding = encoding
+
         # none of the given encodings can encode the first character - give up
         if max_index == 0:
-            raise ValueError("None of the given encodings can encode the "
-                             "first character")
+            raise ValueError(
+                "None of the given encodings can encode the first character"
+            )
 
         # encode the part that can be encoded with the found encoding
-        encoded_part = _encode_string_impl(unencoded_part[:max_index],
-                                           best_encoding)
+        encoded_part = _encode_string_impl(
+            unencoded_part[:max_index], best_encoding
+        )
         if best_encoding not in handled_encodings:
             encoded += _get_escape_sequence_for_encoding(
-                    best_encoding, encoded=encoded_part)
+                    best_encoding, encoded=encoded_part
+            )
         encoded += encoded_part
         # set remaining unencoded part of the string and handle that
         unencoded_part = unencoded_part[max_index:]
     # unencoded_part is empty - we are done, return the encoded string
     if best_encoding in need_tail_escape_sequence_encodings:
         encoded += _get_escape_sequence_for_encoding(encodings[0])
+
     return bytes(encoded)
 
 
-def _encode_string_impl(value, encoding, errors='strict'):
-    """Convert a unicode string into a byte string. If given encoding is in
-    custom_encoders, use a corresponding custom_encoder. If given encoding
-    is not in custom_encoders, use a corresponding python handled encoder.
+def _encode_string_impl(
+    value: str, encoding: str, errors: str = 'strict'
+) -> bytes:
+    """Convert a unicode string into a byte string.
+
+    If given encoding is in `custom_encoders`, use a corresponding
+    `custom_encoder`. If given encoding is not in `custom_encoders`, use a
+    corresponding python handled encoder.
     """
     if encoding in custom_encoders:
         return custom_encoders[encoding](value, errors=errors)
-    else:
-        return value.encode(encoding, errors=errors)
+
+    return value.encode(encoding, errors=errors)
 
 
 # DICOM PS3.5-2008 6.1.1 (p 18) says:
@@ -615,7 +635,7 @@ def _encode_string_impl(value, encoding, errors='strict'):
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(encodings):
+def convert_encodings(encodings: Union[str, List[str]]) -> List[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -631,9 +651,9 @@ def convert_encodings(encodings):
 
     Parameters
     ----------
-    encodings : list of str
-        The list of encodings as read from (0008,0005) *Specific Character
-        Set*.
+    encodings : str or list of str
+        The encoding or list of encodings as read from (0008,0005)
+        *Specific Character Set*.
 
     Returns
     -------
@@ -655,7 +675,6 @@ def convert_encodings(encodings):
     """
 
     encodings = encodings or ['']
-
     if isinstance(encodings, str):
         encodings = [encodings]
     else:
@@ -671,15 +690,18 @@ def convert_encodings(encodings):
             py_encodings.append(python_encoding[encoding])
         except KeyError:
             py_encodings.append(
-                _python_encoding_for_corrected_encoding(encoding))
+                _python_encoding_for_corrected_encoding(encoding)
+            )
 
     if len(encodings) > 1:
-        py_encodings = _handle_illegal_standalone_encodings(encodings,
-                                                            py_encodings)
+        py_encodings = _handle_illegal_standalone_encodings(
+            encodings, py_encodings
+        )
+
     return py_encodings
 
 
-def _python_encoding_for_corrected_encoding(encoding):
+def _python_encoding_for_corrected_encoding(encoding: str) -> str:
     """Try to replace the given invalid encoding with a valid encoding by
     checking for common spelling errors, and return the correct Python
     encoding for that encoding. Otherwise check if the
@@ -716,7 +738,9 @@ def _python_encoding_for_corrected_encoding(encoding):
         return default_encoding
 
 
-def _warn_about_invalid_encoding(encoding, patched_encoding=None):
+def _warn_about_invalid_encoding(
+    encoding: str, patched_encoding: Optional[str] = None
+) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
     replacement encoding, other the default encoding.
@@ -725,45 +749,57 @@ def _warn_about_invalid_encoding(encoding, patched_encoding=None):
     """
     if patched_encoding is None:
         if config.enforce_valid_values:
-            raise LookupError(
-                "Unknown encoding '{}'".format(encoding))
-        msg = ("Unknown encoding '{}' - using default encoding "
-               "instead".format(encoding))
+            raise LookupError(f"Unknown encoding '{encoding}'")
+
+        msg = f"Unknown encoding '{encoding}' - using default encoding instead"
     else:
-        msg = ("Incorrect value for Specific Character Set "
-               "'{}' - assuming '{}'".format(encoding, patched_encoding))
+        msg = (
+            f"Incorrect value for Specific Character Set '{encoding}' - "
+            f"assuming '{patched_encoding}'"
+        )
     warnings.warn(msg, stacklevel=2)
 
 
-def _handle_illegal_standalone_encodings(encodings, py_encodings):
+def _handle_illegal_standalone_encodings(
+    encodings: List[str], py_encodings: List[str]
+) -> List[str]:
     """Check for stand-alone encodings in multi-valued encodings.
     If the first encoding is a stand-alone encoding, the rest of the
     encodings is removed. If any other encoding is a stand-alone encoding,
     it is removed from the encodings.
     """
     if encodings[0] in STAND_ALONE_ENCODINGS:
-        warnings.warn("Value '{}' for Specific Character Set does not "
-                      "allow code extensions, ignoring: {}"
-                      .format(encodings[0], ', '.join(encodings[1:])),
-                      stacklevel=2)
-        py_encodings = py_encodings[:1]
-    else:
-        for i, encoding in reversed(list(enumerate(encodings[1:]))):
-            if encoding in STAND_ALONE_ENCODINGS:
-                warnings.warn(
-                    "Value '{}' cannot be used as code extension, "
-                    "ignoring it".format(encoding),
-                    stacklevel=2)
-                del py_encodings[i + 1]
+        warnings.warn(
+            (
+                f"Value '{encodings[0]}' for Specific Character Set does not "
+                f"allow code extensions, ignoring: {', '.join(encodings[1:])}"
+            ),
+            stacklevel=2
+        )
+        return py_encodings[:1]
+
+    for i, encoding in reversed(list(enumerate(encodings[1:]))):
+        if encoding in STAND_ALONE_ENCODINGS:
+            warnings.warn(
+                (
+                    f"Value '{encoding}' cannot be used as code "
+                    "extension, ignoring it"
+                ),
+                stacklevel=2
+            )
+            del py_encodings[i + 1]
+
     return py_encodings
 
 
-def decode_element(data_element, dicom_character_set):
+def decode_element(
+    elem: "DataElement", dicom_character_set: Optional[Union[str, List[str]]]
+) -> None:
     """Apply the DICOM character encoding to a data element
 
     Parameters
     ----------
-    data_element : dataelem.DataElement
+    elem : dataelem.DataElement
         The :class:`DataElement<pydicom.dataelem.DataElement>` instance
         containing an encoded byte string value to decode.
     dicom_character_set : str or list of str or None
@@ -771,8 +807,9 @@ def decode_element(data_element, dicom_character_set):
         single value, a multiple value (code extension), or may also be ``''``
         or ``None``, in which case ``'ISO_IR 6'`` will be used.
     """
-    if data_element.is_empty:
-        return data_element.empty_value
+    if elem.is_empty:
+        return
+
     if not dicom_character_set:
         dicom_character_set = ['ISO_IR 6']
 
@@ -780,27 +817,22 @@ def decode_element(data_element, dicom_character_set):
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with different chr sets
-    if data_element.VR == "PN":
-        if data_element.VM <= 1:
-            data_element.value = data_element.value.decode(encodings)
+    if elem.VR == "PN":
+        if elem.VM == 1:
+            # elem.value: Union[PersonName, bytes]
+            elem.value = elem.value.decode(encodings)
         else:
-            data_element.value = [
-                val.decode(encodings) for val in data_element.value
-            ]
-
-    if data_element.VR in text_VRs:
+            # elem.value: Iterable[Union[PersonName, bytes]]
+            elem.value = [val.decode(encodings) for val in elem.value]
+    elif elem.VR in text_VRs:
         # You can't re-decode unicode (string literals in py3)
-        if data_element.VM == 1:
-            if isinstance(data_element.value, str):
+        if elem.VM == 1:
+            if isinstance(elem.value, str):
                 return
-            data_element.value = decode_bytes(
-                data_element.value, encodings, TEXT_VR_DELIMS
-            )
+            elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS)
         else:
-
             output = list()
-
-            for value in data_element.value:
+            for value in elem.value:
                 if isinstance(value, str):
                     output.append(value)
                 else:
@@ -808,28 +840,4 @@ def decode_element(data_element, dicom_character_set):
                         decode_bytes(value, encodings, TEXT_VR_DELIMS)
                     )
 
-            data_element.value = output
-
-
-def decode(data_element, dicom_character_set):
-    """Apply the DICOM character encoding to a data element
-
-    .. deprecated:: 1.4
-       This function is deprecated, use :func:`decode_element` instead.
-
-    Parameters
-    ----------
-    data_element : dataelem.DataElement
-        The :class:`DataElement<pydicom.dataelem.DataElement>` instance
-        containing an encoded byte string value to decode.
-    dicom_character_set : str or list of str or None
-        The value of (0008,0005) *Specific Character Set*, which may be a
-        single value, a multiple value (code extension), or may also be ``''``
-        or ``None``, in which case ``'ISO_IR 6'`` will be used.
-    """
-    warnings.warn(
-        "'charset.decode()' is deprecated and will be removed in "
-        "v1.5, use 'charset.decode_element()' instead",
-        DeprecationWarning
-    )
-    return decode_element(data_element, dicom_character_set)
+            elem.value = output
