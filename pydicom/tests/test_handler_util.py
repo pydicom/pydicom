@@ -1412,191 +1412,8 @@ class TestNumpy_ExpandSegmentedLUT:
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
-class TestNumpy_VOILUT:
-    """Tests for util.apply_voi_lut()."""
-    def test_voi_single_view(self):
-        """Test VOI LUT with a single view."""
-        ds = dcmread(VOI_08_1F)
-        assert 8 == ds.BitsAllocated
-        assert 8 == ds.BitsStored
-        assert 0 == ds.PixelRepresentation
-        item = ds.VOILUTSequence[0]
-        assert [256, 0, 16] == item.LUTDescriptor
-        lut = item.LUTData
-        assert 0 == lut[0]
-        assert 19532 == lut[76]
-        assert 45746 == lut[178]
-        assert 65535 == lut[255]
-
-        arr = ds.pixel_array
-        assert 0 == arr[387, 448]
-        assert 76 == arr[178, 126]
-        assert 178 == arr[186, 389]
-        assert 255 == arr[129, 79]
-
-        out = apply_voi_lut(arr, ds)
-        assert 0 == out[387, 448]
-        assert 19532 == out[178, 126]
-        assert 45746 == out[186, 389]
-        assert 65535 == out[129, 79]
-
-    def test_voi_multi_view(self):
-        """Test VOI LUT with multiple views."""
-        ds = dcmread(VOI_08_1F)
-        assert 8 == ds.BitsAllocated
-        assert 8 == ds.BitsStored
-        assert 0 == ds.PixelRepresentation
-        item0 = ds.VOILUTSequence[0]
-        # Add another view thats the inverse
-        ds.VOILUTSequence.append(Dataset())
-        item1 = ds.VOILUTSequence[1]
-        item1.LUTDescriptor = [256, 0, 16]
-        item1.LUTData = item0.LUTData[::-1]
-
-        arr = ds.pixel_array
-        assert 0 == arr[387, 448]
-        assert 76 == arr[178, 126]
-        assert 178 == arr[186, 389]
-        assert 255 == arr[129, 79]
-
-        out0 = apply_voi_lut(arr, ds)
-        assert 0 == out0[387, 448]
-        assert 19532 == out0[178, 126]
-        assert 45746 == out0[186, 389]
-        assert 65535 == out0[129, 79]
-
-        out1 = apply_voi_lut(arr, ds, index=1)
-        assert 65535 == out1[387, 448]
-        assert 46003 == out1[178, 126]
-        assert 19789 == out1[186, 389]
-        assert 0 == out1[129, 79]
-
-    def test_voi_multi_frame(self):
-        """Test VOI with a multiple frames."""
-        ds = dcmread(VOI_08_1F)
-        assert 8 == ds.BitsAllocated
-        assert 8 == ds.BitsStored
-        assert 0 == ds.PixelRepresentation
-
-        arr = ds.pixel_array
-        arr = np.stack([arr, 255 - arr])
-        assert (2, 512, 512) == arr.shape
-
-        out = apply_voi_lut(arr, ds)
-        assert 0 == out[0, 387, 448]
-        assert 19532 == out[0, 178, 126]
-        assert 45746 == out[0, 186, 389]
-        assert 65535 == out[0, 129, 79]
-        assert 65535 == out[1, 387, 448]
-        assert 46003 == out[1, 178, 126]
-        assert 19789 == out[1, 186, 389]
-        assert 0 == out[1, 129, 79]
-
-    def test_voi_zero_entries(self):
-        """Test that 0 entries is interpreted correctly."""
-        ds = dcmread(VOI_08_1F)
-        seq = ds.VOILUTSequence[0]
-        seq.LUTDescriptor = [0, 0, 16]
-        assert 256 == len(seq.LUTData)
-        arr = np.asarray([0, 255, 256, 65535])
-        msg = r"index 256 is out of bounds"
-        with pytest.raises(IndexError, match=msg):
-            apply_voi_lut(arr, ds)
-
-        # LUTData with 65536 entries
-        seq.LUTData = [0] * 65535 + [1]
-        out = apply_voi_lut(arr, ds)
-        assert [0, 0, 0, 1] == list(out)
-
-    def test_voi_uint8(self):
-        """Test uint VOI LUT with an 8-bit LUT."""
-        ds = Dataset()
-        ds.PixelRepresentation = 0
-        ds.BitsStored = 8
-        ds.VOILUTSequence = [Dataset()]
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor = [4, 0, 8]
-        item.LUTData = [0, 127, 128, 255]
-        arr = np.asarray([0, 1, 128, 254, 255], dtype='uint8')
-        out = apply_voi_lut(arr, ds)
-        assert 'uint8' == out.dtype
-        assert [0, 127, 255, 255, 255] == out.tolist()
-
-    def test_voi_uint16(self):
-        """Test uint VOI LUT with an 16-bit LUT."""
-        ds = Dataset()
-        ds.PixelRepresentation = 0
-        ds.BitsStored = 16
-        ds.VOILUTSequence = [Dataset()]
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor = [4, 0, 16]
-        item.LUTData = [0, 127, 32768, 65535]
-        arr = np.asarray([0, 1, 2, 3, 255], dtype='uint16')
-        out = apply_voi_lut(arr, ds)
-        assert 'uint16' == out.dtype
-        assert [0, 127, 32768, 65535, 65535] == out.tolist()
-
-    def test_voi_int8(self):
-        """Test int VOI LUT with an 8-bit LUT."""
-        ds = Dataset()
-        ds.PixelRepresentation = 1
-        ds.BitsStored = 8
-        ds.VOILUTSequence = [Dataset()]
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor = [4, 0, 8]
-        item.LUTData = [0, 127, 128, 255]
-        arr = np.asarray([0, -1, 2, -128, 127], dtype='int8')
-        out = apply_voi_lut(arr, ds)
-        assert 'uint8' == out.dtype
-        assert [0, 0, 128, 0, 255] == out.tolist()
-
-    def test_voi_int16(self):
-        """Test int VOI LUT with an 16-bit LUT."""
-        ds = Dataset()
-        ds.PixelRepresentation = 0
-        ds.BitsStored = 16
-        ds.VOILUTSequence = [Dataset()]
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor = [4, 0, 16]
-        item.LUTData = [0, 127, 32768, 65535]
-        arr = np.asarray([0, -1, 2, -128, 255], dtype='int16')
-        out = apply_voi_lut(arr, ds)
-        assert 'uint16' == out.dtype
-        assert [0, 0, 32768, 0, 65535] == out.tolist()
-
-    def test_voi_bad_depth(self):
-        """Test bad LUT depth raises exception."""
-        ds = dcmread(VOI_08_1F)
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor[2] = 7
-        msg = r"'7' bits per LUT entry is not supported"
-        with pytest.raises(NotImplementedError, match=msg):
-            apply_voi_lut(ds.pixel_array, ds)
-
-        item.LUTDescriptor[2] = 17
-        msg = r"'17' bits per LUT entry is not supported"
-        with pytest.raises(NotImplementedError, match=msg):
-            apply_voi_lut(ds.pixel_array, ds)
-
-    def test_voi_uint16_array_float(self):
-        """Test warning when array is float and VOI LUT with an 16-bit LUT"""
-        ds = Dataset()
-        ds.PixelRepresentation = 0
-        ds.BitsStored = 16
-        ds.VOILUTSequence = [Dataset()]
-        item = ds.VOILUTSequence[0]
-        item.LUTDescriptor = [4, 0, 16]
-        item.LUTData = [0, 127, 32768, 65535]
-        arr = np.asarray([0, 1, 2, 3, 255], dtype='float64')
-        msg = (
-            r"Applying a VOI LUT on a float input array may give "
-            r"incorrect results"
-        )
-
-        with pytest.warns(UserWarning, match=msg):
-            out = apply_voi_lut(arr, ds)
-            assert [0, 127, 32768, 65535, 65535] == out.tolist()
-
+class TestNumpy_ApplyWindowing:
+    """Tests for util.apply_windowing()."""
     def test_window_single_view(self):
         """Test windowing with a single view."""
         # 12-bit unsigned
@@ -1976,6 +1793,203 @@ class TestNumpy_VOILUT:
         arr = ds.pixel_array
         with pytest.raises(IndexError, match=r"list index out of range"):
             apply_voi_lut(arr, ds, index=2)
+
+    def test_unchanged(self):
+        """Test input array is unchanged if no VOI LUT"""
+        ds = Dataset()
+        ds.PhotometricInterpretation = 'MONOCHROME1'
+        ds.PixelRepresentation = 1
+        ds.BitsStored = 8
+        arr = np.asarray([-128, -127, -1, 0, 1, 126, 127], dtype='int8')
+        out = apply_voi_lut(arr, ds)
+        assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_ApplyVOI:
+    """Tests for util.apply_voi()."""
+    def test_voi_single_view(self):
+        """Test VOI LUT with a single view."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        item = ds.VOILUTSequence[0]
+        assert [256, 0, 16] == item.LUTDescriptor
+        lut = item.LUTData
+        assert 0 == lut[0]
+        assert 19532 == lut[76]
+        assert 45746 == lut[178]
+        assert 65535 == lut[255]
+
+        arr = ds.pixel_array
+        assert 0 == arr[387, 448]
+        assert 76 == arr[178, 126]
+        assert 178 == arr[186, 389]
+        assert 255 == arr[129, 79]
+
+        out = apply_voi_lut(arr, ds)
+        assert 0 == out[387, 448]
+        assert 19532 == out[178, 126]
+        assert 45746 == out[186, 389]
+        assert 65535 == out[129, 79]
+
+    def test_voi_multi_view(self):
+        """Test VOI LUT with multiple views."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+        item0 = ds.VOILUTSequence[0]
+        # Add another view thats the inverse
+        ds.VOILUTSequence.append(Dataset())
+        item1 = ds.VOILUTSequence[1]
+        item1.LUTDescriptor = [256, 0, 16]
+        item1.LUTData = item0.LUTData[::-1]
+
+        arr = ds.pixel_array
+        assert 0 == arr[387, 448]
+        assert 76 == arr[178, 126]
+        assert 178 == arr[186, 389]
+        assert 255 == arr[129, 79]
+
+        out0 = apply_voi_lut(arr, ds)
+        assert 0 == out0[387, 448]
+        assert 19532 == out0[178, 126]
+        assert 45746 == out0[186, 389]
+        assert 65535 == out0[129, 79]
+
+        out1 = apply_voi_lut(arr, ds, index=1)
+        assert 65535 == out1[387, 448]
+        assert 46003 == out1[178, 126]
+        assert 19789 == out1[186, 389]
+        assert 0 == out1[129, 79]
+
+    def test_voi_multi_frame(self):
+        """Test VOI with a multiple frames."""
+        ds = dcmread(VOI_08_1F)
+        assert 8 == ds.BitsAllocated
+        assert 8 == ds.BitsStored
+        assert 0 == ds.PixelRepresentation
+
+        arr = ds.pixel_array
+        arr = np.stack([arr, 255 - arr])
+        assert (2, 512, 512) == arr.shape
+
+        out = apply_voi_lut(arr, ds)
+        assert 0 == out[0, 387, 448]
+        assert 19532 == out[0, 178, 126]
+        assert 45746 == out[0, 186, 389]
+        assert 65535 == out[0, 129, 79]
+        assert 65535 == out[1, 387, 448]
+        assert 46003 == out[1, 178, 126]
+        assert 19789 == out[1, 186, 389]
+        assert 0 == out[1, 129, 79]
+
+    def test_voi_zero_entries(self):
+        """Test that 0 entries is interpreted correctly."""
+        ds = dcmread(VOI_08_1F)
+        seq = ds.VOILUTSequence[0]
+        seq.LUTDescriptor = [0, 0, 16]
+        assert 256 == len(seq.LUTData)
+        arr = np.asarray([0, 255, 256, 65535])
+        msg = r"index 256 is out of bounds"
+        with pytest.raises(IndexError, match=msg):
+            apply_voi_lut(arr, ds)
+
+        # LUTData with 65536 entries
+        seq.LUTData = [0] * 65535 + [1]
+        out = apply_voi_lut(arr, ds)
+        assert [0, 0, 0, 1] == list(out)
+
+    def test_voi_uint8(self):
+        """Test uint VOI LUT with an 8-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 8]
+        item.LUTData = [0, 127, 128, 255]
+        arr = np.asarray([0, 1, 128, 254, 255], dtype='uint8')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint8' == out.dtype
+        assert [0, 127, 255, 255, 255] == out.tolist()
+
+    def test_voi_uint16(self):
+        """Test uint VOI LUT with an 16-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='uint16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_voi_int8(self):
+        """Test int VOI LUT with an 8-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 1
+        ds.BitsStored = 8
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 8]
+        item.LUTData = [0, 127, 128, 255]
+        arr = np.asarray([0, -1, 2, -128, 127], dtype='int8')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint8' == out.dtype
+        assert [0, 0, 128, 0, 255] == out.tolist()
+
+    def test_voi_int16(self):
+        """Test int VOI LUT with an 16-bit LUT."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, -1, 2, -128, 255], dtype='int16')
+        out = apply_voi_lut(arr, ds)
+        assert 'uint16' == out.dtype
+        assert [0, 0, 32768, 0, 65535] == out.tolist()
+
+    def test_voi_bad_depth(self):
+        """Test bad LUT depth raises exception."""
+        ds = dcmread(VOI_08_1F)
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor[2] = 7
+        msg = r"'7' bits per LUT entry is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+        item.LUTDescriptor[2] = 17
+        msg = r"'17' bits per LUT entry is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_voi_lut(ds.pixel_array, ds)
+
+    def test_voi_uint16_array_float(self):
+        """Test warning when array is float and VOI LUT with an 16-bit LUT"""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.LUTData = [0, 127, 32768, 65535]
+        arr = np.asarray([0, 1, 2, 3, 255], dtype='float64')
+        msg = (
+            r"Applying a VOI LUT on a float input array may give "
+            r"incorrect results"
+        )
+
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_voi_lut(arr, ds)
+            assert [0, 127, 32768, 65535, 65535] == out.tolist()
 
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""
