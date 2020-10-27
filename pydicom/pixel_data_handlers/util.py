@@ -329,28 +329,27 @@ def apply_voi_lut(
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    voi_usable = False
+    valid_voi = False
     if 'VOILUTSequence' in ds:
-        voi_usable = None not in [
+        valid_voi = None not in [
             ds.VOILUTSequence[0].get('LUTDescriptor', None),
             ds.VOILUTSequence[0].get('LUTData', None)
         ]
-    windowing_usable = None not in [
+    valid_windowing = None not in [
         ds.get('WindowCenter', None),
         ds.get('WindowWidth', None)
     ]
 
-    if 'VOILUTSequence' in ds and 'WindowCenter' in ds:
-        if prefer_lut and voi_usable:
+    if valid_voi and valid_windowing:
+        if prefer_lut:
             return apply_voi(arr, ds, index)
 
-        elif windowing_usable:
-            return apply_windowing(arr, ds, index)
+        return apply_windowing(arr, ds, index)
 
-    if voi_usable:
+    if valid_voi:
         return apply_voi(arr, ds, index)
 
-    if windowing_usable:
+    if valid_windowing:
         return apply_windowing(arr, ds, index)
 
     return arr
