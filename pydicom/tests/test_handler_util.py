@@ -1806,6 +1806,21 @@ class TestNumpy_ApplyWindowing:
         out = apply_windowing(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
 
+    def test_rescale_empty(self):
+        """Test RescaleSlope and RescaleIntercept being empty."""
+        ds = dcmread(WIN_12_1F)
+        ds.RescaleSlope = None
+        ds.RescaleIntercept = None
+
+        arr = ds.pixel_array
+        assert 0 == arr[16, 60]
+        assert 642 == arr[326, 130]
+        assert 1123 == arr[316, 481]
+        out = apply_windowing(arr, ds)
+        assert 0 == pytest.approx(out[16, 60], abs=0.1)
+        assert 3046.6 == pytest.approx(out[326, 130], abs=0.1)
+        assert 4095.0 == pytest.approx(out[316, 481], abs=0.1)
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ApplyVOI:

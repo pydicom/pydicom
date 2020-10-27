@@ -510,7 +510,9 @@ def apply_windowing(
         y_min = -2**(ds.BitsStored - 1)
         y_max = 2**(ds.BitsStored - 1) - 1
 
-    if 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
+    slope = getattr(ds, 'RescaleSlope', None)
+    intercept = getattr(ds, 'RescaleIntercept', None)
+    if slope is not None and intercept is not None:
         # Otherwise its the actual data range
         y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
         y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
