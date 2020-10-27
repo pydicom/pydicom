@@ -333,8 +333,15 @@ def apply_voi_lut(
         return arr
 
     if 'VOILUTSequence' in ds and 'WindowCenter' in ds:
-        if prefer_lut:
+        desc = getattr(ds.VOILUTSequence[0], 'LUTDescriptor', None)
+        data = getattr(ds.VOILUTSequence[0], 'LUTData', None)
+        if prefer_lut and desc is not None and data is not None:
             return apply_voi(arr, ds, index)
+
+        center = getattr(ds, 'WindowCenter', None)
+        width = getattr(ds, 'WindowWidth', None)
+        if center is None or width is None:
+            return arr
 
         return apply_windowing(arr, ds, index)
 

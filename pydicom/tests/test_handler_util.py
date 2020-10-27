@@ -2096,6 +2096,29 @@ class TestNumpy_ApplyVOILUT:
         out = apply_voi_lut(arr, ds, prefer_lut=False)
         assert [255, 255, 255, 255, 255] == out.tolist()
 
+    def test_voi_windowing_empty(self):
+        """Test empty VOI elements."""
+        ds = Dataset()
+        ds.PhotometricInterpretation = 'MONOCHROME1'
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 8
+        ds.WindowWidth = 1
+        ds.WindowCenter = 0
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4, 0, 8]
+        item.LUTData = [0, 127, 128, 255]
+        arr = np.asarray([0, 1, 128, 254, 255], dtype='uint8')
+
+        # Test empty VOI elements
+        item.LUTData = None
+        out = apply_voi_lut(arr, ds)
+        assert [255, 255, 255, 255, 255] == out.tolist()
+
+        # Test empty windowing elements
+        ds.WindowWidth = None
+        out = apply_voi_lut(arr, ds)
+        assert [0, 1, 128, 254, 255] == out.tolist()
 
 class TestGetJ2KParameters:
     """Tests for get_j2k_parameters."""
