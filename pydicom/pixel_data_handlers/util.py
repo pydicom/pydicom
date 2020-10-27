@@ -329,27 +329,31 @@ def apply_voi_lut(
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if "VOILUTSequence" not in ds and "WindowCenter" not in ds:
-        return arr
+    voi_usable = False
+    if 'VOILUTSequence' in ds:
+        voi_usable = None not in [
+            ds.VOILUTSequence[0].get('LUTDescriptor', None),
+            ds.VOILUTSequence[0].get('LUTData', None)
+        ]
+    windowing_usable = None not in [
+        ds.get('WindowCenter', None),
+        ds.get('WindowWidth', None)
+    ]
 
     if 'VOILUTSequence' in ds and 'WindowCenter' in ds:
-        desc = ds.VOILUTSequence[0].get('LUTDescriptor', None)
-        data = ds.VOILUTSequence[0].get('LUTData', None)
-        if prefer_lut and desc is not None and data is not None:
+        if prefer_lut and voi_usable:
             return apply_voi(arr, ds, index)
 
-        center = ds.get('WindowCenter', None)
-        width = ds.get('WindowWidth', None)
-        if center is None or width is None:
-            return arr
+        elif windowing_usable:
+            return apply_windowing(arr, ds, index)
 
-        return apply_windowing(arr, ds, index)
-
-    if 'VOILUTSequence' in ds:
+    if voi_usable:
         return apply_voi(arr, ds, index)
 
-    if 'WindowCenter' in ds:
+    if windowing_usable:
         return apply_windowing(arr, ds, index)
+
+    return arr
 
 
 def apply_voi(
