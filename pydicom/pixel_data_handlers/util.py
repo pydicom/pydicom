@@ -333,13 +333,13 @@ def apply_voi_lut(
         return arr
 
     if 'VOILUTSequence' in ds and 'WindowCenter' in ds:
-        desc = getattr(ds.VOILUTSequence[0], 'LUTDescriptor', None)
-        data = getattr(ds.VOILUTSequence[0], 'LUTData', None)
+        desc = ds.VOILUTSequence[0].get('LUTDescriptor', None)
+        data = ds.VOILUTSequence[0].get('LUTData', None)
         if prefer_lut and desc is not None and data is not None:
             return apply_voi(arr, ds, index)
 
-        center = getattr(ds, 'WindowCenter', None)
-        width = getattr(ds, 'WindowWidth', None)
+        center = ds.get('WindowCenter', None)
+        width = ds.get('WindowWidth', None)
         if center is None or width is None:
             return arr
 
@@ -517,8 +517,8 @@ def apply_windowing(
         y_min = -2**(ds.BitsStored - 1)
         y_max = 2**(ds.BitsStored - 1) - 1
 
-    slope = getattr(ds, 'RescaleSlope', None)
-    intercept = getattr(ds, 'RescaleIntercept', None)
+    slope = ds.get('RescaleSlope', None)
+    intercept = ds.get('RescaleIntercept', None)
     if slope is not None and intercept is not None:
         # Otherwise its the actual data range
         y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
