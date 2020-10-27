@@ -296,7 +296,7 @@ def apply_voi_lut(
         ``np.float64``. If neither are present then `arr` will be returned
         unchanged.
     index : int, optional
-        Where the VOI LUT Module contains multiple altervative views, this is
+        When the VOI LUT Module contains multiple alternative views, this is
         the index of the view to return (default ``0``).
     prefer_lut : bool
         When the VOI LUT Module contains both *Window Width*/*Window Center*
@@ -363,19 +363,13 @@ def apply_voi(
         (0028,3002) *LUT Descriptor*, otherwise `arr` will be returned
         unchanged.
     index : int, optional
-        Where the VOI LUT Module contains multiple alternative views, this is
+        When the VOI LUT Module contains multiple alternative views, this is
         the index of the view to return (default ``0``).
 
     Returns
     -------
     numpy.ndarray
         An array with applied VOI LUT.
-
-    Notes
-    -----
-    When the dataset requires a modality LUT or rescale operation as part of
-    the Modality LUT module then that must be applied before any windowing
-    operation.
 
     See Also
     --------
@@ -454,7 +448,7 @@ def apply_windowing(
         present then returns an array of ``np.float64``, otherwise `arr` will
         be returned unchanged.
     index : int, optional
-        Where the VOI LUT Module contains multiple alternative views, this is
+        When the VOI LUT Module contains multiple alternative views, this is
         the index of the view to return (default ``0``).
 
     Returns
@@ -471,6 +465,7 @@ def apply_windowing(
     See Also
     --------
     :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut`
+    :func:`~pydicom.pixel_data_handlers.util.apply_voi`
 
     References
     ----------

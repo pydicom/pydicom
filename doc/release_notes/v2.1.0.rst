@@ -110,7 +110,8 @@ Changes
 * :class:`~pydicom.dicomdir.DicomDir` and the ``dicomdir`` module are
   deprecated and will be removed in v3.0. Use :class:`~pydicom.fileset.FileSet`
   instead (:issue:`1211`)
-* `pydicom.overlay_data_handlers` is deprecated, use `pydicom.overlays` instead
+* ``pydicom.overlay_data_handlers`` is deprecated, use ``pydicom.overlays`` 
+  instead
 * Removed transfer syntax limitations when converting overlays to an
   ``ndarray`` (:issue:`1181`)
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
