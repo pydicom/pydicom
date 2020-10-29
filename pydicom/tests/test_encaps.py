@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Test for encaps.py"""
 
 import pytest
@@ -1202,7 +1202,31 @@ class TestEncapsulate:
 
     def test_encapsulate_large(self):
         """Test encapsulating a large frame."""
-        data = bytearray(2**32 - 1)  # Odd length frame gets padded
-        data = encapsulate([data], fragments_per_frame=1)
-        fragments = decode_data_sequence(data)
+        class FakeBytes(bytes):
+            length = -1
+            def __len__(self):
+                return self.length
+
+            def __getitem__(self, s):
+                return b'\x00' * 5
+
+        data = FakeBytes()
+        data.length = 2**32 - 2  # Even, no padding
+        encapsulated = encapsulate([data], fragments_per_frame=1)
+        fragments = decode_data_sequence(encapsulated)
+        assert 1 == len(fragments)
+
+        data.length = 2**32 - 1  # Odd, gets padded to 2**31
+        encapsulated = encapsulate([data], fragments_per_frame=1)
+        fragments = decode_data_sequence(encapsulated)
         assert 2 == len(fragments)
+
+        data.length = 3 * (2**32 - 1) - 1  # Even, no padding
+        encapsulated = encapsulate([data], fragments_per_frame=1)
+        fragments = decode_data_sequence(encapsulated)
+        assert 3 == len(fragments)
+
+        data.length = 3 * (2**32 - 1)  # Odd, padded
+        encapsulated = encapsulate([data], fragments_per_frame=1)
+        fragments = decode_data_sequence(encapsulated)
+        assert 4 == len(fragments)
