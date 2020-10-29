@@ -307,13 +307,16 @@ class TestIS:
     def test_valid_value(self):
         assert 42 == IS(42)
         assert 42 == IS("42")
+        assert 42 == IS("42.0")
         assert 42 == IS(42.0)
 
     def test_invalid_value(self):
         with pytest.raises(TypeError, match="Could not convert value"):
             IS(0.9)
-        with pytest.raises(ValueError, match="invalid literal for int()"):
+        with pytest.raises(TypeError, match="Could not convert value"):
             IS("0.9")
+        with pytest.raises(ValueError, match="could not convert string"):
+            IS("foo")
 
     def test_pickling(self):
         # Check that a pickled IS is read back properly
@@ -349,6 +352,10 @@ class TestIS:
         val = pydicom.valuerep.IS("1")
         assert "1" == str(val)
 
+        val = pydicom.valuerep.IS("1.0")
+        assert "1.0" == str(val)
+
+
     def test_repr(self):
         """Test IS.__repr__()."""
         val = pydicom.valuerep.IS(1)
@@ -356,6 +363,9 @@ class TestIS:
 
         val = pydicom.valuerep.IS("1")
         assert '"1"' == repr(val)
+
+        val = pydicom.valuerep.IS("1.0")
+        assert "1.0" == str(val)
 
 
 class TestBadValueRead:

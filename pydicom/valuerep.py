@@ -478,11 +478,16 @@ class IS(int):
         if isinstance(val, str) and val.strip() == '':
             return None
 
-        newval: _IS = super().__new__(cls, val)
+        try:
+            newval: _IS = super().__new__(cls, val)
+        except ValueError:
+            # accept float strings when no integer loss, e.g. "1.0"
+            newval: _IS = super().__new__(cls, float(val))
+
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
         #   IS('1.23') will raise ValueError
-        if isinstance(val, (float, Decimal)) and newval != val:
+        if isinstance(val, (float, Decimal, str)) and newval != float(val):
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
