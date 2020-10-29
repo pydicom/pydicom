@@ -66,6 +66,8 @@ Enhancements
 * :func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits` can now be used
   with 2D or 3D input arrays and will pad the packed data to even length by
   default.
+* Automatically fragment large frames when using
+  :func:`~pydicom.encaps.encapsulate`
 
 Changes
 .......

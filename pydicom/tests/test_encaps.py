@@ -1199,3 +1199,10 @@ class TestEncapsulate:
             b'\xfe\xff\x00\xe0'  # Next item tag
             b'\xe6\x0e\x00\x00'  # Next item length
         )
+
+    def test_encapsulate_large(self):
+        """Test encapsulating a large frame."""
+        data = bytearray(2**32 - 1)  # Odd length frame gets padded
+        data = encapsulate([data], fragments_per_frame=1)
+        fragments = decode_data_sequence(data)
+        assert 2 == len(fragments)

@@ -549,8 +549,10 @@ def fragment_frame(
     frame_length = len(frame)
     # Add 1 to fix odd length frames not being caught
     if nr_fragments > (frame_length + 1) / 2.0:
-        raise ValueError('Too many fragments requested (the minimum fragment '
-                         'size is 2 bytes)')
+        raise ValueError(
+            "Too many fragments requested (the minimum fragment size is 2 "
+            "bytes)"
+        )
 
     length = int(frame_length / nr_fragments)
 
@@ -596,7 +598,7 @@ def itemize_fragment(fragment: bytes) -> bytes:
       a 4 byte length.
     """
     # item tag (fffe,e000)
-    item = bytes(b'\xFE\xFF\x00\xE0')
+    item = b'\xFE\xFF\x00\xE0'
     # fragment length '<I' little endian, 4 byte unsigned int
     item += pack('<I', len(fragment))
     # fragment data
@@ -640,7 +642,7 @@ def itemize_frame(
     :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     for fragment in fragment_frame(frame, nr_fragments):
-        yield itemise_fragment(fragment)
+        yield itemize_fragment(fragment)
 
 
 itemise_frame = itemize_frame
@@ -668,12 +670,18 @@ def encapsulate(
     then one or more fragment items. Each item will be of even length and the
     final fragment of each frame may be padded with ``0x00`` if required.
 
+    .. versionchanged:: 2.1
+
+        `fragments_per_frame` is the minimum number of fragments that
+        will be used
+
     Parameters
     ----------
     frames : list of bytes
         The frame data to encapsulate, one frame per item.
     fragments_per_frame : int, optional
-        The number of fragments to use for each frame (default ``1``).
+        The minimum number of fragments to use for each frame (default ``1``),
+        may be overridden with a larger number if required.
     has_bot : bool, optional
         ``True`` to include values in the Basic Offset Table, ``False``
         otherwise (default ``True``). If `fragments_per_frame` is not ``1``
@@ -706,9 +714,16 @@ def encapsulate(
 
     bot_offsets = [0]
     for ii, frame in enumerate(frames):
+        # Determine the minimum number of fragments required
+        frame_length = len(frame)
+        frame_length += 1 if frame_length % 2 else 0
+        min_fragments = frame_length // (2**32 - 1) + 1
+        if min_fragments > fragments_per_frame:
+            fragments_per_frame = min_fragments
+
         # `itemised_length` is the total length of each itemised frame
         itemised_length = 0
-        for item in itemise_frame(frame, fragments_per_frame):
+        for item in itemize_frame(frame, fragments_per_frame):
             itemised_length += len(item)
             output.extend(item)
 
@@ -717,7 +732,6 @@ def encapsulate(
 
     if has_bot:
         # Go back and write the frame offsets - don't need the last offset
-        output[8:8 + 4 * no_frames] = pack('<{}I'.format(no_frames),
-                                           *bot_offsets[:-1])
+        output[8:8 + 4 * no_frames] = pack(f"<{no_frames}I", *bot_offsets[:-1])
 
     return bytes(output)
