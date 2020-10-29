@@ -1204,6 +1204,7 @@ class TestEncapsulate:
         """Test encapsulating a large frame."""
         class FakeBytes(bytes):
             length = -1
+
             def __len__(self):
                 return self.length
 
@@ -1230,3 +1231,8 @@ class TestEncapsulate:
         encapsulated = encapsulate([data], fragments_per_frame=1)
         fragments = decode_data_sequence(encapsulated)
         assert 4 == len(fragments)
+
+        data.length = 3 * (2**32 - 1)
+        encapsulated = encapsulate([data], fragments_per_frame=10)
+        fragments = decode_data_sequence(encapsulated)
+        assert 10 == len(fragments)
