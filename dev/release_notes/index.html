@@ -407,6 +407,8 @@ handlers will get the additional information.</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="pydicom.pixel_data_handlers.numpy_handler.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a> can now be used
 with 2D or 3D input arrays and will pad the packed data to even length by
 default.</p></li>
+<li><p>Elements with the <a class="reference internal" href="../reference/generated/pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IS</span></code></a> VR accept float strings that
+are convertible to integers without loss, e.g. “1.0” (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1240">#1240</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
