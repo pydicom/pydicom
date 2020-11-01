@@ -21,8 +21,12 @@ Enhancements
 * Added a new pixel data handler based on `pylibjpeg
   <https://github.com/pydicom/pylibjpeg>`_ which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
-* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`,
-  :func:`~pydicom.pixel_data_handlers.apply_windowing`  aliases
+* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`  alias
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi` and
+  :func:`~pydicom.pixel_data_handlers.util.apply_windowing`
+* Added *prefer_lut* keyword parameter to
+  :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and handle empty
+  VOI LUT module elements (:issue:`1234`, :issue:`1237`)
 * Added ability to register external data sources for use with the functions
   in :mod:`pydicom.data` (:pr:`1156`)
 * ``__contains__``, ``__next__`` and ``__iter__`` implementations added to
@@ -109,7 +113,8 @@ Changes
 * :class:`~pydicom.dicomdir.DicomDir` and the ``dicomdir`` module are
   deprecated and will be removed in v3.0. Use :class:`~pydicom.fileset.FileSet`
   instead (:issue:`1211`)
-* `pydicom.overlay_data_handlers` is deprecated, use `pydicom.overlays` instead
+* ``pydicom.overlay_data_handlers`` is deprecated, use ``pydicom.overlays``
+  instead
 * Removed transfer syntax limitations when converting overlays to an
   ``ndarray`` (:issue:`1181`)
 * The :attr:`~pydicom.config.overlay_data_handlers` config option is
