@@ -44,10 +44,18 @@ jobs:
     - name: Install pytest and our package
       run: |
         pip install pytest
-        cd ..
+        cd ..  # avoid pip seeing 'pydicom' package dir below
         pip install -f pydicom/dist pydicom
 
-    - name: Test with pytest
+    - name: Test with pytest (no numpy)
+      run: |
+        python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
+
+    - name: Install numpy
+      run: |
+        pip install numpy
+
+    - name: Test with pytest (numpy installed)
       run: |
         python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
         cd pydicom  # back to root repo dir
