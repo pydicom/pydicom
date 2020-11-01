@@ -15,7 +15,9 @@
    
       apply_color_lut
       apply_modality_lut
+      apply_voi
       apply_voi_lut
+      apply_windowing
       convert_color_space
       dtype_corrected_for_endianness
       get_expected_length

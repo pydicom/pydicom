@@ -28,6 +28,7 @@ Functions for manipulating (7FE0,0010) *Pixel Data*.
    apply_modality_lut
    apply_rescale
    apply_windowing
+   apply_voi
    apply_voi_lut
    convert_color_space
    util

@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.pixel_data_handlers.convert_color_space" href="pydicom.pixel_data_handlers.convert_color_space.html" />
-    <link rel="prev" title="pydicom.pixel_data_handlers.apply_windowing" href="pydicom.pixel_data_handlers.apply_windowing.html" /> 
+    <link rel="prev" title="pydicom.pixel_data_handlers.apply_voi" href="pydicom.pixel_data_handlers.apply_voi.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -122,6 +122,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_modality_lut.html">pydicom.pixel_data_handlers.apply_modality_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_rescale.html">pydicom.pixel_data_handlers.apply_rescale</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_windowing.html">pydicom.pixel_data_handlers.apply_windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_voi.html">pydicom.pixel_data_handlers.apply_voi</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.apply_voi_lut</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.convert_color_space.html">pydicom.pixel_data_handlers.convert_color_space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
@@ -220,10 +221,13 @@
 <h1>pydicom.pixel_data_handlers.apply_voi_lut<a class="headerlink" href="#pydicom-pixel-data-handlers-apply-voi-lut" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.pixel_data_handlers.apply_voi_lut">
-<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">apply_voi_lut</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em>, <em class="sig-param"><span class="n">ds</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/2119df68/pydicom/pixel_data_handlers/util.py#L264"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_voi_lut" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">apply_voi_lut</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span><span class="p">:</span> <span class="n">np.ndarray</span></em>, <em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">prefer_lut</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/9d69811e/pydicom/pixel_data_handlers/util.py#L271"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_voi_lut" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.1: </span>Added the <cite>prefer_lut</cite> keyword parameter</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -237,8 +241,11 @@ of <code class="docutils literal notranslate"><span class="pre">np.uint8</span><
 (0028,1051) <em>Window Width</em> are present then returns an array of
 <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>. If neither are present then <cite>arr</cite> will be returned
 unchanged.</p></li>
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Where the VOI LUT Module contains multiple possible views, this is
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – When the VOI LUT Module contains multiple alternative views, this is
 the index of the view to return (default <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
+<li><p><strong>prefer_lut</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – When the VOI LUT Module contains both <em>Window Width</em>/<em>Window Center</em>
+and <em>VOI LUT Sequence</em>, if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then apply the VOI LUT,
+otherwise apply the windowing operation.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -254,7 +261,7 @@ the Modality LUT module then that must be applied before any windowing
 operation.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a></p>
+<p><a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a>, <a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi" title="pydicom.pixel_data_handlers.util.apply_voi"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi()</span></code></a>, <a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_windowing" title="pydicom.pixel_data_handlers.util.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a></p>
 </div>
 <p class="rubric">References</p>
 <ul class="simple">
@@ -277,7 +284,7 @@ operation.</p>
         <a href="pydicom.pixel_data_handlers.convert_color_space.html" class="btn btn-neutral float-right" title="pydicom.pixel_data_handlers.convert_color_space" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.pixel_data_handlers.apply_windowing.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.apply_windowing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.pixel_data_handlers.apply_voi.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.apply_voi" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

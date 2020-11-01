@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.values.convert_value &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>pydicom.pixel_data_handlers.apply_voi &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Element Multi-value Representation (pydicom.multival)" href="../elem.multival.html" />
-    <link rel="prev" title="pydicom.values.convert_UR_string" href="pydicom.values.convert_UR_string.html" /> 
+    <link rel="next" title="pydicom.pixel_data_handlers.apply_voi_lut" href="pydicom.pixel_data_handlers.apply_voi_lut.html" />
+    <link rel="prev" title="pydicom.pixel_data_handlers.apply_windowing" href="pydicom.pixel_data_handlers.apply_windowing.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -114,40 +114,20 @@
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_AE_string.html">pydicom.values.convert_AE_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_ATvalue.html">pydicom.values.convert_ATvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DA_string.html">pydicom.values.convert_DA_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DS_string.html">pydicom.values.convert_DS_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_DT_string.html">pydicom.values.convert_DT_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_IS_string.html">pydicom.values.convert_IS_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_numbers.html">pydicom.values.convert_numbers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OBvalue.html">pydicom.values.convert_OBvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_OWvalue.html">pydicom.values.convert_OWvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_PN.html">pydicom.values.convert_PN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_single_string.html">pydicom.values.convert_single_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_SQ.html">pydicom.values.convert_SQ</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_string.html">pydicom.values.convert_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_tag.html">pydicom.values.convert_tag</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_text.html">pydicom.values.convert_text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_TM_string.html">pydicom.values.convert_TM_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UI.html">pydicom.values.convert_UI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UN.html">pydicom.values.convert_UN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.values.convert_UR_string.html">pydicom.values.convert_UR_string</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.values.convert_value</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_color_lut.html">pydicom.pixel_data_handlers.apply_color_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_modality_lut.html">pydicom.pixel_data_handlers.apply_modality_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_rescale.html">pydicom.pixel_data_handlers.apply_rescale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_windowing.html">pydicom.pixel_data_handlers.apply_windowing</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.apply_voi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_voi_lut.html">pydicom.pixel_data_handlers.apply_voi_lut</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.convert_color_space.html">pydicom.pixel_data_handlers.convert_color_space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -218,11 +198,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
+          <li><a href="../handlers.html">Bulk Data Handlers</a> &raquo;</li>
         
-          <li><a href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a> &raquo;</li>
-        
-      <li>pydicom.values.convert_value</li>
+      <li>pydicom.pixel_data_handlers.apply_voi</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -239,28 +217,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-values-convert-value">
-<h1>pydicom.values.convert_value<a class="headerlink" href="#pydicom-values-convert-value" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-pixel-data-handlers-apply-voi">
+<h1>pydicom.pixel_data_handlers.apply_voi<a class="headerlink" href="#pydicom-pixel-data-handlers-apply-voi" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.values.convert_value">
-<code class="sig-prename descclassname">pydicom.values.</code><code class="sig-name descname">convert_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">VR</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">raw_data_element</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a></span></em>, <em class="sig-param"><span class="n">encodings</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">, </span>Sequence<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9d69811e/pydicom/values.py#L681"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.values.convert_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the element value decoded using the appropriate decoder.</p>
+<dt id="pydicom.pixel_data_handlers.apply_voi">
+<code class="sig-prename descclassname">pydicom.pixel_data_handlers.</code><code class="sig-name descname">apply_voi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span><span class="p">:</span> <span class="n">np.ndarray</span></em>, <em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/9d69811e/pydicom/pixel_data_handlers/util.py#L358"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_voi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a VOI lookup table to <cite>arr</cite>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.</span></p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>VR</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The element’s VR.</p></li>
-<li><p><strong>raw_data_element</strong> (<a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><em>pydicom.dataelem.RawDataElement</em></a>) – The encoded element value.</p></li>
-<li><p><strong>encodings</strong> (<em>list of str</em><em>, </em><em>optional</em>) – A list of the character encoding schemes used to encode any text
-elements.</p></li>
+<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to apply the VOI LUT to.</p></li>
+<li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – A dataset containing a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT Module</a>.
+If (0028,3010) <em>VOI LUT Sequence</em> is present then returns an array
+of <code class="docutils literal notranslate"><span class="pre">np.uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">np.uint16</span></code>, depending on the 3rd value of
+(0028,3002) <em>LUT Descriptor</em>, otherwise <cite>arr</cite> will be returned
+unchanged.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – When the VOI LUT Module contains multiple alternative views, this is
+the index of the view to return (default <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The element value decoded using the appropriate decoder.</p>
+<dd class="field-even"><p>An array with applied VOI LUT.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)">type</a> or MultiValue of type</p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a>, <a class="reference internal" href="pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_windowing" title="pydicom.pixel_data_handlers.util.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a></p>
+</div>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>DICOM Standard, Part 3, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.2">Annex C.11.2</a></p></li>
+<li><p>DICOM Standard, Part 3, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.8.11.3.html#sect_C.8.11.3.1.5">Annex C.8.11.3.1.5</a></p></li>
+<li><p>DICOM Standard, Part 4, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part04/sect_N.2.html#sect_N.2.1.1">Annex N.2.1.1</a></p></li>
+</ul>
 </dd></dl>
 
 </div>
@@ -273,10 +268,10 @@ elements.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../elem.multival.html" class="btn btn-neutral float-right" title="Element Multi-value Representation (pydicom.multival)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.pixel_data_handlers.apply_voi_lut.html" class="btn btn-neutral float-right" title="pydicom.pixel_data_handlers.apply_voi_lut" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.values.convert_UR_string.html" class="btn btn-neutral float-left" title="pydicom.values.convert_UR_string" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.pixel_data_handlers.apply_windowing.html" class="btn btn-neutral float-left" title="pydicom.pixel_data_handlers.apply_windowing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
