@@ -77,13 +77,15 @@ def get_frame_offsets(fp: DicomFileLike) -> Tuple[bool, List[int]]:
     tag = Tag(fp.read_tag())
 
     if tag != 0xfffee000:
-        raise ValueError("Unexpected tag '{}' when parsing the Basic Table "
-                         "Offset item.".format(tag))
+        raise ValueError(
+            f"Unexpected tag '{tag}' when parsing the Basic Table Offset item"
+        )
 
     length = fp.read_UL()
     if length % 4:
-        raise ValueError("The length of the Basic Offset Table item is not "
-                         "a multiple of 4.")
+        raise ValueError(
+            "The length of the Basic Offset Table item is not a multiple of 4"
+        )
 
     offsets = []
     # Always return at least a 0 offset
@@ -116,18 +118,20 @@ def get_nr_fragments(fp: DicomFileLike) -> int:
             # Item
             length = fp.read_UL()
             if length == 0xFFFFFFFF:
-                raise ValueError("Undefined item length at offset {} when "
-                                 "parsing the encapsulated pixel data "
-                                 "fragments.".format(fp.tell() - 4))
+                raise ValueError(
+                    f"Undefined item length at offset {fp.tell() - 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
             fp.seek(length, 1)
             nr_fragments += 1
         elif tag == 0xFFFEE0DD:
             # Sequence Delimiter
             break
         else:
-            raise ValueError("Unexpected tag '{}' at offset {} when parsing "
-                             "the encapsulated pixel data fragment items."
-                             .format(tag, fp.tell() - 4))
+            raise ValueError(
+                f"Unexpected tag '{tag}' at offset {fp.tell() - 4} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
 
     fp.seek(start)
     return nr_fragments
@@ -206,9 +210,10 @@ def generate_pixel_data_fragment(
             # Item
             length = fp.read_UL()
             if length == 0xFFFFFFFF:
-                raise ValueError("Undefined item length at offset {} when "
-                                 "parsing the encapsulated pixel data "
-                                 "fragments.".format(fp.tell() - 4))
+                raise ValueError(
+                    f"Undefined item length at offset {fp.tell() - 4} when "
+                    "parsing the encapsulated pixel data fragments"
+                )
             yield fp.read(length)
         elif tag == 0xFFFEE0DD:
             # Sequence Delimiter
@@ -216,9 +221,10 @@ def generate_pixel_data_fragment(
             fp.seek(-4, 1)
             break
         else:
-            raise ValueError("Unexpected tag '{0}' at offset {1} when parsing "
-                             "the encapsulated pixel data fragment items."
-                             .format(tag, fp.tell() - 4))
+            raise ValueError(
+                f"Unexpected tag '{tag}' at offset {fp.tell() - 4} when "
+                "parsing the encapsulated pixel data fragment items"
+            )
 
 
 def generate_pixel_data_frame(
@@ -549,8 +555,10 @@ def fragment_frame(
     frame_length = len(frame)
     # Add 1 to fix odd length frames not being caught
     if nr_fragments > (frame_length + 1) / 2.0:
-        raise ValueError('Too many fragments requested (the minimum fragment '
-                         'size is 2 bytes)')
+        raise ValueError(
+            "Too many fragments requested (the minimum fragment size is "
+            "2 bytes)"
+        )
 
     length = int(frame_length / nr_fragments)
 
@@ -596,7 +604,7 @@ def itemize_fragment(fragment: bytes) -> bytes:
       a 4 byte length.
     """
     # item tag (fffe,e000)
-    item = bytes(b'\xFE\xFF\x00\xE0')
+    item = b'\xFE\xFF\x00\xE0'
     # fragment length '<I' little endian, 4 byte unsigned int
     item += pack('<I', len(fragment))
     # fragment data
@@ -640,7 +648,7 @@ def itemize_frame(
     :dcm:`Annex A.4 <part05/sect_A.4.html>`
     """
     for fragment in fragment_frame(frame, nr_fragments):
-        yield itemise_fragment(fragment)
+        yield itemize_fragment(fragment)
 
 
 itemise_frame = itemize_frame
@@ -663,6 +671,16 @@ def encapsulate(
 
     For multi-frame data each frame must be encoded separately and then all
     encoded frames encapsulated together.
+
+    When many large frames are to be encapsulated, the total length of
+    encapsulated data may exceed the maximum length available with the
+    :dcm:`Basic Offset Table<part05/sect_A.4.html>` (2**31 - 1 bytes). Under
+    these circumstances you can:
+
+    * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
+    * Use :func:`~pydicom.encaps.encapsulate_extended` and add the
+      :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html>` elements to your
+      dataset (recommended)
 
     Data will be encapsulated with a Basic Offset Table Item at the beginning,
     then one or more fragment items. Each item will be of even length and the
@@ -688,18 +706,33 @@ def encapsulate(
     ----------
     DICOM Standard, Part 5, :dcm:`Section 7.5 <part05/sect_7.5.html>` and
     :dcm:`Annex A.4 <part05/sect_A.4.html>`
+
+    See Also
+    --------
+    :func:`~pydicom.encaps.encapsulate_extended`
     """
-    no_frames = len(frames)
+    nr_frames = len(frames)
     output = bytearray()
 
     # Add the Basic Offset Table Item
     # Add the tag
     output.extend(b'\xFE\xFF\x00\xE0')
     if has_bot:
+        # Check that the 2**32 - 1 limit in BOT item lengths won't be exceeded
+        total = (nr_frames - 1) * 8 + sum([len(f) for f in frames[:-1]])
+        if total > 2**32 - 1:
+            raise ValueError(
+                f"The total length of the encapsulated frame data ({total} "
+                "bytes) will be greater than the maximum allowed by the Basic "
+                f"Offset Table ({2**32 - 1} bytes), it's recommended that you "
+                "use the Extended Offset Table instead (see the "
+                "'encapsulate_extended' function for more information)"
+            )
+
         # Add the length
-        output.extend(pack('<I', 4 * no_frames))
+        output.extend(pack('<I', 4 * nr_frames))
         # Reserve 4 x len(frames) bytes for the offsets
-        output.extend(b'\xFF\xFF\xFF\xFF' * no_frames)
+        output.extend(b'\xFF\xFF\xFF\xFF' * nr_frames)
     else:
         # Add the length
         output.extend(pack('<I', 0))
@@ -708,7 +741,7 @@ def encapsulate(
     for ii, frame in enumerate(frames):
         # `itemised_length` is the total length of each itemised frame
         itemised_length = 0
-        for item in itemise_frame(frame, fragments_per_frame):
+        for item in itemize_frame(frame, fragments_per_frame):
             itemised_length += len(item)
             output.extend(item)
 
@@ -717,7 +750,67 @@ def encapsulate(
 
     if has_bot:
         # Go back and write the frame offsets - don't need the last offset
-        output[8:8 + 4 * no_frames] = pack('<{}I'.format(no_frames),
-                                           *bot_offsets[:-1])
+        output[8:8 + 4 * nr_frames] = pack(f"<{nr_frames}I", *bot_offsets[:-1])
 
     return bytes(output)
+
+
+def encapsulate_extended(frames: List[bytes]) -> Tuple[bytes, bytes, bytes]:
+    """Return encapsulated image data and values for the Extended Offset Table
+    elements.
+
+    When using a compressed transfer syntax (such as RLE Lossless or one of
+    JPEG formats) then any *Pixel Data* must be :dcm:`encapsulated
+    <part05/sect_A.4.html>`. When many large frames are to be encapsulated, the
+    total length of encapsulated data may exceed the maximum length available
+    with the :dcm:`Basic Offset Table<part05/sect_A.4.html>` (2**32 - 1 bytes).
+    Under these circumstances you can:
+
+    * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
+    * Use :func:`~pydicom.encaps.encapsulate_extended` and add the
+      :dcm:`Extended Offset Table<part03/sect_C.7.6.3.html>` elements to your
+      dataset (recommended)
+
+    Examples
+    --------
+
+    .. code-block:: python
+
+        from pydicom.encaps import encapsulate_extended
+
+        # 'frames' is a list of image frames that have been each been encoded
+        # separately using the compression method corresponding to the Transfer
+        # Syntax UID
+        frames: List[bytes] = [...]
+        out: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
+
+        ds.PixelData = out[0]
+        ds.ExtendedOffsetTable = out[1]
+        ds.ExtendedOffsetTableLengths = out[2]
+
+    Parameters
+    ----------
+    frames : list of bytes
+        The compressed frame data to encapsulate, one frame per item.
+
+    Returns
+    -------
+    bytes, bytes, bytes
+        The (encapsulated frames, extended offset table, extended offset
+        table lengths).
+
+    See Also
+    --------
+    :func:`~pydicom.encaps.encapsulate`
+    """
+    nr_frames = len(frames)
+    frame_lengths = [len(frame) for frame in frames]
+    frame_offsets = [0]
+    for ii, length in enumerate(frame_lengths[:-1]):
+        # Extra 8 bytes for the Item tag and length
+        frame_offsets.append(frame_offsets[ii] + length + 8)
+
+    offsets = pack(f"<{nr_frames}Q", *frame_offsets)
+    lengths = pack(f"<{nr_frames}Q", *frame_lengths)
+
+    return encapsulate(frames, has_bot=False), offsets, lengths

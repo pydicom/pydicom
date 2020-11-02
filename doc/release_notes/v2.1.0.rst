@@ -72,6 +72,8 @@ Enhancements
   default.
 * Elements with the :class:`~pydicom.valuerep.IS` VR accept float strings that
   are convertible to integers without loss, e.g. "1.0" (:pr:`1240`)
+* Added :func:`~pydicom.encaps.encapsulate_extended` function for use when
+  an Extended Offset Table is required (:issue:`1178`)
 
 Changes
 .......
