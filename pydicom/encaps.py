@@ -675,8 +675,8 @@ def encapsulate(
 
     When many large frames are to be encapsulated, the total length of
     encapsulated data may exceed the maximum length available with the
-    :dcm:`Basic Offset Table<part05/sect_A.4.html>`. Under these
-    circumstances you can:
+    :dcm:`Basic Offset Table<part05/sect_A.4.html>` (2**31 - 1 bytes). Under
+    these circumstances you can:
 
     * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
     * Use :func:`~pydicom.encaps.encapsulate_extended` and add the
@@ -765,8 +765,8 @@ def encapsulate_extended(frames: List[bytes]) -> Tuple[bytes, bytes, bytes]:
     JPEG formats) then any *Pixel Data* must be :dcm:`encapsulated
     <part05/sect_A.4.html>`. When many large frames are to be encapsulated, the
     total length of encapsulated data may exceed the maximum length available
-    with the :dcm:`Basic Offset Table<part05/sect_A.4.html>`. Under these
-    circumstances you can:
+    with the :dcm:`Basic Offset Table<part05/sect_A.4.html>` (2**32 - 1 bytes).
+    Under these circumstances you can:
 
     * Pass ``has_bot=False`` to :func:`~pydicom.encaps.encapsulate`
     * Use :func:`~pydicom.encaps.encapsulate_extended` and add the
