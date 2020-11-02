@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.datadict.get_entry &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>pydicom.datadict.get_entry &mdash; pydicom 2.1.0 documentation</title>
   
 
   
@@ -73,7 +73,7 @@
             
             
               <div class="version">
-                2.1.0.dev0
+                2.1.0
               </div>
             
           
@@ -231,7 +231,7 @@
 <h1>pydicom.datadict.get_entry<a class="headerlink" href="#pydicom-datadict-get-entry" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.datadict.get_entry">
-<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">get_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/11abc5f8/pydicom/datadict.py#L244"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.get_entry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.datadict.</code><code class="sig-name descname">get_entry</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/datadict.py#L244"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.datadict.get_entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an entry from the DICOM dictionary as a tuple.</p>
 <p>If the <cite>tag</cite> is not in the main DICOM dictionary, then the repeating
 group dictionary will also be checked.</p>
@@ -254,7 +254,7 @@ private dictionary.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="pydicom.datadict.get_private_entry.html#pydicom.datadict.get_private_entry" title="pydicom.datadict.get_private_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_private_entry()</span></code></a></dt><dd><p>Return an entry from the private dictionary.</p>
+<dt><a class="reference internal" href="pydicom.datadict.get_private_entry.html#pydicom.datadict.get_private_entry" title="pydicom.datadict.get_private_entry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_private_entry</span></code></a></dt><dd><p>Return an entry from the private dictionary.</p>
 </dd>
 </dl>
 </div>
