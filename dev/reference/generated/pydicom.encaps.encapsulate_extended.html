@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pydicom.filewriter.write_PN &mdash; pydicom 2.1.0.dev0 documentation</title>
+  <title>pydicom.encaps.encapsulate_extended &mdash; pydicom 2.1.0.dev0 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.filewriter.write_sequence" href="pydicom.filewriter.write_sequence.html" />
-    <link rel="prev" title="pydicom.filewriter.write_OWvalue" href="pydicom.filewriter.write_OWvalue.html" /> 
+    <link rel="next" title="pydicom.encaps.fragment_frame" href="pydicom.encaps.fragment_frame.html" />
+    <link rel="prev" title="pydicom.encaps.encapsulate" href="pydicom.encaps.encapsulate.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -120,39 +120,20 @@
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.encapsulate_extended</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../errors.html">Exceptions (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.errors</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../fileio.html">Dataset IO</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../fileio.read.html">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr.html">pydicom.filewriter.correct_ambiguous_vr</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.correct_ambiguous_vr_element.html">pydicom.filewriter.correct_ambiguous_vr_element</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.dcmwrite.html">pydicom.filewriter.dcmwrite</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.multi_string.html">pydicom.filewriter.multi_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_ATvalue.html">pydicom.filewriter.write_ATvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_DA.html">pydicom.filewriter.write_DA</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_dataset.html">pydicom.filewriter.write_dataset</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_data_element.html">pydicom.filewriter.write_data_element</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_DT.html">pydicom.filewriter.write_DT</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_file_meta_info.html">pydicom.filewriter.write_file_meta_info</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_numbers.html">pydicom.filewriter.write_numbers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_number_string.html">pydicom.filewriter.write_number_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_OBvalue.html">pydicom.filewriter.write_OBvalue</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_OWvalue.html">pydicom.filewriter.write_OWvalue</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.filewriter.write_PN</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_sequence.html">pydicom.filewriter.write_sequence</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_sequence_item.html">pydicom.filewriter.write_sequence_item</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_string.html">pydicom.filewriter.write_string</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_text.html">pydicom.filewriter.write_text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_TM.html">pydicom.filewriter.write_TM</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_UI.html">pydicom.filewriter.write_UI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.filewriter.write_UN.html">pydicom.filewriter.write_UN</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.base.html">IO Base Classes (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filebase</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../fileio.util.html">IO Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileutil</span></code>)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../fileio.html">Dataset IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../misc.html">Miscellaneous (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.misc</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../uid.html">UID Definitions and Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.uid</span></code>)</a></li>
 </ul>
@@ -218,11 +199,9 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../fileio.html">Dataset IO</a> &raquo;</li>
+          <li><a href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a> &raquo;</li>
         
-          <li><a href="../fileio.write.html">Dataset Writing (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filewriter</span></code>)</a> &raquo;</li>
-        
-      <li>pydicom.filewriter.write_PN</li>
+      <li>pydicom.encaps.encapsulate_extended</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -239,12 +218,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-filewriter-write-pn">
-<h1>pydicom.filewriter.write_PN<a class="headerlink" href="#pydicom-filewriter-write-pn" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pydicom-encaps-encapsulate-extended">
+<h1>pydicom.encaps.encapsulate_extended<a class="headerlink" href="#pydicom-encaps-encapsulate-extended" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.filewriter.write_PN">
-<code class="sig-prename descclassname">pydicom.filewriter.</code><code class="sig-name descname">write_PN</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fp</span></em>, <em class="sig-param"><span class="n">data_element</span></em>, <em class="sig-param"><span class="n">encodings</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/11abc5f8/pydicom/filewriter.py#L287"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.filewriter.write_PN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="pydicom.encaps.encapsulate_extended">
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">encapsulate_extended</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/11abc5f8/pydicom/encaps.py#L758"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.encapsulate_extended" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return encapsulated image data and values for the Extended Offset Table
+elements.</p>
+<p>When using a compressed transfer syntax (such as RLE Lossless or one of
+JPEG formats) then any <em>Pixel Data</em> must be <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a>. When many large frames are to be encapsulated, the
+total length of encapsulated data may exceed the maximum length available
+with the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">Basic Offset Table</a> (2**32 - 1 bytes).
+Under these circumstances you can:</p>
+<ul class="simple">
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">has_bot=False</span></code> to <a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a></p></li>
+<li><p>Use <a class="reference internal" href="#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> and add the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Extended Offset Table</a> elements to your
+dataset (recommended)</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate_extended</span>
+
+<span class="c1"># &#39;frames&#39; is a list of image frames that have been each been encoded</span>
+<span class="c1"># separately using the compression method corresponding to the Transfer</span>
+<span class="c1"># Syntax UID</span>
+<span class="n">frames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="n">out</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLengths</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>frames</strong> (<em>list of bytes</em>) – The compressed frame data to encapsulate, one frame per item.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The (encapsulated frames, extended offset table, extended offset
+table lengths).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a></p>
+</div>
+</dd></dl>
 
 </div>
 
@@ -256,10 +278,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pydicom.filewriter.write_sequence.html" class="btn btn-neutral float-right" title="pydicom.filewriter.write_sequence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.encaps.fragment_frame.html" class="btn btn-neutral float-right" title="pydicom.encaps.fragment_frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.filewriter.write_OWvalue.html" class="btn btn-neutral float-left" title="pydicom.filewriter.write_OWvalue" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.encaps.encapsulate.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

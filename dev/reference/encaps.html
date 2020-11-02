@@ -133,6 +133,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#creating-encapsulated-data">Creating Encapsulated Data</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
@@ -271,13 +272,16 @@ as (7FE0,0010) <em>Pixel Data</em>.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate</span></code></a>(frames[, fragments_per_frame, …])</p></td>
 <td><p>Return encapsulated <cite>frames</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.fragment_frame.html#pydicom.encaps.fragment_frame" title="pydicom.encaps.fragment_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fragment_frame</span></code></a>(frame[, nr_fragments])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-obj docutils literal notranslate"><span class="pre">encapsulate_extended</span></code></a>(frames)</p></td>
+<td><p>Return encapsulated image data and values for the Extended Offset Table elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.fragment_frame.html#pydicom.encaps.fragment_frame" title="pydicom.encaps.fragment_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fragment_frame</span></code></a>(frame[, nr_fragments])</p></td>
 <td><p>Yield one or more fragments from <cite>frame</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.itemize_fragment.html#pydicom.encaps.itemize_fragment" title="pydicom.encaps.itemize_fragment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itemize_fragment</span></code></a>(fragment)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.itemize_fragment.html#pydicom.encaps.itemize_fragment" title="pydicom.encaps.itemize_fragment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itemize_fragment</span></code></a>(fragment)</p></td>
 <td><p>Return an itemized <cite>fragment</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.encaps.itemize_frame.html#pydicom.encaps.itemize_frame" title="pydicom.encaps.itemize_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itemize_frame</span></code></a>(frame[, nr_fragments])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.encaps.itemize_frame.html#pydicom.encaps.itemize_frame" title="pydicom.encaps.itemize_frame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itemize_frame</span></code></a>(frame[, nr_fragments])</p></td>
 <td><p>Yield items generated from <cite>frame</cite>.</p></td>
 </tr>
 </tbody>

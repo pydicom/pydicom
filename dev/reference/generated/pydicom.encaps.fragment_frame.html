@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="pydicom.encaps.itemize_fragment" href="pydicom.encaps.itemize_fragment.html" />
-    <link rel="prev" title="pydicom.encaps.encapsulate" href="pydicom.encaps.encapsulate.html" /> 
+    <link rel="prev" title="pydicom.encaps.encapsulate_extended" href="pydicom.encaps.encapsulate_extended.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -124,6 +124,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate.html">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.fragment_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
@@ -221,7 +222,7 @@
 <h1>pydicom.encaps.fragment_frame<a class="headerlink" href="#pydicom-encaps-fragment-frame" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.fragment_frame">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">fragment_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em>, <em class="sig-param"><span class="n">nr_fragments</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9d69811e/pydicom/encaps.py#L512"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.fragment_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">fragment_frame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></span></em>, <em class="sig-param"><span class="n">nr_fragments</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span> &#x2192; Generator<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/11abc5f8/pydicom/encaps.py#L518"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.fragment_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield one or more fragments from <cite>frame</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -267,7 +268,7 @@ value (<code class="docutils literal notranslate"><span class="pre">0x00</span><
         <a href="pydicom.encaps.itemize_fragment.html" class="btn btn-neutral float-right" title="pydicom.encaps.itemize_fragment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pydicom.encaps.encapsulate.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pydicom.encaps.encapsulate_extended.html" class="btn btn-neutral float-left" title="pydicom.encaps.encapsulate_extended" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

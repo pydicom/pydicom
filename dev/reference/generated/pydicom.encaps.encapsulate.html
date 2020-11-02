@@ -45,7 +45,7 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.encaps.fragment_frame" href="pydicom.encaps.fragment_frame.html" />
+    <link rel="next" title="pydicom.encaps.encapsulate_extended" href="pydicom.encaps.encapsulate_extended.html" />
     <link rel="prev" title="pydicom.encaps.read_item" href="pydicom.encaps.read_item.html" /> 
 </head>
 
@@ -124,6 +124,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../encaps.html#parsing-encapsulated-data">Parsing Encapsulated Data</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../encaps.html#creating-encapsulated-data">Creating Encapsulated Data</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.encaps.encapsulate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.encapsulate_extended.html">pydicom.encaps.encapsulate_extended</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.fragment_frame.html">pydicom.encaps.fragment_frame</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_fragment.html">pydicom.encaps.itemize_fragment</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.encaps.itemize_frame.html">pydicom.encaps.itemize_frame</a></li>
@@ -221,7 +222,7 @@
 <h1>pydicom.encaps.encapsulate<a class="headerlink" href="#pydicom-encaps-encapsulate" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.encapsulate">
-<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">encapsulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fragments_per_frame</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">has_bot</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/9d69811e/pydicom/encaps.py#L649"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.encapsulate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.encaps.</code><code class="sig-name descname">encapsulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">fragments_per_frame</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em>, <em class="sig-param"><span class="n">has_bot</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/11abc5f8/pydicom/encaps.py#L657"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.encaps.encapsulate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return encapsulated <cite>frames</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -235,6 +236,16 @@ JPEG formats) then any <em>Pixel Data</em> must be <a class="reference external"
 </div>
 <p>For multi-frame data each frame must be encoded separately and then all
 encoded frames encapsulated together.</p>
+<p>When many large frames are to be encapsulated, the total length of
+encapsulated data may exceed the maximum length available with the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">Basic Offset Table</a> (2**31 - 1 bytes). Under
+these circumstances you can:</p>
+<ul class="simple">
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">has_bot=False</span></code> to <a class="reference internal" href="#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a></p></li>
+<li><p>Use <a class="reference internal" href="pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> and add the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Extended Offset Table</a> elements to your
+dataset (recommended)</p></li>
+</ul>
 <p>Data will be encapsulated with a Basic Offset Table Item at the beginning,
 then one or more fragment items. Each item will be of even length and the
 final fragment of each frame may be padded with <code class="docutils literal notranslate"><span class="pre">0x00</span></code> if required.</p>
@@ -258,6 +269,10 @@ then it’s strongly recommended that this be <code class="docutils literal notr
 <p class="rubric">References</p>
 <p>DICOM Standard, Part 5, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.5.html">Section 7.5</a> and
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">Annex A.4</a></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a></p>
+</div>
 </dd></dl>
 
 </div>
@@ -270,7 +285,7 @@ then it’s strongly recommended that this be <code class="docutils literal notr
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="pydicom.encaps.fragment_frame.html" class="btn btn-neutral float-right" title="pydicom.encaps.fragment_frame" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="pydicom.encaps.encapsulate_extended.html" class="btn btn-neutral float-right" title="pydicom.encaps.encapsulate_extended" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pydicom.encaps.read_item.html" class="btn btn-neutral float-left" title="pydicom.encaps.read_item" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
