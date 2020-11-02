@@ -257,8 +257,7 @@ def generate_pixel_data_frame(
 
 
 def generate_pixel_data(
-    bytestream: bytes,
-    nr_frames: Optional[int] = None,
+    bytestream: bytes, nr_frames: Optional[int] = None,
 ) -> Generator[Tuple[bytes, ...], None, None]:
     """Yield an encapsulated pixel data frame.
 
@@ -751,7 +750,6 @@ def encapsulate(
 
     if has_bot:
         # Go back and write the frame offsets - don't need the last offset
-        print(bot_offsets)
         output[8:8 + 4 * nr_frames] = pack(f"<{nr_frames}I", *bot_offsets[:-1])
 
     return bytes(output)

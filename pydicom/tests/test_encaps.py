@@ -1245,8 +1245,7 @@ class TestEncapsulateExtended:
 
         # Extended Offset Table is OK
         assert isinstance(out[1], bytes)
-        offsets = list(unpack('<10Q', out[1]))
-        assert offsets == [
+        assert [
             0x0000,  # 0
             0x0eee,  # 3822
             0x1df6,  # 7670
@@ -1257,7 +1256,7 @@ class TestEncapsulateExtended:
             0x6834,  # 26676
             0x76e2,  # 30434
             0x8594  # 34196
-        ]
+        ] == list(unpack('<10Q', out[1]))
 
         # Extended Offset Table Lengths are OK
         assert isinstance(out[2], bytes)
