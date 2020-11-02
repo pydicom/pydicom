@@ -257,7 +257,7 @@ def generate_pixel_data_frame(
 
 
 def generate_pixel_data(
-    bytestream: bytes, nr_frames: Optional[int] = None,
+    bytestream: bytes, nr_frames: Optional[int] = None
 ) -> Generator[Tuple[bytes, ...], None, None]:
     """Yield an encapsulated pixel data frame.
 
