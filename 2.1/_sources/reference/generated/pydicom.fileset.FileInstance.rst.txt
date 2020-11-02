@@ -1,0 +1,39 @@
+﻿pydicom.fileset.FileInstance
+============================
+
+.. currentmodule:: pydicom.fileset
+
+.. autoclass:: FileInstance
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FileInstance.__init__
+      ~FileInstance.load
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FileInstance.FileID
+      ~FileInstance.SOPClassUID
+      ~FileInstance.SOPInstanceUID
+      ~FileInstance.TransferSyntaxUID
+      ~FileInstance.file_set
+      ~FileInstance.for_addition
+      ~FileInstance.for_moving
+      ~FileInstance.for_removal
+      ~FileInstance.is_private
+      ~FileInstance.is_staged
+      ~FileInstance.path
+   
+   

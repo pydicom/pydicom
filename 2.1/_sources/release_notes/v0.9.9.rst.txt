@@ -1,0 +1,35 @@
+Version 0.9.9
+=============
+
+Changelog
+---------
+
+In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
+dictionaries.  New features include DICOMDIR handling, and a utility module
+which produces python/pydicom source code to recreate a DICOM file.
+
+Enhancements
+............
+
+* All DICOM dictionaries updated (standard dictionary, UID dictionary, and
+  private dictionaries)
+* Dicom commands also added to dictionary
+* Ability to work with DICOMDIR: ``read_dicomdir()`` function and ``DicomDir``
+  class. Example file ``show_dicomdir.py`` file added to examples subdirectory.
+* ``codify.py``: Produce python/pydicom source code from a DICOM file.
+* a number of Python 3 compatibility enhancements
+* setup.py uses ez_setup only if setuptools not already installed
+* exceptions carry tag info with them, to aid in debugging
+
+Contrib file changes
+....................
+
+* pydicom_series:  force parameter added (Nil Goyette)
+* dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)
+
+Other Contributors
+..................
+
+Other than Jonathan and myself, other contributors were: Rickard Holmberg,
+Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
+Papadopoulos, videan42 ...(sorry if I've missed anyone).

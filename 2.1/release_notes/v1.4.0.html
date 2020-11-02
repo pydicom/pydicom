@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Version 1.4.0 &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Version 1.4.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="version-1-4-0">
+<h1>Version 1.4.0<a class="headerlink" href="#version-1-4-0" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed handling of VRs AT and PN in json encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/915">#915</a>)</p></li>
+<li><p>Fixed handling of binary values in json encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/887">#887</a>)</p></li>
+<li><p>Prevent exception if assigning <cite>None</cite> to UI element (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/894">#894</a>)</p></li>
+<li><p>Fixed print output for numeric multi-value elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/892">#892</a>)</p></li>
+<li><p>Fixed testing PN values for truthiness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/891">#891</a>)</p></li>
+<li><p>Fixed handling of data too large to written in explicit transfer syntax</p></li>
+<li><p>Fixed handling of known tags with VR UN (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/899">#899</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/968">#968</a>)</p></li>
+<li><p>Fixed assigning of empty values to data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/896">#896</a>)</p></li>
+<li><p>Fixed error in unpickling dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/947">#947</a>)</p></li>
+<li><p>Fixed error in pickling modified datasets (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/951">#951</a>)</p></li>
+<li><p>Fixed improper conversion of the first value of the <em>LUT
+Descriptor</em> elements (0028,1101-1103) and (0028,3002) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/942">#942</a>)</p></li>
+<li><p>Fixed handling of ISO IR 159 encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/917">#917</a>)</p></li>
+<li><p>Fixed propagation of bulk data handler in Dataset.from_json (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/971">#971</a>)</p></li>
+<li><p>Correctly handle DICOMDIR files with records in reverse-hierarchical order
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/822">#822</a>)</p></li>
+<li><p><em>Pixel Data</em> encoded using JPEG2000 and decoded using the Pillow handler no
+longer returns RGB data when the (0028,0004) <em>Photometric Interpretation</em> is
+YBR_FULL or YBR_FULL_422. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/263">#263</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/273">#273</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/826">#826</a>)</p></li>
+<li><p>Avoid possible high memory usage while reading sequences (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/994">#994</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.encaps.generate_pixel_data.html#pydicom.encaps.generate_pixel_data" title="pydicom.encaps.generate_pixel_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_pixel_data()</span></code></a> not returning all available
+frames when the Basic Offset Table was empty. This may still occur when
+multiple fragments per frame are present for non-JPEG transfer syntaxes or
+where no JPEG EOI/EOC marker is present (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/685">#685</a>)</p></li>
+<li><p>Fixed possible incorrect switch to explicit VR in sequence items
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/999">#999</a>)</p></li>
+<li><p>Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
+pixel data with bit depth range 9-16 not producing the correct values with
+the Pillow handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/693">#693</a>)</p></li>
+<li><p>Fixed parsing a DICOMDIR file with no records raising an exception
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1004">#1004</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="enhancements">
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Added support for converting (60xx,3000) <em>Overlay Data</em> to a numpy ndarray
+using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/912">#912</a>)</p></li>
+<li><p>Added support for deferred reading in file-like objects (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/932">#932</a>)</p></li>
+<li><p>Tolerate values with multiple and/or incorrect padding bytes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/940">#940</a>)</p></li>
+<li><p>Added support for uncompressed pixel data with (0028,0004) <em>Photometric
+Interpretation</em> of <cite>YBR_FULL_422</cite> to the numpy pixel data handler.</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_color_lut" title="pydicom.pixel_data_handlers.util.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> function for
+applying color palette LUTs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/205">#205</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_modality_lut" title="pydicom.pixel_data_handlers.util.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a> function
+for applying modality LUTs.</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.data.get_palette_files.html#pydicom.data.get_palette_files" title="pydicom.data.get_palette_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_palette_files()</span></code></a> for retrieving well-known
+palette color datasets.</p></li>
+<li><p>Raise on end of file errors if <cite>config.enforce_valid_values</cite> is set
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/277">#277</a>)</p></li>
+<li><p>Added user warning, or exception in strict mode, if a DICOMDIR has an
+unexpected transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/848">#848</a>)</p></li>
+<li><p>Handle missing offset tags in DICOMDIR (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/981">#981</a>)</p></li>
+<li><p>Added optional <cite>handler</cite> argument to
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-func docutils literal notranslate"><span class="pre">decompress()</span></code></a>. This lets you specify a
+particular handler, rather than following pydicom’s default order (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/537">#537</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi_lut" title="pydicom.pixel_data_handlers.util.apply_voi_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a> function for
+applying VOI LUTs or windowing operations.</p></li>
+<li><p>Added support for (7fe0,0008) <em>Float Pixel Data</em> and (7fe0,0009) <em>Double
+Float Pixel Data</em> to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/452">#452</a>)</p></li>
+<li><p>JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
+with bit depth &gt; 8 with the Pillow pixel data handler</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.is_undefined_length" title="pydicom.dataelem.DataElement.is_undefined_length"><code class="xref py py-attr docutils literal notranslate"><span class="pre">PixelData.is_undefined_length</span></code></a> is now set automatically
+based on whether the Dataset’s Transfer Syntax is compressed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1006">#1006</a>)</p></li>
+<li><p>Updated DICOM dictionary to 2019e edition (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1013">#1013</a>)</p></li>
+<li><p>Added support for new VRs OV, SV, UV (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1016">#1016</a>)</p></li>
+<li><p>Code dictionaries and <code class="docutils literal notranslate"><span class="pre">Code</span></code> class for structured reporting added
+(alpha release only).  See the
+<a class="reference internal" href="../tutorials/sr_basics.html"><span class="doc">Structured Reporting tutorial</span></a> for more
+information</p></li>
+</ul>
+</div>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets" title="pydicom.encaps.get_frame_offsets"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame_offsets()</span></code></a> now returns whether the Basic Offset Table is empty and a list of the offsets.</p></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

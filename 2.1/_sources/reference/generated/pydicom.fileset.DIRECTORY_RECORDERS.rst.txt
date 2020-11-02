@@ -1,0 +1,6 @@
+﻿pydicom.fileset.DIRECTORY\_RECORDERS
+====================================
+
+.. currentmodule:: pydicom.fileset
+
+.. autodata:: DIRECTORY_RECORDERS

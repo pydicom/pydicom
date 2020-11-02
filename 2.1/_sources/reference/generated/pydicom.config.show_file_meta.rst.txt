@@ -1,0 +1,6 @@
+﻿pydicom.config.show\_file\_meta
+===============================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: show_file_meta

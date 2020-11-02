@@ -1,0 +1,6 @@
+﻿pydicom.config.APPLY\_J2K\_CORRECTIONS
+======================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: APPLY_J2K_CORRECTIONS

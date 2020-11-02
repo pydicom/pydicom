@@ -1,0 +1,6 @@
+﻿pydicom.uid.MPEG4HP41
+=====================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MPEG4HP41

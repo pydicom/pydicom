@@ -1,0 +1,85 @@
+Version 1.4.0
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+* Fixed handling of VRs AT and PN in json encoding (:issue:`915`)
+* Fixed handling of binary values in json encoding (:issue:`887`)
+* Prevent exception if assigning `None` to UI element (:issue:`894`)
+* Fixed print output for numeric multi-value elements (:issue:`892`)
+* Fixed testing PN values for truthiness (:issue:`891`)
+* Fixed handling of data too large to written in explicit transfer syntax
+* Fixed handling of known tags with VR UN (:issue:`899`, :issue:`968`)
+* Fixed assigning of empty values to data elements (:issue:`896`)
+* Fixed error in unpickling dataset (:issue:`947`)
+* Fixed error in pickling modified datasets (:issue:`951`)
+* Fixed improper conversion of the first value of the *LUT
+  Descriptor* elements (0028,1101-1103) and (0028,3002) (:issue:`942`)
+* Fixed handling of ISO IR 159 encoding (:issue:`917`)
+* Fixed propagation of bulk data handler in Dataset.from_json (:issue:`971`)
+* Correctly handle DICOMDIR files with records in reverse-hierarchical order
+  (:issue:`822`)
+* *Pixel Data* encoded using JPEG2000 and decoded using the Pillow handler no
+  longer returns RGB data when the (0028,0004) *Photometric Interpretation* is
+  YBR_FULL or YBR_FULL_422. (:issue:`263`, :issue:`273`, :issue:`826`)
+* Avoid possible high memory usage while reading sequences (:issue:`994`)
+* Fixed :func:`~pydicom.encaps.generate_pixel_data` not returning all available
+  frames when the Basic Offset Table was empty. This may still occur when
+  multiple fragments per frame are present for non-JPEG transfer syntaxes or
+  where no JPEG EOI/EOC marker is present (:issue:`685`)
+* Fixed possible incorrect switch to explicit VR in sequence items
+  (:issue:`999`)
+* Fixed JPEG 2000 (UIDs 1.2.840.10008.1.2.4.90 and 1.2.840.10008.1.2.4.91)
+  pixel data with bit depth range 9-16 not producing the correct values with
+  the Pillow handler (:issue:`693`)
+* Fixed parsing a DICOMDIR file with no records raising an exception
+  (:issue:`1004`)
+
+Enhancements
+............
+
+* Added support for converting (60xx,3000) *Overlay Data* to a numpy ndarray
+  using :meth:`Dataset.overlay_array()
+  <pydicom.dataset.Dataset.overlay_array>` (:issue:`912`)
+* Added support for deferred reading in file-like objects (:issue:`932`)
+* Tolerate values with multiple and/or incorrect padding bytes (:issue:`940`)
+* Added support for uncompressed pixel data with (0028,0004) *Photometric
+  Interpretation* of `YBR_FULL_422` to the numpy pixel data handler.
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_color_lut` function for
+  applying color palette LUTs (:issue:`205`)
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
+  for applying modality LUTs.
+* Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
+  palette color datasets.
+* Raise on end of file errors if `config.enforce_valid_values` is set
+  (:issue:`277`)
+* Added user warning, or exception in strict mode, if a DICOMDIR has an
+  unexpected transfer syntax (:issue:`848`)
+* Handle missing offset tags in DICOMDIR (:issue:`981`)
+* Added optional `handler` argument to
+  :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
+  particular handler, rather than following pydicom's default order (:issue:`537`)
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function for
+  applying VOI LUTs or windowing operations.
+* Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
+  Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
+  (:issue:`452`)
+* JPEG 2000 (1.2.840.10008.1.2.4.91) transfer syntax is supported for data
+  with bit depth > 8 with the Pillow pixel data handler
+* :attr:`PixelData.is_undefined_length
+  <pydicom.dataelem.DataElement.is_undefined_length>` is now set automatically
+  based on whether the Dataset's Transfer Syntax is compressed (:issue:`1006`)
+* Updated DICOM dictionary to 2019e edition (:issue:`1013`)
+* Added support for new VRs OV, SV, UV (:issue:`1016`)
+* Code dictionaries and ``Code`` class for structured reporting added
+  (alpha release only).  See the 
+  :doc:`Structured Reporting tutorial <../tutorials/sr_basics>` for more
+  information
+
+Changes
+.......
+
+* :func:`~pydicom.encaps.get_frame_offsets` now returns whether the Basic Offset Table is empty and a list of the offsets.

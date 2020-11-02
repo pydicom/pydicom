@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>General examples &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Analyse differences between DICOM files" href="plot_dicom_difference.html" />
+    <link rel="prev" title="pydicom.uid.UID" href="../reference/generated/pydicom.uid.UID.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plot_dicom_difference.html">Analyse differences between DICOM files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="show_charset_name.html">Display unicode person names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="memory_dataset.html">Show working with memory-based dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicomtree.html">Show a dicom file using hierarchical tree</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#image-processing">Image processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="image_processing/plot_downsize_image.html">Downsize MRI image using pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_processing/plot_waveforms.html">Decode and plot Waveform Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_processing/reslice.html">Load CT slices and plot axial, sagittal and coronal images</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#input-output">Input-output</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="input_output/plot_read_fileset.html">Read a DICOM File-set</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#metadata-processing">Metadata processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metadata_processing/plot_add_dict_entries.html">Add dictionary items in the standard DICOM dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata_processing/plot_sequences.html">Working with sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metadata_processing/plot_anonymize.html">Anonymize DICOM data</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>General examples</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="general-examples">
+<span id="sphx-glr-auto-examples"></span><span id="id1"></span><h1>General examples<a class="headerlink" href="#general-examples" title="Permalink to this headline">¶</a></h1>
+<p>Somewhere to start</p>
+<div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to find the differences between two DICOM files."><div class="figure align-default" id="id2">
+<img alt="Analyse differences between DICOM files" src="../_images/sphx_glr_plot_dicom_difference_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="plot_dicom_difference.html#sphx-glr-auto-examples-plot-dicom-difference-py"><span class="std std-ref">Analyse differences between DICOM files</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="Very simple app to display unicode person names."><div class="figure align-default" id="id3">
+<img alt="Display unicode person names" src="../_images/sphx_glr_show_charset_name_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="show_charset_name.html#sphx-glr-auto-examples-show-charset-name-py"><span class="std std-ref">Display unicode person names</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="Show how to write a DICOM dataset into a byte array and to read it back from a byte array. This..."><div class="figure align-default" id="id4">
+<img alt="Show working with memory-based dataset" src="../_images/sphx_glr_memory_dataset_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="memory_dataset.html#sphx-glr-auto-examples-memory-dataset-py"><span class="std std-ref">Show working with memory-based dataset</span></a></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="sudo apt install tix-dev sudo pip install -U pydicom python3 dicomtree.py file.dcm Or in file b..."><div class="figure align-default" id="id5">
+<img alt="Show a dicom file using hierarchical tree" src="../_images/sphx_glr_dicomtree_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="dicomtree.html#sphx-glr-auto-examples-dicomtree-py"><span class="std std-ref">Show a dicom file using hierarchical tree</span></a></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="image-processing">
+<span id="image-processing-examples"></span><span id="sphx-glr-auto-examples-image-processing"></span><h1>Image processing<a class="headerlink" href="#image-processing" title="Permalink to this headline">¶</a></h1>
+<p>These examples illustrate the image processing available in pydicom which can
+be applied to DICOM images.</p>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The down..."><div class="figure align-default" id="id6">
+<img alt="Downsize MRI image using pydicom" src="../_images/sphx_glr_plot_downsize_image_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="image_processing/plot_downsize_image.html#sphx-glr-auto-examples-image-processing-plot-downsize-image-py"><span class="std std-ref">Downsize MRI image using pydicom</span></a></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to plot waveforms from a Waveform Sequence using matplotlib."><div class="figure align-default" id="id7">
+<img alt="Decode and plot Waveform Data" src="../_images/sphx_glr_plot_waveforms_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="image_processing/plot_waveforms.html#sphx-glr-auto-examples-image-processing-plot-waveforms-py"><span class="std std-ref">Decode and plot Waveform Data</span></a></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D ..."><div class="figure align-default" id="id8">
+<img alt="Load CT slices and plot axial, sagittal and coronal images" src="../_images/sphx_glr_reslice_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="image_processing/reslice.html#sphx-glr-auto-examples-image-processing-reslice-py"><span class="std std-ref">Load CT slices and plot axial, sagittal and coronal images</span></a></span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="input-output">
+<span id="input-ouput-examples"></span><span id="sphx-glr-auto-examples-input-output"></span><h1>Input-output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h1>
+<p>These examples illustrate the use of pydicom to read DICOM data.</p>
+<div class="sphx-glr-thumbcontainer" tooltip="Given an RTPLAN DICOM file, list basic info for the beams in it."><div class="figure align-default" id="id9">
+<img alt="Read RTPLAN DICOM and list information" src="../_images/sphx_glr_plot_read_rtplan_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_read_rtplan.html#sphx-glr-auto-examples-input-output-plot-read-rtplan-py"><span class="std std-ref">Read RTPLAN DICOM and list information</span></a></span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to open a DICOM file, print some dataset information, and show it ..."><div class="figure align-default" id="id10">
+<img alt="Read a Dataset and plot Pixel Data" src="../_images/sphx_glr_plot_read_dicom_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_read_dicom.html#sphx-glr-auto-examples-input-output-plot-read-dicom-py"><span class="std std-ref">Read a Dataset and plot Pixel Data</span></a></span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to print the data set in your own format."><div class="figure align-default" id="id11">
+<img alt="Format the output of the data set printing" src="../_images/sphx_glr_plot_printing_dataset_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_printing_dataset.html#sphx-glr-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">Format the output of the data set printing</span></a></span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows how to write a DICOM file from scratch using pydicom. This example does not ..."><div class="figure align-default" id="id12">
+<img alt="Write DICOM data" src="../_images/sphx_glr_plot_write_dicom_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_write_dicom.html#sphx-glr-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">Write DICOM data</span></a></span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read a DICOM :File-set&#x27;s DICOMDIR dataset."><div class="figure align-default" id="id13">
+<img alt="Read a DICOMDIR dataset" src="../_images/sphx_glr_plot_read_dicom_directory_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_read_dicom_directory.html#sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"><span class="std std-ref">Read a DICOMDIR dataset</span></a></span><a class="headerlink" href="#id13" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example shows how to read and interact with a DICOM File-set."><div class="figure align-default" id="id14">
+<img alt="Read a DICOM File-set" src="../_images/sphx_glr_plot_read_fileset_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="input_output/plot_read_fileset.html#sphx-glr-auto-examples-input-output-plot-read-fileset-py"><span class="std std-ref">Read a DICOM File-set</span></a></span><a class="headerlink" href="#id14" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="metadata-processing">
+<span id="metadata-processing-examples"></span><span id="sphx-glr-auto-examples-metadata-processing"></span><h1>Metadata processing<a class="headerlink" href="#metadata-processing" title="Permalink to this headline">¶</a></h1>
+<p>These examples illustrates the processing available in pydicom to modify the
+metadata of DICOM data.</p>
+<div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to add dictionary items to the &#x27;standard&#x27; DICOM dictionary dynami..."><div class="figure align-default" id="id15">
+<img alt="Add dictionary items in the standard DICOM dictionary" src="../_images/sphx_glr_plot_add_dict_entries_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="metadata_processing/plot_add_dict_entries.html#sphx-glr-auto-examples-metadata-processing-plot-add-dict-entries-py"><span class="std std-ref">Add dictionary items in the standard DICOM dictionary</span></a></span><a class="headerlink" href="#id15" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This examples illustrates how to work with sequences."><div class="figure align-default" id="id16">
+<img alt="Working with sequences" src="../_images/sphx_glr_plot_sequences_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="metadata_processing/plot_sequences.html#sphx-glr-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">Working with sequences</span></a></span><a class="headerlink" href="#id16" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-thumbcontainer" tooltip="This example is a starting point to anonymize DICOM data."><div class="figure align-default" id="id17">
+<img alt="Anonymize DICOM data" src="../_images/sphx_glr_plot_anonymize_thumb.png" />
+<p class="caption"><span class="caption-text"><a class="reference internal" href="metadata_processing/plot_anonymize.html#sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"><span class="std std-ref">Anonymize DICOM data</span></a></span><a class="headerlink" href="#id17" title="Permalink to this image">¶</a></p>
+</div>
+</div><div class="toctree-wrapper compound">
+</div>
+<div class="sphx-glr-clear"></div><div class="sphx-glr-footer class sphx-glr-footer-gallery docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/07fcc19ba03226cd3d83d4e40ec44385/auto_examples_python.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">auto_examples_python.zip</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6f1e7a639e0699d6164445b55e6c116d/auto_examples_jupyter.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">all</span> <span class="pre">examples</span> <span class="pre">in</span> <span class="pre">Jupyter</span> <span class="pre">notebooks:</span> <span class="pre">auto_examples_jupyter.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_dicom_difference.html" class="btn btn-neutral float-right" title="Analyse differences between DICOM files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../reference/generated/pydicom.uid.UID.html" class="btn btn-neutral float-left" title="pydicom.uid.UID" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

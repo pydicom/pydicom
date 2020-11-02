@@ -1,0 +1,6 @@
+﻿pydicom.uid.MPEG4HP422D
+=======================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MPEG4HP422D
