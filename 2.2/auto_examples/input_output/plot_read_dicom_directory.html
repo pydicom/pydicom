@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Read a DICOMDIR dataset &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Read a DICOM File-set" href="plot_read_fileset.html" />
+    <link rel="prev" title="Write DICOM data" href="plot_write_dicom.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">General examples</a> &raquo;</li>
+        
+      <li>Read a DICOMDIR dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="read-a-dicomdir-dataset">
+<span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read a DICOMDIR dataset<a class="headerlink" href="#read-a-dicomdir-dataset" title="Permalink to this headline">¶</a></h1>
+<p>This example shows how to read a DICOM :File-set’s DICOMDIR dataset.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="../../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class is a much better way of working
+with DICOM File-sets and allows creation and modification of DICOMDIR
+files. See the <a class="reference internal" href="plot_read_fileset.html"><span class="doc">DICOM File-set example</span></a> or the
+<a class="reference external" href="../../tutorials/filesets.html">File-set tutorial</a>.</p>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Root directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests
+
+PATIENT: PatientID=77654033, PatientName=Doe^Archibald
+  STUDY: StudyID=2, StudyDate=20010101, StudyDescription=XR C Spine Comp Min 4 Views
+    SERIES: SeriesNumber=1, Modality=CR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=77654033/CR1/6154
+    SERIES: SeriesNumber=2, Modality=CR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=77654033/CR2/6247
+    SERIES: SeriesNumber=3, Modality=CR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=77654033/CR3/6278
+  STUDY: StudyID=2, StudyDate=19950903, StudyDescription=CT, HEAD/BRAIN WO CONTRAST
+    SERIES: SeriesNumber=2, Modality=CT, SeriesDescription=(no value available) - 4 SOP Instances
+      IMAGE: Path=77654033/CT2/17106
+      IMAGE: Path=77654033/CT2/17136
+      IMAGE: Path=77654033/CT2/17166
+      IMAGE: Path=77654033/CT2/17196
+PATIENT: PatientID=98890234, PatientName=Doe^Peter
+  STUDY: StudyID=2, StudyDate=20010101, StudyDescription=(no value available)
+    SERIES: SeriesNumber=4, Modality=CT, SeriesDescription=(no value available) - 2 SOP Instances
+      IMAGE: Path=98892001/CT2N/6293
+      IMAGE: Path=98892001/CT2N/6924
+    SERIES: SeriesNumber=5, Modality=CT, SeriesDescription=(no value available) - 5 SOP Instances
+      IMAGE: Path=98892001/CT5N/2062
+      IMAGE: Path=98892001/CT5N/2392
+      IMAGE: Path=98892001/CT5N/2693
+      IMAGE: Path=98892001/CT5N/3023
+      IMAGE: Path=98892001/CT5N/3353
+  STUDY: StudyID=428, StudyDate=20030505, StudyDescription=Carotids
+    SERIES: SeriesNumber=1, Modality=MR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=98892003/MR1/15820
+    SERIES: SeriesNumber=2, Modality=MR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=98892003/MR2/15970
+  STUDY: StudyID=134, StudyDate=20030505, StudyDescription=Brain
+    SERIES: SeriesNumber=1, Modality=MR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=98892003/MR1/4919
+    SERIES: SeriesNumber=2, Modality=MR, SeriesDescription=(no value available) - 3 SOP Instances
+      IMAGE: Path=98892003/MR2/4950
+      IMAGE: Path=98892003/MR2/5011
+      IMAGE: Path=98892003/MR2/4981
+  STUDY: StudyID=2, StudyDate=20030505, StudyDescription=Brain-MRA
+    SERIES: SeriesNumber=1, Modality=MR, SeriesDescription=(no value available) - 1 SOP Instance
+      IMAGE: Path=98892003/MR1/5641
+    SERIES: SeriesNumber=2, Modality=MR, SeriesDescription=(no value available) - 3 SOP Instances
+      IMAGE: Path=98892003/MR2/6935
+      IMAGE: Path=98892003/MR2/6605
+      IMAGE: Path=98892003/MR2/6273
+    SERIES: SeriesNumber=700, Modality=MR, SeriesDescription=(no value available) - 7 SOP Instances
+      IMAGE: Path=98892003/MR700/4558
+      IMAGE: Path=98892003/MR700/4528
+      IMAGE: Path=98892003/MR700/4588
+      IMAGE: Path=98892003/MR700/4467
+      IMAGE: Path=98892003/MR700/4618
+      IMAGE: Path=98892003/MR700/4678
+      IMAGE: Path=98892003/MR700/4648
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
+
+<span class="c1"># fetch the path to the test data</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;DICOMDIR&#39;</span><span class="p">)</span>
+<a href="../../reference/generated/pydicom.dicomdir.DicomDir.html#pydicom.dicomdir.DicomDir" title="pydicom.dicomdir.DicomDir" class="sphx-glr-backref-module-pydicom-dicomdir sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span></a> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">path</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">root_dir</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">filename</span></a><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Root directory: </span><span class="si">{</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">root_dir</span></a><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Iterate through the PATIENT records</span>
+<span class="k">for</span> <span class="n">patient</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">patient_records</span></a><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;PATIENT: PatientID=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">patient</span><span class="o">.</span><span class="n">PatientID</span></a><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;PatientName=</span><span class="si">{</span><a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">patient</span><span class="o">.</span><span class="n">PatientName</span></a><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Find all the STUDY records for the patient</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">studies</span></a> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">ii</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">patient</span><span class="o">.</span><span class="n">children</span></a> <span class="k">if</span> <span class="n">ii</span><span class="o">.</span><span class="n">DirectoryRecordType</span> <span class="o">==</span> <span class="s2">&quot;STUDY&quot;</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">study</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">studies</span></a><span class="p">:</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descr</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">study</span><span class="o">.</span><span class="n">StudyDescription</span></a> <span class="ow">or</span> <span class="s2">&quot;(no value available)&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;  &#39;</span> <span class="o">*</span> <span class="mi">1</span><span class="si">}</span><span class="s2">STUDY: StudyID=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">study</span><span class="o">.</span><span class="n">StudyID</span></a><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;StudyDate=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">study</span><span class="o">.</span><span class="n">StudyDate</span></a><span class="si">}</span><span class="s2">, StudyDescription=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descr</span></a><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Find all the SERIES records in the study</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_series</span></a> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ii</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">study</span><span class="o">.</span><span class="n">children</span></a> <span class="k">if</span> <span class="n">ii</span><span class="o">.</span><span class="n">DirectoryRecordType</span> <span class="o">==</span> <span class="s2">&quot;SERIES&quot;</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">series</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_series</span></a><span class="p">:</span>
+            <span class="c1"># Find all the IMAGE records in the series</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">images</span></a> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ii</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">series</span><span class="o">.</span><span class="n">children</span></a>
+                <span class="k">if</span> <span class="n">ii</span><span class="o">.</span><span class="n">DirectoryRecordType</span> <span class="o">==</span> <span class="s2">&quot;IMAGE&quot;</span>
+            <span class="p">]</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plural</span></a> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">images</span></a><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+
+            <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descr</span></a> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                <span class="n">series</span><span class="p">,</span> <span class="s2">&quot;SeriesDescription&quot;</span><span class="p">,</span> <span class="s2">&quot;(no value available)&quot;</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;  &#39;</span> <span class="o">*</span> <span class="mi">2</span><span class="si">}</span><span class="s2">SERIES: SeriesNumber=</span><span class="si">{</span><a href="../../reference/generated/pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">series</span><span class="o">.</span><span class="n">SeriesNumber</span></a><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Modality=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">series</span><span class="o">.</span><span class="n">Modality</span></a><span class="si">}</span><span class="s2">, SeriesDescription=</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">descr</span></a><span class="si">}</span><span class="s2"> - &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">images</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> SOP Instance</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plural</span></a><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get the absolute file path to each instance</span>
+            <span class="c1">#   Each IMAGE contains a relative file path to the root directory</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">elems</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">ii</span><span class="p">[</span><span class="s2">&quot;ReferencedFileID&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">images</span></a><span class="p">]</span>
+            <span class="c1"># Make sure the relative file path is always a list of str</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">paths</span></a> <span class="o">=</span> <span class="p">[[</span><span class="n">ee</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="n">ee</span><span class="o">.</span><span class="n">VM</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">ee</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">ee</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">elems</span></a><span class="p">]</span>
+            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">paths</span></a> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="pathlib.Path" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class"><span class="n">Path</span></a><span class="p">(</span><span class="o">*</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">p</span></a><span class="p">)</span> <span class="k">for</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">p</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">paths</span></a><span class="p">]</span>
+
+            <span class="c1"># List the instance file paths</span>
+            <span class="k">for</span> <a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">p</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">paths</span></a><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;  &#39;</span> <span class="o">*</span> <span class="mi">3</span><span class="si">}</span><span class="s2">IMAGE: Path=</span><span class="si">{</span><a href="https://docs.python.org/3/library/os.html#os.fspath" title="os.fspath" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">fspath</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/pathlib.html#pathlib.PosixPath" title="pathlib.PosixPath" class="sphx-glr-backref-module-pathlib sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">p</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Optionally read the corresponding SOP Instance</span>
+                <span class="c1"># instance = dcmread(Path(root_dir) / p)</span>
+                <span class="c1"># print(instance.PatientName)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.026 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/33b840573239ff057316729322f32358/plot_read_dicom_directory.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom_directory.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/aac78b7419d1af47f86d51ba12974948/plot_read_dicom_directory.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_read_dicom_directory.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_read_fileset.html" class="btn btn-neutral float-right" title="Read a DICOM File-set" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_write_dicom.html" class="btn btn-neutral float-left" title="Write DICOM data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

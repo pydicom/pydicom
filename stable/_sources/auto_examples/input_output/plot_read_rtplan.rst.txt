@@ -43,7 +43,7 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
     # license : MIT
 
     import pydicom
-    from pydicom.data import get_testdata_files
+    from pydicom.data import get_testdata_file
 
     print(__doc__)
 
@@ -62,14 +62,14 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
         return "\n".join(lines)
 
 
-    filename = get_testdata_files('rtplan.dcm')[0]
+    filename = get_testdata_file('rtplan.dcm')
     dataset = pydicom.dcmread(filename)
     print(list_beams(dataset))
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.003 seconds)
+   **Total running time of the script:** ( 0 minutes  0.004 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_rtplan.py:

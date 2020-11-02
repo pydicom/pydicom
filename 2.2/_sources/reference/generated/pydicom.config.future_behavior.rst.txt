@@ -1,0 +1,6 @@
+﻿pydicom.config.future\_behavior
+===============================
+
+.. currentmodule:: pydicom.config
+
+.. autofunction:: future_behavior

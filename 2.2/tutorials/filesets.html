@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DICOM File-sets and DICOMDIR &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Structured Reporting" href="sr_basics.html" />
+    <link rel="prev" title="Waveforms" href="waveforms.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DICOM File-sets and DICOMDIR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-dicom-file-set">The DICOM File-set</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-dicomdir-file">The DICOMDIR file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#fileset">FileSet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#loading-existing-file-sets">Loading existing File-sets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-a-new-file-set">Creating a new File-set</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modifying-a-file-set">Modifying a File-set</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#applying-the-changes">Applying the changes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li>DICOM File-sets and DICOMDIR</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dicom-file-sets-and-dicomdir">
+<h1>DICOM File-sets and DICOMDIR<a class="headerlink" href="#dicom-file-sets-and-dicomdir" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial is about DICOM File-sets and covers</p>
+<ul class="simple">
+<li><p>An introduction to DICOM File-sets and the DICOMDIR file</p></li>
+<li><p>Loading a File-set using the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class and
+accessing its managed SOP instances</p></li>
+<li><p>Creating a new File-set and modifying existing ones</p></li>
+</ul>
+<p>It’s assumed that you’re already familiar with the <a class="reference internal" href="dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
+<p><strong>References</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">DICOM File Service</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Media Formats and Physical Media for Media Interchange</a></p></li>
+</ul>
+<div class="section" id="the-dicom-file-set">
+<h2>The DICOM File-set<a class="headerlink" href="#the-dicom-file-set" title="Permalink to this headline">¶</a></h2>
+<p>A File-set is a collection of DICOM files that share a common naming
+space. Most people have probably interacted with a File-set without being aware
+of it; one place they’re frequently used is on the CDs/DVDs containing DICOM
+data that are given to a patient after a medical procedure (such as an MR or
+ultrasound).</p>
+<p>The specification for File-sets is given in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">Part 10 of the DICOM
+Standard</a>.</p>
+<div class="section" id="the-dicomdir-file">
+<h3>The DICOMDIR file<a class="headerlink" href="#the-dicomdir-file" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Despite its name, a DICOMDIR file is not a file system directory and
+can be read using <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> like any other DICOM
+dataset</p>
+</div>
+<p>Every File-set must contain a single file with the filename <code class="docutils literal notranslate"><span class="pre">DICOMDIR</span></code>, the
+location of which is dependent on the type of media used to store the File-set.
+For the most commonly used media (DVD, CD, USB, PC file system, etc), the
+DICOMDIR file will be in the root directory of the File-set. For other
+media types, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Part 12 of the DICOM Standard</a>
+specifies where the DICOMDIR must be located.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It’s <strong>strongly recommended</strong> that you avoid making changes to a DICOMDIR
+dataset directly unless you know what you’re doing. Even minor changes may
+require recalculating the offsets for each directory record. Use the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> methods (see below) instead.</p>
+</div>
+<p>The DICOMDIR file is used to summarize the contents of the File-set, and is a
+<em>Media Storage Directory</em> instance that follows the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">MediaStorageSOPClassUID</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;Media Storage Directory Storage&#39;</span>
+</pre></div>
+</div>
+<p>The most important element in a DICOMDIR is the (0004,1220) <em>Directory
+Record Sequence</em>; each item in the sequence is a <em>directory record</em>,
+and one or more records are used to briefly describe an available SOP
+Instance and its location within the File-set’s directory structure. Each
+record has a <em>record type</em> given by the (0004,1430) <em>Directory Record Type</em>
+element, and different records are related to each other using the hierarchy
+given in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.4.html#table_F.4-1">Table F.4-1</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">DirectoryRecordSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">(0004, 1400) Offset of the Next Directory Record UL: 3126</span>
+<span class="go">(0004, 1410) Record In-use Flag                  US: 65535</span>
+<span class="go">(0004, 1420) Offset of Referenced Lower-Level Di UL: 510</span>
+<span class="go">(0004, 1430) Directory Record Type               CS: &#39;PATIENT&#39;</span>
+<span class="go">(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
+<span class="go">(0010, 0010) Patient&#39;s Name                      PN: &#39;Doe^Archibald&#39;</span>
+<span class="go">(0010, 0020) Patient ID                          LO: &#39;77654033&#39;</span>
+</pre></div>
+</div>
+<p>Here we have a <code class="docutils literal notranslate"><span class="pre">'PATIENT'</span></code> record, which from <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html#table_F.5-1">Table F.5-1</a> we see must also contain <em>Patient’s Name</em>
+and <em>Patient ID</em> elements. The full list of available record types and their
+requirements is in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html">Annex F.5 of Part 3 of the DICOM Standard</a>.</p>
+</div>
+</div>
+<div class="section" id="fileset">
+<h2>FileSet<a class="headerlink" href="#fileset" title="Permalink to this headline">¶</a></h2>
+<p>While it’s possible to access everything within a File-set using the DICOMDIR
+dataset, making changes to an existing File-set quickly becomes complicated
+due to the need to add and remove directory records, recalculate the
+byte offsets for existing records and manage the corresponding file
+system changes. A more user-friendly way to interact with one is via the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class.</p>
+<div class="section" id="loading-existing-file-sets">
+<h3>Loading existing File-sets<a class="headerlink" href="#loading-existing-file-sets" title="Permalink to this headline">¶</a></h3>
+<p>To load an existing File-set just pass a DICOMDIR
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or the path to the DICOMDIR file to
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.fileset</span> <span class="kn">import</span> <span class="n">FileSet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>  <span class="c1"># or FileSet(path)</span>
+</pre></div>
+</div>
+<p>An overview of the File-set’s contents is shown when printing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+<span class="go">DICOM File-set</span>
+<span class="go">  Root directory: /home/user/env/lib/python3.7/site-packages/pydicom/data/test_files/dicomdirtests</span>
+<span class="go">  File-set ID: PYDICOM_TEST</span>
+<span class="go">  File-set UID: 1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187</span>
+<span class="go">  Descriptor file ID: (no value available)</span>
+<span class="go">  Descriptor file character set: (no value available)</span>
+<span class="go">  Changes staged for write(): DICOMDIR update, directory structure update</span>
+
+<span class="go">  Managed instances:</span>
+<span class="go">    PATIENT: PatientID=&#39;77654033&#39;, PatientName=&#39;Doe^Archibald&#39;</span>
+<span class="go">      STUDY: StudyDate=20010101, StudyTime=000000, StudyDescription=&#39;XR C Spine Comp Min 4 Views&#39;</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=1</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=2</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=CR, SeriesNumber=3</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">      STUDY: StudyDate=19950903, StudyTime=173032, StudyDescription=&#39;CT, HEAD/BRAIN WO CONTRAST&#39;</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=2</span>
+<span class="go">          IMAGE: 4 SOP Instances</span>
+<span class="go">    PATIENT: PatientID=&#39;98890234&#39;, PatientName=&#39;Doe^Peter&#39;</span>
+<span class="go">      STUDY: StudyDate=20010101, StudyTime=000000</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=4</span>
+<span class="go">          IMAGE: 2 SOP Instances</span>
+<span class="go">        SERIES: Modality=CT, SeriesNumber=5</span>
+<span class="go">          IMAGE: 5 SOP Instances</span>
+<span class="go">      STUDY: StudyDate=20030505, StudyTime=050743, StudyDescription=&#39;Carotids&#39;</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=1</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=2</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">      STUDY: StudyDate=20030505, StudyTime=025109, StudyDescription=&#39;Brain&#39;</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=1</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=2</span>
+<span class="go">          IMAGE: 3 SOP Instances</span>
+<span class="go">      STUDY: StudyDate=20030505, StudyTime=045357, StudyDescription=&#39;Brain-MRA&#39;</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=1</span>
+<span class="go">          IMAGE: 1 SOP Instance</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=2</span>
+<span class="go">          IMAGE: 3 SOP Instances</span>
+<span class="go">        SERIES: Modality=MR, SeriesNumber=700</span>
+<span class="go">          IMAGE: 7 SOP Instances</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class treats a File-set as a flat
+collection of SOP Instances, abstracting away the need to dig down into the
+hierarchy like you would with a DICOMDIR dataset. For example,
+iterating over the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> yields a
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> object for each of the managed
+instances.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">fs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">PatientName</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">break</span>
+<span class="gp">...</span>
+<span class="go">Doe^Archibald</span>
+</pre></div>
+</div>
+<p>A list of unique element values within the File-set can be found using the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find_values" title="pydicom.fileset.FileSet.find_values"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_values()</span></code></a> method, which by default
+searches the corresponding DICOMDIR records:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PatientID&quot;</span><span class="p">)</span>
+<span class="go">[&#39;77654033&#39;, &#39;98890234&#39;]</span>
+</pre></div>
+</div>
+<p>The search can be expanded to the File-set’s managed instances by supplying
+the <cite>load</cite> parameter, at the cost of a longer search time due to having
+to read and decode the corresponding files:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PhotometricInterpretation&quot;</span><span class="p">)</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">find_values</span><span class="p">(</span><span class="s2">&quot;PhotometricInterpretation&quot;</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;MONOCHROME1&#39;, &#39;MONOCHROME2&#39;]</span>
+</pre></div>
+</div>
+<p>More importantly, the File-set can be searched to find instances matching
+a query using the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find"><code class="xref py py-func docutils literal notranslate"><span class="pre">find()</span></code></a> method, which returns
+a list of <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a>. The corresponding file
+can then be read and decoded using <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance.load" title="pydicom.fileset.FileInstance.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileInstance.load()</span></code></a>, returning it as a
+<a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s1">&#39;77654033&#39;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">MONOCHROME1</span>
+<span class="go">MONOCHROME1</span>
+<span class="go">MONOCHROME1</span>
+<span class="go">MONOCHROME2</span>
+<span class="go">MONOCHROME2</span>
+<span class="go">MONOCHROME2</span>
+<span class="go">MONOCHROME2</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find"><code class="xref py py-func docutils literal notranslate"><span class="pre">find()</span></code></a> also supports the use of the <cite>load</cite>
+parameter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s1">&#39;77654033&#39;</span><span class="p">,</span> <span class="n">PhotometricInterpretation</span><span class="o">=</span><span class="s1">&#39;MONOCHROME1&#39;</span><span class="p">))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s1">&#39;77654033&#39;</span><span class="p">,</span> <span class="n">PhotometricInterpretation</span><span class="o">=</span><span class="s1">&#39;MONOCHROME1&#39;</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-a-new-file-set">
+<h3>Creating a new File-set<a class="headerlink" href="#creating-a-new-file-set" title="Permalink to this headline">¶</a></h3>
+<p>You can create a new File-set by creating a new
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> instance:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will create a completely conformant File-set, however it won’t contain
+any SOP instances. Since empty File-sets aren’t very useful, our next step
+will be to add some.</p>
+</div>
+<div class="section" id="modifying-a-file-set">
+<h3>Modifying a File-set<a class="headerlink" href="#modifying-a-file-set" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="fileset-and-staging">
+<h4><a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> and staging<a class="headerlink" href="#fileset-and-staging" title="Permalink to this headline">¶</a></h4>
+<p>Before we go any further we need to discuss how the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class manages changes to the File-set.
+Modifications to the File-set are first <em>staged</em>, which means that although
+the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> instance behaves as though you’ve applied
+them, nothing will actually change on the file system itself until
+you explicitly call <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.write()</span></code></a>.
+This includes changes such as:</p>
+<ul class="simple">
+<li><p>Adding SOP instances using the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.add()</span></code></a> or <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add_custom" title="pydicom.fileset.FileSet.add_custom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.add_custom()</span></code></a> methods</p></li>
+<li><p>Removing SOP instances with <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.remove" title="pydicom.fileset.FileSet.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.remove()</span></code></a></p></li>
+<li><p>Changing one of the following properties:
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.ID" title="pydicom.fileset.FileSet.ID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ID</span></code></a>, <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID" title="pydicom.fileset.FileSet.UID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UID</span></code></a>,
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id" title="pydicom.fileset.FileSet.descriptor_file_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_file_id</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set" title="pydicom.fileset.FileSet.descriptor_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_character_set</span></code></a>.</p></li>
+<li><p>When the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class determines it needs to move
+SOP instances from an existing File-set’s directory structure to the
+structure used by <em>pydicom</em>.</p></li>
+</ul>
+<p>You can tell if changes are staged with the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.is_staged" title="pydicom.fileset.FileSet.is_staged"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_staged</span></code></a> property:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">is_staged</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>You may also have noticed this line in the <code class="docutils literal notranslate"><span class="pre">print(fs)</span></code> output shown above:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Changes staged for write(): DICOMDIR update, directory structure update
+</pre></div>
+</div>
+<p>This appears when the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> is staged and will
+contain at least one of the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DICOMDIR</span> <span class="pre">update</span></code> or <code class="docutils literal notranslate"><span class="pre">DICOMDIR</span> <span class="pre">creation</span></code>: the DICOMDIR file will be
+updated or created</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">directory</span> <span class="pre">structure</span> <span class="pre">update</span></code>: one or more of the SOP instances in the
+existing File-set will be moved over to use the <em>pydicom</em> File-set
+directory structure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">additions</span></code>: <em>N</em> SOP instances will be added to the File-set</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">removals</span></code>:  <em>M</em> SOP instances will be removed from the File-set</p></li>
+</ul>
+</div>
+<div class="section" id="adding-sop-instances">
+<h4>Adding SOP instances<a class="headerlink" href="#adding-sop-instances" title="Permalink to this headline">¶</a></h4>
+<p>The simplest way to add new SOP instances to the File-set is with the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method, which takes the path to the
+instance or the instance itself as a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> and
+returns the addition as a <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a>.</p>
+<p>To reduce memory usage, instances staged for addition are written to a
+temporary directory and only copied to the File-set itself when
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> is called, however they can still be
+accessed and loaded:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span><span class="o">.</span><span class="n">is_staged</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span><span class="o">.</span><span class="n">for_addition</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span><span class="o">.</span><span class="n">path</span>
+<span class="go">&#39;/tmp/tmp0aalrzir/1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+<span class="go">&lt;class &#39;pydicom.dataset.FileDataset&#39;&gt;</span>
+</pre></div>
+</div>
+<p>Alternatively, if you want more control over the directory records that will
+be added to the DICOMDIR file, or if you need to use PRIVATE records, you can
+use the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add_custom" title="pydicom.fileset.FileSet.add_custom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_custom()</span></code></a> method.</p>
+<p>The <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method uses <em>pydicom’s</em> default
+directory record creation functions to create the necessary records based on
+the SOP instance’s attributes, such as <em>SOP Class UID</em> and <em>Modality</em>.
+Occassionally they may fail when an element required by these functions
+is empty or missing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtdose.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1858</span>, in <span class="n">_recordify</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">[</span><span class="n">record_type</span><span class="p">](</span><span class="n">ds</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">2338</span>, in <span class="n">_define_rt_dose</span>
+    <span class="n">_check_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;InstanceNumber&quot;</span><span class="p">,</span> <span class="s2">&quot;DoseSummationType&quot;</span><span class="p">])</span>
+  File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">2281</span>, in <span class="n">_check_dataset</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="gr">ValueError</span>: <span class="n">The instance&#39;s (0020, 0013) &#39;Instance Number&#39; element cannot be empty</span>
+
+<span class="go">The above exception was the direct cause of the following exception:</span>
+
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1039</span>, in <span class="n">add</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">record_gen</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1860</span>, in <span class="n">_recordify</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="gr">ValueError</span>: <span class="n">Unable to use the default &#39;RT DOSE&#39; record creator as the instance is missing a required element or value. Either update the instance, define your own record creation function or use &#39;FileSet.add_custom()&#39; instead</span>
+</pre></div>
+</div>
+<p>When this occurs you have three choices:</p>
+<ul class="simple">
+<li><p>Update the instance to include the required element and/or value</p></li>
+<li><p>Override the default record creation functions with your own by modifying
+<a class="reference internal" href="../reference/generated/pydicom.fileset.DIRECTORY_RECORDERS.html#pydicom.fileset.DIRECTORY_RECORDERS" title="pydicom.fileset.DIRECTORY_RECORDERS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DIRECTORY_RECORDERS</span></code></a></p></li>
+<li><p>Use the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add_custom" title="pydicom.fileset.FileSet.add_custom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_custom()</span></code></a> method</p></li>
+</ul>
+<p>From the exception message above we’ve got an empty <em>Instance Number</em>, so
+let’s update the instance and try adding it again:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">InstanceNumber</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="removing-instances">
+<h4>Removing instances<a class="headerlink" href="#removing-instances" title="Permalink to this headline">¶</a></h4>
+<p>SOP instances can be removed from the File-set with the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.remove" title="pydicom.fileset.FileSet.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove()</span></code></a> method, which takes the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> to be removed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instances</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s2">&quot;1CT1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="applying-the-changes">
+<h3>Applying the changes<a class="headerlink" href="#applying-the-changes" title="Permalink to this headline">¶</a></h3>
+<p>Let’s add a couple of SOP instances back to the File-set:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>To apply the changes we’ve made to the File-set we use
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>. For new File-sets we have to supply the
+path where the File-set root directory will be located:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;/tmp/tmpsqz8rhgb&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">is_staged</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**/*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">/tmp/tmpsqz8rhgb/DICOMDIR</span>
+<span class="go">/tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/RD000000</span>
+<span class="go">/tmp/tmpsqz8rhgb/PT000001/ST000000/SE000000/IM000000</span>
+<span class="go">/tmp/tmpsqz8rhgb/PT000002/ST000000/SE000000/IM000000</span>
+</pre></div>
+</div>
+<p>The root directory for existing File-sets cannot be changed, so for those
+you only need to call <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> without any
+arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">instances</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s2">&quot;1CT1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**/*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">/tmp/tmpsqz8rhgb/DICOMDIR</span>
+<span class="go">/tmp/tmpsqz8rhgb/PT000000/ST000000/SE000000/RD000000</span>
+<span class="go">/tmp/tmpsqz8rhgb/PT000001/ST000000/SE000000/IM000000</span>
+</pre></div>
+</div>
+<p>For existing File-sets that don’t use the same directory structure semantics
+as <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>, calling
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> will move SOP instances over to the
+new structure. However, if the only modification you’ve made is to remove SOP
+instances or change <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.ID" title="pydicom.fileset.FileSet.ID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ID</span></code></a>,
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID" title="pydicom.fileset.FileSet.UID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UID</span></code></a>,
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id" title="pydicom.fileset.FileSet.descriptor_file_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_file_id</span></code></a> or
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set" title="pydicom.fileset.FileSet.descriptor_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_character_set</span></code></a>, then you can pass
+the <em>use_existing</em> keyword parameter to keep the existing directory structure
+and update the DICOMDIR file.</p>
+<p>First we need to copy the existing example File-set to a temporary directory
+so we don’t accidentally modify it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copytree</span><span class="p">,</span> <span class="n">copyfile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dst</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">src</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;DICOMDIR&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">parent</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">copyfile</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s2">&quot;DICOMDIR&quot;</span><span class="p">,</span> <span class="n">dst</span> <span class="o">/</span> <span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s2">&quot;77654033&quot;</span><span class="p">,</span> <span class="n">dst</span> <span class="o">/</span> <span class="s2">&quot;77654033&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s2">&quot;98892001&quot;</span><span class="p">,</span> <span class="n">dst</span> <span class="o">/</span> <span class="s2">&quot;98892001&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">copytree</span><span class="p">(</span><span class="n">src</span> <span class="o">/</span> <span class="s2">&quot;98892003&quot;</span><span class="p">,</span> <span class="n">dst</span> <span class="o">/</span> <span class="s2">&quot;98892003&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we load the File-set from the temporary directory, remove instances and
+write out the changes with <em>use_existing</em> to keep the current directory
+structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span> <span class="o">=</span> <span class="n">FileSet</span><span class="p">(</span><span class="n">dst</span> <span class="o">/</span> <span class="s2">&quot;DICOMDIR&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">instances</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">PatientID</span><span class="o">=</span><span class="s2">&quot;98890234&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">use_existing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Keep the current directory structure</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">dst</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**/*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">/tmp/tmpu068kdwp/DICOMDIR</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CR1/6154</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CR2/6247</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CR3/6278</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CT2/17106</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CT2/17136</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CT2/17166</span>
+<span class="go">/tmp/tmpu068kdwp/77654033/CT2/17196</span>
+</pre></div>
+</div>
+<p>If you’d just called <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> without
+<em>use_existing</em> then it would’ve moved the SOP instances to the new
+directory structure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">dst</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**/*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">/tmp/tmpu068kdwp/DICOMDIR</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000000/SE000000/IM000000</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000000/SE000001/IM000000</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000000/SE000002/IM000000</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000000</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000001</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000002</span>
+<span class="go">/tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000003</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>In this tutorial you’ve learned about DICOM File-sets and the DICOMDIR file.
+You should now be able to use the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class
+to create new File-sets, and to load, search and modify existing ones.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="sr_basics.html" class="btn btn-neutral float-right" title="Structured Reporting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="waveforms.html" class="btn btn-neutral float-left" title="Waveforms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

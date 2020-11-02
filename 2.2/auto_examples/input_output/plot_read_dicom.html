@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Read a Dataset and plot Pixel Data &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Format the output of the data set printing" href="plot_printing_dataset.html" />
+    <link rel="prev" title="Read RTPLAN DICOM and list information" href="plot_read_rtplan.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Read a Dataset and plot Pixel Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">General examples</a> &raquo;</li>
+        
+      <li>Read a Dataset and plot Pixel Data</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-read-dicom-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="read-a-dataset-and-plot-pixel-data">
+<span id="sphx-glr-auto-examples-input-output-plot-read-dicom-py"></span><h1>Read a Dataset and plot Pixel Data<a class="headerlink" href="#read-a-dataset-and-plot-pixel-data" title="Permalink to this headline">¶</a></h1>
+<p>This example illustrates how to open a DICOM file, print some dataset
+information, and show it using matplotlib.</p>
+<img alt="plot read dicom" class="sphx-glr-single-img" src="../../_images/sphx_glr_plot_read_dicom_001.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>File path........: /home/circleci/project/pydicom/data/test_files/CT_small.dcm
+SOP Class........: 1.2.840.10008.5.1.4.1.1.2 (CT Image Storage)
+
+Patient&#39;s Name...: CompressedSamples, CT1
+Patient ID.......: 1CT1
+Modality.........: CT
+Study Date.......: 20040119
+Image size.......: 128 x 128
+Pixel Spacing....: [0.661468, 0.661468]
+Slice location...: -77.2040634155
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># authors : Guillaume Lemaitre &lt;g.lemaitre58@gmail.com&gt;</span>
+<span class="c1"># license : MIT</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fpath</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;CT_small.dcm&#39;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fpath</span></a><span class="p">)</span>
+
+<span class="c1"># Normal mode:</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File path........: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fpath</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SOP Class........: </span><span class="si">{</span><a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">SOPClassUID</span></a><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><a href="../../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.name" title="pydicom.uid.UID.name" class="sphx-glr-backref-module-pydicom-uid sphx-glr-backref-type-py-method"><span class="n">ds</span><span class="o">.</span><span class="n">SOPClassUID</span><span class="o">.</span><span class="n">name</span></a><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+
+<a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pat_name</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientName</span></a>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">display_name</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.family_name" title="pydicom.valuerep.PersonName.family_name" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-method"><span class="n">pat_name</span><span class="o">.</span><span class="n">family_name</span></a> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <a href="../../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.given_name" title="pydicom.valuerep.PersonName.given_name" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-method"><span class="n">pat_name</span><span class="o">.</span><span class="n">given_name</span></a>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient&#39;s Name...: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">display_name</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patient ID.......: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PatientID</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modality.........: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">Modality</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Study Date.......: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">StudyDate</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image size.......: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span></a><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">Columns</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pixel Spacing....: </span><span class="si">{</span><a href="../../reference/generated/pydicom.multival.MultiValue.html#pydicom.multival.MultiValue" title="pydicom.multival.MultiValue" class="sphx-glr-backref-module-pydicom-multival sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ds</span><span class="o">.</span><span class="n">PixelSpacing</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># use .get() if not sure the item exists, and want a default value if missing</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Slice location...: </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#dict.get" title="builtins.dict.get" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-method"><span class="n">ds</span><span class="o">.</span><span class="n">get</span></a><span class="p">(</span><span class="s1">&#39;SliceLocation&#39;</span><span class="p">,</span> <span class="s1">&#39;(missing)&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># plot the image using matplotlib</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html#matplotlib.pyplot.imshow" title="matplotlib.pyplot.imshow" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span></a><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">pixel_array</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><a href="https://matplotlib.org/api/_as_gen/matplotlib.colors.LinearSegmentedColormap.html#matplotlib.colors.LinearSegmentedColormap" title="matplotlib.colors.LinearSegmentedColormap" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span></a><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.166 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5e2195081f5a423e984744f70649688b/plot_read_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/596a13aa12214abf0489d3740bbada1f/plot_read_dicom.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_read_dicom.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="plot_printing_dataset.html" class="btn btn-neutral float-right" title="Format the output of the data set printing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot_read_rtplan.html" class="btn btn-neutral float-left" title="Read RTPLAN DICOM and list information" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

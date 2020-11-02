@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Waveforms &mdash; pydicom 2.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DICOM File-sets and DICOMDIR" href="filesets.html" />
+    <link rel="prev" title="Dataset basics: read, access, modify, write" href="dataset_basics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Waveforms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#waveforms-in-dicom">Waveforms in DICOM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decoding-waveform-data">Decoding <em>Waveform Data</em></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encoding-waveform-data">Encoding <em>Waveform Data</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Waveforms</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="waveforms">
+<h1>Waveforms<a class="headerlink" href="#waveforms" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial is about understanding waveforms in DICOM datasets and covers:</p>
+<ul class="simple">
+<li><p>An introduction to DICOM waveforms</p></li>
+<li><p>Decoding and displaying <em>Waveform Data</em></p></li>
+<li><p>Encoding <em>Waveform Data</em></p></li>
+</ul>
+<p>It’s assumed that you’re already familiar with the <a class="reference internal" href="dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
+<p><strong>Prerequisites</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install -U pydicom&gt;<span class="o">=</span><span class="m">2</span>.1 numpy matplotlib
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy matplotlib
+conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">2</span>.1
+</pre></div>
+</div>
+<p><strong>References</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/chapter_C.html">Waveform Explanatory Information</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/sect_C.5.html">Waveform Information Model</a></p></li>
+<li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Waveform IODs</a></p></li>
+</ul>
+<div class="section" id="waveforms-in-dicom">
+<h2>Waveforms in DICOM<a class="headerlink" href="#waveforms-in-dicom" title="Permalink to this headline">¶</a></h2>
+<p>There are a number of DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Information Object Definitions</a> (IODs) that contain
+waveforms, such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>,
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.9.html">Respiratory Waveform</a> and
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.11.html">Real-Time Audio Waveform</a>. Every waveform IOD
+uses the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> to represent one or
+more multi-channel time-based digitized waveforms, sampled at constant time
+intervals.</p>
+<p>The waveforms within a dataset are contained in the items of the (5400,0100)
+<em>Waveform Sequence</em> element:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;waveform_ecg.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SOPClassUID</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;12-lead ECG Waveform Storage&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">waveforms</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">waveforms</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>Each item in the sequence is a <em>multiplex group</em>, which is a group of related
+waveforms that are synchronised at common sampling frequency.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span> <span class="o">=</span> <span class="n">waveforms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">MultiplexGroupLabel</span>
+<span class="go">&#39;RHYTHM&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">SamplingFrequency</span>  <span class="c1"># in Hz</span>
+<span class="go">&quot;1000.0&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">NumberOfWaveformChannels</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">NumberOfWaveformSamples</span>
+<span class="go">10000</span>
+</pre></div>
+</div>
+<p>So the first multiplex group has 12 channels, each with 10,000 samples. Since
+the sampling frequency is 1 kHz, this represents 10 seconds of data. The
+defining information for each channel is available in the (5400,0200)
+<em>Channel Definition Sequence</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">multiplex</span><span class="o">.</span><span class="n">ChannelDefinitionSequence</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">source</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">ChannelSourceSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">CodeMeaning</span>
+<span class="gp">... </span>    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="s1">&#39;ChannelSensitivity&#39;</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>  <span class="c1"># Type 1C, may be absent</span>
+<span class="gp">... </span>        <span class="n">units</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">ChannelSensitivityUnitsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">CodeMeaning</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Channel 1: Lead I (Einthoven) (microvolt)</span>
+<span class="go">Channel 2: Lead II (microvolt)</span>
+<span class="go">Channel 3: Lead III (microvolt)</span>
+<span class="go">Channel 4: Lead aVR (microvolt)</span>
+<span class="go">Channel 5: Lead aVL (microvolt)</span>
+<span class="go">Channel 6: Lead aVF (microvolt)</span>
+<span class="go">Channel 7: Lead V1 (microvolt)</span>
+<span class="go">Channel 8: Lead V2 (microvolt)</span>
+<span class="go">Channel 9: Lead V3 (microvolt)</span>
+<span class="go">Channel 10: Lead V4 (microvolt)</span>
+<span class="go">Channel 11: Lead V5 (microvolt)</span>
+<span class="go">Channel 12: Lead V6 (microvolt)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="decoding-waveform-data">
+<h2>Decoding <em>Waveform Data</em><a class="headerlink" href="#decoding-waveform-data" title="Permalink to this headline">¶</a></h2>
+<p>The combined sample data for each multiplex is stored in the corresponding
+(5400,1010) <em>Waveform Data</em> element:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">WaveformBitsAllocated</span>
+<span class="go">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">multiplex</span><span class="o">.</span><span class="n">WaveformSampleInterpretation</span>
+<span class="go">&#39;SS&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">multiplex</span><span class="o">.</span><span class="n">WaveformData</span><span class="p">)</span>
+<span class="go">240000</span>
+</pre></div>
+</div>
+<p>If <em>Waveform Bits Allocated</em> is <code class="docutils literal notranslate"><span class="pre">16</span></code> and <em>Waveform Sample Interpretation</em> is
+<code class="docutils literal notranslate"><span class="pre">'SS'</span></code> then the data for this multiplex consists of <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html#table_C.10-10">signed 16-bit
+samples</a>. Waveform data is encoded
+with the channels interleaved, so for our case the data is ordered as:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>(Ch 1, Sample 1), (Ch 2, Sample 1), ..., (Ch 12, Sample 1),
+(Ch 1, Sample 2), (Ch 2, Sample 2), ..., (Ch 12, Sample 2),
+...,
+(Ch 1, Sample 10,000), (Ch 2, Sample 10,000), ..., (Ch 12, Sample 10,000)
+</pre></div>
+</div>
+<p>To decode the raw multiplex waveform data to a numpy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+you can use the <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiplex_array()</span></code></a>
+function. The following decodes and returns the raw data from the multiplex at
+<em>index</em> <code class="docutils literal notranslate"><span class="pre">0</span></code> within the <em>Waveform Sequence</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveforms</span> <span class="kn">import</span> <span class="n">multiplex_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span> <span class="o">=</span> <span class="n">multiplex_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="go">80</span>
+</pre></div>
+</div>
+<p>If (003A,0210) <em>Channel Sensitivity</em> is present within the multiplex’s <em>Channel
+Definition Sequence</em> then the raw sample data needs to be corrected before it’s
+in the quantity it represents. This correction is given by (sample + <em>Channel
+Baseline</em>) x <em>Channel Sensitivity</em> x <em>Channel Sensitivity Correction Factor</em>
+and will be applied when <cite>as_raw</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> or when using the
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code></a>
+function:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_array</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mf">100.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">raw</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;unitless&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;μV&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/waveforms_decode.png"><img alt="../_images/waveforms_decode.png" class="align-center" src="../_images/waveforms_decode.png" style="width: 800px;" /></a>
+<p>When processing large amounts of waveform data it might be more efficient to
+use the <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.generate_multiplex" title="pydicom.waveforms.numpy_handler.generate_multiplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code></a> function
+instead. It yields an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for each multiplex group
+within the <em>Waveform Sequence</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.waveforms</span> <span class="kn">import</span> <span class="n">generate_multiplex</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">generate_multiplex</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">as_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">(10000, 12)</span>
+<span class="go">(1200, 12)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="encoding-waveform-data">
+<h2>Encoding <em>Waveform Data</em><a class="headerlink" href="#encoding-waveform-data" title="Permalink to this headline">¶</a></h2>
+<p>Having seen how to decode and view a waveform then next step is creating our
+own multiplex group. The new group will contain two channels
+representing cosine and sine curves. We’ve chosen to represent our waveforms
+using signed 16-bit integers, but you can use signed or unsigned 8, 16, 32 or
+64-bit integers depending on the requirements of the IOD.</p>
+<p>First we create two <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarrays</span></code></a> with our waveform data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">15</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int16&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch2</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">15</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int16&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we create the new multiplex group that will contain the waveforms:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">WaveformOriginality</span> <span class="o">=</span> <span class="s2">&quot;ORIGINAL&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">NumberOfWaveformChannels</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">NumberOfWaveformSamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">SamplingFrequency</span> <span class="o">=</span> <span class="mf">1000.0</span>
+</pre></div>
+</div>
+<p>To find out which elements we need to add to our new multiplex, we check the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.9.html">Waveform Module</a> in Part 3 of the DICOM
+Standard. Type 1 elements must be present and not empty, Type 1C are
+conditionally required, Type 2 elements must be present but may be empty, and
+Type 3 elements are optional.</p>
+<p>Set our channel definitions, one for each channel (note that we have opted not
+to include a <em>Channel Sensitivity</em>, so our data will be unit-less). If you were
+to do this for real you would obviously use an official coding scheme.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">ChannelDefinitionSequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dataset</span><span class="p">(),</span> <span class="n">Dataset</span><span class="p">()]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chdef_seq</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">ChannelDefinitionSequence</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">chdef</span><span class="p">,</span> <span class="n">curve_type</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chdef_seq</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="s2">&quot;sine&quot;</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="n">chdef</span><span class="o">.</span><span class="n">ChannelSampleSkew</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+<span class="gp">... </span>    <span class="n">chdef</span><span class="o">.</span><span class="n">WaveformBitsStored</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="gp">... </span>    <span class="n">chdef</span><span class="o">.</span><span class="n">ChannelSourceSequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dataset</span><span class="p">()]</span>
+<span class="gp">... </span>    <span class="n">source</span> <span class="o">=</span> <span class="n">chdef</span><span class="o">.</span><span class="n">ChannelSourceSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">source</span><span class="o">.</span><span class="n">CodeValue</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+<span class="gp">... </span>    <span class="n">source</span><span class="o">.</span><span class="n">CodingSchemeDesignator</span> <span class="o">=</span> <span class="s2">&quot;PYDICOM&quot;</span>
+<span class="gp">... </span>    <span class="n">source</span><span class="o">.</span><span class="n">CodingSchemeVersion</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+<span class="gp">... </span>    <span class="n">source</span><span class="o">.</span><span class="n">CodeMeaning</span> <span class="o">=</span> <span class="n">curve_type</span>
+</pre></div>
+</div>
+<p>Interleave the waveform samples, convert to bytes and set the <em>Waveform Data</em>.
+Since the dataset’s transfer syntax is little endian, if you’re working on
+a big endian system you’ll need to perform the necessary conversion. You can
+determine the endianness of your system with <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">sys;</span>
+<span class="pre">print(sys.byteorder)</span></code>.</p>
+<p>We also set our corresponding <em>Waveform Bits Allocated</em> and <em>Waveform Sample
+Interpretation</em> element values to match our data representation type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">ch1</span><span class="p">,</span> <span class="n">ch2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(126, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">WaveformData</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">WaveformBitsAllocated</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new</span><span class="o">.</span><span class="n">WaveformSampleInterpretation</span> <span class="o">=</span> <span class="s1">&#39;SS&#39;</span>
+</pre></div>
+</div>
+<p>And finally add the new multiplex group to our example dataset and save:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">WaveformSequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;my_waveform.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We should now be able to plot our new waveforms:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="s2">&quot;my_waveform.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">waveform_array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/waveforms_encode.png"><img alt="../_images/waveforms_encode.png" class="align-center" src="../_images/waveforms_encode.png" style="width: 800px;" /></a>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="filesets.html" class="btn btn-neutral float-right" title="DICOM File-sets and DICOMDIR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dataset_basics.html" class="btn btn-neutral float-left" title="Dataset basics: read, access, modify, write" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

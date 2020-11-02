@@ -1,15 +1,23 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Read RTPLAN DICOM and list information &mdash; pydicom 2.0.0 documentation</title>
+  <title>Read RTPLAN DICOM and list information &mdash; pydicom 2.1.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
   
@@ -19,7 +27,9 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -27,21 +37,15 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Read DICOM and ploting using matplotlib" href="plot_read_dicom.html" />
+    <link rel="next" title="Read a Dataset and plot Pixel Data" href="plot_read_dicom.html" />
     <link rel="prev" title="Load CT slices and plot axial, sagittal and coronal images" href="../image_processing/reslice.html" /> 
 </head>
 
@@ -56,7 +60,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> pydicom
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
           
 
           
@@ -69,7 +73,7 @@
             
             
               <div class="version">
-                2.0.0
+                2.1.0
               </div>
             
           
@@ -86,6 +90,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -112,10 +117,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Read RTPLAN DICOM and list information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read DICOM and ploting using matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read DICOM directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
@@ -130,6 +136,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -168,7 +175,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">General examples</a> &raquo;</li>
         
@@ -208,7 +215,7 @@
 <span class="c1"># license : MIT</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_files</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
@@ -227,12 +234,12 @@
     <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 
 
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_files</span></a><span class="p">(</span><span class="s1">&#39;rtplan.dcm&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;rtplan.dcm&#39;</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">list_beams</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.003 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.004 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c01783b47dfa1aa1100193cafc705c66/plot_read_rtplan.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_rtplan.py</span></code></a></p>
@@ -252,7 +259,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="plot_read_dicom.html" class="btn btn-neutral float-right" title="Read DICOM and ploting using matplotlib" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="plot_read_dicom.html" class="btn btn-neutral float-right" title="Read a Dataset and plot Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../image_processing/reslice.html" class="btn btn-neutral float-left" title="Load CT slices and plot axial, sagittal and coronal images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -264,11 +271,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -279,7 +294,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
