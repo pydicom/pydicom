@@ -2,13 +2,21 @@
 """Pydicom command line interface program for `pydicom show`"""
 
 from pydicom import dcmread
+from pydicom.data.data_manager import get_testdata_file
+from pydicom.dataset import Dataset
+import sys
 
+from pydicom.cli.main import filespec_help, filespec_parser
 
 def add_subparser(subparsers):
     subparser = subparsers.add_parser(
         "show", description="Display all or part of a DICOM file"
     )
-    subparser.add_argument("filename", help="DICOM file to show")
+    subparser.add_argument(
+        "filespec", 
+        help=filespec_help,
+        type=filespec_parser
+    )
     subparser.add_argument(
         "-x",
         "--exclude-private",
@@ -29,21 +37,19 @@ def add_subparser(subparsers):
 
 
 def do_command(args):
-    try:
-        ds = dcmread(args.filename, force=True)
-    except Exception:
-        print(f"Unable to read file {args.filename}")
-        return
+    ds, element = args.filespec
+    if not element:
+        element = ds
 
     if args.exclude_private:
         ds.remove_private_tags()
 
-    if args.quiet:
-        show_quiet(ds)
-    elif args.top:
-        print(ds.top())
+    if args.quiet and isinstance(element, Dataset):
+        show_quiet(element)
+    elif args.top and isinstance(element, Dataset):
+        print(element.top())
     else:
-        print(repr(ds))
+        print(str(element))
 
 
 def SOPClassname(ds):
@@ -99,7 +105,7 @@ def quiet_rtplan(ds):
 
 
 def quiet_image(ds):
-    if "Image Storage" not in ds.SOPClassUID.name:
+    if "SOPClassUID" not in ds or "Image Storage" not in ds.SOPClassUID.name:
         return None
     s = "Image: {}-bit {} {}x{} pixels Slice location: {}"
     results = [
