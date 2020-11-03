@@ -9,7 +9,6 @@ attributes, and does a  set_defaults(func=callback_function)
 
 import argparse
 import sys
-from pydicom.cli import codify, show
 import pkg_resources
 
 
