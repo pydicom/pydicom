@@ -104,7 +104,7 @@ def code_dataelem(
     if exclude_size:
         if (
             dataelem.VR in BINARY_VR_VALUES
-            and not isinstance(dataelem.value, int)
+            and not isinstance(dataelem.value, (int, float))
             and len(dataelem.value) > exclude_size
         ):
             valuerep = f"# XXX Array of {len(dataelem.value)} bytes excluded"

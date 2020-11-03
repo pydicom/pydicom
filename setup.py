@@ -83,7 +83,14 @@ PACKAGE_DATA = {
     'pydicom': data_files_inventory() + ['py.typed']
 }
 
-ENTRY_POINTS = {"console_scripts": ["pydicom=pydicom.cli.main:main"]}
+ENTRY_POINTS = {
+    "console_scripts": ["pydicom=pydicom.cli.main:main"],
+    "pydicom_subcommands": [
+        "codify = pydicom.cli.codify:add_subparser",
+        "show = pydicom.cli.show:add_subparser"
+    ]
+}
+
 
 opts = dict(
     name=NAME,

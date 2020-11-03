@@ -10,8 +10,8 @@ attributes, and does a  set_defaults(func=callback_function)
 import argparse
 import sys
 from pydicom.cli import codify, show
+import pkg_resources
 
-modules = [codify, show]
 
 subparsers = None
 
@@ -24,6 +24,11 @@ def help_command(args):
         subcommands.remove("help")
         print(f"Available subcommands: {', '.join(subcommands)}")
 
+def get_subcommand_entry_points():
+    subcommands = {}
+    for entry_point in pkg_resources.iter_entry_points('pydicom_subcommands'):
+        subcommands[entry_point.name] = entry_point.load()
+    return subcommands
 
 def main(args=None):
     """Entry point for 'pydicom' command line interface
@@ -49,11 +54,15 @@ def main(args=None):
         )
     help_parser.set_defaults(func=help_command)
     
-    for module in modules:
-        module.add_subparser(subparsers)
+
+    # Get subcommands to register themselves as a subparser
+    subcommands = get_subcommand_entry_points()
+    for subcommand in subcommands.values():
+        subcommand(subparsers)
+
 
     args = parser.parse_args(args)
-    if not list(args.__dict__.keys()):
+    if not len(args.__dict__):
         parser.print_help()
     else:
         args.func(args)
