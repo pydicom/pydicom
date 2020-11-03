@@ -83,6 +83,8 @@ PACKAGE_DATA = {
     'pydicom': data_files_inventory() + ['py.typed']
 }
 
+ENTRY_POINTS = {"console_scripts": ["pydicom=pydicom.cli.main:main"]}
+
 opts = dict(
     name=NAME,
     python_requires='>=3.6',
@@ -106,7 +108,8 @@ opts = dict(
     install_requires=REQUIRES,
     setup_requires=SETUP_REQUIRES,
     tests_require=TESTS_REQUIRE,
-    zip_safe=False
+    zip_safe=False,
+    entry_points = ENTRY_POINTS,
 )
 
 if __name__ == '__main__':
