@@ -8,14 +8,13 @@ import sys
 
 from pydicom.cli.main import filespec_help, filespec_parser
 
+
 def add_subparser(subparsers):
     subparser = subparsers.add_parser(
         "show", description="Display all or part of a DICOM file"
     )
     subparser.add_argument(
-        "filespec", 
-        help=filespec_help,
-        type=filespec_parser
+        "filespec", help=filespec_help, type=filespec_parser
     )
     subparser.add_argument(
         "-x",
@@ -63,16 +62,16 @@ def quiet_rtplan(ds):
     if "BeamSequence" not in ds:
         return None
 
-    plan_label = ds.get('RTPlanLabel')
-    plan_name = ds.get('RTPlanName')
+    plan_label = ds.get("RTPlanLabel")
+    plan_name = ds.get("RTPlanName")
     line = f"Plan Label: {plan_label}  "
     if plan_name:
         line += f"Plan Name: {plan_name}"
     lines = [line]
 
-    if 'FractionGroupSequence' in ds:  # it should be
+    if "FractionGroupSequence" in ds:  # it should be
         for fraction_group in ds.FractionGroupSequence:
-            fraction_group_num = fraction_group.get('FractionGroupNumber', '')
+            fraction_group_num = fraction_group.get("FractionGroupNumber", "")
             lines.append(f"Fraction Group {fraction_group_num}")
             for refd_beam in fraction_group.ReferencedBeamSequence:
                 ref_num = refd_beam.get("ReferencedBeamNumber")
@@ -82,15 +81,18 @@ def quiet_rtplan(ds):
                 if dose or mu:
                     line += f"Dose {dose} Meterset {mu}"
                 lines.append(line)
-    
+
     for beam in ds.BeamSequence:
         beam_num = beam.get("BeamNumber")
         beam_name = beam.get("BeamName")
         beam_type = beam.get("BeamType")
         beam_delivery = beam.get("TreatmentDeliveryType")
         beam_radtype = beam.get("RadiationType")
-        line = f"Beam {beam_num} '{beam_name}' {beam_delivery} {beam_type} {beam_radtype}"
-              
+        line = (
+            f"Beam {beam_num} '{beam_name}' {beam_delivery} "
+            f"{beam_type} {beam_radtype}"
+        )
+
         if beam_type == "STATIC":
             cp = beam.ControlPointSequence[0]
             if cp:
@@ -98,8 +100,11 @@ def quiet_rtplan(ds):
                 gantry = cp.get("GantryAngle")
                 bld = cp.get("BeamLimitingDeviceAngle")
                 couch = cp.get("PatientSupportAngle")
-        
-                line += f" energy {energy} gantry {gantry}, coll {bld}, couch {couch}"
+
+                line += (
+                    f" energy {energy} gantry {gantry}, coll {bld}, "
+                    f"couch {couch}"
+                )
         lines.append(line)
     return "\n".join(lines)
 

@@ -116,7 +116,7 @@ opts = dict(
     setup_requires=SETUP_REQUIRES,
     tests_require=TESTS_REQUIRE,
     zip_safe=False,
-    entry_points = ENTRY_POINTS,
+    entry_points=ENTRY_POINTS,
 )
 
 if __name__ == '__main__':

@@ -18,8 +18,8 @@ from pydicom.data.data_manager import get_testdata_file
 subparsers = None
 
 
-re_kywd_or_item = ( 
-    r"\w+"        # Keyword
+re_kywd_or_item = (
+    r"\w+"  # Keyword  
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
@@ -28,14 +28,15 @@ re_file_spec_object = re.compile(
 )
 
 filespec_help = (
-            "filename[:subobject]\n"
-            "DICOM file and optional data element within it.\n"
-            "e.g. rtplan.dcm:BeamSequence[0].BeamNumber"
+    "filename[:subobject]\n"
+    "DICOM file and optional data element within it.\n"
+    "e.g. rtplan.dcm:BeamSequence[0].BeamNumber"
 )
+
 
 def filespec_parser(filespec: str):
     """Utility to return a dataset and an optional data element value within it
-    
+
     Note: this is used as an argparse 'type' for adding parsing arguments.
 
     Parameters
@@ -50,7 +51,7 @@ def filespec_parser(filespec: str):
             rtplan.dcm:PlanLabel
             rtplan.dcm:BeamSequence[0]
             rtplan.dcm:BeamSequence[0].BeamLimitingDeviceSequence
-            
+
     Returns
     -------
     ds: Dataset
@@ -67,7 +68,7 @@ def filespec_parser(filespec: str):
         If the optional element is a valid expression but does not exist
         within the dataset
     """
-   
+
     splitup = filespec.split(":", 1)
     filename = splitup[0]
     element = splitup[1] if len(splitup) == 2 else ""
@@ -86,8 +87,8 @@ def filespec_parser(filespec: str):
         # Try pydicom's test_files
         test_filepath = get_testdata_file(filename)
         not_found_msg = (
-                f"Unable to read file '{filename}' locally "
-                "or in pydicom test files"
+            f"Unable to read file '{filename}' locally "
+            "or in pydicom test files"
         )
         if not test_filepath:
             raise argparse.ArgumentTypeError(not_found_msg)
@@ -100,7 +101,7 @@ def filespec_parser(filespec: str):
 
     if not element:
         return ds, None
-        
+
     try:
         data_elem_val = eval("ds." + element, locals())
     except AttributeError:
@@ -111,7 +112,7 @@ def filespec_parser(filespec: str):
         raise argparse.ArgumentTypeError(
             f"'{element}' has an index error: {str(e)}"
         )
-    
+
     return ds, data_elem_val
 
 
@@ -124,11 +125,13 @@ def help_command(args):
         subcommands.remove("help")
         print(f"Available subcommands: {', '.join(subcommands)}")
 
+
 def get_subcommand_entry_points():
     subcommands = {}
-    for entry_point in pkg_resources.iter_entry_points('pydicom_subcommands'):
+    for entry_point in pkg_resources.iter_entry_points("pydicom_subcommands"):
         subcommands[entry_point.name] = entry_point.load()
     return subcommands
+
 
 def main(args=None):
     """Entry point for 'pydicom' command line interface
@@ -144,16 +147,13 @@ def main(args=None):
     subparsers = parser.add_subparsers(help="subcommand help")
 
     help_parser = subparsers.add_parser(
-            'help',
-             help='display help for subcommands'
-        )
+        "help", help="display help for subcommands"
+    )
     help_parser.add_argument(
-            'subcommand',
-             nargs='?',
-             help='Subcommand to show help for'
-        )
+        "subcommand", nargs="?", help="Subcommand to show help for"
+    )
     help_parser.set_defaults(func=help_command)
-    
+
     # Get subcommands to register themselves as a subparser
     subcommands = get_subcommand_entry_points()
     for subcommand in subcommands.values():
