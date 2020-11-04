@@ -32,15 +32,19 @@ re_file_spec_object = re.compile(
 )
 
 filespec_help = (
-    "filename[:subobject]\n"
+    "[pydicom:]filename[:subobject]\n"
     "DICOM file and optional data element within it.\n"
-    "e.g. rtplan.dcm:BeamSequence[0].BeamNumber"
+    "If optional 'pydicom:' prefix is used, then show the pydicom\n"
+    "test file with the given filename\n"
+    "Examples:\n"
+    "   path/to/your_file.dcm\n"
+    "   pydicom:rtplan.dcm:BeamSequence[0].BeamNumber\n"
 )
 
 
 def eval_element(ds: Dataset, element: str) -> DataElement:
     try:
-        data_elem_val = eval("ds." + element, locals())
+        data_elem_val = eval("ds." + element, {"ds": ds})
     except AttributeError:
         raise argparse.ArgumentTypeError(
             f"Data element '{element}' is not in the dataset"
@@ -61,15 +65,16 @@ def filespec_parser(filespec: str):
     Parameters
     ----------
     filespec: str
-        A filename and optional extra details, in format:
-        <filename>[:<element>]
-        Filename is mandatory.
+        A filename with optional `pydicom:` prefix and optional data element,
+        in format:
+            [pydicom:]<filename>[:<element>]
         If an element is specified, it must be a path to a data element,
         sequence item (dataset), or a sequence.
         Examples:
-            rtplan.dcm:PlanLabel
-            rtplan.dcm:BeamSequence[0]
-            rtplan.dcm:BeamSequence[0].BeamLimitingDeviceSequence
+            your_file.dcm
+            your_file.dcm:StudyDate
+            pydicom:rtplan.dcm:BeamSequence[0]
+            pydicom:rtplan.dcm:BeamSequence[0].BeamLimitingDeviceSequence
 
     Returns
     -------
@@ -96,12 +101,21 @@ def filespec_parser(filespec: str):
         or if the optional element is a valid expression but does not exist
         within the dataset
     """
-
+    pydicom_testfile = False
+    if filespec.startswith("pydicom:"):
+        pydicom_testfile = True
+        filespec = filespec[8:]
+    
+    
     splitup = filespec.split(":", 1)
     filename = splitup[0]
+    if pydicom_testfile:
+        filename = get_testdata_file(filename)
+    
+    # If optional :element there, get it, else blank
     element = splitup[1] if len(splitup) == 2 else ""
 
-    # Check element first to avoid unnecessary load of file
+    # Check element syntax first to avoid unnecessary load of file
     if element and not re_file_spec_object.match(element):
         raise argparse.ArgumentTypeError(
             f"Component '{element}' is not valid syntax for a "
@@ -112,20 +126,11 @@ def filespec_parser(filespec: str):
     try:
         ds = dcmread(filename, force=True)
     except FileNotFoundError:
-        # Try pydicom's test_files
-        test_filepath = get_testdata_file(filename)
-        not_found_msg = (
-            f"Unable to read file '{filename}' locally "
-            "or in pydicom test files"
+        raise argparse.ArgumentTypeError(f"File '{filename}' not found")
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"Error reading '{filename}': {str(e)}"
         )
-        if not test_filepath:
-            raise argparse.ArgumentTypeError(not_found_msg)
-        try:
-            ds = dcmread(test_filepath, force=True)
-        except Exception as e:
-            raise argparse.ArgumentTypeError(
-                f"Error reading '{filename}': {str(e)}"
-            )
 
     if not element:
         return ds, None
