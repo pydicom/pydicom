@@ -19,7 +19,7 @@ Python code. New subcommands may be added over time.
 
 Example at the command line in a terminal window:
 
-.. code-block:: default
+.. code-block:: console
 
     $ pydicom show rtplan.dcm
     Dataset.file_meta -------------------------------
@@ -37,44 +37,114 @@ Example at the command line in a terminal window:
     (0008, 0020) Study Date                          DA: '20030716'
     ...
 
+You can see the available subcommands by simply typing `pydicom` with no
+arguments, or with `pydicom help`:
 
-Combining *pydicom*'s CLI with Others
+.. code-block:: console
+
+    $ pydicom help
+    Use pydicom help [subcommand] to show help for a subcommand
+    Available subcommands: codify, show
+   
+And, as noted in the block above, you get help for a particular subcommand
+by typing `pydicom help [subcommand]`.  For example:
+
+
+.. code-block:: console
+
+    $ pydicom help show
+    usage: pydicom show [-h] [-x] [-t] [-q] filespec
+
+    Display all or part of a DICOM file
+
+    positional arguments:
+    filespec              filename[:subobject] DICOM file and optional data element within it. e.g. rtplan.dcm:BeamSequence[0].BeamNumber
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -x, --exclude-private
+                            Don't show private data elements
+    -t, --top             Only show top level
+    -q, --quiet           Only show basic information
+
+
+Installing the pydicom CLI
+--------------------------
+
+The `pydicom` script should automatically be available after you 
+`pip install pydicom`.  It should not require any updates to the system
+path or environment variables.
+
+If you are helping develop *pydicom* code, and are using git clones, 
+you will have to `pip install -e .` or `python setup.py develop` from
+the `pydicom` repository root. This has to be repeated for any changes to
+`setup.py` (e.g. to add a new subcommand).
+
+If you are developing subcommands within your own package, you will need to
+reinstall that package similar to the above as you add entry points.
+
+
+Combining pydicom's CLI with Others
 -------------------------------------
 
 CLIs are useful for general exploration while programming, but also can be 
 combined with other command-line filters to make very powerful
 abilities. The following is an example of piping the output of the pydicom 
 'show' subcommand into 'grep', filtering for lines with 
-either "UI:" or "Sequence":
+either "Dose" or "Sequence" in them:
 
-.. code-block:: default
+.. code-block:: console
 
-    $ pydicom show rtplan.dcm | grep "UI:\|Sequence"
-    (0002, 0002) Media Storage SOP Class UID         UI: RT Plan Storage
-    (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023
-    (0002, 0010) Transfer Syntax UID                 UI: Implicit VR Little Endian
-    (0002, 0012) Implementation Class UID            UI: 1.2.888.888.88.8.8.8
-    (0008, 0016) SOP Class UID                       UI: RT Plan Storage
-    (0008, 0018) SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023
-    (0020, 000d) Study Instance UID                  UI: 1.22.333.4.555555.6.7777777777777777777777777777
-    (0020, 000e) Series Instance UID                 UI: 1.2.333.444.55.6.7777.8888
-    ...
+    $ pydicom show rtplan.dcm | grep "Dose\|Sequence"
+    (300a, 0010)  Dose Reference Sequence  2 item(s) ----
+    (300a, 0012) Dose Reference Number               IS: "1"
+    (300a, 0014) Dose Reference Structure Type       CS: 'COORDINATES'
+    (300a, 0016) Dose Reference Description          LO: 'iso'
+    (300a, 0018) Dose Reference Point Coordinates    DS: [239.531250000000, 239.531250000000, -741.87000000000]
+    (300a, 0020) Dose Reference Type                 CS: 'ORGAN_AT_RISK'
+    (300a, 0023) Delivery Maximum Dose               DS: "75.0"
+    (300a, 002c) Organ at Risk Maximum Dose          DS: "75.0"
+    (300a, 0012) Dose Reference Number               IS: "2"
+    (300a, 0014) Dose Reference Structure Type       CS: 'COORDINATES'
+    (300a, 0016) Dose Reference Description          LO: 'PTV'
+    (300a, 0018) Dose Reference Point Coordinates    DS: [239.531250000000, 239.531250000000, -751.87000000000]
+    (300a, 0020) Dose Reference Type                 CS: 'TARGET'
+    (300a, 0026) Target Prescription Dose            DS: "30.826203"
+    (300a, 0070)  Fraction Group Sequence  1 item(s) ----
+    (300c, 0004)  Referenced Beam Sequence  1 item(s) ----
+        (300a, 0082) Beam Dose Specification Point       DS: [239.531250000000, 239.531250000000, -751.87000000000]
+        (300a, 0084) Beam Dose                           DS: "1.0275401"
+    (300a, 00b0)  Beam Sequence  1 item(s) ----
+    (300a, 00b6)  Beam Limiting Device Sequence  2 item(s) ----
     (300a, 0111)  Control Point Sequence  2 item(s) ----
+        (300a, 0115) Dose Rate Set                       DS: "650.0"
         (300a, 011a)  Beam Limiting Device Position Sequence  2 item(s) ----
         (300c, 0050)  Referenced Dose Reference Sequence  2 item(s) ----
+            (300a, 010c) Cumulative Dose Reference Coefficie DS: "0.0"
+            (300c, 0051) Referenced Dose Reference Number    IS: "1"
+            (300a, 010c) Cumulative Dose Reference Coefficie DS: "0.0"
+            (300c, 0051) Referenced Dose Reference Number    IS: "2"
         (300c, 0050)  Referenced Dose Reference Sequence  2 item(s) ----
+            (300a, 010c) Cumulative Dose Reference Coefficie DS: "0.9990268"
+            (300c, 0051) Referenced Dose Reference Number    IS: "1"
+            (300a, 010c) Cumulative Dose Reference Coefficie DS: "1.0"
+            (300c, 0051) Referenced Dose Reference Number    IS: "2"
     (300a, 0180)  Patient Setup Sequence  1 item(s) ----
     (300c, 0002)  Referenced RT Plan Sequence  1 item(s) ----
-    (0008, 1150) Referenced SOP Class UID            UI: RT Plan Storage
-    (0008, 1155) Referenced SOP Instance UID         UI: 1.9.999.999.99.9.9999.9999.20030903145128
     (300c, 0060)  Referenced Structure Set Sequence  1 item(s) ----
-    (0008, 1150) Referenced SOP Class UID            UI: RT Structure Set Storage
-    (0008, 1155) Referenced SOP Instance UID         UI: 1.2.333.444.55.6.7777.88888   
+
+Using the "or Sequence" (```\|Sequence```) regular expression as above allows you 
+to see any filtered results in relation to their parent Sequence as well.
+
+See the :ref:`pydicom show command` section for more examples of the `show`
+command, its options, and the ability to show only data elements or sequences
+within the file.
 
 
 Extending the CLI
 -----------------
 
-For developers, you can extend this interface by adding your own sub-commands
-in your own packages for whatever behavior you would like. See the section
-on extending the CLI.
+For developers, you can extend this command-line interface by adding 
+sub-commands in your own packages for whatever behavior you would like. 
+
+See :ref:`XXX_cli_dev` for information on extending the CLI.

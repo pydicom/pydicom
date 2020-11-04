@@ -19,9 +19,12 @@ import os.path
 import argparse
 import pydicom
 from pydicom.datadict import dictionary_keyword
-from pydicom.dataelem import BINARY_VR_VALUES
+from pydicom.dataelem import DataElement, BINARY_VR_VALUES
+from pydicom.dataset import Dataset
+from pydicom.tag import Tag
 
 import re
+from typing import Optional, List, Callable
 
 line_term = "\n"
 
@@ -30,19 +33,19 @@ first_cap_re = re.compile("(.)([A-Z][a-z]+)")
 all_cap_re = re.compile("([a-z0-9])([A-Z])")
 
 
-def camel_to_underscore(name):
+def camel_to_underscore(name: str) -> str:
     """Convert name from CamelCase to lower_case_with_underscores"""
     # From http://stackoverflow.com/questions/1175208
     s1 = first_cap_re.sub(r"\1_\2", name)
     return all_cap_re.sub(r"\1_\2", s1).lower()
 
 
-def tag_repr(tag):
+def tag_repr(tag: Tag) -> str:
     """String of tag value as (0xgggg, 0xeeee)"""
     return f"(0x{tag.group:04x}, 0x{tag.element:04x})"
 
 
-def default_name_filter(name):
+def default_name_filter(name: str) -> str:
     """Callable to reduce some names in code to more readable short form
 
     :arg name: a sequence variable name or sequence item name
@@ -58,7 +61,7 @@ def default_name_filter(name):
 
 
 # Functions to produce python code
-def code_imports():
+def code_imports() -> str:
     """Code the import statements needed by other codify results
 
     :return: a string of import statement lines
@@ -71,18 +74,31 @@ def code_imports():
 
 
 def code_dataelem(
-    dataelem, dataset_name="ds", exclude_size=None, include_private=False
-):
+    dataelem: DataElement, 
+    dataset_name: str = "ds", 
+    exclude_size: Optional[int] = None,
+    include_private:bool = False
+) -> str:
     """Code lines for a single DICOM data element
 
-    :arg dataelem: the DataElement instance to turn into code
-    :arg dataset_name: variable name of the Dataset containing dataelem
-    :arg exclude_size: if specified, values longer than this (in bytes)
-                       will only have a commented string for a value,
-                       causing a syntax error when the code is run,
-                       and thus prompting the user to remove or fix that line.
-    :return: a string containing code to recreate the data element
-             If the data element is a sequence, calls code_sequence
+    Parameters
+    ----------
+
+    dataelem : DataElement
+        The DataElement instance to turn into code
+    dataset_name : str
+        The variable name of the Dataset containing dataelem
+    exclude_size : Union[int, None]
+        If specified, values longer than this (in bytes)
+        will only have a commented string for a value,
+        causing a syntax error when the code is run,
+        and thus prompting the user to remove or fix that line.
+    
+    Returns
+    -------
+    code: str
+        A string containing code to recreate the data element
+        If the data element is a sequence, calls code_sequence
 
     """
 
@@ -120,25 +136,36 @@ def code_dataelem(
 
 
 def code_sequence(
-    dataelem,
-    dataset_name="ds",
-    exclude_size=None,
-    include_private=False,
-    name_filter=default_name_filter,
-):
+    dataelem: DataElement,
+    dataset_name: str = "ds",
+    exclude_size: Optional[int] = None,
+    include_private: bool = False,
+    name_filter: Callable = default_name_filter,
+) -> str:
     """Code lines for recreating a Sequence data element
 
-    :arg dataelem: the DataElement instance of the Sequence
-    :arg dataset_name: variable name of the dataset containing the Sequence
-    :arg exclude_size: if specified, values longer than this (in bytes)
-                       will only have a commented string for a value,
-                       causing a syntax error when the code is run,
-                       and thus prompting the user to remove or fix that line.
-    :arg include_private: If True, private data elements will be coded.
-                          If False, private elements are skipped
-    :arg name_filter: a callable taking a sequence name or sequence item name,
-                      and returning a shorter name for easier code reading
-    :return: a string containing code lines to recreate a DICOM sequence
+    Parameters
+    ----------
+    dataelem: DataElement
+        The DataElement instance whose value is the Sequence
+    dataset_name: str
+        Variable name of the dataset containing the Sequence
+    exclude_size: Union[int,None]
+        If not None, values longer than this (in bytes)
+        will only have a commented string for a value,
+        causing a syntax error when the code is run,
+        and thus prompting the user to remove or fix that line.
+    include_private: bool
+        If ``False`` (default), private elements are skipped
+        If ``True``, private data elements will be coded.
+    name_filter: Callable
+        A callable taking a sequence name or sequence item name,
+        and returning a shorter name for easier code reading
+    
+    Returns
+    -------
+    code: str
+        A string containing code lines to recreate a DICOM sequence
 
     """
     lines = []
@@ -191,21 +218,29 @@ def code_sequence(
 
 
 def code_dataset(
-    ds,
-    dataset_name="ds",
-    exclude_size=None,
-    include_private=False,
-    is_file_meta=False,
-):
+    ds: Dataset,
+    dataset_name: str = "ds",
+    exclude_size: Optional[int] = None,
+    include_private: bool = False,
+    is_file_meta: bool = False,
+) -> List[str]:
     """Return python code lines for import statements needed by other code
 
-    :arg exclude_size: if specified, values longer than this (in bytes)
-                       will only have a commented string for a value,
-                       causing a syntax error when the code is run,
-                       and thus prompting the user to remove or fix that line.
-    :arg include_private: If True, private data elements will be coded.
-                          If False, private elements are skipped
-    :return: a list of code lines containing import statements
+    Parameters
+    ----------
+    exclude_size: Union[int,None]
+        If not None, values longer than this (in bytes)
+        will only have a commented string for a value,
+        causing a syntax error when the code is run,
+        and thus prompting the user to remove or fix that line.
+    include_private: bool
+        If ``False`` (default), private elements are skipped
+        If ``True``, private data elements will be coded.
+
+    Returns
+    -------
+    code_list: List[str]
+        A list of code lines containing import statements
 
     """
     lines = []
@@ -230,17 +265,31 @@ def code_dataset(
     return line_term.join(lines)
 
 
-def code_file(filename, exclude_size=None, include_private=False):
+def code_file(
+    filename: str,
+    exclude_size: Optional[int] = None,
+    include_private: bool = False
+) -> str:
     """Write a complete source code file to recreate a DICOM file
 
-    :arg filename: complete path and filename of a DICOM file to convert
-    :arg exclude_size: if specified, values longer than this (in bytes)
-                       will only have a commented string for a value,
-                       causing a syntax error when the code is run,
-                       and thus prompting the user to remove or fix that line.
-    :arg include_private: If True, private data elements will be coded.
-                          If False, private elements are skipped
-    :return: a string containing code lines to recreate entire file
+    Parameters
+    ----------
+    filename : str
+        Complete path and filename of a DICOM file to convert
+    
+    exclude_size : Union[int,None]
+        If not None, values longer than this (in bytes)
+        will only have a commented string for a value,
+        causing a syntax error when the code is run,
+        and thus prompting the user to remove or fix that line.
+    include_private : bool
+        If ``False`` (default), private elements are skipped
+        If ``True``, private data elements will be coded.
+
+    Returns
+    -------
+    code_string: str
+        A string containing code lines to recreate the entire DICOM file
 
     """
     lines = []

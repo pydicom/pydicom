@@ -5,7 +5,7 @@ from argparse import ArgumentTypeError
 
 import pytest
 
-from pydicom.cli.main import filespec_parser
+from pydicom.cli.main import filespec_parser, eval_element
 
 bad_elem_specs = (
     "extra:colon",
@@ -47,3 +47,40 @@ class TestFileSpec:
         """CLI filespec elements with an invalid index raise an error"""
         with pytest.raises(ArgumentTypeError, match=r".* index error"):
             filespec_parser(f"rtplan.dcm:{bad_index}")
+
+class TestFilespecElementEval:
+    # Load plan once
+    plan, _ = filespec_parser("rtplan.dcm")
+
+    def test_correct_values(self):
+        """CLI produces correct evaluation of requested element"""
+        # A nested data element 
+        elem_str = "BeamSequence[0].ControlPointSequence[0].NominalBeamEnergy"
+        elem_val = eval_element(self.plan, elem_str)
+        assert 6.0 == elem_val
+
+        # A nested Sequence item
+        elem_str = "BeamSequence[0].ControlPointSequence[0]"
+        elem_val = eval_element(self.plan, elem_str)
+        assert 6.0 == elem_val.NominalBeamEnergy
+
+        # A nested Sequence itself
+        elem_str = "BeamSequence[0].ControlPointSequence"
+        elem_val = eval_element(self.plan, elem_str)
+        assert 6.0 == elem_val[0].NominalBeamEnergy
+
+
+        # A non-nested data element
+        elem_str = "PatientID"
+        elem_val = eval_element(self.plan, elem_str)
+        assert "id00001" == elem_val
+
+        # The file_meta or file_meta data element
+        elem_str = "file_meta"
+        elem_val = eval_element(self.plan, elem_str)
+        assert "RT Plan Storage" == elem_val.MediaStorageSOPClassUID.name
+
+        elem_str = "file_meta.MediaStorageSOPClassUID"
+        elem_val = eval_element(self.plan, elem_str)
+        assert "RT Plan Storage" == elem_val.name
+        

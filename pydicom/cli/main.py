@@ -14,12 +14,16 @@ import re
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
+from pydicom.dataset import Dataset
+from pydicom.dataelem import DataElement
 
 subparsers = None
 
 
+# Restrict the allowed syntax tightly, since use Python `eval`
+# on the expression. Do not allow callables, or assignment, for example.
 re_kywd_or_item = (
-    r"\w+"  # Keyword  
+    r"\w+"  # Keyword (\w allows underscore, needed for file_meta) 
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
@@ -32,6 +36,21 @@ filespec_help = (
     "DICOM file and optional data element within it.\n"
     "e.g. rtplan.dcm:BeamSequence[0].BeamNumber"
 )
+
+
+def eval_element(ds: Dataset, element: str) -> DataElement:
+    try:
+        data_elem_val = eval("ds." + element, locals())
+    except AttributeError:
+        raise argparse.ArgumentTypeError(
+            f"Data element '{element}' is not in the dataset"
+        )
+    except IndexError as e:
+        raise argparse.ArgumentTypeError(
+            f"'{element}' has an index error: {str(e)}"
+        )
+
+    return data_elem_val
 
 
 def filespec_parser(filespec: str):
@@ -60,12 +79,21 @@ def filespec_parser(filespec: str):
         The specified data element's value: one of Sequence, Dataset
         (sequence item) or data element value like float, int, str
 
+    Note
+    ----
+        This function is meant to be used in a call to an `argparse` libary's
+        `add_argument` call for subparsers, with name="filespec" and 
+        `type=filespec_parser`. When used that way, the resulting args.filespec
+        will contain the return values of this function
+        (e.g. use `ds, element_val = args.filespec` after parsing arguments)
+        See the `pydicom.cli.show` module for an example.
+    
     Raises
     ------
     argparse.ArgumentTypeError
-        If the filename does not exist in local path or in pydicom test files
-        If the optional element is not a valid expression
-        If the optional element is a valid expression but does not exist
+        If the filename does not exist in local path or in pydicom test files,
+        or if the optional element is not a valid expression,
+        or if the optional element is a valid expression but does not exist
         within the dataset
     """
 
@@ -102,16 +130,7 @@ def filespec_parser(filespec: str):
     if not element:
         return ds, None
 
-    try:
-        data_elem_val = eval("ds." + element, locals())
-    except AttributeError:
-        raise argparse.ArgumentTypeError(
-            f"Data element '{element}' is not in the dataset"
-        )
-    except IndexError as e:
-        raise argparse.ArgumentTypeError(
-            f"'{element}' has an index error: {str(e)}"
-        )
+    data_elem_val = eval_element(ds, element)
 
     return ds, data_elem_val
 
