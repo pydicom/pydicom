@@ -1,0 +1,8 @@
+Version 2.1.1
+=============
+
+Fixes
+-----
+
+* Remove ``py.typed``(:issue:`1251`)
+* Fix ``ImportError`` with Python 3.6.0 (:issue:`1253`)
