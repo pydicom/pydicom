@@ -109,8 +109,10 @@ def filespec_parser(filespec: str):
     
     splitup = filespec.split(":", 1)
     filename = splitup[0]
+    # Check if in pydicom test data, even if prefix not there
+    pydicom_filename = get_testdata_file(filename)
     if pydicom_testfile:
-        filename = get_testdata_file(filename)
+        filename = pydicom_filename
     
     # If optional :element there, get it, else blank
     element = splitup[1] if len(splitup) == 2 else ""
@@ -126,7 +128,10 @@ def filespec_parser(filespec: str):
     try:
         ds = dcmread(filename, force=True)
     except FileNotFoundError:
-        raise argparse.ArgumentTypeError(f"File '{filename}' not found")
+        extra = (
+            f", \nbut 'pydicom:{filename}' test data file is available"
+        ) if pydicom_filename else ""
+        raise argparse.ArgumentTypeError(f"File '{filename}' not found{extra}")
     except Exception as e:
         raise argparse.ArgumentTypeError(
             f"Error reading '{filename}': {str(e)}"

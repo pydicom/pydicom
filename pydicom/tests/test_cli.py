@@ -48,6 +48,14 @@ class TestFileSpec:
         with pytest.raises(ArgumentTypeError, match=r".* index error"):
             filespec_parser(f"pydicom:rtplan.dcm:{bad_index}")
 
+    def test_offers_pydicom_testfile(self):
+        """CLI message offers pydicom data file if file not found"""
+        with pytest.raises(
+            ArgumentTypeError, match=r".*pydicom:rtplan\.dcm.*is available.*"
+        ):
+            filespec_parser(f"rtplan.dcm")
+
+
 class TestFilespecElementEval:
     # Load plan once
     plan, _ = filespec_parser("pydicom:rtplan.dcm")
@@ -114,6 +122,19 @@ class TestCLIcall:
             "Image: 16-bit MR 64x64 pixels Slice location: 0.0000\n"
         )
         assert err == ""
+
+        main(["show", "-q", "pydicom:rtplan.dcm"])
+        out, err = capsys.readouterr()
+
+        # Check a couple of things to make sure output okay
+        assert out.endswith(
+            "Beam 1 'Field 1' TREATMENT STATIC PHOTON energy 6.00000000000000 "
+            "gantry 0.0, coll 0.0, couch 0.0\n"
+        )
+        assert err == ""
+    
+
+
 
     def test_help(self, capsys):
         main(["help", "show"])
