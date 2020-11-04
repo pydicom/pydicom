@@ -226,7 +226,8 @@ class JsonDataElementConverter:
                     value_key = unique_value_keys[0]
                     elem = DataElement.from_json(
                         self.dataset_class, key, vr,
-                        val[value_key], value_key
+                        val[value_key], value_key,
+                        self.bulk_data_element_handler
                     )
                 ds.add(elem)
         return ds
