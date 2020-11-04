@@ -67,6 +67,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Initial test environment setup
       run: |
+        python -m pip install -e .
         python -m pip install wheel
         python -m pip install pytest
     - name: Test with no external libraries
@@ -119,6 +120,7 @@ jobs:
         key: pydicom-testdata
     - name: Initial test environment setup
       run: |
+        python -m pip install -e .
         python -m pip install wheel
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
