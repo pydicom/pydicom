@@ -17,13 +17,15 @@ from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.dataelem import DataElement
 
+import os.path
+
 subparsers = None
 
 
 # Restrict the allowed syntax tightly, since use Python `eval`
 # on the expression. Do not allow callables, or assignment, for example.
 re_kywd_or_item = (
-    r"\w+"  # Keyword (\w allows underscore, needed for file_meta) 
+    r"\w+"  # Keyword (\w allows underscore, needed for file_meta)
     r"(\[(-)?\d+\])?"  # Optional [index] or [-index]
 )
 
@@ -34,11 +36,11 @@ re_file_spec_object = re.compile(
 filespec_help = (
     "[pydicom:]filename[:subobject]\n"
     "DICOM file and optional data element within it.\n"
-    "If optional 'pydicom:' prefix is used, then show the pydicom\n"
+    "If optional 'pydicom::' prefix is used, then show the pydicom\n"
     "test file with the given filename\n"
     "Examples:\n"
     "   path/to/your_file.dcm\n"
-    "   pydicom:rtplan.dcm:BeamSequence[0].BeamNumber\n"
+    "   pydicom::rtplan.dcm::BeamSequence[0].BeamNumber\n"
 )
 
 
@@ -55,6 +57,30 @@ def eval_element(ds: Dataset, element: str) -> DataElement:
         )
 
     return data_elem_val
+
+
+def filespec_parts(filespec: str):
+    """Parse the filespec format into prefix, filename, element
+
+    Format is [prefix::filename::element]
+
+    Note that ':' can also exist in valid filename, e.g. r'c:\temp\test.dcm'
+    """
+
+    *prefix_file, last = filespec.split("::")
+
+    if not prefix_file:  # then only the filename component
+        return "", last, ""
+
+    prefix = "pydicom" if prefix_file[0] == "pydicom" else ""
+    if prefix:
+        prefix_file.pop(0)
+
+    # If list empty after pop above, then have pydicom::filename
+    if not prefix_file:
+        return prefix, last, ""
+
+    return prefix, "".join(prefix_file), last
 
 
 def filespec_parser(filespec: str):
@@ -87,12 +113,12 @@ def filespec_parser(filespec: str):
     Note
     ----
         This function is meant to be used in a call to an `argparse` libary's
-        `add_argument` call for subparsers, with name="filespec" and 
+        `add_argument` call for subparsers, with name="filespec" and
         `type=filespec_parser`. When used that way, the resulting args.filespec
         will contain the return values of this function
         (e.g. use `ds, element_val = args.filespec` after parsing arguments)
         See the `pydicom.cli.show` module for an example.
-    
+
     Raises
     ------
     argparse.ArgumentTypeError
@@ -101,21 +127,16 @@ def filespec_parser(filespec: str):
         or if the optional element is a valid expression but does not exist
         within the dataset
     """
-    pydicom_testfile = False
-    if filespec.startswith("pydicom:"):
-        pydicom_testfile = True
-        filespec = filespec[8:]
-    
-    
-    splitup = filespec.split(":", 1)
-    filename = splitup[0]
-    # Check if in pydicom test data, even if prefix not there
-    pydicom_filename = get_testdata_file(filename)
-    if pydicom_testfile:
+    prefix, filename, element = filespec_parts(filespec)
+
+    # Get the pydicom test filename even without prefix, in case user forgot it
+    try:
+        pydicom_filename = get_testdata_file(filename)
+    except NotImplementedError:  # will get this if absolute path passed
+        pydicom_filename = ""
+
+    if prefix == "pydicom":
         filename = pydicom_filename
-    
-    # If optional :element there, get it, else blank
-    element = splitup[1] if len(splitup) == 2 else ""
 
     # Check element syntax first to avoid unnecessary load of file
     if element and not re_file_spec_object.match(element):
@@ -129,8 +150,10 @@ def filespec_parser(filespec: str):
         ds = dcmread(filename, force=True)
     except FileNotFoundError:
         extra = (
-            f", \nbut 'pydicom:{filename}' test data file is available"
-        ) if pydicom_filename else ""
+            (f", \nbut 'pydicom::{filename}' test data file is available")
+            if pydicom_filename
+            else ""
+        )
         raise argparse.ArgumentTypeError(f"File '{filename}' not found{extra}")
     except Exception as e:
         raise argparse.ArgumentTypeError(

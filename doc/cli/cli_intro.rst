@@ -21,7 +21,7 @@ Example at the command line in a terminal window:
 
 .. code-block:: console
 
-    $ pydicom show pydicom:rtplan.dcm
+    $ pydicom show pydicom::rtplan.dcm
     Dataset.file_meta -------------------------------
     (0002, 0000) File Meta Information Group Length  UL: 156
     (0002, 0001) File Meta Information Version       OB: b'\x00\x01'
@@ -37,7 +37,7 @@ Example at the command line in a terminal window:
     (0008, 0020) Study Date                          DA: '20030716'
     ...
 
-Note that prefixing the filespec with "pydicom:" will read the file from
+Note that prefixing the filespec with "pydicom::" will read the file from
 the *pydicom* test data files.
 
 You can see the available subcommands by simply typing `pydicom` with no
@@ -98,7 +98,7 @@ either "Dose" or "Sequence" in them:
 
 .. code-block:: console
 
-    $ pydicom show pydicom:rtplan.dcm | grep "Dose\|Sequence"
+    $ pydicom show pydicom::rtplan.dcm | grep "Dose\|Sequence"
     (300a, 0010)  Dose Reference Sequence  2 item(s) ----
     (300a, 0012) Dose Reference Number               IS: "1"
     (300a, 0014) Dose Reference Structure Type       CS: 'COORDINATES'

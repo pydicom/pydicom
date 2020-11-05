@@ -22,6 +22,7 @@ from pydicom.datadict import dictionary_keyword
 from pydicom.dataelem import DataElement, BINARY_VR_VALUES
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
+from pydicom import cli
 
 import re
 from typing import Optional, List, Callable
@@ -74,10 +75,10 @@ def code_imports() -> str:
 
 
 def code_dataelem(
-    dataelem: DataElement, 
-    dataset_name: str = "ds", 
+    dataelem: DataElement,
+    dataset_name: str = "ds",
     exclude_size: Optional[int] = None,
-    include_private:bool = False
+    include_private: bool = False
 ) -> str:
     """Code lines for a single DICOM data element
 
@@ -93,7 +94,7 @@ def code_dataelem(
         will only have a commented string for a value,
         causing a syntax error when the code is run,
         and thus prompting the user to remove or fix that line.
-    
+
     Returns
     -------
     code: str
@@ -161,7 +162,7 @@ def code_sequence(
     name_filter: Callable
         A callable taking a sequence name or sequence item name,
         and returning a shorter name for easier code reading
-    
+
     Returns
     -------
     code: str
@@ -172,7 +173,10 @@ def code_sequence(
     seq = dataelem.value
     seq_name = dataelem.name
     seq_item_name = seq_name.replace(" Sequence", "")
-    seq_keyword = dictionary_keyword(dataelem.tag)
+    try:
+        seq_keyword = dictionary_keyword(dataelem.tag)
+    except KeyError:
+        seq_keyword = f"Tag{dataelem.tag:08x}"
 
     # Create comment line to document the start of Sequence
     lines.append("")
@@ -276,7 +280,36 @@ def code_file(
     ----------
     filename : str
         Complete path and filename of a DICOM file to convert
-    
+    exclude_size : Union[int,None]
+        If not None, values longer than this (in bytes)
+        will only have a commented string for a value,
+        causing a syntax error when the code is run,
+        and thus prompting the user to remove or fix that line.
+    include_private : bool
+        If ``False`` (default), private elements are skipped
+        If ``True``, private data elements will be coded.
+
+    Returns
+    -------
+    code_string: str
+        A string containing code lines to recreate the entire DICOM file
+
+    """
+    ds = pydicom.dcmread(filename, force=True)
+    return code_file_from_dataset(ds, exclude_size, include_private)
+
+
+def code_file_from_dataset(
+    ds: Dataset,
+    exclude_size: Optional[int] = None,
+    include_private: bool = False
+) -> str:
+    """Write a complete source code file to recreate a DICOM file
+
+    Parameters
+    ----------
+    filename : str
+        Complete path and filename of a DICOM file to convert
     exclude_size : Union[int,None]
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
@@ -294,10 +327,11 @@ def code_file(
     """
     lines = []
 
-    ds = pydicom.dcmread(filename, force=True)
-
     # Code a nice header for the python file
-    lines.append(f"# Coded version of DICOM file '{filename}'")
+    filename = ds.get("filename")
+    identifier = f"DICOM file '{filename}'" if filename else "non-file dataset"
+
+    lines.append(f"# Coded version of {identifier}")
     lines.append("# Produced by pydicom codify utility script")
 
     # Code the necessary imports
@@ -305,16 +339,17 @@ def code_file(
     lines.append("")
 
     # Code the file_meta information
-    lines.append("# File meta info data elements")
-    code_meta = code_dataset(
-        ds.file_meta,
-        "file_meta",
-        exclude_size,
-        include_private,
-        is_file_meta=True,
-    )
-    lines.append(code_meta)
-    lines.append("")
+    if 'file_meta' in ds:
+        lines.append("# File meta info data elements")
+        code_meta = code_dataset(
+            ds.file_meta,
+            "file_meta",
+            exclude_size,
+            include_private,
+            is_file_meta=True,
+        )
+        lines.append(code_meta)
+        lines.append("")
 
     # Code the main dataset
     lines.append("# Main data elements")
@@ -325,7 +360,8 @@ def code_file(
     lines.append("")
 
     # Add the file meta to the dataset, and set transfer syntax
-    lines.append("ds.file_meta = file_meta")
+    if 'file_meta' in ds:
+        lines.append("ds.file_meta = file_meta")
     lines.append("ds.is_implicit_VR = " + str(ds.is_implicit_VR))
     lines.append("ds.is_little_endian = " + str(ds.is_little_endian))
 
@@ -335,7 +371,9 @@ def code_file(
 
 def set_parser_arguments(parser, default_exclude_size):
     parser.add_argument(
-        "infile", help="DICOM file from which to produce code lines"
+        "filespec",
+        help=cli.main.filespec_help,
+        type=cli.main.filespec_parser
     )
     parser.add_argument(
         "outfile",
@@ -373,9 +411,18 @@ def set_parser_arguments(parser, default_exclude_size):
 
 
 def do_codify(args):
-    # Read the requested file and convert to python/pydicom code lines
-    filename = args.infile  # name
-    code_lines = code_file(filename, args.exclude_size, args.include_private)
+    # Convert the requested dataset to python/pydicom code lines
+    ds, element = args.filespec
+    filename = ds.filename
+
+    if element and not isinstance(element, Dataset):
+        raise NotImplementedError(
+            f"Codify can only code a Dataset, not a {type(element)}"
+        )
+
+    code_str = code_file_from_dataset(
+        element or ds, args.exclude_size, args.include_private
+    )
 
     # If requested, write a code line to save the dataset
     if args.save_as:
@@ -386,7 +433,7 @@ def do_codify(args):
     save_line = (
         f"\nds.save_as(r'{save_as_filename}', write_like_original=False)"
     )
-    code_lines += save_line
+    code_str += save_line
 
     # Write the code lines to specified file or to standard output
     # For test_util, captured output .name throws error, ignore it:
@@ -395,7 +442,7 @@ def do_codify(args):
             print(f"Writing code to file '{args.outfile.name}'")
     except AttributeError:
         pass
-    args.outfile.write(code_lines)
+    args.outfile.write(code_str)
 
 
 def main(default_exclude_size, args=None):
@@ -412,10 +459,9 @@ def main(default_exclude_size, args=None):
     parser = argparse.ArgumentParser(
         description="Produce python/pydicom code from a DICOM file",
         epilog="Binary data (e.g. pixels) larger than --exclude-size "
-        f"(default {default_exclude_size} bytes) is not included. A dummy line "
-        "with a syntax error is produced. "
-        "Private data elements are not included "
-        "by default.",
+        f"(default {default_exclude_size} bytes) is not included. A "
+        "dummy line with a syntax error is produced. "
+        "Private data elements are not included by default.",
     )
     set_parser_arguments(parser, default_exclude_size)
     args = parser.parse_args(args)
