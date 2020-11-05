@@ -17,7 +17,6 @@ from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.dataelem import DataElement
 
-import os.path
 
 subparsers = None
 
@@ -34,7 +33,7 @@ re_file_spec_object = re.compile(
 )
 
 filespec_help = (
-    "[pydicom:]filename[:subobject]\n"
+    "[pydicom::]filename[::element]\n"
     "DICOM file and optional data element within it.\n"
     "If optional 'pydicom::' prefix is used, then show the pydicom\n"
     "test file with the given filename\n"
@@ -91,16 +90,16 @@ def filespec_parser(filespec: str):
     Parameters
     ----------
     filespec: str
-        A filename with optional `pydicom:` prefix and optional data element,
+        A filename with optional `pydicom::` prefix and optional data element,
         in format:
-            [pydicom:]<filename>[:<element>]
+            [pydicom::]<filename>[::<element>]
         If an element is specified, it must be a path to a data element,
         sequence item (dataset), or a sequence.
         Examples:
             your_file.dcm
-            your_file.dcm:StudyDate
-            pydicom:rtplan.dcm:BeamSequence[0]
-            pydicom:rtplan.dcm:BeamSequence[0].BeamLimitingDeviceSequence
+            your_file.dcm::StudyDate
+            pydicom::rtplan.dcm::BeamSequence[0]
+            pydicom::rtplan.dcm::BeamSequence[0].BeamLimitingDeviceSequence
 
     Returns
     -------
