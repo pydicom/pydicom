@@ -354,3 +354,25 @@ class TestBinary:
         ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
 
         assert b'xyzzy' == ds[0x00091002].value
+
+    def test_bulk_data_reader_is_called_within_SQ(self):
+        def bulk_data_reader(_):
+            return b'xyzzy'
+
+        json_data = {
+            "003a0200": {
+                "vr": "SQ",
+                "Value": [
+                    {
+                        "54001010": {
+                            "vr": "OW",
+                            "BulkDataURI": "https://a.dummy.url"
+                        }
+                    }
+                ]
+            }
+        }
+
+        ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
+
+        assert b'xyzzy' == ds[0x003a0200].value[0][0x54001010].value
