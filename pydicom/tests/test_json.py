@@ -361,7 +361,7 @@ class TestBinary:
 
         json_data = {
             "003a0200": {
-                "vr": "SQ", 
+                "vr": "SQ",
                 "Value": [
                     {
                         "54001010": {
