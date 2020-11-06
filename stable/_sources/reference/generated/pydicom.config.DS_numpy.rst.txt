@@ -1,6 +1,0 @@
-﻿pydicom.config.DS\_numpy
-========================
-
-.. currentmodule:: pydicom.config
-
-.. autofunction:: DS_numpy

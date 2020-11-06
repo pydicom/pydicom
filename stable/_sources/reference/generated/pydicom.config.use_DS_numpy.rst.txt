@@ -1,6 +1,0 @@
-﻿pydicom.config.use\_DS\_numpy
-=============================
-
-.. currentmodule:: pydicom.config
-
-.. autodata:: use_DS_numpy
