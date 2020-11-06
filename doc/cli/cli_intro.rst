@@ -1,21 +1,12 @@
+
 .. _cli_intro:
-.. title:: CLI Introduction
-
-*pydicom* Command-line Interface Introduction
-=============================================
-
-.. versionadded:: 2.2
-
-.. currentmodule:: pydicom
-
-.. rubric:: pydicom command-line interface
 
 Introduction
-------------
+============
 
 Starting in v2.2, *pydicom* offers a useful command-line interface (CLI) for 
 exploring DICOM files, and access to the `codify` option for creating pydicom 
-Python code. New subcommands may be added over time.
+Python code. Additional subcommands may be added over time.
 
 Example at the command line in a terminal window:
 
@@ -37,11 +28,28 @@ Example at the command line in a terminal window:
     (0008, 0020) Study Date                          DA: '20030716'
     ...
 
-Note that prefixing the filespec with "pydicom::" will read the file from
-the *pydicom* test data files.
+Note that prefixing the file specification with ``pydicom::`` will read the file
+from the *pydicom* test data files rather than from the normal file system.
 
-You can see the available subcommands by simply typing `pydicom` with no
-arguments, or with `pydicom help`:
+You can also show just parts of the DICOM file by specifying a data element
+using the usual pydicom keyword notation:
+
+.. code-block:: console
+
+    $ pydicom show pydicom::rtplan.dcm::FractionGroupSequence[0]
+    (300a, 0071) Fraction Group Number               IS: "1"
+    (300a, 0078) Number of Fractions Planned         IS: "30"
+    (300a, 0080) Number of Beams                     IS: "1"
+    (300a, 00a0) Number of Brachy Application Setups IS: "0"
+    (300c, 0004)  Referenced Beam Sequence  1 item(s) ----
+    (300a, 0082) Beam Dose Specification Point       DS: [239.531250000000, 239.531250000000, -751.87000000000]
+    (300a, 0084) Beam Dose                           DS: "1.0275401"
+    (300a, 0086) Beam Meterset                       DS: "116.0036697"
+    (300c, 0006) Referenced Beam Number              IS: "1"
+    ---------
+
+You can see the available subcommands by simply typing ``pydicom`` with no
+arguments, or with ``pydicom help``:
 
 .. code-block:: console
 
@@ -50,8 +58,7 @@ arguments, or with `pydicom help`:
     Available subcommands: codify, show
    
 And, as noted in the block above, you get help for a particular subcommand
-by typing `pydicom help [subcommand]`.  For example:
-
+by typing ``pydicom help [subcommand]``.  For example:
 
 .. code-block:: console
 
@@ -61,7 +68,11 @@ by typing `pydicom help [subcommand]`.  For example:
     Display all or part of a DICOM file
 
     positional arguments:
-    filespec              filename[:subobject] DICOM file and optional data element within it. e.g. rtplan.dcm:BeamSequence[0].BeamNumber
+    filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
+                            prefix is used, then show the pydicom test file with that name. If `element`
+                            is given, use only that data element within the file. Examples:
+                            path/to/your_file.dcm, your_file.dcm::StudyDate,
+                            pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber
 
     optional arguments:
     -h, --help            show this help message and exit
@@ -79,16 +90,16 @@ The `pydicom` script should automatically be available after you
 path or environment variables.
 
 If you are helping develop *pydicom* code, and are using git clones, 
-you will have to `pip install -e .` or `python setup.py develop` from
+you will have to ``pip install -e .`` or ``python setup.py develop`` from
 the `pydicom` repository root. This has to be repeated for any changes to
 `setup.py` (e.g. to add a new subcommand).
 
 If you are developing subcommands within your own package, you will need to
-reinstall that package similar to the above as you add entry points.
+reinstall your package similar to the above as you add entry points.
 
 
 Combining pydicom's CLI with Others
--------------------------------------
+-----------------------------------
 
 CLIs are useful for general exploration while programming, but also can be 
 combined with other command-line filters to make very powerful
@@ -137,17 +148,8 @@ either "Dose" or "Sequence" in them:
     (300c, 0060)  Referenced Structure Set Sequence  1 item(s) ----
 
 Using the "or Sequence" (```\|Sequence```) regular expression as above allows you 
-to see any filtered results in relation to their parent Sequence as well.
+to see any filtered results in relation to their parent Sequences.
 
-See the :ref:`pydicom show command` section for more examples of the `show`
+See the :ref:`cli_show` section for more examples of the `show`
 command, its options, and the ability to show only data elements or sequences
 within the file.
-
-
-Extending the CLI
------------------
-
-For developers, you can extend this command-line interface by adding 
-sub-commands in your own packages for whatever behavior you would like. 
-
-See :ref:`XXX_cli_dev` for information on extending the CLI.

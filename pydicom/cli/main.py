@@ -33,13 +33,15 @@ re_file_spec_object = re.compile(
 )
 
 filespec_help = (
-    "[pydicom::]filename[::element]\n"
-    "DICOM file and optional data element within it.\n"
-    "If optional 'pydicom::' prefix is used, then show the pydicom\n"
-    "test file with the given filename\n"
-    "Examples:\n"
-    "   path/to/your_file.dcm\n"
-    "   pydicom::rtplan.dcm::BeamSequence[0].BeamNumber\n"
+    "File specification, in format [pydicom::]filename[::element]. "
+    "If `pydicom::` prefix is present, then use the pydicom "
+    "test file with that name. If `element` is given, "
+    "use only that data element within the file. "
+    "Examples: "
+    "path/to/your_file.dcm, "
+    "your_file.dcm::StudyDate, "
+    "pydicom::rtplan.dcm::BeamSequence[0], "
+    "yourplan.dcm::BeamSequence[0].BeamNumber"
 )
 
 

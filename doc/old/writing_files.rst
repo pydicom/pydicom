@@ -26,17 +26,18 @@ and populating it.
   own UIDs, implementation name, and so on.
 
 
-Using the Codify Script
------------------------
+.. _writing_files_using_codify:
 
-In the pydicom 'util' folder, there is a script called `codify.py
-<https://github.com/pydicom/pydicom/blob/master/pydicom/util/codify.py>`_.
-It takes an existing DICOM file, and produces python code. The python code
+Using Codify
+------------
+
+pydicom has a command-line utility called ``codify`` that
+takes an existing DICOM file, and produces Python code. The Python code
 uses pydicom to produce a copy of the original file again, when the code is
 run.
 
 In other words: pydicom has a tool that can automatically generate
-well-designed python code for you - code that creates DICOM files. The only
+well-designed Python code for you - code that creates DICOM files. The only
 requirement is that you have an existing DICOM file that looks approximately
 like the one you need. You can then use the code as a model to work from. The
 tool is especially useful with Sequences, which can be tricky to code
@@ -51,7 +52,7 @@ correctly.
   with codify, or handling the output files according to your requirements for
   sensitive information.
 
-One issue to be aware of is that codify will not create code for large items
+One issue to be aware of is that ``codify`` will not create code for large items
 like pixel data. Instead it creates a line like:
 
 .. code-block:: python
@@ -65,32 +66,19 @@ to edit the code to supply a valid value.
    element value that is coded. Data elements bigger than that will have the
    syntax error line as shown above.
 
-One potential disadvantage of codify, depending on your use case, is that it
-does not create loops. If you have, say, 30 items in a Sequence, codify will
+One potential disadvantage of ``codify``, depending on your use case, is that it
+does not create loops. If you have, say, 30 items in a Sequence, ``codify`` will
 produce code that makes them one at a time. Code you wrote by hand would
 likely create them in a loop, because most of the code needed is quite
 repetitive. If you want to switch to a loop, you could use the first item's
 code as a starting point, and modify as needed, deleting the code for the
 other individual items.
 
-Codify could also be called from code, rather than as a script; you can look
-at the codify.py source and the ``code_file`` function for a starting point
-for that.
+For details on calling the codify command, see the :ref:`cli_codify` section.
 
-To call codify as a script, use::
-
-    python <path-to-pydicom-util folder>/codify.py -s savename dicom-file createdicomfile.py
-
-The -s parameter is optional, but if present, is followed by a save filename
-(the DICOM filename that would be created when the code is run). If not
-specified, then a modified version of the input dicom filename is used. The
-output file (createdicomfile.py in the example above) is optional.  If nothing
-is specified, the code is written to standard output.
-
-There is also a parameter ``--exclude-private`` if you don't want private data
-elements to be included in the generated code.
-
-You can also call codify with ``--help`` to see details of all the parameters.
+``Codify`` could also be called from code, rather than from a command line; you 
+can look at the codify.py source and the ``code_file`` function for a 
+starting point for that.
 
 
 Writing a file from Scratch
