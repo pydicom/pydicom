@@ -1,8 +1,8 @@
 :orphan:
 
-.. _cli_guide:
-
 .. rubric:: pydicom command-line interface
+
+.. _cli_guide:
 
 ============================
 Command-line Interface Guide

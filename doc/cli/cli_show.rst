@@ -75,7 +75,7 @@ using the usual pydicom keyword notation:
 
 .. code-block:: console
 
-    $ pydicom show CT_small.dcm::PatientName
+    $ pydicom show pydicom::CT_small.dcm::PatientName
 
     $ pydicom show pydicom::rtplan.dcm::FractionGroupSequence
     [(300a, 0071) Fraction Group Number               IS: "1"
@@ -89,5 +89,40 @@ using the usual pydicom keyword notation:
     (300c, 0006) Referenced Beam Number              IS: "1"
     ---------]
 
+The 'quiet' argument shows a minimal version of some of the information in the
+file, using just the DICOM keyword and value (not showing the tag numbers
+and VR). The example below shows the quiet mode with an image slice::
 
+    pydicom show -q pydicom::ct_small.dcm
 
+    SOPClassUID: CT Image Storage
+    PatientName: CompressedSamples^CT1
+    PatientID: 1CT1
+    StudyID: 1CT1
+    StudyDate: 20040119
+    StudyTime: 072730
+    StudyDescription: e+1
+    Image: 16-bit CT 128x128 pixels Slice location: -77.2040634155
+
+And the following example shows an RT Plan in quiet mode::
+
+    pydicom show -q pydicom::rtplan.dcm
+
+    SOPClassUID: RT Plan Storage
+    PatientName: Last^First^mid^pre
+    PatientID: id00001
+    StudyID: study1
+    StudyDate: 20030716
+    StudyTime: 153557
+    StudyDescription: N/A
+    Plan Label: Plan1  Plan Name: Plan1
+    Fraction Group 1
+    Beam 1 Dose 1.02754010000000 Meterset 116.003669700000
+    Beam 1 'Field 1' TREATMENT STATIC PHOTON energy 6.00000000000000 gantry 0.0, coll 0.0, couch 0.0
+
+All quiet modes show the SOP Class UID, patient and study information as shown
+in the above two examples. After that are custom values for different classes.
+Currently "Image Storage" and "RT Plan Storage" classes have custom extra
+information.  Please submit an issue on the *pydicom* issues list (or even
+better a pull request) to help us expand the list of custom 'quiet' mode 
+options.
