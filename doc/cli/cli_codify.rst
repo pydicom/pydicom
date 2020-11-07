@@ -9,7 +9,7 @@ recreate that file, or, optionally a subset within that file.
 See :ref:`writing_files_using_codify` for full details of writing a complete
 file.  Here we will review the command-line options in more detail than
 in that section, and show how to export a dataset within a DICOM file that has
-Sequences.
+sequences.
 
 .. Warning::
 
@@ -90,7 +90,7 @@ For example::
 
 would read the DICOM file "dicomfile.dcm" and write the Python code
 to file "pythoncode.py".  In that code, near the end of the file
-would be a ds.save_as("savename.dcm", ...) call.
+would be a ``ds.save_as("savename.dcm", ...)`` line.
 
 .. Note::
 
@@ -126,5 +126,10 @@ rather than the whole file::
     refd_beam1.BeamDoseSpecificationPoint = [239.531250000000, 239.531250000000, -751.87000000000]
     ...
 
-Currently, only a data element which is a Dataset (an item within a Sequence)
-is accepted.
+Currently, only a data element which is a :class:`~pydicom.dataset.Dataset` 
+(an item within a :class:`~pydicom.sequence.Sequence`) is accepted.
+The resulting code would not on its own produce a correct DICOM file,
+but could be useful as a model when creating
+more complete code.  For example, issuing code for one item in a
+``Sequence`` could be the starting point towards a loop
+producing a number of sequence items.

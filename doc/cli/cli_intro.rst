@@ -30,6 +30,9 @@ Example at the command line in a terminal window:
 
 Note that prefixing the file specification with ``pydicom::`` will read the file
 from the *pydicom* test data files rather than from the normal file system.
+The following examples will use that so that you can replicate these 
+examples exactly.  In normal use, you would leave the ``pydicom::`` prefix
+off when working with your files.
 
 You can also show just parts of the DICOM file by specifying a data element
 using the usual pydicom keyword notation:

@@ -3,8 +3,8 @@
 Extending the CLI
 =================
 
-You can create your own 'subcommands' for the ``pydicom`` command,
-by adding entry points to your package's setup.py file, specifying a callback
+Developers can create their own 'subcommands' for the ``pydicom`` command,
+by adding entry points to their package's setup.py file, specifying a callback
 function to register the subcommand and its arguments.
 
 If you wanted to create two subcommands, 'command1' and 'command2',
@@ -68,7 +68,7 @@ And define your command function::
         # work with the dataset ds or element as needed...
 
 The ``pydicom`` command uses Python's 
-:ref:`argparse<https://docs.python.org/3/library/argparse.html`_ library to 
+`argparse <https://docs.python.org/3/library/argparse.html>`_ library to 
 process commands.
 
 The above code snippets show adding the ``filespec`` argument, and processing
@@ -76,3 +76,9 @@ the resulting dataset in the ``do_command()`` function.  This is
 recommended if you wish to use the filespec as was seen in the :ref:`cli_show`
 and :ref:`cli_codify` sections.  If not, you can just create a normal
 arg with the type set to ``argparse.FileType`` to open files yourself.
+
+The above has been shown in relation to a different package than *pydicom*;
+however, if you think your command has general use, please consider contributing
+it to *pydicom*: in that case, change the entry points in the *pydicom*
+``setup.py`` script, and add a module under ``pydicom.cli`` and create a
+pull request.

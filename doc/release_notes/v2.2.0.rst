@@ -1,0 +1,23 @@
+Version 2.2.0
+=================================
+
+Changelog
+---------
+* 
+
+Enhancements
+............
+* Added a command-line interface for pydicom.  Current subcommands are:
+    * ``show``: display all or part of a DICOM file
+    * ``codify`` to produce Python code for writing files or sequence items
+      from scratch.
+  Please see the :ref:`cli_guide` for examples and details
+  of all the options for each command.
+
+Changes
+.......
+* 
+
+Fixes
+.....
+* 
