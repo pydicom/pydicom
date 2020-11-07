@@ -13,7 +13,7 @@ sequences.
 
 .. Warning::
 
-  The code produced by codify will contain all the information in the original
+  The code produced by ``codify`` will contain all the information in the original
   file, which may include private health information or other sensitive
   information.
 

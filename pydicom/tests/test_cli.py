@@ -187,7 +187,8 @@ class TestCLIcall:
         out, err = capsys.readouterr()
         assert out.endswith(
             "Beam 1 'Field 1' TREATMENT STATIC PHOTON energy 6.00000000000000 "
-            "gantry 0.0, coll 0.0, couch 0.0\n"
+            "gantry 0.0, coll 0.0, couch 0.0 "
+            "(0 wedges, 0 comps, 0 boli, 0 blocks)\n"
         )
         assert err == ""
 

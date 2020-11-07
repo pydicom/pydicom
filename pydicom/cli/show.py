@@ -69,10 +69,17 @@ def quiet_rtplan(ds):
         line += f"Plan Name: {plan_name}"
     lines = [line]
 
-    if "FractionGroupSequence" in ds:  # it should be
+    if "FractionGroupSequence" in ds:  # it should be, is mandatory
         for fraction_group in ds.FractionGroupSequence:
             fraction_group_num = fraction_group.get("FractionGroupNumber", "")
-            lines.append(f"Fraction Group {fraction_group_num}")
+            descr = fraction_group.get("FractionGroupDescription", "")
+            fractions = fraction_group.get("NumberOfFractionsPlanned")
+            fxn_info = f"{fractions} fraction(s) planned" if fractions else ""
+            lines.append(
+                f"Fraction Group {fraction_group_num} {descr} {fxn_info}"
+            )
+            num_brachy = fraction_group.get("NumberOfBrachyApplicationSetups")
+            lines.append(f"   Brachy Application Setups: {num_brachy}")
             for refd_beam in fraction_group.ReferencedBeamSequence:
                 ref_num = refd_beam.get("ReferencedBeamNumber")
                 dose = refd_beam.get("BeamDose")
@@ -100,12 +107,24 @@ def quiet_rtplan(ds):
                 gantry = cp.get("GantryAngle")
                 bld = cp.get("BeamLimitingDeviceAngle")
                 couch = cp.get("PatientSupportAngle")
-
                 line += (
                     f" energy {energy} gantry {gantry}, coll {bld}, "
                     f"couch {couch}"
                 )
+        
+
+        wedges = beam.get("NumberOfWedges")
+        comps = beam.get("NumberOfCompensators")
+        boli = beam.get("NumberOfBoli")
+        blocks = beam.get("NumberOfBlocks")
+
+        line += (
+            f" ({wedges} wedges, {comps} comps, {boli} boli,"
+            f" {blocks} blocks)"
+        )
+
         lines.append(line)
+
     return "\n".join(lines)
 
 
