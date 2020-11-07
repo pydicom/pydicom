@@ -5,7 +5,7 @@ from io import BytesIO
 from struct import unpack, pack
 from types import TracebackType
 from typing import (
-    Tuple, Optional, NoReturn, BinaryIO, Callable, Type, Union, cast, TextIO,
+    Tuple, Optional, BinaryIO, Callable, Type, Union, cast, TextIO,
     TYPE_CHECKING, Any
 )
 
@@ -182,15 +182,15 @@ class DicomFileLike(DicomIO):
         self.close = file_like_obj.close
         self.name: str = getattr(file_like_obj, 'name', '<no filename>')
 
-    def no_write(self, bytes_read: bytes) -> NoReturn:
+    def no_write(self, bytes_read: bytes) -> None:
         """Used for file-like objects where no write is available"""
         raise IOError("This DicomFileLike object has no write() method")
 
-    def no_read(self, bytes_read: Optional[int] = None) -> NoReturn:
+    def no_read(self, bytes_read: Optional[int] = None) -> None:
         """Used for file-like objects where no read is available"""
         raise IOError("This DicomFileLike object has no read() method")
 
-    def no_seek(self, offset: int, from_what: int = 0) -> NoReturn:
+    def no_seek(self, offset: int, from_what: int = 0) -> None:
         """Used for file-like objects where no seek is available"""
         raise IOError("This DicomFileLike object has no seek() method")
 
