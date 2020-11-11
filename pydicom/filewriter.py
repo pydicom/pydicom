@@ -804,10 +804,10 @@ def dcmwrite(
 ) -> None:
     """Write `dataset` to the `filename` specified.
 
-    If `write_like_original` is ``True`` then `dataset` will be written as is
-    (after minimal validation checking) and may or may not contain all or parts
-    of the File Meta Information (and hence may or may not be conformant with
-    the DICOM File Format).
+    If `write_like_original` is ``True`` then the :class:`Dataset` will be
+    written as is (after minimal validation checking) and may or may not
+    contain all or parts of the *File Meta Information* (and hence may or
+    may not be conformant with the DICOM File Format).
 
     If `write_like_original` is ``False``, `dataset` will be stored in the
     :dcm:`DICOM File Format <part10/chapter_7.html>`.  To do
