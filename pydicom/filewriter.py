@@ -816,11 +816,6 @@ def dcmwrite(
     Meta Information Group* elements. The byte stream of the `dataset` will be
     placed into the file after the DICOM *File Meta Information*.
 
-    If `write_like_original` is ``True`` then the :class:`Dataset` will be
-    written as is (after minimal validation checking) and may or may not
-    contain all or parts of the *File Meta Information* (and hence may or
-    may not be conformant with the DICOM File Format).
-
     **File Meta Information**
 
     The *File Meta Information* consists of a 128-byte preamble, followed by
