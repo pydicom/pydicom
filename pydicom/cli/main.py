@@ -11,6 +11,7 @@ import argparse
 import sys
 import pkg_resources
 import re
+from typing import Tuple
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
@@ -60,7 +61,7 @@ def eval_element(ds: Dataset, element: str) -> DataElement:
     return data_elem_val
 
 
-def filespec_parts(filespec: str):
+def filespec_parts(filespec: str) -> Tuple[str, str, str]:
     """Parse the filespec format into prefix, filename, element
 
     Format is [prefix::filename::element]

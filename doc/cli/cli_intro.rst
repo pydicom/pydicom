@@ -35,7 +35,7 @@ examples exactly.  In normal use, you would leave the ``pydicom::`` prefix
 off when working with your files.
 
 You can also show just parts of the DICOM file by specifying a data element
-using the usual pydicom keyword notation:
+using the usual *pydicom* keyword notation:
 
 .. code-block:: console
 
@@ -88,7 +88,7 @@ by typing ``pydicom help [subcommand]``.  For example:
 Installing the pydicom CLI
 --------------------------
 
-The `pydicom` script should automatically be available after you 
+The ``pydicom`` command should automatically be available after you 
 `pip install pydicom`.  It should not require any updates to the system
 path or environment variables.
 
@@ -101,8 +101,8 @@ If you are developing subcommands within your own package, you will need to
 reinstall your package similar to the above as you add entry points.
 
 
-Combining pydicom's CLI with Others
------------------------------------
+Combining with other CLIs
+-------------------------
 
 CLIs are useful for general exploration while programming, but also can be 
 combined with other command-line filters to make very powerful

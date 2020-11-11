@@ -17,7 +17,7 @@ sequences.
   file, which may include private health information or other sensitive
   information.
 
-A Simple example
+A simple example
 ----------------
 
 A simple example of using the ``codify`` command would be::
@@ -42,7 +42,7 @@ A simple example of using the ``codify`` command would be::
     .
     .
 
-Note that prefixing the file specification with "pydicom::" will read the file
+Note that prefixing the file specification with ``pydicom::`` will read the file
 from the *pydicom* test data files rather than from the file system.
 
 
@@ -50,7 +50,7 @@ Command options
 ---------------
 
 In the above example, the output was directed to screen, because no output file
-was specified. To see the available command options, use the help command:
+was specified. To see the available command options, use the ``help`` command:
 
 .. code-block::
 
@@ -58,7 +58,7 @@ was specified. To see the available command options, use the help command:
 
     usage: pydicom codify [-h] [-e EXCLUDE_SIZE] [-p] [-s SAVE_AS] filespec [outfile]
 
-    Read a DICOM file and produce the pydicom (Python) code which can create that file
+    Read a DICOM file and produce the *pydicom* (Python) code which can create that file
 
     positional arguments:
     filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
@@ -95,13 +95,13 @@ would be a ``ds.save_as("savename.dcm", ...)`` line.
 .. Note::
 
     By default, any private data elements within the file are not translated
-    to code.  If you want to include them, use the -p parameter.
+    to code.  If you want to include them, use the ``-p`` parameter.
 
 
 Codifying a part of a DICOM file
 --------------------------------
 
-Note that the filespec argument to the ``codify`` command, as for  
+Note that the ``filespec`` argument to the ``codify`` command, as for  
 :ref:`the show command<cli_show>`, allows you to specify a data element within the file,
 rather than the whole file::
 

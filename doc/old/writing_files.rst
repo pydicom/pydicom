@@ -76,7 +76,7 @@ other individual items.
 
 For details on calling the codify command, see the :ref:`cli_codify` section.
 
-``Codify`` could also be called from code, rather than from a command line; you 
+``codify`` could also be called from code, rather than from a command line; you 
 can look at the codify.py source and the ``code_file`` function for a 
 starting point for that.
 

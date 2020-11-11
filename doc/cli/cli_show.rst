@@ -10,8 +10,8 @@ from a command-line terminal.
 Some examples were already given in the :ref:`cli_intro`, but here we will
 show some additional options.
 
-To see the available options, in a command-line terminal, type `pydicom help show`
-or `pydicom show -h`.
+To see the available options, in a command-line terminal, type ``pydicom help show``
+or ``pydicom show -h``.
 
 .. code-block:: console
 
@@ -67,7 +67,7 @@ The basic command with no options shows all data elements and nested sequences:
     (7fe0, 0010) Pixel Data                          OW: Array of 32768 elements
     (fffc, fffc) Data Set Trailing Padding           OB: Array of 126 elements
 
-Note that prefixing the file specification with "pydicom::" will read the file
+Note that prefixing the file specification with ``pydicom::`` will read the file
 from the *pydicom* test data files rather than from the file system.
 
 You can also show just parts of the DICOM file by specifying a data element
@@ -90,7 +90,7 @@ using the usual pydicom keyword notation:
     (300c, 0006) Referenced Beam Number              IS: "1"
     ---------]
 
-The 'quiet' argument shows a minimal version of some of the information in the
+The ``-q`` quiet argument shows a minimal version of some of the information in the
 file, using just the DICOM keyword and value (not showing the tag numbers
 and VR). The example below shows the quiet mode with an image slice::
 

@@ -12,6 +12,8 @@ you setup.py file should include something like:
 
 .. code-block:: python
 
+    from setuptools import setup
+
     if __name__ == '__main__':
         setup(
             name="yourpackage",
