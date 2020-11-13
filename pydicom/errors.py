@@ -16,3 +16,8 @@ class InvalidDicomError(Exception):
         if not args:
             args = ('The specified file is not a valid DICOM file.', )
         Exception.__init__(self, *args)
+
+
+class BytesLengthException(Exception):
+    """Exception that is raised for an unexpected number of bytes."""
+    pass

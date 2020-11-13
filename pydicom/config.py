@@ -149,6 +149,11 @@ the allowed range.
 Default ``False``.
 """
 
+convert_wrong_length_to_UN = False
+"""Convert a field VR to "UN" and return bytes if bytes length is invalid.
+Default ``False``.
+"""
+
 datetime_conversion = False
 """Set to ``True`` to convert the value(s) of elements with a VR of DA, DT and
 TM to :class:`datetime.date`, :class:`datetime.datetime` and
