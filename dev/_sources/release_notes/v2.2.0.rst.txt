@@ -1,0 +1,20 @@
+Version 2.2.0
+=================================
+
+Changelog
+---------
+* 
+
+Enhancements
+............
+* A field containing an invalid number of bytes will result in a warning 
+  instead of an exception when 
+  :attr:`~pydicom.config.convert_wrong_length_to_UN` is set to True.
+
+Changes
+.......
+* 
+
+Fixes
+.....
+* 
