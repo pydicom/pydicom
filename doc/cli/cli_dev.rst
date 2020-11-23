@@ -27,7 +27,7 @@ you setup.py file should include something like:
         )
 
 
-The ``"pydicom_subcommands"`` is a literal string; this must not be 
+The ``"pydicom_subcommands"`` is a literal string; this must not be
 changed or *pydicom* will not find your subcommand.
 
 The ``add_subparser`` function name could be changed if you wish, but usually
@@ -62,19 +62,18 @@ line::
 And define your command function::
 
     def do_command(args):
-        ds, element = args.filespec
+        for ds, element_val in args.filespec:
+            if args.yourarg:
+                # Do something...
 
-        if args.yourarg:
-            # Do something...
+            # work with the dataset ds or element as needed...
 
-        # work with the dataset ds or element as needed...
-
-The ``pydicom`` command uses Python's 
-`argparse <https://docs.python.org/3/library/argparse.html>`_ library to 
+The ``pydicom`` command uses Python's
+`argparse <https://docs.python.org/3/library/argparse.html>`_ library to
 process commands.
 
 The above code snippets show adding the ``filespec`` argument, and processing
-the resulting dataset in the ``do_command()`` function.  This is 
+the resulting dataset-element_value pairs in the ``do_command()`` function.  This is
 recommended if you wish to use the filespec as was seen in the :ref:`cli_show`
 and :ref:`cli_codify` sections.  If not, you can just create a normal
 arg with the type set to ``argparse.FileType`` to open files yourself.

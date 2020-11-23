@@ -106,11 +106,10 @@ def filespec_parser(filespec: str):
 
     Returns
     -------
-    ds: Dataset
-        The entire dataset read from the file.
-    element: Union[Sequence, Dataset, Any]
-        The specified data element's value: one of Sequence, Dataset
-        (sequence item) or data element value like float, int, str
+    matches: List[Tuple[Dataset, Any]]
+        Matching pairs of (dataset, data element value)
+        This usually is a single pair, but a list is returned for future
+        ability to work across multiple files.
 
     Note
     ----
@@ -163,11 +162,11 @@ def filespec_parser(filespec: str):
         )
 
     if not element:
-        return ds, None
+        return [(ds, None)]
 
     data_elem_val = eval_element(ds, element)
 
-    return ds, data_elem_val
+    return [(ds, data_elem_val)]
 
 
 def help_command(args):

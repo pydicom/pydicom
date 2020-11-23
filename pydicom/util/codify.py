@@ -412,7 +412,12 @@ def set_parser_arguments(parser, default_exclude_size):
 
 def do_codify(args):
     # Convert the requested dataset to python/pydicom code lines
-    ds, element = args.filespec
+    if len(args.filespec) != 1:
+        raise NotImplementedError(
+            "Codify can only work on a single DICOM file input"
+        )
+
+    ds, element = args.filespec[0]
     filename = ds.filename
 
     if element and not isinstance(element, Dataset):

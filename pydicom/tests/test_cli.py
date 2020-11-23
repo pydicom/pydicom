@@ -77,7 +77,7 @@ class TestFilespec:
 
 class TestFilespecElementEval:
     # Load plan once
-    plan, _ = filespec_parser("pydicom::rtplan.dcm")
+    plan, _ = filespec_parser("pydicom::rtplan.dcm")[0]
 
     def test_correct_values(self):
         """CLI produces correct evaluation of requested element"""

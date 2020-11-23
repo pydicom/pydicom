@@ -36,19 +36,24 @@ def add_subparser(subparsers):
 
 
 def do_command(args):
-    ds, element = args.filespec
-    if not element:
-        element = ds
+    if len(args.filespec) != 1:
+        raise NotImplementedError(
+            "Show can only work on a single DICOM file input"
+        )
+
+    ds, element_val = args.filespec[0]
+    if not element_val:
+        element_val = ds
 
     if args.exclude_private:
         ds.remove_private_tags()
 
-    if args.quiet and isinstance(element, Dataset):
-        show_quiet(element)
-    elif args.top and isinstance(element, Dataset):
-        print(element.top())
+    if args.quiet and isinstance(element_val, Dataset):
+        show_quiet(element_val)
+    elif args.top and isinstance(element_val, Dataset):
+        print(element_val.top())
     else:
-        print(str(element))
+        print(str(element_val))
 
 
 def SOPClassname(ds):
@@ -111,7 +116,7 @@ def quiet_rtplan(ds):
                     f" energy {energy} gantry {gantry}, coll {bld}, "
                     f"couch {couch}"
                 )
-        
+
 
         wedges = beam.get("NumberOfWedges")
         comps = beam.get("NumberOfCompensators")
