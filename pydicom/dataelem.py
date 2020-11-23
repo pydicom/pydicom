@@ -22,6 +22,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag)
+from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
@@ -793,6 +794,18 @@ def DataElement_from_raw(
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+    except BytesLengthException as e:
+        message = (f"{e} This occurred while trying to parse "
+                   f"{raw.tag} according to VR '{VR}'.")
+        if config.convert_wrong_length_to_UN:
+            warnings.warn(f"{message} Setting VR to 'UN'.")
+            VR = "UN"
+            value = raw.value
+        else:
+            raise BytesLengthException(
+                f"{message} To replace this error with a warning set "
+                "pydicom.config.convert_wrong_length_to_UN = True."
+            )
 
     if raw.tag in _LUT_DESCRIPTOR_TAGS and value:
         # We only fix the first value as the third value is 8 or 16

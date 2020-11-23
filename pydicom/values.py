@@ -6,7 +6,7 @@
 import re
 from io import BytesIO
 from struct import (unpack, calcsize)
-from typing import Optional, Union, List, cast, Tuple, Dict, Callable
+from typing import Optional, Union, List, Tuple, Dict, Callable
 from typing import Sequence as SequenceType
 
 # don't import datetime_conversion directly
@@ -14,6 +14,7 @@ from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
+from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
@@ -377,7 +378,12 @@ def convert_numbers(
     length = len(byte_string)
 
     if length % bytes_per_value != 0:
-        logger.warning("Expected length to be even multiple of number size")
+        raise BytesLengthException(
+            "Expected total bytes to be an even multiple of bytes per value. "
+            f"Instead received {byte_string} with length {length} and struct "
+            f"format '{struct_format}' which corresponds to bytes per value "
+            f"of {bytes_per_value}."
+        )
 
     format_string = f"{endianChar}{length // bytes_per_value}{struct_format}"
     value: Union[Tuple[int, ...], Tuple[float, ...]] = (
