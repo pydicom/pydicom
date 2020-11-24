@@ -3,7 +3,7 @@
 
 Each subcommand is a module within pydicom.cli, which
 defines an add_subparser(subparsers) function to set argparse
-attributes, and does a  set_defaults(func=callback_function)
+attributes, and calls set_defaults(func=callback_function)
 
 """
 

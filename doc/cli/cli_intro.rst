@@ -4,8 +4,8 @@
 Introduction
 ============
 
-Starting in v2.2, *pydicom* offers a useful command-line interface (CLI) for 
-exploring DICOM files, and access to the `codify` option for creating pydicom 
+Starting in v2.2, *pydicom* offers a useful command-line interface (CLI) for
+exploring DICOM files, and access to the `codify` option for creating pydicom
 Python code. Additional subcommands may be added over time.
 
 Example at the command line in a terminal window:
@@ -30,7 +30,7 @@ Example at the command line in a terminal window:
 
 Note that prefixing the file specification with ``pydicom::`` will read the file
 from the *pydicom* test data files rather than from the normal file system.
-The following examples will use that so that you can replicate these 
+The following examples will use that so that you can replicate these
 examples exactly.  In normal use, you would leave the ``pydicom::`` prefix
 off when working with your files.
 
@@ -59,7 +59,7 @@ arguments, or with ``pydicom help``:
     $ pydicom help
     Use pydicom help [subcommand] to show help for a subcommand
     Available subcommands: codify, show
-   
+
 And, as noted in the block above, you get help for a particular subcommand
 by typing ``pydicom help [subcommand]``.  For example:
 
@@ -88,11 +88,11 @@ by typing ``pydicom help [subcommand]``.  For example:
 Installing the pydicom CLI
 --------------------------
 
-The ``pydicom`` command should automatically be available after you 
+The ``pydicom`` command should automatically be available after you
 `pip install pydicom`.  It should not require any updates to the system
 path or environment variables.
 
-If you are helping develop *pydicom* code, and are using git clones, 
+If you are helping develop *pydicom* code, and are using git clones,
 you will have to ``pip install -e .`` or ``python setup.py develop`` from
 the `pydicom` repository root. This has to be repeated for any changes to
 `setup.py` (e.g. to add a new subcommand).
@@ -104,10 +104,10 @@ reinstall your package similar to the above as you add entry points.
 Combining with other CLIs
 -------------------------
 
-CLIs are useful for general exploration while programming, but also can be 
-combined with other command-line filters to make very powerful
-abilities. The following is an example of piping the output of the pydicom 
-'show' subcommand into 'grep', filtering for lines with 
+CLIs are useful for general exploration while programming, but also can be
+combined with other command-line filters for additional functionality. The
+following is an example of piping the output of the pydicom
+'show' subcommand into 'grep', filtering for lines with
 either "Dose" or "Sequence" in them:
 
 .. code-block:: console
@@ -150,7 +150,7 @@ either "Dose" or "Sequence" in them:
     (300c, 0002)  Referenced RT Plan Sequence  1 item(s) ----
     (300c, 0060)  Referenced Structure Set Sequence  1 item(s) ----
 
-Using the "or Sequence" (```\|Sequence```) regular expression as above allows you 
+Using the "or Sequence" (```\|Sequence```) regular expression as above allows you
 to see any filtered results in relation to their parent Sequences.
 
 See the :ref:`cli_show` section for more examples of the `show`

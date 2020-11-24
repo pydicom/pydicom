@@ -3,7 +3,7 @@
 ``pydicom codify`` command
 ==========================
 
-The ``pydicom codify`` command takes a DICOM file and produces Python code to 
+The ``pydicom codify`` command takes a DICOM file and produces Python code to
 recreate that file, or, optionally a subset within that file.
 
 See :ref:`writing_files_using_codify` for full details of writing a complete
@@ -22,7 +22,7 @@ A simple example
 
 A simple example of using the ``codify`` command would be::
 
-    pydicom codify pydicom::rtplan.dcm
+    $ pydicom codify pydicom::rtplan.dcm
 
     # Coded version of DICOM file 'C:\git\pydicom\pydicom\data\test_files\rtplan.dcm'
     # Produced by pydicom codify utility script
@@ -101,12 +101,12 @@ would be a ``ds.save_as("savename.dcm", ...)`` line.
 Codifying a part of a DICOM file
 --------------------------------
 
-Note that the ``filespec`` argument to the ``codify`` command, as for  
+Note that the ``filespec`` argument to the ``codify`` command, as for
 :ref:`the show command<cli_show>`, allows you to specify a data element within the file,
 rather than the whole file::
 
     pydicom codify pydicom::rtplan.dcm::FractionGroupSequence[0]
-    
+
     # Coded version of non-file dataset
     ...
 
@@ -126,7 +126,7 @@ rather than the whole file::
     refd_beam1.BeamDoseSpecificationPoint = [239.531250000000, 239.531250000000, -751.87000000000]
     ...
 
-Currently, only a data element which is a :class:`~pydicom.dataset.Dataset` 
+Currently, only a data element which is a :class:`~pydicom.dataset.Dataset`
 (an item within a :class:`~pydicom.sequence.Sequence`) is accepted.
 The resulting code would not on its own produce a correct DICOM file,
 but could be useful as a model when creating

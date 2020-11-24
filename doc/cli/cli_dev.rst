@@ -8,7 +8,7 @@ by adding entry points to their package's setup.py file, specifying a callback
 function to register the subcommand and its arguments.
 
 If you wanted to create two subcommands, 'command1' and 'command2',
-you setup.py file should include something like:
+your setup.py file should include something like:
 
 .. code-block:: python
 

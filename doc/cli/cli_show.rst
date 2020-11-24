@@ -122,9 +122,9 @@ And the following example shows an RT Plan in quiet mode::
     Beam 1 Dose 1.02754010000000 Meterset 116.003669700000
     Beam 1 'Field 1' TREATMENT STATIC PHOTON energy 6.00000000000000 gantry 0.0, coll 0.0, couch 0.0 (0 wedges, 0 comps, 0 boli, 0 blocks)
 
-All quiet modes show the SOP Class UID, patient and study information as shown
-in the above two examples. After that are custom values for different classes.
-Currently "Image Storage" and "RT Plan Storage" classes have custom extra
-information.  Please submit an issue on the *pydicom* issues list (or even
-better a pull request) to help us expand the list of custom 'quiet' mode 
-options.
+Quiet modes always show the SOP Class UID, patient and study information as
+shown in the above two examples. After those elements, custom values for
+different SOP classes are shown. Currently "Image Storage" and "RT Plan Storage"
+classes have custom extra information.  Please submit an issue on the *pydicom*
+issues list or a pull request to help us expand the list of custom
+'quiet' mode options.
