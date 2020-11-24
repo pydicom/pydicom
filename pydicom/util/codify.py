@@ -88,7 +88,7 @@ def code_dataelem(
     dataelem : DataElement
         The DataElement instance to turn into code
     dataset_name : str
-        The variable name of the Dataset containing dataelem
+        The variable name of the Dataset containing `dataelem`
     exclude_size : Union[int, None]
         If specified, values longer than this (in bytes)
         will only have a commented string for a value,
@@ -97,7 +97,7 @@ def code_dataelem(
 
     Returns
     -------
-    code: str
+    str
         A string containing code to recreate the data element
         If the data element is a sequence, calls code_sequence
 
@@ -165,7 +165,7 @@ def code_sequence(
 
     Returns
     -------
-    code: str
+    str
         A string containing code lines to recreate a DICOM sequence
 
     """
@@ -243,7 +243,7 @@ def code_dataset(
 
     Returns
     -------
-    code_list: List[str]
+    List[str]
         A list of code lines containing import statements
 
     """
@@ -291,7 +291,7 @@ def code_file(
 
     Returns
     -------
-    code_string: str
+    str
         A string containing code lines to recreate the entire DICOM file
 
     """
@@ -321,7 +321,7 @@ def code_file_from_dataset(
 
     Returns
     -------
-    code_string: str
+    str
         A string containing code lines to recreate the entire DICOM file
 
     """

@@ -106,7 +106,7 @@ def filespec_parser(filespec: str):
 
     Returns
     -------
-    matches: List[Tuple[Dataset, Any]]
+    List[Tuple[Dataset, Any]]
         Matching pairs of (dataset, data element value)
         This usually is a single pair, but a list is returned for future
         ability to work across multiple files.
