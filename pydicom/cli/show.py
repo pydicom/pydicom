@@ -136,9 +136,8 @@ def quiet_rtplan(ds):
 def quiet_image(ds):
     if "SOPClassUID" not in ds or "Image Storage" not in ds.SOPClassUID.name:
         return None
-    s = "Image: {}-bit {} {}x{} pixels Slice location: {}"
     results = [
-        ds.get(name, "N/A")
+        f"{name}: {ds.get(name, 'N/A')}"
         for name in [
             "BitsStored",
             "Modality",
@@ -147,7 +146,7 @@ def quiet_image(ds):
             "SliceLocation",
         ]
     ]
-    return s.format(*results)
+    return "\n".join(results)
 
 
 # Items to show in quiet mode

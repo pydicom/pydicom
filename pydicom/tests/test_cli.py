@@ -177,9 +177,7 @@ class TestCLIcall:
         out, err = capsys.readouterr()
 
         assert out.startswith("SOPClassUID: MR Image Storage")
-        assert out.endswith(
-            "Image: 16-bit MR 64x64 pixels Slice location: 0.0000\n"
-        )
+        assert out.endswith("Rows: 64\nColumns: 64\nSliceLocation: 0.0000\n")
         assert err == ""
 
         # 'Quiet' option, RTPLAN file
