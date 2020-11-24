@@ -4,8 +4,6 @@
 
 # Many tests of DataElement class are implied in test_dataset also
 
-import sys
-
 import pytest
 
 from pydicom import filewriter, config, dcmread
@@ -17,6 +15,7 @@ from pydicom.dataelem import (
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag
@@ -578,3 +577,34 @@ class TestRawDataElement:
                              0, False, True)
         with pytest.raises(NotImplementedError):
             DataElement_from_raw(raw, default_encoding)
+
+    @pytest.fixture
+    def accept_wrong_length(self, request):
+        old_value = config.convert_wrong_length_to_UN
+        config.convert_wrong_length_to_UN = request.param
+        yield
+        config.convert_wrong_length_to_UN = old_value
+
+    @pytest.mark.parametrize("accept_wrong_length", [False], indirect=True)
+    def test_wrong_bytes_length_exception(self, accept_wrong_length):
+        """Check exception when number of raw bytes is not correct."""
+        raw = RawDataElement(Tag(0x00190000), 'FD', 1, b'1', 0, False, True)
+        with pytest.raises(BytesLengthException):
+            DataElement_from_raw(raw)
+
+    @pytest.mark.parametrize("accept_wrong_length", [True], indirect=True)
+    def test_wrong_bytes_length_convert_to_UN(self, accept_wrong_length):
+        """Check warning and behavior for incorrect number of raw bytes."""
+        value = b'1'
+        raw = RawDataElement(Tag(0x00190000), 'FD', 1, value, 0, False, True)
+        msg = (
+            r"Expected total bytes to be an even multiple of bytes per value. "
+            r"Instead received b'1' with length 1 and struct format 'd' which "
+            r"corresponds to bytes per value of 8. This occurred while trying "
+            r"to parse \(0019, 0000\) according to VR 'FD'. "
+            r"Setting VR to 'UN'."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            raw_elem = DataElement_from_raw(raw)
+            assert 'UN' == raw_elem.VR
+            assert value == raw_elem.value
