@@ -103,7 +103,11 @@ and VR). The example below shows the quiet mode with an image slice::
     StudyDate: 20040119
     StudyTime: 072730
     StudyDescription: e+1
-    Image: 16-bit CT 128x128 pixels Slice location: -77.2040634155
+    BitsStored: 16
+    Modality: CT
+    Rows: 128
+    Columns: 128
+    SliceLocation: -77.2040634155
 
 And the following example shows an RT Plan in quiet mode::
 
@@ -127,4 +131,4 @@ shown in the above two examples. After those elements, custom values for
 different SOP classes are shown. Currently "Image Storage" and "RT Plan Storage"
 classes have custom extra information.  Please submit an issue on the *pydicom*
 issues list or a pull request to help us expand the list of custom
-'quiet' mode options.
+'quiet' mode SOP Classes.
