@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Extending the CLI &mdash; pydicom 2.2.0.dev0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Extending the CLI</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="extending-the-cli">
+<h1>Extending the CLI<a class="headerlink" href="#extending-the-cli" title="Permalink to this headline">¶</a></h1>
+<p>Developers can create their own ‘subcommands’ for the <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> command,
+by adding entry points to their package’s setup.py file, specifying a callback
+function to register the subcommand and its arguments.</p>
+<p>If you wanted to create two subcommands, ‘command1’ and ‘command2’,
+your setup.py file should include something like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">setup</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;yourpackage&quot;</span><span class="p">,</span>
+        <span class="c1"># various setup options...,</span>
+        <span class="n">entry_points</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pydicom_subcommands&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;command1 = yourpackage.command1module.add_subparser&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;command2 = yourpackage.command2module.add_subparser&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;pydicom_subcommands&quot;</span></code> is a literal string; this must not be
+changed or <em>pydicom</em> will not find your subcommand.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">add_subparser</span></code> function name could be changed if you wish, but usually
+would be used by convention, and is assumed in the following examples.</p>
+<p>In the module you have specified, create the <code class="docutils literal notranslate"><span class="pre">add_subparser</span></code> function,
+which takes a single argument <code class="docutils literal notranslate"><span class="pre">subparsers</span></code>, and a <code class="docutils literal notranslate"><span class="pre">do_command</span></code> function,
+which will take the call when you subcommand is actually used at the command
+line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pydicom.cli.main</span> <span class="kn">import</span> <span class="n">filespec_help</span><span class="p">,</span> <span class="n">filespec_parser</span>
+
+<span class="k">def</span> <span class="nf">add_subparser</span><span class="p">(</span><span class="n">subparsers</span><span class="p">):</span>
+    <span class="c1"># Register the sub-parser</span>
+    <span class="n">subparser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;subcommandname&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Summary of your subcommand&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;filespec&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="n">filespec_help</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">filespec_parser</span>
+    <span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+    <span class="o">...</span>
+    <span class="p">)</span>
+
+    <span class="n">subparser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">do_command</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And define your command function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">do_command</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">ds</span><span class="p">,</span> <span class="n">element_val</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">filespec</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">yourarg</span><span class="p">:</span>
+            <span class="c1"># Do something...</span>
+
+        <span class="c1"># work with the dataset ds or element as needed...</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> command uses Python’s
+<a class="reference external" href="https://docs.python.org/3/library/argparse.html">argparse</a> library to
+process commands.</p>
+<p>The above code snippets show adding the <code class="docutils literal notranslate"><span class="pre">filespec</span></code> argument, and processing
+the resulting dataset-element_value pairs in the <code class="docutils literal notranslate"><span class="pre">do_command()</span></code> function.  This is
+recommended if you wish to use the filespec as was seen in the <a class="reference internal" href="../guides/cli_guide.html#cli-show"><span class="std std-ref">pydicom show command</span></a>
+and <a class="reference internal" href="../guides/cli_guide.html#cli-codify"><span class="std std-ref">pydicom codify command</span></a> sections.  If not, you can just create a normal
+arg with the type set to <code class="docutils literal notranslate"><span class="pre">argparse.FileType</span></code> to open files yourself.</p>
+<p>The above has been shown in relation to a different package than <em>pydicom</em>;
+however, if you think your command has general use, please consider contributing
+it to <em>pydicom</em>: in that case, change the entry points in the <em>pydicom</em>
+<code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, and add a module under <code class="docutils literal notranslate"><span class="pre">pydicom.cli</span></code> and create a
+pull request.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

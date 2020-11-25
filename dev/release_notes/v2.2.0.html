@@ -193,7 +193,18 @@
 </ul>
 <div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
+<ul>
+<li><dl class="simple">
+<dt>Added a command-line interface for pydicom.  Current subcommands are:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">show</span></code>: display all or part of a DICOM file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">codify</span></code> to produce Python code for writing files or sequence items
+from scratch.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Please see the <a class="reference internal" href="../guides/cli_guide.html#cli-guide"><span class="std std-ref">Command-line Interface Guide</span></a> for examples and details
+of all the options for each command.</p>
+</li>
 <li><p>A field containing an invalid number of bytes will result in a warning
 instead of an exception when
 <a class="reference internal" href="../reference/generated/pydicom.config.convert_wrong_length_to_UN.html#pydicom.config.convert_wrong_length_to_UN" title="pydicom.config.convert_wrong_length_to_UN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">convert_wrong_length_to_UN</span></code></a> is set to True.</p></li>
