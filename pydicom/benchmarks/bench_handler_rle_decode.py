@@ -36,7 +36,7 @@ SC_RLE_32_2F = get_testdata_files("SC_rgb_rle_32bit_2frame.dcm")[0]
 RTDOSE_RLE_15F = get_testdata_files("rtdose_rle.dcm")[0]
 
 
-class TimeRLEDecodeFrame(object):
+class TimeRLEDecodeFrame:
     """Time tests for rle_handler._rle_decode_frame."""
     def setup(self):
         # MONOCHROME2, 64x64, 1 sample/pixel, 16 bits allocated, 12 bits stored
@@ -66,7 +66,7 @@ class TimeRLEDecodeFrame(object):
                                   self.ds.BitsAllocated)
 
 
-class TimeGetPixelData(object):
+class TimeGetPixelData:
     """Time tests for rle_handler.get_pixeldata."""
     def setup(self):
         """Setup the test"""

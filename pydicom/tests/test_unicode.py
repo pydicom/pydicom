@@ -9,10 +9,10 @@ import pytest
 from pydicom import dcmread
 
 
-class TestUnicodeFilenames(object):
+class TestUnicodeFilenames:
     def test_read(self):
         """Unicode: Can read a file with unicode characters in name..."""
-        uni_name = u'test°'
+        uni_name = 'test°'
 
         # verify first that we could encode file name in this environment
         try:

@@ -10,7 +10,7 @@ from tempfile import TemporaryFile
 import numpy as np
 
 from pydicom import dcmread
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.data import get_testdata_files
 from pydicom.encaps import decode_data_sequence
 from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
@@ -67,7 +67,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     ds = Dataset()
     ds.is_little_endian = True
     ds.is_implicit_VR = False
-    ds.file_meta = Dataset()
+    ds.file_meta = FileMetaDataset()
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
     ds.SOPClassUID = '1.2.3.4'
     ds.SOPInstanceUID = generate_uid()
@@ -96,7 +96,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     return tfile
 
 
-class TimeGetPixelData_LargeDataset(object):
+class TimeGetPixelData_LargeDataset:
     """Time tests for numpy_handler.get_pixeldata with large datasets."""
     def setup(self):
         """Setup the tests."""
@@ -110,7 +110,7 @@ class TimeGetPixelData_LargeDataset(object):
             get_pixeldata(self.ds_16_3_100)
 
 
-class TimeGetPixelData(object):
+class TimeGetPixelData:
     """Time tests for numpy_handler.get_pixeldata."""
     def setup(self):
         """Setup the tests."""

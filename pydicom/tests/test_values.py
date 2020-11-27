@@ -5,12 +5,13 @@
 import pytest
 
 from pydicom.tag import Tag
-from pydicom.values import (convert_value, converters, convert_tag,
-                            convert_ATvalue, convert_DA_string, convert_text,
-                            convert_single_string, convert_AE_string)
+from pydicom.values import (
+    convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
+    convert_text, convert_single_string, convert_AE_string
+)
 
 
-class TestConvertTag(object):
+class TestConvertTag:
     def test_big_endian(self):
         """Test convert_tag with a big endian byte string"""
         bytestring = b'\x00\x10\x00\x20'
@@ -40,19 +41,19 @@ class TestConvertTag(object):
         convert_tag(bytestring, True)
 
 
-class TestConvertAE(object):
+class TestConvertAE:
     def test_strip_blanks(self):
         bytestring = b'  AE_TITLE '
-        assert u'AE_TITLE' == convert_AE_string(bytestring, True)
+        assert 'AE_TITLE' == convert_AE_string(bytestring, True)
 
 
-class TestConvertText(object):
+class TestConvertText:
     def test_single_value(self):
         """Test that encoding can change inside a text string"""
         bytestring = (b'Dionysios is \x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         encodings = ('latin_1', 'iso_ir_126')
-        assert u'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
+        assert 'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
 
     def test_multi_value(self):
         """Test that backslash is handled as value separator"""
@@ -61,7 +62,7 @@ class TestConvertText(object):
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        assert [u'Buc^Jérôme', u'Διονυσιος', u'Люкceмбypг'] == convert_text(
+        assert ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг'] == convert_text(
             bytestring, encodings)
 
     def test_single_value_with_backslash(self):
@@ -71,7 +72,7 @@ class TestConvertText(object):
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        assert u'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
+        assert 'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
 
     def test_single_value_with_delimiters(self):
@@ -83,7 +84,7 @@ class TestConvertText(object):
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'
                       b'\tJ\xe9r\xf4me')
         encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
-        expected = u'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
+        expected = 'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         assert expected == convert_single_string(bytestring, encodings)
 
     def test_value_ending_with_padding(self):
@@ -102,7 +103,7 @@ class TestConvertText(object):
         assert ['Values', 'with zeros'] == convert_text(bytestring)
 
 
-class TestConvertAT(object):
+class TestConvertAT:
     def test_big_endian(self):
         """Test convert_ATvalue with a big endian byte string"""
         # VM 1
@@ -144,7 +145,7 @@ class TestConvertAT(object):
         convert_ATvalue(bytestring, True)
 
 
-class TestConvertDA(object):
+class TestConvertDA:
     def test_big_endian(self):
         """Test convert_DA_string with a big endian byte string"""
         # VM 1
@@ -175,7 +176,7 @@ class TestConvertDA(object):
         assert convert_DA_string(bytestring, True) == ''
 
 
-class TestConvertValue(object):
+class TestConvertValue:
     def test_convert_value_raises(self):
         """Test convert_value raises exception if unsupported VR"""
         converter_func = converters['PN']
@@ -188,3 +189,11 @@ class TestConvertValue(object):
         # Fix converters
         converters['PN'] = converter_func
         assert 'PN' in converters
+
+
+class TestConvertOValues:
+    """Test converting values with the 'O' VRs like OB, OW, OF, etc."""
+    def test_convert_of(self):
+        """Test converting OF."""
+        fp = b'\x00\x01\x02\x03'
+        assert b'\x00\x01\x02\x03' == converters['OF'](fp, True)

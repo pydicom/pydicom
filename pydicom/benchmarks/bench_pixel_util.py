@@ -6,7 +6,7 @@ from pydicom.data import get_testdata_files
 from pydicom.pixel_data_handlers.util import convert_color_space
 
 
-class TimeConvertColorSpace(object):
+class TimeConvertColorSpace:
     """Benchmarks for utils.convert_color_space()."""
     def setup(self):
         """Setup the benchmark."""

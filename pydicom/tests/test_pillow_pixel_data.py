@@ -1,8 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 
-import os
-import sys
-
 import pytest
 
 import pydicom
@@ -10,7 +7,6 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import convert_color_space
-from pydicom.tag import Tag
 from pydicom.tests._handler_common import ALL_TRANSFER_SYNTAXES
 from pydicom.uid import (
     JPEGBaseline,
@@ -70,10 +66,6 @@ JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_jpeg_no_color_transform.dcm")
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
-# JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
-# No supported datasets available
-# JPGL14: 1.2.840.10008.1.2.4.57 - JPEG Lossless P14
-# No supported datasets available
 
 # JPEG 2000 - ISO/IEC 15444 Standard
 # J2KR: 1.2.840.100008.1.2.4.90 - JPEG 2000 Lossless
@@ -102,12 +94,16 @@ JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 RLE = get_testdata_file("MR_small_RLE.dcm")
 JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPEG-lossy.dcm")
 JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
+# JPGL14: 1.2.840.10008.1.2.4.57 - JPEG Lossless P14
+# No datasets available
+# JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
+JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
 
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 JPEG_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG:
-    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended, JPEGLossless]
+    JPEG_SUPPORTED_SYNTAXES = [JPEGBaseline, JPEGExtended]
 
 JPEG2K_SUPPORTED_SYNTAXES = []
 if HAVE_JPEG2K:
@@ -131,13 +127,14 @@ REFERENCE_DATA_UNSUPPORTED = [
     (EXPB, ('1.2.840.10008.1.2.2', 'OB^^^^')),
     (DEFL, ('1.2.840.10008.1.2.1.99', '^^^^')),
     (JPEG_LS_LOSSLESS, ('1.2.840.10008.1.2.4.80', 'CompressedSamples^MR1')),
+    (JPGL_08_08_1_0_1F, ('1.2.840.10008.1.2.4.70', 'Citizen^Jan')),
     (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
 
 
 # Numpy and the pillow handler are unavailable
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
-class TestNoNumpy_NoPillowHandler(object):
+class TestNoNumpy_NoPillowHandler:
     """Tests for handling datasets without numpy and the handler."""
 
     def setup(self):
@@ -245,9 +242,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
@@ -266,9 +261,7 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(
-            reason="Non-default JPEG lossy colorspace not supported by Pillow"
-        )
+        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,
@@ -344,9 +337,6 @@ JPEG2K_MATCHING_DATASETS = [
         J2KI_08_08_3_0_1F_YBR_ICT,
         get_testdata_file("US1_UNCI.dcm"),
         {},
-        marks=pytest.mark.xfail(
-            reason="Needs YBR_ICT to RGB conversion"
-        )
     ),
     pytest.param(
         J2KI_16_10_1_0_1F_M1,
@@ -377,7 +367,7 @@ JPEG2K_MATCHING_DATASETS = [
 
 
 @pytest.mark.skipif(not HAVE_JPEG2K, reason='Pillow or JPEG2K not available')
-class TestPillowHandler_JPEG2K(object):
+class TestPillowHandler_JPEG2K:
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -485,7 +475,7 @@ class TestPillowHandler_JPEG2K(object):
 
 
 @pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
-class TestPillowHandler_JPEG(object):
+class TestPillowHandler_JPEG:
     """Tests for handling Pixel Data with the handler."""
     def setup(self):
         """Setup the test datasets and the environment."""
@@ -578,15 +568,18 @@ class TestPillowHandler_JPEG(object):
     def test_JPGE_16bit_raises(self):
         """Test decoding JPEG lossy with pillow handler fails."""
         ds = dcmread(JPGE_16_12_1_0_1F_M2)
-        msg = r"JPEG Lossy only supported if Bits Allocated = 8"
+        msg = (
+            r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
+            r"supported by Pillow if Bits Allocated = 8"
+        )
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_JPGL_raises(self):
-        """Test decoding JPEG lossless with pillow handler fails."""
+        """Test decoding JPEG Lossless with pillow handler fails."""
         ds = dcmread(JPGL_16_16_1_1_1F_M2)
-        msg = r"cannot identify image file"
-        with pytest.raises((IOError, OSError), match=msg):
+        msg = r"as there are no pixel data handlers available that support it"
+        with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_JPGB_odd_data_size(self):
@@ -597,7 +590,7 @@ class TestPillowHandler_JPEG(object):
         assert pixel_data.shape == (3, 3, 3)
 
 
-class TestPillow_GetJ2KPrecision(object):
+class TestPillow_GetJ2KPrecision:
     """Tests for _get_j2k_precision."""
     def test_precision(self):
         """Test getting the precision for a JPEG2K bytestream."""

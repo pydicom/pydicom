@@ -15,20 +15,18 @@ cid_for_name = {v: k for k, v in name_for_cid.items()}
 
 
 def _filtered(allnames, filters):
-    """Helper function for dir() methods"""
-    matches = {}
-    for filter_ in filters:
-        filter_ = filter_.lower()
-        match = [x for x in allnames if x.lower().find(filter_) != -1]
-        matches.update(dict([(x, 1) for x in match]))
-    if filters:
-        names = sorted(matches.keys())
-        return names
-    else:
-        return sorted(allnames)
+    if not filters:
+        return sorted(set(allnames))
+    lowered_filters = tuple(filter.lower() for filter in filters)
+    return sorted(set(
+        name for name in allnames if
+        any((lowered_filter in name.lower())
+            for lowered_filter in lowered_filters)
+    ))
 
 
-class _CID_Dict(object):
+
+class _CID_Dict:
     repr_format = "{} = {}"
     str_format = "{:20} {:12} {:8} {}\n"
 
@@ -42,8 +40,7 @@ class _CID_Dict(object):
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0
@@ -73,7 +70,7 @@ class _CID_Dict(object):
             raise AttributeError(msg)
         elif len(matches) > 1:
             # Should never happen, but just in case
-            msg = "Multiple schemes found for '{}' in cid{}".format(name, cid)
+            msg = "Multiple schemes found for '{}' in cid{}".format(name, self.cid)
             raise AssertionError(msg)
         else:
             scheme = matches[0]
@@ -90,7 +87,7 @@ class _CID_Dict(object):
                 if len(matches) > 1:
                     # Should never happen, but check in case
                     msg = "{} had multiple code matches for cid{}".format(
-                        name, cid
+                        name, self.cid
                     )
                     raise AssertionError(msg)
                 code, val = matches[0]
@@ -140,8 +137,8 @@ class _CID_Dict(object):
             The matching SR keywords. If no filters are
             used then all keywords are returned.
         """
-        allnames = set(chain(*cid_concepts[self.cid].values()))
-        return _filtered(allnames, filters)
+        return _filtered(chain.from_iterable(cid_concepts[self.cid].values()),
+                         filters)
 
     def __contains__(self, code):
         """Checks whether a given code is a member of the context group.
@@ -169,7 +166,7 @@ class _CID_Dict(object):
         return dir(self)
 
 
-class _CodesDict(object):
+class _CodesDict:
     def __init__(self, scheme=None):
         self.scheme = scheme
         if scheme:
@@ -183,8 +180,7 @@ class _CodesDict(object):
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list in case of python3. Also backwards
-        # compatible
+        # Force zip object into a list
         meths = set(
             list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
                 0
@@ -252,8 +248,7 @@ class _CodesDict(object):
             used then all keywords are returned.
 
         """
-        allnames = set(chain(*(x.keys() for x in self._dict.values())))
-        return _filtered(allnames, filters)
+        return _filtered(chain.from_iterable(self._dict.values()), filters)
 
     def schemes(self):
         return self._dict.keys()

@@ -6,6 +6,7 @@ import uuid
 import random
 import hashlib
 import re
+from typing import List, Optional, TypeVar, Type
 
 from pydicom._uid_dict import UID_dictionary
 
@@ -27,6 +28,9 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 """Regex for a valid UID prefix"""
 
 
+U = TypeVar('U', bound='UID')
+
+
 class UID(str):
     """Human friendly UIDs as a Python :class:`str` subclass.
 
@@ -46,7 +50,7 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls, val):
+    def __new__(cls: Type[U], val: str) -> U:
         """Setup new instance of the class.
 
         Parameters
@@ -59,18 +63,13 @@ class UID(str):
         pydicom.uid.UID
             The UID object.
         """
-        # Don't repeat if already a UID class then may get the name that
-        #   str(uid) gives rather than the dotted number
-        if isinstance(val, UID):
-            return val
-
         if isinstance(val, str):
-            return super(UID, cls).__new__(cls, val.strip())
+            return super().__new__(cls, val.strip())  # type: ignore
 
-        raise TypeError("UID must be a string")
+        raise TypeError("A UID must be created from a string")
 
     @property
-    def is_implicit_VR(self):
+    def is_implicit_VR(self) -> bool:
         """Return ``True`` if an implicit VR transfer syntax UID."""
         if self.is_transfer_syntax:
             # Implicit VR Little Endian
@@ -86,7 +85,7 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
-    def is_little_endian(self):
+    def is_little_endian(self) -> bool:
         """Return ``True`` if a little endian transfer syntax UID."""
         if self.is_transfer_syntax:
             # Explicit VR Big Endian
@@ -102,7 +101,7 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
-    def is_transfer_syntax(self):
+    def is_transfer_syntax(self) -> bool:
         """Return ``True`` if a transfer syntax UID."""
         if not self.is_private:
             return self.type == "Transfer Syntax"
@@ -110,7 +109,7 @@ class UID(str):
         raise ValueError("Can't determine UID type for private UIDs.")
 
     @property
-    def is_deflated(self):
+    def is_deflated(self) -> bool:
         """Return ``True`` if a deflated transfer syntax UID."""
         if self.is_transfer_syntax:
             # Deflated Explicit VR Little Endian
@@ -126,12 +125,12 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
-    def is_encapsulated(self):
+    def is_encapsulated(self) -> bool:
         """Return ``True`` if an encasulated transfer syntax UID."""
         return self.is_compressed
 
     @property
-    def is_compressed(self):
+    def is_compressed(self) -> bool:
         """Return ``True`` if a compressed transfer syntax UID."""
         if self.is_transfer_syntax:
             # Explicit VR Little Endian
@@ -148,7 +147,7 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return the UID name from the UID dictionary."""
         uid_string = str.__str__(self)
         if uid_string in UID_dictionary:
@@ -157,7 +156,7 @@ class UID(str):
         return uid_string
 
     @property
-    def type(self):
+    def type(self) -> str:
         """Return the UID type from the UID dictionary."""
         if str.__str__(self) in UID_dictionary:
             return UID_dictionary[self][1]
@@ -165,7 +164,7 @@ class UID(str):
         return ''
 
     @property
-    def info(self):
+    def info(self) -> str:
         """Return the UID info from the UID dictionary."""
         if str.__str__(self) in UID_dictionary:
             return UID_dictionary[self][2]
@@ -173,7 +172,7 @@ class UID(str):
         return ''
 
     @property
-    def is_retired(self):
+    def is_retired(self) -> bool:
         """Return ``True`` if the UID is retired, ``False`` otherwise or if
         private.
         """
@@ -183,7 +182,7 @@ class UID(str):
         return False
 
     @property
-    def is_private(self):
+    def is_private(self) -> bool:
         """Return ``True`` if the UID isn't an officially registered DICOM
         UID.
         """
@@ -193,7 +192,7 @@ class UID(str):
         return True
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         """Return ``True`` if `self` is a valid UID, ``False`` otherwise."""
         if len(self) <= 64 and re.match(RE_VALID_UID, self):
             return True
@@ -230,6 +229,24 @@ JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
 """1.2.840.10008.1.2.4.92"""
 JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
 """1.2.840.10008.1.2.4.93"""
+MPEG2MainProfileMainLevel = UID('1.2.840.10008.1.2.4.100')
+"""1.2.840.10008.1.2.4.100"""
+MPEG2MainProfileHighLevel = UID('1.2.840.10008.1.2.4.101')
+"""1.2.840.10008.1.2.4.101"""
+MPEG4HighProfileLevel41 = UID('1.2.840.10008.1.2.4.102')
+"""1.2.840.10008.1.2.4.102"""
+MPEG4BDCompatibleHighProfileLevel41 = UID('1.2.840.10008.1.2.4.103')
+"""1.2.840.10008.1.2.4.103"""
+MPEG4HighProfileLevel422D = UID('1.2.840.10008.1.2.4.104')
+"""1.2.840.10008.1.2.4.104"""
+MPEG4HighProfileLevel423D = UID('1.2.840.10008.1.2.4.105')
+"""1.2.840.10008.1.2.4.105"""
+MPEG4StereoHighProfileLevel42 = UID('1.2.840.10008.1.2.4.106')
+"""1.2.840.10008.1.2.4.106"""
+HEVCMainProfileLevel51 = UID('1.2.840.10008.1.2.4.107')
+"""1.2.840.10008.1.2.4.107"""
+HEVCMain10ProfileLevel51 = UID('1.2.840.10008.1.2.4.108')
+"""1.2.840.10008.1.2.4.108"""
 RLELossless = UID('1.2.840.10008.1.2.5')
 """1.2.840.10008.1.2.5"""
 
@@ -263,13 +280,25 @@ JPEGLossyCompressedPixelTransferSyntaxes = [
     JPEGExtended,
 ]
 
+MPEGTransferSyntaxes = [
+    MPEG2MainProfileMainLevel,
+    MPEG2MainProfileHighLevel,
+    MPEG4HighProfileLevel41,
+    MPEG4BDCompatibleHighProfileLevel41,
+    MPEG4HighProfileLevel422D,
+    MPEG4HighProfileLevel423D,
+    MPEG4StereoHighProfileLevel42,
+    HEVCMainProfileLevel51,
+    HEVCMain10ProfileLevel51,
+]
 
 RLECompressedLosslessSyntaxes = [
     RLELossless
 ]
 
 
-def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
+def generate_uid(prefix: str = PYDICOM_ROOT_UID,
+                 entropy_srcs: Optional[List[str]] = None) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
     .. versionchanged:: 1.3
@@ -279,16 +308,17 @@ def generate_uid(prefix=PYDICOM_ROOT_UID, entropy_srcs=None):
 
     Parameters
     ----------
-    prefix : str or None
+    prefix : str, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
-        root UID ``'1.2.826.0.1.3680043.8.498.'``. If ``None`` then a prefix of
+        root UID ``'1.2.826.0.1.3680043.8.498.'``. If not used then a prefix of
         ``'2.25.'`` will be used with the integer form of a UUID generated
         using the :func:`uuid.uuid4` algorithm.
-    entropy_srcs : list of str or None
-        If `prefix` is not ``None``, then `prefix` will be appended with a
-        SHA512 hash of the :class:`list` which means the result is
+    entropy_srcs : list of str, optional
+        If `prefix` is used then the `prefix` will be appended with a
+        SHA512 hash of the supplied :class:`list` which means the result is
         deterministic and should make the original data unrecoverable. If
-        ``None`` random data will be used (default).
+        `entropy_srcs` isn't used then random data will be appended instead
+        (default). If `prefix` is not used then `entropy_srcs` has no effect.
 
     Returns
     -------
