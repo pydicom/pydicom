@@ -5,7 +5,8 @@
 
 import logging
 import os
-from typing import Optional
+from typing import Optional, Union
+from pydicom.misc import size_in_bytes
 
 have_numpy = True
 try:
@@ -355,6 +356,58 @@ Traceback (most recent call last):
 ValueError: Invalid value used with the 'in' operator: must be an
 element tag as a 2-tuple or int, or an element keyword
 """
+
+
+_memmap_size: int = 0
+_memmap_read_only: bool = True
+
+def memmap_size(size: Union[int, str]) -> None:
+    """Set Data element value lenght beyond which values are memmap'd
+
+    Binary data element values greater than this length will not be read
+    from file. When the value is accessed, a numpy `memmap` will be returned,
+    which reads directly from the bytes in the file as needed
+
+    Parameters
+    ----------
+    size : Union[int, str]
+        Either an integer number of bytes, or a string expression in any
+        form accepted by :func:~pydicom.misc.size_in_bytes.
+        E.g. "30000", "50MB", 0.7 GB", "2GB"
+        Set to 0 to read all data element values into memory
+        `size` must be at least 10 KB
+
+    Raises
+    ------
+    ValueError
+        If the size is less than 10 KB.
+    """
+    global _memmap_size
+
+    size = size_in_bytes(size)
+
+    # Keep greater than 10 K to avoid any text types (if allowed later)
+    # other than VR of UT
+    if size and size <= 10*1024:
+        raise ValueError(
+            "The size must be greater than 10 KB, or 0 to disable memmap"
+        )
+
+    _memmap_size = size
+
+
+def memmap_read_only(read_only: bool = True) -> None:
+    """Set whether or not memmap'd values can be modified directly in the file
+
+    Parameters
+    ----------
+    read_only : bool, optional
+        If ``False``, allow changes to pixel data to be written directly
+        back to the file. Default ``True``
+    """
+    global _memmap_read_only
+
+    _memmap_read_only = read_only
 
 
 def debug(debug_on=True, default_handler=True):

@@ -15,7 +15,8 @@ from pydicom.charset import (default_encoding, convert_encodings)
 from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw, empty_value_for_VR)
+                              DataElement_from_raw, empty_value_for_VR,
+                              BINARY_VR_VALUES)
 from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
@@ -114,6 +115,7 @@ def data_element_generator(fp,
     logger_debug = logger.debug
     debugging = config.debugging
     element_struct_unpack = element_struct.unpack
+    memmap_size = config._memmap_size
     defer_size = size_in_bytes(defer_size)
 
     tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
@@ -177,7 +179,18 @@ def data_element_generator(fp,
                 fp.seek(fp_tell() + length)
                 continue
 
-            if (defer_size is not None and length > defer_size and
+            if (
+                memmap_size and length >= memmap_size
+                and VR in BINARY_VR_VALUES
+            ):
+                value = None
+                logger_debug(
+                    "Memmap size exceeded. "
+                    "Skipping forward to next data element."
+                )
+                fp.seek(fp_tell() + length)
+
+            elif (defer_size is not None and length > defer_size and
                     tag != BaseTag(0x00080005)):
                 # Flag as deferred by setting value to None, and skip bytes
                 value = None
@@ -1008,22 +1021,41 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
           if is_filename else filename_or_obj)
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
+
+    if config._memmap_size and raw_data_elem.length > config._memmap_size:
+        # Reading value via memmap and return numpy.memmap array dtype=uint8
+        try:
+            import numpy
+        except ImportError:
+            raise ImportError(
+                "Numpy required for memmap'd values, but numpy is missing"
+            )
+        mode = 'r' if config._memmap_read_only else 'r+'
+        file_tell = raw_data_elem.value_tell
+        value = numpy.memmap(
+            fp, mode=mode, offset=file_tell, shape=(raw_data_elem.length,)
+        )
+
+        return raw_data_elem._replace(value=value)
+
+    # Is deprecated deferred data element
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
     fp.seek(raw_data_elem.value_tell - offset)
+
     elem_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                      defer_size=None)
+                                    defer_size=None)
 
     # Read the data element and check matches what was stored before
     data_elem = next(elem_gen)
     fp.close()
     if data_elem.VR != raw_data_elem.VR:
         raise ValueError("Deferred read VR {0:s} does not match "
-                         "original {1:s}".format(data_elem.VR,
-                                                 raw_data_elem.VR))
+                        "original {1:s}".format(data_elem.VR,
+                                                raw_data_elem.VR))
     if data_elem.tag != raw_data_elem.tag:
         raise ValueError("Deferred read tag {0!r} does not match "
-                         "original {1!r}".format(data_elem.tag,
-                                                 raw_data_elem.tag))
+                        "original {1!r}".format(data_elem.tag,
+                                                raw_data_elem.tag))
 
     # Everything is ok, now this object should act like usual DataElement
     return data_elem

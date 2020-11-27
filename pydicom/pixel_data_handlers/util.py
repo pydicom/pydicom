@@ -18,6 +18,7 @@ from pydicom.uid import UID
 if TYPE_CHECKING:
     from pydicom.dataset import Dataset
 
+PIXEL_DATA_KEYWORDS = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
 
 def apply_color_lut(
     arr: "np.ndarray",
