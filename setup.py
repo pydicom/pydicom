@@ -95,7 +95,7 @@ ENTRY_POINTS = {
 
 opts = dict(
     name=NAME,
-    python_requires='>=3.6',
+    python_requires='>=3.6.1',
     version=VERSION,
     maintainer=MAINTAINER,
     maintainer_email=MAINTAINER_EMAIL,
