@@ -1,0 +1,7 @@
+Version 2.1.2
+=============
+
+Changes
+-------
+
+* Changed minimum supported Python version to 3.6.1 (:issue:`1270`)

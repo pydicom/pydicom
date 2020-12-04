@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Version 0.9.9 &mdash; pydicom 2.1.2 documentation</title>
+  <title>Version 2.1.2 &mdash; pydicom 2.1.2 documentation</title>
   
 
   
@@ -167,7 +167,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Version 0.9.9</li>
+      <li>Version 2.1.2</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -184,40 +184,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-9">
-<h1>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<p>In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
-dictionaries.  New features include DICOMDIR handling, and a utility module
-which produces python/pydicom source code to recreate a DICOM file.</p>
-<div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+  <div class="section" id="version-2-1-2">
+<h1>Version 2.1.2<a class="headerlink" href="#version-2-1-2" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>All DICOM dictionaries updated (standard dictionary, UID dictionary, and
-private dictionaries)</p></li>
-<li><p>Dicom commands also added to dictionary</p></li>
-<li><p>Ability to work with DICOMDIR: <code class="docutils literal notranslate"><span class="pre">read_dicomdir()</span></code> function and <code class="docutils literal notranslate"><span class="pre">DicomDir</span></code>
-class. Example file <code class="docutils literal notranslate"><span class="pre">show_dicomdir.py</span></code> file added to examples subdirectory.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">codify.py</span></code>: Produce python/pydicom source code from a DICOM file.</p></li>
-<li><p>a number of Python 3 compatibility enhancements</p></li>
-<li><p>setup.py uses ez_setup only if setuptools not already installed</p></li>
-<li><p>exceptions carry tag info with them, to aid in debugging</p></li>
+<li><p>Changed minimum supported Python version to 3.6.1 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1270">#1270</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="contrib-file-changes">
-<h3>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li><p>pydicom_series:  force parameter added (Nil Goyette)</p></li>
-<li><p>dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)</p></li>
-</ul>
-</div>
-<div class="section" id="other-contributors">
-<h3>Other Contributors<a class="headerlink" href="#other-contributors" title="Permalink to this headline">¶</a></h3>
-<p>Other than Jonathan and myself, other contributors were: Rickard Holmberg,
-Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
-Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
-</div>
 </div>
 </div>
 
