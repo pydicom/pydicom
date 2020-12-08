@@ -2260,6 +2260,7 @@ DicomDictionary = {
     0x00380400: ('LO', '1', "Patient's Institution Residence", '', 'PatientInstitutionResidence'),  # noqa
     0x00380500: ('LO', '1', "Patient State", '', 'PatientState'),  # noqa
     0x00380502: ('SQ', '1', "Patient Clinical Trial Participation Sequence", '', 'PatientClinicalTrialParticipationSequence'),  # noqa
+    0x00381234: ("SQ", "1", "Referenced Patient Alias Sequence", "", "ReferencedPatientAliasSequence"),  # noqa
     0x00384000: ('LT', '1', "Visit Comments", '', 'VisitComments'),  # noqa
     0x003A0004: ('CS', '1', "Waveform Originality", '', 'WaveformOriginality'),  # noqa
     0x003A0005: ('US', '1', "Number of Waveform Channels", '', 'NumberOfWaveformChannels'),  # noqa
@@ -2337,6 +2338,7 @@ DicomDictionary = {
     0x00400243: ('SH', '1', "Performed Location", '', 'PerformedLocation'),  # noqa
     0x00400244: ('DA', '1', "Performed Procedure Step Start Date", '', 'PerformedProcedureStepStartDate'),  # noqa
     0x00400245: ('TM', '1', "Performed Procedure Step Start Time", '', 'PerformedProcedureStepStartTime'),  # noqa
+    0x00400248: ("SQ", "1", "Performed Station Name Code Sequence", "", "PerformedStationNameCodeSequence",),  # noqa
     0x00400250: ('DA', '1', "Performed Procedure Step End Date", '', 'PerformedProcedureStepEndDate'),  # noqa
     0x00400251: ('TM', '1', "Performed Procedure Step End Time", '', 'PerformedProcedureStepEndTime'),  # noqa
     0x00400252: ('CS', '1', "Performed Procedure Step Status", '', 'PerformedProcedureStepStatus'),  # noqa
