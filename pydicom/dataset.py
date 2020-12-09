@@ -26,7 +26,7 @@ import os.path
 import re
 from types import ModuleType, TracebackType
 from typing import (
-    Generator, TYPE_CHECKING, Optional, Tuple, Union, List, ItemsView,
+    TYPE_CHECKING, Optional, Tuple, Union, List, Any, ItemsView,
     KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr,
     Callable, TypeVar, Type, overload
 )
@@ -2364,6 +2364,18 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         return dump_handler(
             self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+
+    def __getstate__(self) -> Dict[str, Any]:
+        # pickle cannot handle weakref - remove parent
+        d = self.__dict__.copy()
+        del d['parent']
+        return d
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        # re-add parent - it will be set to the parent dataset on demand
+        # if the dataset is in a sequence
+        self.__dict__['parent'] = None
 
     __repr__ = __str__
 

@@ -2,7 +2,8 @@
 """Unit tests for the pydicom.dataset module."""
 
 import copy
-import warnings
+import pickle
+import weakref
 
 import pytest
 
@@ -1730,19 +1731,37 @@ class TestFileDataset:
     def setup(self):
         self.test_file = get_testdata_file('CT_small.dcm')
 
-    def test_pickle(self):
+    def test_pickle_raw_data(self):
         ds = pydicom.dcmread(self.test_file)
-        import pickle
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
         assert ds == ds1
         assert ds1.Modality == 'CT'
 
+    def test_pickle_data_elements(self):
+        ds = pydicom.dcmread(self.test_file)
+        assert ds.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        for e in ds:
+            # make sure all data elements have been loaded
+            pass
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds1.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds == ds1
+
+    def test_pickle_nested_sequence(self):
+        ds = pydicom.dcmread(get_testdata_file("nested_priv_SQ.dcm"))
+        for e in ds:
+            # make sure all data elements have been loaded
+            pass
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds == ds1
+
     def test_pickle_modified(self):
         """Test pickling a modified dataset."""
         ds = pydicom.dcmread(self.test_file)
         ds.PixelSpacing = [1.0, 1.0]
-        import pickle
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
         assert ds == ds1
