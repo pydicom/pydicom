@@ -59,6 +59,8 @@ class _CID_Dict:
         alldir = sorted(props | meths | sr_names)
         return alldir
 
+    # Note that if the name is a Python keyword (such as 'None') that
+    # the generated name has '__' appended to the end (like 'None__')
     def __getattr__(self, name):
         matches = [
             scheme

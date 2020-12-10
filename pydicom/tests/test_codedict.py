@@ -162,6 +162,20 @@ class TestCodeDict:
             meaning="P' wave (second deflection in P wave)",
         )
 
+    def test_cid3716(self):
+        invalid_attribute_name = "None"
+        try:
+            getattr(codes.cid3716, invalid_attribute_name)
+            raise LookupError(f'Invalid keyword attribute "{invalid_attribute_name}"')
+        except AttributeError:
+            pass
+
+        assert codes.cid3716.None__ == Code(
+            value="260413007",
+            scheme_designator="SCT",
+            meaning=invalid_attribute_name,
+        )
+
     def test_contained(self):
         c = Code("24028007", "SCT", "Right")
         assert c in codes.cid244

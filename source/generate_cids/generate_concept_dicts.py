@@ -9,6 +9,7 @@ resources.
 
 from io import BytesIO
 import json
+import keyword
 import ftplib
 import glob
 import logging
@@ -125,6 +126,11 @@ def keyword_from_meaning(name):
     # Python variables must not begin with a number.
     if re.match(r'[0-9]', name):
         name = "_" + name
+
+    # If a Python keyword (such as 'None') append '__'
+    name_is_keyword = keyword.iskeyword(name)
+    if name_is_keyword:
+        name = f'{name}__'
 
     return name
 
