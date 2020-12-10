@@ -166,7 +166,9 @@ class TestCodeDict:
         invalid_attribute_name = "None"
         try:
             getattr(codes.cid3716, invalid_attribute_name)
-            raise LookupError(f'Invalid keyword attribute "{invalid_attribute_name}"')
+            raise LookupError(
+                f'Invalid keyword attribute "{invalid_attribute_name}"'
+            )
         except AttributeError:
             pass
 
