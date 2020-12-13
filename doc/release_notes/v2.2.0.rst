@@ -24,4 +24,5 @@ Changes
 
 Fixes
 .....
-* 
+* Fixed pickling a :class:`~pydicom.dataset.Dataset` instance with sequences
+  after the sequence had been read (:issue:`1278`)
