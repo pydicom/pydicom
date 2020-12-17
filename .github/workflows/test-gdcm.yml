@@ -64,7 +64,7 @@ jobs:
     - name: Check build
       if: ${{ always() }}
       run: |
-        ls .
+        ls gdcmbin
     - name: Test with GDCM
       run: |
         # Create super-simple setup.py for python -m pip install
