@@ -11,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version:  [3.6, 3.7, 3.8, 3.9]
+        python-version:  [3.6] #, 3.7, 3.8, 3.9]
         include:
           - os: ubuntu-latest
-            python-version: 3.9
+            python-version: 3.6
 
     steps:
     - uses: actions/checkout@v2
@@ -59,9 +59,12 @@ jobs:
         mkdir gdcmbin
         cd gdcmbin
         cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
-        ls .
         ninja
         cd ..
+    - name: Check build
+      if: ${{ always() }}
+      run: |
+        ls .
     - name: Test with GDCM
       run: |
         # Create super-simple setup.py for python -m pip install
