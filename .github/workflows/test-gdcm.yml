@@ -68,9 +68,9 @@ jobs:
     - name: Upload build dir
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
-        with:
-          name: gdcmbin
-          path: gdcmbin.tar.gz
+      with:
+        name: gdcmbin
+        path: gdcmbin.tar.gz
     - name: Test with GDCM
       run: |
         # Create super-simple setup.py for python -m pip install
