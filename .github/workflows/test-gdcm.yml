@@ -54,7 +54,7 @@ jobs:
       #if: ${{ steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build cmake
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
