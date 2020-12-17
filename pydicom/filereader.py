@@ -823,7 +823,7 @@ def dcmread(
     Raises
     ------
     InvalidDicomError
-        If `force` is ``True`` and the file is not a valid DICOM file.
+        If `force` is ``False`` and the file is not a valid DICOM file.
     TypeError
         If `fp` is ``None`` or of an unsupported type.
 
