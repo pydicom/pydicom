@@ -61,12 +61,16 @@ jobs:
         cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         ninja
         cd ..
+    - name: Archive build dir
+      if: ${{ always() }}
+      run: |
+        tar czf gdcmbin.tar.gz gdcmbin
     - name: Upload build dir
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
         with:
           name: gdcmbin
-          path: gdcmbin
+          path: gdcmbin.tar.gz
     - name: Test with GDCM
       run: |
         # Create super-simple setup.py for python -m pip install
