@@ -59,6 +59,7 @@ jobs:
         mkdir gdcmbin
         cd gdcmbin
         cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        ls .
         ninja
         cd ..
     - name: Test with GDCM
