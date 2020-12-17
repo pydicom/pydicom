@@ -58,23 +58,23 @@ jobs:
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
-        cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
-        ninja
+        cmake -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        make
         cd ..
-    - name: Archive build dir
-      if: ${{ always() }}
-      run: |
-        tar czf gdcmbin.tar.gz gdcmbin
-    - name: Upload build dir
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: gdcmbin
-        path: gdcmbin.tar.gz
-    - name: Test with GDCM
-      run: |
-        # Create super-simple setup.py for python -m pip install
-        echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
-        python -m pip install -e gdcmbin/bin/
-        python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest
+    #- name: Archive build dir
+    #  if: ${{ always() }}
+    #  run: |
+    #    tar czf gdcmbin.tar.gz gdcmbin
+    #- name: Upload build dir
+    #  if: ${{ always() }}
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: gdcmbin
+    #    path: gdcmbin.tar.gz
+    #- name: Test with GDCM
+    #  run: |
+    #    # Create super-simple setup.py for python -m pip install
+    #    echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
+    #    python -m pip install -e gdcmbin/bin/
+    #    python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
+    #    pytest
