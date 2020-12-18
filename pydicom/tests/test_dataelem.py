@@ -18,7 +18,7 @@ from pydicom.dataset import Dataset
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
 
@@ -45,6 +45,25 @@ class TestDataElement:
         config.replace_un_with_known_vr = True
         yield
         config.replace_un_with_known_vr = old_value
+
+    def test_AT(self):
+        """VR of AT takes Tag variants when set"""
+        elem1 = DataElement("OffendingElement", "AT", 0x100010)
+        elem2 = DataElement("OffendingElement", "AT", (0x10, 0x10))
+        elem3 = DataElement(
+            "FrameIncrementPointer", "AT", [0x540010, 0x540020]
+        )
+        elem4 = DataElement("OffendingElement", "AT", "PatientName")
+        assert isinstance(elem1.value, BaseTag)
+        assert isinstance(elem2.value, BaseTag)
+        assert elem1.value == elem2.value == elem4.value
+        assert elem1.value == 0x100010
+        assert isinstance(elem3.value, MultiValue)
+        assert len(elem3.value) == 2
+
+        # Now an invalid Tag will throw an error
+        with pytest.raises(OverflowError):
+            _ = DataElement("OffendingElement", "AT", 0x100000000)
 
     def test_VM_1(self):
         """DataElement: return correct value multiplicity for VM > 1"""

@@ -31,9 +31,6 @@ ensure that the value gets written correctly?
 
 * **SQ** element values should be set using a :class:`list` of zero or more
   :class:`~dataset.Dataset` instances.
-* To ensure **AT** elements are encoded correctly, their values should be set
-  using the 8-byte integer form of the tag - such as ``0x00100020`` for the tag
-  (0010,0020) - and not as a 2-tuple or 2-list.
 
 
 +----+------------------+-----------------+-----------------------------------+
@@ -44,19 +41,20 @@ ensure that the value gets written correctly?
 +----+------------------+-----------------+-----------------------------------+
 | AS | Age String       | :class:`str`    | :class:`str`                      |
 +----+------------------+-----------------+-----------------------------------+
-| AT | Attribute Tag    | :class:`int`    | :class:`int`                      |
+| AT | Attribute Tag    | Tag             | :class:`~tag.BaseTag`             |
+|    |                  | :sup:`1`        |                                   |
 +----+------------------+-----------------+-----------------------------------+
 | CS | Code String      | :class:`str`    | :class:`str`                      |
 +----+------------------+-----------------+-----------------------------------+
 | DA | Date             | :class:`str`    | :class:`str` or                   |
-|    |                  |                 | :class:`~valuerep.DA`\ :sup:`1`   |
+|    |                  |                 | :class:`~valuerep.DA`\ :sup:`2`   |
 +----+------------------+-----------------+-----------------------------------+
 | DS | Decimal String   | :class:`str`,   | :class:`~valuerep.DSfloat` or     |
 |    |                  | :class:`float`  | :class:`~valuerep.DSdecimal`\     |
-|    |                  | or :class:`int` | :sup:`2`                          |
+|    |                  | or :class:`int` | :sup:`3`                          |
 +----+------------------+-----------------+-----------------------------------+
 | DT | Date Time        | :class:`str`    | :class:`str` or                   |
-|    |                  |                 | :class:`~valuerep.DT`\ :sup:`1`   |
+|    |                  |                 | :class:`~valuerep.DT`\ :sup:`2`   |
 +----+------------------+-----------------+-----------------------------------+
 | FL | Floating Point   | :class:`float`  | :class:`float`                    |
 |    | Single           |                 |                                   |
@@ -101,7 +99,7 @@ ensure that the value gets written correctly?
 |    | Very Long        |                 |                                   |
 +----+------------------+-----------------+-----------------------------------+
 | TM | Time             | :class:`str`    | :class:`str` or                   |
-|    |                  |                 | :class:`~valuerep.TM`\ :sup:`1`   |
+|    |                  |                 | :class:`~valuerep.TM`\ :sup:`2`   |
 +----+------------------+-----------------+-----------------------------------+
 | UC | Unlimited        | :class:`str`    | :class:`str`                      |
 |    | Characters       |                 |                                   |
@@ -123,7 +121,8 @@ ensure that the value gets written correctly?
 |    | Very Long        |                 |                                   |
 +----+------------------+-----------------+-----------------------------------+
 
-| :sup:`1` If :attr:`config.datetime_conversion<config.datetime_conversion>`
+| :sup:`1` Any type accepted by :func:`~tag.Tag` can be used
+| :sup:`2` If :attr:`config.datetime_conversion<config.datetime_conversion>`
   = ``True`` (default ``False``)
-| :sup:`2` If :attr:`config.use_DS_decimal<config.use_DS_decimal>`
+| :sup:`3` If :attr:`config.use_DS_decimal<config.use_DS_decimal>`
   = ``True`` (default ``False``)
