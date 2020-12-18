@@ -59,7 +59,7 @@ jobs:
         mkdir gdcmbin
         cd gdcmbin
         which cmake
-        cmake -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        /usr/bin/cmake -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         make
         cd ..
     #- name: Archive build dir
