@@ -355,7 +355,10 @@
 <div class="section" id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li></li>
+<li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
+acceptable to <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a>, and are always stored as a
+<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a>.  Previously, any Python type could be
+set.</p></li>
 </ul>
 <div class="section" id="enhancements">
 <h4>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h4>

@@ -224,9 +224,6 @@ never have a VM greater than 1.</p></li>
 </li>
 <li><p><strong>SQ</strong> element values should be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of zero or more
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances.</p></li>
-<li><p>To ensure <strong>AT</strong> elements are encoded correctly, their values should be set
-using the 8-byte integer form of the tag - such as <code class="docutils literal notranslate"><span class="pre">0x00100020</span></code> for the tag
-(0010,0020) - and not as a 2-tuple or 2-list.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -256,8 +253,9 @@ Entity</p></td>
 </tr>
 <tr class="row-even"><td><p>AT</p></td>
 <td><p>Attribute Tag</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Tag
+<sup>1</sup></p></td>
+<td><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>CS</p></td>
 <td><p>Code String</p></td>
@@ -268,7 +266,7 @@ Entity</p></td>
 <td><p>Date</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-class docutils literal notranslate"><span class="pre">DA</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-class docutils literal notranslate"><span class="pre">DA</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p>DS</p></td>
 <td><p>Decimal String</p></td>
@@ -276,13 +274,13 @@ Entity</p></td>
 <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>
 or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a><sup>2</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a><sup>3</sup></p></td>
 </tr>
 <tr class="row-even"><td><p>DT</p></td>
 <td><p>Date Time</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-class docutils literal notranslate"><span class="pre">DT</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-class docutils literal notranslate"><span class="pre">DT</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p>FL</p></td>
 <td><p>Floating Point
@@ -384,7 +382,7 @@ Very Long</p></td>
 <td><p>Time</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM" title="pydicom.valuerep.TM"><code class="xref py py-class docutils literal notranslate"><span class="pre">TM</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM" title="pydicom.valuerep.TM"><code class="xref py py-class docutils literal notranslate"><span class="pre">TM</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-even"><td><p>UC</p></td>
 <td><p>Unlimited
@@ -432,9 +430,10 @@ Very Long</p></td>
 </tbody>
 </table>
 <div class="line-block">
-<div class="line"><sup>1</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.datetime_conversion.html#pydicom.config.datetime_conversion" title="pydicom.config.datetime_conversion"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.datetime_conversion</span></code></a>
+<div class="line"><sup>1</sup> Any type accepted by <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a> can be used</div>
+<div class="line"><sup>2</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.datetime_conversion.html#pydicom.config.datetime_conversion" title="pydicom.config.datetime_conversion"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.datetime_conversion</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
-<div class="line"><sup>2</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
+<div class="line"><sup>3</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
 </div>
 </div>
