@@ -61,7 +61,15 @@ class TestDataElement:
         assert isinstance(elem3.value, MultiValue)
         assert len(elem3.value) == 2
 
-        # Now an invalid Tag will throw an error
+        # Test also using Dataset, and check 0x00000000 works
+        ds = Dataset()
+        ds.OffendingElement = 0
+        assert isinstance(ds.OffendingElement, BaseTag)
+        ds.OffendingElement = (0x0000, 0x0000)
+        assert isinstance(ds.OffendingElement, BaseTag)
+        assert ds.OffendingElement == 0
+
+        # An invalid Tag should throw an error
         with pytest.raises(OverflowError):
             _ = DataElement("OffendingElement", "AT", 0x100000000)
 

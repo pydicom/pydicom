@@ -527,7 +527,7 @@ class DataElement:
             return UID(val) if val is not None else None
         elif self.VR == "PN":
             return PersonName(val)
-        elif self.VR == "AT" and val:
+        elif self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought
