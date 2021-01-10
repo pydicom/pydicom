@@ -121,7 +121,7 @@ def _decompress_single_frame(
     # signals Pillow to not apply any color transformation upon
     # decompression.
     if (transfer_syntax in PillowJPEGTransferSyntaxes and
-        photometric_interpretation == 'RGB'):
+            photometric_interpretation == 'RGB'):
         color_mode = 'YCbCr'
         image.tile = [(
             'jpeg',
