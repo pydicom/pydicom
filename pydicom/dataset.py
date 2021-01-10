@@ -1365,7 +1365,8 @@ class Dataset(dict):
         transfer_syntax = self.file_meta.TransferSyntaxUID
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
-            if hh.supports_transfer_syntax(transfer_syntax)
+            if hh is not None
+            and hh.supports_transfer_syntax(transfer_syntax)
         ]
 
         # No handlers support the transfer syntax
