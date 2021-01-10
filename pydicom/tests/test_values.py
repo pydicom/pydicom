@@ -46,6 +46,10 @@ class TestConvertAE:
         bytestring = b'  AE_TITLE '
         assert 'AE_TITLE' == convert_AE_string(bytestring, True)
 
+    def test_convert_multival(self):
+        bytestring = b'AE_ONE\\AE_TWO'
+        assert ['AE_ONE', 'AE_TWO'] == convert_AE_string(bytestring, True)
+
 
 class TestConvertText:
     def test_single_value(self):

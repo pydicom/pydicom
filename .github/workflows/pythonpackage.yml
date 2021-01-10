@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version:  [3.8]
+        python-version:  [3.9]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -48,20 +48,52 @@ jobs:
     - name: Style warnings
       run: python -m flake8 --exit-zero ${{ steps.pydiff.outputs.pyfiles }}
 
+  pypy:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version:  [pypy3]
+        include:
+          - jpeg-deps: pillow-jpegls
+            gdcm-dep: gdcm
+            pylibjpeg-dep: pylibjpeg
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Initial test environment setup
+      run: |
+        python -m pip install -e .
+        python -m pip install wheel
+        python -m pip install pytest
+    - name: Test with no external libraries
+      run: |
+        pytest
+    - name: Install numpy
+      run: |
+        python -m pip install numpy
+    - name: Test with numpy
+      run: |
+        pytest
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version:  [3.6, 3.7, 3.8]
+        python-version:  [3.6, 3.7, 3.8, 3.9]
         include:
           - os: ubuntu-latest
             python-version: 3.8
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
-            coverage-args: --cov=pydicom --cov-append
+            pytest-args: --cov=pydicom --cov-append
             coverage: coverage
 
     steps:
@@ -88,17 +120,18 @@ jobs:
         key: pydicom-testdata
     - name: Initial test environment setup
       run: |
+        python -m pip install -e .
         python -m pip install wheel
         python -m pip install pytest pytest-cov
     - name: Test with no external libraries
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Install numpy
       run: |
         python -m pip install numpy
     - name: Test with numpy
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Set up Pillow and jpeg_ls
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
@@ -107,14 +140,14 @@ jobs:
     - name: Run Pillow and jpeg_ls tests
       if: ${{ matrix.jpeg-deps == 'pillow-jpegls' }}
       run: |
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
     - name: Cache GDCM
       id: cache-gdcm
       if: ${{ matrix.gdcm-dep == 'gdcm' }}
       uses: actions/cache@v2
       with:
         path: gdcmbin
-        key: GDCM
+        key: GDCM-${{ matrix.os }}-python${{ matrix.python-version }}
 
     - name: Build GDCM (if not in cache)
       if: ${{ matrix.gdcm-dep == 'gdcm' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
@@ -134,16 +167,21 @@ jobs:
         echo 'from setuptools import setup; setup(name="gdcm.py")' > gdcmbin/bin/setup.py
         python -m pip install -e gdcmbin/bin/
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest ${{ matrix.coverage-args }}
+        pytest ${{ matrix.pytest-args }}
 
     - name: Test pylibjpeg
-      if: ${{ matrix.pylibjpeg-dep == 'normal' }}
+      if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
-        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
-        pytest ${{ matrix.coverage-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+
+    - name: Test external sources using pydicom-data
+      run: |
+        python -m pip install git+https://github.com/pydicom/pydicom-data
+        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}

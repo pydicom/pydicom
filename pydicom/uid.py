@@ -6,9 +6,43 @@ import uuid
 import random
 import hashlib
 import re
-from typing import List, Optional, TypeVar, Type
+import sys
+from typing import List, Optional, TypeVar, Type, Union
+import warnings
 
 from pydicom._uid_dict import UID_dictionary
+
+
+_deprecations = {
+    "JPEGBaseline": "JPEGBaseline8Bit",
+    "JPEGExtended": "JPEGExtended12Bit",
+    "JPEGLossless": "JPEGLosslessSV1",
+    "JPEGLSLossy": "JPEGLSNearLossless",
+    "JPEG2000MultiComponentLossless": "JPEG2000MCLossless",
+    "JPEG2000MultiComponent": "JPEG2000MC",
+}
+
+
+def __getattr__(name):
+    if name in _deprecations:
+        replacement = _deprecations[name]
+        if name == "JPEGLossless":
+            warnings.warn(
+                "In pydicom v3.0 the UID for 'JPEGLossless' will change "
+                "from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
+                f"match its UID keyword. Use '{replacement}' instead"
+            )
+        else:
+            warnings.warn(
+                f"The UID constant '{name}' is deprecated and will be removed "
+                f"in pydicom v2.2, use '{replacement}' instead",
+                DeprecationWarning
+            )
+
+        return globals()[replacement]
+
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
@@ -28,7 +62,7 @@ RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
 """Regex for a valid UID prefix"""
 
 
-U = TypeVar('U', bound='UID')
+_UID = TypeVar("_UID", bound="UID")
 
 
 class UID(str):
@@ -50,7 +84,7 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls: Type[U], val: str) -> U:
+    def __new__(cls: Type[_UID], val: str) -> _UID:
         """Setup new instance of the class.
 
         Parameters
@@ -147,9 +181,17 @@ class UID(str):
         raise ValueError('UID is not a transfer syntax.')
 
     @property
+    def keyword(self) -> str:
+        """Return the UID keyword from the UID dictionary."""
+        if str(self) in UID_dictionary:
+            return UID_dictionary[self][4]
+
+        return ''
+
+    @property
     def name(self) -> str:
         """Return the UID name from the UID dictionary."""
-        uid_string = str.__str__(self)
+        uid_string = str(self)
         if uid_string in UID_dictionary:
             return UID_dictionary[self][0]
 
@@ -158,7 +200,7 @@ class UID(str):
     @property
     def type(self) -> str:
         """Return the UID type from the UID dictionary."""
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return UID_dictionary[self][1]
 
         return ''
@@ -166,7 +208,7 @@ class UID(str):
     @property
     def info(self) -> str:
         """Return the UID info from the UID dictionary."""
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return UID_dictionary[self][2]
 
         return ''
@@ -176,7 +218,7 @@ class UID(str):
         """Return ``True`` if the UID is retired, ``False`` otherwise or if
         private.
         """
-        if str.__str__(self) in UID_dictionary:
+        if str(self) in UID_dictionary:
             return bool(UID_dictionary[self][3])
 
         return False
@@ -186,10 +228,7 @@ class UID(str):
         """Return ``True`` if the UID isn't an officially registered DICOM
         UID.
         """
-        if self[:13] == '1.2.840.10008':
-            return False
-
-        return True
+        return self[:14] != '1.2.840.10008.'
 
     @property
     def is_valid(self) -> bool:
@@ -209,95 +248,138 @@ DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
 """1.2.840.10008.1.2.1.99"""
 ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
 """1.2.840.10008.1.2.2"""
-JPEGBaseline = UID('1.2.840.10008.1.2.4.50')
+JPEGBaseline8Bit = UID('1.2.840.10008.1.2.4.50')
 """1.2.840.10008.1.2.4.50"""
-JPEGExtended = UID('1.2.840.10008.1.2.4.51')
+JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
 """1.2.840.10008.1.2.4.51"""
-JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')
+JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')  # needs to be updated
 """1.2.840.10008.1.2.4.57"""
-JPEGLossless = UID('1.2.840.10008.1.2.4.70')
+JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')  # Old JPEGLossless
 """1.2.840.10008.1.2.4.70"""
 JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
 """1.2.840.10008.1.2.4.80"""
-JPEGLSLossy = UID('1.2.840.10008.1.2.4.81')
+JPEGLSNearLossless = UID('1.2.840.10008.1.2.4.81')
 """1.2.840.10008.1.2.4.81"""
 JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
 """1.2.840.10008.1.2.4.90"""
 JPEG2000 = UID('1.2.840.10008.1.2.4.91')
 """1.2.840.10008.1.2.4.91"""
-JPEG2000MultiComponentLossless = UID('1.2.840.10008.1.2.4.92')
+JPEG2000MCLossless = UID('1.2.840.10008.1.2.4.92')
 """1.2.840.10008.1.2.4.92"""
-JPEG2000MultiComponent = UID('1.2.840.10008.1.2.4.93')
+JPEG2000MC = UID('1.2.840.10008.1.2.4.93')
 """1.2.840.10008.1.2.4.93"""
-MPEG2MainProfileMainLevel = UID('1.2.840.10008.1.2.4.100')
+MPEG2MPML = UID('1.2.840.10008.1.2.4.100')
 """1.2.840.10008.1.2.4.100"""
-MPEG2MainProfileHighLevel = UID('1.2.840.10008.1.2.4.101')
+MPEG2MPHL = UID('1.2.840.10008.1.2.4.101')
 """1.2.840.10008.1.2.4.101"""
-MPEG4HighProfileLevel41 = UID('1.2.840.10008.1.2.4.102')
+MPEG4HP41 = UID('1.2.840.10008.1.2.4.102')
 """1.2.840.10008.1.2.4.102"""
-MPEG4BDCompatibleHighProfileLevel41 = UID('1.2.840.10008.1.2.4.103')
+MPEG4HP41BD = UID('1.2.840.10008.1.2.4.103')
 """1.2.840.10008.1.2.4.103"""
-MPEG4HighProfileLevel422D = UID('1.2.840.10008.1.2.4.104')
+MPEG4HP422D = UID('1.2.840.10008.1.2.4.104')
 """1.2.840.10008.1.2.4.104"""
-MPEG4HighProfileLevel423D = UID('1.2.840.10008.1.2.4.105')
+MPEG4HP423D = UID('1.2.840.10008.1.2.4.105')
 """1.2.840.10008.1.2.4.105"""
-MPEG4StereoHighProfileLevel42 = UID('1.2.840.10008.1.2.4.106')
+MPEG4HP42STEREO = UID('1.2.840.10008.1.2.4.106')
 """1.2.840.10008.1.2.4.106"""
-HEVCMainProfileLevel51 = UID('1.2.840.10008.1.2.4.107')
+HEVCMP51 = UID('1.2.840.10008.1.2.4.107')
 """1.2.840.10008.1.2.4.107"""
-HEVCMain10ProfileLevel51 = UID('1.2.840.10008.1.2.4.108')
+HEVCM10P51 = UID('1.2.840.10008.1.2.4.108')
 """1.2.840.10008.1.2.4.108"""
 RLELossless = UID('1.2.840.10008.1.2.5')
 """1.2.840.10008.1.2.5"""
 
-UncompressedPixelTransferSyntaxes = [
+AllTransferSyntaxes = [
+    ImplicitVRLittleEndian,
+    ExplicitVRLittleEndian,
+    DeflatedExplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
+    JPEGLosslessP14,
+    JPEGLosslessSV1,
+    JPEGLSLossless,
+    JPEGLSNearLossless,
+    JPEG2000Lossless,
+    JPEG2000,
+    JPEG2000MCLossless,
+    JPEG2000MC,
+    MPEG2MPML,
+    MPEG2MPHL,
+    MPEG4HP41,
+    MPEG4HP41BD,
+    MPEG4HP422D,
+    MPEG4HP423D,
+    MPEG4HP42STEREO,
+    HEVCMP51,
+    HEVCM10P51,
+    RLELossless,
+]
+"""All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
+
+JPEGTransferSyntaxes = [
+    JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1
+]
+"""JPEG (ISO/IEC 10918-1) transfer syntaxes"""
+
+JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
+"""JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
+
+JPEG2000TransferSyntaxes = [
+    JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC
+]
+"""JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
+
+MPEGTransferSyntaxes = [
+    MPEG2MPML,
+    MPEG2MPHL,
+    MPEG4HP41,
+    MPEG4HP41BD,
+    MPEG4HP422D,
+    MPEG4HP423D,
+    MPEG4HP42STEREO,
+    HEVCMP51,
+    HEVCM10P51,
+]
+"""MPEG transfer syntaxes."""
+
+RLETransferSyntaxes = [RLELossless]
+"""RLE transfer syntaxes."""
+
+UncompressedTransferSyntaxes = [
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
     ExplicitVRBigEndian,
 ]
+"""Uncompressed (native) transfer syntaxes."""
 
-JPEGLSSupportedCompressedPixelTransferSyntaxes = [
-    JPEGLSLossless,
-    JPEGLSLossy,
-]
-
-PILSupportedCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
-    JPEGLossless,
-    JPEGExtended,
-    JPEG2000Lossless,
-    JPEG2000,
-]
-
-JPEG2000CompressedPixelTransferSyntaxes = [
-    JPEG2000Lossless,
-    JPEG2000,
-]
-
+# Deprecated
+if sys.version_info[:2] < (3, 7):
+    JPEGBaseline = JPEGBaseline8Bit
+    JPEGExtended = JPEGExtended12Bit
+    JPEGLossless = JPEGLosslessSV1
+    JPEGLSLossy = JPEGLSNearLossless
+    JPEG2000MultiComponentLossless = JPEG2000MCLossless
+    JPEG2000MultiComponent = JPEG2000MC
 JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseline,
-    JPEGExtended,
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit
 ]
-
-MPEGTransferSyntaxes = [
-    MPEG2MainProfileMainLevel,
-    MPEG2MainProfileHighLevel,
-    MPEG4HighProfileLevel41,
-    MPEG4BDCompatibleHighProfileLevel41,
-    MPEG4HighProfileLevel422D,
-    MPEG4HighProfileLevel423D,
-    MPEG4StereoHighProfileLevel42,
-    HEVCMainProfileLevel51,
-    HEVCMain10ProfileLevel51,
+JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
+JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
+PILSupportedCompressedPixelTransferSyntaxes = [
+    JPEGBaseline8Bit,
+    JPEGLosslessP14,
+    JPEGExtended12Bit,
+    JPEG2000Lossless,
+    JPEG2000,
 ]
-
-RLECompressedLosslessSyntaxes = [
-    RLELossless
-]
+RLECompressedLosslessSyntaxes = RLETransferSyntaxes
+UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
-def generate_uid(prefix: str = PYDICOM_ROOT_UID,
+def generate_uid(prefix: Union[str, None] = PYDICOM_ROOT_UID,
                  entropy_srcs: Optional[List[str]] = None) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 
@@ -308,7 +390,7 @@ def generate_uid(prefix: str = PYDICOM_ROOT_UID,
 
     Parameters
     ----------
-    prefix : str, optional
+    prefix : str or None, optional
         The UID prefix to use when creating the UID. Default is the *pydicom*
         root UID ``'1.2.826.0.1.3680043.8.498.'``. If not used then a prefix of
         ``'2.25.'`` will be used with the integer form of a UUID generated

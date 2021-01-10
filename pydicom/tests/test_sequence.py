@@ -1,5 +1,7 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.sequence module."""
+
+import weakref
 
 import pytest
 
@@ -67,3 +69,108 @@ class TestSequence:
         assert "PN: 'TEST'" in out
         assert "(0010, 0020) Patient ID" in out
         assert "LO: '12345']" in out
+
+    def test_adding_datasets(self):
+        """Tests for adding datasets to the Sequence"""
+        ds_a = Dataset()
+        ds_a.Rows = 1
+        ds_b = Dataset()
+        ds_b.Rows = 2
+        ds_c = Dataset()
+        ds_c.Rows = 3
+        ds_d = Dataset()
+        ds_d.Rows = 4
+        ds_e = Dataset()
+        ds_e.Rows = 5
+
+        parent = Dataset()
+        parent.PatientName = "Parent"
+
+        seq = Sequence()
+        seq.parent = parent
+        assert isinstance(seq.parent, weakref.ReferenceType)
+        seq.append(ds_a)
+        seq.append(ds_c)
+        seq.insert(1, ds_b)
+        assert 3 == len(seq)
+        for ds in seq:
+            assert isinstance(ds.parent, weakref.ReferenceType)
+
+        seq[1] = ds_e
+        assert ds_e == seq[1]
+        assert [ds_a, ds_e, ds_c] == seq
+        seq[1:1] = [ds_d]
+        assert [ds_a, ds_d, ds_e, ds_c] == seq
+        seq[1:2] = [ds_c, ds_e]
+        assert [ds_a, ds_c, ds_e, ds_e, ds_c] == seq
+        for ds in seq:
+            assert isinstance(ds.parent, weakref.ReferenceType)
+
+        msg = r"Can only assign an iterable of 'Dataset'"
+        with pytest.raises(TypeError, match=msg):
+            seq[1:1] = ds_d
+
+    def test_extending(self):
+        """Test Sequence.extend()."""
+        ds_a = Dataset()
+        ds_a.Rows = 1
+        ds_b = Dataset()
+        ds_b.Rows = 2
+        ds_c = Dataset()
+        ds_c.Rows = 3
+        ds_d = Dataset()
+        ds_d.Rows = 4
+        ds_e = Dataset()
+        ds_e.Rows = 5
+
+        parent = Dataset()
+        parent.PatientName = "Parent"
+
+        seq = Sequence()
+        seq.parent = parent
+        assert isinstance(seq.parent, weakref.ReferenceType)
+        seq.extend([ds_a, ds_b, ds_c])
+        assert [ds_a, ds_b, ds_c] == seq
+
+        msg = r"An iterable of 'Dataset' is required"
+        with pytest.raises(TypeError, match=msg):
+            seq.extend(ds_d)
+        assert [ds_a, ds_b, ds_c] == seq
+
+        seq.extend([ds_d, ds_e])
+        assert [ds_a, ds_b, ds_c, ds_d, ds_e] == seq
+        for ds in seq:
+            assert isinstance(ds.parent, weakref.ReferenceType)
+
+    def test_iadd(self):
+        """Test Sequence() += [Dataset()]."""
+        ds_a = Dataset()
+        ds_a.Rows = 1
+        ds_b = Dataset()
+        ds_b.Rows = 2
+        ds_c = Dataset()
+        ds_c.Rows = 3
+        ds_d = Dataset()
+        ds_d.Rows = 4
+        ds_e = Dataset()
+        ds_e.Rows = 5
+
+        parent = Dataset()
+        parent.PatientName = "Parent"
+
+        seq = Sequence()
+        seq.parent = parent
+        assert isinstance(seq.parent, weakref.ReferenceType)
+        seq += [ds_a, ds_b, ds_c]
+        assert [ds_a, ds_b, ds_c] == seq
+
+        msg = r"An iterable of 'Dataset' is required"
+        with pytest.raises(TypeError, match=msg):
+            seq += ds_d
+        assert [ds_a, ds_b, ds_c] == seq
+
+        seq += [ds_d, ds_e]
+        assert [ds_a, ds_b, ds_c, ds_d, ds_e] == seq
+
+        for ds in seq:
+            assert isinstance(ds.parent, weakref.ReferenceType)

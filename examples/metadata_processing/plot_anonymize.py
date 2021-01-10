@@ -17,7 +17,7 @@ optionally remove curves and private tags, and write the results in a new file.
 import tempfile
 
 import pydicom
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 print(__doc__)
 
@@ -25,7 +25,7 @@ print(__doc__)
 # Anonymize a single file
 ###############################################################################
 
-filename = get_testdata_files('MR_small.dcm')[0]
+filename = get_testdata_file('MR_small.dcm')
 dataset = pydicom.dcmread(filename)
 
 data_elements = ['PatientID',

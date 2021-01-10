@@ -1,5 +1,7 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Test for encaps.py"""
+
+from struct import unpack
 
 import pytest
 
@@ -16,7 +18,8 @@ from pydicom.encaps import (
     read_item,
     fragment_frame,
     itemise_frame,
-    encapsulate
+    encapsulate,
+    encapsulate_extended
 )
 from pydicom.filebase import DicomBytesIO
 
@@ -36,7 +39,7 @@ class TestGetFrameOffsets:
         fp.is_little_endian = True
         with pytest.raises(ValueError,
                            match=r"Unexpected tag '\(fffe, e100\)' when "
-                                 r"parsing the Basic Table Offset item."):
+                                 r"parsing the Basic Table Offset item"):
             get_frame_offsets(fp)
 
     def test_bad_length_multiple(self):
@@ -49,7 +52,7 @@ class TestGetFrameOffsets:
         fp.is_little_endian = True
         with pytest.raises(ValueError,
                            match="The length of the Basic Offset Table item"
-                                 " is not a multiple of 4."):
+                                 " is not a multiple of 4"):
             get_frame_offsets(fp)
 
     def test_zero_length(self):
@@ -138,7 +141,7 @@ class TestGetNrFragments:
         fp.is_little_endian = True
         msg = (
             r"Unexpected tag '\(0010, 0010\)' at offset 12 when parsing the "
-            r"encapsulated pixel data fragment items."
+            r"encapsulated pixel data fragment items"
         )
         with pytest.raises(ValueError, match=msg):
             get_nr_fragments(fp)
@@ -212,7 +215,7 @@ class TestGeneratePixelDataFragment:
         with pytest.raises(ValueError,
                            match="Undefined item length at offset 4 when "
                                  "parsing the encapsulated pixel data "
-                                 "fragments."):
+                                 "fragments"):
             next(fragments)
         pytest.raises(StopIteration, next, fragments)
 
@@ -249,8 +252,7 @@ class TestGeneratePixelDataFragment:
         with pytest.raises(ValueError,
                            match=r"Unexpected tag '\(0010, 0010\)' at offset "
                                  r"12 when parsing the encapsulated pixel "
-                                 r"data "
-                                 r"fragment items."):
+                                 r"data fragment items"):
             next(fragments)
         pytest.raises(StopIteration, next, fragments)
 
@@ -1199,3 +1201,63 @@ class TestEncapsulate:
             b'\xfe\xff\x00\xe0'  # Next item tag
             b'\xe6\x0e\x00\x00'  # Next item length
         )
+
+    def test_encapsulate_bot_large_raises(self):
+        """Test exception raised if too much pixel data for BOT."""
+
+        class FakeBytes(bytes):
+            length = -1
+
+            def __len__(self):
+                return self.length
+
+            def __getitem__(self, s):
+                return b'\x00' * 5
+
+        frame_a = FakeBytes()
+        frame_a.length = 2**32 - 1 - 8  # 8 for first BOT item tag/length
+        frame_b = FakeBytes()
+        frame_b.length = 10
+        data = encapsulate([frame_a, frame_b], has_bot=True)
+
+        frame_a.length = 2**32 - 1 - 7
+        msg = (
+            r"The total length of the encapsulated frame data \(4294967296 "
+            r"bytes\) will be greater than the maximum allowed by the Basic "
+        )
+        with pytest.raises(ValueError, match=msg):
+            encapsulate([frame_a, frame_b], has_bot=True)
+
+
+class TestEncapsulateExtended:
+    """Tests for encaps.encapsulate_extended."""
+    def test_encapsulate(self):
+        ds = dcmread(JP2K_10FRAME_NOBOT)
+        frames = decode_data_sequence(ds.PixelData)
+        assert len(frames) == 10
+
+        out = encapsulate_extended(frames)
+        # Pixel Data encapsulated OK
+        assert isinstance(out[0], bytes)
+        test_frames = decode_data_sequence(out[0])
+        for a, b in zip(test_frames, frames):
+            assert a == b
+
+        # Extended Offset Table is OK
+        assert isinstance(out[1], bytes)
+        assert [
+            0x0000,  # 0
+            0x0eee,  # 3822
+            0x1df6,  # 7670
+            0x2cf8,  # 11512
+            0x3bfc,  # 15356
+            0x4ade,  # 19166
+            0x59a2,  # 22946
+            0x6834,  # 26676
+            0x76e2,  # 30434
+            0x8594  # 34196
+        ] == list(unpack('<10Q', out[1]))
+
+        # Extended Offset Table Lengths are OK
+        assert isinstance(out[2], bytes)
+        assert [len(f) for f in frames] == list(unpack('<10Q', out[2]))

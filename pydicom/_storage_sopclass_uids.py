@@ -24,6 +24,12 @@ EncapsulatedPDFStorage = UID(
     '1.2.840.10008.5.1.4.1.1.104.1')
 EncapsulatedCDAStorage = UID(
     '1.2.840.10008.5.1.4.1.1.104.2')
+EncapsulatedSTLStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.104.3')
+EncapsulatedOBJStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.104.4')
+EncapsulatedMTLStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.104.5')
 GrayscaleSoftcopyPresentationStateStorage = UID(
     '1.2.840.10008.5.1.4.1.1.11.1')
 SegmentedVolumeRenderingVolumetricPresentationStateStorage = UID(
@@ -90,7 +96,7 @@ CTPerformedProcedureProtocolStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.2')
 ProtocolApprovalStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.3')
-UltrasoundMultiframeImageStorage = UID(
+UltrasoundMultiFrameImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.3.1')
 ParametricMapStorage = UID(
     '1.2.840.10008.5.1.4.1.1.30')
@@ -106,8 +112,30 @@ LegacyConvertedEnhancedMRImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.4.4')
 RTImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.481.1')
+RTPhysicianIntentStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.10')
+RTSegmentAnnotationStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.11')
+RTRadiationSetStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.12')
+CArmPhotonElectronRadiationStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.13')
+TomotherapeuticRadiationStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.14')
+RoboticArmRadiationStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.15')
+RTRadiationRecordSetStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.16')
+RTRadiationSalvageRecordStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.17')
+TomotherapeuticRadiationRecordStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.18')
+CArmPhotonElectronRadiationRecordStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.19')
 RTDoseStorage = UID(
     '1.2.840.10008.5.1.4.1.1.481.2')
+RoboticRadiationRecordStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.481.20')
 RTStructureSetStorage = UID(
     '1.2.840.10008.5.1.4.1.1.481.3')
 RTBeamsTreatmentRecordStorage = UID(
@@ -134,7 +162,7 @@ DICOS2DAITStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.4')
 DICOS3DAITStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.5')
-DICOSQuadrupoleResonanceQRStorage = UID(
+DICOSQuadrupoleResonanceStorage = UID(
     '1.2.840.10008.5.1.4.1.1.501.6')
 UltrasoundImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.6.1')
@@ -142,7 +170,7 @@ EnhancedUSVolumeStorage = UID(
     '1.2.840.10008.5.1.4.1.1.6.2')
 EddyCurrentImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.601.1')
-EddyCurrentMultiframeImageStorage = UID(
+EddyCurrentMultiFrameImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.601.2')
 RawDataStorage = UID(
     '1.2.840.10008.5.1.4.1.1.66')
@@ -166,13 +194,13 @@ SurfaceScanPointCloudStorage = UID(
     '1.2.840.10008.5.1.4.1.1.68.2')
 SecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7')
-MultiframeSingleBitSecondaryCaptureImageStorage = UID(
+MultiFrameSingleBitSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.1')
-MultiframeGrayscaleByteSecondaryCaptureImageStorage = UID(
+MultiFrameGrayscaleByteSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.2')
-MultiframeGrayscaleWordSecondaryCaptureImageStorage = UID(
+MultiFrameGrayscaleWordSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.3')
-MultiframeTrueColorSecondaryCaptureImageStorage = UID(
+MultiFrameTrueColorSecondaryCaptureImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.7.4')
 VLEndoscopicImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.77.1.1')
@@ -222,7 +250,7 @@ OphthalmicAxialMeasurementsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.78.7')
 IntraocularLensCalculationsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.78.8')
-MacularGridThicknessandVolumeReportStorage = UID(
+MacularGridThicknessAndVolumeReportStorage = UID(
     '1.2.840.10008.5.1.4.1.1.79.1')
 OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.80.1')
@@ -262,6 +290,10 @@ SimplifiedAdultEchoSRStorage = UID(
     '1.2.840.10008.5.1.4.1.1.88.72')
 PatientRadiationDoseSRStorage = UID(
     '1.2.840.10008.5.1.4.1.1.88.73')
+PlannedImagingAgentAdministrationSRStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.88.74')
+PerformedImagingAgentAdministrationSRStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.88.75')
 TwelveLeadECGWaveformStorage = UID(
     '1.2.840.10008.5.1.4.1.1.9.1.1')
 GeneralECGWaveformStorage = UID(
@@ -280,6 +312,18 @@ ArterialPulseWaveformStorage = UID(
     '1.2.840.10008.5.1.4.1.1.9.5.1')
 RespiratoryWaveformStorage = UID(
     '1.2.840.10008.5.1.4.1.1.9.6.1')
+MultichannelRespiratoryWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.6.2')
+RoutineScalpElectroencephalogramWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.7.1')
+ElectromyogramWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.7.2')
+ElectrooculogramWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.7.3')
+SleepElectroencephalogramWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.7.4')
+BodyPositionWaveformStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.9.8.1')
 ContentAssessmentResultsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.90.1')
 RTBrachyApplicationSetupDeliveryInstructionStorage = UID(

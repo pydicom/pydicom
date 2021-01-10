@@ -1,15 +1,20 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Code for multi-value data elements values,
 or any list of items that must all be the same type.
 """
 
-try:
-    from collections.abc import MutableSequence
-except ImportError:
-    from collections import MutableSequence
+from typing import (
+    Iterable, Union, List, overload, Iterator, Optional, Callable, Any, cast,
+    TypeVar, MutableSequence
+)
+from typing import Sequence as SequenceType
 
 
-class MultiValue(MutableSequence):
+_T = TypeVar("_T")
+_ItemType = TypeVar("_ItemType")
+
+
+class MultiValue(MutableSequence[_ItemType]):
     """Class to hold any multi-valued DICOM value, or any list of items that
     are all of the same type.
 
@@ -23,71 +28,114 @@ class MultiValue(MutableSequence):
     than an instance of their classes.
     """
 
-    def __init__(self, type_constructor, iterable):
-        """Initialize the list of values
+    def __init__(
+        self,
+        type_constructor: Callable[[_T], _ItemType],
+        iterable: Iterable[_T]
+    ) -> None:
+        """Create a new :class:`MultiValue` from an iterable and ensure each
+        item in the :class:`MultiValue` has the same type.
 
         Parameters
         ----------
-        type_constructor : type
-            A constructor for the required type for all list items. Could be
-            the class, or a factory function. For DICOM multi-value data
-            elements, this will be the class or type corresponding to the VR.
+        type_constructor : callable
+            A constructor for the required type for all items. Could be
+            the class, or a factory function. Takes a single parameter and
+            returns the input as the desired type (or raises an appropriate
+            exception).
         iterable : iterable
             An iterable (e.g. :class:`list`, :class:`tuple`) of items to
-            initialize the :class:`MultiValue` list.
+            initialize the :class:`MultiValue` list. Each item in the iterable
+            is passed to `type_constructor` and the returned value added to
+            the :class:`MultiValue`.
         """
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
-        def number_string_type_constructor(x):
-            return self.type_constructor(x) if x != '' else x
+        def DS_IS_constructor(x: _T) -> _ItemType:
+            return self.type_constructor(x) if x != '' else cast(_ItemType, x)
 
         self._list = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):
-            type_constructor = number_string_type_constructor
+            type_constructor = DS_IS_constructor
+
         for x in iterable:
             self._list.append(type_constructor(x))
 
-    def insert(self, position, val):
-        self._list.insert(position, self.type_constructor(val))
-
-    def append(self, val):
+    def append(self, val: _T) -> None:
         self._list.append(self.type_constructor(val))
 
-    def __setitem__(self, i, val):
-        """Set an item of the list, making sure it is of the right VR type"""
-        if isinstance(i, slice):
-            val = [self.type_constructor(v) for v in val]
-            self._list.__setitem__(i, val)
-        else:
-            self._list.__setitem__(i, self.type_constructor(val))
-
-    def __str__(self):
-        if not self:
-            return ''
-        lines = ["'{}'".format(x) if isinstance(x, (str, bytes))
-                 else str(x) for x in self]
-        return "[" + ", ".join(lines) + "]"
-
-    __repr__ = __str__
-
-    def __len__(self):
-        return len(self._list)
-
-    def __getitem__(self, index):
-        return self._list[index]
-
-    def __delitem__(self, index):
+    def __delitem__(self, index: Union[slice, int]) -> None:
         del self._list[index]
 
-    def __iter__(self):
-        return iter(self._list)
+    def extend(self, val: Iterable[_T]) -> None:
+        """Extend the :class:`~pydicom.multival.MultiValue` using an iterable
+        of objects.
+        """
+        self._list.extend([self.type_constructor(x) for x in val])
 
-    def __eq__(self, other):
+    def __iadd__(self, other: Iterable[_T]) -> MutableSequence[_ItemType]:
+        """Implement MultiValue() += [object]."""
+        self._list += [self.type_constructor(x) for x in other]
+        return self
+
+    def __eq__(self, other: object) -> bool:
         return self._list == other
 
-    def __ne__(self, other):
+    @overload
+    def __getitem__(self, index: int) -> _ItemType: pass
+
+    @overload
+    def __getitem__(self, index: slice) -> MutableSequence[_ItemType]: pass
+
+    def __getitem__(
+        self, index: Union[slice, int]
+    ) -> Union[MutableSequence[_ItemType], _ItemType]:
+        return self._list[index]
+
+    def insert(self, position: int, val: _T) -> None:
+        self._list.insert(position, self.type_constructor(val))
+
+    def __iter__(self) -> Iterator[_ItemType]:
+        return iter(self._list)
+
+    def __len__(self) -> int:
+        return len(self._list)
+
+    def __ne__(self, other: object) -> bool:
         return self._list != other
 
-    def sort(self, key=None, reverse=False):
+    @overload
+    def __setitem__(self, idx: int, val: _T) -> None: pass
+
+    @overload
+    def __setitem__(self, idx: slice, val: Iterable[_T]) -> None: pass
+
+    def __setitem__(
+        self, idx: Union[slice, int], val: Union[Iterable[_T], _T]
+    ) -> None:
+        """Set an item of the list, making sure it is of the right VR type"""
+        if isinstance(idx, slice):
+            val = cast(Iterable[_T], val)
+            out = [self.type_constructor(v) for v in val]
+            self._list.__setitem__(idx, out)
+        else:
+            val = cast(_T, val)
+            self._list.__setitem__(idx, self.type_constructor(val))
+
+    def sort(
+        self,
+        key: Optional[Callable[[_ItemType], object]] = None,
+        reverse: bool = False
+    ) -> None:
         self._list.sort(key=key, reverse=reverse)
+
+    def __str__(self) -> str:
+        if not self:
+            return ''
+        lines = (
+            f"{x!r}" if isinstance(x, (str, bytes)) else str(x) for x in self
+        )
+        return f"[{', '.join(lines)}]"
+
+    __repr__ = __str__

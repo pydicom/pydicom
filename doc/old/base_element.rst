@@ -241,7 +241,7 @@ Tag
 elements using their keywords as illustrated in sections above.
 
 The :class:`~tag.BaseTag` class is derived from :class:`int`,
-so in effect, it is just a number with some extra behaviour:
+so in effect, it is just a number with some extra behavior:
 
   * :func:`~tag.Tag` is used to create instances of :class:`~tag.BaseTag` and
     enforces that the DICOM tag fits in the expected 4-byte (group,element)

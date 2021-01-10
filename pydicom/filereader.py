@@ -6,6 +6,7 @@
 from io import BytesIO
 import os
 from struct import (Struct, unpack)
+from typing import BinaryIO, Union, Optional, List, Tuple, AnyStr
 import warnings
 import zlib
 
@@ -115,15 +116,10 @@ def data_element_generator(fp,
     element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
 
-    tag_set = set()
-    if specific_tags is not None:
-        for tag in specific_tags:
-            if isinstance(tag, str):
-                tag = Tag(tag_for_keyword(tag))
-            if isinstance(tag, BaseTag):
-                tag_set.add(tag)
-        tag_set.add(Tag(0x08, 0x05))
-    has_tag_set = len(tag_set) > 0
+    tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
+    has_tag_set = bool(tag_set)
+    if has_tag_set:
+        tag_set.add(Tag(0x00080005))  # Specific Character Set
 
     while True:
         # Read tag, VR, length, get ready to read value
@@ -387,8 +383,14 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     return ds
 
 
-def read_sequence(fp, is_implicit_VR, is_little_endian, bytelength, encoding,
-                  offset=0):
+def read_sequence(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    bytelength: int,
+    encoding: Union[str, List[str]],
+    offset: int = 0
+) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
     """
@@ -752,6 +754,12 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
     class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
     if class_uid and class_uid.name == "Media Storage Directory Storage":
+        warnings.warn(
+            "The 'DicomDir' class is deprecated and will be removed in v3.0, "
+            "after which 'dcmread()' will return a normal 'FileDataset' "
+            "instance for 'Media Storage Directory' SOP Instances.",
+            DeprecationWarning
+        )
         dataset_class = DicomDir
     else:
         dataset_class = FileDataset
@@ -763,8 +771,13 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
     return new_dataset
 
 
-def dcmread(fp, defer_size=None, stop_before_pixels=False,
-            force=False, specific_tags=None):
+def dcmread(
+    fp: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+    defer_size: Optional[Union[str, int]] = None,
+    stop_before_pixels: bool = False,
+    force: bool = False,
+    specific_tags: Optional[List[Union[int, str, Tuple[int]]]] = None
+) -> Union[FileDataset, DicomDir]:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
@@ -793,7 +806,7 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         :class:`~pydicom.errors.InvalidDicomError` if the file is
         missing the *File Meta Information* header. Set to ``True`` to force
         reading even if no *File Meta Information* header is found.
-    specific_tags : list or None, optional
+    specific_tags : list of (int or str or 2-tuple of int), optional
         If not ``None``, only the tags in the list are returned. The list
         elements can be tags or tag names. Note that the element (0008,0005)
         *Specific Character Set* is always returned if present - this ensures
@@ -801,14 +814,18 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
 
     Returns
     -------
-    FileDataset
+    FileDataset or DicomDir
         An instance of :class:`~pydicom.dataset.FileDataset` that represents
-        a parsed DICOM file.
+        a parsed DICOM file, unless the dataset is a *Media Storage Directory*
+        instance in which case it will be a
+        :class:`~pydicom.dicomdir.DicomDir`.
 
     Raises
     ------
     InvalidDicomError
-        If `force` is ``True`` and the file is not a valid DICOM file.
+        If `force` is ``False`` and the file is not a valid DICOM file.
+    TypeError
+        If `fp` is ``None`` or of an unsupported type.
 
     See Also
     --------
@@ -842,6 +859,9 @@ def dcmread(fp, defer_size=None, stop_before_pixels=False,
         caller_owns_file = False
         logger.debug("Reading file '{0}'".format(fp))
         fp = open(fp, 'rb')
+    elif fp is None or not hasattr(fp, "read") or not hasattr(fp, "seek"):
+        raise TypeError("dcmread: Expected a file path or a file-like, "
+                        "but got " + type(fp).__name__)
 
     if config.debugging:
         logger.debug("\n" + "-" * 80)
@@ -881,6 +901,11 @@ def read_dicomdir(filename="DICOMDIR"):
 
     This is a wrapper around :func:`dcmread` which gives a default file name.
 
+    .. deprecated:: 2.1
+
+        ``read_dicomdir()`` is deprecated and will be removed in v3.0. Use
+        :func:`~pydicom.filereader.dcmread` instead.
+
     Parameters
     ----------
     filename : str, optional
@@ -896,6 +921,11 @@ def read_dicomdir(filename="DICOMDIR"):
         Raised if filename is not a DICOMDIR file.
     """
     # dcmread will return a DicomDir instance if file is one.
+    warnings.warn(
+        "'read_dicomdir()' is deprecated and will be removed in v3.0, use "
+        "'dcmread()' instead",
+        DeprecationWarning
+    )
 
     # Read the file as usual.
     ds = dcmread(filename)

@@ -69,7 +69,9 @@ the top left pixels are aligned and a value of ``[0, 0]`` indicates that the
 overlay pixels start 1 row above and 1 row to the left of the image pixels.
 
 NumPy can be used to modify the pixels, but if the changes are to be saved,
-they must be bit-packed and written back to the correct element:
+they must be bit-packed (using something like
+:func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits`) and written
+back to the correct element:
 
 .. code-block:: python
 
@@ -79,10 +81,6 @@ they must be bit-packed and written back to the correct element:
   # Pack the data
   from pydicom.pixel_data_handlers.numpy_handler import pack_bits
   packed_bytes = pack_bits(arr)
-
-  # Pad the value if odd-length
-  if len(packed_bytes) % 2:
-      packed_bytes += b'\x00'
 
   # Update the element value
   ds[0x6000, 0x3000].value = packed_bytes

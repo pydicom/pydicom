@@ -1054,7 +1054,7 @@ class TestCorrectAmbiguousVRElement:
         elem = RawDataElement(0x60003000, 'OB', 1, b'\x00', 0, True, True)
         out = correct_ambiguous_vr_element(elem, Dataset(), True)
         assert out == elem
-        assert type(out) == RawDataElement
+        assert isinstance(out, RawDataElement)
 
     def test_correct_ambiguous_data_element(self):
         """Test correct ambiguous US/SS element"""
@@ -1086,9 +1086,27 @@ class TestCorrectAmbiguousVRElement:
         ds[0x00280120] = elem
         ds.PixelRepresentation = 0
         out = correct_ambiguous_vr_element(elem, ds, True)
-        assert type(out) == DataElement
+        assert isinstance(out, DataElement)
         assert out.VR == 'US'
         assert out.value == 0xfffe
+
+    def test_empty_value(self):
+        """Regression test for #1193: empty value raises exception."""
+        ds = Dataset()
+        elem = RawDataElement(0x00280106, 'US or SS', 0, None, 0, True, True)
+        ds[0x00280106] = elem
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert isinstance(out, DataElement)
+        assert out.VR == 'US'
+
+        ds.LUTDescriptor = [1, 1, 1]
+        elem = RawDataElement(0x00283006, 'US or SS', 0, None, 0, True, True)
+        assert out.value is None
+        ds[0x00283006] = elem
+        out = correct_ambiguous_vr_element(elem, ds, True)
+        assert isinstance(out, DataElement)
+        assert out.VR == 'US'
+        assert out.value is None
 
 
 class TestWriteAmbiguousVR:
@@ -1251,6 +1269,16 @@ class TestWriteToStandard:
         ds.preamble = b'\x00' * 129
         with pytest.raises(ValueError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
+
+    def test_bad_filename(self):
+        """Test that TypeError is raised for a bad filename."""
+        ds = dcmread(ct_name)
+        with pytest.raises(TypeError, match="dcmwrite: Expected a file path "
+                                            "or a file-like, but got None"):
+            ds.save_as(None)
+        with pytest.raises(TypeError, match="dcmwrite: Expected a file path "
+                                            "or a file-like, but got int"):
+            ds.save_as(42)
 
     def test_prefix(self):
         """Test that the 'DICM' prefix
@@ -1497,7 +1525,7 @@ class TestWriteToStandard:
         assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
         assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
 
-    def test_convert_rgb_from_implicit_to_explicit_vr(self):
+    def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use):
         """Test converting an RGB dataset from implicit to explicit VR
         and vice verse."""
         ds_orig = dcmread(sc_rgb_name)
@@ -2411,9 +2439,6 @@ class TestWritePN:
 class TestWriteText:
     """Test filewriter.write_PN"""
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
     def test_no_encoding(self):
         """If text element has no encoding info, default is used"""
         fp = DicomBytesIO()
@@ -2489,19 +2514,14 @@ class TestWriteText:
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
 
-    def test_invalid_encoding(self):
+    def test_invalid_encoding(self, allow_invalid_values):
         """Test encoding text with invalid encodings"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
         elem = DataElement(0x00081039, 'LO', 'Dionysios Διονυσιος')
         msg = 'Failed to encode value with encodings: iso-2022-jp'
-        if 'PyPy' in python_implementation():
-            # PyPy seems to have a different implementation of
-            # replacement mode with regard to escape sequences
-            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O?\x1b(B '
-        else:
-            expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
+        expected = b'Dionysios \x1b$B&$&I&O&M&T&R&I&O\x1b(B? '
         with pytest.warns(UserWarning, match=msg):
             # encode with one invalid encoding
             write_text(fp, elem, encodings=['iso-2022-jp'])
@@ -2517,10 +2537,9 @@ class TestWriteText:
             write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
             assert expected == fp.getvalue()
 
-    def test_invalid_encoding_enforce_standard(self):
+    def test_invalid_encoding_enforce_standard(self, enforce_valid_values):
         """Test encoding text with invalid encodings with
         `config.enforce_valid_values` enabled"""
-        config.enforce_valid_values = True
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value

@@ -5,8 +5,9 @@ Data generated from GDCM project's private dictionary.
 The outer dictionary key is the Private Creator name ("owner"), while the inner
 dictionary key is a map of DICOM tag to (VR, VM, name, is_retired).
 """
+from typing import Dict, Tuple
 
-private_dictionaries = {
+private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
     '1.2.840.113663.1': {
         '0029xx00': ('US', '1', 'Unknown', ''),  # noqa
         '0029xx01': ('US', '1', 'Unknown', ''),  # noqa

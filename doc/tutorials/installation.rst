@@ -28,17 +28,17 @@ Install using pip
 official third-party Python software repository. The simplest way to install
 from PyPi is using `pip <https://pip.pypa.io/>`_ with the command::
 
-  $ pip install pydicom
+  pip install pydicom
 
 You may need to use this instead, depending on your operating system::
 
-  $ python -m pip install pydicom
+  python -m pip install pydicom
 
 You can also perform an offline installation by
 `downloading <https://github.com/pydicom/pydicom/releases>`_ and installing
-one of the release ``*.whl`` files. For example, with the v1.3 release::
+one of the release ``*.whl`` files. For example, with the v2.0 release::
 
-  $ pip install pydicom-1.3.0-py2.py3-none-any.whl
+  pip install pydicom-2.0.0-py3-none-any.whl
 
 
 Install using conda
@@ -47,23 +47,26 @@ Install using conda
 *pydicom* is also available for `conda <https://docs.conda.io/>`_ at
 `conda-forge <https://anaconda.org/conda-forge/pydicom>`_::
 
-  $ conda install -c conda-forge pydicom
-
-
-.. _tut_install_libs:
+  conda install -c conda-forge pydicom
 
 
 Downloading example/test DICOM files
 ------------------------------------
 
-A range of the test data files are not distributed within the pydicom package
-so as to keep the package download size small. These files are instead housed
-on Zenodo at <https://zenodo.org/communities/pydicom>. To download all of the
-pydicom test files and get all of the respective paths of where this data is
-housed run the following::
+To keep the package size small, a number of the larger DICOM files are not
+distributed with *pydicom* and are instead kept in the
+`pydicom-data <https://github.com/pydicom/pydicom-data>`_
+repository. To get the complete set of testing and example files you can either
+install the *pydicom-data* repository::
 
-  pydicom.data.get_testdata_files()
+  pip install git+https://github.com/pydicom/pydicom-data
 
+Or download the missing files to the local cache (after installing *pydicom*)::
+
+  python -c "import pydicom; pydicom.data.fetch_data_files()"
+
+
+.. _tut_install_libs:
 
 Install the optional libraries
 ==============================
@@ -73,11 +76,11 @@ If you're going to be manipulating pixel data then
 
 Using pip::
 
-  $ pip install numpy
+  pip install numpy
 
 Through conda::
 
-  $ conda install numpy
+  conda install numpy
 
 To decode JPEG compressed pixel data one or more additional libraries will
 need to be installed. See :ref:`this page <guide_compressed>` for a list of
@@ -96,12 +99,12 @@ Using pip; you may need to make sure that the
 `openjpeg <http://www.openjpeg.org/>`_ (for JPEG 2000) libraries are installed
 beforehand::
 
-  $ pip install pillow
+  pip install pillow
 
 Through conda::
 
-  $ conda install -c conda-forge openjpeg jpeg
-  $ conda install pillow
+  conda install -c conda-forge openjpeg jpeg
+  conda install pillow
 
 
 Installing CharPyLS
@@ -113,13 +116,13 @@ decompress JPEG-LS images.
 
 Using pip::
 
-  $ pip install cython
-  $ pip install git+https://github.com/Who8MyLunch/CharPyLS
+  pip install cython
+  pip install git+https://github.com/Who8MyLunch/CharPyLS
 
 Through conda::
 
-  $ conda install cython
-  $ pip install git+https://github.com/Who8MyLunch/CharPyLS
+  conda install cython
+  pip install git+https://github.com/Who8MyLunch/CharPyLS
 
 
 Installing GDCM
@@ -136,7 +139,7 @@ has instructions for installing in a virtual environment in Ubuntu
 
 Through conda::
 
-  $ conda install gdcm -c conda-forge
+  conda install gdcm -c conda-forge
 
 
 Installing pylibjpeg
@@ -148,7 +151,7 @@ is installed.
 
 Using pip::
 
-  $ pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg
+  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg
 
 
 .. _tut_install_dev:
@@ -159,7 +162,7 @@ Install the development version
 To install a snapshot of the latest code (the ``master`` branch) from
 `GitHub <https://github.com/pydicom/pydicom>`_::
 
-  $ pip install git+https://github.com/pydicom/pydicom.git
+  pip install git+https://github.com/pydicom/pydicom.git
 
 The ``master`` branch is under active development and while it is usually
 stable, it may have undocumented changes or bugs.
@@ -168,11 +171,11 @@ If you want to keep up-to-date with the latest code, make sure you have
 `Git <https://git-scm.com/>`_ installed and then clone the ``master``
 branch (this will create a ``pydicom`` directory in your current directory)::
 
-  $ git clone --depth=1 https://github.com/pydicom/pydicom.git
+  git clone --depth=1 https://github.com/pydicom/pydicom.git
 
 Then install using pip in editable (``-e``) mode::
 
-  $ pip install -e pydicom/
+  pip install -e pydicom/
 
 When you want to update your copy of the source code, run ``git pull`` from
 within the ``pydicom`` directory and Git will download and apply any changes.

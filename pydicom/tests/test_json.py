@@ -151,15 +151,15 @@ class TestAT:
     def test_invalid_tag_in_json(self):
         ds_json = ('{"000910AG": {"vr": "AT", "Value": ["00091000"]}, '
                    '"00091002": {"vr": "AT", "Value": ["00100010"]}}')
-        with pytest.raises(ValueError, match='Data element "000910AG" could '
-                                             'not be loaded from JSON:'):
+        with pytest.raises(ValueError, match="Data element '000910AG' could "
+                                             "not be loaded from JSON:"):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
             assert 0x00100010 == ds[0x00091002].value
 
 
 class TestDataSetToJson:
-    def test_json_from_dicom_file(self):
+    def test_json_from_dicom_file(self, no_numpy_use):
         ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
         ds_json = ds1.to_json()
         ds2 = Dataset.from_json(ds_json)
@@ -334,7 +334,7 @@ class TestBinary:
             Dataset.from_json(ds_json)
 
     def test_bulk_data_reader_is_called(self):
-        def bulk_data_reader(_):
+        def bulk_data_reader(value):
             return b'xyzzy'
 
         json_data = {
@@ -343,3 +343,36 @@ class TestBinary:
         ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
 
         assert b'xyzzy' == ds[0x00091002].value
+
+    def test_bulk_data_reader_is_called_2(self):
+        def bulk_data_reader(tag, vr, value):
+            return b'xyzzy'
+
+        json_data = {
+            "00091002": {"vr": "OB", "BulkDataURI": "https://a.dummy.url"}
+        }
+        ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
+
+        assert b'xyzzy' == ds[0x00091002].value
+
+    def test_bulk_data_reader_is_called_within_SQ(self):
+        def bulk_data_reader(_):
+            return b'xyzzy'
+
+        json_data = {
+            "003a0200": {
+                "vr": "SQ",
+                "Value": [
+                    {
+                        "54001010": {
+                            "vr": "OW",
+                            "BulkDataURI": "https://a.dummy.url"
+                        }
+                    }
+                ]
+            }
+        }
+
+        ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
+
+        assert b'xyzzy' == ds[0x003a0200].value[0][0x54001010].value

@@ -19,11 +19,9 @@ TEST_FILES = (
 )
 
 
+@pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestDicomDir:
     """Test dicomdir.DicomDir class"""
-
-    def teardown(self):
-        config.enforce_valid_values = False
 
     @pytest.mark.parametrize("testfile", TEST_FILES)
     def test_read_file(self, testfile):
@@ -38,7 +36,7 @@ class TestDicomDir:
         with pytest.raises(InvalidDicomError, match=msg):
             DicomDir("some_name", ds, b'\x00' * 128, ds.file_meta, True, True)
 
-    def test_invalid_sop_no_file_meta(self):
+    def test_invalid_sop_no_file_meta(self, allow_invalid_values):
         """Test exception raised if invalid sop class but no file_meta"""
         ds = dcmread(get_testdata_file('CT_small.dcm'))
         with pytest.raises(AttributeError,
@@ -57,7 +55,7 @@ class TestDicomDir:
         assert ds.patient_records[0].PatientName == 'Doe^Archibald'
         assert ds.patient_records[1].PatientName == 'Doe^Peter'
 
-    def test_invalid_transfer_syntax(self):
+    def test_invalid_transfer_syntax(self, allow_invalid_values):
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
             dcmread(IMPLICIT_TEST_FILE)
         with pytest.warns(UserWarning, match='Invalid transfer syntax*'):
@@ -68,11 +66,20 @@ class TestDicomDir:
         ds = dcmread(get_testdata_file('DICOMDIR-empty.dcm'))
         assert [] == ds.DirectoryRecordSequence
 
-    def test_invalid_transfer_syntax_strict_mode(self):
-        config.enforce_valid_values = True
+    def test_invalid_transfer_syntax_strict_mode(self, enforce_valid_values):
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
             dcmread(IMPLICIT_TEST_FILE)
         with pytest.raises(InvalidDicomError,
                            match='Invalid transfer syntax*'):
             dcmread(BIGENDIAN_TEST_FILE)
+
+
+def test_deprecation_warning():
+    msg = (
+        r"The 'DicomDir' class is deprecated and will be removed in v3.0, "
+        r"after which 'dcmread\(\)' will return a normal 'FileDataset' "
+        r"instance for 'Media Storage Directory' SOP Instances."
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        ds = dcmread(TEST_FILE)

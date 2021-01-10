@@ -66,6 +66,11 @@ GDCMJ2K_TextGBR.dcm (from GDCM)
   * Contains non-conformant Pixel Data with a JP2 header
   * unsigned 8-bit, 3 samples/px, YBR_RCT Photometric Interpretation
 
+J2K_pixelrep_mismatch.dcm
+  * Dataset from issue 1149
+  * J2K data is unsigned, Pixel Representation 1
+  * Bits Stored is 13
+
 MR_small.dcm
   * MR image, Explicit VR, LittleEndian
   * Downsized to 64x64 from 'MR1_UNC', ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
@@ -121,6 +126,11 @@ JPEG-lossy.dcm
   * NM1_JPLY from ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04/
   * 1.2.840.10008.1.2.4.51 Default Transfer Syntax for Lossy JPEG 12-bit
   * GDCM prints when reading this file: "Unsupported JPEG data precision 12" and "Invalid SOS parameters for sequential JPEG", although it does appear to be read properly
+
+JPEG2000-embedded-sequence-delimiter.dcm
+  * A copy of JPEG2000.dcm, with 4 of the encoded pixel data bytes replaced with the Sequence Delimiter
+  * Almost certainly not a valid JPEG anymore, but the DICOM structure is valid
+  * Used to reproduce #1140.
 
 liver.dcm
   * The DICOM SEG example was generated using the dcmqi library: https://github.com/qiicr/dcmqi

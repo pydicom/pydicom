@@ -5,12 +5,12 @@ from io import BytesIO
 
 import pytest
 
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.filebase import DicomIO, DicomFileLike, DicomFile, DicomBytesIO
 from pydicom.tag import Tag
 
 
-TEST_FILE = get_testdata_files('CT_small.dcm')[0]
+TEST_FILE = get_testdata_file('CT_small.dcm')
 
 
 class TestDicomIO:
@@ -260,5 +260,7 @@ class TestDicomFile:
         """Test the function"""
         with DicomFile(TEST_FILE, 'rb') as fp:
             assert not fp.parent.closed
-            assert 'CT_small.dcm' in fp.name
+            # Weird issue with Python 3.6 sometimes returning
+            #   lowercase file path on Windows
+            assert "ct_small.dcm" in fp.name.lower()
             assert fp.read(2) == b'\x49\x49'

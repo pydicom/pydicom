@@ -19,7 +19,7 @@ from pydicom.util.codify import (camel_to_underscore, tag_repr,
                                  code_dataelem, main as codify_main)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 have_numpy = True
 try:
@@ -117,16 +117,18 @@ class TestCodify:
         # ControlPointSequence
         elem = DataElement(0x300A0111, 'SQ', [])
         elem.value.append(Dataset())
-        elem[0].PatientID = '1234'
-        out = "\n"
-        out += "# Control Point Sequence\n"
-        out += "cp_sequence = Sequence()\n"
-        out += "ds.ControlPointSequence = cp_sequence\n"
-        out += "\n"
-        out += "# Control Point Sequence: Control Point 1\n"
-        out += "cp1 = Dataset()\n"
-        out += "cp1.PatientID = '1234'\n"
-        out += "cp_sequence.append(cp1)"
+        elem.value[0].PatientID = '1234'
+        out = (
+            "\n"
+            "# Control Point Sequence\n"
+            "cp_sequence = Sequence()\n"
+            "ds.ControlPointSequence = cp_sequence\n"
+            "\n"
+            "# Control Point Sequence: Control Point 1\n"
+            "cp1 = Dataset()\n"
+            "cp1.PatientID = '1234'\n"
+            "cp_sequence.append(cp1)"
+        )
 
         assert out == code_dataelem(elem)
 
@@ -136,7 +138,7 @@ class TestCodify:
 
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""
-        filename = get_testdata_files("rtplan.dcm")[0]
+        filename = get_testdata_file("rtplan.dcm")
         args = ["--save-as", r"c:\temp\testout.dcm", filename]
         codify_main(100, args)
         out, err = capsys.readouterr()
@@ -230,7 +232,6 @@ class TestHexUtil:
 class TestDataElementCallbackTests:
     def setup(self):
         # Set up a dataset with commas in one item instead of backslash
-        config.enforce_valid_values = True
         namespace = {}
         exec(raw_hex_code, {}, namespace)
         ds_bytes = hexutil.hex2bytes(namespace['impl_LE_deflen_std_hex'])
@@ -240,10 +241,7 @@ class TestDataElementCallbackTests:
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
-    def testBadSeparator(self):
+    def testBadSeparator(self, enforce_valid_values):
         """Ensure that unchanged bad separator does raise an error..."""
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)

@@ -1,10 +1,11 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-
+import os
+from struct import pack
+from typing import Union, BinaryIO, AnyStr
 import warnings
 import zlib
-from struct import pack
 
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
@@ -17,8 +18,7 @@ from pydicom.fileutil import path_from_pathlike
 from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
-from pydicom.uid import (UncompressedPixelTransferSyntaxes,
-                         DeflatedExplicitVRLittleEndian)
+from pydicom.uid import DeflatedExplicitVRLittleEndian
 from pydicom.valuerep import extra_length_VRs
 from pydicom.values import convert_numbers
 
@@ -87,6 +87,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
             elem.VR = 'SS'
             byte_type = 'h'
 
+        if elem.VM == 0:
+            return elem
+
         # Need to handle type check for elements with VM > 1
         elem_value = elem.value if elem.VM == 1 else elem.value[0]
         if not isinstance(elem_value, int):
@@ -115,6 +118,9 @@ def _correct_ambiguous_vr_element(elem, ds, is_little_endian):
         # As per PS3.3 C.11.1.1.1
         if ds.LUTDescriptor[0] == 1:
             elem.VR = 'US'
+            if elem.VM == 0:
+                return elem
+
             elem_value = elem.value if elem.VM == 1 else elem.value[0]
             if not isinstance(elem_value, int):
                 elem.value = convert_numbers(elem.value, is_little_endian, 'H')
@@ -791,13 +797,17 @@ def _write_dataset(fp, dataset, write_like_original):
     write_dataset(fp, get_item(dataset, slice(0x00010000, None)))
 
 
-def dcmwrite(filename, dataset, write_like_original=True):
+def dcmwrite(
+    filename: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+    dataset: Dataset,
+    write_like_original: bool = True
+) -> None:
     """Write `dataset` to the `filename` specified.
 
-    If `write_like_original` is ``True`` then `dataset` will be written as is
-    (after minimal validation checking) and may or may not contain all or parts
-    of the File Meta Information (and hence may or may not be conformant with
-    the DICOM File Format).
+    If `write_like_original` is ``True`` then the :class:`Dataset` will be
+    written as is (after minimal validation checking) and may or may not
+    contain all or parts of the *File Meta Information* (and hence may or
+    may not be conformant with the DICOM File Format).
 
     If `write_like_original` is ``False``, `dataset` will be stored in the
     :dcm:`DICOM File Format <part10/chapter_7.html>`.  To do
@@ -805,11 +815,6 @@ def dcmwrite(filename, dataset, write_like_original=True):
     exists and contains a :class:`Dataset` with the required (Type 1) *File
     Meta Information Group* elements. The byte stream of the `dataset` will be
     placed into the file after the DICOM *File Meta Information*.
-
-    If `write_like_original` is ``True`` then the :class:`Dataset` will be
-    written as is (after minimal validation checking) and may or may not
-    contain all or parts of the *File Meta Information* (and hence may or
-    may not be conformant with the DICOM File Format).
 
     **File Meta Information**
 
@@ -1004,8 +1009,11 @@ def dcmwrite(filename, dataset, write_like_original=True):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
     else:
-        fp = DicomFileLike(filename)
-
+        try:
+            fp = DicomFileLike(filename)
+        except AttributeError:
+            raise TypeError("dcmwrite: Expected a file path or a file-like, "
+                            "but got " + type(filename).__name__)
     try:
         # WRITE FILE META INFORMATION
         if preamble:

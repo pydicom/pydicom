@@ -1,10 +1,14 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataset module."""
+
 import copy
+import pickle
+import weakref
 
 import pytest
 
 import pydicom
+from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
@@ -20,7 +24,7 @@ from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
-    JPEGBaseline,
+    JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID
 )
 
@@ -32,6 +36,7 @@ class BadRepr:
 
 class TestDataset:
     """Tests for dataset.Dataset."""
+
     def setup(self):
         self.ds = Dataset()
         self.ds.TreatmentMachineName = "unit001"
@@ -104,6 +109,7 @@ class TestDataset:
 
     def test_attribute_error_in_property_correct_debug(self):
         """Test AttributeError in property raises correctly."""
+
         class Foo(Dataset):
             @property
             def bar(self):
@@ -159,19 +165,29 @@ class TestDataset:
         self.ds.TreatmentMachineName = "unit999"  # change existing value
         assert "unit999" == self.ds[0x300a, 0x00b2].value
 
-    def test_set_non_dicom(self):
+    def test_set_non_dicom(self, setattr_warn):
         """Dataset: can set class instance property (non-dicom)."""
         ds = Dataset()
-        ds.SomeVariableName = 42
+        msg = (
+            r"Camel case attribute 'SomeVariableName' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.SomeVariableName = 42
         assert hasattr(ds, 'SomeVariableName')
         assert 42 == ds.SomeVariableName
 
-    def test_membership(self):
+    def test_membership(self, contains_warn):
         """Dataset: can test if item present by 'if <name> in dataset'."""
         assert 'TreatmentMachineName' in self.ds
-        assert 'Dummyname' not in self.ds
+        msg = (
+            r"Invalid value used with the 'in' operator: must be "
+            r"an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert 'Dummyname' not in self.ds
 
-    def test_contains(self):
+    def test_contains(self, contains_warn):
         """Dataset: can test if item present by 'if <tag> in dataset'."""
         self.ds.CommandGroupLength = 100  # (0000,0000)
         assert (0x300a, 0xb2) in self.ds
@@ -180,9 +196,39 @@ class TestDataset:
         assert (0x10, 0x5f) not in self.ds
         assert 'CommandGroupLength' in self.ds
         # Use a negative tag to cause an exception
-        assert (-0x0010, 0x0010) not in self.ds
+        msg = (
+            r"Invalid value used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert (-0x0010, 0x0010) not in self.ds
+
         # Random non-existent property
-        assert 'random name' not in self.ds
+        with pytest.warns(UserWarning, match=msg):
+            assert 'random name' not in self.ds
+
+        # Overflowing tag
+        msg = (
+            r"Invalid element tag value used with the 'in' operator: "
+            r"tags have a maximum value of \(0xFFFF, 0xFFFF\)"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            assert 0x100100010 not in self.ds
+
+    def test_contains_raises(self, contains_raise):
+        """Test raising exception for invalid key."""
+        msg = (
+            r"Invalid value used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            'invalid' in self.ds
+
+    def test_contains_ignore(self, contains_ignore):
+        """Test ignoring invalid keys."""
+        with pytest.warns(None) as record:
+            assert 'invalid' not in self.ds
+            assert len(record) == 0
 
     def test_clear(self):
         assert 1 == len(self.ds)
@@ -228,6 +274,17 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
+    def test_setdefault_unknown_tag(self, allow_invalid_values):
+        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+            elem = self.ds.setdefault(0x88880002, 'foo')
+        assert 'foo' == elem.value
+        assert 'UN' == elem.VR
+        assert 2 == len(self.ds)
+
+    def test_setdefault_unknown_tag_strict(self, enforce_valid_values):
+        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+            elem = self.ds.setdefault(0x88880004, 'foo')
+
     def test_setdefault_tuple(self):
         elem = self.ds.setdefault((0x300a, 0x00b2), 'foo')
         assert 'unit001' == elem.value
@@ -237,22 +294,64 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
-    def test_setdefault_use_value(self):
+    def test_setdefault_unknown_tuple(self, allow_invalid_values):
+        with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
+            elem = self.ds.setdefault((0x8888, 0x0002), 'foo')
+        assert 'foo' == elem.value
+        assert 'UN' == elem.VR
+        assert 2 == len(self.ds)
+
+    def test_setdefault_unknown_tuple_strict(self, enforce_valid_values):
+        with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
+            elem = self.ds.setdefault((0x8888, 0x0004), 'foo')
+
+    def test_setdefault_use_value(self, allow_invalid_values):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
-        with pytest.raises(KeyError, match=r'Tag \(0011, 0010\) not found '
-                                           r'in DICOM dictionary'):
-            self.ds.setdefault((0x0011, 0x0010), "Test")
 
     def test_setdefault_keyword(self):
+        """Test setdefault()."""
+        assert 'WindowWidth' not in self.ds
+        elem = self.ds.setdefault('WindowWidth', None)
+        assert elem.value is None
+        assert self.ds.WindowWidth is None
+        elem = self.ds.setdefault('WindowWidth', 1024)
+        assert elem.value is None
+        assert self.ds.WindowWidth is None
+
+        assert 'TreatmentMachineName' in self.ds
+        assert 'unit001' == self.ds.TreatmentMachineName
         elem = self.ds.setdefault('TreatmentMachineName', 'foo')
         assert 'unit001' == elem.value
+
         elem = self.ds.setdefault(
             'PatientName', DataElement(0x00100010, 'PN', "Test")
         )
         assert 'Test' == elem.value
-        assert 2 == len(self.ds)
+        assert 3 == len(self.ds)
+
+    def test_setdefault_invalid_keyword(self):
+        """Test setdefault() with an invalid keyword raises."""
+        msg = (
+            r"Unable to create an element tag from 'FooBar': unknown "
+            r"DICOM element keyword"
+        )
+        with pytest.raises(ValueError, match=msg):
+            self.ds.setdefault('FooBar', 'foo')
+
+    def test_setdefault_private(self):
+        """Test setdefault() with a private tag."""
+        elem = self.ds.setdefault(0x00090020, None)
+        assert elem.is_private
+        assert elem.value is None
+        assert 'UN' == elem.VR
+        assert 0x00090020 in self.ds
+        elem.VR = 'PN'
+        elem = self.ds.setdefault(0x00090020, 'test')
+        assert elem.is_private
+        assert elem.value is None
+        assert 'PN' == elem.VR
 
     def test_get_exists1(self):
         """Dataset: dataset.get() returns an existing item by name."""
@@ -329,6 +428,7 @@ class TestDataset:
 
     def test_dir_subclass(self):
         """Dataset.__dir__ returns class specific dir"""
+
         class DSP(Dataset):
             def test_func(self):
                 pass
@@ -343,12 +443,17 @@ class TestDataset:
         assert callable(ds.group_dataset)
         assert 'group_dataset' in dir(ds)
 
-    def test_dir(self):
+    def test_dir(self, setattr_warn):
         """Dataset.dir() returns sorted list of named data_elements."""
         ds = self.ds
         ds.PatientName = "name"
         ds.PatientID = "id"
-        ds.NonDicomVariable = "junk"
+        msg = (
+            r"Camel case attribute 'NonDicomVariable' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.NonDicomVariable = "junk"
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
         expected = ['PatientID',
@@ -357,12 +462,17 @@ class TestDataset:
                     'XRayTubeCurrent']
         assert expected == ds.dir()
 
-    def test_dir_filter(self):
+    def test_dir_filter(self, setattr_warn):
         """Test Dataset.dir(*filters) works OK."""
         ds = self.ds
         ds.PatientName = "name"
         ds.PatientID = "id"
-        ds.NonDicomVariable = "junk"
+        msg = (
+            r"Camel case attribute 'NonDicomVariable' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.NonDicomVariable = "junk"
         ds.add_new((0x18, 0x1151), "IS", 150)  # X-ray Tube Current
         ds.add_new((0x1111, 0x123), "DS", "42.0")  # private - no name in dir()
         assert 'PatientID' in ds
@@ -513,15 +623,21 @@ class TestDataset:
         # Make sure Dataset.__eq__() is being used, not dict__eq__()
         assert not d == {'SOPInstanceUID': '1.2.3.4'}
 
-    def test_equality_unknown(self):
+    def test_equality_unknown(self, setattr_warn):
         """Dataset: equality returns correct value with extra members """
         # Non-element class members are ignored in equality testing
         d = Dataset()
-        d.SOPEustaceUID = '1.2.3.4'
+        msg = (
+            r"Camel case attribute 'SOPEustaceUID' used which is not in "
+            r"the element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            d.SOPEustaceUID = '1.2.3.4'
         assert d == d
 
         e = Dataset()
-        e.SOPEustaceUID = '1.2.3.5'
+        with pytest.warns(UserWarning, match=msg):
+            e.SOPEustaceUID = '1.2.3.5'
         assert d == e
 
     def test_equality_inheritance(self):
@@ -574,6 +690,7 @@ class TestDataset:
 
     def test_property(self):
         """Test properties work OK."""
+
         class DSPlus(Dataset):
             @property
             def test(self):
@@ -1185,7 +1302,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = b'\x00\x01\x02\x03\x04\x05\x06'
         ds['PixelData'].VR = 'OB'
         msg = (
@@ -1202,7 +1319,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         ds['PixelData'].VR = 'OB'
         ds.save_as(fp)
@@ -1214,7 +1331,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.save_as(fp)
 
     def test_save_as_no_file_meta(self):
@@ -1269,7 +1386,7 @@ class TestDataset:
         ds.is_little_endian = True
         ds.is_implicit_VR = False
         ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = JPEGBaseline
+        ds.file_meta.TransferSyntaxUID = JPEGBaseline8Bit
         ds.PixelData = encapsulate([b'\x00\x01\x02\x03\x04\x05\x06'])
         elem = ds['PixelData']
         elem.VR = 'OB'
@@ -1337,6 +1454,7 @@ class TestDataset:
 
     def test_exit_exception(self):
         """Test Dataset.__exit__ when an exception is raised."""
+
         class DSException(Dataset):
             @property
             def test(self):
@@ -1443,6 +1561,7 @@ class TestDataset:
 
     def test_walk(self):
         """Test Dataset.walk iterates through sequences"""
+
         def test_callback(dataset, elem):
             if elem.keyword == 'PatientID':
                 dataset.PatientID = 'FIXED'
@@ -1485,9 +1604,28 @@ class TestDataset:
         ds2.update(ds)
         assert 'TestC' == ds2.PatientName
 
+    def test_getitem_invalid_key_raises(self):
+        """Test that __getitem__ raises KeyError on invalid key."""
+        ds = Dataset()
+        with pytest.raises(KeyError, match=r"'invalid'"):
+            ds['invalid']
+
+    def test_setitem_invalid_key(self):
+        """Test that __setitem__ behavior."""
+        a = {}
+        with pytest.raises(KeyError, match=r"'invalid'"):
+            a['invalid']
+
+        ds = Dataset()
+        ds.PatientName = 'Citizen^Jan'
+        msg = r"Unable to convert the key 'invalid' to an element tag"
+        with pytest.raises(ValueError, match=msg):
+            ds['invalid'] = ds['PatientName']
+
 
 class TestDatasetElements:
     """Test valid assignments of data elements"""
+
     def setup(self):
         self.ds = Dataset()
         self.sub_ds1 = Dataset()
@@ -1530,7 +1668,7 @@ class TestDatasetElements:
         assert ExplicitVRBigEndian == self.ds.file_meta.TransferSyntaxUID
 
         assert 'MediaStorageSOPClassUID' not in self.ds.file_meta
-        assert 'MediaStorageSOPInstanceUID ' not in self.ds.file_meta
+        assert 'MediaStorageSOPInstanceUID' not in self.ds.file_meta
         with pytest.raises(ValueError,
                            match='Missing required File Meta .*'):
             self.ds.fix_meta_info(enforce_standard=True)
@@ -1593,19 +1731,37 @@ class TestFileDataset:
     def setup(self):
         self.test_file = get_testdata_file('CT_small.dcm')
 
-    def test_pickle(self):
+    def test_pickle_raw_data(self):
         ds = pydicom.dcmread(self.test_file)
-        import pickle
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
         assert ds == ds1
         assert ds1.Modality == 'CT'
 
+    def test_pickle_data_elements(self):
+        ds = pydicom.dcmread(self.test_file)
+        assert ds.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        for e in ds:
+            # make sure all data elements have been loaded
+            pass
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds1.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds == ds1
+
+    def test_pickle_nested_sequence(self):
+        ds = pydicom.dcmread(get_testdata_file("nested_priv_SQ.dcm"))
+        for e in ds:
+            # make sure all data elements have been loaded
+            pass
+        s = pickle.dumps({'ds': ds})
+        ds1 = pickle.loads(s)['ds']
+        assert ds == ds1
+
     def test_pickle_modified(self):
         """Test pickling a modified dataset."""
         ds = pydicom.dcmread(self.test_file)
         ds.PixelSpacing = [1.0, 1.0]
-        import pickle
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
         assert ds == ds1
@@ -1635,6 +1791,7 @@ class TestFileDataset:
 
     def test_creation_with_container(self):
         """FileDataset.__init__ works OK with a container such as gzip"""
+
         class Dummy:
             filename = '/some/path/to/test'
 
@@ -1670,6 +1827,7 @@ class TestFileDataset:
 
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""
+
     def setup(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
@@ -1861,3 +2019,138 @@ class TestFileMeta:
         assert ds_copy.is_implicit_VR
         assert ds_copy.is_little_endian
         assert ds_copy.read_encoding == "utf-8"
+
+
+@pytest.fixture
+def contains_raise():
+    """Raise on invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "RAISE"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
+
+
+@pytest.fixture
+def contains_ignore():
+    """Ignore invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "IGNORE"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
+
+
+@pytest.fixture
+def contains_warn():
+    """Warn on invalid keys with Dataset.__contains__()"""
+    original = config.INVALID_KEY_BEHAVIOR
+    config.INVALID_KEY_BEHAVIOR = "WARN"
+    yield
+    config.INVALID_KEY_BEHAVIOR = original
+CAMEL_CASE = (
+    [  # Shouldn't warn
+        "Rows", "_Rows", "Rows_", "rows", "_rows", "__rows", "rows_", "ro_ws",
+        "rowds", "BitsStored", "bits_Stored", "Bits_Stored", "bits_stored",
+        "_BitsStored", "BitsStored_", "B_itsStored", "BitsS_tored",
+        "12LeadECG", "file_meta", "filename", "is_implicit_VR",
+        "is_little_endian", "preamble", "timestamp", "fileobj_type",
+        "patient_records", "_parent_encoding", "_dict", "is_decompressed",
+        "read_little_endian", "read_implicit_vr", "read_encoding", "parent",
+        "_private_blocks", "default_element_format", "indent_chars",
+        "default_sequence_element_format", "PatientName"
+    ],
+    [  # Should warn
+        "bitsStored", "BitSStored", "TwelveLeadECG", "SOPInstanceUId",
+        "PatientsName", "Rowds"
+    ]
+)
+
+
+@pytest.fixture
+def setattr_raise():
+    """Raise on Dataset.__setattr__() close keyword matches."""
+    original = config.INVALID_KEYWORD_BEHAVIOR
+    config.INVALID_KEYWORD_BEHAVIOR = "RAISE"
+    yield
+    config.INVALID_KEYWORD_BEHAVIOR = original
+
+
+@pytest.fixture
+def setattr_ignore():
+    """Ignore Dataset.__setattr__() close keyword matches."""
+    original = config.INVALID_KEYWORD_BEHAVIOR
+    config.INVALID_KEYWORD_BEHAVIOR = "IGNORE"
+    yield
+    config.INVALID_KEYWORD_BEHAVIOR = original
+
+
+@pytest.fixture
+def setattr_warn():
+    """Warn on Dataset.__setattr__() close keyword matches."""
+    original = config.INVALID_KEYWORD_BEHAVIOR
+    config.INVALID_KEYWORD_BEHAVIOR = "WARN"
+    yield
+    config.INVALID_KEYWORD_BEHAVIOR = original
+
+
+def test_setattr_warns(setattr_warn):
+    """"Test warnings for Dataset.__setattr__() for close matches."""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    for s in CAMEL_CASE[1]:
+        msg = (
+            r"Camel case attribute '" + s + r"' used which is not in the "
+            r"element keyword data dictionary"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+
+
+def test_setattr_raises(setattr_raise):
+    """"Test exceptions for Dataset.__setattr__() for close matches."""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    for s in CAMEL_CASE[1]:
+        msg = (
+            r"Camel case attribute '" + s + r"' used which is not in the "
+            r"element keyword data dictionary"
+        )
+        with pytest.raises(ValueError, match=msg):
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+
+
+def test_setattr_ignore(setattr_ignore):
+    """Test config.INVALID_KEYWORD_BEHAVIOR = 'IGNORE'"""
+    with pytest.warns(None) as record:
+        ds = Dataset()
+        assert len(record) == 0
+
+    for s in CAMEL_CASE[0]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, val)
+            assert len(record) == 0
+
+    ds = Dataset()
+    for s in CAMEL_CASE[1]:
+        with pytest.warns(None) as record:
+            val = getattr(ds, s, None)
+            setattr(ds, s, None)
+            assert len(record) == 0

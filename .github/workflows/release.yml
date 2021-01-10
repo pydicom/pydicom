@@ -1,0 +1,74 @@
+name: release
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Build package
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel
+        python setup.py sdist bdist_wheel
+
+    - name: Upload artifacts
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist/*.whl
+
+    - name: Set up venv
+      run: |
+        sudo apt-get install python3-venv
+        python -m venv ~/myenv
+        source ~/myenv/bin/activate
+        echo "Virtual env: $VIRTUAL_ENV"
+
+    - name: Install pytest and our package
+      run: |
+        pip install pytest
+        cd ..  # avoid pip seeing 'pydicom' package dir below
+        pip install -f pydicom/dist pydicom
+
+    - name: Test with pytest (no numpy)
+      run: |
+        python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
+
+    - name: Install numpy
+      run: |
+        pip install numpy
+
+    - name: Test with pytest (numpy installed)
+      run: |
+        python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
+        cd pydicom  # back to root repo dir
+
+    # - name: Publish package to Test PyPi
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.TEST_PYPI_PASSWORD }}
+    #     repository_url: https://test.pypi.org/legacy/
+
+    - name: Publish package to PyPi
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}

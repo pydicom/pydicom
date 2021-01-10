@@ -19,7 +19,7 @@ from pydicom import config
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
-from pydicom.filereader import dcmread, read_dataset
+from pydicom.filereader import dcmread, read_dataset, read_dicomdir
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
@@ -67,6 +67,9 @@ ct_name = get_testdata_file("CT_small.dcm")
 mr_name = get_testdata_file("MR_small.dcm")
 truncated_mr_name = get_testdata_file("MR_truncated.dcm")
 jpeg2000_name = get_testdata_file("JPEG2000.dcm")
+jpeg2000_embedded_sequence_delimeter_name = get_testdata_file(
+    "JPEG2000-embedded-sequence-delimiter.dcm"
+)
 jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
 jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
 jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
@@ -95,10 +98,6 @@ save_dir = os.getcwd()
 
 
 class TestReader:
-    def teardown(self):
-        config.enforce_valid_values = False
-        config.replace_un_with_known_vr = True
-
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as ``None``."""
@@ -120,14 +119,12 @@ class TestReader:
 
     def test_pathlib_path_filename(self):
         """Check that file can be read using pathlib.Path"""
-        ds = dcmread(Path(priv_SQ_name))
+        dcmread(Path(priv_SQ_name))
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test
         RT Plan file.
         """
-        orig_use_numpy = config.use_DS_numpy
-        config.use_DS_numpy = False
         plan = dcmread(rtplan_name)
         beam = plan.BeamSequence[0]
         # if not two controlpoints, then this would raise exception
@@ -143,8 +140,12 @@ class TestReader:
         expected = DS("0.9990268")
         assert expected == got
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
-        assert [DS("-100"), DS("100.0")] == got
-        config.use_DS_numpy = orig_use_numpy
+        if have_numpy and config.use_DS_numpy:
+            expected = numpy.array([DS("-100"), DS("100.0")])
+            assert numpy.allclose(got, expected)
+        else:
+            expected = [DS("-100"), DS("100.0")]
+            assert got == expected
 
     def test_RTDose(self):
         """Returns correct values for sample data elements in test
@@ -274,6 +275,8 @@ class TestReader:
 
     def test_bad_sequence(self):
         """Test that automatic UN conversion can be switched off."""
+        replace_un_with_known_vr = config.replace_un_with_known_vr
+        config.replace_un_with_known_vr = True
         with pytest.raises(NotImplementedError):
             ds = dcmread(get_testdata_file("bad_sequence.dcm"))
             # accessing the elements of the faulty sequence raises
@@ -282,6 +285,7 @@ class TestReader:
         config.replace_un_with_known_vr = False
         ds = dcmread(get_testdata_file("bad_sequence.dcm"))
         str(ds.CTDIPhantomTypeCodeSequence)
+        config.replace_un_with_known_vr = replace_un_with_known_vr
 
     def test_no_pixels_read(self):
         """Returns all data elements before pixels using
@@ -342,7 +346,7 @@ class TestReader:
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
 
-    def test_tag_with_unknown_length_tag_too_short(self):
+    def test_tag_with_unknown_length_tag_too_short(self, allow_invalid_values):
         """Tests handling of incomplete sequence value."""
         # the data set is the same as emri_jpeg_2k_lossless,
         # with the last 8 bytes removed to provoke the EOF error
@@ -353,7 +357,10 @@ class TestReader:
                 specific_tags=[unknown_len_tag],
             )
 
-        config.enforce_valid_values = True
+    def test_tag_with_unknown_length_tag_too_short_strict(
+            self, enforce_valid_values):
+        """Tests handling of incomplete sequence value in strict mode."""
+        unknown_len_tag = Tag(0x7FE0, 0x0010)  # Pixel Data
         with pytest.raises(EOFError, match="End of file reached*"):
             dcmread(
                 emri_jpeg_2k_lossless_too_short,
@@ -397,7 +404,7 @@ class TestReader:
         assert b"Double Nested SQ" == seq1[0][tag].value
         assert b"Nested SQ" == seq0[0][0x01, 0x02].value
 
-    def test_no_meta_group_length(self):
+    def test_no_meta_group_length(self, no_datetime_conversion):
         """Read file with no group length in file meta."""
         # Issue 108 -- iView example file with no group length (0002,0002)
         # Originally crashed, now check no exception, but also check one item
@@ -416,7 +423,7 @@ class TestReader:
         pixel_data_tag = TupleTag((0x7FE0, 0x10))
         assert pixel_data_tag in ds
 
-    def test_explicit_VR_little_endian_no_meta(self):
+    def test_explicit_VR_little_endian_no_meta(self, no_datetime_conversion):
         """Read file without file meta with Little Endian Explicit VR dataset.
         """
         # Example file from CMS XiO 5.0 and above
@@ -424,7 +431,7 @@ class TestReader:
         ds = dcmread(explicit_vr_le_no_meta, force=True)
         assert "20150529" == ds.InstanceCreationDate
 
-    def test_explicit_VR_big_endian_no_meta(self):
+    def test_explicit_VR_big_endian_no_meta(self, no_datetime_conversion):
         """Read file without file meta with Big Endian Explicit VR dataset."""
         # Example file from CMS XiO 5.0 and above
         # Still need to force read data since there is no 'DICM' marker present
@@ -487,7 +494,20 @@ class TestReader:
         ds = dcmread(fp, force=True)
         assert "OB" == ds[0x7FE00010].VR
 
-    def test_long_specific_char_set(self):
+    def test_read_encoded_pixel_data_without_embedded_sequence_delimiter(self):
+        ds = dcmread(jpeg2000_name)
+        assert "OB" == ds[0x7FE00010].VR
+        assert 266 == len(ds[0x7FE00010].value)
+
+    def test_read_encoded_pixel_data_with_embedded_sequence_delimiter(self):
+        """Test ignoring embedded sequence delimiter in encoded pixel
+        data fragment. Reproduces #1140.
+        """
+        ds = dcmread(jpeg2000_embedded_sequence_delimeter_name)
+        assert "OB" == ds[0x7FE00010].VR
+        assert 266 == len(ds[0x7FE00010].value)
+
+    def test_long_specific_char_set(self, allow_invalid_values):
         """Test that specific character set is read even if it is longer
          than defer_size"""
         ds = Dataset()
@@ -508,6 +528,18 @@ class TestReader:
         with pytest.warns(UserWarning, match=msg):
             ds = dcmread(fp, defer_size=65, force=True)
             assert long_specific_char_set_value == ds[0x00080005].value
+
+    def test_long_specific_char_set_strict(self, enforce_valid_values):
+        ds = Dataset()
+
+        long_specific_char_set_value = ["ISO 2022IR 100"] * 9
+        ds.add(DataElement(0x00080005, "CS", long_specific_char_set_value))
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        with pytest.raises(LookupError,
+                           match="Unknown encoding 'ISO 2022IR 100'"):
+            file_ds.save_as(fp, write_like_original=True)
 
     def test_no_preamble_file_meta_dataset(self):
         """Test correct read of group 2 elements with no preamble."""
@@ -673,7 +705,7 @@ class TestReader:
         assert ds.preamble is None
         assert Dataset() == ds.file_meta
 
-    def test_file_meta_dataset_implicit_vr(self):
+    def test_file_meta_dataset_implicit_vr(self, allow_invalid_values):
         """Test reading a file meta dataset that is implicit VR"""
 
         bytestream = (
@@ -686,6 +718,21 @@ class TestReader:
         with pytest.warns(UserWarning):
             ds = dcmread(fp, force=True)
         assert "TransferSyntaxUID" in ds.file_meta
+
+    def test_file_meta_dataset_implicit_vr_strict(self, enforce_valid_values):
+        """Test reading a file meta dataset that is implicit VR"""
+
+        bytestream = (
+            b"\x02\x00\x10\x00\x12\x00\x00\x00"
+            b"\x31\x2e\x32\x2e\x38\x34\x30\x2e"
+            b"\x31\x30\x30\x30\x38\x2e\x31\x2e"
+            b"\x32\x00"
+        )
+        fp = BytesIO(bytestream)
+        with pytest.raises(InvalidDicomError,
+                           match="Expected explicit VR, "
+                                 "but found implicit VR"):
+            dcmread(fp, force=True)
 
     def test_no_dataset(self):
         """Test reading no elements or preamble produces empty Dataset"""
@@ -703,6 +750,17 @@ class TestReader:
             assert ds.preamble is None
             assert Dataset() == ds.file_meta
             assert Dataset() == ds[:]
+
+    def test_bad_filename(self):
+        """Test reading from non-existing file raises."""
+        with pytest.raises(FileNotFoundError):
+            dcmread("InvalidFilePath")
+        with pytest.raises(TypeError, match="dcmread: Expected a file path or "
+                                            "a file-like, but got None"):
+            dcmread(None)
+        with pytest.raises(TypeError, match="dcmread: Expected a file path or "
+                                            "a file-like, but got int"):
+            dcmread(42)
 
     def test_empty_specific_character_set(self):
         """Test that an empty Specific Character Set is handled correctly.
@@ -785,7 +843,6 @@ class TestReader:
 
 class TestIncorrectVR:
     def setup(self):
-        config.enforce_valid_values = False
         self.ds_explicit = BytesIO(
             b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"  # SpecificCharacterSet
             b"\x08\x00\x20\x00DA\x08\x0020000101"  # StudyDate
@@ -795,10 +852,8 @@ class TestIncorrectVR:
             b"\x08\x00\x20\x00\x08\x00\x00\x0020000101"
         )
 
-    def teardown(self):
-        config.enforce_valid_values = False
-
-    def test_implicit_vr_expected_explicit_used(self):
+    def test_implicit_vr_expected_explicit_used(self, allow_invalid_values,
+                                                no_datetime_conversion):
         msg = (
             "Expected implicit VR, but found explicit VR - "
             "using explicit VR for reading"
@@ -811,8 +866,8 @@ class TestIncorrectVR:
         assert "ISO_IR 100" == ds.SpecificCharacterSet
         assert "20000101" == ds.StudyDate
 
-    def test_implicit_vr_expected_explicit_used_strict(self):
-        config.enforce_valid_values = True
+    def test_implicit_vr_expected_explicit_used_strict(
+            self, enforce_valid_values):
         msg = (
             "Expected implicit VR, but found explicit VR - "
             "using explicit VR for reading"
@@ -823,7 +878,8 @@ class TestIncorrectVR:
                 self.ds_explicit, is_implicit_VR=True, is_little_endian=True
             )
 
-    def test_explicit_vr_expected_implicit_used(self):
+    def test_explicit_vr_expected_implicit_used(self, allow_invalid_values,
+                                                no_datetime_conversion):
         msg = (
             "Expected explicit VR, but found implicit VR - "
             "using implicit VR for reading"
@@ -836,8 +892,8 @@ class TestIncorrectVR:
         assert "ISO_IR 100" == ds.SpecificCharacterSet
         assert "20000101" == ds.StudyDate
 
-    def test_explicit_vr_expected_implicit_used_strict(self):
-        config.enforce_valid_values = True
+    def test_explicit_vr_expected_implicit_used_strict(
+            self, enforce_valid_values):
         msg = (
             "Expected explicit VR, but found implicit VR - "
             "using implicit VR for reading"
@@ -1112,6 +1168,15 @@ class TestReadDataElement:
         ds = dcmread(self.fp, force=True)
         assert "TEST  12" == ds.DestinationAE
 
+        # Test multivalue read correctly
+        ds.DestinationAE = ["TEST  12  ", "  TEST2", "   TEST 3  "]
+
+        fp = BytesIO()
+        ds.save_as(fp, write_like_original=True)
+        fp.seek(0)
+        ds = dcmread(fp, force=True)
+        assert ["TEST  12", "TEST2", "TEST 3"] == ds.DestinationAE
+
     def test_read_OV_implicit_little(self):
         """Check reading element with VR of OV encoded as implicit"""
         ds = dcmread(self.fp, force=True)
@@ -1221,15 +1286,15 @@ class TestReadDataElement:
 
 
 class TestDSISnumpy:
-    def setup(self):
-        self.orig_IS_numpy = config.use_IS_numpy
-        self.orig_DS_numpy = config.use_DS_numpy
-        self.orig_DS_decimal = config.use_DS_decimal
-
-    def teardown(self):
-        config.use_IS_numpy = self.orig_IS_numpy
-        config.DS_decimal(self.orig_DS_decimal)
-        config.DS_numpy(self.orig_DS_numpy)
+    @pytest.fixture(autouse=True)
+    def restore_config_values(self):
+        orig_IS_numpy = config.use_IS_numpy
+        orig_DS_numpy = config.use_DS_numpy
+        orig_DS_decimal = config.use_DS_decimal
+        yield
+        config.use_IS_numpy = orig_IS_numpy
+        config.DS_decimal(orig_DS_decimal)
+        config.DS_numpy(orig_DS_numpy)
 
     @pytest.mark.skipif(have_numpy, reason="Testing import error")
     def test_IS_numpy_import_error(self):
@@ -1237,7 +1302,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
+            rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_IS_numpy_class(self):
@@ -1265,7 +1330,7 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
         with pytest.raises(ImportError):
-            cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
+            rtss.ROIContourSequence[0].ContourSequence[0].ContourData
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
     def test_DS_numpy_class(self):
@@ -1290,6 +1355,7 @@ class TestDSISnumpy:
 
     @pytest.mark.skipif(not have_numpy, reason="numpy not installed")
     def test_DS_conflict_config(self):
+        config.DS_numpy(False)
         config.DS_decimal(True)
         with pytest.raises(ValueError):
             config.DS_numpy(True)
@@ -1509,3 +1575,13 @@ class TestDataElementGenerator:
         gen = data_element_generator(fp, False, False)
         elem = DataElement(0x00100010, "PN", "ABCDEF")
         assert elem == DataElement_from_raw(next(gen), "ISO_IR 100")
+
+
+def test_read_dicomdir_deprecated():
+    """Test deprecation warning for read_dicomdir()."""
+    msg = (
+        r"'read_dicomdir\(\)' is deprecated and will be removed in v3.0, use "
+        r"'dcmread\(\)' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        ds = read_dicomdir(get_testdata_file("DICOMDIR"))

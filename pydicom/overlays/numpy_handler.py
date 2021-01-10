@@ -2,13 +2,6 @@
 """Use the `numpy <https://numpy.org/>`_ package to convert supported *Overlay
 Data* to a :class:`numpy.ndarray`.
 
-**Supported transfer syntaxes**
-
-* 1.2.840.10008.1.2 : Implicit VR Little Endian
-* 1.2.840.10008.1.2.1 : Explicit VR Little Endian
-* 1.2.840.10008.1.2.1.99 : Deflated Explicit VR Little Endian
-* 1.2.840.10008.1.2.2 : Explicit VR Big Endian
-
 **Supported data**
 
 The numpy handler supports the conversion of data in the (60xx,3000)
@@ -35,6 +28,7 @@ table below.
 
 """
 
+from typing import TYPE_CHECKING
 import warnings
 
 try:
@@ -43,25 +37,17 @@ try:
 except ImportError:
     HAVE_NP = False
 
-import pydicom.uid
 from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
+
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'Numpy Overlay'
-
-DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
-}
-
-SUPPORTED_TRANSFER_SYNTAXES = [
-    pydicom.uid.ExplicitVRLittleEndian,
-    pydicom.uid.ImplicitVRLittleEndian,
-    pydicom.uid.DeflatedExplicitVRLittleEndian,
-    pydicom.uid.ExplicitVRBigEndian,
-]
+DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met.
 
     .. versionadded:: 1.4
@@ -69,21 +55,7 @@ def is_available():
     return HAVE_NP
 
 
-def supports_transfer_syntax(transfer_syntax):
-    """Return ``True`` if the handler supports the `transfer_syntax`.
-
-    .. versionadded:: 1.4
-
-    Parameters
-    ----------
-    transfer_syntax : uid.UID
-        The Transfer Syntax UID of the *Pixel Data* that is to be used with
-        the handler.
-    """
-    return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
-
-
-def get_expected_length(elem, unit='bytes'):
+def get_expected_length(elem: dict, unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -131,7 +103,7 @@ def get_expected_length(elem, unit='bytes'):
     return length // 8 + (length % 8 > 0)
 
 
-def reshape_overlay_array(elem, arr):
+def reshape_overlay_array(elem: dict, arr: "np.ndarray") -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     .. versionadded:: 1.4
@@ -193,7 +165,7 @@ def reshape_overlay_array(elem, arr):
     return arr.reshape(nr_rows, nr_columns)
 
 
-def get_overlay_array(ds, group):
+def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the *Overlay Data*.
 
     .. versionadded:: 1.4
@@ -220,13 +192,8 @@ def get_overlay_array(ds, group):
         If the actual length of the overlay data doesn't match the expected
         length.
     """
-    transfer_syntax = ds.file_meta.TransferSyntaxUID
-    # The check of transfer syntax must be first
-    if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
-        raise NotImplementedError(
-            "Unable to convert the overlay data as the transfer syntax "
-            "is not supported by the numpy overlay data handler."
-        )
+    if not HAVE_NP:
+        raise ImportError("The overlay data handler requires numpy")
 
     # Check required elements
     elem = {

@@ -11,11 +11,13 @@ Configuration Options (:mod:`pydicom.config`)
    :toctree: generated/
 
    allow_DS_float
+   convert_wrong_length_to_UN
    data_element_callback
    data_element_callback_kwargs
    datetime_conversion
    debug
    enforce_valid_values
+   future_behavior
    overlay_data_handlers
    pixel_data_handlers
    reset_data_element_callback
@@ -25,4 +27,6 @@ Configuration Options (:mod:`pydicom.config`)
    use_DS_decimal
    use_IS_numpy
    use_DS_numpy
-
+   APPLY_J2K_CORRECTIONS
+   INVALID_KEY_BEHAVIOR
+   INVALID_KEYWORD_BEHAVIOR

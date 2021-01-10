@@ -1,11 +1,58 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for uid.py"""
 
+from importlib import import_module
+import sys
 import uuid
 
 import pytest
 
-from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSLossy
+from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSNearLossless
+import pydicom.uid
+
+
+def test_jpeglossless_warning():
+    """Test warning when importing JPEGLossless for Python 3.7+."""
+    if sys.version_info[:2] < (3, 7):
+        from pydicom.uid import JPEGLossless
+        assert '1.2.840.10008.1.2.4.70' == JPEGLossless
+    else:
+        msg = (
+            r"In pydicom v3.0 the UID for 'JPEGLossless' will change "
+            r"from '1.2.840.10008.1.2.4.70' to '1.2.840.10008.1.2.4.57' to "
+            r"match its UID keyword. Use 'JPEGLosslessSV1' instead"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            from pydicom.uid import JPEGLossless
+            assert '1.2.840.10008.1.2.4.70' == JPEGLossless
+
+
+def test_deprecation_warnings():
+    """Test deprecations warnings for other UIDs for Python 3.7+."""
+    _deprecations = {
+        "JPEGBaseline": ("1.2.840.10008.1.2.4.50", "JPEGBaseline8Bit"),
+        "JPEGExtended": ("1.2.840.10008.1.2.4.51", "JPEGExtended12Bit"),
+        "JPEGLSLossy": ("1.2.840.10008.1.2.4.81", "JPEGLSNearLossless"),
+        "JPEG2000MultiComponentLossless": (
+            "1.2.840.10008.1.2.4.92", "JPEG2000MCLossless"
+        ),
+        "JPEG2000MultiComponent": ("1.2.840.10008.1.2.4.93", "JPEG2000MC"),
+    }
+
+    if sys.version_info[:2] < (3, 7):
+        for name, (value, replacement) in _deprecations.items():
+            uid = getattr(pydicom.uid, name)
+
+            assert value == uid
+    else:
+        for name, (value, replacement) in _deprecations.items():
+            msg = (
+                f"The UID constant '{name}' is deprecated and will be removed "
+                f"in pydicom v2.2, use '{replacement}' instead"
+            )
+            with pytest.warns(DeprecationWarning, match=msg):
+                uid = getattr(pydicom.uid, name)
+                assert value == uid
 
 
 class TestGenerateUID:
@@ -80,8 +127,7 @@ class TestGenerateUID:
 
 class TestUID:
     """Test DICOM UIDs"""
-    @classmethod
-    def setup_class(self):
+    def setup(self):
         """Set default UID"""
         self.uid = UID('1.2.840.10008.1.2')
 
@@ -230,7 +276,7 @@ class TestUID:
             # operator while checking for containment in the uid dictionary
             # (regression test for issue #499)
             def __hash__(self):
-                return hash(JPEGLSLossy)
+                return hash(JPEGLSNearLossless)
 
         uid = MockedUID('1.2.3')
         assert uid.name == '1.2.3'
@@ -290,11 +336,14 @@ class TestUID:
         assert uid == b
         assert a == b
 
+    def test_keyword(self):
+        """Test the keyword property."""
+        assert "ImplicitVRLittleEndian" == self.uid.keyword
+
 
 class TestUIDPrivate:
     """Test private UIDs"""
-    @classmethod
-    def setup_class(self):
+    def setup(self):
         """Set default UID"""
         self.uid = UID('9.9.999.90009.1.2')
 
@@ -373,3 +422,7 @@ class TestUIDPrivate:
     def test_is_private(self):
         """Test that UID.is_private works with private UIDs."""
         assert self.uid.is_private
+
+    def test_keyword(self):
+        """Test the keyword property."""
+        assert "" == self.uid.keyword

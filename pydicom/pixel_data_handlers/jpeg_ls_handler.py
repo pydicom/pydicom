@@ -30,7 +30,7 @@ DEPENDENCIES = {
 
 SUPPORTED_TRANSFER_SYNTAXES = [
     pydicom.uid.JPEGLSLossless,
-    pydicom.uid.JPEGLSLossy,
+    pydicom.uid.JPEGLSNearLossless,
 ]
 
 

@@ -11,7 +11,7 @@ This example illustrates how to print the data set in your own format.
 # license : MIT
 
 import pydicom
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 
 print(__doc__)
 
@@ -44,7 +44,7 @@ def myprint(dataset, indent=0):
                                                    repr_value))
 
 
-filename = get_testdata_files('MR_small.dcm')[0]
+filename = get_testdata_file('MR_small.dcm')
 ds = pydicom.dcmread(filename)
 
 myprint(ds)

@@ -4,22 +4,21 @@
 
 # Many tests of DataElement class are implied in test_dataset also
 
-import sys
-
 import pytest
 
 from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
-from pydicom.data import get_testdata_files
+from pydicom.data import get_testdata_file
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
     DataElement_from_raw,
 )
 from pydicom.dataset import Dataset
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
 
@@ -39,6 +38,40 @@ class TestDataElement:
 
     def teardown(self):
         config.use_none_as_empty_text_VR_value = False
+
+    @pytest.fixture
+    def replace_un_with_known_vr(self):
+        old_value = config.replace_un_with_known_vr
+        config.replace_un_with_known_vr = True
+        yield
+        config.replace_un_with_known_vr = old_value
+
+    def test_AT(self):
+        """VR of AT takes Tag variants when set"""
+        elem1 = DataElement("OffendingElement", "AT", 0x100010)
+        elem2 = DataElement("OffendingElement", "AT", (0x10, 0x10))
+        elem3 = DataElement(
+            "FrameIncrementPointer", "AT", [0x540010, 0x540020]
+        )
+        elem4 = DataElement("OffendingElement", "AT", "PatientName")
+        assert isinstance(elem1.value, BaseTag)
+        assert isinstance(elem2.value, BaseTag)
+        assert elem1.value == elem2.value == elem4.value
+        assert elem1.value == 0x100010
+        assert isinstance(elem3.value, MultiValue)
+        assert len(elem3.value) == 2
+
+        # Test also using Dataset, and check 0x00000000 works
+        ds = Dataset()
+        ds.OffendingElement = 0
+        assert isinstance(ds.OffendingElement, BaseTag)
+        ds.OffendingElement = (0x0000, 0x0000)
+        assert isinstance(ds.OffendingElement, BaseTag)
+        assert ds.OffendingElement == 0
+
+        # An invalid Tag should throw an error
+        with pytest.raises(OverflowError):
+            _ = DataElement("OffendingElement", "AT", 0x100000000)
 
     def test_VM_1(self):
         """DataElement: return correct value multiplicity for VM > 1"""
@@ -338,7 +371,7 @@ class TestDataElement:
         assert '[Overlay ID]' == private_data_elem.name
         assert 'UN' == private_data_elem.VR
 
-    def test_known_tags_with_UN_VR(self):
+    def test_known_tags_with_UN_VR(self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly decoded."""
         ds = Dataset()
         ds[0x00080005] = DataElement(0x00080005, 'UN', b'ISO_IR 126')
@@ -360,9 +393,10 @@ class TestDataElement:
         assert 'PN' == ds[0x00100010].VR
         assert 'Dionysios=Διονυσιος' == ds[0x00100010].value
 
-    def test_reading_ds_with_known_tags_with_UN_VR(self):
+    def test_reading_ds_with_known_tags_with_UN_VR(
+            self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly read."""
-        test_file = get_testdata_files('explicit_VR-UN.dcm')[0]
+        test_file = get_testdata_file('explicit_VR-UN.dcm')
         ds = dcmread(test_file)
         assert 'CS' == ds[0x00080005].VR
         assert 'TM' == ds[0x00080030].VR
@@ -395,7 +429,8 @@ class TestDataElement:
 
     @pytest.mark.parametrize('use_none, empty_value',
                              ((True, None), (False, '')))
-    def test_empty_text_values(self, use_none, empty_value):
+    def test_empty_text_values(self, use_none, empty_value,
+                               no_datetime_conversion):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
             setattr(ds, tag_name, value)
@@ -510,21 +545,38 @@ class TestDataElement:
         assert 0 == elem.VM
         assert elem.value == []
 
+    def test_is_private(self):
+        """Test the is_private property."""
+        elem = DataElement(0x00090010, 'UN', None)
+        assert elem.is_private
+        elem = DataElement(0x00080010, 'UN', None)
+        assert not elem.is_private
+
 
 class TestRawDataElement:
+
     """Tests for dataelem.RawDataElement."""
-    def test_key_error(self):
+    def test_invalid_tag_warning(self, allow_invalid_values):
+        """RawDataElement: conversion of unknown tag warns..."""
+        raw = RawDataElement(Tag(0x88880088), None, 4, b'unknown',
+                             0, True, True)
+
+        with pytest.warns(UserWarning, match=r"\(8888, 0088\)"):
+            element = DataElement_from_raw(raw)
+            assert element.VR == 'UN'
+
+    def test_key_error(self, enforce_valid_values):
         """RawDataElement: conversion of unknown tag throws KeyError..."""
         # raw data element -> tag VR length value
         #                       value_tell is_implicit_VR is_little_endian'
         # Unknown (not in DICOM dict), non-private, non-group 0 for this test
-        raw = RawDataElement(Tag(0x88880002), None, 4, 0x1111,
+        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
                              0, True, True)
 
         with pytest.raises(KeyError, match=r"\(8888, 0002\)"):
             DataElement_from_raw(raw)
 
-    def test_valid_tag(self):
+    def test_valid_tag(self, no_datetime_conversion):
         """RawDataElement: conversion of known tag succeeds..."""
         raw = RawDataElement(Tag(0x00080020), 'DA', 8, b'20170101',
                              0, False, True)
@@ -552,3 +604,34 @@ class TestRawDataElement:
                              0, False, True)
         with pytest.raises(NotImplementedError):
             DataElement_from_raw(raw, default_encoding)
+
+    @pytest.fixture
+    def accept_wrong_length(self, request):
+        old_value = config.convert_wrong_length_to_UN
+        config.convert_wrong_length_to_UN = request.param
+        yield
+        config.convert_wrong_length_to_UN = old_value
+
+    @pytest.mark.parametrize("accept_wrong_length", [False], indirect=True)
+    def test_wrong_bytes_length_exception(self, accept_wrong_length):
+        """Check exception when number of raw bytes is not correct."""
+        raw = RawDataElement(Tag(0x00190000), 'FD', 1, b'1', 0, False, True)
+        with pytest.raises(BytesLengthException):
+            DataElement_from_raw(raw)
+
+    @pytest.mark.parametrize("accept_wrong_length", [True], indirect=True)
+    def test_wrong_bytes_length_convert_to_UN(self, accept_wrong_length):
+        """Check warning and behavior for incorrect number of raw bytes."""
+        value = b'1'
+        raw = RawDataElement(Tag(0x00190000), 'FD', 1, value, 0, False, True)
+        msg = (
+            r"Expected total bytes to be an even multiple of bytes per value. "
+            r"Instead received b'1' with length 1 and struct format 'd' which "
+            r"corresponds to bytes per value of 8. This occurred while trying "
+            r"to parse \(0019, 0000\) according to VR 'FD'. "
+            r"Setting VR to 'UN'."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            raw_elem = DataElement_from_raw(raw)
+            assert 'UN' == raw_elem.VR
+            assert value == raw_elem.value

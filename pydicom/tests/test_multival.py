@@ -35,14 +35,11 @@ class TestMultiValue:
         assert not multival
         assert 0 == len(multival)
 
-    def testLimits(self):
+    def testLimits(self, enforce_valid_values):
         """MultiValue: Raise error if any item outside DICOM limits...."""
-        original_flag = config.enforce_valid_values
-        config.enforce_valid_values = True
         with pytest.raises(OverflowError):
             MultiValue(IS, [1, -2 ** 31 - 1])
         # Overflow error not raised for IS out of DICOM valid range
-        config.enforce_valid_values = original_flag
 
     def testAppend(self):
         """MultiValue: Append of item converts it to required type..."""
@@ -131,9 +128,28 @@ class TestMultiValue:
         """MultiValue: test print output"""
         multival = MultiValue(IS, [])
         assert '' == str(multival)
+        multival.extend(['1', 2, 3, 4])
+        assert "[1, 2, 3, 4]" == str(multival)
         multival = MultiValue(str, [1, 2, 3])
         assert "['1', '2', '3']" == str(multival)
         multival = MultiValue(int, [1, 2, 3])
         assert '[1, 2, 3]' == str(multival)
         multival = MultiValue(float, [1.1, 2.2, 3.3])
         assert '[1.1, 2.2, 3.3]' == str(multival)
+        mv = MultiValue(IS, [])
+        mv._list = ['1234', b'\x01\x00']
+        assert "['1234', b'\\x01\\x00']" == str(mv)
+
+    def test_setitem(self):
+        """Test MultiValue.__setitem__()."""
+        mv = MultiValue(int, [1, 2, 3])
+        with pytest.raises(TypeError, match="'int' object is not iterable"):
+            mv[1:1] = 4
+
+        assert [1, 2, 3] == mv
+        mv[1:1] = [4]
+        assert [1, 4, 2, 3] == mv
+        mv[1:2] = [5, 6]
+        assert [1, 5, 6, 2, 3] == mv
+        mv[1:3] = [7, 8]
+        assert [1, 7, 8, 2, 3] == mv
