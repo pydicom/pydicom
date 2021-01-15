@@ -1591,7 +1591,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         handler_name : str, optional
             The name of the pixel handler that shall be used to
             decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
+            ``'pylibjpeg'``.
             If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 

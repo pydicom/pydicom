@@ -262,7 +262,7 @@ correctly sized numpy array from the *Pixel Data* element.
 
 Handlers shall have four methods:
 
-def supports_transfer_syntax(ds)
+def supports_transfer_syntax(ds.file_meta.TransferSyntaxUID: UID)
     Return ``True`` if the handler supports the transfer syntax indicated in
     :class:`Dataset` `ds`, ``False`` otherwise.
 
