@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Command-line Interface Guide &mdash; pydicom 2.2.0.dev0 documentation</title>
   
@@ -24,7 +24,10 @@
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -60,7 +63,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -183,6 +186,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -196,7 +201,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -239,7 +244,7 @@
 exploring DICOM files, and access to the <cite>codify</cite> option for creating pydicom
 Python code. Additional subcommands may be added over time.</p>
 <p>Example at the command line in a terminal window:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom show pydicom::rtplan.dcm
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="gp gp-VirtualEnv">(0002, 0000)</span> <span class="go">File Meta Information Group Length  UL: 156</span>
 <span class="gp gp-VirtualEnv">(0002, 0001)</span> <span class="go">File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
@@ -263,7 +268,7 @@ examples exactly.  In normal use, you would leave the <code class="docutils lite
 off when working with your files.</p>
 <p>You can also show just parts of the DICOM file by specifying a data element
 using the usual <em>pydicom</em> keyword notation:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom show pydicom::rtplan.dcm::FractionGroupSequence<span class="o">[</span><span class="m">0</span><span class="o">]</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm::FractionGroupSequence<span class="o">[</span><span class="m">0</span><span class="o">]</span>
 <span class="gp gp-VirtualEnv">(300a, 0071)</span> <span class="go">Fraction Group Number               IS: &quot;1&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0078)</span> <span class="go">Number of Fractions Planned         IS: &quot;30&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0080)</span> <span class="go">Number of Beams                     IS: &quot;1&quot;</span>
@@ -278,14 +283,14 @@ using the usual <em>pydicom</em> keyword notation:</p>
 </div>
 <p>You can see the available subcommands by simply typing <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> with no
 arguments, or with <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span></code>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom <span class="nb">help</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span>
 <span class="go">Use pydicom help [subcommand] to show help for a subcommand</span>
 <span class="go">Available subcommands: codify, show</span>
 </pre></div>
 </div>
 <p>And, as noted in the block above, you get help for a particular subcommand
 by typing <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span> <span class="pre">[subcommand]</span></code>.  For example:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom <span class="nb">help</span> show
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span> show
 <span class="go">usage: pydicom show [-h] [-x] [-t] [-q] filespec</span>
 
 <span class="go">Display all or part of a DICOM file</span>
@@ -324,7 +329,7 @@ combined with other command-line filters for additional functionality. The
 following is an example of piping the output of the pydicom
 ‘show’ subcommand into ‘grep’, filtering for lines with
 either “Dose” or “Sequence” in them:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom show pydicom::rtplan.dcm <span class="p">|</span> grep <span class="s2">&quot;Dose\|Sequence&quot;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm <span class="p">|</span> grep <span class="s2">&quot;Dose\|Sequence&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0010)</span>  <span class="go">Dose Reference Sequence  2 item(s) ----</span>
 <span class="gp gp-VirtualEnv">(300a, 0012)</span> <span class="go">Dose Reference Number               IS: &quot;1&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0014)</span> <span class="go">Dose Reference Structure Type       CS: &#39;COORDINATES&#39;</span>
@@ -378,7 +383,7 @@ from a command-line terminal.</p>
 show some additional options.</p>
 <p>To see the available options, in a command-line terminal, type <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span> <span class="pre">show</span></code>
 or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span> <span class="pre">-h</span></code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom <span class="nb">help</span> show
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span> show
 <span class="go">usage: pydicom show [-h] [-x] [-t] [-q] filespec</span>
 
 <span class="go">Display all or part of a DICOM file</span>
@@ -399,7 +404,7 @@ or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <
 </pre></div>
 </div>
 <p>The basic command with no options shows all data elements and nested sequences:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom show pydicom::CT_small.dcm
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="gp gp-VirtualEnv">(0002, 0000)</span> <span class="go">File Meta Information Group Length  UL: 192</span>
 <span class="gp gp-VirtualEnv">(0002, 0001)</span> <span class="go">File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
@@ -433,10 +438,10 @@ or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <
 from the <em>pydicom</em> test data files rather than from the file system.</p>
 <p>You can also show just parts of the DICOM file by specifying a data element
 using the usual pydicom keyword notation:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pydicom show pydicom::CT_small.dcm::PatientName
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm::PatientName
 <span class="go">CompressedSamples^CT1</span>
 
-<span class="gp">$</span> pydicom show pydicom::rtplan.dcm::FractionGroupSequence
+<span class="gp">$ </span>pydicom show pydicom::rtplan.dcm::FractionGroupSequence
 <span class="go">[(300a, 0071) Fraction Group Number               IS: &quot;1&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0078)</span> <span class="go">Number of Fractions Planned         IS: &quot;30&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0080)</span> <span class="go">Number of Beams                     IS: &quot;1&quot;</span>
@@ -697,37 +702,29 @@ pull request.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="writing_documentation.html" class="btn btn-neutral float-right" title="Writing documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="element_value_types.html" class="btn btn-neutral float-left" title="Element VRs and Python types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="writing_documentation.html" class="btn btn-neutral float-right" title="Writing documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="element_value_types.html" class="btn btn-neutral float-left" title="Element VRs and Python types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

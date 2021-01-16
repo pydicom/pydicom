@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom.overlays.numpy_handler &mdash; pydicom 2.2.0.dev0 documentation</title>
   
@@ -24,7 +24,10 @@
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -60,7 +63,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -188,6 +191,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -205,7 +210,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -295,7 +300,7 @@ values</p></th>
 </table>
 <dl class="py function">
 <dt id="pydicom.overlays.numpy_handler.get_expected_length">
-<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></span></em>, <em class="sig-param"><span class="n">unit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'bytes'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/16896e24/pydicom/overlays/numpy_handler.py#L58"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">get_expected_length</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></span></em>, <em class="sig-param"><span class="n">unit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'bytes'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/overlays/numpy_handler.py#L58"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.get_expected_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the expected length (in terms of bytes or pixels) of the <em>Overlay
 Data</em>.</p>
 <div class="versionadded">
@@ -360,7 +365,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlays.numpy_handler.get_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/16896e24/pydicom/overlays/numpy_handler.py#L168"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">get_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Dataset</span></em>, <em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/overlays/numpy_handler.py#L168"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.get_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the <em>Overlay Data</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -392,7 +397,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlays.numpy_handler.is_available">
-<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/16896e24/pydicom/overlays/numpy_handler.py#L50"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">is_available</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/overlays/numpy_handler.py#L50"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -401,7 +406,7 @@ pixels, excluding the NULL trailing padding byte for odd length data.</p>
 
 <dl class="py function">
 <dt id="pydicom.overlays.numpy_handler.reshape_overlay_array">
-<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></span></em>, <em class="sig-param"><span class="n">arr</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/16896e24/pydicom/overlays/numpy_handler.py#L106"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pydicom.overlays.numpy_handler.</code><code class="sig-name descname">reshape_overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elem</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></span></em>, <em class="sig-param"><span class="n">arr</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/overlays/numpy_handler.py#L106"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.overlays.numpy_handler.reshape_overlay_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a reshaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -478,37 +483,29 @@ and <a class="reference external" href="http://dicom.nema.org/medical/dicom/curr
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../handlers.pixel_data.html" class="btn btn-neutral float-right" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../handlers.overlay_data.html" class="btn btn-neutral float-left" title="Overlay Data Handlers (pydicom.overlays)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../handlers.pixel_data.html" class="btn btn-neutral float-right" title="Pixel Data Handlers (pydicom.pixel_data_handlers)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../handlers.overlay_data.html" class="btn btn-neutral float-left" title="Overlay Data Handlers (pydicom.overlays)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
