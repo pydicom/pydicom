@@ -302,6 +302,19 @@ using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
 
+assume_implicit_vr_switch = True
+"""If invalid VR encountered, assume file switched to implicit VR
+
+.. versionadded:: 2.2
+
+If ``True`` (default), when reading an explicit VR file,
+if a VR is encountered that is not a valid two bytes within A-Z,
+then assume the original writer switched to implicit VR.  This has been
+seen in particular in some sequences.  This does not test that
+the VR is a valid DICOM VR, just that it has valid characters.
+"""
+
+
 INVALID_KEYWORD_BEHAVIOR = "WARN"
 """Control the behavior when setting a :class:`~pydicom.dataset.Dataset`
 attribute that's not a known element keyword.

@@ -277,6 +277,9 @@ class TestReader:
         """Test that automatic UN conversion can be switched off."""
         replace_un_with_known_vr = config.replace_un_with_known_vr
         config.replace_un_with_known_vr = True
+        assume_implicit_vr_switch = config.assume_implicit_vr_switch
+        config.assume_implicit_vr_switch = False
+
         with pytest.raises(NotImplementedError):
             ds = dcmread(get_testdata_file("bad_sequence.dcm"))
             # accessing the elements of the faulty sequence raises
@@ -286,6 +289,7 @@ class TestReader:
         ds = dcmread(get_testdata_file("bad_sequence.dcm"))
         str(ds.CTDIPhantomTypeCodeSequence)
         config.replace_un_with_known_vr = replace_un_with_known_vr
+        config.assume_implicit_vr_switch = assume_implicit_vr_switch
 
     def test_no_pixels_read(self):
         """Returns all data elements before pixels using
@@ -933,7 +937,15 @@ class TestIncorrectVR:
         ds.remove_private_tags()  # forces it to actually parse SQ
 
 
+
 class TestUnknownVR:
+    @pytest.fixture(autouse=True)
+    def restore_config_values(self):
+        orig_impl_VR_switch = config.assume_implicit_vr_switch
+        config.assume_implicit_vr_switch = False
+        yield
+        config.assume_implicit_vr_switch = orig_impl_VR_switch
+
     @pytest.mark.parametrize(
         "vr_bytes, str_output",
         [
