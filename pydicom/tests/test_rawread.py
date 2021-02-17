@@ -534,3 +534,25 @@ class TestRawSequence:
         # They will be converted when asked for. Check some:
         assert 1 == seq[0].BeamNumber
         assert 'Beam 2' == seq[1].BeamName
+
+    def test_explVR_switch_implVR_in_SQ_item(self):
+        """Raw read: Tolerate missing VR in Sequence item"""
+        # issue 1305
+        hexstr = (
+            "30 0a 00 B0"    # (300a, 00b0) Beam Sequence
+            " 53 51"         # SQ
+            " 00 00"         # reserved
+            " FF FF FF FF"   # undefined length
+            " ff fe e0 00"   # (fffe, e000) Item Tag
+            " 00 00 00 12"   # Item (dataset) Length - 18 bytes
+            " 00 10 00 20 00 00 00 0a"  # (0010, 0020) IMPL VR with length 0a
+            " 34 34 34 34 34 34 34 34 34 34"
+            " ff fe E0 dd"    # SQ delimiter
+            " 00 00 00 00"    # zero length
+        )
+        infile = BytesIO(hex2bytes(hexstr))
+        de_gen = data_element_generator(infile,
+                                        is_implicit_VR=False,
+                                        is_little_endian=False)
+        seq = next(de_gen)
+        assert seq[0].PatientID == "4444444444"
