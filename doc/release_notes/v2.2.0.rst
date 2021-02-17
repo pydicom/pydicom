@@ -19,6 +19,8 @@ Enhancements
 * A field containing an invalid number of bytes will result in a warning
   instead of an exception when
   :attr:`~pydicom.config.convert_wrong_length_to_UN` is set to True.
+* Private tags known via the private dictionary will now get the configured
+  VR if read from a dataset instead of "UN" (:issue:`1051`).
 
 
 Changes
