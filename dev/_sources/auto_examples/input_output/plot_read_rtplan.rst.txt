@@ -36,6 +36,8 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
  .. code-block:: none
 
 
+    /home/circleci/project/pydicom/filereader.py:152: UserWarning: Explicit VR character(s) invalid. Assuming data element is implicit VR and attempting to continue
+      warnings.warn(message, UserWarning)
       Beam name    Number   Gantry   SSD (cm)  
        Field 1           1      0.0     89.8
 

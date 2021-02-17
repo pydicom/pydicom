@@ -116,6 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
@@ -238,7 +239,7 @@
 <h1>pydicom.config.overlay_data_handlers<a class="headerlink" href="#pydicom-config-overlay-data-handlers" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
 <dt id="pydicom.config.overlay_data_handlers">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">overlay_data_handlers</code><em class="property"> = [&lt;module 'pydicom.overlays.numpy_handler' from '/home/circleci/project/pydicom/overlays/numpy_handler.py'&gt;]</em><a class="headerlink" href="#pydicom.config.overlay_data_handlers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.config.</span></code><code class="sig-name descname"><span class="pre">overlay_data_handlers</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;module</span> <span class="pre">'pydicom.overlays.numpy_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/overlays/numpy_handler.py'&gt;]</span></em><a class="headerlink" href="#pydicom.config.overlay_data_handlers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handlers for converting (60xx,3000) <em>Overlay Data</em></p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -254,7 +255,7 @@ sized numpy array from an <em>Overlay Data</em> element.</p>
 <dt>def is_available():</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler’s dependencies are installed, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
-<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
+<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
 <em>Overlay Data</em> with element tag <cite>group</cite>, in <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <cite>ds</cite> or raise
 an exception.</p>
 </dd>

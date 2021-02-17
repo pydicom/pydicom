@@ -116,6 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
@@ -238,7 +239,7 @@
 <h1>pydicom.config.DS_decimal<a class="headerlink" href="#pydicom-config-ds-decimal" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.config.DS_decimal">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">DS_decimal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_Decimal_boolean</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/config.py#L82"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.DS_decimal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.config.</span></code><code class="sig-name descname"><span class="pre">DS_decimal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_Decimal_boolean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fd83de40/pydicom/config.py#L82"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.DS_decimal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set DS class to be derived from <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> or
 <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p>
 <p>If this function is never called, the default in <em>pydicom</em> &gt;= 0.9.8

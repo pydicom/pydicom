@@ -116,6 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback.html">pydicom.config.data_element_callback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.data_element_callback_kwargs.html">pydicom.config.data_element_callback_kwargs</a></li>
@@ -238,7 +239,7 @@
 <h1>pydicom.config.DS_numpy<a class="headerlink" href="#pydicom-config-ds-numpy" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.config.DS_numpy">
-<code class="sig-prename descclassname">pydicom.config.</code><code class="sig-name descname">DS_numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">use_numpy</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/6ecfedef/pydicom/config.py#L50"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.config.DS_numpy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.config.</span></code><code class="sig-name descname"><span class="pre">DS_numpy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_numpy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/fd83de40/pydicom/config.py#L50"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.DS_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set whether multi-valued elements with VR of <strong>DS</strong> will be numpy arrays</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.0.</span></p>
@@ -246,7 +247,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>use_numpy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – <p><code class="docutils literal notranslate"><span class="pre">True</span></code> (default) to read multi-value <strong>DS</strong> elements
-as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <code class="docutils literal notranslate"><span class="pre">False</span></code> to read multi-valued <strong>DS</strong>
+as <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <code class="docutils literal notranslate"><span class="pre">False</span></code> to read multi-valued <strong>DS</strong>
 data elements as type <code class="xref py py-class docutils literal notranslate"><span class="pre">MultiValue</span></code></p>
 <p>Note: once a value has been accessed, changing this setting will
 no longer change its type</p>
