@@ -9,6 +9,7 @@ import pytest
 from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
 from pydicom.data import get_testdata_file
+from pydicom.datadict import add_private_dict_entry
 from pydicom.dataelem import (
     DataElement,
     RawDataElement,
@@ -353,7 +354,7 @@ class TestDataElement:
 
         private_data_elem = ds[0x50f1100a]
         assert '[FNC Parameters]' == private_data_elem.name
-        assert 'UN' == private_data_elem.VR
+        assert 'SH' == private_data_elem.VR
 
     def test_private_repeater_tag(self):
         """Test that a known private tag in the repeater range is correctly
@@ -369,7 +370,7 @@ class TestDataElement:
 
         private_data_elem = ds[0x60211200]
         assert '[Overlay ID]' == private_data_elem.name
-        assert 'UN' == private_data_elem.VR
+        assert 'IS' == private_data_elem.VR
 
     def test_known_tags_with_UN_VR(self, replace_un_with_known_vr):
         """Known tags with VR UN are correctly decoded."""
@@ -555,6 +556,13 @@ class TestDataElement:
 
 class TestRawDataElement:
 
+    @pytest.fixture
+    def dont_replace_un_with_known_vr(self):
+        old_value = config.replace_un_with_known_vr
+        config.replace_un_with_known_vr = False
+        yield
+        config.replace_un_with_known_vr = old_value
+
     """Tests for dataelem.RawDataElement."""
     def test_invalid_tag_warning(self, allow_invalid_values):
         """RawDataElement: conversion of unknown tag warns..."""
@@ -635,3 +643,75 @@ class TestRawDataElement:
             raw_elem = DataElement_from_raw(raw)
             assert 'UN' == raw_elem.VR
             assert value == raw_elem.value
+
+    def test_read_known_private_tag_implicit(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds[0x00410010] = RawDataElement(
+            Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, True, True)
+        ds[0x00411001] = RawDataElement(
+            Tag(0x00411001), "US", 2, b"\x2A\x00", 0, True, True)
+        ds[0x00431001] = RawDataElement(
+            Tag(0x00431001), "SH", 8, b"Unknown ", 0, True, True)
+        ds.save_as(fp)
+        ds = dcmread(fp, force=True)
+        elem = ds[0x00411001]
+        assert elem.VR == "UN"
+        assert elem.name == "Private tag data"
+        assert elem.value == b"\x2A\x00"
+
+        add_private_dict_entry("ACME 3.2", 0x00410001, "US", "Some Number")
+        ds = dcmread(fp, force=True)
+        elem = ds[0x00411001]
+        assert elem.VR == "US"
+        assert elem.name == "[Some Number]"
+        assert elem.value == 42
+
+        # Unknown private tag is handled as before
+        elem = ds[0x00431001]
+        assert elem.VR == "UN"
+        assert elem.name == "Private tag data"
+        assert elem.value == b"Unknown "
+
+    def test_read_known_private_tag_explicit(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = False
+        ds.is_little_endian = True
+        ds[0x00410010] = RawDataElement(
+            Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True)
+        ds[0x00411002] = RawDataElement(
+            Tag(0x00411002), "UN", 8, b"SOME_AET", 0, False, True)
+        ds.save_as(fp)
+        ds = dcmread(fp, force=True)
+        elem = ds[0x00411002]
+        assert elem.VR == "UN"
+        assert elem.name == "Private tag data"
+        assert elem.value == b"SOME_AET"
+
+        add_private_dict_entry("ACME 3.2", 0x00410002, "AE", "Some AET")
+        ds = dcmread(fp, force=True)
+        elem = ds[0x00411002]
+        assert elem.VR == "AE"
+        assert elem.name == "[Some AET]"
+        assert elem.value == "SOME_AET"
+
+    def test_read_known_private_tag_explicit_no_lookup(
+            self, dont_replace_un_with_known_vr):
+        add_private_dict_entry("ACME 3.2", 0x00410003, "IS", "Another Number")
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = False
+        ds.is_little_endian = True
+        ds[0x00410010] = RawDataElement(
+            Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True)
+        ds[0x00411003] = RawDataElement(
+            Tag(0x00411003), "UN", 8, b"12345678", 0, False, True)
+        ds.save_as(fp)
+        ds = dcmread(fp, force=True)
+        elem = ds[0x00411003]
+        assert elem.VR == "UN"
+        assert elem.name == "[Another Number]"
+        assert elem.value == b"12345678"

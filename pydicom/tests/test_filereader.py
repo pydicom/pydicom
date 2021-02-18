@@ -325,6 +325,24 @@ class TestReader:
         ]
         assert expected == ctspecific_tags
 
+    def test_specific_tags_with_other_unkonwn_length_tags(self):
+        rtstruct_specific = dcmread(
+            rtstruct_name,
+            force=True,
+            specific_tags=[
+                "PatientName",
+                "PatientID",
+            ],
+        )
+        rtstruct_specific_tags = sorted(rtstruct_specific.keys())
+        expected = [
+            # SpecificCharacterSet is always added
+            Tag(0x0008, 0x0005),
+            Tag(0x0010, 0x0010),
+            Tag(0x0010, 0x0020),
+        ]
+        assert expected == rtstruct_specific_tags
+
     def test_specific_tags_with_unknown_length_SQ(self):
         """Returns only tags specified by user."""
         unknown_len_sq_tag = Tag(0x3F03, 0x1001)

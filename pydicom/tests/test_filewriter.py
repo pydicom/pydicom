@@ -1521,9 +1521,9 @@ class TestWriteToStandard:
         ds_expl = dcmread(fp)
 
         assert ds_expl[(0x0009, 0x0010)].VR == 'LO'  # private creator
-        assert ds_expl[(0x0009, 0x1001)].VR == 'UN'  # originally LO
-        assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
-        assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
+        assert ds_expl[(0x0009, 0x1001)].VR == 'LO'
+        assert ds_expl[(0x0009, 0x10e7)].VR == 'UL'
+        assert ds_expl[(0x0043, 0x1010)].VR == 'US'
 
     def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use):
         """Test converting an RGB dataset from implicit to explicit VR
