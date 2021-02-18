@@ -365,7 +365,7 @@ class DataElement:
                 else:
                     value = [self.value]
                 json_element['Value'] = [v for v in value]
-        if hasattr(json_element, 'Value'):
+        if 'Value' in json_element:
             json_element['Value'] = jsonrep.convert_to_python_number(
                 json_element['Value'], self.VR
             )
