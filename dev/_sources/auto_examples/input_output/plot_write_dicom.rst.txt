@@ -39,10 +39,10 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpad2zuu1s.dcm
+    Writing test file /tmp/tmpx7r0ghgk.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpey980blz.dcm
-    Load file /tmp/tmpad2zuu1s.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmp_u3_btz7.dcm
+    Load file /tmp/tmpx7r0ghgk.dcm ...
     /home/circleci/project/pydicom/filereader.py:152: UserWarning: Explicit VR character(s) invalid. Assuming data element is implicit VR and attempting to continue
       warnings.warn(message, UserWarning)
     Dataset.file_meta -------------------------------
@@ -50,23 +50,23 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210217'
-    (0008, 0033) Content Time                        TM: '020030.732370'
+    (0008, 0023) Content Date                        DA: '20210218'
+    (0008, 0033) Content Time                        TM: '232236.874814'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpad2zuu1s.dcm ...
-    Load file /tmp/tmpey980blz.dcm ...
+    Remove file /tmp/tmpx7r0ghgk.dcm ...
+    Load file /tmp/tmp_u3_btz7.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210217'
-    (0008, 0033) Content Time                        TM: '020030.732370'
+    (0008, 0023) Content Date                        DA: '20210218'
+    (0008, 0033) Content Time                        TM: '232236.874814'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpey980blz.dcm ...
+    Remove file /tmp/tmp_u3_btz7.dcm ...
 
 
 
