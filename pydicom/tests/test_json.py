@@ -379,7 +379,7 @@ class TestBinary:
 
 
 class TestNumeric:
-    def test_numeric(self):
+    def test_numeric_values(self):
         ds = Dataset()
 
         ds.add_new(0x0009100b, 'UL', 3000000000)
@@ -404,3 +404,27 @@ class TestNumeric:
         assert ds_json['00091015']['Value'] == [3.14159265]
         assert ds_json['00091102']['Value'] == [2]
 
+    def test_numeric_types(self):
+        ds = Dataset()
+
+        ds.add_new(0x0009100b, 'UL', 3000000000)
+        ds.add_new(0x0009100c, 'SL', -2000000000)
+        ds.add_new(0x0009100d, 'US', 40000)
+        ds.add_new(0x0009100e, 'SS', -22222)
+        ds.add_new(0x0009100f, 'FL', 3.14)
+        ds.add_new(0x00091010, 'FD', 3.14159265)
+        ds.add_new(0x00091014, 'IS', '42')
+        ds.add_new(0x00091015, 'DS', '3.14159265')
+        ds.add_new(0x00091102, 'US', 2)
+
+        ds_json = ds.to_json_dict()
+
+        assert type(ds_json['0009100B']['Value'][0]) == int
+        assert type(ds_json['0009100C']['Value'][0]) == int
+        assert type(ds_json['0009100D']['Value'][0]) == int
+        assert type(ds_json['0009100E']['Value'][0]) == int
+        assert type(ds_json['0009100F']['Value'][0]) == float
+        assert type(ds_json['00091010']['Value'][0]) == float
+        assert type(ds_json['00091014']['Value'][0]) == int
+        assert type(ds_json['00091015']['Value'][0]) == float
+        assert type(ds_json['00091102']['Value'][0]) == int
