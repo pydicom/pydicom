@@ -32,4 +32,5 @@ Fixes
 * Fixed pickling a :class:`~pydicom.dataset.Dataset` instance with sequences
   after the sequence had been read (:issue:`1278`)
 * Fixed JSON export of numeric values
-  
+* Fixed handling of sequences of unknown length that switch to implicit
+  encoding, and sequences with VR ``UN`` (:issue:`1312`)

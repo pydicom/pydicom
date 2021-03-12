@@ -232,7 +232,7 @@ def data_element_generator(fp,
             # if private tag, won't be able to look it up in dictionary,
             #   in which case just ignore it and read the bytes unless it is
             #   identified as a Sequence
-            if VR is None:
+            if VR is None or VR == 'UN' and config.replace_un_with_known_vr:
                 try:
                     VR = dictionary_VR(tag)
                 except KeyError:
@@ -268,7 +268,8 @@ def data_element_generator(fp,
                                      is_implicit_VR, is_little_endian)
 
 
-def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
+def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
+                    is_sequence):
     """Check if the real VR is explicit or implicit.
 
     Parameters
@@ -284,11 +285,19 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
     stop_when : None, optional
         Optional call_back function which can terminate reading.
         Needed to check if the next tag still belongs to the read dataset.
+    is_sequence : bool
+        True if called for a sequence, False for a top-level dataset.
 
     Returns
     -------
     True if implicit VR is used, False otherwise.
     """
+    # sequences do not switch from implicit to explicit encoding,
+    # but they are allowed to use implicit encoding if the dataset
+    # is encoded as explicit VR
+    if is_sequence and implicit_vr_is_assumed:
+        return implicit_vr_is_assumed
+
     tag_bytes = fp.read(4)
     vr = fp.read(2)
     if len(vr) < 2:
@@ -306,6 +315,10 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
         endian_chr = "<" if is_little_endian else ">"
         tag = TupleTag(unpack(endian_chr + "HH", tag_bytes))
         if stop_when is not None and stop_when(tag, vr, 0):
+            return found_implicit
+        # sequences with undefined length can be encoded in implicit VR,
+        # see PS 3.5, section 6.2.2
+        if found_implicit and is_sequence:
             return found_implicit
 
         # got to the real problem - warn or raise depending on config
@@ -365,9 +378,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
-    if at_top_level:
-        is_implicit_VR = _is_implicit_vr(
-            fp, is_implicit_VR, is_little_endian, stop_when)
+    is_implicit_VR = _is_implicit_vr(
+        fp, is_implicit_VR, is_little_endian, stop_when,
+        is_sequence=not at_top_level)
     fp.seek(fp_start)
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
                                     stop_when, defer_size, parent_encoding,

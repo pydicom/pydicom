@@ -273,21 +273,26 @@ class TestReader:
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
 
-    def test_bad_sequence(self):
-        """Test that automatic UN conversion can be switched off."""
+    def test_sequence_with_implicit_vr(self):
+        """Test that reading a UN sequence with unknown length and implicit VR
+        in a dataset with explicit VR is read regardless of the value of
+        the assume_implicit_vr_switch option."""
         replace_un_with_known_vr = config.replace_un_with_known_vr
-        config.replace_un_with_known_vr = True
         assume_implicit_vr_switch = config.assume_implicit_vr_switch
-        config.assume_implicit_vr_switch = False
 
-        with pytest.raises(NotImplementedError):
-            ds = dcmread(get_testdata_file("bad_sequence.dcm"))
-            # accessing the elements of the faulty sequence raises
-            str(ds.CTDIPhantomTypeCodeSequence)
+        config.replace_un_with_known_vr = True
+        config.assume_implicit_vr_switch = True
+        ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+        str(ds.CTDIPhantomTypeCodeSequence)
+
+        config.assume_implicit_vr_switch = False
+        ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+        str(ds.CTDIPhantomTypeCodeSequence)
 
         config.replace_un_with_known_vr = False
         ds = dcmread(get_testdata_file("bad_sequence.dcm"))
         str(ds.CTDIPhantomTypeCodeSequence)
+
         config.replace_un_with_known_vr = replace_un_with_known_vr
         config.assume_implicit_vr_switch = assume_implicit_vr_switch
 
@@ -953,7 +958,6 @@ class TestIncorrectVR:
         dbio.seek(0)
         ds = dcmread(dbio)
         ds.remove_private_tags()  # forces it to actually parse SQ
-
 
 
 class TestUnknownVR:
