@@ -300,7 +300,7 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
     # but they are allowed to use implicit encoding if the dataset
     # is encoded as explicit VR
     if is_sequence and implicit_vr_is_assumed:
-        return implicit_vr_is_assumed
+        return True
 
     tag_bytes = fp.read(4)
     vr = fp.read(2)
@@ -323,7 +323,7 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
         # sequences with undefined length can be encoded in implicit VR,
         # see PS 3.5, section 6.2.2
         if found_implicit and is_sequence:
-            return found_implicit
+            return True
 
         # got to the real problem - warn or raise depending on config
         found_vr = 'implicit' if found_implicit else 'explicit'
