@@ -811,19 +811,16 @@ def DataElement_from_raw(
                     VR = 'UN'
                     msg += " - setting VR to 'UN'"
                     warnings.warn(msg)
-    elif VR == 'UN':
-        if raw.length == 0xffffffff:
-            VR = 'SQ'
-        elif config.replace_un_with_known_vr:
-            # handle rare case of incorrectly set 'UN' in explicit encoding
-            # see also DataElement.__init__()
-            if raw.tag.is_private:
-                VR = _private_vr_for_tag(dataset, raw.tag)
-            elif raw.value is None or len(raw.value) < 0xffff:
-                try:
-                    VR = dictionary_VR(raw.tag)
-                except KeyError:
-                    pass
+    elif VR == 'UN' and config.replace_un_with_known_vr:
+        # handle rare case of incorrectly set 'UN' in explicit encoding
+        # see also DataElement.__init__()
+        if raw.tag.is_private:
+            VR = _private_vr_for_tag(dataset, raw.tag)
+        elif raw.value is None or len(raw.value) < 0xffff:
+            try:
+                VR = dictionary_VR(raw.tag)
+            except KeyError:
+                pass
     try:
         value = convert_value(VR, raw, encoding)
     except NotImplementedError as e:
