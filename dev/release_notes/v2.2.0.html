@@ -232,6 +232,8 @@ VR if read from a dataset instead of “UN” (<a class="reference external" hre
 <li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
 after the sequence had been read (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1278">#1278</a>)</p></li>
 <li><p>Fixed JSON export of numeric values</p></li>
+<li><p>Fixed handling of sequences of unknown length that switch to implicit
+encoding, and sequences with VR <code class="docutils literal notranslate"><span class="pre">UN</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
 </ul>
 </div>
 </div>
