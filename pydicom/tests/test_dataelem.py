@@ -556,13 +556,6 @@ class TestDataElement:
 
 class TestRawDataElement:
 
-    @pytest.fixture
-    def dont_replace_un_with_known_vr(self):
-        old_value = config.replace_un_with_known_vr
-        config.replace_un_with_known_vr = False
-        yield
-        config.replace_un_with_known_vr = old_value
-
     """Tests for dataelem.RawDataElement."""
     def test_invalid_tag_warning(self, allow_invalid_values):
         """RawDataElement: conversion of unknown tag warns..."""

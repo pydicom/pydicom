@@ -816,11 +816,7 @@ def DataElement_from_raw(
         # see also DataElement.__init__()
         if raw.tag.is_private:
             VR = _private_vr_for_tag(dataset, raw.tag)
-        elif (
-            raw.length == 0xffffffff
-            or raw.value is None
-            or len(raw.value) < 0xffff
-        ):
+        elif raw.value is None or len(raw.value) < 0xffff:
             try:
                 VR = dictionary_VR(raw.tag)
             except KeyError:
