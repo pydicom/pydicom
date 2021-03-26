@@ -100,8 +100,11 @@ def data_element_generator(fp,
         endian_chr = "<"
     else:
         endian_chr = ">"
+
+    # assign implicit VR struct to variable as use later if VR assumed missing
+    implicit_VR_struct = Struct(endian_chr + "HHL")
     if is_implicit_VR:
-        element_struct = Struct(endian_chr + "HHL")
+        element_struct = implicit_VR_struct
     else:  # Explicit VR
         # tag, VR, 2-byte length (or 0 if special VRs)
         element_struct = Struct(endian_chr + "HH2sH")
@@ -136,12 +139,27 @@ def data_element_generator(fp,
             group, elem, length = element_struct_unpack(bytes_read)
         else:  # explicit VR
             group, elem, VR, length = element_struct_unpack(bytes_read)
-            VR = VR.decode(default_encoding)
-            if VR in extra_length_VRs:
-                bytes_read = fp_read(4)
-                length = extra_length_unpack(bytes_read)[0]
-                if debugging:
-                    debug_msg += " " + bytes2hex(bytes_read)
+            # defend against switching to implicit VR, some writer do in SQ's
+            # issue 1067, issue 1035
+
+            if config.assume_implicit_vr_switch and not (b'AA' <= VR <= b'ZZ'):
+                # invalid VR, must be two cap chrs
+                message = (
+                    "Explicit VR character(s) invalid. "
+                    "Assuming data element is implicit VR "
+                    "and attempting to continue"
+                )
+                warnings.warn(message, UserWarning)
+                VR = None
+                group, elem, length = implicit_VR_struct.unpack(bytes_read)
+            else:
+                VR = VR.decode(default_encoding)
+                if VR in extra_length_VRs:
+                    bytes_read = fp_read(4)
+                    length = extra_length_unpack(bytes_read)[0]
+                    if debugging:
+                        debug_msg += " " + bytes2hex(bytes_read)
+
         if debugging:
             debug_msg = "%-47s  (%04x, %04x)" % (debug_msg, group, elem)
             if not is_implicit_VR:
@@ -188,8 +206,8 @@ def data_element_generator(fp,
                 value = (fp_read(length) if length > 0
                          else empty_value_for_VR(VR, raw=True))
                 if debugging:
-                    dotdot = "..." if length > 12 else "   "
-                    displayed_value = value[:12] if value else b''
+                    dotdot = "..." if length > 20 else "   "
+                    displayed_value = value[:20] if value else b''
                     logger_debug("%08x: %-34s %s %r %s" %
                                  (value_tell, bytes2hex(displayed_value),
                                   dotdot, displayed_value, dotdot))
@@ -210,11 +228,15 @@ def data_element_generator(fp,
         # undefined length SQs and items of undefined lengths can be nested
         # and it would be error-prone to read to the correct outer delimiter
         else:
+            # VR UN with undefined length shall be handled as SQ
+            # see PS 3.5, section 6.2.2
+            if VR == 'UN':
+                VR = 'SQ'
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,
             #   in which case just ignore it and read the bytes unless it is
             #   identified as a Sequence
-            if VR is None:
+            if VR is None or VR == 'UN' and config.replace_un_with_known_vr:
                 try:
                     VR = dictionary_VR(tag)
                 except KeyError:
@@ -250,7 +272,8 @@ def data_element_generator(fp,
                                      is_implicit_VR, is_little_endian)
 
 
-def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
+def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
+                    is_sequence):
     """Check if the real VR is explicit or implicit.
 
     Parameters
@@ -266,11 +289,19 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
     stop_when : None, optional
         Optional call_back function which can terminate reading.
         Needed to check if the next tag still belongs to the read dataset.
+    is_sequence : bool
+        True if called for a sequence, False for a top-level dataset.
 
     Returns
     -------
     True if implicit VR is used, False otherwise.
     """
+    # sequences do not switch from implicit to explicit encoding,
+    # but they are allowed to use implicit encoding if the dataset
+    # is encoded as explicit VR
+    if is_sequence and implicit_vr_is_assumed:
+        return True
+
     tag_bytes = fp.read(4)
     vr = fp.read(2)
     if len(vr) < 2:
@@ -289,6 +320,10 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when):
         tag = TupleTag(unpack(endian_chr + "HH", tag_bytes))
         if stop_when is not None and stop_when(tag, vr, 0):
             return found_implicit
+        # sequences with undefined length can be encoded in implicit VR,
+        # see PS 3.5, section 6.2.2
+        if found_implicit and is_sequence:
+            return True
 
         # got to the real problem - warn or raise depending on config
         found_vr = 'implicit' if found_implicit else 'explicit'
@@ -347,9 +382,9 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
     """
     raw_data_elements = dict()
     fp_start = fp.tell()
-    if at_top_level:
-        is_implicit_VR = _is_implicit_vr(
-            fp, is_implicit_VR, is_little_endian, stop_when)
+    is_implicit_VR = _is_implicit_vr(
+        fp, is_implicit_VR, is_little_endian, stop_when,
+        is_sequence=not at_top_level)
     fp.seek(fp_start)
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
                                     stop_when, defer_size, parent_encoding,

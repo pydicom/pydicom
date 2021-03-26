@@ -932,7 +932,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set)
+            self[tag] = DataElement_from_raw(data_elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
@@ -2058,7 +2058,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             private_creator_tag = Tag(elem_tag.group, private_block)
             if private_creator_tag in self and elem_tag != private_creator_tag:
                 if elem.is_raw:
-                    elem = DataElement_from_raw(elem, self._character_set)
+                    elem = DataElement_from_raw(
+                        elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
 
         self._dict[elem_tag] = elem

@@ -11,6 +11,7 @@ Configuration Options (:mod:`pydicom.config`)
    :toctree: generated/
 
    allow_DS_float
+   assume_implicit_vr_switch
    convert_wrong_length_to_UN
    data_element_callback
    data_element_callback_kwargs
