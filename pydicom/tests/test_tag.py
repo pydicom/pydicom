@@ -160,11 +160,9 @@ class TestBaseTag:
         assert BaseTag(0x00010002) == (0x0001, 0x0002)
         assert not BaseTag(0x00010001) == (0x0001, 0x0002)
 
-    def test_eq_raises(self):
-        """Test __eq__ raises TypeError when comparing to non numeric."""
-        def test_raise():
-            BaseTag(0x00010002) == 'eraa'
-        pytest.raises(TypeError, test_raise)
+    def test_eq_non_numeric(self):
+        """Test __eq__ of non numeric with BaseTag."""
+        assert not BaseTag(0x00010002) == 'eraa'
 
     def test_ne_same_class(self):
         """Test __ne__ of two classes with same type."""
@@ -190,11 +188,9 @@ class TestBaseTag:
         assert not BaseTag(0x00010002) != (0x0001, 0x0002)
         assert BaseTag(0x00010001) != (0x0001, 0x0002)
 
-    def test_ne_raises(self):
-        """Test __ne__ raises TypeError when comparing to non numeric."""
-        def test_raise():
-            BaseTag(0x00010002) != 'aaag'
-        pytest.raises(TypeError, test_raise)
+    def test_ne_non_numeric(self):
+        """Test __ne__ of non numeric with BaseTag."""
+        assert BaseTag(0x00010002) != 'aaag'
 
     def test_hash(self):
         """Test hash of BaseTag class."""
