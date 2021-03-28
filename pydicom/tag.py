@@ -10,7 +10,6 @@ stored as a single number and separated to (group, element) as required.
 from contextlib import contextmanager
 import traceback
 from typing import Tuple, Optional, Union, Any, Iterator
-from pydicom.config import logger
 
 
 @contextmanager
@@ -153,7 +152,7 @@ class BaseTag(int):
     def __lt__(self, other: object) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
+        if not isinstance(other, int):
             try:
                 other = Tag(other)
             except Exception:
@@ -167,23 +166,15 @@ class BaseTag(int):
 
     def __gt__(self, other: object) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
-        # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
-            try:
-                other = Tag(other)
-            except Exception:
-                raise TypeError("Cannot compare Tag with non-Tag item")
-
         return not (self == other or self < other)
 
     def __eq__(self, other: object) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
+        if not isinstance(other, int):
             try:
                 other = Tag(other)
             except Exception:
-                logger.warning(f"Cannot compare Tag with non-Tag item ({other})")
                 return False
 
         return int(self) == int(other)
