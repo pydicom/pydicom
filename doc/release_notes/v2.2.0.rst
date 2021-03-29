@@ -21,6 +21,9 @@ Enhancements
   :attr:`~pydicom.config.convert_wrong_length_to_UN` is set to True.
 * Private tags known via the private dictionary will now get the configured
   VR if read from a dataset instead of "UN" (:issue:`1051`).
+* while reading explicit VR, a switch to implicit VR will be silently attempted
+  if the VR bytes are not valid VR characters, and config option
+  :attr:`~pydicom.config.assume_implicit_vr_switch` is ``True`` (default)
 
 
 Changes

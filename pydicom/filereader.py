@@ -142,14 +142,8 @@ def data_element_generator(fp,
             # defend against switching to implicit VR, some writer do in SQ's
             # issue 1067, issue 1035
 
-            if config.assume_implicit_vr_switch and not (b'AA' <= VR <= b'ZZ'):
-                # invalid VR, must be two cap chrs
-                message = (
-                    "Explicit VR character(s) invalid. "
-                    "Assuming data element is implicit VR "
-                    "and attempting to continue"
-                )
-                warnings.warn(message, UserWarning)
+            if not (b'AA' <= VR <= b'ZZ') and config.assume_implicit_vr_switch:
+                # invalid VR, must be 2 cap chrs, assume implicit and continue
                 VR = None
                 group, elem, length = implicit_VR_struct.unpack(bytes_read)
             else:
