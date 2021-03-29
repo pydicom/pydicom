@@ -25,7 +25,9 @@ Enhancements
 
 Changes
 .......
-*
+* Changed the raising exception to return False
+  in :meth:`~pydicom.tag.BaseTag.__eq__`,
+  when operand cannot be converted to BaseTag Type (:pr:`1327`)
 
 Fixes
 .....
