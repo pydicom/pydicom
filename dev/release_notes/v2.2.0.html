@@ -218,6 +218,9 @@ instead of an exception when
 <a class="reference internal" href="../reference/generated/pydicom.config.convert_wrong_length_to_UN.html#pydicom.config.convert_wrong_length_to_UN" title="pydicom.config.convert_wrong_length_to_UN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">convert_wrong_length_to_UN</span></code></a> is set to True.</p></li>
 <li><p>Private tags known via the private dictionary will now get the configured
 VR if read from a dataset instead of “UN” (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1051">#1051</a>).</p></li>
+<li><p>while reading explicit VR, a switch to implicit VR will be silently attempted
+if the VR bytes are not valid VR characters, and config option
+<a class="reference internal" href="../reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch" title="pydicom.config.assume_implicit_vr_switch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assume_implicit_vr_switch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">

@@ -39,34 +39,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpgsq_cbmx.dcm
+    Writing test file /tmp/tmpdd1yjaq3.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmp79_j3ppz.dcm
-    Load file /tmp/tmpgsq_cbmx.dcm ...
-    /home/circleci/project/pydicom/filereader.py:152: UserWarning: Explicit VR character(s) invalid. Assuming data element is implicit VR and attempting to continue
-      warnings.warn(message, UserWarning)
+    Writing test file as Big Endian Explicit VR /tmp/tmp21uiphh_.dcm
+    Load file /tmp/tmpdd1yjaq3.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210313'
-    (0008, 0033) Content Time                        TM: '210946.461832'
+    (0008, 0023) Content Date                        DA: '20210329'
+    (0008, 0033) Content Time                        TM: '201201.810310'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpgsq_cbmx.dcm ...
-    Load file /tmp/tmp79_j3ppz.dcm ...
+    Remove file /tmp/tmpdd1yjaq3.dcm ...
+    Load file /tmp/tmp21uiphh_.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210313'
-    (0008, 0033) Content Time                        TM: '210946.461832'
+    (0008, 0023) Content Date                        DA: '20210329'
+    (0008, 0033) Content Time                        TM: '201201.810310'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp79_j3ppz.dcm ...
+    Remove file /tmp/tmp21uiphh_.dcm ...
 
 
 
@@ -147,7 +145,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.006 seconds)
+   **Total running time of the script:** ( 0 minutes  0.012 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
