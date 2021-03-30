@@ -928,35 +928,39 @@ class PersonName:
             If any of the input strings contain disallowed characters:
             '\\' (single backslash), '^', '='.
         """
-        from pydicom.charset import encode_string
+        from pydicom.charset import encode_string, decode_string
 
         def enc(s: str) -> bytes:
             return encode_string(s, encodings or [default_encoding])
+
+        def dec(s: bytes) -> str:
+            return decode_string(s, encodings or [default_encoding], [])
 
         encoded_component_sep = enc('^')
         encoded_group_sep = enc('=')
 
         disallowed_chars = ['\\', '=', '^']
-        encoded_disallowed_chars = [enc(c) for c in disallowed_chars]
 
         def standardize_encoding(val: Union[str, bytes]) -> bytes:
             # Return a byte encoded string regardless of the input type
             # This allows the user to supply a mixture of str and bytes
             # for different parts of the input
             if isinstance(val, bytes):
-                for c in encoded_disallowed_chars:
-                    if c in val:
-                        raise ValueError(
-                            f'Strings may not contain the {c} character'
-                        )
-                return val
+                val_enc = val
+                val_dec = dec(val)
             else:
-                for c in disallowed_chars:
-                    if c in val:
-                        raise ValueError(
-                            f'Strings may not contain the {c} character'
-                        )
-                return enc(val)
+                val_enc = enc(val)
+                val_dec = val
+
+            # Check for disallowed chars in the decoded string
+            for c in disallowed_chars:
+                if c in val_dec:
+                    raise ValueError(
+                        f'Strings may not contain the {c} character'
+                    )
+
+            # Return the encoded string
+            return val_enc
 
         def make_component_group(components: List[Union[str, bytes]]):
             encoded_components = map(standardize_encoding, components)
