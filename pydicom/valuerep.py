@@ -996,7 +996,7 @@ class PersonName:
         name_suffix_phonetic: Union[str, bytes] = '',
         encodings: Optional[List[str]] = None,
     ) -> 'PersonName':
-        """Construct a PersonName from explicit named components
+        """Construct a PersonName from explicit named components.
 
         The DICOM standard describes human names using five components:
         family name, given name, middle name, name prefix, and name suffix.
@@ -1023,7 +1023,7 @@ class PersonName:
         name_prefix: Union[str, bytes]
             Name prefix in alphabetic form, e.g. 'Mrs.', 'Dr.', 'Sr.', 'Rev.'.
         name_suffix: Union[str, bytes]
-            Name prefix in alphabetic form, e.g. 'M.D.', 'B.A., M.Div.'.
+            Name prefix in alphabetic form, e.g. 'M.D.', 'B.A., M.Div.',
             'Chief Executive Officer'.
         family_name_ideographic: Union[str, bytes]
             Family name in ideographic form.
@@ -1053,10 +1053,35 @@ class PersonName:
         PersonName:
             PersonName constructed from the supplied components.
 
+        Example
+        -------
+        A case with multiple given names and suffixes (DICOM standard,
+        part 5, sect 6.2.1.1):
+
+        >>> pn = PersonName.from_named_components(
+                family_name='Adams',
+                given_name='John Robert Quincy',
+                name_prefix='Rev.',
+                name_suffix='B.A. M.Div.'
+            )
+
+        A Korean case with phonetic and ideographic representations (PS3.5-2008
+        section I.2 p. 108):
+
+        >>> pn = PersonName.from_named_components(
+                family_name='Hong',
+                given_name='Gildong',
+                family_name_ideographic='洪',
+                given_name_ideographic='吉洞',
+                family_name_phonetic='홍',
+                given_name_phonetic='길동',
+                encodings=[default_encoding, 'euc_kr']
+            )
+
         Notes
         -----
         Strings may not contain the following characters: '^', '=',
-        '\\' (single backslash).
+        or the backslash character.
 
         """  # noqa: E501
         # Alphatic component group
@@ -1148,10 +1173,21 @@ class PersonName:
         PersonName:
             PersonName constructed from the supplied components
 
+        Example
+        -------
+        Example from the DICOM standard, part 5, sect 6.2.1.1: A horse whose
+        responsible organization is named ABC Farms, and whose name
+        is "Running On Water"
+
+        >>> pn = PersonName.from_named_components_veterinary(
+                responsible_party_name='ABC Farms',
+                patient_name='Running on Water'
+            )
+
         Notes
         -----
         Strings may not contain the following characters: '^', '=',
-        '\\' (single backslash)
+        or the backslash character.
 
         """  # noqa: E501
         # Alphatic component group
