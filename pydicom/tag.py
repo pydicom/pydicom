@@ -152,7 +152,7 @@ class BaseTag(int):
     def __lt__(self, other: object) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
-        if not isinstance(other, BaseTag):
+        if not isinstance(other, int):
             try:
                 other = Tag(other)
             except Exception:
@@ -175,7 +175,7 @@ class BaseTag(int):
             try:
                 other = Tag(other)
             except Exception:
-                raise TypeError("Cannot compare Tag with non-Tag item")
+                return False
 
         return int(self) == int(other)
 
