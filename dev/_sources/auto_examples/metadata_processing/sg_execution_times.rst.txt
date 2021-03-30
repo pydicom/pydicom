@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**00:00.014** total execution time for **auto_examples_metadata_processing** files:
+**00:00.010** total execution time for **auto_examples_metadata_processing** files:
 
 +-----------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``plot_anonymize.py``)               | 00:00.011 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py` (``plot_anonymize.py``)               | 00:00.008 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``plot_add_dict_entries.py``) | 00:00.002 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``plot_sequences.py``)               | 00:00.001 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py` (``plot_sequences.py``)               | 00:00.002 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py` (``plot_add_dict_entries.py``) | 00:00.001 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------------+-----------+--------+
