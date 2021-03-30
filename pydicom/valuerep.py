@@ -894,6 +894,289 @@ class PersonName:
 
         return bool(self.original_string)
 
+    @staticmethod
+    def _encode_component_groups(
+        alphabetic_group: SequenceType[Union[str, bytes]],
+        ideographic_group: SequenceType[Union[str, bytes]],
+        phonetic_group: SequenceType[Union[str, bytes]],
+        encodings: Optional[List[str]] = None,
+    ) -> bytes:
+        """Creates a byte string for a person name from lists of parts.
+
+        Each of the three component groups (alphabetic, ideographic, phonetic)
+        are supplied as a list of components.
+
+        Parameters
+        ----------
+        alphabetic_group: SequenceType[Union[str, bytes]]
+            List of components for the alphabetic group.
+        ideographic_group: SequenceType[Union[str, bytes]]
+            List of components for the ideographic group.
+        phonetic_group: SequenceType[Union[str, bytes]]
+            List of components for the phonetic group.
+        encodings: Optional[List[str]]
+            A list of encodings used for the other input parameters.
+
+        Returns
+        -------
+        bytes:
+            Bytes string representation of the person name.
+
+        Raises
+        ------
+        ValueError:
+            If any of the input strings contain disallowed characters:
+            '\\' (single backslash), '^', '='.
+        """
+        from pydicom.charset import encode_string
+
+        def enc(s: str) -> bytes:
+            return encode_string(s, encodings or [default_encoding])
+
+        encoded_component_sep = enc('^')
+        encoded_group_sep = enc('=')
+
+        disallowed_chars = ['\\', '=', '^']
+        encoded_disallowed_chars = [enc(c) for c in disallowed_chars]
+
+        def standardize_encoding(val: Union[str, bytes]) -> bytes:
+            # Return a byte encoded string regardless of the input type
+            # This allows the user to supply a mixture of str and bytes
+            # for different parts of the input
+            if isinstance(val, bytes):
+                for c in encoded_disallowed_chars:
+                    if c in val:
+                        raise ValueError(
+                            f'Strings may not contain the {c} character'
+                        )
+                return val
+            else:
+                for c in disallowed_chars:
+                    if c in val:
+                        raise ValueError(
+                            f'Strings may not contain the {c} character'
+                        )
+                return enc(val)
+
+        def make_component_group(components: List[Union[str, bytes]]):
+            encoded_components = map(standardize_encoding, components)
+            joined_components = encoded_component_sep.join(encoded_components)
+            return joined_components.rstrip(encoded_component_sep)
+
+        component_groups = [
+            make_component_group(alphabetic_group),
+            make_component_group(ideographic_group),
+            make_component_group(phonetic_group)
+        ]
+        joined_groups = encoded_group_sep.join(component_groups)
+        joined_groups = joined_groups.rstrip(encoded_group_sep)
+        return joined_groups
+
+    @classmethod
+    def from_named_components(
+        cls,
+        family_name: Union[str, bytes] = '',
+        given_name: Union[str, bytes] = '',
+        middle_name: Union[str, bytes] = '',
+        name_prefix: Union[str, bytes] = '',
+        name_suffix: Union[str, bytes] = '',
+        family_name_ideographic: Union[str, bytes] = '',
+        given_name_ideographic: Union[str, bytes] = '',
+        middle_name_ideographic: Union[str, bytes] = '',
+        name_prefix_ideographic: Union[str, bytes] = '',
+        name_suffix_ideographic: Union[str, bytes] = '',
+        family_name_phonetic: Union[str, bytes] = '',
+        given_name_phonetic: Union[str, bytes] = '',
+        middle_name_phonetic: Union[str, bytes] = '',
+        name_prefix_phonetic: Union[str, bytes] = '',
+        name_suffix_phonetic: Union[str, bytes] = '',
+        encodings: Optional[List[str]] = None,
+    ) -> 'PersonName':
+        """Construct a PersonName from explicit named components
+
+        The DICOM standard describes human names using five components:
+        family name, given name, middle name, name prefix, and name suffix.
+        Any component may be an empty string (the default) if not used.
+        A component may contain multiple space-separated words if there
+        are, for example, multiple given names, middle names, or titles.
+
+        Additionally, each component may be represented in ideographic or
+        phonetic form in addition to (or instead of) alphabetic form.
+
+        For more information see the following parts of the DICOM standard:
+        - `Value Representations <http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html>`_
+        - `PN Examples <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+        - `PN Precise semantics <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+
+        Parameters
+        ----------
+        family_name: Union[str, bytes]
+            Family name in alphabetic form.
+        given_name: Union[str, bytes]
+            Given name in alphabetic form.
+        middle_name: Union[str, bytes]
+            Middle name in alphabetic form.
+        name_prefix: Union[str, bytes]
+            Name prefix in alphabetic form, e.g. 'Mrs.', 'Dr.', 'Sr.', 'Rev.'.
+        name_suffix: Union[str, bytes]
+            Name prefix in alphabetic form, e.g. 'M.D.', 'B.A., M.Div.'.
+            'Chief Executive Officer'.
+        family_name_ideographic: Union[str, bytes]
+            Family name in ideographic form.
+        given_name_ideographic: Union[str, bytes]
+            Given name in ideographic form.
+        middle_name_ideographic: Union[str, bytes]
+            Middle name in ideographic form.
+        name_prefix_ideographic: Union[str, bytes]
+            Name prefix in ideographic form.
+        name_suffix_ideographic: Union[str, bytes]
+            Name suffix in ideographic form.
+        family_name_phonetic: Union[str, bytes]
+            Family name in phonetic form.
+        given_name_phonetic: Union[str, bytes]
+            Given name in phonetic form.
+        middle_name_phonetic: Union[str, bytes]
+            Middle name in phonetic form.
+        name_prefix_phonetic: Union[str, bytes]
+            Name prefix in phonetic form.
+        name_suffix_phonetic: Union[str, bytes]
+            Name suffix in phonetic form.
+        encodings: Optional[List[str]]
+            A list of encodings used for the other input parameters.
+
+        Returns
+        -------
+        PersonName:
+            PersonName constructed from the supplied components.
+
+        Notes
+        -----
+        Strings may not contain the following characters: '^', '=',
+        '\\' (single backslash).
+
+        """  # noqa: E501
+        # Alphatic component group
+        alphabetic_group = [
+            family_name,
+            given_name,
+            middle_name,
+            name_prefix,
+            name_suffix,
+        ]
+
+        # Ideographic component group
+        ideographic_group = [
+            family_name_ideographic,
+            given_name_ideographic,
+            middle_name_ideographic,
+            name_prefix_ideographic,
+            name_suffix_ideographic,
+        ]
+
+        # Phonetic component group
+        phonetic_group = [
+            family_name_phonetic,
+            given_name_phonetic,
+            middle_name_phonetic,
+            name_prefix_phonetic,
+            name_suffix_phonetic,
+        ]
+
+        joined_string = cls._encode_component_groups(
+            alphabetic_group,
+            ideographic_group,
+            phonetic_group,
+            encodings,
+        )
+
+        return cls(joined_string, encodings=encodings)
+
+    @classmethod
+    def from_named_components_veterinary(
+        cls,
+        responsible_party_name: Union[str, bytes] = '',
+        patient_name: Union[str, bytes] = '',
+        responsible_party_name_ideographic: Union[str, bytes] = '',
+        patient_name_ideographic: Union[str, bytes] = '',
+        responsible_party_name_phonetic: Union[str, bytes] = '',
+        patient_name_phonetic: Union[str, bytes] = '',
+        encodings: Optional[List[str]] = None,
+    ) -> 'PersonName':
+        """Construct a PersonName from explicit named components following the
+        veterinary usage convention.
+
+        The DICOM standard describes names for veterinary use with two components:
+        responsible party family name OR responsible party organization name,
+        and patient name.
+        Any component may be an empty string (the default) if not used.
+        A component may contain multiple space-separated words if there
+        are, for example, multiple given names, middle names, or titles.
+
+        Additionally, each component may be represented in ideographic or
+        phonetic form in addition to (or instead of) alphabetic form.
+
+        For more information see the following parts of the DICOM standard:
+        - `Value Representations <http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html>`_
+        - `PN Examples <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+        - `PN Precise semantics <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+
+        Parameters
+        ----------
+        responsible_party_name: Union[str, bytes]
+            Name of the responsible party in alphabetic form. This may be
+            either the family name of the responsible party, or the
+            name of the responsible organization.
+        patient_name: Union[str, bytes]
+            Patient name in alphabetic form.
+        responsible_party_name_ideographic: Union[str, bytes]
+            Name of the responsible party in ideographic form.
+        patient_name_ideographic: Union[str, bytes]
+            Patient name in ideographic form.
+        responsible_party_name_phonetic: Union[str, bytes]
+            Name of the responsible party in phonetic form.
+        patient_name_phonetic: Union[str, bytes]
+            Patient name in phonetic form.
+        encodings: Optional[List[str]]
+            A list of encodings used for the other input parameters
+
+        Returns
+        -------
+        PersonName:
+            PersonName constructed from the supplied components
+
+        Notes
+        -----
+        Strings may not contain the following characters: '^', '=',
+        '\\' (single backslash)
+
+        """  # noqa: E501
+        # Alphatic component group
+        alphabetic_group = [
+            responsible_party_name,
+            patient_name,
+        ]
+
+        # Ideographic component group
+        ideographic_group = [
+            responsible_party_name_ideographic,
+            patient_name_ideographic,
+        ]
+
+        # Phonetic component group
+        phonetic_group = [
+            responsible_party_name_phonetic,
+            patient_name_phonetic,
+        ]
+
+        joined_string = cls._encode_component_groups(
+            alphabetic_group,
+            ideographic_group,
+            phonetic_group,
+            encodings
+        )
+
+        return cls(joined_string, encodings=encodings)
+
 
 # Alias old class names for backwards compat in user code
 def __getattr__(name):
