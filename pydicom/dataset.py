@@ -2299,8 +2299,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             JSON representation of the data element (dictionary including the
             "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
         suppress_invalid_tags : bool, optional
-            Flag to specify if errors while serializing tags should be logged and the
-            tag dropped or if the error should be bubbled up.
+            Flag to specify if errors while serializing tags should be logged
+            and the tag dropped or if the error should be bubbled up.
 
         Returns
         -------
@@ -2356,8 +2356,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 Make sure to use a dump handler that sorts the keys (see
                 example below) to create DICOM-conformant JSON.
         suppress_invalid_tags : bool, optional
-            Flag to specify if errors while serializing tags should be logged and the
-            tag dropped or if the error should be bubbled up.
+            Flag to specify if errors while serializing tags should be logged
+            and the tag dropped or if the error should be bubbled up.
 
         Returns
         -------

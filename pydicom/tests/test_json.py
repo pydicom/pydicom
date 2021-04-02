@@ -271,7 +271,8 @@ class TestDataSetToJson:
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
     def test_suppress_invalid_tags(self):
-        """Test tags that raise exceptions don't raise if suppress_invalid_tags True."""
+        """Test tags that raise exceptions don't if suppress_invalid_tags True.
+        """
         ds = Dataset()
         ds.add_new(0x00100010, 'PN', ['Jane^Doe'])
 
