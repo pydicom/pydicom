@@ -270,6 +270,18 @@ class TestDataSetToJson:
         assert ds_json.index('"00100020"') < ds_json.index('"00100030"')
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
+    def test_suppress_invalid_tags(self):
+        """Test tags that raise exceptions don't raise if suppress_invalid_tags True."""
+        ds = Dataset()
+        ds.add_new(0x00100010, 'PN', ['Jane^Doe'])
+
+        with pytest.raises(Exception):
+            ds.to_json_dict()
+
+        ds_json = ds.to_json_dict(suppress_invalid_tags=True)
+
+        assert ds_json.get("00100010") is None
+
 
 class TestSequence:
     def test_nested_sequences(self):
