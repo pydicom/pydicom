@@ -2278,7 +2278,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None  # noqa
+        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
+        suppress_invalid_tags: bool = False,
     ) -> _Dataset:
         """Return a dictionary representation of the :class:`Dataset`
         conforming to the DICOM JSON Model as described in the DICOM
@@ -2297,6 +2298,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             Callable function that accepts a bulk data element and returns a
             JSON representation of the data element (dictionary including the
             "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
+        suppress_invalid_tags : bool, optional
+            Flag to specify if errors while serializing tags should be logged and the
+            tag dropped or if the error should be bubbled up.
 
         Returns
         -------
@@ -2307,17 +2311,23 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         for key in self.keys():
             json_key = '{:08X}'.format(key)
             data_element = self[key]
-            json_dataset[json_key] = data_element.to_json_dict(
-                bulk_data_element_handler=bulk_data_element_handler,
-                bulk_data_threshold=bulk_data_threshold
-            )
+            try:
+                json_dataset[json_key] = data_element.to_json_dict(
+                    bulk_data_element_handler=bulk_data_element_handler,
+                    bulk_data_threshold=bulk_data_threshold
+                )
+            except Exception as exc:
+                logger.error("Error while processing tag {}".format(json_key))
+                if not suppress_invalid_tags:
+                    raise exc
         return json_dataset
 
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
-        dump_handler: Optional[Callable[["Dataset"], str]] = None
+        dump_handler: Optional[Callable[["Dataset"], str]] = None,
+        suppress_invalid_tags: bool = False,
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
 
@@ -2345,6 +2355,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
                 Make sure to use a dump handler that sorts the keys (see
                 example below) to create DICOM-conformant JSON.
+        suppress_invalid_tags : bool, optional
+            Flag to specify if errors while serializing tags should be logged and the
+            tag dropped or if the error should be bubbled up.
 
         Returns
         -------
@@ -2365,7 +2378,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             dump_handler = json_dump
 
         return dump_handler(
-            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+            self.to_json_dict(
+                bulk_data_threshold,
+                bulk_data_element_handler,
+                suppress_invalid_tags=suppress_invalid_tags
+            )
+        )
 
     def __getstate__(self) -> Dict[str, Any]:
         # pickle cannot handle weakref - remove parent
