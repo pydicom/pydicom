@@ -3,6 +3,7 @@
 
 import datetime
 from decimal import Decimal
+from math import floor, isfinite, log10
 import platform
 import re
 import sys
@@ -329,6 +330,126 @@ class TM(_DateTimeBase, datetime.time):
             )
 
 
+def is_valid_ds(s: str) -> bool:
+    """Check whether this string is a valid decimal string.
+
+    Valid decimal strings must be 16 characters or fewer, and contain only
+    characters from a limited set.
+
+    Parameters
+    ----------
+    s: str
+        String to test.
+
+    Returns
+    -------
+    bool
+        True if the string is a valid decimal string. Otherwise False.
+    """
+    # Check that the length is within the limits
+    if len(s) > 16:
+        return False
+
+    # Remove trailing and leading spaces for remainder of the checks
+    s = s.strip()
+
+    # Check all characters are from the allowed subset
+    # part 5, table 6.2-1
+    allowed_chars = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+',
+        '.', 'e', 'E'
+    }
+    if any(c not in allowed_chars for c in s):
+        return False
+
+    # Check that the string can be successfully cast to float
+    try:
+        val = float(s)
+    except ValueError:
+        return False
+
+    # If checks passed, return True
+    return True
+
+
+def truncate_float_for_ds(val: float) -> str:
+    """Truncate a float's representation to give a valid Decimal String (DS).
+
+    DICOM's decimal string (DS) representation is limited to strings with 16
+    characters and a limited set of characters. This function represents a
+    float that satisfies these constraints while retaining as much
+    precision as possible. Some floats are represented using scientific
+    notation to make more efficient use of the limited number of characters.
+
+    Note that this will incur a loss of precision if the number cannot be
+    represented with 16 characters. Furthermore, non-finite floats (infs and
+    nans) cannot be represented as decimal strings and will cause an error to
+    be raised.
+
+    Parameters
+    ----------
+    val: float
+        The floating point value whose representation is required.
+
+    Returns
+    -------
+    str
+        String representation of the float satisfying the constraints of the
+        decimal string representation.
+
+    Raises
+    ------
+    ValueError
+        If val does not represent a finite value
+
+    """
+    if not isfinite(val):
+        raise ValueError(
+            "Cannot encode non-finite floats as DICOM decimal strings. "
+            f"Got {val}"
+        )
+
+    valstr = str(val)
+
+    # In the simple case, the default python string representation
+    # will do
+    if len(valstr) <= 16:
+        return valstr
+
+    # Decide whether to use scientific notation
+    logval = log10(abs(val))
+
+    # Characters needed for '-' at start
+    sign_chars = 1 if val < 0.0 else 0
+
+    # Numbers larger than 1e14 cannot be correctly represented by truncating
+    # their string representations to 16 chars, e.g pi * 10^13 would become
+    # '314159265358979.', which may not be universally understood. This limit
+    # is 1e13 for negative numbers because of the minus sign.
+    # For negative exponents, the point of equal precision between scientific
+    # and standard notation is 1e-4 e.g. '0.00031415926535' and
+    # '3.1415926535e-04' are both 16 chars
+    use_scientific = logval < -4 or logval >= (14 - sign_chars)
+
+    if use_scientific:
+        # In principle, we could have number where the exponent
+        # needs three digits represent (bigger than this cannot be
+        # represented by floats). Due to floating point limitations
+        # this is best checked for by doing the string conversion
+        remaining_chars = 10 - sign_chars
+        trunc_str = f'%.{remaining_chars}e' % val
+        if len(trunc_str) > 16:
+            trunc_str = f'%.{remaining_chars - 1}e' % val
+        return trunc_str
+    else:
+        if logval >= 1.0:
+            # chars remaining for digits after sign, digits left of '.' and '.'
+            remaining_chars = 14 - sign_chars - int(floor(logval))
+        else:
+            remaining_chars = 14 - sign_chars
+        return f'%.{remaining_chars}f' % val
+
+
 class DSfloat(float):
     """Store value for an element with VR **DS** as :class:`float`.
 
@@ -337,18 +458,31 @@ class DSfloat(float):
 
     """
     def __init__(
-        self, val: Union[str, int, float, Decimal]
+        self, val: Union[str, int, float, Decimal],
+        truncate_on_write: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
         """
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
+        self.truncate_on_write = truncate_on_write
         has_attribute = hasattr(val, 'original_string')
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
+
+        if not is_valid_ds(str(self)) and config.enforce_valid_values:
+            if not truncate_on_write:
+                raise OverflowError(
+                    "Values for elements with a VR of 'DS' must be <= 16 "
+                    "characters long, but the float provided requires > 16 "
+                    "characters to be accurately represented. Use a smaller "
+                    "string, set 'config.enforce_valid_values' to False to "
+                    "override the length check, or explicitly construct a DS "
+                    "object with truncate_on_write set to True"
+                )
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
@@ -358,6 +492,7 @@ class DSfloat(float):
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
+        # TODO truncate on write
         return f'"{super().__repr__()}"'
 
 

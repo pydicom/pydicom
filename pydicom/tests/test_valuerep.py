@@ -9,6 +9,7 @@ try:
     import cPickle as pickle
 except ImportError:
     import pickle
+import math
 import sys
 
 from pydicom.tag import Tag
@@ -189,6 +190,107 @@ class TestDA:
         msg = r"Unable to convert '123456' to 'DA' object"
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DA(123456)
+
+
+class TestIsValidDS:
+    """Unit tests for the is_valid_ds function."""
+    @pytest.mark.parametrize(
+        's',
+        [
+            '1',
+            '3.14159265358979',
+            '-1234.456e78',
+            '1.234E-5',
+            '1.234E+5',
+            '+1',
+            '    42',  # leading spaces allowed
+            '42    ',  # trailing spaces allowed
+        ]
+    )
+    def test_valid(self, s: str):
+        """Various valid decimal strings."""
+        assert pydicom.valuerep.is_valid_ds(s)
+
+    @pytest.mark.parametrize(
+        's',
+        [
+            'nan',
+            '-inf',
+            '3.141592653589793',  # too long
+            '1,000',              # no commas
+            '1 000',              # no embedded spaces
+            '127.0.0.1',          # not a number
+            '1.e',                # not a number
+        ]
+    )
+    def test_invalid(self, s: str):
+        """Various invalid decimal strings."""
+        assert not pydicom.valuerep.is_valid_ds(s)
+
+
+class TestTruncateFloatForDS:
+    """Unit tests for float truncation function"""
+    def check_valid(self, s: str) -> bool:
+        # Use the pydicom test function
+        if not pydicom.valuerep.is_valid_ds(s):
+            return False
+
+        # Disallow floats ending in '.' since this may not be correctly
+        # interpreted
+        if s.endswith('.'):
+            return False
+
+        # Otherwise return True
+        return True
+
+    @pytest.mark.parametrize(
+        'val,expected_str',
+        [
+            [1.0, "1.0"],
+            [0.0, "0.0"],
+            [-0.0, "-0.0"],
+            [0.123, "0.123"],
+            [-0.321, "-0.321"],
+            [0.00001, "1e-05"],
+            [3.14159265358979323846, '3.14159265358979'],
+            [-3.14159265358979323846, '-3.1415926535898'],
+            [5.3859401928763739403e-7, '5.3859401929e-07'],
+            [-5.3859401928763739403e-7, '-5.385940193e-07'],
+            [1.2342534378125532912998323e10, '12342534378.1255'],
+            [6.40708699858767842501238e13, '64070869985876.8'],
+            [1.7976931348623157e+308, '1.797693135e+308'],
+        ]
+    )
+    def test_truncate(self, val: float, expected_str: str):
+        """Test truncation of some basic values."""
+        assert pydicom.valuerep.truncate_float_for_ds(val) == expected_str
+
+    @pytest.mark.parametrize(
+        'exp', [-101, -100, 100, 101] + list(range(-16, 17))
+    )
+    def test_powers_of_pi(self, exp: int):
+        """Raise pi to various powers to test truncation."""
+        val = math.pi * 10 ** exp
+        s = pydicom.valuerep.truncate_float_for_ds(val)
+        print(s)
+        assert self.check_valid(s)
+
+    @pytest.mark.parametrize(
+        'exp', [-101, -100, 100, 101] + list(range(-16, 17))
+    )
+    def test_powers_of_negative_pi(self, exp: int):
+        """Raise negative pi to various powers to test truncation."""
+        val = -math.pi * 10 ** exp
+        s = pydicom.valuerep.truncate_float_for_ds(val)
+        assert self.check_valid(s)
+
+    @pytest.mark.parametrize(
+        'val', [float('-nan'), float('nan'), float('-inf'), float('inf')]
+    )
+    def test_invalid(self, val: float):
+        """Test non-finite floating point number raise an error"""
+        with pytest.raises(ValueError):
+            pydicom.valuerep.truncate_float_for_ds(val)
 
 
 class TestDS:
