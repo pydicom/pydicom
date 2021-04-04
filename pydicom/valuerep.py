@@ -528,10 +528,20 @@ class DSfloat(float):
 class DSdecimal(Decimal):
     """Store value for an element with VR **DS** as :class:`decimal.Decimal`.
 
+    Parameters
+    ----------
+    val: Union[str, int, float, Decimal]
+        Value to store as a DS.
+    truncate: bool
+        If True, automatically truncate the string representation of this
+        number to ensure it satisfies the constraints in the DICOM standard.
+        Note that this will lead to loss of precision for some numbers.
+
     Notes
     -----
     If constructed from an empty string, returns the empty string, not an
     instance of this class.
+
     """
     def __new__(
         cls: Type[_DSdecimal],
