@@ -647,13 +647,6 @@ class TestDecimalString:
         assert isinstance(ds, valuerep.DSdecimal)
         assert len(str(ds)) <= 16
 
-        # Now the input string is too long but decimal.Decimal can convert it
-        # to a valid 16-character string
-        long_str = "-0.000000981338674"
-        ds = valuerep.DS(long_str)
-        assert isinstance(ds, valuerep.DSdecimal)
-        assert len(str(ds)) <= 16
-
     def test_invalid_decimal_strings(self, enforce_valid_values):
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
