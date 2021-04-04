@@ -309,9 +309,17 @@ class TestTruncateFloatForDS:
         'val', [float('-nan'), float('nan'), float('-inf'), float('inf')]
     )
     def test_invalid(self, val: float):
-        """Test non-finite floating point number raise an error"""
+        """Test non-finite floating point numbers raise an error"""
         with pytest.raises(ValueError):
             pydicom.valuerep.truncate_float_for_ds(val)
+
+    def test_wrong_type(self):
+        """Test calling with a string raises an error"""
+        with pytest.raises(
+            TypeError,
+            match="'val' must be of type float or decimal.Decimal"
+        ):
+            pydicom.valuerep.truncate_float_for_ds('1.0')
 
 
 class TestDS:
