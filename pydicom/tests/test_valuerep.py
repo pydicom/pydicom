@@ -11,6 +11,7 @@ except ImportError:
     import pickle
 import math
 import sys
+from typing import Union
 
 from pydicom.tag import Tag
 from pydicom.values import convert_value
@@ -28,6 +29,27 @@ from pydicom.valuerep import PersonName
 
 badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
+
+
+@pytest.fixture()
+def enforce_valid_true_fixture():
+    """Fixture to run tests with enforce_valid_values True and ensure it is
+       reset afterwards regardless of whether test succeeds."""
+    enforce_flag_original = config.enforce_valid_values
+    config.enforce_valid_values = True
+    yield
+    config.enforce_valid_values = enforce_flag_original
+
+
+@pytest.fixture(params=(True, False))
+def enforce_valid_both_fixture(request):
+    """Fixture to run tests with enforce_valid_values with both True and False
+       and ensure it is reset afterwards regardless of whether test succeeds.
+    """
+    enforce_flag_original = config.enforce_valid_values
+    config.enforce_valid_values = request.param
+    yield
+    config.enforce_valid_values = enforce_flag_original
 
 
 class TestTM:
@@ -272,7 +294,6 @@ class TestTruncateFloatForDS:
         """Raise pi to various powers to test truncation."""
         val = math.pi * 10 ** exp
         s = pydicom.valuerep.truncate_float_for_ds(val)
-        print(s)
         assert self.check_valid(s)
 
     @pytest.mark.parametrize(
@@ -351,6 +372,57 @@ class TestDSfloat:
         assert 1.2345 == y
         assert "1.2345" == y.original_string
 
+    def test_truncate(self, enforce_valid_both_fixture):
+        """Test truncating floats"""
+        x = pydicom.valuerep.DSfloat(math.pi, truncate=True)
+
+        # Float representation should be unaltered by truncation
+        assert x == math.pi
+        # String representations should be correctly truncated
+        assert str(x) == '3.14159265358979'
+        assert repr(x) == '"3.14159265358979"'
+
+    def test_truncate_invalid_string(self, enforce_valid_both_fixture):
+        """If the user supplies an invalid string, this should be truncated."""
+        x = pydicom.valuerep.DSfloat('3.141592653589793', truncate=True)
+
+        # Float representation should be unaltered by truncation
+        assert x == float('3.141592653589793')
+        # String representations should be correctly truncated
+        assert str(x) == '3.14159265358979'
+        assert repr(x) == '"3.14159265358979"'
+
+    def test_truncate_valid_string(self, enforce_valid_both_fixture):
+        """If the user supplies a valid string, this should not be altered."""
+        x = pydicom.valuerep.DSfloat('1.234e-1', truncate=True)
+
+        # Float representation should be correct
+        assert x == 0.1234
+        # String representations should be unaltered
+        assert str(x) == '1.234e-1'
+        assert repr(x) == '"1.234e-1"'
+
+    def test_enforce_valid_values_length(self, enforce_valid_true_fixture):
+        """Test that errors are raised when length is too long."""
+        with pytest.raises(OverflowError):
+            valuerep.DSfloat('3.141592653589793')
+
+    @pytest.mark.parametrize(
+        'val',
+        [
+            'nan', '-nan', 'inf', '-inf', float('nan'), float('-nan'),
+            float('-inf'), float('inf')
+        ]
+    )
+    def test_enforce_valid_values_value(
+        self,
+        val: Union[float, str],
+        enforce_valid_true_fixture
+    ):
+        """Test that errors are raised when value is invalid."""
+        with pytest.raises(ValueError):
+            valuerep.DSfloat(val)
+
 
 class TestDSdecimal:
     """Unit tests for pickling DSdecimal"""
@@ -398,6 +470,52 @@ class TestDSdecimal:
         """Test repr(DSdecimal)."""
         x = pydicom.valuerep.DSdecimal('1.2345')
         assert '"1.2345"' == repr(x)
+
+    def test_truncate(self, enforce_valid_both_fixture):
+        """Test truncating decimal"""
+        x = pydicom.valuerep.DSdecimal(Decimal(math.pi), truncate=True)
+
+        # Decimal representation should be unaltered by truncation
+        assert x == Decimal(math.pi)
+        # String representations should be correctly truncated
+        assert str(x) == '3.14159265358979'
+        assert repr(x) == '"3.14159265358979"'
+
+    def test_truncate_invalid_string(self, enforce_valid_both_fixture):
+        """If the user supplies an invalid string, this should be truncated."""
+        x = pydicom.valuerep.DSdecimal('3.141592653589793', truncate=True)
+
+        # Decimal representation should be unaltered by truncation
+        assert x == Decimal('3.141592653589793')
+        # String representations should be correctly truncated
+        assert str(x) == '3.14159265358979'
+        assert repr(x) == '"3.14159265358979"'
+
+    @pytest.mark.parametrize(
+        'val',
+        [
+            'NaN', '-NaN', 'Infinity', '-Infinity', Decimal('NaN'),
+            Decimal('-NaN'), Decimal('-Infinity'), Decimal('Infinity')
+        ]
+    )
+    def test_enforce_valid_values_value(
+        self,
+        val: Union[Decimal, str],
+        enforce_valid_true_fixture
+    ):
+        """Test that errors are raised when value is invalid."""
+        with pytest.raises(ValueError):
+            valuerep.DSdecimal(val)
+
+    def test_truncate_valid_string(self, enforce_valid_both_fixture):
+        """If the user supplies a valid string, this should not be altered."""
+        x = pydicom.valuerep.DSdecimal('1.234e-1', truncate=True)
+
+        # Decimal representation should be correct
+        assert x == Decimal('1.234e-1')
+        # String representations should be unaltered
+        assert str(x) == '1.234e-1'
+        assert repr(x) == '"1.234e-1"'
 
 
 class TestIS:
@@ -456,7 +574,6 @@ class TestIS:
 
         val = pydicom.valuerep.IS("1.0")
         assert "1.0" == str(val)
-
 
     def test_repr(self):
         """Test IS.__repr__()."""

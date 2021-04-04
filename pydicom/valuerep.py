@@ -364,7 +364,7 @@ def is_valid_ds(s: str) -> bool:
 
     # Check that the string can be successfully cast to float
     try:
-        val = float(s)
+        float(s)
     except ValueError:
         return False
 
@@ -372,7 +372,7 @@ def is_valid_ds(s: str) -> bool:
     return True
 
 
-def truncate_float_for_ds(val: float) -> str:
+def truncate_float_for_ds(val: Union[float, Decimal]) -> str:
     """Truncate a float's representation to give a valid Decimal String (DS).
 
     DICOM's decimal string (DS) representation is limited to strings with 16
@@ -388,7 +388,7 @@ def truncate_float_for_ds(val: float) -> str:
 
     Parameters
     ----------
-    val: float
+    val: Union[float, Decimal]
         The floating point value whose representation is required.
 
     Returns
@@ -403,10 +403,12 @@ def truncate_float_for_ds(val: float) -> str:
         If val does not represent a finite value
 
     """
+    if not isinstance(val, (float, Decimal)):
+        raise TypeError("'val' must be of type float or decimal.Decimal")
     if not isfinite(val):
         raise ValueError(
             "Cannot encode non-finite floats as DICOM decimal strings. "
-            f"Got {val}"
+            f"Got '{val}'"
         )
 
     valstr = str(val)
@@ -456,43 +458,70 @@ class DSfloat(float):
     If constructed from an empty string, return the empty string,
     not an instance of this class.
 
+    Parameters
+    ----------
+    val: Union[str, int, float, Decimal]
+        Value to store as a DS.
+    truncate: bool
+        If True, automatically truncate the string representation of this
+        number to ensure it satisfies the constraints in the DICOM standard.
+        Note that this will lead to loss of precision for some numbers.
+
     """
     def __init__(
         self, val: Union[str, int, float, Decimal],
-        truncate_on_write: bool = False
+        truncate: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
         """
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
-        self.truncate_on_write = truncate_on_write
         has_attribute = hasattr(val, 'original_string')
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
 
-        if not is_valid_ds(str(self)) and config.enforce_valid_values:
-            if not truncate_on_write:
+        self.truncate = truncate
+        if self.truncate:
+            # If truncate is True, keep the float value the same, but change
+            # the string representation stored in original_string if necessary
+            if hasattr(self, 'original_string'):
+                if not is_valid_ds(self.original_string):
+                    self.original_string = truncate_float_for_ds(
+                        float(self.original_string)
+                    )
+            else:
+                self.original_string = truncate_float_for_ds(self)
+
+        if config.enforce_valid_values:
+            if len(repr(self).strip('"')) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
                     "characters long, but the float provided requires > 16 "
                     "characters to be accurately represented. Use a smaller "
                     "string, set 'config.enforce_valid_values' to False to "
                     "override the length check, or explicitly construct a DS "
-                    "object with truncate_on_write set to True"
+                    "object with 'truncate' set to True"
+                )
+            if not is_valid_ds(repr(self).strip('"')):
+                # This will catch nan and inf
+                raise ValueError(
+                    f'Value "{str(self)}" is not valid for elements with a VR '
+                    'of DS'
                 )
 
     def __str__(self) -> str:
-        if hasattr(self, 'original_string'):
+        if hasattr(self, 'original_string') and not self.truncate:
             return self.original_string
 
         # Issue #937 (Python 3.8 compatibility)
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        # TODO truncate on write
+        if self.truncate and hasattr(self, 'original_string'):
+            return f'"{self.original_string}"'
         return f'"{super().__repr__()}"'
 
 
@@ -506,7 +535,8 @@ class DSdecimal(Decimal):
     """
     def __new__(
         cls: Type[_DSdecimal],
-        val: Union[str, int, float, Decimal]
+        val: Union[str, int, float, Decimal],
+        truncate: bool = False
     ) -> Optional[_DSdecimal]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -530,19 +560,13 @@ class DSdecimal(Decimal):
                 return None
 
         val = super().__new__(cls, val)
-        if len(str(val)) > 16 and config.enforce_valid_values:
-            raise OverflowError(
-                "Values for elements with a VR of 'DS' values must be <= 16 "
-                "characters long. Use a smaller string, set "
-                "'config.enforce_valid_values' to False to override the "
-                "length check, or use 'Decimal.quantize()' and initialize "
-                "with a 'Decimal' instance."
-            )
 
         return val
 
     def __init__(
-        self, val: Union[str, int, float, Decimal]
+        self,
+        val: Union[str, int, float, Decimal],
+        truncate: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
@@ -556,6 +580,35 @@ class DSdecimal(Decimal):
         elif isinstance(val, (DSfloat, DSdecimal)) and has_str:
             self.original_string = val.original_string
 
+        self.truncate = truncate
+        if self.truncate:
+            # If truncate is True, keep the float value the same, but change
+            # the string representation stored in original_string if necessary
+            if hasattr(self, 'original_string'):
+                if not is_valid_ds(self.original_string):
+                    self.original_string = truncate_float_for_ds(
+                        float(self.original_string)
+                    )
+            else:
+                self.original_string = truncate_float_for_ds(self)
+
+        if config.enforce_valid_values:
+            if len(repr(self).strip('"')) > 16:
+                raise OverflowError(
+                    "Values for elements with a VR of 'DS' values must be "
+                    "<= 16 characters long. Use a smaller string, set "
+                    "'config.enforce_valid_values' to False to override the "
+                    "length check, use 'Decimal.quantize()' and initialize "
+                    "with a 'Decimal' instance, or explicitly construct a DS "
+                    "instance with 'truncate' set to True"
+                )
+            if not is_valid_ds(repr(self).strip('"')):
+                # This will catch nan and inf
+                raise ValueError(
+                    f'Value "{str(self)}" is not valid for elements with a VR '
+                    'of DS'
+                )
+
     def __str__(self) -> str:
         has_str = hasattr(self, 'original_string')
         if has_str and len(self.original_string) <= 16:
@@ -564,6 +617,8 @@ class DSdecimal(Decimal):
         return super().__str__()
 
     def __repr__(self) -> str:
+        if self.truncate and hasattr(self, 'original_string'):
+            return f'"{self.original_string}"'
         return f'"{str(self)}"'
 
 
@@ -575,7 +630,8 @@ else:
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal]
+    val: Union[None, str, int, float, Decimal],
+    truncate: bool = False
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -593,7 +649,7 @@ def DS(
     if val == '' or val is None:
         return val
 
-    return DSclass(val)
+    return DSclass(val, truncate=truncate)
 
 
 class IS(int):
