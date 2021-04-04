@@ -468,6 +468,13 @@ class DSfloat(float):
         Note that this will lead to loss of precision for some numbers.
 
     """
+    def __new__(
+            cls,
+            val: Union[str, int, float, Decimal],
+            truncate: bool = False
+    ) -> [_DSfloat]:
+        return super().__new__(cls, val)
+
     def __init__(
         self, val: Union[str, int, float, Decimal],
         truncate: bool = False
