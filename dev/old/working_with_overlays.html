@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Working with Overlay Data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -101,12 +102,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
@@ -130,14 +131,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -209,10 +210,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="working-with-overlay-data">
+  <section id="working-with-overlay-data">
 <span id="id1"></span><h1>Working with Overlay Data<a class="headerlink" href="#working-with-overlay-data" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to work with overlay data in pydicom.</p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.9.2.html">Overlays</a> in DICOM are present in what’s called
 a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_7.6.html">Repeating Group</a>, where the group number of the
@@ -237,8 +238,8 @@ it doesn’t do anything with overlay data except read in the raw bytes:</p>
 <span class="go">b&#39;\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00...</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="dataset-overlay-array">
+</section>
+<section id="dataset-overlay-array">
 <h2><code class="docutils literal notranslate"><span class="pre">Dataset.overlay_array()</span></code><a class="headerlink" href="#dataset-overlay-array" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -290,8 +291,8 @@ the overlay data is reduced (e.g. a 512x512 image is collapsed
 to 256x256) then the corresponding (60xx,0010) <em>Overlay Rows</em>
 and (60xx,0011) <em>Overlay Columns</em> should be set appropriately. You must
 explicitly set these yourself; pydicom does not do so automatically.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

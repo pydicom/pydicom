@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Version 0.9.7 &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -99,12 +100,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -112,14 +113,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -189,14 +190,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-7">
+  <section id="version-0-9-7">
 <h1>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
+<section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <p>pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
 compatibility. ** It is the last version which will run with Python &lt; 2.6 **
 (it will run with Python 2.4 to Python 2.7)</p>
-<div class="section" id="major-changes">
+<section id="major-changes">
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added DICOM 2011 keywords. Old “named tags” still work, but will be
@@ -221,8 +222,8 @@ dicom.config.&lt;parameter&gt;={True|False}’ before setting values of data ele
 <p>Users are encouraged to switch to the official DICOM keywords, as these are now
 part of the standard, and promote consistency across programming languages and
 libraries.</p>
-</div>
-<div class="section" id="bug-fixes">
+</section>
+<section id="bug-fixes">
 <h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>New way to read file meta information, not using the group length, instead
@@ -234,8 +235,8 @@ log a warning (revision b6b3658f3b14).</p></li>
 <li><p>Setting individual items in a DS or IS list now saves to file correctly</p></li>
 <li><p>Japanese and Korean encoding fixes (issue 110)</p></li>
 </ul>
-</div>
-<div class="section" id="other-enhancements">
+</section>
+<section id="other-enhancements">
 <h3>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>New Sequence class which verifies items are Datasets (issue 52)</p></li>
@@ -250,9 +251,9 @@ only on Python &gt;= 2.6 as previous versions do not call __dir__ method
 </ul>
 <p>Many of the bug fixes/enhancements were submitted by users. Many thanks to
 those who contributed.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>

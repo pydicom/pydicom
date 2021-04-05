@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Working with Pixel Data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -101,12 +102,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
@@ -134,14 +135,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -213,10 +214,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="working-with-pixel-data">
+  <section id="working-with-pixel-data">
 <span id="id1"></span><h1>Working with Pixel Data<a class="headerlink" href="#working-with-pixel-data" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to work with pixel data in pydicom.</p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Many DICOM SOP classes contain bulk pixel data, which is usually used to
 represent one or more image frames (although <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.18.3.html">other types of data</a> are possible). In these SOP classes the pixel
@@ -258,8 +259,8 @@ frame may be broken up into one or more fragments.</p></li>
 <p>Because of the complexity in interpreting the pixel data, <em>pydicom</em> provides
 an easy way to get it in a convenient form:
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a>.</p>
-</div>
-<div class="section" id="dataset-pixel-array">
+</section>
+<section id="dataset-pixel-array">
 <h2><code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code><a class="headerlink" href="#dataset-pixel-array" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -309,8 +310,8 @@ automatically.</p>
 an example.</p>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a> can also be used to pass image
 data to graphics libraries for viewing. See <a class="reference internal" href="viewing_images.html"><span class="doc">Viewing Images</span></a> for details.</p>
-</div>
-<div class="section" id="color-space">
+</section>
+<section id="color-space">
 <span id="colorspace"></span><h2>Color space<a class="headerlink" href="#color-space" title="Permalink to this headline">¶</a></h2>
 <p>When using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_array</span></code></a>
 with <em>Pixel Data</em> that has an (0028,0002) <em>Samples per Pixel</em> value
@@ -328,8 +329,8 @@ of <em>Photometric Interpretation</em> to match.</p>
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1">Section C.7.6.3.1</a> for more
 information about color spaces.</p>
 </div>
-</div>
-<div class="section" id="palette-color">
+</section>
+<section id="palette-color">
 <h2>Palette Color<a class="headerlink" href="#palette-color" title="Permalink to this headline">¶</a></h2>
 <p>Some DICOM datasets store their output image pixel values in a lookup table
 (LUT), where the values in <em>Pixel Data</em> are the index to a corresponding
@@ -363,8 +364,8 @@ of the pixel data is 8-bit.</p>
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">C.7.6.3</a> and
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.9.html">C.7.9</a> for more information.</p>
 </div>
-</div>
-<div class="section" id="modality-lut-or-rescale-operation">
+</section>
+<section id="modality-lut-or-rescale-operation">
 <h2>Modality LUT or Rescale Operation<a class="headerlink" href="#modality-lut-or-rescale-operation" title="Permalink to this headline">¶</a></h2>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.html#sect_C.11.1">Modality LUT</a> module
 converts raw pixel data values to a specific (possibly unitless) physical
@@ -382,8 +383,8 @@ first.</p>
 <span class="n">hu</span> <span class="o">=</span> <span class="n">apply_modality_lut</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="voi-lut-or-windowing-operation">
+</section>
+<section id="voi-lut-or-windowing-operation">
 <h2>VOI LUT or Windowing Operation<a class="headerlink" href="#voi-lut-or-windowing-operation" title="Permalink to this headline">¶</a></h2>
 <p>The DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT</a> module applies a
 VOI or windowing operation to input values. The
@@ -402,8 +403,8 @@ that the modality LUT or rescale operation has already been applied.</p>
 <span class="n">out</span> <span class="o">=</span> <span class="n">apply_voi_lut</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

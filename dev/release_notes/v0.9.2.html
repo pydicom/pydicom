@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Version 0.9.2 &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -99,12 +100,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -112,14 +113,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -189,11 +190,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-0-9-2">
+  <section id="version-0-9-2">
 <h1>Version 0.9.2<a class="headerlink" href="#version-0-9-2" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
+<section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="major-changes">
+<section id="major-changes">
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Renamed Attribute class and related modules to !DataElement. Old code will
@@ -204,8 +205,8 @@ using Python unicode. Thus foreign languages can display names in Greek,
 Japanese, Chinese etc characters in environments which support unicode
 (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</p></li>
 </ul>
-</div>
-<div class="section" id="other-enhancements">
+</section>
+<section id="other-enhancements">
 <h3>Other Enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added support for auto-completion of dataset elements in ipython; also all
@@ -221,8 +222,8 @@ UID_dictionary used (r51).</p></li>
 <li><p>Added !DataElement.name property; synonym for !DataElement.description()
 function</p></li>
 </ul>
-</div>
-<div class="section" id="bug-fixes">
+</section>
+<section id="bug-fixes">
 <h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed issue27, sequence with a single empty item read incorrectly</p></li>
@@ -232,8 +233,8 @@ function</p></li>
 <li><p>Fixed issue33, VR=UN being split on backslash (r70)</p></li>
 <li><p>Fixed issue18, util directory not installed (r45)</p></li>
 </ul>
-</div>
-<div class="section" id="other">
+</section>
+<section id="other">
 <h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added example file myprint.py – shows how to custom format DICOM file
@@ -244,9 +245,9 @@ information (r67)</p></li>
 <li><p>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</p></li>
 <li><p>changed to setuptools for packaging rather than distutils</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>

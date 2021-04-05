@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Best Practices &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -101,12 +102,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
@@ -132,14 +133,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -211,18 +212,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="best-practices">
+  <section id="best-practices">
 <span id="id1"></span><h1>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">Future-proof your code, and help ensure valid DICOM</p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>There are some features of <em>pydicom</em> that allow you to help check your code
 for more strict DICOM practices, and to future-proof against major
 <em>pydicom</em> version changes.</p>
 <p>It is recommended that you turn on two features if you can:
 enforcement of valid DICOM, and a flag to enable “future” pydicom changes.</p>
-</div>
-<div class="section" id="enforcing-valid-dicom">
+</section>
+<section id="enforcing-valid-dicom">
 <h2>Enforcing Valid DICOM<a class="headerlink" href="#enforcing-valid-dicom" title="Permalink to this headline">¶</a></h2>
 <p><em>pydicom</em> has a configuration option to help enforce valid DICOM:
 <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a>.</p>
@@ -241,8 +242,8 @@ strictly adhere to the DICOM Standard, you may need to disable this flag.</p>
 <code class="code docutils literal notranslate"><span class="pre">from</span> <span class="pre">pydicom.config</span> <span class="pre">import</span> <span class="pre">enforce_valid_values</span></code>.
 That makes the <cite>enforce_valid_values</cite> variable local only to that module,
 so <em>pydicom</em> would not see your change to its value.</p>
-</div>
-<div class="section" id="future-proofing-your-code">
+</section>
+<section id="future-proofing-your-code">
 <h2>Future-proofing your code<a class="headerlink" href="#future-proofing-your-code" title="Permalink to this headline">¶</a></h2>
 <p><em>pydicom</em>, like all software, must balance its evolution with not breaking
 existing code using the library. Sometimes, major changes are necessary
@@ -276,8 +277,8 @@ using the <a class="reference internal" href="../reference/generated/pydicom.con
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">future_behavior</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="limiting-the-pydicom-major-version-in-your-package">
+</section>
+<section id="limiting-the-pydicom-major-version-in-your-package">
 <h2>Limiting the <em>pydicom</em> major version in your package<a class="headerlink" href="#limiting-the-pydicom-major-version-in-your-package" title="Permalink to this headline">¶</a></h2>
 <p>Another way to avoid breaking changes in future <em>pydicom</em> versions is to
 limit the version of <em>pydicom</em> that your code uses.</p>
@@ -291,8 +292,8 @@ major version.  E.g. a line like:</p>
 will get the same major version (in the example, version 2) of <em>pydicom</em>
 that you have developed the code for. This works best if your package is
 installed in a virtual environment.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

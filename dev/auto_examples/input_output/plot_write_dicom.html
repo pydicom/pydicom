@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Write DICOM data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -101,12 +102,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -114,7 +115,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
@@ -129,7 +130,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -206,7 +207,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="write-dicom-data">
+<section class="sphx-glr-example-title" id="write-dicom-data">
 <span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to write a DICOM file from scratch using pydicom. This
 example does not produce a DICOM standards compliant file as written, you will
@@ -214,32 +215,32 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpe82kan7o.dcm
+Writing test file /tmp/tmpredlah06.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpzzjqp56k.dcm
-Load file /tmp/tmpe82kan7o.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpflpd_vys.dcm
+Load file /tmp/tmpredlah06.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210330&#39;
-(0008, 0033) Content Time                        TM: &#39;011250.099788&#39;
+(0008, 0023) Content Date                        DA: &#39;20210405&#39;
+(0008, 0033) Content Time                        TM: &#39;235757.059281&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpe82kan7o.dcm ...
-Load file /tmp/tmpzzjqp56k.dcm ...
+Remove file /tmp/tmpredlah06.dcm ...
+Load file /tmp/tmpflpd_vys.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210330&#39;
-(0008, 0033) Content Time                        TM: &#39;011250.099788&#39;
+(0008, 0023) Content Date                        DA: &#39;20210405&#39;
+(0008, 0033) Content Time                        TM: &#39;235757.059281&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpzzjqp56k.dcm ...
+Remove file /tmp/tmpflpd_vys.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -322,7 +323,7 @@ Remove file /tmp/tmpzzjqp56k.dcm ...
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
+</section>
 
 
            </div>
