@@ -653,6 +653,13 @@ class PersonName:
         original_string: str, optional
             When creating a ``PersonName`` using a decoded string, this is the
             original encoded value.
+
+        Notes
+        -----
+        A :class:`PersonName` may also be constructed by specifying individual
+        components using the :meth:`from_named_components` and
+        :meth:`from_named_components_veterinary` classmethods.
+
         """
         self.original_string: Union[None, str, bytes] = None
         self._components = None
@@ -928,13 +935,13 @@ class PersonName:
             If any of the input strings contain disallowed characters:
             '\\' (single backslash), '^', '='.
         """
-        from pydicom.charset import encode_string, decode_string
+        from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
             return encode_string(s, encodings or [default_encoding])
 
         def dec(s: bytes) -> str:
-            return decode_string(s, encodings or [default_encoding], [])
+            return decode_bytes(s, encodings or [default_encoding], [])
 
         encoded_component_sep = enc('^')
         encoded_group_sep = enc('=')
@@ -963,7 +970,7 @@ class PersonName:
             return val_enc
 
         def make_component_group(components: List[Union[str, bytes]]):
-            encoded_components = map(standardize_encoding, components)
+            encoded_components = [standardize_encoding(c) for c in components]
             joined_components = encoded_component_sep.join(encoded_components)
             return joined_components.rstrip(encoded_component_sep)
 
@@ -1008,9 +1015,9 @@ class PersonName:
         phonetic form in addition to (or instead of) alphabetic form.
 
         For more information see the following parts of the DICOM standard:
-        - `Value Representations <http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html>`_
-        - `PN Examples <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
-        - `PN Precise semantics <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+        - :dcm:`Value Representations <part05/sect_6.2.html>`
+        - :dcm:`PN Examples <part05/sect_6.2.html#sect_6.2.1.1>`
+        - :dcm:`PN Precise semantics <part05/sect_6.2.html#sect_6.2.1.2>`
 
         Parameters
         ----------
@@ -1138,8 +1145,7 @@ class PersonName:
         responsible party family name OR responsible party organization name,
         and patient name.
         Any component may be an empty string (the default) if not used.
-        A component may contain multiple space-separated words if there
-        are, for example, multiple given names, middle names, or titles.
+        A component may contain multiple space-separated words if necessary.
 
         Additionally, each component may be represented in ideographic or
         phonetic form in addition to (or instead of) alphabetic form.
