@@ -372,7 +372,7 @@ def is_valid_ds(s: str) -> bool:
     return True
 
 
-def truncate_float_for_ds(val: Union[float, Decimal]) -> str:
+def format_number_as_ds(val: Union[float, Decimal]) -> str:
     """Truncate a float's representation to give a valid Decimal String (DS).
 
     DICOM's decimal string (DS) representation is limited to strings with 16
@@ -462,8 +462,8 @@ class DSfloat(float):
     ----------
     val: Union[str, int, float, Decimal]
         Value to store as a DS.
-    truncate: bool
-        If True, automatically truncate the string representation of this
+    auto_format: bool
+        If True, automatically format the string representation of this
         number to ensure it satisfies the constraints in the DICOM standard.
         Note that this will lead to loss of precision for some numbers.
 
@@ -471,13 +471,13 @@ class DSfloat(float):
     def __new__(
             cls,
             val: Union[str, int, float, Decimal],
-            truncate: bool = False
+            auto_format: bool = False
     ) -> [_DSfloat]:
         return super().__new__(cls, val)
 
     def __init__(
         self, val: Union[str, int, float, Decimal],
-        truncate: bool = False
+        auto_format: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -490,17 +490,17 @@ class DSfloat(float):
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
 
-        self.truncate = truncate
-        if self.truncate:
-            # If truncate is True, keep the float value the same, but change
+        self.auto_format = auto_format
+        if self.auto_format:
+            # If auto_format is True, keep the float value the same, but change
             # the string representation stored in original_string if necessary
             if hasattr(self, 'original_string'):
                 if not is_valid_ds(self.original_string):
-                    self.original_string = truncate_float_for_ds(
+                    self.original_string = format_number_as_ds(
                         float(self.original_string)
                     )
             else:
-                self.original_string = truncate_float_for_ds(self)
+                self.original_string = format_number_as_ds(self)
 
         if config.enforce_valid_values:
             if len(repr(self).strip('"')) > 16:
@@ -510,7 +510,7 @@ class DSfloat(float):
                     "characters to be accurately represented. Use a smaller "
                     "string, set 'config.enforce_valid_values' to False to "
                     "override the length check, or explicitly construct a DS "
-                    "object with 'truncate' set to True"
+                    "object with 'auto_format' set to True"
                 )
             if not is_valid_ds(repr(self).strip('"')):
                 # This will catch nan and inf
@@ -520,14 +520,14 @@ class DSfloat(float):
                 )
 
     def __str__(self) -> str:
-        if hasattr(self, 'original_string') and not self.truncate:
+        if hasattr(self, 'original_string') and not self.auto_format:
             return self.original_string
 
         # Issue #937 (Python 3.8 compatibility)
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        if self.truncate and hasattr(self, 'original_string'):
+        if self.auto_format and hasattr(self, 'original_string'):
             return f'"{self.original_string}"'
         return f'"{super().__repr__()}"'
 
@@ -539,8 +539,8 @@ class DSdecimal(Decimal):
     ----------
     val: Union[str, int, float, Decimal]
         Value to store as a DS.
-    truncate: bool
-        If True, automatically truncate the string representation of this
+    auto_format: bool
+        If True, automatically format the string representation of this
         number to ensure it satisfies the constraints in the DICOM standard.
         Note that this will lead to loss of precision for some numbers.
 
@@ -553,7 +553,7 @@ class DSdecimal(Decimal):
     def __new__(
         cls: Type[_DSdecimal],
         val: Union[str, int, float, Decimal],
-        truncate: bool = False
+        auto_format: bool = False
     ) -> Optional[_DSdecimal]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -583,7 +583,7 @@ class DSdecimal(Decimal):
     def __init__(
         self,
         val: Union[str, int, float, Decimal],
-        truncate: bool = False
+        auto_format: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
@@ -597,17 +597,17 @@ class DSdecimal(Decimal):
         elif isinstance(val, (DSfloat, DSdecimal)) and has_str:
             self.original_string = val.original_string
 
-        self.truncate = truncate
-        if self.truncate:
-            # If truncate is True, keep the float value the same, but change
+        self.auto_format = auto_format
+        if self.auto_format:
+            # If auto_format is True, keep the float value the same, but change
             # the string representation stored in original_string if necessary
             if hasattr(self, 'original_string'):
                 if not is_valid_ds(self.original_string):
-                    self.original_string = truncate_float_for_ds(
+                    self.original_string = format_number_as_ds(
                         float(self.original_string)
                     )
             else:
-                self.original_string = truncate_float_for_ds(self)
+                self.original_string = format_number_as_ds(self)
 
         if config.enforce_valid_values:
             if len(repr(self).strip('"')) > 16:
@@ -617,7 +617,7 @@ class DSdecimal(Decimal):
                     "'config.enforce_valid_values' to False to override the "
                     "length check, use 'Decimal.quantize()' and initialize "
                     "with a 'Decimal' instance, or explicitly construct a DS "
-                    "instance with 'truncate' set to True"
+                    "instance with 'auto_format' set to True"
                 )
             if not is_valid_ds(repr(self).strip('"')):
                 # This will catch nan and inf
@@ -634,7 +634,7 @@ class DSdecimal(Decimal):
         return super().__str__()
 
     def __repr__(self) -> str:
-        if self.truncate and hasattr(self, 'original_string'):
+        if self.auto_format and hasattr(self, 'original_string'):
             return f'"{self.original_string}"'
         return f'"{str(self)}"'
 
@@ -648,7 +648,7 @@ else:
 
 def DS(
     val: Union[None, str, int, float, Decimal],
-    truncate: bool = False
+    auto_format: bool = False
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -666,7 +666,7 @@ def DS(
     if val == '' or val is None:
         return val
 
-    return DSclass(val, truncate=truncate)
+    return DSclass(val, auto_format=auto_format)
 
 
 class IS(int):
