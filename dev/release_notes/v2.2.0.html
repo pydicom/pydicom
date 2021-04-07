@@ -222,6 +222,10 @@ VR if read from a dataset instead of “UN” (<a class="reference external" hre
 <li><p>while reading explicit VR, a switch to implicit VR will be silently attempted
 if the VR bytes are not valid VR characters, and config option
 <a class="reference internal" href="../reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch" title="pydicom.config.assume_implicit_vr_switch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assume_implicit_vr_switch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default)</p></li>
+<li><p>Added methods to construct <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> objects
+from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
+See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components_veterinary" title="pydicom.valuerep.PersonName.from_named_components_veterinary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components_veterinary()</span></code></a>.</p></li>
 </ul>
 </section>
 <section id="changes">

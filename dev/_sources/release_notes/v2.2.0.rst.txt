@@ -24,6 +24,10 @@ Enhancements
 * while reading explicit VR, a switch to implicit VR will be silently attempted
   if the VR bytes are not valid VR characters, and config option
   :attr:`~pydicom.config.assume_implicit_vr_switch` is ``True`` (default)
+* Added methods to construct :class:`~pydicom.valuerep.PersonName` objects
+  from individual components of names (``family_name``, ``given_name``, etc.).
+  See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
+  :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
 
 
 Changes
