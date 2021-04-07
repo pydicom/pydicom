@@ -243,6 +243,7 @@ class TestIsValidDS:
             '1 000',              # no embedded spaces
             '127.0.0.1',          # not a number
             '1.e',                # not a number
+            '',
         ]
     )
     def test_invalid(self, s: str):

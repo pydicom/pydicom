@@ -330,6 +330,10 @@ class TM(_DateTimeBase, datetime.time):
             )
 
 
+# Regex to match strings that represent valid DICOM decimal strings (DS)
+_DS_REGEX = re.compile(r'\s*[\+\-]?\d+(\.\d+)?([eE][\+\-]?\d+)?\s*$')
+
+
 def is_valid_ds(s: str) -> bool:
     """Check whether this string is a valid decimal string.
 
@@ -350,26 +354,7 @@ def is_valid_ds(s: str) -> bool:
     if len(s) > 16:
         return False
 
-    # Remove trailing and leading spaces for remainder of the checks
-    s = s.strip()
-
-    # Check all characters are from the allowed subset
-    # part 5, table 6.2-1
-    allowed_chars = {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+',
-        '.', 'e', 'E'
-    }
-    if any(c not in allowed_chars for c in s):
-        return False
-
-    # Check that the string can be successfully cast to float
-    try:
-        float(s)
-    except ValueError:
-        return False
-
-    # If checks passed, return True
-    return True
+    return _DS_REGEX.match(s) is not None
 
 
 def format_number_as_ds(val: Union[float, Decimal]) -> str:
@@ -434,8 +419,8 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
     use_scientific = logval < -4 or logval >= (14 - sign_chars)
 
     if use_scientific:
-        # In principle, we could have number where the exponent
-        # needs three digits represent (bigger than this cannot be
+        # In principle, we could have a number where the exponent
+        # needs three digits to be represented (bigger than this cannot be
         # represented by floats). Due to floating point limitations
         # this is best checked for by doing the string conversion
         remaining_chars = 10 - sign_chars
@@ -502,7 +487,7 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if config.enforce_valid_values:
+        if config.enforce_valid_values and not self.auto_format:
             if len(repr(self).strip('"')) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
