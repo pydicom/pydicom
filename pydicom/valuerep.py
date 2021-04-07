@@ -3,6 +3,7 @@
 
 import datetime
 from decimal import Decimal
+from math import floor, isfinite, log10
 import platform
 import re
 import sys
@@ -329,15 +330,139 @@ class TM(_DateTimeBase, datetime.time):
             )
 
 
+# Regex to match strings that represent valid DICOM decimal strings (DS)
+_DS_REGEX = re.compile(r'\s*[\+\-]?\d+(\.\d+)?([eE][\+\-]?\d+)?\s*$')
+
+
+def is_valid_ds(s: str) -> bool:
+    """Check whether this string is a valid decimal string.
+
+    Valid decimal strings must be 16 characters or fewer, and contain only
+    characters from a limited set.
+
+    Parameters
+    ----------
+    s: str
+        String to test.
+
+    Returns
+    -------
+    bool
+        True if the string is a valid decimal string. Otherwise False.
+    """
+    # Check that the length is within the limits
+    if len(s) > 16:
+        return False
+
+    return _DS_REGEX.match(s) is not None
+
+
+def format_number_as_ds(val: Union[float, Decimal]) -> str:
+    """Truncate a float's representation to give a valid Decimal String (DS).
+
+    DICOM's decimal string (DS) representation is limited to strings with 16
+    characters and a limited set of characters. This function represents a
+    float that satisfies these constraints while retaining as much
+    precision as possible. Some floats are represented using scientific
+    notation to make more efficient use of the limited number of characters.
+
+    Note that this will incur a loss of precision if the number cannot be
+    represented with 16 characters. Furthermore, non-finite floats (infs and
+    nans) cannot be represented as decimal strings and will cause an error to
+    be raised.
+
+    Parameters
+    ----------
+    val: Union[float, Decimal]
+        The floating point value whose representation is required.
+
+    Returns
+    -------
+    str
+        String representation of the float satisfying the constraints of the
+        decimal string representation.
+
+    Raises
+    ------
+    ValueError
+        If val does not represent a finite value
+
+    """
+    if not isinstance(val, (float, Decimal)):
+        raise TypeError("'val' must be of type float or decimal.Decimal")
+    if not isfinite(val):
+        raise ValueError(
+            "Cannot encode non-finite floats as DICOM decimal strings. "
+            f"Got '{val}'"
+        )
+
+    valstr = str(val)
+
+    # In the simple case, the default python string representation
+    # will do
+    if len(valstr) <= 16:
+        return valstr
+
+    # Decide whether to use scientific notation
+    logval = log10(abs(val))
+
+    # Characters needed for '-' at start
+    sign_chars = 1 if val < 0.0 else 0
+
+    # Numbers larger than 1e14 cannot be correctly represented by truncating
+    # their string representations to 16 chars, e.g pi * 10^13 would become
+    # '314159265358979.', which may not be universally understood. This limit
+    # is 1e13 for negative numbers because of the minus sign.
+    # For negative exponents, the point of equal precision between scientific
+    # and standard notation is 1e-4 e.g. '0.00031415926535' and
+    # '3.1415926535e-04' are both 16 chars
+    use_scientific = logval < -4 or logval >= (14 - sign_chars)
+
+    if use_scientific:
+        # In principle, we could have a number where the exponent
+        # needs three digits to be represented (bigger than this cannot be
+        # represented by floats). Due to floating point limitations
+        # this is best checked for by doing the string conversion
+        remaining_chars = 10 - sign_chars
+        trunc_str = f'%.{remaining_chars}e' % val
+        if len(trunc_str) > 16:
+            trunc_str = f'%.{remaining_chars - 1}e' % val
+        return trunc_str
+    else:
+        if logval >= 1.0:
+            # chars remaining for digits after sign, digits left of '.' and '.'
+            remaining_chars = 14 - sign_chars - int(floor(logval))
+        else:
+            remaining_chars = 14 - sign_chars
+        return f'%.{remaining_chars}f' % val
+
+
 class DSfloat(float):
     """Store value for an element with VR **DS** as :class:`float`.
 
     If constructed from an empty string, return the empty string,
     not an instance of this class.
 
+    Parameters
+    ----------
+    val: Union[str, int, float, Decimal]
+        Value to store as a DS.
+    auto_format: bool
+        If True, automatically format the string representation of this
+        number to ensure it satisfies the constraints in the DICOM standard.
+        Note that this will lead to loss of precision for some numbers.
+
     """
+    def __new__(
+            cls,
+            val: Union[str, int, float, Decimal],
+            auto_format: bool = False
+    ) -> [_DSfloat]:
+        return super().__new__(cls, val)
+
     def __init__(
-        self, val: Union[str, int, float, Decimal]
+        self, val: Union[str, int, float, Decimal],
+        auto_format: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -350,28 +475,70 @@ class DSfloat(float):
         elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
             self.original_string = val.original_string
 
+        self.auto_format = auto_format
+        if self.auto_format:
+            # If auto_format is True, keep the float value the same, but change
+            # the string representation stored in original_string if necessary
+            if hasattr(self, 'original_string'):
+                if not is_valid_ds(self.original_string):
+                    self.original_string = format_number_as_ds(
+                        float(self.original_string)
+                    )
+            else:
+                self.original_string = format_number_as_ds(self)
+
+        if config.enforce_valid_values and not self.auto_format:
+            if len(repr(self).strip('"')) > 16:
+                raise OverflowError(
+                    "Values for elements with a VR of 'DS' must be <= 16 "
+                    "characters long, but the float provided requires > 16 "
+                    "characters to be accurately represented. Use a smaller "
+                    "string, set 'config.enforce_valid_values' to False to "
+                    "override the length check, or explicitly construct a DS "
+                    "object with 'auto_format' set to True"
+                )
+            if not is_valid_ds(repr(self).strip('"')):
+                # This will catch nan and inf
+                raise ValueError(
+                    f'Value "{str(self)}" is not valid for elements with a VR '
+                    'of DS'
+                )
+
     def __str__(self) -> str:
-        if hasattr(self, 'original_string'):
+        if hasattr(self, 'original_string') and not self.auto_format:
             return self.original_string
 
         # Issue #937 (Python 3.8 compatibility)
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
+        if self.auto_format and hasattr(self, 'original_string'):
+            return f'"{self.original_string}"'
         return f'"{super().__repr__()}"'
 
 
 class DSdecimal(Decimal):
     """Store value for an element with VR **DS** as :class:`decimal.Decimal`.
 
+    Parameters
+    ----------
+    val: Union[str, int, float, Decimal]
+        Value to store as a DS.
+    auto_format: bool
+        If True, automatically format the string representation of this
+        number to ensure it satisfies the constraints in the DICOM standard.
+        Note that this will lead to loss of precision for some numbers.
+
     Notes
     -----
     If constructed from an empty string, returns the empty string, not an
     instance of this class.
+
     """
     def __new__(
         cls: Type[_DSdecimal],
-        val: Union[str, int, float, Decimal]
+        val: Union[str, int, float, Decimal],
+        auto_format: bool = False
     ) -> Optional[_DSdecimal]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -395,19 +562,13 @@ class DSdecimal(Decimal):
                 return None
 
         val = super().__new__(cls, val)
-        if len(str(val)) > 16 and config.enforce_valid_values:
-            raise OverflowError(
-                "Values for elements with a VR of 'DS' values must be <= 16 "
-                "characters long. Use a smaller string, set "
-                "'config.enforce_valid_values' to False to override the "
-                "length check, or use 'Decimal.quantize()' and initialize "
-                "with a 'Decimal' instance."
-            )
 
         return val
 
     def __init__(
-        self, val: Union[str, int, float, Decimal]
+        self,
+        val: Union[str, int, float, Decimal],
+        auto_format: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
@@ -421,6 +582,35 @@ class DSdecimal(Decimal):
         elif isinstance(val, (DSfloat, DSdecimal)) and has_str:
             self.original_string = val.original_string
 
+        self.auto_format = auto_format
+        if self.auto_format:
+            # If auto_format is True, keep the float value the same, but change
+            # the string representation stored in original_string if necessary
+            if hasattr(self, 'original_string'):
+                if not is_valid_ds(self.original_string):
+                    self.original_string = format_number_as_ds(
+                        float(self.original_string)
+                    )
+            else:
+                self.original_string = format_number_as_ds(self)
+
+        if config.enforce_valid_values:
+            if len(repr(self).strip('"')) > 16:
+                raise OverflowError(
+                    "Values for elements with a VR of 'DS' values must be "
+                    "<= 16 characters long. Use a smaller string, set "
+                    "'config.enforce_valid_values' to False to override the "
+                    "length check, use 'Decimal.quantize()' and initialize "
+                    "with a 'Decimal' instance, or explicitly construct a DS "
+                    "instance with 'auto_format' set to True"
+                )
+            if not is_valid_ds(repr(self).strip('"')):
+                # This will catch nan and inf
+                raise ValueError(
+                    f'Value "{str(self)}" is not valid for elements with a VR '
+                    'of DS'
+                )
+
     def __str__(self) -> str:
         has_str = hasattr(self, 'original_string')
         if has_str and len(self.original_string) <= 16:
@@ -429,6 +619,8 @@ class DSdecimal(Decimal):
         return super().__str__()
 
     def __repr__(self) -> str:
+        if self.auto_format and hasattr(self, 'original_string'):
+            return f'"{self.original_string}"'
         return f'"{str(self)}"'
 
 
@@ -440,7 +632,8 @@ else:
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal]
+    val: Union[None, str, int, float, Decimal],
+    auto_format: bool = False
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -458,7 +651,7 @@ def DS(
     if val == '' or val is None:
         return val
 
-    return DSclass(val)
+    return DSclass(val, auto_format=auto_format)
 
 
 class IS(int):

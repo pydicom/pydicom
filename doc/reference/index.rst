@@ -29,3 +29,4 @@ This API reference guide details the functions, modules and objects included in
    fileio
    misc
    uid
+   valuerep
