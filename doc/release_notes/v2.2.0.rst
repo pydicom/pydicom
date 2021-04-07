@@ -39,6 +39,10 @@ Enhancements
       :class:`~pydicom.valuerep.DSdecimal` and the :func:`~pydicom.valuerep.DS`
       factory function to allow explicitly requesting automatic formatting of
       the string representations of these objects when they are constructed.
+* Added methods to construct :class:`~pydicom.valuerep.PersonName` objects
+  from individual components of names (``family_name``, ``given_name``, etc.).
+  See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
+  :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
 
 
 Changes

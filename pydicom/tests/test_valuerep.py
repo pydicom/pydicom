@@ -871,6 +871,111 @@ class TestPersonName:
         assert ("o" in pn1) == True
         assert ("x" in pn1) == False
 
+    def test_from_named_components(self):
+        # Example from DICOM standard, part 5, sect 6.2.1.1
+        pn = PersonName.from_named_components(
+            family_name='Adams',
+            given_name='John Robert Quincy',
+            name_prefix='Rev.',
+            name_suffix='B.A. M.Div.'
+        )
+        assert pn == 'Adams^John Robert Quincy^^Rev.^B.A. M.Div.'
+        assert pn.family_name == 'Adams'
+        assert pn.given_name == 'John Robert Quincy'
+        assert pn.name_prefix == 'Rev.'
+        assert pn.name_suffix == 'B.A. M.Div.'
+
+    def test_from_named_components_kr_from_bytes(self):
+        # Example name from PS3.5-2008 section I.2 p. 108
+        pn = PersonName.from_named_components(
+            family_name='Hong',
+            given_name='Gildong',
+            family_name_ideographic=b'\033$)C\373\363',
+            given_name_ideographic=b'\033$)C\321\316\324\327',
+            family_name_phonetic=b'\033$)C\310\253',
+            given_name_phonetic=b'\033$)C\261\346\265\277',
+            encodings=[default_encoding, 'euc_kr'],
+        )
+        pn = pn.decode()
+        assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
+        assert "洪^吉洞" == pn.ideographic
+        assert "홍^길동" == pn.phonetic
+
+    def test_from_named_components_kr_from_unicode(self):
+        # Example name from PS3.5-2008 section I.2 p. 108
+        pn = PersonName.from_named_components(
+            family_name='Hong',
+            given_name='Gildong',
+            family_name_ideographic='洪',
+            given_name_ideographic='吉洞',
+            family_name_phonetic='홍',
+            given_name_phonetic='길동',
+            encodings=[default_encoding, 'euc_kr'],
+        )
+        pn = pn.decode()
+        assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
+        assert "洪^吉洞" == pn.ideographic
+        assert "홍^길동" == pn.phonetic
+
+    def test_from_named_components_jp_from_bytes(self):
+        # Example name from PS3.5-2008 section H  p. 98
+        pn = PersonName.from_named_components(
+            family_name='Yamada',
+            given_name='Tarou',
+            family_name_ideographic=b'\033$B;3ED\033(B',
+            given_name_ideographic=b'\033$BB@O:\033(B',
+            family_name_phonetic=b'\033$B$d$^$@\033(B',
+            given_name_phonetic=b'\033$B$?$m$&\033(B',
+            encodings=[default_encoding, 'iso2022_jp'],
+        )
+        pn = pn.decode()
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
+
+    def test_from_named_components_jp_from_unicode(self):
+        # Example name from PS3.5-2008 section H  p. 98
+        pn = PersonName.from_named_components(
+            family_name='Yamada',
+            given_name='Tarou',
+            family_name_ideographic='山田',
+            given_name_ideographic='太郎',
+            family_name_phonetic='やまだ',
+            given_name_phonetic='たろう',
+            encodings=[default_encoding, 'iso2022_jp'],
+        )
+        pn = pn.decode()
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
+
+    def test_from_named_components_veterinary(self):
+        # Example from DICOM standard, part 5, sect 6.2.1.1
+        # A horse whose responsible organization is named ABC Farms, and whose
+        # name is "Running On Water"
+        pn = PersonName.from_named_components_veterinary(
+            responsible_party_name='ABC Farms',
+            patient_name='Running on Water',
+        )
+        assert pn == 'ABC Farms^Running on Water'
+        assert pn.family_name == 'ABC Farms'
+        assert pn.given_name == 'Running on Water'
+
+    def test_from_named_components_with_separator(self):
+        # If the names already include separator chars
+        # a ValueError should be raised
+        with pytest.raises(ValueError):
+            PersonName.from_named_components(given_name='Yamada^Tarou')
+
+    def test_from_named_components_with_separator_from_bytes(self):
+        # If the names already include separator chars
+        # a ValueError should be raised
+        with pytest.raises(ValueError):
+            PersonName.from_named_components(
+                family_name_ideographic=b'\033$B;3ED\033(B^\033$BB@O:\033(B',
+                encodings=[default_encoding, 'iso2022_jp'],
+            )
+
 
 class TestDateTime:
     """Unit tests for DA, DT, TM conversion to datetime objects"""
