@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pydicom.datadict.add_private_dict_entries &mdash; pydicom 2.2.0.dev0 documentation</title>
+  <title>pydicom.valuerep.is_valid_ds &mdash; pydicom 2.2.0.dev0 documentation</title>
   
 
   
@@ -49,8 +49,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pydicom.datadict.add_private_dict_entry" href="pydicom.datadict.add_private_dict_entry.html" />
-    <link rel="prev" title="pydicom.datadict.tag_for_keyword" href="pydicom.datadict.tag_for_keyword.html" /> 
+    <link rel="next" title="pydicom.valuerep.format_number_as_ds" href="pydicom.valuerep.format_number_as_ds.html" />
+    <link rel="prev" title="pydicom.valuerep.DA" href="pydicom.valuerep.DA.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -117,20 +117,30 @@
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../datadict.html#dicom-data-dictionary">DICOM Data Dictionary</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../datadict.html#private-data-dictionary">Private Data Dictionary</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.datadict.add_private_dict_entries</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.add_private_dict_entry.html">pydicom.datadict.add_private_dict_entry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.get_private_entry.html">pydicom.datadict.get_private_entry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.private_dictionary_description.html">pydicom.datadict.private_dictionary_description</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.private_dictionary_VM.html">pydicom.datadict.private_dictionary_VM</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.datadict.private_dictionary_VR.html">pydicom.datadict.private_dictionary_VR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../elem.html">Representation of Data Elements</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../elem.dataelem.html">Data Elements (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataelem</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.tag.html">Element Tags (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.tag</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.values.html">Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.multival.html">Element Multi-value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.multival</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DA.html">pydicom.valuerep.DA</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pydicom.valuerep.is_valid_ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.format_number_as_ds.html">pydicom.valuerep.format_number_as_ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DS.html">pydicom.valuerep.DS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSdecimal.html">pydicom.valuerep.DSdecimal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DT.html">pydicom.valuerep.DT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.TM.html">pydicom.valuerep.TM</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../elem.html">Representation of Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
@@ -206,9 +216,11 @@
         
           <li><a href="../index.html">API Reference</a> &raquo;</li>
         
-          <li><a href="../datadict.html">Data Dictionary Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.datadict</span></code>)</a> &raquo;</li>
+          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
         
-      <li>pydicom.datadict.add_private_dict_entries</li>
+          <li><a href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a> &raquo;</li>
+        
+      <li>pydicom.valuerep.is_valid_ds</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -225,43 +237,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="pydicom-datadict-add-private-dict-entries">
-<h1>pydicom.datadict.add_private_dict_entries<a class="headerlink" href="#pydicom-datadict-add-private-dict-entries" title="Permalink to this headline">¶</a></h1>
+  <section id="pydicom-valuerep-is-valid-ds">
+<h1>pydicom.valuerep.is_valid_ds<a class="headerlink" href="#pydicom-valuerep-is-valid-ds" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.datadict.add_private_dict_entries">
-<code class="sig-prename descclassname"><span class="pre">pydicom.datadict.</span></code><code class="sig-name descname"><span class="pre">add_private_dict_entries</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_creator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_entries_dict</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f9c53f2/pydicom/datadict.py#L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.datadict.add_private_dict_entries" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update pydicom’s private DICOM tag dictionary with new entries.</p>
-<div class="versionadded">
-<p><span class="versionmodified added">New in version 1.3.</span></p>
-</div>
+<dt id="pydicom.valuerep.is_valid_ds">
+<code class="sig-prename descclassname"><span class="pre">pydicom.valuerep.</span></code><code class="sig-name descname"><span class="pre">is_valid_ds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f9c53f2/pydicom/valuerep.py#L337"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.valuerep.is_valid_ds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether this string is a valid decimal string.</p>
+<p>Valid decimal strings must be 16 characters or fewer, and contain only
+characters from a limited set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>private_creator</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The private creator for all entries in <cite>new_entries_dict</cite>.</p></li>
-<li><p><strong>new_entries_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> of form <code class="docutils literal notranslate"><span class="pre">{tag:</span> <span class="pre">(VR,</span> <span class="pre">VM,</span> <span class="pre">description,</span> <span class="pre">is_retired),</span> <span class="pre">...}</span></code>
-where parameters are as described in <a class="reference internal" href="pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry" title="pydicom.datadict.add_private_dict_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_private_dict_entry()</span></code></a>.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – String to test.</p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If one of the entries is a non-private tag.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the string is a valid decimal string. Otherwise False.</p>
 </dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="pydicom.datadict.add_private_dict_entry.html#pydicom.datadict.add_private_dict_entry" title="pydicom.datadict.add_private_dict_entry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_private_dict_entry</span></code></a></dt><dd><p>Function to add a single entry to the private tag dictionary.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
-</div>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_dict_items</span> <span class="o">=</span> <span class="p">{</span>
-<span class="gp">... </span>       <span class="mh">0x00410001</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;UL&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s2">&quot;Test One&quot;</span><span class="p">),</span>
-<span class="gp">... </span>       <span class="mh">0x00410002</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;DS&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s2">&quot;Test Two&quot;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">),</span>
-<span class="gp">... </span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">add_private_dict_entries</span><span class="p">(</span><span class="s2">&quot;ACME LTD 1.2&quot;</span><span class="p">,</span> <span class="n">new_dict_items</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">add_private_dict_entry</span><span class="p">(</span><span class="s2">&quot;ACME LTD 1.3&quot;</span><span class="p">,</span> <span class="mh">0x00410001</span><span class="p">,</span> <span class="s2">&quot;US&quot;</span><span class="p">,</span> <span class="s2">&quot;Test Three&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 </dd></dl>
 
 </section>
@@ -272,8 +266,8 @@ where parameters are as described in <a class="reference internal" href="pydicom
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="pydicom.datadict.add_private_dict_entry.html" class="btn btn-neutral float-right" title="pydicom.datadict.add_private_dict_entry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="pydicom.datadict.tag_for_keyword.html" class="btn btn-neutral float-left" title="pydicom.datadict.tag_for_keyword" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydicom.valuerep.format_number_as_ds.html" class="btn btn-neutral float-right" title="pydicom.valuerep.format_number_as_ds" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.valuerep.DA.html" class="btn btn-neutral float-left" title="pydicom.valuerep.DA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

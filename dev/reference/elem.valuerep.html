@@ -126,6 +126,8 @@
 <li class="toctree-l3"><a class="reference internal" href="elem.sequence.html">Sequence Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.sequence</span></code>)</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.DA.html">pydicom.valuerep.DA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.is_valid_ds.html">pydicom.valuerep.is_valid_ds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.format_number_as_ds.html">pydicom.valuerep.format_number_as_ds</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.DS.html">pydicom.valuerep.DS</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.DSdecimal.html">pydicom.valuerep.DSdecimal</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
@@ -246,13 +248,19 @@ or TM and utilities.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DA</span></code></a>(val, str, _DA, datetime.date])</p></td>
 <td><p>Store value for an element with VR <strong>DA</strong> as <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS</span></code></a>(val)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.is_valid_ds.html#pydicom.valuerep.is_valid_ds" title="pydicom.valuerep.is_valid_ds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid_ds</span></code></a>(s)</p></td>
+<td><p>Check whether this string is a valid decimal string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_number_as_ds</span></code></a>(val)</p></td>
+<td><p>Truncate a float’s representation to give a valid Decimal String (DS).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DS</span></code></a>(val[, auto_format])</p></td>
 <td><p>Factory function for creating DS class instances.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSdecimal</span></code></a>(val, int, float, decimal.Decimal])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSdecimal</span></code></a>(val, int, float, decimal.Decimal], …)</p></td>
 <td><p>Store value for an element with VR <strong>DS</strong> as <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSfloat</span></code></a>(val, int, float, decimal.Decimal])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DSfloat</span></code></a>(val, int, float, decimal.Decimal], …)</p></td>
 <td><p>Store value for an element with VR <strong>DS</strong> as <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DT</span></code></a>(val, str, _DT, datetime.datetime])</p></td>

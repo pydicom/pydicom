@@ -387,6 +387,25 @@ VR if read from a dataset instead of “UN” (<a class="reference external" hre
 <li><p>while reading explicit VR, a switch to implicit VR will be silently attempted
 if the VR bytes are not valid VR characters, and config option
 <a class="reference internal" href="../reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch" title="pydicom.config.assume_implicit_vr_switch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assume_implicit_vr_switch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default)</p></li>
+<li><dl class="simple">
+<dt>New functionality to help with correct formatting of decimal strings (DS)</dt><dd><ul class="simple">
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.is_valid_ds.html#pydicom.valuerep.is_valid_ds" title="pydicom.valuerep.is_valid_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_valid_ds()</span></code></a> to check whether a string is
+valid as a DICOM decimal string (DS) and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_number_as_ds()</span></code></a> to format a given <code class="docutils literal notranslate"><span class="pre">float</span></code>
+or <code class="docutils literal notranslate"><span class="pre">Decimal</span></code> as a DS while retaining the highest possible level of
+precision</p></li>
+<li><p>If <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, all
+DS objects created will be checked for the validity of their string
+representations.</p></li>
+<li><p>Added optional <code class="docutils literal notranslate"><span class="pre">auto_format</span></code> parameter to the init methods of
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a> and the <a class="reference internal" href="../reference/generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS()</span></code></a>
+factory function to allow explicitly requesting automatic formatting of
+the string representations of these objects when they are constructed.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
 <li><p>Added methods to construct <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> objects
 from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
 See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
