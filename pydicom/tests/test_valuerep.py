@@ -391,6 +391,20 @@ class TestDSfloat:
         assert str(x) == '3.14159265358979'
         assert repr(x) == '"3.14159265358979"'
 
+    def test_auto_format_from_invalid_DS(self):
+        """Test truncating floats"""
+        # A DSfloat that has a non-valid string representation
+        x = pydicom.valuerep.DSfloat(math.pi)
+
+        # Use this to initialise another with auto_format set to true
+        y = pydicom.valuerep.DSfloat(x, auto_format=True)
+
+        # Float representation should be unaltered by truncation
+        assert y == math.pi
+        # String representations should be correctly formatted
+        assert str(y) == '3.14159265358979'
+        assert repr(y) == '"3.14159265358979"'
+
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
         x = pydicom.valuerep.DSfloat('3.141592653589793', auto_format=True)
@@ -500,6 +514,20 @@ class TestDSdecimal:
         # String representations should be correctly formatted
         assert str(x) == '3.14159265358979'
         assert repr(x) == '"3.14159265358979"'
+
+    def test_auto_format_from_invalid_DS(self):
+        """Test truncating floats"""
+        # A DSdecimal that has a non-valid string representation
+        x = pydicom.valuerep.DSdecimal(math.pi)
+
+        # Use this to initialise another with auto_format set to true
+        y = pydicom.valuerep.DSdecimal(x, auto_format=True)
+
+        # Float representation should be unaltered by truncation
+        assert y == math.pi
+        # String representations should be correctly formatted
+        assert str(y) == '3.14159265358979'
+        assert repr(y) == '"3.14159265358979"'
 
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
