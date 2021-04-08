@@ -416,6 +416,17 @@ class TestDSfloat:
         with pytest.raises(OverflowError):
             valuerep.DSfloat('3.141592653589793')
 
+    def test_DSfloat_auto_format(self):
+        """Test creating a value using DSfloat copies auto_format"""
+        x = pydicom.valuerep.DSfloat(math.pi, auto_format=True)
+        y = pydicom.valuerep.DSfloat(x)
+        assert x == y
+        assert y == x
+        assert y.auto_format
+        assert math.pi == y
+        assert str(y) == '3.14159265358979'
+        assert repr(y) == '"3.14159265358979"'
+
     @pytest.mark.parametrize(
         'val',
         [
@@ -525,6 +536,17 @@ class TestDSdecimal:
         # String representations should be unaltered
         assert str(x) == '1.234e-1'
         assert repr(x) == '"1.234e-1"'
+
+    def test_DSdecimal_auto_format(self):
+        """Test creating a value using DSdecimal copies auto_format"""
+        x = pydicom.valuerep.DSdecimal(math.pi, auto_format=True)
+        y = pydicom.valuerep.DSdecimal(x)
+        assert x == y
+        assert y == x
+        assert y.auto_format
+        assert math.pi == y
+        assert str(y) == '3.14159265358979'
+        assert repr(y) == '"3.14159265358979"'
 
 
 class TestIS:

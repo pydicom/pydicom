@@ -3,6 +3,7 @@
 """Unit tests for the pydicom.dataelem module."""
 
 # Many tests of DataElement class are implied in test_dataset also
+import math
 
 import pytest
 
@@ -101,6 +102,13 @@ class TestDataElement:
         self.data_elementMulti.value[3] = '123.4'
         assert isinstance(self.data_elementMulti.value[3], DSfloat)
         assert DSfloat('123.4') == self.data_elementMulti.value[3]
+
+    def test_DSFloat_conversion_auto_format(self):
+        """Test that strings are being auto-formatted correctly."""
+        data_element = DataElement((1, 2), "DS",
+                                   DSfloat(math.pi, auto_format=True))
+        assert math.pi == data_element.value
+        assert '3.14159265358979' == str(data_element.value)
 
     def test_backslash(self):
         """DataElement: String with '\\' sets multi-valued data_element."""

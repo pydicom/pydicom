@@ -472,8 +472,10 @@ class DSfloat(float):
         has_attribute = hasattr(val, 'original_string')
         if isinstance(val, str):
             self.original_string = val
-        elif isinstance(val, (DSfloat, DSdecimal)) and has_attribute:
-            self.original_string = val.original_string
+        elif isinstance(val, (DSfloat, DSdecimal)):
+            auto_format = val.auto_format
+            if has_attribute:
+                self.original_string = val.original_string
 
         self.auto_format = auto_format
         if self.auto_format:
@@ -579,8 +581,10 @@ class DSdecimal(Decimal):
         has_str = hasattr(val, 'original_string')
         if isinstance(val, str):
             self.original_string = val
-        elif isinstance(val, (DSfloat, DSdecimal)) and has_str:
-            self.original_string = val.original_string
+        elif isinstance(val, (DSfloat, DSdecimal)):
+            auto_format = val.auto_format
+            if has_str:
+                self.original_string = val.original_string
 
         self.auto_format = auto_format
         if self.auto_format:
