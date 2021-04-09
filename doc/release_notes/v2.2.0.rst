@@ -52,9 +52,8 @@ Enhancements
 
 Changes
 .......
-* Changed the raising exception to return False
-  in :meth:`~pydicom.tag.BaseTag.__eq__`,
-  when operand cannot be converted to BaseTag Type (:pr:`1327`)
+* :meth:`~pydicom.tag.BaseTag.__eq__` returns ``False`` rather than raising an
+  exception when the operand cannot be converted to ``BaseTag`` (:pr:`1327`)
 
 Fixes
 .....
@@ -65,3 +64,5 @@ Fixes
   encoding, and sequences with VR ``UN`` (:issue:`1312`)
 * Do not load external data sources until needed - fixes problems with
   standard workflow if `setuptools` are not installed (:issue:`1341`)
+* Fixed empty PN elements read from file being `str` rather than
+  :class:`~pydicom.valuerep.PersonName` (:issue:`1338`)
