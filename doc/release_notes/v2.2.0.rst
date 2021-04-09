@@ -13,6 +13,7 @@ Enhancements
 ------------
 
 * Added a command-line interface for pydicom.  Current subcommands are:
+
     * ``show``: display all or part of a DICOM file
     * ``codify`` to produce Python code for writing files or sequence items
       from scratch.
@@ -28,6 +29,7 @@ Enhancements
   if the VR bytes are not valid VR characters, and config option
   :attr:`~pydicom.config.assume_implicit_vr_switch` is ``True`` (default)
 * New functionality to help with correct formatting of decimal strings (**DS**)
+
     * Added :func:`~pydicom.valuerep.is_valid_ds` to check whether a string is
       valid as a DICOM decimal string and
       :func:`~pydicom.valuerep.format_number_as_ds` to format a given ``float``
