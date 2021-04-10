@@ -101,7 +101,8 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
             with open(fpath, "wb") as file:
                 for data in tqdm.tqdm(
                     r.iter_content(), total=total_size_in_bytes,
-                    unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+                    unit="B", unit_scale=True, miniters=1,
+                    desc=url.split("/")[-1]
                 ):
                     file.write(data)
         else:
@@ -111,7 +112,8 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
     else:
         if USE_PROGRESS_BAR:
             with DownloadProgressBar(
-                unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+                unit="B", unit_scale=True, miniters=1,
+                desc=url.split("/")[-1]
             ) as t:
                 urllib.request.urlretrieve(
                     url, filename, reporthook=t.update_to
