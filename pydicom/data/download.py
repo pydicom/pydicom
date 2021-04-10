@@ -3,7 +3,6 @@
 # Copyright 2018-2019 Cancer Care Associates.
 # Relicensed under pydicom LICENSE by Simon Biggs.
 
-import contextlib
 import functools
 import hashlib
 import json
@@ -15,13 +14,21 @@ import urllib.error
 import warnings
 
 try:
+    import requests
+
+    IMPORTED_REQUESTS = True
+except ImportError:
+    IMPORTED_REQUESTS = False
+
+try:
     import tqdm
 
-    class DownloadProgressBar(tqdm.tqdm):
-        def update_to(self, b=1, bsize=1, tsize=None):
-            if tsize is not None:
-                self.total = tsize
-            self.update(b * bsize - self.n)
+    if IMPORTED_REQUESTS is False:
+        class DownloadProgressBar(tqdm.tqdm):
+            def update_to(self, b=1, bsize=1, tsize=None):
+                if tsize is not None:
+                    self.total = tsize
+                self.update(b * bsize - self.n)
 
     USE_PROGRESS_BAR = True
 except ImportError:
@@ -70,7 +77,11 @@ def get_config_dir() -> os.PathLike:
     return config_dir
 
 
-@retry.retry(urllib.error.HTTPError)
+@retry.retry(
+    (urllib.error.HTTPError, urllib.error.URLError),
+    exception_msg=("Installing the `requests` package "
+                   "could be a possible solution to this problem.")
+)
 def download_with_progress(url: str, fpath: os.PathLike) -> None:
     """Download the file at `url` to `fpath` with a progress bar.
 
@@ -81,15 +92,32 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
     fpath : os.PathLike
         The absolute path where the file will be written to.
     """
-    if USE_PROGRESS_BAR:
-        with DownloadProgressBar(
-            unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
-        ) as t:
-            urllib.request.urlretrieve(
-                url, os.fspath(fpath), reporthook=t.update_to
-            )
+    filename = os.fspath(fpath)
+
+    if IMPORTED_REQUESTS:
+        if USE_PROGRESS_BAR:
+            r = requests.get(url, stream=True)
+            total_size_in_bytes = int(r.headers.get("content-length", 0))
+            with open(fpath, "wb") as file:
+                for data in tqdm.tqdm(
+                    r.iter_content(), total=total_size_in_bytes,
+                    unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+                ):
+                    file.write(data)
+        else:
+            r = requests.get(url)
+            with open(filename, "wb") as f:
+                f.write(r.content)
     else:
-        urllib.request.urlretrieve(url, os.fspath(fpath))
+        if USE_PROGRESS_BAR:
+            with DownloadProgressBar(
+                unit="B", unit_scale=True, miniters=1, desc=url.split("/")[-1]
+            ) as t:
+                urllib.request.urlretrieve(
+                    url, filename, reporthook=t.update_to
+                )
+        else:
+            urllib.request.urlretrieve(url, filename)
 
 
 def get_data_dir() -> os.PathLike:
