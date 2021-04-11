@@ -172,7 +172,8 @@ class TestExternalDataSource:
 
     def test_get_testdata_file_external_ignore_hash(self):
         """Test that non-pydicom-data external source ignores hash check."""
-        external_data_sources()['mylib'] = external_data_sources()['pydicom-data']
+        external_data_sources()['mylib'] = external_data_sources()[
+            'pydicom-data']
         p = self.dpath / "693_UNCI.dcm"
         with open(p, 'wb') as f:
             f.write(b"\x00\x01")
@@ -235,7 +236,8 @@ class TestExternalDataSource:
 
     def test_get_testdata_files_external_ignore_hash(self):
         """Test that non-pydicom-data external source ignores hash check."""
-        external_data_sources()['mylib'] = external_data_sources()['pydicom-data']
+        external_data_sources()['mylib'] = external_data_sources()[
+            'pydicom-data']
         p = self.dpath / "693_UNCI.dcm"
         with open(p, 'wb') as f:
             f.write(b"\x00\x01")
