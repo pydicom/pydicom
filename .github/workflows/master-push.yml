@@ -23,7 +23,7 @@ jobs:
           - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
           # Test all pixel data handlers for code coverage
           - os: ubuntu-latest
-            python-version: 3.8
+            python-version: 3.9
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
