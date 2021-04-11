@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Dataset basics: read, access, modify, write &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -102,12 +101,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -144,14 +143,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -223,7 +222,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="dataset-basics-read-access-modify-write">
+  <div class="section" id="dataset-basics-read-access-modify-write">
 <h1>Dataset basics: read, access, modify, write<a class="headerlink" href="#dataset-basics-read-access-modify-write" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we’re going to cover the basics of using <em>pydicom</em>:</p>
 <ul class="simple">
@@ -234,7 +233,7 @@
 </ul>
 <p>If you haven’t installed <em>pydicom</em> yet, follow the instructions in our
 <a class="reference internal" href="installation.html"><span class="doc">installation guide</span></a>.</p>
-<section id="getting-our-example-dataset">
+<div class="section" id="getting-our-example-dataset">
 <h2>Getting our example dataset<a class="headerlink" href="#getting-our-example-dataset" title="Permalink to this headline">¶</a></h2>
 <p>In the tutorial we’re going to be using a DICOM dataset included with
 <em>pydicom</em>: <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/data/test_files/CT_small.dcm">CT_small.dcm</a>.
@@ -262,8 +261,8 @@ containing matching paths:</p>
 <span class="go">&#39;1.3.0&#39;</span>
 </pre></div>
 </div>
-</section>
-<section id="reading">
+</div>
+<div class="section" id="reading">
 <h2>Reading<a class="headerlink" href="#reading" title="Permalink to this headline">¶</a></h2>
 <p>To read the DICOM dataset at a given file path we use
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>, which returns a
@@ -338,8 +337,8 @@ no matter what the contents of the file are:</p>
 <span class="gr">  KeyError</span>: <span class="n">&quot;Unknown DICOM tag (6854, 7369) can&#39;t look up VR&quot;</span>
 </pre></div>
 </div>
-</section>
-<section id="viewing-and-accessing">
+</div>
+<div class="section" id="viewing-and-accessing">
 <h2>Viewing and accessing<a class="headerlink" href="#viewing-and-accessing" title="Permalink to this headline">¶</a></h2>
 <p>Let’s go back to our <code class="docutils literal notranslate"><span class="pre">CT_small.dcm</span></code> dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
@@ -388,7 +387,7 @@ as (group number, element number) in hexadecimal</p></li>
 if known</p></li>
 <li><p><strong>‘ISO_IR_100’</strong>: the element’s stored value</p></li>
 </ul>
-<section id="elements">
+<div class="section" id="elements">
 <h3>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h3>
 <p>There are three categories of elements:</p>
 <ul class="simple">
@@ -470,8 +469,8 @@ on you’ll see how you can use the keyword to do more than accessing the value.
 <span class="go">&#39;PRIMARY&#39;</span>
 </pre></div>
 </div>
-</section>
-<section id="sequences">
+</div>
+<div class="section" id="sequences">
 <h3>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h3>
 <p>When viewing a dataset, you may see that some of the elements are indented:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -531,8 +530,8 @@ which can be accessed using the standard Python <a class="reference external" hr
 <span class="go">(0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
 </pre></div>
 </div>
-</section>
-<section id="file-meta">
+</div>
+<div class="section" id="file-meta">
 <h3>file_meta<a class="headerlink" href="#file-meta" title="Permalink to this headline">¶</a></h3>
 <p>Earlier we saw that by default <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> only reads
 files that are in the DICOM File Format. So what’s the difference between a
@@ -575,11 +574,11 @@ that at some point you’ll need to know it:</p>
 <span class="go">&#39;Explicit VR Little Endian&#39;</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="modifying">
+</div>
+</div>
+<div class="section" id="modifying">
 <h2>Modifying<a class="headerlink" href="#modifying" title="Permalink to this headline">¶</a></h2>
-<section id="modifying-elements">
+<div class="section" id="modifying-elements">
 <h3>Modifying elements<a class="headerlink" href="#modifying-elements" title="Permalink to this headline">¶</a></h3>
 <p>We can modify the value of any element by retrieving it and setting the
 value:</p>
@@ -643,10 +642,10 @@ will automatically be converted to an empty list when you do so):</p>
 </div>
 <p>Elements with a value of <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">b''</span></code>, <code class="docutils literal notranslate"><span class="pre">''</span></code> or <code class="docutils literal notranslate"><span class="pre">[]</span></code> will still be
 written to file, but will have an empty value and zero length.</p>
-</section>
-<section id="adding-elements">
+</div>
+<div class="section" id="adding-elements">
 <h3>Adding elements<a class="headerlink" href="#adding-elements" title="Permalink to this headline">¶</a></h3>
-<section id="any-category">
+<div class="section" id="any-category">
 <h4>Any category<a class="headerlink" href="#any-category" title="Permalink to this headline">¶</a></h4>
 <p>New elements of any category can be added to the dataset with the
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> method, which takes the tag, VR and
@@ -674,8 +673,8 @@ function to look it up</p></li>
 <span class="go">(0028, 1050) Window Center                       DS: &quot;100.0&quot;</span>
 </pre></div>
 </div>
-</section>
-<section id="standard-elements">
+</div>
+<div class="section" id="standard-elements">
 <h4>Standard elements<a class="headerlink" href="#standard-elements" title="Permalink to this headline">¶</a></h4>
 <p>Adding elements with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> is a lot of
 work, so for standard elements you can just use the keyword
@@ -695,8 +694,8 @@ elements are also covered:</p>
 <span class="go">True</span>
 </pre></div>
 </div>
-</section>
-<section id="id1">
+</div>
+<div class="section" id="id1">
 <h4>Sequences<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
 <p>Because sequence items are also <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances,
 you can use the same methods on them as well.</p>
@@ -714,9 +713,9 @@ you can use the same methods on them as well.</p>
 <span class="go">(0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="deleting-elements">
+</div>
+</div>
+<div class="section" id="deleting-elements">
 <h3>Deleting elements<a class="headerlink" href="#deleting-elements" title="Permalink to this headline">¶</a></h3>
 <p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
 operator in combination with the element tag:</p>
@@ -741,9 +740,9 @@ preferred <a class="reference external" href="https://docs.python.org/3/library/
 <span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;LOCALIZER&#39;]</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="writing">
+</div>
+</div>
+<div class="section" id="writing">
 <h2>Writing<a class="headerlink" href="#writing" title="Permalink to this headline">¶</a></h2>
 <p>After changing the dataset, the final step is to write the modifications back
 to file. This can be done by using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> to
@@ -804,15 +803,15 @@ we need to add it back:</p>
 </pre></div>
 </div>
 <p>And we’re done.</p>
-</section>
-<section id="next-steps">
+</div>
+<div class="section" id="next-steps">
 <h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>Congratulations, you’re now familiar with the basics of using <em>pydicom</em> to
 read, access, modify and write DICOM datasets. Next up you may be interested
 in looking at our <a class="reference internal" href="../old/pydicom_user_guide.html"><span class="doc">User Guide</span></a> or some of our
 <a class="reference internal" href="../auto_examples/index.html"><span class="doc">examples</span></a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

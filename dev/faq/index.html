@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Frequently asked questions &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -102,12 +101,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -115,14 +114,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently asked questions</a><ul>
@@ -209,17 +208,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="frequently-asked-questions">
+  <div class="section" id="frequently-asked-questions">
 <span id="faq"></span><h1>Frequently asked questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
-<section id="general">
+<div class="section" id="general">
 <span id="faq-general"></span><h2>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h2>
-<section id="what-happened-to-import-dicom">
+<div class="section" id="what-happened-to-import-dicom">
 <h3>What happened to import dicom?<a class="headerlink" href="#what-happened-to-import-dicom" title="Permalink to this headline">¶</a></h3>
 <p>Starting in version 1.0, <em>pydicom</em> changed the library import from
 <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">dicom</span></code> to <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code>. If you’re used to using the earlier
 versions of <em>pydicom</em> see the <a class="reference internal" href="../old/transition_to_pydicom1.html"><span class="doc">transitioning guide</span></a> on how to make the change.</p>
-</section>
-<section id="how-do-i-cite-pydicom">
+</div>
+<div class="section" id="how-do-i-cite-pydicom">
 <h3>How do I cite pydicom?<a class="headerlink" href="#how-do-i-cite-pydicom" title="Permalink to this headline">¶</a></h3>
 <p>The easiest method is probably to <a class="reference external" href="https://zenodo.org/search?page=1&amp;size=20&amp;q=conceptrecid:1291985&amp;all_versions&amp;sort=-version">find the Zenodo DOI</a>
 for the version you are using and then entering your required citation style
@@ -228,25 +227,25 @@ in the <em>Cite as</em> box.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Mason, D. L., et al, pydicom: An open source DICOM library, https://github.com/pydicom/pydicom [Online; accessed YYYY-MM-DD].
 </pre></div>
 </div>
-</section>
-</section>
-<section id="installation">
+</div>
+</div>
+<div class="section" id="installation">
 <span id="faq-install"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<section id="what-are-pydicom-s-prerequisites">
+<div class="section" id="what-are-pydicom-s-prerequisites">
 <h3>What are pydicom’s prerequisites?<a class="headerlink" href="#what-are-pydicom-s-prerequisites" title="Permalink to this headline">¶</a></h3>
-<section id="required">
+<div class="section" id="required">
 <h4>Required<a class="headerlink" href="#required" title="Permalink to this headline">¶</a></h4>
 <p><em>pydicom</em> requires Python.</p>
-</section>
-<section id="optional">
+</div>
+<div class="section" id="optional">
 <h4>Optional<a class="headerlink" href="#optional" title="Permalink to this headline">¶</a></h4>
 <p>When manipulating <em>Pixel Data</em> it’s recommended you install
 <a class="reference external" href="https://numpy.org/">NumPy</a>. When dealing with JPEG
 compressed <em>Pixel Data</em> see <a class="reference internal" href="../old/image_data_handlers.html#guide-compressed"><span class="std std-ref">this table</span></a> for which
 libraries are required.</p>
-</section>
-</section>
-<section id="what-version-of-python-can-i-use">
+</div>
+</div>
+<div class="section" id="what-version-of-python-can-i-use">
 <span id="faq-install-version"></span><h3>What version of Python can I use?<a class="headerlink" href="#what-version-of-python-can-i-use" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -299,15 +298,15 @@ libraries are required.</p>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="what-about-support-for-python-2-7">
+</div>
+<div class="section" id="what-about-support-for-python-2-7">
 <h3>What about support for Python 2.7?<a class="headerlink" href="#what-about-support-for-python-2-7" title="Permalink to this headline">¶</a></h3>
 <p>Python 2.7 reached <a class="reference external" href="https://www.python.org/doc/sunset-python-2/">end of life</a>
 on 1st January, 2020 and is no longer supported by <em>pydicom</em>. More information
 is available <a class="reference internal" href="../old/python2_support.html"><span class="doc">here</span></a>.</p>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>

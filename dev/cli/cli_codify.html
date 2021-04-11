@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom codify command &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -100,12 +99,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -113,14 +112,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -190,7 +189,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="pydicom-codify-command">
+  <div class="section" id="pydicom-codify-command">
 <span id="cli-codify"></span><h1><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command<a class="headerlink" href="#pydicom-codify-command" title="Permalink to this headline">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command takes a DICOM file and produces Python code to
 recreate that file, or, optionally a subset within that file.</p>
@@ -204,7 +203,7 @@ sequences.</p>
 file, which may include private health information or other sensitive
 information.</p>
 </div>
-<section id="a-simple-example">
+<div class="section" id="a-simple-example">
 <h2>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h2>
 <p>A simple example of using the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pydicom codify pydicom::rtplan.dcm
@@ -230,8 +229,8 @@ ds.StudyTime = &#39;153557&#39;
 </div>
 <p>Note that prefixing the file specification with <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> will read the file
 from the <em>pydicom</em> test data files rather than from the file system.</p>
-</section>
-<section id="command-options">
+</div>
+<div class="section" id="command-options">
 <h2>Command options<a class="headerlink" href="#command-options" title="Permalink to this headline">¶</a></h2>
 <p>In the above example, the output was directed to screen, because no output file
 was specified. To see the available command options, use the <code class="docutils literal notranslate"><span class="pre">help</span></code> command:</p>
@@ -277,8 +276,8 @@ would be a <code class="docutils literal notranslate"><span class="pre">ds.save_
 <p>By default, any private data elements within the file are not translated
 to code.  If you want to include them, use the <code class="docutils literal notranslate"><span class="pre">-p</span></code> parameter.</p>
 </div>
-</section>
-<section id="codifying-a-part-of-a-dicom-file">
+</div>
+<div class="section" id="codifying-a-part-of-a-dicom-file">
 <h2>Codifying a part of a DICOM file<a class="headerlink" href="#codifying-a-part-of-a-dicom-file" title="Permalink to this headline">¶</a></h2>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">filespec</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, as for
 <a class="reference internal" href="../guides/cli_guide.html#cli-show"><span class="std std-ref">the show command</span></a>, allows you to specify a data element within the file,
@@ -312,8 +311,8 @@ but could be useful as a model when creating
 more complete code.  For example, issuing code for one item in a
 <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> could be the starting point towards a loop
 producing a number of sequence items.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

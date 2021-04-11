@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Transition to pydicom 1.x &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -100,12 +99,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref_guide.html">Reading and writing DICOM files</a></li>
@@ -113,14 +112,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -190,10 +189,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="transition-to-pydicom-1-x">
+  <div class="section" id="transition-to-pydicom-1-x">
 <span id="transition-to-pydicom1"></span><h1>Transition to pydicom 1.x<a class="headerlink" href="#transition-to-pydicom-1-x" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">Important information on differences in pydicom post 1.0 vs pre-1.0</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>As is often the case for major software version number changes, pydicom 1.0
 breaks with the previous release of pydicom (0.9.9) in several ways.  These
@@ -224,8 +223,8 @@ to find relevant questions and example code online</p></li>
 <p>The decision wasn’t taken lightly, but with a great deal of discussion on the
 GitHub issues list.  Having made the leap, the rest of this guide should help
 smooth the way…</p>
-</section>
-<section id="for-authors-of-packages-requiring-pydicom-1-0">
+</div>
+<div class="section" id="for-authors-of-packages-requiring-pydicom-1-0">
 <h2>For authors of packages requiring pydicom &lt; 1.0<a class="headerlink" href="#for-authors-of-packages-requiring-pydicom-1-0" title="Permalink to this headline">¶</a></h2>
 <p>The old pydicom releases have been split off into their own package, called
 <code class="docutils literal notranslate"><span class="pre">dicom</span></code>, which is now hosted on PyPI. This allows the old library <code class="docutils literal notranslate"><span class="pre">dicom</span></code>
@@ -242,8 +241,8 @@ existing pydicom installs</p></li>
 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pydicom</span></code></p></li>
 </ol>
 </div></blockquote>
-</section>
-<section id="error-messages-relating-to-the-pydicom-transition">
+</div>
+<div class="section" id="error-messages-relating-to-the-pydicom-transition">
 <h2>Error messages relating to the pydicom transition<a class="headerlink" href="#error-messages-relating-to-the-pydicom-transition" title="Permalink to this headline">¶</a></h2>
 <p>This section is here in the hopes of people getting directed to this page on
 searches. If that’s you, then welcome! Hopefully the information here can get
@@ -275,21 +274,21 @@ you should:</p>
 </pre></div>
 </div>
 <p>and you should be good to go.</p>
-</section>
-</section>
-<section id="api-changes-in-version-1-0">
+</div>
+</div>
+<div class="section" id="api-changes-in-version-1-0">
 <h1>API Changes in version 1.0<a class="headerlink" href="#api-changes-in-version-1-0" title="Permalink to this headline">¶</a></h1>
 <p>Apart from the change of the package name, there are some changes in
 module names, class names, and behavior that may require some code changes.</p>
-<section id="changed-module-names">
+<div class="section" id="changed-module-names">
 <h2>Changed module names<a class="headerlink" href="#changed-module-names" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>module <code class="docutils literal notranslate"><span class="pre">UID</span></code> is now <code class="docutils literal notranslate"><span class="pre">uid</span></code></p></li>
 </ul>
 </div></blockquote>
-</section>
-<section id="changed-function-and-variable-names">
+</div>
+<div class="section" id="changed-function-and-variable-names">
 <h2>Changed function and variable names<a class="headerlink" href="#changed-function-and-variable-names" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
@@ -325,8 +324,8 @@ module names, class names, and behavior that may require some code changes.</p>
 </li>
 </ul>
 </div></blockquote>
-</section>
-<section id="removed-functions-and-names">
+</div>
+<div class="section" id="removed-functions-and-names">
 <h2>Removed functions and names<a class="headerlink" href="#removed-functions-and-names" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
@@ -337,8 +336,8 @@ gone (<code class="docutils literal notranslate"><span class="pre">CleanName()</
 <li><p><code class="docutils literal notranslate"><span class="pre">uid.pydicom_UIDs</span></code> has been removed</p></li>
 </ul>
 </div></blockquote>
-</section>
-<section id="changed-behavior">
+</div>
+<div class="section" id="changed-behavior">
 <h2>Changed behavior<a class="headerlink" href="#changed-behavior" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
@@ -346,8 +345,8 @@ gone (<code class="docutils literal notranslate"><span class="pre">CleanName()</
 <code class="docutils literal notranslate"><span class="pre">dataset.file_meta</span></code> if missing</p></li>
 </ul>
 </div></blockquote>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

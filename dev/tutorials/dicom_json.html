@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Introduction to JSON support &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -102,12 +101,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -131,14 +130,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -210,7 +209,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="introduction-to-json-support">
+  <div class="section" id="introduction-to-json-support">
 <h1>Introduction to JSON support<a class="headerlink" href="#introduction-to-json-support" title="Permalink to this headline">¶</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -221,7 +220,7 @@ beta state, and the API is still subject to change.</p>
 <p>Support for the JSON format has been added to the DICOM Standard in
 Part 18 as the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">DICOM JSON Model</a>. The standard
 describes how different DICOM value representations can be encoded in JSON.</p>
-<section id="converting-a-dataset-into-json-format">
+<div class="section" id="converting-a-dataset-into-json-format">
 <h2>Converting a dataset into JSON format<a class="headerlink" href="#converting-a-dataset-into-json-format" title="Permalink to this headline">¶</a></h2>
 <p><em>pydicom</em> supports the conversion of a DICOM dataset both into a JSON string
 and into a deserialized JSON dictionary:</p>
@@ -241,8 +240,8 @@ low-level APIs to serialize the dataset.
 Higher-level Python APIs (like Django) often work directly with Python
 dictionaries deserialized from a JSON string instead, so
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> can be more convenient here.</p>
-</section>
-<section id="creating-a-dataset-from-json">
+</div>
+<div class="section" id="creating-a-dataset-from-json">
 <h2>Creating a dataset from JSON<a class="headerlink" href="#creating-a-dataset-from-json" title="Permalink to this headline">¶</a></h2>
 <p>Similar, a dataset can be created both from a JSON string and from a JSON
 dictionary. There is only a single function to handle both cases:</p>
@@ -262,8 +261,8 @@ dictionary. There is only a single function to handle both cases:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">ds</span> <span class="o">==</span> <span class="n">ds1</span>
 </pre></div>
 </div>
-</section>
-<section id="working-with-large-binary-data">
+</div>
+<div class="section" id="working-with-large-binary-data">
 <h2>Working with large binary data<a class="headerlink" href="#working-with-large-binary-data" title="Permalink to this headline">¶</a></h2>
 <p>Large binary data can be handled in two ways. It can be encoded
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.7.html">inline</a> as a base64-encoded string, or it can
@@ -310,8 +309,8 @@ the stored <code class="docutils literal notranslate"><span class="pre">BulkData
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">bulk_data_uri_handler</span><span class="o">=</span><span class="n">bulk_data_reader</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

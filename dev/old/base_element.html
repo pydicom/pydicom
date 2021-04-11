@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Core elements in pydicom &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -102,12 +101,12 @@
               
             
             
-              <p><span class="caption-text">Getting started</span></p>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p><span class="caption-text">Documentation</span></p>
+<p class="caption"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Core elements in pydicom</a><ul>
@@ -133,14 +132,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Examples</span></p>
+<p class="caption"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p><span class="caption-text">Additional Information</span></p>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -212,10 +211,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="core-elements-in-pydicom">
+  <div class="section" id="core-elements-in-pydicom">
 <h1>Core elements in pydicom<a class="headerlink" href="#core-elements-in-pydicom" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">pydicom object model, description of classes, examples</p>
-<section id="dataset">
+<div class="section" id="dataset">
 <h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> is the main object you will work with
 directly. <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> wraps a dictionary, where the key
@@ -420,8 +419,8 @@ through the <cite>PixelData</cite> keyword:</p>
 </pre></div>
 </div>
 <p>For more details, see <a class="reference internal" href="working_with_pixel_data.html"><span class="doc">Working with Pixel Data</span></a>.</p>
-</section>
-<section id="dataelement">
+</div>
+<div class="section" id="dataelement">
 <h2>DataElement<a class="headerlink" href="#dataelement" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> class is not usually used directly in user
 code, but is used extensively by <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.
@@ -442,8 +441,8 @@ A regular value like a number or string (or <a class="reference external" href="
 VM &gt; 1), or a <a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>.</p></li>
 </ul>
 </div></blockquote>
-</section>
-<section id="tag">
+</div>
+<div class="section" id="tag">
 <h2>Tag<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a> is not generally used directly in user code, as
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-func docutils literal notranslate"><span class="pre">BaseTags</span></code></a> are automatically created when you assign or read
@@ -477,8 +476,8 @@ portions of the tag.</p></li>
 whether the tag represents a private tag (i.e. if group number is odd).</p></li>
 </ul>
 </div></blockquote>
-</section>
-<section id="sequence">
+</div>
+<div class="section" id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> is derived from Python’s <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>.
 The only added functionality is to make string representations prettier.
@@ -486,8 +485,8 @@ Otherwise all the usual methods of <a class="reference external" href="https://d
 etc. are available.</p>
 <p>For examples of accessing data nested in sequences, see
 <a class="reference internal" href="../auto_examples/metadata_processing/plot_sequences.html#sphx-glr-auto-examples-metadata-processing-plot-sequences-py"><span class="std std-ref">Working with sequences</span></a>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
