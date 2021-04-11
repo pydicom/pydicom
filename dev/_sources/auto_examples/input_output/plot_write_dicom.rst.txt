@@ -39,21 +39,21 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmp76hiuc9q.dcm
+    Writing test file /tmp/tmpwfwnw3ki.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmp61ltg0e_.dcm
-    Load file /tmp/tmp76hiuc9q.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmpqgyrk7go.dcm
+    Load file /tmp/tmpwfwnw3ki.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
     (0008, 0023) Content Date                        DA: '20210411'
-    (0008, 0033) Content Time                        TM: '220701.354301'
+    (0008, 0033) Content Time                        TM: '221103.421263'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp76hiuc9q.dcm ...
-    Load file /tmp/tmp61ltg0e_.dcm ...
+    Remove file /tmp/tmpwfwnw3ki.dcm ...
+    Load file /tmp/tmpqgyrk7go.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
@@ -61,10 +61,10 @@ have to change UIDs to valid values and add all required DICOM data elements.
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
     (0008, 0023) Content Date                        DA: '20210411'
-    (0008, 0033) Content Time                        TM: '220701.354301'
+    (0008, 0033) Content Time                        TM: '221103.421263'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp61ltg0e_.dcm ...
+    Remove file /tmp/tmpqgyrk7go.dcm ...
 
 
 
