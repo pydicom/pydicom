@@ -57,10 +57,16 @@ except ImportError:
 
 try:
     import pylibjpeg
-    from pylibjpeg.pydicom.utils import get_pixel_data_decoders
     HAVE_PYLIBJPEG = True
 except ImportError:
     HAVE_PYLIBJPEG = False
+
+if HAVE_PYLIBJPEG:
+    try:
+        from pylibjpeg.utils import get_pixel_data_decoders
+    except ImportError:
+        # Old import, deprecated in 1.2, removal in 2.0
+        from pylibjpeg.pydicom.utils import get_pixel_data_decoders
 
 try:
     import openjpeg

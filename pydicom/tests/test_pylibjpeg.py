@@ -520,6 +520,12 @@ class TestJPEG2K:
     @pytest.mark.parametrize('fpath, data', J2K_REFERENCE_DATA)
     def test_properties_as_array(self, fpath, data):
         """Test dataset, pixel_array and as_array() are as expected."""
+        req_fixes = [
+            J2KR_16_16_1_0_10F_M2,
+            J2KR_16_14_1_1_1F_M2,
+            J2KI_16_14_1_1_1F_M2
+        ]
+
         ds = dcmread(fpath)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
@@ -528,14 +534,22 @@ class TestJPEG2K:
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
         # Check Dataset.pixel_array
-        arr = ds.pixel_array
+        if fpath in req_fixes:
+            with pytest.warns(UserWarning):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
 
         assert arr.flags.writeable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
         # Check handlers as_array() function
-        arr = as_array(ds)
+        if fpath in req_fixes:
+            with pytest.warns(UserWarning):
+                arr = as_array(ds)
+        else:
+            arr = as_array(ds)
 
         assert arr.flags.writeable
         assert data[5] == arr.shape
@@ -545,7 +559,11 @@ class TestJPEG2K:
     def test_array(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
-        arr = ds.pixel_array
+        if fixes:
+            with pytest.warns(UserWarning):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
 
         ref = dcmread(rpath).pixel_array
         assert np.array_equal(arr, ref)
@@ -559,7 +577,11 @@ class TestJPEG2K:
 
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         for ii in range(nr_frames):
-            arr = next(frame_generator)
+            if fixes:
+                with pytest.warns(UserWarning):
+                    arr = next(frame_generator)
+            else:
+                arr = next(frame_generator)
 
             if nr_frames > 1:
                 assert np.array_equal(arr, ref[ii, ...])
@@ -588,8 +610,7 @@ class TestJPEG2K:
         msg = (
             r"The \(0028,0103\) Pixel Representation value '0' \(unsigned\) "
             r"in the dataset does not match the format of the values found in "
-            r"the JPEG 2000 data 'signed'. It's recommended that you change "
-            r"the  Pixel Representation value to produce the correct output"
+            r"the JPEG 2000 data 'signed'"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.pixel_array
@@ -637,7 +658,10 @@ class TestJPEG2K:
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]
-        arr = ds.pixel_array
+
+        msg = r"value '1' \(signed\)"
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
 
         assert 'int16' == arr.dtype
         assert (512, 512) == arr.shape

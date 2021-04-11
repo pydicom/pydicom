@@ -710,10 +710,10 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
         [[1.000, 1.000, 1.000],
          [0.000, -0.114 * 1.772 / 0.587, 1.772],
          [1.402, -0.299 * 1.402 / 0.587, 0.000]],
-        dtype=np.float
+        dtype=float
     )
 
-    arr = arr.astype(np.float)
+    arr = arr.astype(float)
     arr -= [0, 128, 128]
     arr = np.dot(arr, ybr_to_rgb)
 
