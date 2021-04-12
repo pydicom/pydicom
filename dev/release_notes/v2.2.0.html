@@ -199,37 +199,39 @@ acceptable to <a class="reference internal" href="../reference/generated/pydicom
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a>.  Previously, any Python type could be
 set.</p></li>
 </ul>
+</div>
 <div class="section" id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
 <ul>
-<li><dl class="simple">
-<dt>Added a command-line interface for pydicom.  Current subcommands are:</dt><dd><ul class="simple">
+<li><p>Added a command-line interface for pydicom.  Current subcommands are:</p>
+<blockquote>
+<div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">show</span></code>: display all or part of a DICOM file</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">codify</span></code> to produce Python code for writing files or sequence items
 from scratch.</p></li>
 </ul>
-</dd>
-</dl>
-<p>Please see the <a class="reference internal" href="../guides/cli_guide.html#cli-guide"><span class="std std-ref">Command-line Interface Guide</span></a> for examples and details
+</div></blockquote>
+<p>Please see the <a class="reference internal" href="../guides/cli/cli_guide.html#cli-guide"><span class="std std-ref">Command-line Interface Guide</span></a> for examples and details
 of all the options for each command.</p>
 </li>
 <li><p>A field containing an invalid number of bytes will result in a warning
 instead of an exception when
-<a class="reference internal" href="../reference/generated/pydicom.config.convert_wrong_length_to_UN.html#pydicom.config.convert_wrong_length_to_UN" title="pydicom.config.convert_wrong_length_to_UN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">convert_wrong_length_to_UN</span></code></a> is set to True.</p></li>
+<a class="reference internal" href="../reference/generated/pydicom.config.convert_wrong_length_to_UN.html#pydicom.config.convert_wrong_length_to_UN" title="pydicom.config.convert_wrong_length_to_UN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">convert_wrong_length_to_UN</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 <li><p>Private tags known via the private dictionary will now get the configured
-VR if read from a dataset instead of “UN” (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1051">#1051</a>).</p></li>
-<li><p>while reading explicit VR, a switch to implicit VR will be silently attempted
+VR if read from a dataset instead of <strong>UN</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1051">#1051</a>).</p></li>
+<li><p>While reading explicit VR, a switch to implicit VR will be silently attempted
 if the VR bytes are not valid VR characters, and config option
 <a class="reference internal" href="../reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch" title="pydicom.config.assume_implicit_vr_switch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assume_implicit_vr_switch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default)</p></li>
-<li><dl class="simple">
-<dt>New functionality to help with correct formatting of decimal strings (DS)</dt><dd><ul class="simple">
+<li><p>New functionality to help with correct formatting of decimal strings (<strong>DS</strong>)</p>
+<blockquote>
+<div><ul class="simple">
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.is_valid_ds.html#pydicom.valuerep.is_valid_ds" title="pydicom.valuerep.is_valid_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_valid_ds()</span></code></a> to check whether a string is
-valid as a DICOM decimal string (DS) and
+valid as a DICOM decimal string and
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_number_as_ds()</span></code></a> to format a given <code class="docutils literal notranslate"><span class="pre">float</span></code>
 or <code class="docutils literal notranslate"><span class="pre">Decimal</span></code> as a DS while retaining the highest possible level of
 precision</p></li>
 <li><p>If <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, all
-DS objects created will be checked for the validity of their string
+<strong>DS</strong> objects created will be checked for the validity of their string
 representations.</p></li>
 <li><p>Added optional <code class="docutils literal notranslate"><span class="pre">auto_format</span></code> parameter to the init methods of
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a> and
@@ -237,8 +239,7 @@ representations.</p></li>
 factory function to allow explicitly requesting automatic formatting of
 the string representations of these objects when they are constructed.</p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 <li><p>Added methods to construct <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> objects
 from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
@@ -252,25 +253,26 @@ a more powerful <code class="docutils literal notranslate"><span class="pre">req
 </ul>
 </div>
 <div class="section" id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Changed the raising exception to return False
-in <code class="xref py py-meth docutils literal notranslate"><span class="pre">__eq__()</span></code>,
-when operand cannot be converted to BaseTag Type (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTag.__eq__()</span></code> returns <code class="docutils literal notranslate"><span class="pre">False</span></code> rather
+than raising an exception when the operand cannot be converted to
+<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
 after the sequence had been read (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1278">#1278</a>)</p></li>
 <li><p>Fixed JSON export of numeric values</p></li>
 <li><p>Fixed handling of sequences of unknown length that switch to implicit
-encoding, and sequences with VR <code class="docutils literal notranslate"><span class="pre">UN</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
+encoding, and sequences with VR <strong>UN</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
 <li><p>Do not load external data sources until needed - fixes problems with
 standard workflow if <cite>setuptools</cite> are not installed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1341">#1341</a>)</p></li>
+<li><p>Fixed empty <strong>PN</strong> elements read from file being <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> rather than
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1338">#1338</a>)</p></li>
 </ul>
-</div>
 </div>
 </div>
 
