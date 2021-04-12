@@ -874,6 +874,21 @@ class TestReader:
         assert "OF" == elem.VR
         assert b"\x00\x01\x02\x03" == elem.value
 
+    def test_empty_pn(self):
+        """Test correct type for an empty PN element."""
+        # Test for 1338
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.PatientName = ''
+        assert isinstance(ds.PatientName, pydicom.valuerep.PersonName)
+
+        bs = DicomBytesIO()
+        ds.save_as(bs)
+
+        out = dcmread(bs, force=True)
+        assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
+
 
 class TestIncorrectVR:
     def setup(self):

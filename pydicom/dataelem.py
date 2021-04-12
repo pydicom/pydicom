@@ -67,8 +67,7 @@ def empty_value_for_VR(
     ----------
     VR : str
         The VR of the corresponding element.
-
-    raw : bool
+    raw : bool, optional
         If ``True``, returns the value for a :class:`RawDataElement`,
         otherwise for a :class:`DataElement`
 
@@ -80,11 +79,19 @@ def empty_value_for_VR(
     """
     if VR == 'SQ':
         return b'' if raw else []
+
     if config.use_none_as_empty_text_VR_value:
         return None
-    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
-              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+
+    if VR == 'PN':
+        return b'' if raw else PersonName('')
+
+    if VR in (
+        'AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT', 'SH', 'ST', 'TM',
+        'UC', 'UI', 'UR', 'UT'
+    ):
         return b'' if raw else ''
+
     return None
 
 
