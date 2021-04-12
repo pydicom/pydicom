@@ -60,3 +60,5 @@ Fixes
   encoding, and sequences with VR ``UN`` (:issue:`1312`)
 * Do not load external data sources until needed - fixes problems with
   standard workflow if `setuptools` are not installed (:issue:`1341`)
+* Fixed a potential recursion for private tags in the invalid tag range
+  (:issue:`1347`)

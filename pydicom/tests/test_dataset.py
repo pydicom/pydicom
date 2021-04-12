@@ -1204,6 +1204,19 @@ class TestDataset:
         assert len(ds) == 2
         assert ds[0x000b0010].value == 'dog^2'
 
+    def test_read_invalid_private_tag_number_as_un(self):
+        # regression test for #1347
+        ds = Dataset()
+        # not a valid private tag number nor a valid private creator
+        tag1 = Tag(0x70050000)  # this one caused a recursion
+        tag2 = Tag(0x70050005)
+        ds[tag1] = RawDataElement(tag1, None, 2, b'\x01\x02', 0, True, True)
+        ds[tag2] = RawDataElement(tag2, None, 2, b'\x03\x04', 0, True, True)
+        assert ds[tag1].value == b'\x01\x02'
+        assert ds[tag1].VR == 'UN'
+        assert ds[tag2].value == b'\x03\x04'
+        assert ds[tag2].VR == 'UN'
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
