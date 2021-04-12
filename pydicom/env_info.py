@@ -18,7 +18,8 @@ import importlib
 def main():
     version_rows = [("platform", platform.platform()), ("Python", sys.version)]
 
-    for module in ("pydicom", "gdcm", "jpeg_ls", "numpy", "PIL"):
+    for module in ("pydicom", "gdcm", "jpeg_ls", "numpy", "PIL",
+                   "pylibjpeg", "openjpeg", "libjpeg"):
         try:
             m = importlib.import_module(module)
         except ImportError:

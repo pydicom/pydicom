@@ -1,4 +1,3 @@
-.. _cli_codify:
 
 ``pydicom codify`` command
 ==========================

@@ -1,6 +1,4 @@
 
-.. _cli_intro:
-
 Introduction
 ============
 
