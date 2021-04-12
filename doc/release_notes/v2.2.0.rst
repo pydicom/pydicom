@@ -43,6 +43,11 @@ Enhancements
   from individual components of names (``family_name``, ``given_name``, etc.).
   See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
   :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
+* Added library support so that files can be downloaded
+  not only through ``urllib.request`` but also through the ``requests`` package.
+  If you run into problems using ``urllib.request``,
+  a more powerful ``requests`` package will be recommended via log messages.
+  (:pr:`1340`)
 
 
 Changes
