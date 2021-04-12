@@ -427,6 +427,8 @@ after the sequence had been read (<a class="reference external" href="https://gi
 <li><p>Fixed JSON export of numeric values</p></li>
 <li><p>Fixed handling of sequences of unknown length that switch to implicit
 encoding, and sequences with VR <code class="docutils literal notranslate"><span class="pre">UN</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
+<li><p>Do not load external data sources until needed - fixes problems with
+standard workflow if <cite>setuptools</cite> are not installed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1341">#1341</a>)</p></li>
 </ul>
 </div>
 </div>
