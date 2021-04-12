@@ -16,14 +16,14 @@ import warnings
 try:
     import requests
 
-    IMPORTED_REQUESTS = True
+    HAVE_REQUESTS = True
 except ImportError:
-    IMPORTED_REQUESTS = False
+    HAVE_REQUESTS = False
 
 try:
     import tqdm
 
-    if IMPORTED_REQUESTS is False:
+    if HAVE_REQUESTS is False:
         class DownloadProgressBar(tqdm.tqdm):
             def update_to(self, b=1, bsize=1, tsize=None):
                 if tsize is not None:
@@ -94,7 +94,7 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
     """
     filename = os.fspath(fpath)
 
-    if IMPORTED_REQUESTS:
+    if HAVE_REQUESTS:
         if USE_PROGRESS_BAR:
             r = requests.get(url, stream=True)
             total_size_in_bytes = int(r.headers.get("content-length", 0))
