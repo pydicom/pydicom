@@ -47,6 +47,7 @@ Enhancements
   not only through ``urllib.request`` but also through the ``requests`` package.
   If you run into problems using ``urllib.request``,
   a more powerful ``requests`` package will be recommended via log messages.
+  (:pr:`1340`)
 
 
 Changes
