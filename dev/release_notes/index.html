@@ -409,6 +409,11 @@ the string representations of these objects when they are constructed.</p></li>
 from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
 See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components_veterinary" title="pydicom.valuerep.PersonName.from_named_components_veterinary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components_veterinary()</span></code></a>.</p></li>
+<li><p>Added library support so that files can be downloaded
+not only through <code class="docutils literal notranslate"><span class="pre">urllib.request</span></code> but also through the <code class="docutils literal notranslate"><span class="pre">requests</span></code> package.
+If you run into problems using <code class="docutils literal notranslate"><span class="pre">urllib.request</span></code>,
+a more powerful <code class="docutils literal notranslate"><span class="pre">requests</span></code> package will be recommended via log messages.
+(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
