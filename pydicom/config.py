@@ -158,8 +158,15 @@ datetime_conversion = False
 """Set to ``True`` to convert the value(s) of elements with a VR of DA, DT and
 TM to :class:`datetime.date`, :class:`datetime.datetime` and
 :class:`datetime.time` respectively.
+Note that when datetime conversion is enabled then range matching in
+C-GET/C-FIND/C-MOVE queries is not possible anymore. So if you need range
+matching we recommend to do the conversion manually.
 
 Default ``False``
+
+References
+----------
+* :dcm:`Range Matching<part04/sect_C.2.2.2.5.html>`
 """
 
 use_none_as_empty_text_VR_value = False

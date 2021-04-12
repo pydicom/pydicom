@@ -2,6 +2,7 @@
 """Unit tests for the pydicom.dataset module."""
 
 import copy
+import math
 import pickle
 import weakref
 
@@ -27,6 +28,7 @@ from pydicom.uid import (
     JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID
 )
+from pydicom.valuerep import DS
 
 
 class BadRepr:
@@ -1640,6 +1642,14 @@ class TestDatasetElements:
         # check also that assigning proper sequence *does* work
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         assert isinstance(self.ds.ConceptCodeSequence, Sequence)
+
+    def test_formatted_DS_assigment(self):
+        """Assigning an auto-formatted decimal string works as expected."""
+        ds = pydicom.Dataset()
+        ds.PatientWeight = DS(math.pi, auto_format=True)
+        assert ds.PatientWeight.auto_format
+        # Check correct 16-character string representation
+        assert str(ds.PatientWeight) == '3.14159265358979'
 
     def test_ensure_file_meta(self):
         assert not hasattr(self.ds, 'file_meta')
