@@ -95,10 +95,9 @@ sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes \
 python3 -m venv venv
 . venv/bin/activate
 python --version
-pip install wheel setuptools numpy matplotlib sphinx pillow \
+pip install wheel setuptools numpy matplotlib sphinx pillow sphinx_rtd_theme \
     numpydoc sphinx-gallery sphinx-issues~=1.0 sphinx-copybutton \
     --progress-bar off
-pip install "docutils <0.17" sphinx_rtd_theme --progress-bar off
 
 # Build and install pydicom in dev mode
 pip install -e .
