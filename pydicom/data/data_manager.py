@@ -49,15 +49,13 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from pkg_resources import iter_entry_points
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 import warnings
 
 from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
     get_url_map, get_data_dir
 )
-
 
 DATA_ROOT = os.fspath(Path(__file__).parent.resolve())
 """The absolute path to the pydicom/data directory."""
@@ -106,6 +104,9 @@ def get_external_sources() -> Dict:
     dict
         A dict of ``{'source name': <interface class instance>}``.
     """
+
+    from pkg_resources import iter_entry_points
+
     # Prefer pydicom-data as the source
     entry_point = "pydicom.data.external_sources"
     sources = {vv.name: vv.load()() for vv in iter_entry_points(entry_point)}
@@ -118,7 +119,15 @@ def get_external_sources() -> Dict:
     return out
 
 
-EXTERNAL_DATA_SOURCES = get_external_sources()
+_EXTERNAL_DATA_SOURCES: Optional[Dict] = None
+
+
+def external_data_sources() -> Dict:
+    """Return the available external data sources - loaded once."""
+    global _EXTERNAL_DATA_SOURCES
+    if _EXTERNAL_DATA_SOURCES is None:
+        _EXTERNAL_DATA_SOURCES = get_external_sources()
+    return _EXTERNAL_DATA_SOURCES
 
 
 def online_test_file_dummy_paths() -> Dict[str, str]:
@@ -151,7 +160,7 @@ def fetch_data_files():
         # Download missing files or files that don't match the hash
         try:
             data_path_with_download(p.name)
-        except Exception as exc:
+        except Exception:
             error.append(p.name)
 
     if error:
@@ -162,9 +171,9 @@ def fetch_data_files():
 
 
 def get_files(
-    base: Union[str, os.PathLike],
-    pattern: str = "**/*",
-    dtype: int = DataTypes.DATASET
+        base: Union[str, os.PathLike],
+        pattern: str = "**/*",
+        dtype: int = DataTypes.DATASET
 ) -> List[str]:
     """Return all matching file paths from the available data sources.
 
@@ -204,7 +213,7 @@ def get_files(
     files = [os.fspath(m) for m in base.glob(pattern)]
 
     # Search external sources
-    for lib, source in EXTERNAL_DATA_SOURCES.items():
+    for lib, source in external_data_sources().items():
         fpaths = source.get_paths(pattern, dtype)
         if lib == "pydicom-data":
             # For pydicom-data, check the hash against hashes.json
@@ -231,7 +240,7 @@ def get_files(
             real_online_file_paths.append(
                 os.fspath(data_path_with_download(filename))
             )
-        except Exception as exc:
+        except Exception:
             download_error = True
 
     files += real_online_file_paths
@@ -302,7 +311,7 @@ def get_testdata_file(name: str) -> str:
         return os.fspath(matches[0])
 
     # Check external data sources
-    for lib, source in EXTERNAL_DATA_SOURCES.items():
+    for lib, source in external_data_sources().items():
         try:
             fpath = source.get_path(name, dtype=DataTypes.DATASET)
         except ValueError:
@@ -320,7 +329,7 @@ def get_testdata_file(name: str) -> str:
         if filename == name:
             try:
                 return os.fspath(data_path_with_download(filename))
-            except Exception as exc:
+            except Exception:
                 warnings.warn(
                     f"A download failure occurred while attempting to "
                     f"retrieve {name}"

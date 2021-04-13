@@ -67,8 +67,7 @@ def empty_value_for_VR(
     ----------
     VR : str
         The VR of the corresponding element.
-
-    raw : bool
+    raw : bool, optional
         If ``True``, returns the value for a :class:`RawDataElement`,
         otherwise for a :class:`DataElement`
 
@@ -80,11 +79,19 @@ def empty_value_for_VR(
     """
     if VR == 'SQ':
         return b'' if raw else []
+
     if config.use_none_as_empty_text_VR_value:
         return None
-    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
-              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+
+    if VR == 'PN':
+        return b'' if raw else PersonName('')
+
+    if VR in (
+        'AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT', 'SH', 'ST', 'TM',
+        'UC', 'UI', 'UR', 'UT'
+    ):
         return b'' if raw else ''
+
     return None
 
 
@@ -732,9 +739,13 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
     Returns
     -------
     str
-        The VR of the private tag if found in the private dictionary or "UN".
+        "LO" if the tag is a private creator, the VR of the private tag if
+        found in the private dictionary, or "UN".
     """
-    if ds is not None:
+    if tag.is_private_creator:
+        return "LO"
+    # invalid private tags are handled as UN
+    if ds is not None and (tag.element & 0xff00):
         private_creator_tag = tag.group << 16 | (tag.element >> 8)
         private_creator = ds.get(private_creator_tag, "")
         if private_creator:
@@ -794,10 +805,7 @@ def DataElement_from_raw(
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
                 # for VR for private tags see PS3.5, 6.2.2
-                if raw.tag.is_private_creator:
-                    VR = 'LO'
-                else:
-                    VR = _private_vr_for_tag(dataset, raw.tag)
+                VR = _private_vr_for_tag(dataset, raw.tag)
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:
