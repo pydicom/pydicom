@@ -36,9 +36,13 @@ class TimeConversion:
     def time_ybr_rgb_large(self):
         """Time converting YBR to RGB."""
         for ii in range(1):
-            convert_color_space(self.arr_large, "YBR_FULL", "RGB", per_frame=True)
+            convert_color_space(
+                self.arr_large, "YBR_FULL", "RGB", per_frame=True
+            )
 
     def time_rgb_ybr_large(self):
         """Time converting RGB to YBR."""
         for ii in range(1):
-            convert_color_space(self.arr_large, "RGB", "YBR_FULL", per_frame=True)
+            convert_color_space(
+                self.arr_large, "RGB", "YBR_FULL", per_frame=True
+            )
