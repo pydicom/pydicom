@@ -503,8 +503,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             return Tag(name) in self._dict
         except Exception as exc:
             msg = (
-                "Invalid value used with the 'in' operator: must be an "
-                "element tag as a 2-tuple or int, or an element keyword"
+                f"Invalid value '{name}' used with the 'in' operator: must be "
+                "an element tag as a 2-tuple or int, or an element keyword"
             )
             if isinstance(exc, OverflowError):
                 msg = (

@@ -183,7 +183,7 @@ class TestDataset:
         """Dataset: can test if item present by 'if <name> in dataset'."""
         assert 'TreatmentMachineName' in self.ds
         msg = (
-            r"Invalid value used with the 'in' operator: must be "
+            r"Invalid value 'Dummyname' used with the 'in' operator: must be "
             r"an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
@@ -199,13 +199,24 @@ class TestDataset:
         assert 'CommandGroupLength' in self.ds
         # Use a negative tag to cause an exception
         msg = (
-            r"Invalid value used with the 'in' operator: must "
+            r"Invalid value '\(-16, 16\)' used with the 'in' operator: must "
             r"be an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             assert (-0x0010, 0x0010) not in self.ds
 
+        def foo(): pass
+
+        # Try a function
+        msg = r"Invalid value '<function TestDataset"
+        with pytest.warns(UserWarning, match=msg):
+            assert foo not in self.ds
+
         # Random non-existent property
+        msg = (
+            r"Invalid value 'random name' used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
         with pytest.warns(UserWarning, match=msg):
             assert 'random name' not in self.ds
 
@@ -220,7 +231,7 @@ class TestDataset:
     def test_contains_raises(self, contains_raise):
         """Test raising exception for invalid key."""
         msg = (
-            r"Invalid value used with the 'in' operator: must "
+            r"Invalid value 'invalid' used with the 'in' operator: must "
             r"be an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.raises(ValueError, match=msg):
