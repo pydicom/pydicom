@@ -587,7 +587,7 @@ def convert_color_space(
 
     .. versionchanged:: 2.2
 
-        Added `by_frame` keyword parameter.
+        Added `per_frame` keyword parameter.
 
     Parameters
     ----------
