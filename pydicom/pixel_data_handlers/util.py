@@ -574,10 +574,7 @@ def apply_windowing(
 
 
 def convert_color_space(
-    arr: "np.ndarray",
-    current: str,
-    desired: str,
-    per_frame: Optional[bool] = False
+    arr: "np.ndarray", current: str, desired: str, per_frame: bool = False
 ) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
 
