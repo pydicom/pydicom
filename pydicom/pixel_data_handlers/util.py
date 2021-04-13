@@ -670,16 +670,16 @@ def _convert_RGB_to_YBR_FULL(arr: "np.ndarray") -> "np.ndarray":
         [[+0.299, -0.299 / 1.772, +0.701 / 1.402],
          [+0.587, -0.587 / 1.772, -0.587 / 1.402],
          [+0.114, +0.886 / 1.772, -0.114 / 1.402]],
-        dtype=np.float
+        dtype=np.float32
     )
 
-    arr = np.dot(arr, rgb_to_ybr)
+    arr = np.matmul(arr, rgb_to_ybr, dtype=np.float32)
     arr += [0.5, 128.5, 128.5]
     # Round(x) -> floor of (arr + 0.5) : 0.5 added in previous step
-    arr = np.floor(arr)
+    np.floor(arr, out=arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
     # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
-    arr = np.clip(arr, 0, 255)
+    np.clip(arr, 0, 255, out=arr)
 
     return arr.astype(orig_dtype)
 
@@ -710,18 +710,17 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
         [[1.000, 1.000, 1.000],
          [0.000, -0.114 * 1.772 / 0.587, 1.772],
          [1.402, -0.299 * 1.402 / 0.587, 0.000]],
-        dtype=float
+        dtype=np.float32
     )
 
-    arr = arr.astype(float)
+    arr = arr.astype(np.float32)
     arr -= [0, 128, 128]
-    arr = np.dot(arr, ybr_to_rgb)
 
     # Round(x) -> floor of (arr + 0.5)
-    arr = np.floor(arr + 0.5)
+    np.floor(arr @ ybr_to_rgb + 0.5, out=arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
     # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
-    arr = np.clip(arr, 0, 255)
+    np.clip(arr, 0, 255, out=arr)
 
     return arr.astype(orig_dtype)
 

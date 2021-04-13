@@ -43,6 +43,8 @@ Enhancements
   from individual components of names (``family_name``, ``given_name``, etc.).
   See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
   :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
+* Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
+  32-bit floats for calculation and improved the speed by ~60% (:issue:`1348`)
 
 
 Changes

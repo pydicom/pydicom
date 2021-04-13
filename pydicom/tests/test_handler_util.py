@@ -2120,6 +2120,7 @@ class TestNumpy_ApplyVOILUT:
         out = apply_voi_lut(arr, ds)
         assert [0, 1, 128, 254, 255] == out.tolist()
 
+
 class TestGetJ2KParameters:
     """Tests for get_j2k_parameters."""
     def test_precision(self):
