@@ -577,7 +577,7 @@ def convert_color_space(
     arr: "np.ndarray",
     current: str,
     desired: str,
-    by_frame: Optional[bool] = False
+    per_frame: Optional[bool] = False
 ) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
 
@@ -603,7 +603,7 @@ def convert_color_space(
         The desired color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
         ``'YBR_FULL_422'``.
-    by_frame : bool, optional
+    per_frame : bool, optional
         If ``True`` and the input array contains multiple frames then process
         each frame individually to reduce memory usage. Default ``False``.
 
@@ -648,7 +648,7 @@ def convert_color_space(
             f"Conversion from {current} to {desired} is not supported."
         )
 
-    if len(arr.shape) == 4 and by_frame:
+    if len(arr.shape) == 4 and per_frame:
         for idx, frame in enumerate(arr):
             arr[idx] = converter(frame)
 

@@ -572,7 +572,7 @@ class TestNumpy_ConvertColourSpace:
         assert (192, 192, 192) == tuple(arr[85, 50, :])
         assert (255, 255, 255) == tuple(arr[95, 50, :])
 
-        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL', by_frame=True)
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL')
         assert (76, 85, 255) == tuple(ybr[5, 50, :])
         assert (166, 107, 192) == tuple(ybr[15, 50, :])
         assert (150, 44, 21) == tuple(ybr[25, 50, :])
@@ -642,7 +642,7 @@ class TestNumpy_ConvertColourSpace:
         ds = dcmread(RGB_8_3_2F)
 
         arr = ds.pixel_array
-        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL', by_frame=True)
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL', per_frame=True)
         assert (76, 85, 255) == tuple(ybr[0, 5, 50, :])
         assert (166, 107, 192) == tuple(ybr[0, 15, 50, :])
         assert (150, 44, 21) == tuple(ybr[0, 25, 50, :])

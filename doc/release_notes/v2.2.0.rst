@@ -53,7 +53,7 @@ Enhancements
   a more powerful ``requests`` package will be recommended via log messages.
   (:pr:`1340`)
 * Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
-  32-bit floats for calculation, added `by_frame` flag to allow frame-by-frame
+  32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
 
 
