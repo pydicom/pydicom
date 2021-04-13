@@ -4,6 +4,8 @@
 Requires asv and numpy.
 """
 
+import numpy as np
+
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers import convert_color_space
@@ -18,6 +20,7 @@ class TimeConversion:
         """Setup the tests."""
         self.no_runs = 100
 
+        self.arr_large = np.ones((10, 1024, 1024, 3), dtype=np.uint8)
         self.arr_32_3_2f = dcmread(EXPL_32_3_2F).pixel_array
 
     def time_ybr_rgb_32_3_2f(self):
@@ -29,3 +32,13 @@ class TimeConversion:
         """Time converting RGB to YBR."""
         for ii in range(self.no_runs):
             convert_color_space(self.arr_32_3_2f, "RGB", "YBR_FULL")
+
+    def time_ybr_rgb_large(self):
+        """Time converting YBR to RGB."""
+        for ii in range(1):
+            convert_color_space(self.arr_large, "YBR_FULL", "RGB", by_frame=True)
+
+    def time_rgb_ybr_large(self):
+        """Time converting RGB to YBR."""
+        for ii in range(1):
+            convert_color_space(self.arr_large, "RGB", "YBR_FULL", by_frame=True)

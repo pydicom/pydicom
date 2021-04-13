@@ -574,13 +574,20 @@ def apply_windowing(
 
 
 def convert_color_space(
-    arr: "np.ndarray", current: str, desired: str
+    arr: "np.ndarray",
+    current: str,
+    desired: str,
+    by_frame: Optional[bool] = False
 ) -> "np.ndarray":
     """Convert the image(s) in `arr` from one color space to another.
 
     .. versionchanged:: 1.4
 
         Added support for ``YBR_FULL_422``
+
+    .. versionchanged:: 2.2
+
+        Added `by_frame` keyword parameter.
 
     Parameters
     ----------
@@ -596,6 +603,9 @@ def convert_color_space(
         The desired color space, should be a valid value for (0028,0004)
         *Photometric Interpretation*. One of ``'RGB'``, ``'YBR_FULL'``,
         ``'YBR_FULL_422'``.
+    by_frame : bool, optional
+        If ``True`` and the input array contains multiple frames then process
+        each frame individually to reduce memory usage. Default ``False``.
 
     Returns
     -------
@@ -635,9 +645,14 @@ def convert_color_space(
         converter = _converters[current][desired]
     except KeyError:
         raise NotImplementedError(
-            "Conversion from {0} to {1} is not supported."
-            .format(current, desired)
+            f"Conversion from {current} to {desired} is not supported."
         )
+
+    if len(arr.shape) == 4 and by_frame:
+        for idx, frame in enumerate(arr):
+            arr[idx] = converter(frame)
+
+        return arr
 
     return converter(arr)
 
@@ -717,7 +732,9 @@ def _convert_YBR_FULL_to_RGB(arr: "np.ndarray") -> "np.ndarray":
     arr -= [0, 128, 128]
 
     # Round(x) -> floor of (arr + 0.5)
-    np.floor(arr @ ybr_to_rgb + 0.5, out=arr)
+    np.matmul(arr, ybr_to_rgb, out=arr)
+    arr += 0.5
+    np.floor(arr, out=arr)
     # Max(0, arr) -> 0 if 0 >= arr, arr otherwise
     # Min(arr, 255) -> arr if arr <= 255, 255 otherwise
     np.clip(arr, 0, 255, out=arr)

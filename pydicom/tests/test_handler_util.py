@@ -572,7 +572,7 @@ class TestNumpy_ConvertColourSpace:
         assert (192, 192, 192) == tuple(arr[85, 50, :])
         assert (255, 255, 255) == tuple(arr[95, 50, :])
 
-        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL')
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL', by_frame=True)
         assert (76, 85, 255) == tuple(ybr[5, 50, :])
         assert (166, 107, 192) == tuple(ybr[15, 50, :])
         assert (150, 44, 21) == tuple(ybr[25, 50, :])
@@ -636,6 +636,34 @@ class TestNumpy_ConvertColourSpace:
         # All pixels within +/- 1 units
         assert np.allclose(rgb, arr, atol=1)
         assert rgb.shape == arr.shape
+
+    def test_frame_by_frame(self):
+        """Test processing frame-by-frame."""
+        ds = dcmread(RGB_8_3_2F)
+
+        arr = ds.pixel_array
+        ybr = convert_color_space(arr, 'RGB', 'YBR_FULL', by_frame=True)
+        assert (76, 85, 255) == tuple(ybr[0, 5, 50, :])
+        assert (166, 107, 192) == tuple(ybr[0, 15, 50, :])
+        assert (150, 44, 21) == tuple(ybr[0, 25, 50, :])
+        assert (203, 86, 75) == tuple(ybr[0, 35, 50, :])
+        assert (29, 255, 107) == tuple(ybr[0, 45, 50, :])
+        assert (142, 192, 118) == tuple(ybr[0, 55, 50, :])
+        assert (0, 128, 128) == tuple(ybr[0, 65, 50, :])
+        assert (64, 128, 128) == tuple(ybr[0, 75, 50, :])
+        assert (192, 128, 128) == tuple(ybr[0, 85, 50, :])
+        assert (255, 128, 128) == tuple(ybr[0, 95, 50, :])
+        # Frame 2
+        assert (179, 171, 1) == tuple(ybr[1, 5, 50, :])
+        assert (89, 149, 65) == tuple(ybr[1, 15, 50, :])
+        assert (105, 212, 235) == tuple(ybr[1, 25, 50, :])
+        assert (52, 170, 181) == tuple(ybr[1, 35, 50, :])
+        assert (226, 1, 149) == tuple(ybr[1, 45, 50, :])
+        assert (113, 65, 138) == tuple(ybr[1, 55, 50, :])
+        assert (255, 128, 128) == tuple(ybr[1, 65, 50, :])
+        assert (191, 128, 128) == tuple(ybr[1, 75, 50, :])
+        assert (63, 128, 128) == tuple(ybr[1, 85, 50, :])
+        assert (0, 128, 128) == tuple(ybr[1, 95, 50, :])
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
