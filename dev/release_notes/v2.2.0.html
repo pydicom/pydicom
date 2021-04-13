@@ -250,6 +250,9 @@ not only through <code class="docutils literal notranslate"><span class="pre">ur
 If you run into problems using <code class="docutils literal notranslate"><span class="pre">urllib.request</span></code>,
 a more powerful <code class="docutils literal notranslate"><span class="pre">requests</span></code> package will be recommended via log messages.
 (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
+<li><p>Ensured <code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code> uses
+32-bit floats for calculation, added <cite>per_frame</cite> flag to allow frame-by-frame
+processing and improved the speed by ~20-60% (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="changes">
