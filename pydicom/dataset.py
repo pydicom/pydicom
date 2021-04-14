@@ -2062,6 +2062,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                         elem, self._character_set, self)
                 elem.private_creator = self[private_creator_tag].value
 
+        if elem_tag == 0x00080005:
+            self.read_encoding = None
         self._dict[elem_tag] = elem
 
     def _slice_dataset(

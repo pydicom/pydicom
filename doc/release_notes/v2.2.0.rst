@@ -55,6 +55,8 @@ Enhancements
 * Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
+* Make sure that changing the ``Specific Character Set`` in a dataset will
+  affect the following decoding (:issue:`1328`)
 
 
 Changes

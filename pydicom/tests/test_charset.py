@@ -101,7 +101,6 @@ class TestCharset:
     def test_invalid_character_set(self, allow_invalid_values):
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
-        ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
         with pytest.warns(
             UserWarning,
@@ -114,7 +113,6 @@ class TestCharset:
     def test_invalid_character_set_enforce_valid(self, enforce_valid_values):
         """charset: raise on invalid encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
-        ds.read_encoding = None
         ds.SpecificCharacterSet = 'Unsupported'
         with pytest.raises(LookupError,
                            match="Unknown encoding 'Unsupported'"):
@@ -128,6 +126,13 @@ class TestCharset:
         ds.decode()
         assert 2 == len(ds)  # specific character set is always decoded
         assert 'Люкceмбypг' == ds.PatientName
+
+    def test_change_specific_character_set(self):
+        """Changed specific character set is used"""
+        rus_file = get_charset_files("chrRuss.dcm")[0]
+        ds = dcmread(rus_file)
+        ds.SpecificCharacterSet = "ISO_IR 100"
+        assert '»îÚceÜÑypÓ' == ds.PatientName
 
     def test_bad_charset(self):
         """Test bad charset defaults to ISO IR 6"""
