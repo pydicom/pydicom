@@ -89,6 +89,51 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     return False
 
 
+def _decompress_single_frame(
+    data: bytes,
+    transfer_syntax: str,
+    photometric_interpretation: str
+) -> "Image":
+    """Decompresses a single frame of an encapsulated Pixel Data element.
+
+    Parameters
+    ----------
+    data: bytes
+        Compressed pixel data
+    transfer_syntax: str
+        Transfer Syntax UID
+    photometric_interpretation: str
+        Photometric Interpretation
+
+    Returns
+    -------
+    PIL.Image
+        Decompressed pixel data
+
+    """
+    fio = io.BytesIO(data)
+    image = Image.open(fio)
+    # This hack ensures that RGB color images, which were not
+    # color transformed (i.e. not transformed into YCbCr color space)
+    # upon JPEG compression are decompressed correctly.
+    # Since Pillow assumes that images were transformed into YCbCr color
+    # space prior to compression, setting the value of "mode" to YCbCr
+    # signals Pillow to not apply any color transformation upon
+    # decompression.
+    if (transfer_syntax in PillowJPEGTransferSyntaxes and
+            photometric_interpretation == 'RGB'):
+        color_mode = 'YCbCr'
+        image.tile = [(
+            'jpeg',
+            image.tile[0][1],
+            image.tile[0][2],
+            (color_mode, ''),
+        )]
+        image.mode = color_mode
+        image.rawmode = color_mode
+    return image
+
+
 def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     """Return a :class:`numpy.ndarray` of the *Pixel Data*.
 
@@ -142,7 +187,11 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         j2k_precision, j2k_sign = None, None
         # multiple compressed frames
         for frame in decode_data_sequence(ds.PixelData):
-            im = Image.open(io.BytesIO(frame))
+            im = _decompress_single_frame(
+                frame,
+                transfer_syntax,
+                ds.PhotometricInterpretation
+            )
             if 'YBR' in ds.PhotometricInterpretation:
                 im.draft('YCbCr', (ds.Rows, ds.Columns))
             pixel_bytes.extend(im.tobytes())
@@ -155,7 +204,11 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     else:
         # single compressed frame
         pixel_data = defragment_data(ds.PixelData)
-        im = Image.open(io.BytesIO(pixel_data))
+        im = _decompress_single_frame(
+            pixel_data,
+            transfer_syntax,
+            ds.PhotometricInterpretation
+        )
         if 'YBR' in ds.PhotometricInterpretation:
             im.draft('YCbCr', (ds.Rows, ds.Columns))
         pixel_bytes.extend(im.tobytes())

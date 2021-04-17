@@ -214,7 +214,6 @@ class TestGDCM_JPEGlossless_no_gdcm:
 
 if have_pytest_param:
     pi_rgb_test_ids = [
-        "JPEG_RGB_RGB",
         "JPEG_RGB_411_AS_YBR_FULL",
         "JPEG_RGB_411_AS_YBR_FULL_422",
         "JPEG_RGB_422_AS_YBR_FULL",
@@ -223,21 +222,6 @@ if have_pytest_param:
     ]
 
     pi_rgb_testdata = [
-        (sc_rgb_jpeg_dcmtk_RGB,
-         "RGB",
-         [
-             (255, 0, 0),
-             (255, 128, 128),
-             (0, 255, 0),
-             (128, 255, 128),
-             (0, 0, 255),
-             (128, 128, 255),
-             (0, 0, 0),
-             (64, 64, 64),
-             (192, 192, 192),
-             (255, 255, 255),
-         ],
-         False),
         pytest.param(
             sc_rgb_jpeg_dcmtk_411_YBR_FULL,
             "YBR_FULL",
@@ -345,21 +329,6 @@ else:
         "JPEG_RGB_RGB",
     ]
     pi_rgb_testdata = [
-        (sc_rgb_jpeg_dcmtk_RGB,
-         "RGB",
-         [
-             (255, 0, 0),
-             (255, 128, 128),
-             (0, 255, 0),
-             (128, 255, 128),
-             (0, 0, 255),
-             (128, 128, 255),
-             (0, 0, 0),
-             (64, 64, 64),
-             (192, 192, 192),
-             (255, 255, 255),
-         ],
-         False),
     ]
 
     if HAVE_GDCM_IN_MEMORY_SUPPORT:

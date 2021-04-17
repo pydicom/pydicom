@@ -63,7 +63,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.d
 JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
-JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
+JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_jpeg_no_color_transform.dcm")
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
 
@@ -216,7 +216,7 @@ REFERENCE_DATA = [
     (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
-    (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),
+    (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (J2KR_08_08_3_0_1F_YBR_ICT, (J2KR, 8, 3, 0, 1, (480, 640, 3), 'uint8')),
     (J2KR_16_10_1_0_1F_M1, (J2KR, 16, 1, 0, 1, (1760, 1760), 'uint16')),
     (J2KR_16_12_1_0_1F_M2, (J2KR, 16, 1, 0, 1, (1024, 1024), 'uint16')),
@@ -284,11 +284,11 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB,
-        get_testdata_file("SC_rgb_dcmtk_ebcr_dcmd.dcm"),
+        get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
         [
-            (255, 0, 0), (255, 128, 128), (0, 255, 0), (128, 255, 128),
-            (0, 0, 255), (128, 128, 255), (0, 0, 0), (64, 64, 64),
-            (192, 192, 192), (255, 255, 255),
+            (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+            (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+            (244, 244, 244), (244, 244, 244),
         ],
     ),
 ]

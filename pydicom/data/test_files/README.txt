@@ -210,6 +210,14 @@ SC_rgb.dcm
   * 2 frame versions created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
+SC_jpeg_no_color_transform.dcm
+  * 8-bit baseline JPEG compressed in RGB color space without transformation
+    into YCbCr color space
+  * Individual tile of a TCGA whole slide image in Aperio SVS format obtained
+    from TCIA
+  * Created for PR #878 using DCMTK's img2cdm script with the value of the
+    Photometric Interpretation element patched
+
 SC_ybr_full_uncompressed.dcm
   * Uncompressed version of SC_rgb_dcmtk_+eb+cy+n2.dcm using gdcmconv
   * PhotometricIntepretation is YBR_FULL
