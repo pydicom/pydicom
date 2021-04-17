@@ -29,7 +29,7 @@ function doc_clone_commit {
     git reset --hard origin/$DOC_BRANCH
     # Update the doc directory that will be committed
     git rm -rf $DIR/ && rm -rf $DIR/
-    cp -R $HOME/project/docs/_build/html $DIR
+    cp -R $HOME/project/doc/_build/html $DIR
     # Set the git details of the committer
     git config --global user.email $EMAIL
     git config --global user.name $USERNAME
