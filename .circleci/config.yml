@@ -7,10 +7,12 @@ jobs:
       - checkout
       - run:
           name: Build documentation
-          command: ./build_tools/circle/build_doc.sh
+          command: |
+            ls
+            ./build_tools/circle/build_doc.sh
           timeout: "3600"
       - store_artifacts:
-          path: docs/_build/html
+          path: doc/_build/html
       - add_ssh_keys:
           fingerprints:
             - "36:ae:e2:2f:a7:11:f1:3f:d5:45:1d:c1:ef:55:0b:9d"
