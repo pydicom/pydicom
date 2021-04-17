@@ -22,21 +22,19 @@ function doc_clone_commit {
     #   /home/circleci/project/pydicom/dataset.py
     #   note the base directory for the repo is 'project' not 'pydicom'
 
-    # Test to see if $HOME/pydicom exists, if not then clone it from the repo
-    #   with CircleCI v2.0 it will always be the case that we need to clone
+    # Clone the $DOC_BRANCH branch
     cd $HOME
-    if [ ! -d $CIRCLE_PROJECT_REPONAME ]
-    then
-        git clone -b $DOC_BRANCH --single-branch $CIRCLE_REPOSITORY_URL
-    fi
-
+    git clone -b $DOC_BRANCH --single-branch $CIRCLE_REPOSITORY_URL
     cd $CIRCLE_PROJECT_REPONAME
     git reset --hard origin/$DOC_BRANCH
+    # Update the doc directory that will be committed
     git rm -rf $DIR/ && rm -rf $DIR/
-    cp -R $HOME/project/doc/_build/html $DIR
+    cp -R $HOME/project/docs/_build/html $DIR
+    # Set the git details of the committer
     git config --global user.email $EMAIL
     git config --global user.name $USERNAME
     git config --global push.default matching
+    # Add back to git the doc directory that will be committed
     git add -f $DIR/
     git commit -m "$MSG" $DIR
 }
@@ -51,6 +49,9 @@ if [ -z ${EMAIL+x} ]; then echo "EMAIL is unset"; fi
 if [ -z ${USERNAME+x} ]; then echo "USERNAME is unset"; fi
 
 DOC_BRANCH=gh-pages
+
+echo $GIT_AUTHOR_EMAIL
+echo $GIT_AUTHOR_NAME
 
 # Determine which of the three workflows to take
 if [ "$CIRCLE_BRANCH" = "master" ]

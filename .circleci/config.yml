@@ -3,47 +3,20 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.8
-    environment:
-      # The github organization or username of the repository which hosts the
-      # project and documentation.
-      USERNAME: glemaitre
-      # The name of the organization which host the repositories
-      ORGANIZATION: pydicom
-      # The repository where the documentation will be hosted
-      DOC_REPO: pydicom
-      # The base URL for the Github page where the documentation will be hosted
-      DOC_URL: ""
-      # The email is to be used for commits in the Github Page
-      EMAIL: g.lemaitre58@gmail.com
-    branches:
-      ignore:
-        - gh-pages
     steps:
       - checkout
       - run:
-          name: Checkout merge commit
-          command: bash ./build_tools/circle/checkout_merge_commit.sh
-      - run:
-          # Check whether the doc build is required, install build dependencies and
-          # run sphinx to build the doc.
           name: Build documentation
-          command: bash ./build_tools/circle/build_doc.sh
-          timeout: "3600"  # seconds
-
-      - run:
-          # Grep error on the documentation
-          name: Parse errors
-          command: cat ~/log.txt && if grep -q "Traceback (most recent call last):" ~/log.txt; then false; else true; fi
-
+          command: ./build_tools/circle/build_doc.sh
+          timeout: "3600"
       - store_artifacts:
-          path: ~/log.txt
-      - store_artifacts:
-          path: doc/_build/html
-
+          path: docs/_build/html
       - add_ssh_keys:
           fingerprints:
-              - "68:22:28:55:a9:d1:cc:ee:18:b1:0e:a4:87:ac:d1:f0"
-
+            - "36:ae:e2:2f:a7:11:f1:3f:d5:45:1d:c1:ef:55:0b:9d"
       - deploy:
           name: Deploy documentation
-          command: bash ./build_tools/circle/push_doc.sh
+          environment:
+            USERNAME: darcymason
+            EMAIL: darcymason@gmail.com
+          command: ./build_tools/circle/push_doc.sh
