@@ -275,6 +275,8 @@ encoding, and sequences with VR <strong>UN</strong> (<a class="reference externa
 standard workflow if <cite>setuptools</cite> are not installed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1341">#1341</a>)</p></li>
 <li><p>Fixed empty <strong>PN</strong> elements read from file being <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> rather than
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1338">#1338</a>)</p></li>
+<li><p>Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
+rather than YBR with the Pillow pixel data handler (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/878">#878</a>)</p></li>
 </ul>
 </div>
 </div>
