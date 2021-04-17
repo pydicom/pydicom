@@ -93,7 +93,7 @@ def _decompress_single_frame(
     data: bytes,
     transfer_syntax: str,
     photometric_interpretation: str
-) -> Image:
+) -> "Image":
     """Decompresses a single frame of an encapsulated Pixel Data element.
 
     Parameters
