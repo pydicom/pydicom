@@ -7,9 +7,7 @@ jobs:
       - checkout
       - run:
           name: Build documentation
-          command: |
-            ls
-            ./build_tools/circle/build_doc.sh
+          command: ./build_tools/circle/build_doc.sh
           timeout: "3600"
       - store_artifacts:
           path: doc/_build/html
