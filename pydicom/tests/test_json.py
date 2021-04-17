@@ -270,6 +270,19 @@ class TestDataSetToJson:
         assert ds_json.index('"00100020"') < ds_json.index('"00100030"')
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
+    def test_suppress_invalid_tags(self):
+        """Test tags that raise exceptions don't if suppress_invalid_tags True.
+        """
+        ds = Dataset()
+        ds.add_new(0x00100010, 'PN', ['Jane^Doe'])
+
+        with pytest.raises(Exception):
+            ds.to_json_dict()
+
+        ds_json = ds.to_json_dict(suppress_invalid_tags=True)
+
+        assert ds_json.get("00100010") is None
+
 
 class TestSequence:
     def test_nested_sequences(self):
@@ -376,3 +389,55 @@ class TestBinary:
         ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
 
         assert b'xyzzy' == ds[0x003a0200].value[0][0x54001010].value
+
+
+class TestNumeric:
+    def test_numeric_values(self):
+        ds = Dataset()
+
+        ds.add_new(0x0009100b, 'UL', 3000000000)
+        ds.add_new(0x0009100c, 'SL', -2000000000)
+        ds.add_new(0x0009100d, 'US', 40000)
+        ds.add_new(0x0009100e, 'SS', -22222)
+        ds.add_new(0x0009100f, 'FL', 3.14)
+        ds.add_new(0x00091010, 'FD', 3.14159265)
+        ds.add_new(0x00091014, 'IS', '42')
+        ds.add_new(0x00091015, 'DS', '3.14159265')
+        ds.add_new(0x00091102, 'US', 2)
+
+        ds_json = ds.to_json_dict()
+
+        assert ds_json['0009100B']['Value'] == [3000000000]
+        assert ds_json['0009100C']['Value'] == [-2000000000]
+        assert ds_json['0009100D']['Value'] == [40000]
+        assert ds_json['0009100E']['Value'] == [-22222]
+        assert ds_json['0009100F']['Value'] == [3.14]
+        assert ds_json['00091010']['Value'] == [3.14159265]
+        assert ds_json['00091014']['Value'] == [42]
+        assert ds_json['00091015']['Value'] == [3.14159265]
+        assert ds_json['00091102']['Value'] == [2]
+
+    def test_numeric_types(self):
+        ds = Dataset()
+
+        ds.add_new(0x0009100b, 'UL', 3000000000)
+        ds.add_new(0x0009100c, 'SL', -2000000000)
+        ds.add_new(0x0009100d, 'US', 40000)
+        ds.add_new(0x0009100e, 'SS', -22222)
+        ds.add_new(0x0009100f, 'FL', 3.14)
+        ds.add_new(0x00091010, 'FD', 3.14159265)
+        ds.add_new(0x00091014, 'IS', '42')
+        ds.add_new(0x00091015, 'DS', '3.14159265')
+        ds.add_new(0x00091102, 'US', 2)
+
+        ds_json = ds.to_json_dict()
+
+        assert type(ds_json['0009100B']['Value'][0]) == int
+        assert type(ds_json['0009100C']['Value'][0]) == int
+        assert type(ds_json['0009100D']['Value'][0]) == int
+        assert type(ds_json['0009100E']['Value'][0]) == int
+        assert type(ds_json['0009100F']['Value'][0]) == float
+        assert type(ds_json['00091010']['Value'][0]) == float
+        assert type(ds_json['00091014']['Value'][0]) == int
+        assert type(ds_json['00091015']['Value'][0]) == float
+        assert type(ds_json['00091102']['Value'][0]) == int

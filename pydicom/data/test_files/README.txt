@@ -29,6 +29,7 @@ OBXXXX1A.dcm            : Expl VR Little Endian
 reportsi.dcm            : Expl VR Little Endian
 test-SR.dcm             : Expl VR Little Endian
 explicit_VR-UN.dcm      : Expl VR Little Endian
+UN_sequence.dcm         : Expl VR Little Endian
 
 MR_small_implicit.dcm   : Impl VR Little Endian
 nested_priv_SQ.dcm      : Impl VR Little Endian
@@ -145,7 +146,12 @@ mlut_18.dcm
     images
 
 no_meta.dcm
-    * Same as CT_small.dcm with no File Meta Information header
+  * Same as CT_small.dcm with no File Meta Information header
+    
+UN_sequence.dcm
+  * Contains only one private sequence with VR UN
+  * Provided by @naterichman to reproduce issue #1312
+
 
 Created by a commercial radiotherapy treatment planning system and modified:
 rtplan.dcm       Implicit VR, Little Endian

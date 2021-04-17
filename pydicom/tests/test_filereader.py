@@ -273,19 +273,28 @@ class TestReader:
         ds = dcmread(deflate_name)
         assert "WSD" == ds.ConversionType
 
-    def test_bad_sequence(self):
-        """Test that automatic UN conversion can be switched off."""
+    def test_sequence_with_implicit_vr(self):
+        """Test that reading a UN sequence with unknown length and implicit VR
+        in a dataset with explicit VR is read regardless of the value of
+        the assume_implicit_vr_switch option."""
         replace_un_with_known_vr = config.replace_un_with_known_vr
+        assume_implicit_vr_switch = config.assume_implicit_vr_switch
+
         config.replace_un_with_known_vr = True
-        with pytest.raises(NotImplementedError):
-            ds = dcmread(get_testdata_file("bad_sequence.dcm"))
-            # accessing the elements of the faulty sequence raises
-            str(ds.CTDIPhantomTypeCodeSequence)
+        config.assume_implicit_vr_switch = True
+        ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+        str(ds.CTDIPhantomTypeCodeSequence)
+
+        config.assume_implicit_vr_switch = False
+        ds = dcmread(get_testdata_file("bad_sequence.dcm"))
+        str(ds.CTDIPhantomTypeCodeSequence)
 
         config.replace_un_with_known_vr = False
         ds = dcmread(get_testdata_file("bad_sequence.dcm"))
         str(ds.CTDIPhantomTypeCodeSequence)
+
         config.replace_un_with_known_vr = replace_un_with_known_vr
+        config.assume_implicit_vr_switch = assume_implicit_vr_switch
 
     def test_no_pixels_read(self):
         """Returns all data elements before pixels using
@@ -320,6 +329,24 @@ class TestReader:
             Tag(0x0010, 0x0020),
         ]
         assert expected == ctspecific_tags
+
+    def test_specific_tags_with_other_unkonwn_length_tags(self):
+        rtstruct_specific = dcmread(
+            rtstruct_name,
+            force=True,
+            specific_tags=[
+                "PatientName",
+                "PatientID",
+            ],
+        )
+        rtstruct_specific_tags = sorted(rtstruct_specific.keys())
+        expected = [
+            # SpecificCharacterSet is always added
+            Tag(0x0008, 0x0005),
+            Tag(0x0010, 0x0010),
+            Tag(0x0010, 0x0020),
+        ]
+        assert expected == rtstruct_specific_tags
 
     def test_specific_tags_with_unknown_length_SQ(self):
         """Returns only tags specified by user."""
@@ -403,6 +430,13 @@ class TestReader:
         # Now make sure the values that are parsed are correct
         assert b"Double Nested SQ" == seq1[0][tag].value
         assert b"Nested SQ" == seq0[0][0x01, 0x02].value
+
+    def test_un_sequence(self, dont_replace_un_with_known_vr):
+        ds = dcmread(get_testdata_file("UN_sequence.dcm"))
+        seq_element = ds[0x4453100c]
+        assert seq_element.VR == "SQ"
+        assert len(seq_element.value) == 1
+        assert len(seq_element.value[0].ReferencedSeriesSequence) == 1
 
     def test_no_meta_group_length(self, no_datetime_conversion):
         """Read file with no group length in file meta."""
@@ -840,6 +874,21 @@ class TestReader:
         assert "OF" == elem.VR
         assert b"\x00\x01\x02\x03" == elem.value
 
+    def test_empty_pn(self):
+        """Test correct type for an empty PN element."""
+        # Test for 1338
+        ds = Dataset()
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
+        ds.PatientName = ''
+        assert isinstance(ds.PatientName, pydicom.valuerep.PersonName)
+
+        bs = DicomBytesIO()
+        ds.save_as(bs)
+
+        out = dcmread(bs, force=True)
+        assert isinstance(ds[0x00100010].value, pydicom.valuerep.PersonName)
+
 
 class TestIncorrectVR:
     def setup(self):
@@ -934,6 +983,13 @@ class TestIncorrectVR:
 
 
 class TestUnknownVR:
+    @pytest.fixture(autouse=True)
+    def restore_config_values(self):
+        orig_impl_VR_switch = config.assume_implicit_vr_switch
+        config.assume_implicit_vr_switch = False
+        yield
+        config.assume_implicit_vr_switch = orig_impl_VR_switch
+
     @pytest.mark.parametrize(
         "vr_bytes, str_output",
         [

@@ -196,9 +196,9 @@ def code_sequence(
         #    use that; if one with 'Number', use that, else start at 1
         index_keyword = seq_keyword.replace("Sequence", "") + "Index"
         number_keyword = seq_keyword.replace("Sequence", "") + "Number"
-        if index_keyword in ds:
+        if hasattr(ds, index_keyword):
             index_str = str(getattr(ds, index_keyword))
-        elif number_keyword in ds:
+        elif hasattr(ds, number_keyword):
             index_str = str(getattr(ds, number_keyword))
         else:
             index_str = str(i + 1)
@@ -339,7 +339,7 @@ def code_file_from_dataset(
     lines.append("")
 
     # Code the file_meta information
-    if 'file_meta' in ds:
+    if hasattr(ds, 'file_meta'):
         lines.append("# File meta info data elements")
         code_meta = code_dataset(
             ds.file_meta,
@@ -360,7 +360,7 @@ def code_file_from_dataset(
     lines.append("")
 
     # Add the file meta to the dataset, and set transfer syntax
-    if 'file_meta' in ds:
+    if hasattr(ds, 'file_meta'):
         lines.append("ds.file_meta = file_meta")
     lines.append("ds.is_implicit_VR = " + str(ds.is_implicit_VR))
     lines.append("ds.is_little_endian = " + str(ds.is_little_endian))

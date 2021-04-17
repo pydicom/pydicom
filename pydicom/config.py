@@ -158,8 +158,15 @@ datetime_conversion = False
 """Set to ``True`` to convert the value(s) of elements with a VR of DA, DT and
 TM to :class:`datetime.date`, :class:`datetime.datetime` and
 :class:`datetime.time` respectively.
+Note that when datetime conversion is enabled then range matching in
+C-GET/C-FIND/C-MOVE queries is not possible anymore. So if you need range
+matching we recommend to do the conversion manually.
 
 Default ``False``
+
+References
+----------
+* :dcm:`Range Matching<part04/sect_C.2.2.2.5.html>`
 """
 
 use_none_as_empty_text_VR_value = False
@@ -262,7 +269,7 @@ correctly sized numpy array from the *Pixel Data* element.
 
 Handlers shall have four methods:
 
-def supports_transfer_syntax(ds)
+def supports_transfer_syntax(transfer_syntax: UID)
     Return ``True`` if the handler supports the transfer syntax indicated in
     :class:`Dataset` `ds`, ``False`` otherwise.
 
@@ -301,6 +308,19 @@ use the component precision and sign to correct the returned ndarray when
 using the pixel data handlers. If ``False`` then only rely on the element
 values within the dataset when applying corrections.
 """
+
+assume_implicit_vr_switch = True
+"""If invalid VR encountered, assume file switched to implicit VR
+
+.. versionadded:: 2.2
+
+If ``True`` (default), when reading an explicit VR file,
+if a VR is encountered that is not a valid two bytes within A-Z,
+then assume the original writer switched to implicit VR.  This has been
+seen in particular in some sequences.  This does not test that
+the VR is a valid DICOM VR, just that it has valid characters.
+"""
+
 
 INVALID_KEYWORD_BEHAVIOR = "WARN"
 """Control the behavior when setting a :class:`~pydicom.dataset.Dataset`

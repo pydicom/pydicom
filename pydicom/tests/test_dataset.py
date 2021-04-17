@@ -2,6 +2,7 @@
 """Unit tests for the pydicom.dataset module."""
 
 import copy
+import math
 import pickle
 import weakref
 
@@ -27,6 +28,7 @@ from pydicom.uid import (
     JPEGBaseline8Bit,
     PYDICOM_IMPLEMENTATION_UID
 )
+from pydicom.valuerep import DS
 
 
 class BadRepr:
@@ -181,7 +183,7 @@ class TestDataset:
         """Dataset: can test if item present by 'if <name> in dataset'."""
         assert 'TreatmentMachineName' in self.ds
         msg = (
-            r"Invalid value used with the 'in' operator: must be "
+            r"Invalid value 'Dummyname' used with the 'in' operator: must be "
             r"an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
@@ -197,13 +199,24 @@ class TestDataset:
         assert 'CommandGroupLength' in self.ds
         # Use a negative tag to cause an exception
         msg = (
-            r"Invalid value used with the 'in' operator: must "
+            r"Invalid value '\(-16, 16\)' used with the 'in' operator: must "
             r"be an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.warns(UserWarning, match=msg):
             assert (-0x0010, 0x0010) not in self.ds
 
+        def foo(): pass
+
+        # Try a function
+        msg = r"Invalid value '<function TestDataset"
+        with pytest.warns(UserWarning, match=msg):
+            assert foo not in self.ds
+
         # Random non-existent property
+        msg = (
+            r"Invalid value 'random name' used with the 'in' operator: must "
+            r"be an element tag as a 2-tuple or int, or an element keyword"
+        )
         with pytest.warns(UserWarning, match=msg):
             assert 'random name' not in self.ds
 
@@ -218,7 +231,7 @@ class TestDataset:
     def test_contains_raises(self, contains_raise):
         """Test raising exception for invalid key."""
         msg = (
-            r"Invalid value used with the 'in' operator: must "
+            r"Invalid value 'invalid' used with the 'in' operator: must "
             r"be an element tag as a 2-tuple or int, or an element keyword"
         )
         with pytest.raises(ValueError, match=msg):
@@ -1202,6 +1215,19 @@ class TestDataset:
         assert len(ds) == 2
         assert ds[0x000b0010].value == 'dog^2'
 
+    def test_read_invalid_private_tag_number_as_un(self):
+        # regression test for #1347
+        ds = Dataset()
+        # not a valid private tag number nor a valid private creator
+        tag1 = Tag(0x70050000)  # this one caused a recursion
+        tag2 = Tag(0x70050005)
+        ds[tag1] = RawDataElement(tag1, None, 2, b'\x01\x02', 0, True, True)
+        ds[tag2] = RawDataElement(tag2, None, 2, b'\x03\x04', 0, True, True)
+        assert ds[tag1].value == b'\x01\x02'
+        assert ds[tag1].VR == 'UN'
+        assert ds[tag2].value == b'\x03\x04'
+        assert ds[tag2].VR == 'UN'
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
@@ -1640,6 +1666,14 @@ class TestDatasetElements:
         # check also that assigning proper sequence *does* work
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         assert isinstance(self.ds.ConceptCodeSequence, Sequence)
+
+    def test_formatted_DS_assigment(self):
+        """Assigning an auto-formatted decimal string works as expected."""
+        ds = pydicom.Dataset()
+        ds.PatientWeight = DS(math.pi, auto_format=True)
+        assert ds.PatientWeight.auto_format
+        # Check correct 16-character string representation
+        assert str(ds.PatientWeight) == '3.14159265358979'
 
     def test_ensure_file_meta(self):
         assert not hasattr(self.ds, 'file_meta')

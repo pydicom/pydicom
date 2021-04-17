@@ -35,4 +35,7 @@ platform     |""".lstrip()
             "jpeg_ls",
             "numpy",
             "PIL",
+            "pylibjpeg",
+            "openjpeg",
+            "libjpeg",
         ]
