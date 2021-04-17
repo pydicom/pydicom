@@ -76,3 +76,5 @@ Fixes
   standard workflow if `setuptools` are not installed (:issue:`1341`)
 * Fixed empty **PN** elements read from file being :class:`str` rather than
   :class:`~pydicom.valuerep.PersonName` (:issue:`1338`)
+* Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
+  rather than YBR with the Pillow pixel data handler (:pr:`878`)
