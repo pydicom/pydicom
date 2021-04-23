@@ -84,6 +84,20 @@ REFERENCE_DATA_UNSUPPORTED = [
     (DEFL, ('1.2.840.10008.1.2.1.99', '^^^^')),
 ]
 
+# RLE Lossless - PackBits algorithm
+RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
+RLE_8_1_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
+RLE_8_3_1F = get_testdata_file("SC_rgb_rle.dcm")
+RLE_8_3_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
+RLE_16_1_1F = get_testdata_file("MR_small_RLE.dcm")
+RLE_16_1_10F = get_testdata_file("emri_small_RLE.dcm")
+RLE_16_3_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
+RLE_16_3_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
+RLE_32_1_1F = get_testdata_file("rtdose_rle_1frame.dcm")
+RLE_32_1_15F = get_testdata_file("rtdose_rle.dcm")
+RLE_32_3_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
+RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
+
 # JPEG - ISO/IEC 10918 Standard
 # FMT_BA_BV_SPX_PR_FRAMESF_PI
 # JPGB: 1.2.840.10008.1.2.4.50 - JPEG Baseline (8-bit only)
@@ -346,7 +360,9 @@ class TestHandler:
             with pytest.raises((NotImplementedError, RuntimeError)):
                 ds.pixel_array
 
-    @pytest.mark.skipif(HAVE_LJ and HAVE_OJ, reason="plugins available")
+    @pytest.mark.skipif(
+        HAVE_LJ and HAVE_OJ and HAVE_RLE, reason="plugins available"
+    )
     def test_no_plugins_raises(self):
         """Test exception raised if required plugin missing."""
         ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
@@ -360,6 +376,14 @@ class TestHandler:
         ds = dcmread(J2KI_08_08_3_0_1F_RGB)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-openjpeg' "
+            r"plugin is not installed"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
+
+        ds = dcmread(RLE_8_1_1F)
+        msg = (
+            r"Unable to convert the Pixel Data as the 'pylibjpeg-rle' "
             r"plugin is not installed"
         )
         with pytest.raises(RuntimeError, match=msg):
@@ -678,19 +702,6 @@ class TestJPEG2K:
             arr[328:338, 106].tolist()
         )
 
-
-RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
-RLE_8_1_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
-RLE_8_3_1F = get_testdata_file("SC_rgb_rle.dcm")
-RLE_8_3_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
-RLE_16_1_1F = get_testdata_file("MR_small_RLE.dcm")
-RLE_16_1_10F = get_testdata_file("emri_small_RLE.dcm")
-RLE_16_3_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
-RLE_16_3_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
-RLE_32_1_1F = get_testdata_file("rtdose_rle_1frame.dcm")
-RLE_32_1_15F = get_testdata_file("rtdose_rle.dcm")
-RLE_32_3_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
-RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
 
 RLE_REFERENCE_DATA = [
     # fpath, (bits, nr samples, pixel repr, nr frames, shape, dtype)
