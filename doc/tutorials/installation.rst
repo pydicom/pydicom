@@ -146,12 +146,12 @@ Installing pylibjpeg
 --------------------
 
 `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ is a Python framework for
-decompressing JPEG, JPEG-LS and JPEG 2000 images provided a suitable plugin
+decompressing JPEG, JPEG-LS, JPEG 2000 and RLE images provided a suitable plugin
 is installed.
 
 Using pip::
 
-  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg
+  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
 
 
 .. _tut_install_dev:

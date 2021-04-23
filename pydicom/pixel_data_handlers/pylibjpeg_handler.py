@@ -41,6 +41,10 @@ values given in the table below.
 | (0028,0103) | PixelRepresentation       | 1    | 0, 1          | Required |
 +-------------+---------------------------+------+---------------+----------+
 
+.. versionchanged:: 2.2
+
+    Added support for *RLE Lossless* via the `pylibjpeg-rle` plugin.
+
 """
 
 import logging
@@ -80,6 +84,12 @@ try:
 except ImportError:
     HAVE_LIBJPEG = False
 
+try:
+    import rle
+    HAVE_RLE = True
+except ImportError:
+    HAVE_RLE = False
+
 from pydicom import config
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.pixel_data_handlers.util import (
@@ -94,6 +104,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    RLELossless,
     UID
 )
 
@@ -114,11 +125,12 @@ _LIBJPEG_SYNTAXES = [
     JPEGLSNearLossless
 ]
 _OPENJPEG_SYNTAXES = [JPEG2000Lossless, JPEG2000]
-SUPPORTED_TRANSFER_SYNTAXES = _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES
+_RLE_SYNTAXES = [RLELossless]
+SUPPORTED_TRANSFER_SYNTAXES = (
+    _LIBJPEG_SYNTAXES + _OPENJPEG_SYNTAXES + _RLE_SYNTAXES
+)
 
-DEPENDENCIES = {
-    "numpy": ("http://www.numpy.org/", "NumPy"),
-}
+DEPENDENCIES = {"numpy": ("http://www.numpy.org/", "NumPy")}
 
 
 def is_available() -> bool:
@@ -213,8 +225,10 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     if tsyntax not in _DECODERS:
         if tsyntax in _OPENJPEG_SYNTAXES:
             plugin = "pylibjpeg-openjpeg"
-        else:
+        elif tsyntax in _LIBJPEG_SYNTAXES:
             plugin = "pylibjpeg-libjpeg"
+        else:
+            plugin = "pylibjpeg-rle"
 
         raise RuntimeError(
             f"Unable to convert the Pixel Data as the '{plugin}' plugin is "
@@ -239,6 +253,11 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     nr_frames = getattr(ds, "NumberOfFrames", 1)
     pixel_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
+
+    # RLE Lossless is big-endian encoding
+    if tsyntax == RLELossless:
+        dtype = dtype.newbyteorder('>')
+
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         arr = decoder(frame, pixel_module)
 
@@ -270,8 +289,13 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
         if ds.SamplesPerPixel == 1:
             yield arr.reshape(ds.Rows, ds.Columns)
         else:
-            # JPEG, JPEG-LS and JPEG 2000 are all Planar Configuration 0
-            yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
+            if tsyntax == RLELossless:
+                # RLE Lossless is Planar Configuration 1
+                arr = arr.reshape(ds.SamplesPerPixel, ds.Rows, ds.Columns)
+                yield arr.transpose(1, 2, 0)
+            else:
+                # JPEG, JPEG-LS and JPEG 2000 are all Planar Configuration 0
+                yield arr.reshape(ds.Rows, ds.Columns, ds.SamplesPerPixel)
 
 
 def get_pixeldata(ds: "Dataset") -> "np.ndarray":

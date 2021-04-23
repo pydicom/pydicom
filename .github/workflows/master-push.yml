@@ -110,7 +110,7 @@ jobs:
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
-        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
+        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test external sources using pydicom-data
