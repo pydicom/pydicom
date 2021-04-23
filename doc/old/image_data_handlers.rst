@@ -23,8 +23,8 @@ The following packages can be used with *pydicom*:
 * `Pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
   ``jpeg`` and ``jpeg2000`` plugins
 * `jpeg_ls <https://github.com/Who8MyLunch/CharPyLS>`_
-* `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_, with the ``-libjpeg``
-  and ``-openjpeg`` plugins
+* `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_, with the ``-libjpeg``,
+  ``-openjpeg`` and ``-rle`` plugins
 
 Note that you always need the `NumPy <http://numpy.org/>`_ package to be able
 to handle pixel data.
@@ -62,24 +62,24 @@ handled by the given packages:
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
 | Deflated Explicit VR Little Endian | 1.2.840.10008.1.2.1.99 | |chk| | |chk|       | |chk|    |     |chk|       | |chk|           |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| RLE Lossless                       | 1.2.840.10008.1.2.5    | |chk| | |chk|       | |chk|    |     |chk|       | |chk|           |
+| RLE Lossless                       | 1.2.840.10008.1.2.5    | |chk| | |chk|       | |chk|    |     |chk|       | |chk|\ :sup:`4` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG Baseline (Process 1)          | 1.2.840.10008.1.2.4.50 |       |             | |chk|    | |chk|\ :sup:`1` | |chk|\ :sup:`4` |
+| JPEG Baseline (Process 1)          | 1.2.840.10008.1.2.4.50 |       |             | |chk|    | |chk|\ :sup:`1` | |chk|\ :sup:`5` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG Extended (Process 2 and 4)    | 1.2.840.10008.1.2.4.51 |       |             | |chk|    | |chk|\          | |chk|\ :sup:`4` |
+| JPEG Extended (Process 2 and 4)    | 1.2.840.10008.1.2.4.51 |       |             | |chk|    | |chk|\          | |chk|\ :sup:`5` |
 |                                    |                        |       |             |          | :sup:`1,3`      |                 |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG Lossless (Process 14)         | 1.2.840.10008.1.2.4.57 |       |             | |chk|    |                 | |chk|\ :sup:`4` |
+| JPEG Lossless (Process 14)         | 1.2.840.10008.1.2.4.57 |       |             | |chk|    |                 | |chk|\ :sup:`5` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG Lossless (Process 14, SV1)    | 1.2.840.10008.1.2.4.70 |       |             | |chk|    |                 | |chk|\ :sup:`4` |
+| JPEG Lossless (Process 14, SV1)    | 1.2.840.10008.1.2.4.70 |       |             | |chk|    |                 | |chk|\ :sup:`5` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG LS Lossless                   | 1.2.840.10008.1.2.4.80 |       | |chk|       | |chk|    |                 | |chk|\ :sup:`4` |
+| JPEG LS Lossless                   | 1.2.840.10008.1.2.4.80 |       | |chk|       | |chk|    |                 | |chk|\ :sup:`5` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG LS Lossy                      | 1.2.840.10008.1.2.4.81 |       | |chk|       | |chk|    |                 | |chk|\ :sup:`4` |
+| JPEG LS Lossy                      | 1.2.840.10008.1.2.4.81 |       | |chk|       | |chk|    |                 | |chk|\ :sup:`5` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG2000 Lossless                  | 1.2.840.10008.1.2.4.90 |       |             | |chk|    | |chk|\ :sup:`2` | |chk|\ :sup:`5` |
+| JPEG2000 Lossless                  | 1.2.840.10008.1.2.4.90 |       |             | |chk|    | |chk|\ :sup:`2` | |chk|\ :sup:`6` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
-| JPEG2000                           | 1.2.840.10008.1.2.4.91 |       |             | |chk|    | |chk|\ :sup:`2` | |chk|\ :sup:`5` |
+| JPEG2000                           | 1.2.840.10008.1.2.4.91 |       |             | |chk|    | |chk|\ :sup:`2` | |chk|\ :sup:`6` |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
 | JPEG2000 Multi-component Lossless  | 1.2.840.10008.1.2.4.92 |       |             |          |                 |                 |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
@@ -89,8 +89,9 @@ handled by the given packages:
 | :sup:`1` *only with JpegImagePlugin*
 | :sup:`2` *only with Jpeg2KImagePlugin*
 | :sup:`3` *only if (0028,0100) Bits Allocated = 8*
-| :sup:`4` *with the pylibjpeg-libjpeg plugin*
-| :sup:`5` *with the pylibjpeg-openjpeg plugin*
+| :sup:`4` *with the pylibjpeg-rle plugin and using the :meth:`~pydicom.dataset.Dataset.decompress` method*
+| :sup:`5` *with the pylibjpeg-libjpeg plugin*
+| :sup:`6` *with the pylibjpeg-openjpeg plugin*
 
 Usage
 .....

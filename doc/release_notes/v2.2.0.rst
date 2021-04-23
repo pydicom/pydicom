@@ -55,6 +55,8 @@ Enhancements
 * Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
+* Added support for faster decoding of *RLE Lossless* encoded *Pixel Data* via
+  the `pylibjpeg-rle<https://github.com/pydicom/pylibjpeg-rle>`_ plugin.
 
 
 Changes
