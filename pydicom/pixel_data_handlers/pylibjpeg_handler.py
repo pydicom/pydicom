@@ -254,10 +254,6 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     pixel_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
 
-    # RLE Lossless is big-endian encoding
-    if tsyntax == RLELossless:
-        dtype = dtype.newbyteorder('>')
-
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         arr = decoder(frame, pixel_module)
 
