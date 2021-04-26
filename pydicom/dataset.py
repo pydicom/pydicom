@@ -1718,6 +1718,31 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self.convert_pixel_data()
         return self._pixel_array
 
+    def compress(
+        self, arr: "np.ndarray", uid: str, **kwargs
+    ) -> None:
+        """Compress `arr` and update the dataset in-place.
+
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            The uncompressed pixel data to be compressed.
+        uid : pydicom.uid.UID
+            The UID that the pixel data will be compressed to something.
+        handler_name : str, optional
+            Force the use of `handler_name` to encode the pixel data (provided
+            it supports encoding to match `uid`).
+        **kwargs
+            Optional parameters to pass to the compression handler.
+        """
+        # Explicit
+        if 'handler_name' in kwargs:
+            pass
+
+        # Determine encoder to use... this should be fun
+        ds.PixelData = encoders[UID](arr, **kwargs)
+        ds.file_meta.TransferSyntaxUID = uid
+
     def waveform_array(self, index: int) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
         `index` in the (5400,0100) *Waveform Sequence*.
