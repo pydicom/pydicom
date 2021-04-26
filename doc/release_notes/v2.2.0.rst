@@ -65,6 +65,11 @@ Changes
 * :meth:`BaseTag.__eq__()<pydicom.tag.BaseTag.__eq__>` returns ``False`` rather
   than raising an exception when the operand cannot be converted to
   :class:`~pydicom.tag.BaseTag` (:pr:`1327`)
+* :meth:`DA.__str__()<pydicom.valuerep.DA.__str__>`,
+  :meth:`DT.__str__()<pydicom.valuerep.DT.__str__>` and
+  :meth:`TM.__str__()<pydicom.valuerep.TM.__str__>` return valid DICOM
+  strings instead of the formatted date and time representations
+  (:issue:`1262`)
 
 Fixes
 -----
