@@ -1,5 +1,7 @@
 """Unit tests for the pydicom.encoders module."""
 
+from multiprocessing import Pool
+
 import pytest
 
 try:
@@ -8,9 +10,31 @@ try:
 except ImportError:
     HAVE_NP = False
 
+from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.encoders import EncoderFactory
-from pydicom.uid import RLELossless
+from pydicom.uid import RLELossless, ExplicitVRLittleEndian
+
+
+def foo_encoder(arr, ds, **kwargs):
+    return b'\x00\x01\x02\x03'
+
+@pytest.mark.skip()
+def test_multiprocessing():
+    """Test that the encoder system can be used with multiprocessing."""
+    encoder = EncoderFactory('1.2')
+    encoder.add_decoder('foo', '', 'test error msg')
+
+    datasets = ["CT_small.dcm", "MR_small.dcm"]
+    datasets = [get_testdata_file(f, read=True) for f in datasets]
+
+    with Pool(processes=4) as pool:
+        pool.map(encoder.encode, datasets)
+
+    # well this is nonsense
+
+    with Pool(processes=4) as pool:
+        pool.something(datasets.compress())  # whut?
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -219,7 +243,7 @@ class TestEncoderFactory_ProcessFrame:
         assert 1 == arr.dtype.itemsize
         out = self.e._process_frame(arr, self.ds)
         assert 6 == len(out)
-        assert b"\x80\x00\x00\x00\x7f\x00" == out
+        assert b"\x80\xff\x00\x00\x7f\x00" == out
 
     def test_i08_1s_as_i32(self):
         """Test processing i8/1s w/ upsize to i32"""
@@ -234,7 +258,22 @@ class TestEncoderFactory_ProcessFrame:
         assert 1 == arr.dtype.itemsize
         out = self.e._process_frame(arr, self.ds)
         assert 12 == len(out)
-        assert b"\x80\x00\x00\x00\x00\x00\x00\x00\x7f\x00\x00\x00" == out
+        assert b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00" == out
+
+    def test_u08_3s_as_u08(self):
+        """Test processing i8/3s"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 4
+        self.ds.Columns = 2
+        self.ds.SamplesPerPixel = 3
+
+        arr = self.arr_3s.astype('|i1')
+        assert 1 == arr.dtype.itemsize
+        out = self.e._process_frame(arr, self.ds)
+        assert 24 == len(out)
+        assert bytes(range(1, 25)) == out
 
     # Unsigned 16-bit processing
     def test_u16_1s_as_u08(self):
@@ -254,7 +293,7 @@ class TestEncoderFactory_ProcessFrame:
             assert b"\xff\x7f\x00" == out
 
     def test_u16_1s_as_u08_overflow_raises(self):
-        """Test processing u16/3s w/ downsize to u8 raises on overflow"""
+        """Test processing u16/1s w/ downsize to u8 raises on overflow"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
         self.ds.PixelRepresentation = 0
@@ -322,6 +361,94 @@ class TestEncoderFactory_ProcessFrame:
             assert ref == out
 
     # Signed 16-bit processing
+    def test_i16_1s_as_i08(self):
+        """Test processing i16/1s w/ downsize to i8"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+        self.ds.SamplesPerPixel = 1
+
+        for dtype in ('>i2', '<i2', '=i2'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 2 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 3 == len(out)
+            assert b"\x80\x00\x7f" == out
+
+    def test_i16_1s_as_i08_overflow_raises(self):
+        """Test processing i16/1s w/ downsize to i8 raises on overflow"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+        self.ds.SamplesPerPixel = 1
+
+        msg = (
+            r"Cannot modify the array to match 'Bits Allocated' without "
+            r"clipping the pixel values"
+        )
+        for dtype in ('>i2', '<i2', '=i2'):
+            arr = np.asarray([-129, 2, 3], dtype=dtype)
+            assert 2 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+            arr = np.asarray([128, 2, 3], dtype=dtype)
+            assert 2 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+    def test_i16_1s_as_i16(self):
+        """Test processing i16/1s"""
+        self.ds.BitsAllocated = 16
+        self.ds.BitsStored = 16
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+        self.ds.SamplesPerPixel = 1
+
+        for dtype in ('>i2', '<i2', '=i2'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 2 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 6 == len(out)
+            assert b"\x80\xff\x00\x00\x7f\x00" == out
+
+    def test_i16_1s_as_i32(self):
+        """Test processing i16/1s w/ upsize to i32"""
+        self.ds.BitsAllocated = 32
+        self.ds.BitsStored = 32
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+        self.ds.SamplesPerPixel = 1
+
+        for dtype in ('>i2', '<i2', '=i2'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 2 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 12 == len(out)
+            assert b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00" == out
+
+    def test_i16_3s_as_i16(self):
+        """Test processing i16/3s"""
+        self.ds.BitsAllocated = 16
+        self.ds.BitsStored = 16
+        self.ds.SamplesPerPixel = 3
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 4
+        self.ds.Columns = 2
+        ref = b''.join([bytes([b]) + b'\x00' for b in bytes(range(1, 25))])
+
+        for dtype in ('>i2', '<i2', '=i2'):
+            arr = self.arr_3s.astype(dtype)
+            assert 2 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 48 == len(out)
+            assert ref == out
 
     # Unsigned 32-bit processing
     def test_u32_1s_as_u08(self):
@@ -430,3 +557,117 @@ class TestEncoderFactory_ProcessFrame:
             assert ref == out
 
     # Signed 32-bit processing
+    def test_i32_1s_as_i08(self):
+        """Test processing i32/1s w/ downsize to i8"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 3 == len(out)
+            assert b"\x80\x00\x7f" == out
+
+    def test_i32_1s_as_i08_overflow_raises(self):
+        """Test processing i32/1s w/ downsize to i8 raises on overflow"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+
+        msg = (
+            r"Cannot modify the array to match 'Bits Allocated' without "
+            r"clipping the pixel values"
+        )
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = np.asarray([-129, 0, 127], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+            arr = np.asarray([-128, 0, 128], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+    def test_i32_1s_as_i16(self):
+        """Test processing i32/1s w/ downsize to i16"""
+        self.ds.BitsAllocated = 16
+        self.ds.BitsStored = 16
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 6 == len(out)
+            assert b"\x80\xff\x00\x00\x7f\x00" == out
+
+    def test_i32_1s_as_i16_overflow_raises(self):
+        """Test processing u32/1s w/ downsize to u16 raises on overflow"""
+        self.ds.BitsAllocated = 16
+        self.ds.BitsStored = 16
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+
+        msg = (
+            r"Cannot modify the array to match 'Bits Allocated' without "
+            r"clipping the pixel values"
+        )
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = np.asarray([-32769, 0, 127], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+            arr = np.asarray([-128, 0, 32768], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            with pytest.raises(ValueError, match=msg):
+                self.e._process_frame(arr, self.ds)
+
+    def test_i32_1s_as_i32(self):
+        """Test processing i32/1s"""
+        self.ds.BitsAllocated = 32
+        self.ds.BitsStored = 32
+        self.ds.SamplesPerPixel = 1
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 1
+        self.ds.Columns = 3
+        ref = b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00"
+
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = np.asarray([-128, 0, 127], dtype=dtype)
+            assert 4 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 12 == len(out)
+            assert ref == out
+
+    def test_i32_3s_as_i32(self):
+        """Test processing i32/3s"""
+        self.ds.BitsAllocated = 32
+        self.ds.BitsStored = 32
+        self.ds.SamplesPerPixel = 3
+        self.ds.PixelRepresentation = 1
+        self.ds.Rows = 4
+        self.ds.Columns = 2
+
+        ref = b''.join([bytes([b]) + b'\x00' * 3 for b in bytes(range(1, 25))])
+
+        for dtype in ('>i4', '<i4', '=i4'):
+            arr = self.arr_3s.astype(dtype)
+            assert 4 == arr.dtype.itemsize
+            out = self.e._process_frame(arr, self.ds)
+            assert 96 == len(out)
+            assert ref == out

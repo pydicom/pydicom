@@ -1781,7 +1781,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             will be decompressed (if required) and compressed.
         package : str, optional
             Force the use of `package` to encode the pixel data, provided
-            it supports `uid` and is available.
+            it supports `uid` and is available. The available packages are
+            dependent on the `uid`, see FIXME: doc link for a list of
+            available packages.
         **kwargs
             Optional parameters to pass to the compression function.
 
@@ -1810,11 +1812,24 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
             arr = self.pixel_array
 
-        # Encode and set Pixel Data with encapsulated frames
         encoder = get_encoder(uid, package=package)
+
+        # Reset to default encoder package -> try all available
+        encoder.use_package(None)
+
+        # Allow explicit specification of encoder
+        if package:
+            encoder.use_package(package)
+
+        # Encode and set Pixel Data with encapsulated frames
         self.PixelData = encapsulate(
             [f for f in encoder.encode_array(arr, self, **kwargs)]
         )
+
+        # Hmm, provide a method for the encoder to specify which elements
+        #   should be updated + values? Or just let the encoder function do it?
+
+        # JPEG encoders probably need to customise the PhotometricInterpretation
 
         # Update related elements
         self.PlanarConfiguration = 0

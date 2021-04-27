@@ -60,9 +60,14 @@ except ImportError:
 class EncoderFactory:
     """Factory class for *Pixel Data* encoders."""
     def __init__(self, uid: UID) -> None:
+        # The *Transfer Syntax UID* data will be encoded to
         self._uid = uid
+        # Available encoders (dependencies are met)
         self._available = {}
+        # Unavailable encoders (dependencies not met)
         self._unavailable = {}
+        # Hmm... need to be careful of state management with this
+        self._package = None
 
     def add_decoder(self, package: str, func: Callable, err_msg: str) -> None:
         """Add an encoder function to the encoder.
@@ -86,6 +91,10 @@ class EncoderFactory:
     def available(self) -> bool:
         """Return ``True`` if the encoder has available packages."""
         return bool(self._available)
+
+    @property
+    def dependencies(self) -> Tuple[List[str]]:
+        pass
 
     def _process_frame(self, arr: "np.ndarray", ds: "Dataset", **kwargs) -> bytes:
         """Check if arr is squeezable to ds and return LE uint8s as bytes.
@@ -155,7 +164,6 @@ class EncoderFactory:
             raise ValueError("Unsupported 'Samples per Pixel' must be 1 or 3")
 
         # Change array itemsize to match *Bits Allocated*, if possible
-        # FIXME: signed needs work, or maybe just not bother
         bytes_allocated = ds.BitsAllocated // 8
         if bytes_allocated != arr.dtype.itemsize:
             # Check we won't clip the dataset if shrinking the itemsize
@@ -221,7 +229,30 @@ class EncoderFactory:
             yield self._encode_frame(arr, ds, **kwargs)
 
     def _encode_frame(self, arr: "np.ndarray", ds: "Dataset", **kwargs) -> bytes:
+        """
+        """
         arr = self._process_frame(arr, ds, **kwargs)
+        failed_encoders = []
+
+        if self._package:
+            # Try specific encoder
+            try:
+                return self._available[name](arr, ds, **kwargs)
+            except Exception as exc:
+                failed_encoders.append(name)
+        else:
+            # Try all available encoders
+            for name, func in self._available.items():
+                try:
+                    return func(arr, ds, **kwargs)
+                except Exception as exc:
+                    failed_encoders.append(name)
+
+        # TODO: better exception message -> add exception to msg
+        raise RuntimeError(
+            f"Unable to encode the pixel data using the following packages: "
+            f"{','.join(failed_encoders)}"
+        )
 
     @property
     def endianness(self) -> str:
@@ -233,17 +264,35 @@ class EncoderFactory:
         """Return the encoder's corresponding *Transfer Syntax UID*"""
         return self._uid
 
+    def use_package(self, package: Optional[str]) -> None:
+        # FIXME
+        if not package:
+            self._package = None
+        elif package in self._available:
+            self._package = package
+        elif package in self._unavailable:
+            raise ValueError(
+                f"The {package} is missing required dependencies: {}"
+            )
+        else:
+            raise ValueError(
+                f"{package} is not a package registered for use with the "
+                f"{self.__class__.__name__} encoder. Available packages are: "
+                f"{self._available.keys()}"
+            )
+
+
 
 RLELosslessEncoder = EncoderFactory(RLELossless)
 RLELosslessEncoder.add_decoder(
-    'pylibjpeg',
-    'pylibjpeg.encode_pixel_data',
-    'bluh'
-)
-RLELosslessEncoder.add_decoder(
     'pydicom',
     'pydicom.pixel_data_handlers.rle_handler.encode_rle_frame',
-    'bluh2'
+    'numpy'
+)
+RLELosslessEncoder.add_decoder(
+    'pylibjpeg',
+    'pylibjpeg.encode_pixel_data',
+    'numpy and pylibjpeg (with the pylibjpeg-rle plugin)'
 )
 
 
