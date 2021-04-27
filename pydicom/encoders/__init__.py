@@ -120,6 +120,7 @@ class EncoderFactory:
         if len(arr.shape) > 3:
             raise ValueError("The maximum supported array dimensions is 4")
 
+        # FIXME: 1D array fail on first condition, add test
         if (
             (nr_samples > 1 and len(arr.shape) != 3)
             or (_shape_check[len(arr.shape)] != arr.shape)
@@ -131,12 +132,17 @@ class EncoderFactory:
             np.issubdtype(arr.dtype, np.unsignedinteger),
             np.issubdtype(arr.dtype, np.signedinteger)
         ]
+
+        # FIXME: add test
+        if not any(ui):
+            raise ValueError(
+                "Invalid dtype kind, must be signed or unsigned integer"
+            )
+
         if not ui[ds.PixelRepresentation]:
             raise ValueError(
                 "Incompatible array dtype and dataset 'Pixel Representation'"
             )
-
-        is_signed = bool(ds.PixelRepresentation)
 
         # Ensure *Bits Allocated* value is supported
         if ds.BitsAllocated not in (8, 16, 32, 64):
@@ -149,34 +155,35 @@ class EncoderFactory:
             raise ValueError("Unsupported 'Samples per Pixel' must be 1 or 3")
 
         # Change array itemsize to match *Bits Allocated*, if possible
+        # FIXME: signed needs work, or maybe just not bother
         bytes_allocated = ds.BitsAllocated // 8
         if bytes_allocated != arr.dtype.itemsize:
             # Check we won't clip the dataset if shrinking the itemsize
             if bytes_allocated < arr.dtype.itemsize:
                 value_max, value_min = 2**ds.BitsAllocated - 1, 0
-                if is_signed:
+                if bool(ds.PixelRepresentation):
                     value_max = 2**(ds.BitsAllocated - 1) - 1
                     value_min = -2**(ds.BitsAllocated - 1)
 
-                if arr.max() > value_max or arr.min() < value_min:
+                if arr.min() < value_min or arr.max() > value_max:
                     raise ValueError(
                         "Cannot modify the array to match 'Bits Allocated' "
                         "without clipping the pixel values"
                     )
 
-            arr = arr.astype(
-                f"{arr.dtype.byteorder}{arr.dtype.kind}{bytes_allocated}"
-            )
+            byteorder = '|' if ds.BitsAllocated == 8 else '<'
+            arr = arr.astype(f"{byteorder}{arr.dtype.kind}{bytes_allocated}")
 
-        # Convert the array to the required byte order (i.e. little-endian)
+            # For signed need to bitwise and 0xff * (bytes_allocated - 1)
+            # if less than 0
+
+        # Convert the array to the required byte order (little-endian)
         # `byteorder` may be
         #   '|': none available, such as for 8 bit -> ignore
         #   '=': native system endianness -> change to '<' or '>'
         #   '<' or '>': little or big
         byteorder = arr.dtype.byteorder
         byteorder = self.endianness if byteorder == '=' else byteorder
-
-        # If the array is big-endian we need to change it to little
         if byteorder == '>':
             arr = arr.astype(arr.dtype.newbyteorder('<'))
 
