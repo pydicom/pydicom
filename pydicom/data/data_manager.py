@@ -319,8 +319,8 @@ def get_testdata_file(name: str, read=False) -> Union[str, "Dataset", None]:
     data_path = Path(DATA_ROOT) / 'test_files'
     matches = [m for m in data_path.rglob(name)]
     if matches:
-        return os.fspath(matches[0])
-
+        path = os.fspath(matches[0])
+        return dcmread(path, force=True) if read else path
     # Check external data sources
     for lib, source in external_data_sources().items():
         try:
@@ -331,9 +331,9 @@ def get_testdata_file(name: str, read=False) -> Union[str, "Dataset", None]:
         # For pydicom-data, check the hash against hashes.json
         if lib == "pydicom-data":
             if fpath and _check_data_hash(fpath):
-                return dcmread(fpath) if read else fpath
+                return dcmread(fpath, force=True) if read else fpath
         elif fpath:
-            return dcmread(fpath) if read else fpath
+            return dcmread(fpath, force=True) if read else fpath
 
     # Try online
     for filename in get_url_map().keys():

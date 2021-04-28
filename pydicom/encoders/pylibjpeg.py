@@ -1,41 +1,41 @@
+"""Interface for *Pixel Data* encoding."""
+
+try:
+    from pylibjpeg.utils import get_pixel_data_encoders
+    HAVE_PYLJ = True
+except ImportError:
+    HAVE_PYLJ = False
 
 
-from pydicom.encaps import encapsulate, encapsulate_extended
-from pydicom.encoders import Encoder
-from pydicom.uid import RLELossless
+def encode_pixel_data(src: bytes, ds: "Dataset", **kwargs) -> bytes:
+    """Return the encoded image data in `src`.
+
+    Parameters
+    ----------
+    src : bytes
+        The raw image frame data to be encoded, ordered upper-left to
+        lower-right with little-endian byte order if the number of bits per
+        pixel is greater than 8.
+    ds : pydicom.dataset.Dataset
+        The corresponding dataset.
+    **kwargs
+        Optional parameters to pass to the encoder function.
+
+    Returns
+    -------
+    bytes
+        The encoded image data.
+    """
+    encoder = get_pixel_data_encoders()[kwargs['TransferSyntaxUID']]
+
+    return encoder(src, ds, **kwargs)
 
 
+def is_available(uid: str) -> bool:
+    """Return ``True`` if a pixel data encoder for `uid` is available for use,
+    ``False`` otherwise.
+    """
+    if not HAVE_PYLJ:
+        return False
 
-class PyLibJPEGEncoder(Encoder):
-    def __init__(self, ds, uid):
-        self.arr = arr
-        self.ds = ds
-        self.uid = uid
-
-    @classmethod
-    def is_encodeable(cls, ds, uid, data_type):
-        if data_type != 'PixelData':
-            return False
-
-        if uid not in cls.uids:
-            return False
-
-        if uid == RLELossless:
-            if ds.Rows > 2**16 - 1 or ds.Columns > 2**16 - 1:
-                return False
-
-            if ds.SamplesPerPixel not in (1, 3):
-                return False
-
-            if ds.BitsAllocated not in (8, 16, 32, 64):
-                return False
-
-            if ds.SamplesPerPixel * ds.BitsAllocated > 15:
-                return False
-        else:
-            return False
-
-        return True
-
-    def encode(self, arr, uid, **kwargs):
-        pass
+    return uid in get_pixel_data_encoders()

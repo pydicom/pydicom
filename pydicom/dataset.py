@@ -1728,7 +1728,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         **kwargs
     ) -> None:
         """Compress `arr` and update the dataset in-place with the resulting
-        encapsulated pixel data.
+        :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
 
         .. versionadded:: 2.2.0
 
@@ -1752,6 +1752,13 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         * (0002,0010) *Transfer Syntax UID*
         * (0028,0006) *Planar Configuration*
         * (7FE0,0010) *Pixel Data*
+
+        If the image data is too large then :dcm:`extended encapsulation
+        <part03/sect_C.7.6.3.html>` may be used instead, in which case the
+        following elements will also be added:
+
+        * (7FE0,0001) *Extended Offset Table*
+        * (7FE0,0002) *Extended Offset Table Lengths*
 
         **Supported Transfer Syntax UIDs**
 
@@ -1780,10 +1787,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             If `arr` is not used then the existing *Pixel Data* in the dataset
             will be decompressed (if required) and compressed.
         package : str, optional
-            Force the use of `package` to encode the pixel data, provided
-            it supports `uid` and is available. The available packages are
-            dependent on the `uid`, see FIXME: doc link for a list of
-            available packages.
+            Force the use of `package` to compress the pixel data. See
+            FIXME: doc link for a list of packages available for each UID and
+            their dependencies.
         **kwargs
             Optional parameters to pass to the compression function.
 
@@ -1812,26 +1818,25 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
             arr = self.pixel_array
 
-        encoder = get_encoder(uid, package=package)
+        from pydicom.encoders import get_encoder
+        from pydicom.encaps import encapsulate, encapsulate_extended
 
-        # Reset to default encoder package -> try all available
-        encoder.use_package(None)
+        encoder = get_encoder(uid)
 
-        # Allow explicit specification of encoder
         if package:
-            encoder.use_package(package)
+            kwargs['use_package'] = package
 
         # Encode and set Pixel Data with encapsulated frames
-        self.PixelData = encapsulate(
-            [f for f in encoder.encode_array(arr, self, **kwargs)]
-        )
+        encoded = [f for f in encoder.encode_array(arr, self, **kwargs)]
+        nr_frames = getattr(self, "NumberOfFrames", 1) or 1
+        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+        if total > 2**32 - 1:
+            (self.PixelData,
+             self.ExtendedOffsetTable,
+             self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
+        else:
+            self.PixelData = encapsulate(encoded)
 
-        # Hmm, provide a method for the encoder to specify which elements
-        #   should be updated + values? Or just let the encoder function do it?
-
-        # JPEG encoders probably need to customise the PhotometricInterpretation
-
-        # Update related elements
         self.PlanarConfiguration = 0
         if uid == RLELossless:
             self.PlanarConfiguration = 1

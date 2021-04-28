@@ -59,7 +59,7 @@ DEPENDENCIES = {
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
-def is_available():
+def is_available(uid=None):
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 
@@ -374,6 +374,10 @@ def _rle_decode_segment(data):
 
 
 # RLE encoding functions
+def _wrap_encode_frame(arr, ds, **kwargs):
+    pass
+
+
 def rle_encode_frame(arr):
     """Return an :class:`numpy.ndarray` image frame as RLE encoded
     :class:`bytearray`.

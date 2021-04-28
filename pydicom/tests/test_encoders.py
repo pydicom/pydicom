@@ -16,6 +16,18 @@ from pydicom.encoders import EncoderFactory
 from pydicom.uid import RLELossless, ExplicitVRLittleEndian
 
 
+def test_encoder_import():
+    from pydicom.encoders import RLELosslessEncoder
+
+    enc = RLELosslessEncoder
+    print(enc._available)
+    print(enc._unavailable)
+
+def test_compress():
+    ds = get_testdata_file("CT_small.dcm", read=True)
+    ds.compress(RLELossless)
+    # !
+
 def foo_encoder(arr, ds, **kwargs):
     return b'\x00\x01\x02\x03'
 
