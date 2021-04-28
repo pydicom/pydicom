@@ -20,6 +20,7 @@ def test_encoder_import():
     from pydicom.encoders import RLELosslessEncoder
 
     enc = RLELosslessEncoder
+    print(enc.name)
     print(enc._available)
     print(enc._unavailable)
 
