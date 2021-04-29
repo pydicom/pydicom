@@ -499,17 +499,17 @@ class EncoderFactory:
         failed_encoders = []
         if plugin:
             # Try specific encoder
-            try:
-                return self._available[plugin](src, **kwargs)
-            except Exception as exc:
-                failed_encoders.append(plugin)
+            #try:
+            return self._available[plugin](src, **kwargs)
+            #except Exception as exc:
+            #failed_encoders.append(plugin)
         else:
             # Try all available encoders
             for name, func in self._available.items():
-                try:
-                    return func(src, **kwargs)
-                except Exception as exc:
-                    failed_encoders.append((name, exc))
+                #try:
+                return func(src, **kwargs)
+                #except Exception as exc:
+                #failed_encoders.append((name, exc))
 
         # TODO: better exception message -> add exception to msg
         raise RuntimeError(

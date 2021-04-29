@@ -28,19 +28,19 @@ def test_compress():
     ds = get_testdata_file("CT_small.dcm", read=True)
     ds.compress(RLELossless)
     assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21118 == len(ds.PixelData)
+    assert 21820 == len(ds.PixelData)
     assert 1 == ds.PlanarConfiguration
 
 def test_compress_with_plugin():
     ds = get_testdata_file("CT_small.dcm", read=True)
-    ds.compress(RLELossless, decoder_plugin='pydicom')
+    ds.compress(RLELossless, encoding_plugin='pydicom')
     assert RLELossless == ds.file_meta.TransferSyntaxUID
     assert 21118 == len(ds.PixelData)
     assert 1 == ds.PlanarConfiguration
 
-    ds.compress(RLELossless, decoder_plugin='pylibjpeg')
+    ds.compress(RLELossless, encoding_plugin='pylibjpeg')
     assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21118 == len(ds.PixelData)
+    assert 21820 == len(ds.PixelData)
     assert 1 == ds.PlanarConfiguration
 
 def test_compress_arr():
@@ -49,7 +49,7 @@ def test_compress_arr():
     del ds.PixelData
     ds.compress(RLELossless, arr)
     assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21118 == len(ds.PixelData)
+    assert 21820 == len(ds.PixelData)
     assert 1 == ds.PlanarConfiguration
 
 
