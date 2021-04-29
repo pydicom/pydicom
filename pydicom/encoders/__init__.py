@@ -32,7 +32,9 @@ Save encoded *Pixel Data* to file (single or multi-framed):
 """
 from importlib import import_module
 import sys
-from typing import Callable, Generator, Tuple, List, Optional, Dict, Any
+from typing import (
+    Callable, Generator, Tuple, List, Optional, Dict, Any, Union
+)
 
 from pydicom.encaps import encapsulate
 from pydicom.uid import UID, RLELossless
@@ -70,30 +72,39 @@ class EncoderFactory:
             'byteorder': '<',
         }
 
-    @property
-    def is_available(self) -> bool:
-        """Return ``True`` if the encoder has available plugins and can be
-        used to encode data, ``False`` otherwise.
-        """
-        return bool(self._available)
-
-    def deregister_plugin(self, label: str) -> None:
-        """Deregister a plugin from the encoder.
+    # TODO: err_msg is probably redundant, but would be nice for complicated cases
+    def add_plugin(
+        self, label: str, path: Tuple[str, str], err_msg: Optional[str] = None
+    ) -> None:
+        """Register a plugin with the encoder.
 
         Parameters
         ----------
         label : str
-            The label of the plugin to deregister.
+            The label to use for the plugin, should be unique.
+        path : Tuple[str, str]
+            The module import path and the encoding function name (e.g.
+            ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
+        err_msg : str
+            A message that may be displayed if unable to use the plugin's
+            encoding function due to missing dependencies.
         """
-        if label in self._available:
-            del self._available[package]
+        if label in self._available or label in self._unavailable:
+            raise ValueError(
+                f"'{self.name}' already has a plugin named '{label}'"
+            )
 
-        if label in self._unavailable:
-            del self._unavailable
+        module = import_module(path[0])
+        dependencies = getattr(module, "ENCODER_DEPENDENCIES")
+
+        if module.is_available(self.UID):
+            self._available[label] = getattr(module, path[1])
+        else:
+            self._unavailable[label] = (dependencies, err_msg)
 
     def encode(
         self,
-        ds: "Dataset",
+        src: Union[bytes, "np.ndarray", "Dataset"],
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -104,21 +115,58 @@ class EncoderFactory:
 
         Parameters
         ----------
-        ds : pydicom.dataset.Dataset, optional
-            The dataset containing the *Pixel Data* to be encoded.
+        src : bytes, numpy.ndarray or pydicom.dataset.Dataset
+            Single or multi-framed pixel data as one of the following:
+
+            * :class`bytes`: the uncompressed little-endian ordered pixel data
+            * :class:`~numpy.ndarray`: the uncompressed pixel data, should be
+              shaped as:
+
+              * (Rows, Columns) for single frame, single sample data.
+              * (Rows, Columns, Samples) for single frame, multi-sample data.
+              * (Frames, Rows, Columns) for multi framed, single sample data.
+              * (Frames, Rows, Columns, Samples) for multi-framed and
+                multi-sample data.
+              * or the corresponding 1D array you'd get from ``arr.ravel()``.
+
+            * :class:`~pydicom.dataset.Dataset`: the the dataset containing
+              the compressed or uncompressed *Pixel Data* to be encoded. If the
+              *Pixel Data* is compressed then a suitable pixel data handler
+              must be available to decompress it.
+
+            For multi-sampled pixel data, the data should be in RGB colorspace
+            (i.e. the *Photometric Interpretation* should be ``'RGB'``).
         idx : int, optional
-            When the *Pixel Data* in `ds` contains multiple frames, this is
-            the index of the frame to be encoded.
+            Required when `src` contains multiple frames, this is the index
+            of the frame to be encoded.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available plugins will
             be tried.
         decoding_plugin : str, optional
-            The name of the pixel data decoding handler to use if `ds` contains
-            compressed *Pixel Data*. If `decoding_plugin` is not specified then
-            all available handlers will be tried.
+            The name of the pixel data decoding handler to use if `src`
+            is a :class:`~pydicom.dataset.Dataset` containing compressed
+            *Pixel Data*. If `decoding_plugin` is not specified then all
+            available handlers will be tried.
         **kwargs
-            [FIXME] Optional parameters for the encoding plugin. See the
+            The following parameters are required when `src` is :class:`bytes`
+            or :class:`~numpy.ndarray`:
+
+            * ``'rows': int`` - the number of rows in `src`, maximum 65535.
+            * ``'columns': int`` - the number of columns in `src`, maximum
+              65535.
+            * ``'samples_per_pixel': int`` - the number of samples per pixel in
+              `src`, should be 1 or 3.
+            * ``'bits_allocated': int`` - the number of bits used to contain
+              the pixel data, should be 8, 16, 32 or 64.
+            * ``'bits_stored': int`` - the number of bits actually used per
+              pixel in `src`. For example, an ndarray `src` might have a
+              :class:`~numpy.dtype` of 'uint16' (range 0 to 65535) but only
+              contain 12-bit pixel values (range 0 to 4095).
+            * ``'pixel_representation': int``
+            * ``'photometric_interpretation': str``
+
+            FIXME Optional parameters for the encoding plugin. See the
             documentation for the encoding plugins for what options are
             available.
 
@@ -127,24 +175,22 @@ class EncoderFactory:
         bytes
             The encoded pixel data.
         """
-        try:
-            kwargs.update(self.kwargs_from_ds(ds))
-        except AttributeError as exc:
-            raise AttributeError("FIXME") from exc
+        if isinstance(src, Dataset):
+            return self._encode_dataset(
+                src, idx, encoding_plugin, decoding_plugin, **kwargs
+            )
 
-        if decoding_plugin:
-            ds.convert_pixel_data(handler_name=decoding_plugin)
+        if isinstance(src, np.ndarray):
+            return self._encode_array(src, idx, encoding_plugin, **kwargs)
 
-        arr = ds.pixel_array
+        if isinstance(src, bytes):
+            return self._encode_bytes(src, idx, encoding_plugin, **kwargs)
 
-        if idx is None and kwargs['number_of_frames'] > 1:
-            raise ValueError("FIXME")
-        else:
-            arr = arr[idx]
+        raise TypeError(
+            "'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset"
+        )
 
-        return self._encode(arr, idx, encoding_plugin, **kwargs)
-
-    def encode_array(
+    def _encode_array(
         self,
         arr: "np.ndarray",
         idx: Optional[int] = None,
@@ -157,16 +203,7 @@ class EncoderFactory:
         ----------
         arr : numpy.ndarray
             A single or multi-framed :class:`~numpy.ndarray` containing
-            uncompressed pixel data. Should be shaped as:
-
-            * (Rows, Columns) for single frame, single sample data.
-            * (Rows, Columns, Samples) for single frame, multi-sample data.
-            * (Frames, Rows, Columns) for multi framed, single sample data.
-            * (Frames, Rows, Columns, Samples) for multi-framed and
-              multi-sample data.
-            * or the corresponding 1D array you'd get from ``arr.ravel()``.
-
-            For multi-sample data `arr` should be in RGB colorspace.
+            uncompressed pixel data.
         idx : int, optional
             When `arr` contains multiple frames, this is the index of the
             frame to be encoded.
@@ -175,23 +212,7 @@ class EncoderFactory:
             `encoding_plugin` is not specified then all available plugins will
             be tried.
         **kwargs
-            The following parameters are required:
-
-            * ``'rows': int`` - the number of rows in `arr`, maximum 65535.
-            * ``'columns': int`` - the number of columns in `arr`, maximum
-              65535.
-            * ``'samples_per_pixel': int`` - the number of samples per pixel in
-              `arr`, should be 1 or 3.
-            * ``'bits_allocated': int`` - the number of bits used to contain
-              the pixel data, should be 8, 16, 32 or 64.
-            * ``'bits_stored': int`` - the number of bits actually used per
-              pixel in `arr`. For example, `arr` might have a
-              :class:`~numpy.dtype` of 'uint16' (range 0 to 65535) but only
-              contain 12-bit pixel values (range 0 to 4095).
-
-            `kwargs` may also contain optional parameters for the encoding
-            function. See the [FIXME] documentation for the encoding plugins
-            for what options are available.
+            FIXME
         """
         if idx is None and kwargs['number_of_frames'] > 1:
             raise ValueError("FIXME")
@@ -200,9 +221,54 @@ class EncoderFactory:
 
         return self._encode(arr, idx, encoding_plugin, **kwargs)
 
-    def iter_encode(
+    def _encode_bytes(
+        self,
+        src: bytes,
+        idx: Optional[int] = None,
+        encoding_plugin: str = '',
+        **kwargs
+    ) -> bytes:
+        pass
+
+    def _encode_dataset(
         self,
         ds: "Dataset",
+        idx: Optional[int] = None,
+        encoding_plugin: str = '',
+        decoding_plugin: str = '',
+        **kwargs
+    ) -> bytes:
+        try:
+            kwargs.update(self.kwargs_from_ds(ds))
+        except AttributeError as exc:
+            raise AttributeError("FIXME") from exc
+
+        if not ds.file_meta.TransferSyntaxUID.is_compressed:
+            return self._encode_bytes(ds.PixelData, idx, plugin, **kwargs)
+
+        # Pixel Data is compressed
+        if decoding_plugin:
+            ds.convert_pixel_data(handler_name=decoding_plugin)
+
+        arr = ds.pixel_array
+
+        if idx is None and kwargs['number_of_frames'] > 1:
+            raise ValueError("FIXME")
+        else:
+            arr = arr[idx]
+
+        return self._encode_dataset(src, idx, encoding_plugin, **kwargs)
+
+    @property
+    def is_available(self) -> bool:
+        """Return ``True`` if the encoder has available plugins and can be
+        used to encode data, ``False`` otherwise.
+        """
+        return bool(self._available)
+
+    def iter_encode(
+        self,
+        src: Union[bytes, "np.ndarray", "Dataset"],  # mutate based on type
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs
@@ -232,23 +298,27 @@ class EncoderFactory:
         bytes
             An encoded frame of pixel data.
         """
-        try:
-            kwargs.update(self.kwargs_from_ds(ds))
-        except AttributeError as exc:
-            raise AttributeError("FIXME") from exc
+        if isinstance(src, Dataset):
+            yield from self._iter_encode_dataset(
+                src, idx, encoding_plugin, decoding_plugin, **kwargs
+            )
 
-        if decoding_plugin:
-            ds.convert_pixel_data(handler_name=decoding_plugin)
+        if isinstance(src, np.ndarray):
+            yield from self._iter_encode_array(
+                src, idx, encoding_plugin, **kwargs
+            )
 
-        arr = ds.pixel_array
+        if isinstance(src, bytes):
+            yield from self._iter_encode_bytes(
+                src, idx, encoding_plugin, **kwargs
+            )
 
-        if kwargs['number_of_frames'] > 1:
-            for frame in arr:
-                yield self._process(frame, plugin=encoding_plugin, **kwargs)
-        else:
-            yield self._process(arr, plugin=encoding_plugin, **kwargs)
+        raise TypeError(
+            "'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset"
+        )
 
-    def iter_encode_array(
+
+    def _iter_encode_array(
         self,
         arr: "np.ndarray",
         encoding_plugin: str = '',
@@ -275,6 +345,48 @@ class EncoderFactory:
         bytes
             An encoded pixel data frame.
         """
+        if kwargs['number_of_frames'] > 1:
+            for frame in arr:
+                yield self._process(frame, plugin=encoding_plugin, **kwargs)
+        else:
+            yield self._process(arr, plugin=encoding_plugin, **kwargs)
+
+    def _iter_encode_bytes(
+        self,
+        src: bytes,
+        encoding_plugin: str = '',
+        **kwargs
+    ) -> Generator[bytes, None, None]:
+        pass
+
+    def _iter_encoder_dataset(
+        self,
+        ds: "Dataset",
+        encoding_plugin: str = '',
+        decoding_plugin: str = '',
+        **kwargs
+    ) -> Generator[bytes, None, None]:
+        """"""
+        try:
+            kwargs.update(self.kwargs_from_ds(ds))
+        except AttributeError as exc:
+            raise AttributeError(
+                "Unable to compress the *Pixel Data* as the dataset is "
+                "missing one or more required elements"
+            ) from exc
+
+        if not ds.file_meta.TransferSyntaxUID.is_compressed:
+            # Skip conversion to an ndarray and encode directly
+            yield from self._iter_encode_bytes(
+                ds.PixelData, idx, encoding_plugin, **kwargs
+            )
+
+        # Compressed *Pixel Data*
+        if decoding_plugin:
+            ds.convert_pixel_data(handler_name=decoding_plugin)
+
+        arr = ds.pixel_array
+
         if kwargs['number_of_frames'] > 1:
             for frame in arr:
                 yield self._process(frame, plugin=encoding_plugin, **kwargs)
@@ -333,7 +445,7 @@ class EncoderFactory:
         # What is this for?
         pass
 
-    def _preprocess(self, arr: "np.ndarray", **kwargs) -> bytes:
+    def _preprocess(self, src: Union[bytes, "np.ndarray"], **kwargs) -> bytes:
         """Process `arr` before encoding to ensure it meets requirements.
 
         `arr` will be checked and modified if necessary to match the required
@@ -351,7 +463,7 @@ class EncoderFactory:
 
         Parameters
         ----------
-        arr : numpy.ndarray
+        src : bytes or numpy.ndarray
             A single frame of uncompressed pixel data. Should be shaped as
             (Rows, Columns) or (Rows, Columns, Samples) or the corresponding
             1D array.
@@ -375,7 +487,28 @@ class EncoderFactory:
         cols = kwargs['columns']
         samples_per_pixel = kwargs['samples_per_pixel']
         bits_allocated = kwargs['bits_allocated']
+        bytes_allocated = bits_allocated // 8
         pixel_repr = kwargs['pixel_representation']
+
+        if isinstance(src, bytes):
+            expected_len = rows * cols * samples_per_pixel * bytes_allocated
+            if len(src) != expected_len:
+                # Determine if `src` contains 1 frame with padding or multiple
+                #   frames
+                len_ratio = expected_len / len(src)
+                if 1 < len_ratio < 2:
+                    # `src` contains 1 frame with padding
+                    return src[expected_len]
+
+                # `src contains multiple frames`
+                if 2 <= len_ratio:
+                    raise ValueError("src too long, if multiframe use idx")
+
+                # `src` too short
+                if 0 <= len_ratio:
+                    raise ValueError("src too short (actual, expected)")
+
+            return src
 
         _shape_check = {
             1: (rows * cols * samples_per_pixel, ),
@@ -421,7 +554,6 @@ class EncoderFactory:
             raise ValueError("Unsupported 'Samples per Pixel' must be 1 or 3")
 
         # Change array itemsize to match *Bits Allocated*, if possible
-        bytes_allocated = bits_allocated // 8
         if bytes_allocated != arr.dtype.itemsize:
             # Check we won't clip the dataset if shrinking the itemsize
             if bytes_allocated < arr.dtype.itemsize:
@@ -456,7 +588,7 @@ class EncoderFactory:
 
     def _process(
         self,
-        arr: "np.ndarray",
+        src: bytes,
         idx: Optional[int] = None,
         plugin: str = '',
         **kwargs
@@ -517,35 +649,19 @@ class EncoderFactory:
             f"{','.join(failed_encoders)}"
         )
 
-    # TODO: err_msg is probably redundant, but would be nice for complicated cases
-    def register_plugin(
-        self, label: str, path: Tuple[str, str], err_msg: Optional[str] = None
-    ) -> None:
-        """Register a plugin with the encoder.
+    def remove_plugin(self, label: str) -> None:
+        """Deregister a plugin from the encoder.
 
         Parameters
         ----------
         label : str
-            The label to use for the plugin, should be unique.
-        path : Tuple[str, str]
-            The module import path and the encoding function name (e.g.
-            ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
-        err_msg : str
-            A message that may be displayed if unable to use the plugin's
-            encoding function due to missing dependencies.
+            The label of the plugin to deregister.
         """
-        if label in self._available or label in self._unavailable:
-            raise ValueError(
-                f"'{self.name}' already has a plugin named '{label}'"
-            )
+        if label in self._available:
+            del self._available[package]
 
-        module = import_module(path[0])
-        dependencies = getattr(module, "ENCODER_DEPENDENCIES")
-
-        if module.is_available(self.UID):
-            self._available[label] = getattr(module, path[1])
-        else:
-            self._unavailable[label] = (dependencies, err_msg)
+        if label in self._unavailable:
+            del self._unavailable
 
     @property
     def system_endianness(self) -> str:
@@ -564,12 +680,12 @@ RLELosslessEncoder = EncoderFactory(RLELossless)
 
 .. versionadded:: 2.2
 """
-RLELosslessEncoder.register_plugin(
+RLELosslessEncoder.add_plugin(
     'pylibjpeg',
     ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
     'numpy and pylibjpeg (with the pylibjpeg-rle plugin)'
 )
-RLELosslessEncoder.register_plugin(
+RLELosslessEncoder.add_plugin(
     'pydicom',
     ('pydicom.pixel_data_handlers.rle_handler', '_wrap_rle_encode_frame'),
 )
