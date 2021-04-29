@@ -16,6 +16,19 @@ Recurse through the current directory and compress all the datasets:
         ds = dcmread(p)
         ds.compress(RLELossless)
         ds.save_as(p)
+
+Save encoded *Pixel Data* to file (single or multi-framed):
+
+.. codeblock:: python
+
+    from pydicom import dcmread
+    from pydicom.data import get_testdata_file
+    from pydicom.encoders import RLELosslessEncoder as encoder
+
+    ds = get_testdata_file("CT_small.dcm", read=True)
+
+    with open('pixel_data.rle', 'wb') as f:
+        f.write(encoder.encode(..., ds, frame=0))  # no arr :< -> add new method
 """
 from importlib import import_module
 import sys
@@ -83,36 +96,30 @@ class EncoderFactory:
         if label in self._unavailable:
             del self._unavailable
 
-    # TODO
-    # Add a method for standalone (datasetless) encoding?
     def encode(
-        self, arr: "np.ndarray", ds: Optional["Dataset"] = None, **kwargs
+        self, ds: "Dataset", idx: Optional[int] = None, **kwargs
     ) -> bytes:
-        """Return the single-framed `arr` as encoded bytes.
+        """Return an encoded frame from `ds` as :class:`bytes`.
 
         Parameters
         ----------
-        arr : numpy.ndarray
-            A single frame of uncompressed pixel data. Should be shaped as
-            (Rows, Columns) or (Rows, Columns, Samples) or the corresponding
-            1D array.
         ds : pydicom.dataset.Dataset, optional
-            The dataset corresponding to `arr`. If not used then `kwargs` must
-            contain all the parameters required by the encoder.
+            The dataset containing the *Pixel Data* to be encoded.
+        idx : int, optional
+            When the *Pixel Data* in `ds` contains multiple frames, this is
+            the index of the frame to be encoded.
+        encoding_plugin : str, optional
+            The name of the pixel data encoding plugin to use. If
+            `encoding_plugin` is not specified then all available plugins will
+            be tried.
+        decoding_plugin : str, optional
+            The name of the pixel data decoding handler to use if `ds` contains
+            compressed *Pixel Data*. If `decoding_plugin` is not specified then
+            all available handlers will be tried.
         **kwargs
-            Optional parameters for the encoding function. If `ds` is not used
-            then, at a minimum, the following are required:
-
-            * ``'rows'`` - the number of rows in `arr`
-            * ``'columns'`` - the number of columns in `arr`
-            * ``'samples_per_pixel'`` - the number of samples per pixel in
-              `arr`
-            * ``'bits_allocated'`` - the number of bits per pixel in `arr`
-            * ``'bits_stored'`` - the number of bits actually used per pixel
-              in `arr`
-            * ``'pixel_representation'`` - something
-            * ``'photometric_interpretation'`` - the photometric interpretation
-              of the pixels in `arr`
+            Optional parameters for the encoding function. See the [FIXME]
+            documentation for the encoding plugins for what options are
+            available.
 
         Returns
         -------
@@ -121,9 +128,7 @@ class EncoderFactory:
         """
         return self._encode_frame(arr, ds, **kwargs)
 
-    def _encode_frame(
-        self, arr: "np.ndarray", ds: "Dataset", **kwargs
-    ) -> bytes:
+    def _encode(self, ds: "Dataset", **kwargs) -> bytes:
         """Return an encoded frame from `arr`.
 
         Parameters
@@ -182,8 +187,61 @@ class EncoderFactory:
             f"{','.join(failed_encoders)}"
         )
 
+    def encode_array(
+        self, arr: "np.ndarray", idx: Optional[int] = None, **kwargs
+    ) -> bytes:
+        """Return an encoded frame from `arr` as :class:`bytes`.
+
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            A single or multi-framed :class:`~numpy.ndarray` containing
+            uncompressed pixel data. Should be shaped as:
+
+            * (Rows, Columns) for single frame, single sample data.
+            * (Rows, Columns, Samples) for single frame, multi-sample data.
+            * (Frames, Rows, Columns) for multi framed, single sample data.
+            * (Frames, Rows, Columns, Samples) for multi-framed and
+              multi-sample data.
+            * or the corresponding 1D array you'd get from ``arr.ravel()``.
+
+            For multi-sample data `arr` should be in RGB colorspace.
+        idx : int, optional
+            When `arr` contains multiple frames, this is the index of the
+            frame to be encoded.
+        encoding_plugin : str, optional
+            The name of the encoding plugin to use. [FIXME] see docs.
+        **kwargs
+            The following parameters are required:
+
+            * ``'rows': int`` - the number of rows in `arr`, maximum 65535.
+            * ``'columns': int`` - the number of columns in `arr`, maximum
+              65535.
+            * ``'samples_per_pixel': int`` - the number of samples per pixel in
+              `arr`, should be 1 or 3.
+            * ``'bits_allocated': int`` - the number of bits used to contain
+              the pixel data, should be 8, 16, 32 or 64.
+            * ``'bits_stored': int`` - the number of bits actually used per
+              pixel in `arr`. For example, `arr` might have a
+              :class:`~numpy.dtype` of 'uint16' (range 0 to 65535) but only
+              contain 12-bit pixel values (range 0 to 4095).
+
+            `kwargs` may also contain optional parameters for the encoding
+            function. See the [FIXME] documentation for the encoding plugins
+            for what options are available.
+        """
+        pass
+
+    def _encode_array(self, arr: "np.ndarray", **kwargs) -> bytes:
+        pass
+
     def iter_encode(
-        self, arr: "np.ndarray", ds: Optional["Dataset"] = None, **kwargs
+        self, ds: "Dataset", **kwargs
+    ) -> Generator[bytes, None, None]:
+        pass
+
+    def iter_encode_array(
+        self, arr: "np.ndarray", **kwargs
     ) -> Generator[bytes, None, None]:
         """Yield an encoded frame from single or multi-framed `arr`.
 
