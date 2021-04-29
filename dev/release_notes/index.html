@@ -426,6 +426,11 @@ the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTag.__eq__()</span></code> returns <code class="docutils literal notranslate"><span class="pre">False</span></code> rather
 than raising an exception when the operand cannot be converted to
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DA.__str__()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">DT.__str__()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">TM.__str__()</span></code> return valid DICOM
+strings instead of the formatted date and time representations
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1262">#1262</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
