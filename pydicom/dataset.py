@@ -1566,6 +1566,130 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         self._pixel_id = get_image_pixel_ids(self)
 
+    def compress(
+        self,
+        uid: str,
+        arr: Optional["np.ndarray"] = None,
+        encoding_plugin: str = '',
+        decoding_plugin: str = '',
+        **kwargs
+    ) -> None:
+        """Compress `arr` and update the dataset in-place with the resulting
+        :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
+
+        .. versionadded:: 2.2
+
+        The dataset must already have the following
+        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
+        with values that correspond to the pixel data in `arr`:
+
+        * (0028,0002) *Samples per Pixel*
+        * (0028,0004) *Photometric Interpretation*
+        * (0028,0008) *Number of Frames* (if more than 1 frame is present
+          in `arr`)
+        * (0028,0010) *Rows*
+        * (0028,0011) *Columns*
+        * (0028,0100) *Bits Allocated*
+        * (0028,0101) *Bits Stored*
+        * (0028,0103) *Pixel Representation*
+
+        This method will add the file meta dataset if none is present and add
+        or modify the following elements:
+
+        * (0002,0010) *Transfer Syntax UID*
+        * (0028,0006) *Planar Configuration*
+        * (7FE0,0010) *Pixel Data*
+
+        If the encoded image data is too large then :dcm:`extended
+        encapsulation <part03/sect_C.7.6.3.html>` will be used, in
+        which case the following elements will also be added:
+
+        * (7FE0,0001) *Extended Offset Table*
+        * (7FE0,0002) *Extended Offset Table Lengths*
+
+        **Supported Transfer Syntax UIDs**
+
+        +--------------------------------------+--------------------+
+        | UID                                  | Plugins            |
+        +======================================+====================+
+        | *RLE Lossless* - 1.2.840.10008.1.2.5 | pydicom, pylibjpeg |
+        +--------------------------------------+--------------------+
+
+        Examples
+        --------
+
+        >>> from pydicom import dcmread
+        >>> from pydicom.data import get_testdata_file
+        >>> from pydicom.uid import RLELossless
+        >>> ds = get_testdata_file("CT_small.dcm", read=True)
+        >>> ds.compress(RLELossless)
+        >>> ds.save_as("CT_small_rle.dcm")
+
+        Parameters
+        ----------
+        uid : pydicom.uid.UID
+            The *Transfer Syntax UID* to use when compressing the pixel data.
+        arr : numpy.ndarray, optional
+            An :class:`~numpy.ndarray` containing uncompressed pixel data. The
+            shape and contents of the array should match the dataset.
+            If `arr` is not used then the existing *Pixel Data* in the dataset
+            will be decompressed (if required) and compressed.
+        encoding_plugin : str, optional
+            Force the use of `package` to compress the pixel data. See
+            FIXME: doc link for a list of packages available for each UID and
+            their dependencies.
+        decoding_plugin : str, optional
+            FIXME
+            If `arr` is not used and the existing *Pixel Data* is compressed
+            then the named of the handler to use to decompress it. If not
+            specified then all available handlers will be tried.
+        **kwargs
+            Optional parameters to pass to the compression function.
+        """
+        from pydicom.encoders import get_encoder
+        from pydicom.encaps import encapsulate, encapsulate_extended
+
+        encoder = get_encoder(uid)
+
+        # Encode!
+        if arr is None:
+            # Encode the current *Pixel Data* (decode first if required)
+            frame_iterator = encoder.iter_encode(
+                self,
+                encoding_plugin=encoding_plugin,
+                decoding_plugin=decoding_plugin,
+                **kwargs
+            )
+        else:
+            # Encode from an uncompressed pixel data array
+            kwargs.update(encoder.kwargs_from_ds(self))
+            frame_iterator = encoder.iter_encode_array(
+                arr,
+                encoding_plugin=encoding_plugin,
+                **kwargs
+            )
+
+        encoded = [f for f in frame_iterator]
+
+        # Set Pixel Data with encapsulated frames
+        nr_frames = getattr(self, "NumberOfFrames", 1) or 1
+        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+        if total > 2**32 - 1:
+            (self.PixelData,
+             self.ExtendedOffsetTable,
+             self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
+        else:
+            self.PixelData = encapsulate(encoded)
+
+        self.PlanarConfiguration = 0
+        if uid == RLELossless:
+            self.PlanarConfiguration = 1
+
+        if not hasattr(self, 'file_meta'):
+            self.file_meta = FileMetaDataset()
+
+        self.file_meta.TransferSyntaxUID = uid
+
     def decompress(self, handler_name: str = '') -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
         in-place.
@@ -1719,132 +1843,6 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         self.convert_pixel_data()
         return self._pixel_array
-
-    def compress(
-        self,
-        uid: str,
-        arr: Optional["np.ndarray"] = None,
-        package: Optional[str] = None,
-        **kwargs
-    ) -> None:
-        """Compress `arr` and update the dataset in-place with the resulting
-        :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
-
-        .. versionadded:: 2.2.0
-
-        The dataset must already have the following
-        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
-        with values that correspond to the pixel data in `arr`:
-
-        * (0028,0002) *Samples per Pixel*
-        * (0028,0004) *Photometric Interpretation*
-        * (0028,0008) *Number of Frames* (if more than 1 frame is present
-          in `arr`)
-        * (0028,0010) *Rows*
-        * (0028,0011) *Columns*
-        * (0028,0100) *Bits Allocated*
-        * (0028,0101) *Bits Stored*
-        * (0028,0103) *Pixel Representation*
-
-        This method will add the file meta dataset if none is present and add
-        or modify the following elements:
-
-        * (0002,0010) *Transfer Syntax UID*
-        * (0028,0006) *Planar Configuration*
-        * (7FE0,0010) *Pixel Data*
-
-        If the image data is too large then :dcm:`extended encapsulation
-        <part03/sect_C.7.6.3.html>` may be used instead, in which case the
-        following elements will also be added:
-
-        * (7FE0,0001) *Extended Offset Table*
-        * (7FE0,0002) *Extended Offset Table Lengths*
-
-        **Supported Transfer Syntax UIDs**
-
-        +--------------------------------------+--------------------+
-        | UID                                  | Packages           |
-        +======================================+====================+
-        | *RLE Lossless* - 1.2.840.10008.1.2.5 | pydicom, pylibjpeg |
-        +--------------------------------------+--------------------+
-
-        Examples
-        --------
-
-        >>> from pydicom import dcmread
-        >>> from pydicom.data import get_testdata_file
-        >>> from pydicom.uid import RLELossless
-        >>> ds = get_testdata_file("CT_small.dcm", read=True)
-        >>> ds.compress(ds.pixel_array, RLELossless)
-        >>> ds.save_as("CT_small_rle.dcm")
-
-        Parameters
-        ----------
-        uid : pydicom.uid.UID
-            The *Transfer Syntax UID* to use when compressing the pixel data.
-        arr : numpy.ndarray, optional
-            An :class:`~numpy.ndarray` containing pixel data to be compressed.
-            If `arr` is not used then the existing *Pixel Data* in the dataset
-            will be decompressed (if required) and compressed.
-        package : str, optional
-            Force the use of `package` to compress the pixel data. See
-            FIXME: doc link for a list of packages available for each UID and
-            their dependencies.
-        **kwargs
-            Optional parameters to pass to the compression function.
-
-        Raises
-        ------
-        ValueError
-            If `package` is used but the corresponding encoder doesn't support
-            the `uid`.
-        ImportError
-            If `package` is used but is not available.
-        PixelDataEncodingError  - FIXME
-            If unable to compress `arr`.
-        NotImplementedError
-            If compressing to `uid` is not supported.
-        """
-        # Compress the existing Pixel Data
-        if arr is None:
-            if not hasattr(self, 'file_meta'):
-                raise AttributeError(
-                    "The dataset has no 'file_meta', something something"
-                )
-
-            if uid == self.file_meta.TransferSyntaxUID:
-                # TODO: warn
-                return
-
-            arr = self.pixel_array
-
-        from pydicom.encoders import get_encoder
-        from pydicom.encaps import encapsulate, encapsulate_extended
-
-        encoder = get_encoder(uid)
-
-        if package:
-            kwargs['use_package'] = package
-
-        # Encode and set Pixel Data with encapsulated frames
-        encoded = [f for f in encoder.encode_array(arr, self, **kwargs)]
-        nr_frames = getattr(self, "NumberOfFrames", 1) or 1
-        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
-        if total > 2**32 - 1:
-            (self.PixelData,
-             self.ExtendedOffsetTable,
-             self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
-        else:
-            self.PixelData = encapsulate(encoded)
-
-        self.PlanarConfiguration = 0
-        if uid == RLELossless:
-            self.PlanarConfiguration = 1
-
-        if not hasattr(self, 'file_meta'):
-            self.file_meta = FileMetaDataset()
-
-        self.file_meta.TransferSyntaxUID = uid
 
     def waveform_array(self, index: int) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at

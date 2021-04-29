@@ -47,8 +47,10 @@ If you're new to *pydicom* then start here:
   :doc:`Introduction to pydicom<old/getting_started>` |
   :doc:`What Python types do I use for each VR<guides/element_value_types>`
 * **Basics**: :doc:`Read, access, modify, write</tutorials/dataset_basics>`
-* **Intermediate**: :doc:`Waveform decoding and encoding</tutorials/waveforms>`
-  | :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
+* **Intermediate**:
+  :doc:`Compressing *Pixel Data* </tutorials/pixel_data/compressing>` |
+  :doc:`Waveform decoding and encoding </tutorials/waveforms>` | 
+  :doc:`DICOM File-sets and DICOMDIR</tutorials/filesets>`
 
 
 :doc:`User Guide <old/pydicom_user_guide>`

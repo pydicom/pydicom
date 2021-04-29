@@ -14,27 +14,24 @@ ENCODER_DEPENDENCIES = {
 }
 
 
-# TODO: Change to not require `ds` to allow standalone encoding
-def encode_pixel_data(src: bytes, ds: "Dataset", **kwargs) -> bytes:
+def encode_pixel_data(src: bytes, **kwargs) -> bytes:
     """Return the encoded image data in `src`.
 
     Parameters
     ----------
     src : bytes
         The raw image frame data to be encoded.
-    ds : pydicom.dataset.Dataset
-        The corresponding dataset.
     **kwargs
-        Optional parameters to pass to the encoder function.
+        Parameters to pass to the encoder function.
 
     Returns
     -------
     bytes
         The encoded image data.
     """
-    encoder = get_pixel_data_encoders()[kwargs['transfer_syntax']]
+    encoder = get_pixel_data_encoders()[kwargs['transfer_syntax_uid']]
 
-    return encoder(src, ds, **kwargs)
+    return encoder(src, **kwargs)
 
 
 def is_available(uid: str) -> bool:

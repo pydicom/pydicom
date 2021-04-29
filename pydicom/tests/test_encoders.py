@@ -27,7 +27,31 @@ def test_encoder_import():
 def test_compress():
     ds = get_testdata_file("CT_small.dcm", read=True)
     ds.compress(RLELossless)
-    # !
+    assert RLELossless == ds.file_meta.TransferSyntaxUID
+    assert 21118 == len(ds.PixelData)
+    assert 1 == ds.PlanarConfiguration
+
+def test_compress_with_plugin():
+    ds = get_testdata_file("CT_small.dcm", read=True)
+    ds.compress(RLELossless, decoder_plugin='pydicom')
+    assert RLELossless == ds.file_meta.TransferSyntaxUID
+    assert 21118 == len(ds.PixelData)
+    assert 1 == ds.PlanarConfiguration
+
+    ds.compress(RLELossless, decoder_plugin='pylibjpeg')
+    assert RLELossless == ds.file_meta.TransferSyntaxUID
+    assert 21118 == len(ds.PixelData)
+    assert 1 == ds.PlanarConfiguration
+
+def test_compress_arr():
+    ds = get_testdata_file("CT_small.dcm", read=True)
+    arr = ds.pixel_array
+    del ds.PixelData
+    ds.compress(RLELossless, arr)
+    assert RLELossless == ds.file_meta.TransferSyntaxUID
+    assert 21118 == len(ds.PixelData)
+    assert 1 == ds.PlanarConfiguration
+
 
 def foo_encoder(arr, ds, **kwargs):
     return b'\x00\x01\x02\x03'

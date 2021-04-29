@@ -52,7 +52,7 @@ import pydicom.uid
 
 HANDLER_NAME = 'RLE Lossless'
 
-ENCODER_DEPENDENCIES = {RLELossless: ('numpy', )}
+ENCODER_DEPENDENCIES = {pydicom.uid.RLELossless: ('numpy', )}
 DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy'),}
 
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
@@ -373,8 +373,27 @@ def _rle_decode_segment(data):
 
 
 # RLE encoding functions
-def _wrap_encode_frame(arr, ds, **kwargs):
-    pass
+def _wrap_rle_encode_frame(src: bytes, **kwargs) -> bytes:
+    """Play nice with the new encoder interface.
+
+    .. versionadded:: 2.2
+
+    Parameters
+    ----------
+    src : bytes
+        A single frame of image data to be RLE encoded.
+    **kwargs
+
+
+    Returns
+    -------
+    bytes
+        An RLE encoded frame.
+    """
+    bytes_allocated = kwargs['bits_allocated'] // 8
+    arr = np.frombuffer(src, dtype=f'<u{bytes_allocated}')
+
+    return bytes(rle_encode_frame(arr))
 
 
 def rle_encode_frame(arr):
