@@ -1,7 +1,5 @@
 """Unit tests for the pydicom.encoders module."""
 
-from multiprocessing import Pool
-
 import pytest
 
 try:
@@ -12,7 +10,7 @@ except ImportError:
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.encoders import EncoderFactory
+from pydicom.encoders import EncoderFactory, process
 from pydicom.uid import RLELossless, ExplicitVRLittleEndian
 
 
@@ -53,25 +51,15 @@ def test_compress_arr():
     assert 1 == ds.PlanarConfiguration
 
 
-def foo_encoder(arr, ds, **kwargs):
-    return b'\x00\x01\x02\x03'
-
-@pytest.mark.skip()
-def test_multiprocessing():
+def test_process():
     """Test that the encoder system can be used with multiprocessing."""
-    encoder = EncoderFactory('1.2')
-    encoder.add_decoder('foo', '', 'test error msg')
-
     datasets = ["CT_small.dcm", "MR_small.dcm"]
     datasets = [get_testdata_file(f, read=True) for f in datasets]
 
-    with Pool(processes=4) as pool:
-        pool.map(encoder.encode, datasets)
+    ds = process(datasets, uid=RLELossless)
+    print(ds[0].file_meta.TransferSyntaxUID)
 
-    # well this is nonsense
-
-    with Pool(processes=4) as pool:
-        pool.something(datasets.compress())  # whut?
+    print(datasets[0].file_meta.TransferSyntaxUID)
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")

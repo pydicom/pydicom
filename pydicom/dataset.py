@@ -1574,19 +1574,19 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         decoding_plugin: str = '',
         **kwargs
     ) -> None:
-        """Compress `arr` and update the dataset in-place with the resulting
+        """Compress and update the dataset in-place with the resulting
         :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
 
         .. versionadded:: 2.2
 
         The dataset must already have the following
         :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
-        with values that correspond to the pixel data in `arr`:
+        with correct values that correspond to the resulting compressed
+        pixel data:
 
         * (0028,0002) *Samples per Pixel*
         * (0028,0004) *Photometric Interpretation*
-        * (0028,0008) *Number of Frames* (if more than 1 frame is present
-          in `arr`)
+        * (0028,0008) *Number of Frames* (if more than 1 frame will be present)
         * (0028,0010) *Rows*
         * (0028,0011) *Columns*
         * (0028,0100) *Bits Allocated*
@@ -1600,9 +1600,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         * (0028,0006) *Planar Configuration*
         * (7FE0,0010) *Pixel Data*
 
-        If the encoded image data is too large then :dcm:`extended
-        encapsulation <part03/sect_C.7.6.3.html>` will be used, in
-        which case the following elements will also be added:
+        If the compressed pixel data is too large for the basic encapsulation
+        then :dcm:`extended encapsulation <part03/sect_C.7.6.3.html>` will be
+        used instead, in which case the following elements will also be added:
 
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
@@ -1618,6 +1618,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         Examples
         --------
 
+        Compress the existing *Pixel Data* in place:
+
         >>> from pydicom import dcmread
         >>> from pydicom.data import get_testdata_file
         >>> from pydicom.uid import RLELossless
@@ -1628,15 +1630,17 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         Parameters
         ----------
         uid : pydicom.uid.UID
-            The *Transfer Syntax UID* to use when compressing the pixel data.
+            The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
+            use when compressing the pixel data.
         arr : numpy.ndarray, optional
             An :class:`~numpy.ndarray` containing uncompressed pixel data. The
             shape and contents of the array should match the dataset.
             If `arr` is not used then the existing *Pixel Data* in the dataset
             will be decompressed (if required) and compressed.
         encoding_plugin : str, optional
-            Force the use of `package` to compress the pixel data. See
-            FIXME: doc link for a list of packages available for each UID and
+            FIXME
+            Force the use of `encoding_plugin` to compress the pixel data. See
+            doc link for a list of packages available for each UID and
             their dependencies.
         decoding_plugin : str, optional
             FIXME
@@ -1644,6 +1648,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             then the named of the handler to use to decompress it. If not
             specified then all available handlers will be tried.
         **kwargs
+            FIXME
             Optional parameters to pass to the compression function.
         """
         from pydicom.encoders import get_encoder
@@ -1651,9 +1656,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         encoder = get_encoder(uid)
 
-        # Encode!
         if arr is None:
-            # Encode the current *Pixel Data* (decode first if required)
+            # Encode the current *Pixel Data* (will decode first if required)
             frame_iterator = encoder.iter_encode(
                 self,
                 encoding_plugin=encoding_plugin,
@@ -1663,7 +1667,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         else:
             # Encode from an uncompressed pixel data array
             kwargs.update(encoder.kwargs_from_ds(self))
-            frame_iterator = encoder.iter_encode_array(
+            frame_iterator = encoder.iter_encode(
                 arr,
                 encoding_plugin=encoding_plugin,
                 **kwargs
@@ -1671,7 +1675,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         encoded = [f for f in frame_iterator]
 
-        # Set Pixel Data with encapsulated frames
+        # Encapsulate the *Pixel Data*
         nr_frames = getattr(self, "NumberOfFrames", 1) or 1
         total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
         if total > 2**32 - 1:
@@ -1681,14 +1685,16 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         else:
             self.PixelData = encapsulate(encoded)
 
-        self.PlanarConfiguration = 0
-        if uid == RLELossless:
-            self.PlanarConfiguration = 1
-
+        # Set the correct *Transfer Syntax UID*
         if not hasattr(self, 'file_meta'):
             self.file_meta = FileMetaDataset()
 
         self.file_meta.TransferSyntaxUID = uid
+
+        # Add or update any other required elements
+        self.PlanarConfiguration = 0
+        if uid == RLELossless:
+            self.PlanarConfiguration = 1
 
     def decompress(self, handler_name: str = '') -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`

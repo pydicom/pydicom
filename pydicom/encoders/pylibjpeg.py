@@ -3,7 +3,7 @@
 from pydicom.uid import RLELossless
 
 try:
-    from pylibjpeg.utils import get_pixel_data_encoders
+    from pylibjpeg.utils import get_pixel_data_encoders  # type: ignore[import]
     HAVE_PYLJ = True
 except ImportError:
     HAVE_PYLJ = False
