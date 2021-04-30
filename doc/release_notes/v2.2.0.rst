@@ -85,3 +85,5 @@ Fixes
   :class:`~pydicom.valuerep.PersonName` (:issue:`1338`)
 * Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
   rather than YBR with the Pillow pixel data handler (:pr:`878`)
+* Fixed pickling of timezone in :class:`~pydicom.valuerep.DT` instances
+  (:issue:`1371`)

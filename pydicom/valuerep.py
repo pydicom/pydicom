@@ -1,24 +1,20 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Special classes for DICOM value representations (VR)"""
-
 import datetime
-from decimal import Decimal
-from math import floor, isfinite, log10
-import platform
 import re
 import sys
-from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator, AnyStr,
-    Callable, Iterator, overload
-)
-from typing import Sequence as SequenceType
 import warnings
+from decimal import Decimal
+from math import floor, isfinite, log10
+from typing import Sequence as SequenceType, Any
+from typing import (
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Generator, Callable,
+    Iterable
+)
 
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.multival import MultiValue
-from pydicom.uid import UID
-
 
 # Types
 _T = TypeVar('_T')
@@ -58,36 +54,86 @@ PN_DELIMS = {0xe5}
 
 
 class _DateTimeBase:
-    """Base class for DT, DA and TM element sub-classes."""
-    # Add pickling support for the mutable additions
-    def __getstate__(self) -> Dict[str, Any]:
-        return self.__dict__.copy()
+    """
+    Base class for DT, DA and TM element classes.
+    Makes sure that these classes behave like the wrapped object,
+    which are of type datetime, date, and time, respectively.
+    """
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
-        self.__dict__.update(state)
-
-    def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-        return super().__reduce_ex__(protocol) + (self.__getstate__(),)
+    def __init__(self) -> None:
+        self.original_string: str = ""
+        self.wrapped: Union[
+            None, datetime.date, datetime.date, datetime.time] = None
 
     def __str__(self) -> str:
-        if hasattr(self, 'original_string'):
-            return self.original_string
-
-        return super().__str__()
+        return self.original_string
 
     def __repr__(self) -> str:
         return f'"{str(self)}"'
 
+    def __hash__(self) -> int:
+        return hash(self.wrapped)
 
-class DA(_DateTimeBase, datetime.date):
+    def __dir__(self) -> Iterable[str]:
+        return dir(self.wrapped) + ["original_string"]
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Return True if self equals other, or if other is of the wrapped type,
+        if other equal the wrapped value (e.g. date, time, or datetime)
+        """
+        if other is self:
+            return True
+
+        if isinstance(other, self.__class__):
+            return self.wrapped == other.wrapped
+
+        if isinstance(other, type(self.wrapped)):
+            return self.wrapped == other
+
+    def __ne__(self, other: object) -> bool:
+        return not self == other
+
+    def __lt__(self, other: object) -> bool:
+        if isinstance(other, self.__class__):
+            return self.wrapped < other.wrapped
+        # will raise TypeError on invalid comparison
+        return self.wrapped < other
+
+    def __le__(self, other: object) -> bool:
+        return self == other or self < other
+
+    def __gt__(self, other: object) -> bool:
+        return not (self == other or self < other)
+
+    def __ge__(self, other: object) -> bool:
+        return self == other or self > other
+
+    def __getattr__(self, name: str) -> Any:
+        """Forwards calls to wrapped object."""
+        if name not in ("__getstate__", "__setstate__"):
+            return getattr(self.wrapped, name)
+        return super().__getattr__(name)
+
+
+class DA(_DateTimeBase):
     """Store value for an element with VR **DA** as :class:`datetime.date`.
 
     Note that the :class:`datetime.date` base class is immutable.
     """
-    def __new__(
-        cls: Type[_DA], val: Union[None, str, _DA, datetime.date]
-    ) -> Optional[_DA]:
-        """Create an instance of DA object.
+
+    def __new__(cls, *args, **kwargs) -> Optional["DA"]:
+        """
+        Create a new DA object, except when ``None`` or an empty string is
+        passed as the first argument.
+        """
+        if (args and (args[0] is None or
+                      isinstance(args[0], str) and not args[0])):
+            return None
+        return super().__new__(cls)
+
+    def __init__(self, val: Union[None, str, _DA, datetime.date]) -> None:
+        """Initialize an instance of a DA object.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
@@ -96,50 +142,47 @@ class DA(_DateTimeBase, datetime.date):
         ----------
         val : str
             A string conformant to the DA definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
-        """
-        if val is None:
-            return None
-
-        if isinstance(val, str):
-            if val.strip() == '':
-                return None  # empty date
-
-            if len(val) == 8:
-                year = int(val[0:4])
-                month = int(val[4:6])
-                day = int(val[6:8])
-                return super().__new__(cls, year, month, day)
-
-            if len(val) == 10 and val[4] == '.' and val[7] == '.':
-                # ACR-NEMA Standard 300, predecessor to DICOM
-                # for compatibility with a few old pydicom example files
-                year = int(val[0:4])
-                month = int(val[5:7])
-                day = int(val[8:10])
-                return super().__new__(cls, year, month, day)
-
-        if isinstance(val, datetime.date):
-            return super().__new__(cls, val.year, val.month, val.day)
-
-        try:
-            return super().__new__(cls, val)
-        except Exception as exc:
-            raise ValueError(
-                f"Unable to convert '{val}' to 'DA' object"
-            ) from exc
-
-    def __init__(self, val: Union[str, _DA, datetime.date]) -> None:
-        """Create a new **DA** element value."""
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+            or a :class:`datetime.date` object,
+            or another :class:`~pydicom.valuerep.DA` object
+         """
+        super().__init__()
         if isinstance(val, str):
             self.original_string = val
-        elif isinstance(val, DA) and hasattr(val, 'original_string'):
+            self.wrapped: datetime.date = self._date_from_str(val)
+        elif isinstance(val, DA):
             self.original_string = val.original_string
+            self.wrapped = val.wrapped
         elif isinstance(val, datetime.date):
             self.original_string = f"{val.year}{val.month:02}{val.day:02}"
+            self.wrapped = val
+        else:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'DA' object"
+            )
+
+    @staticmethod
+    def _date_from_str(val: str) -> datetime.date:
+        if len(val) == 8:
+            year = int(val[0:4])
+            month = int(val[4:6])
+            day = int(val[6:8])
+            return datetime.date(year, month, day)
+
+        if len(val) == 10 and val[4] == '.' and val[7] == '.':
+            # ACR-NEMA Standard 300, predecessor to DICOM
+            # for compatibility with a few old pydicom example files
+            year = int(val[0:4])
+            month = int(val[5:7])
+            day = int(val[8:10])
+            return datetime.date(year, month, day)
+        else:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'DA' object"
+            )
 
 
-class DT(_DateTimeBase, datetime.datetime):
+class DT(_DateTimeBase):
     """Store value for an element with VR **DT** as :class:`datetime.datetime`.
 
     Note that the :class:`datetime.datetime` base class is immutable.
@@ -171,80 +214,39 @@ class DT(_DateTimeBase, datetime.datetime):
             name=value
         )
 
-    def __new__(
-        cls: Type[_DT], val: Union[None, str, _DT, datetime.datetime]
-    ) -> Optional[_DT]:
-        """Create an instance of DT object.
+    def __new__(cls, *args, **kwargs) -> Optional["DT"]:
+        """
+        Creates a new DT object, except when ``None`` or an empty string is
+        passed as the first argument.
+        """
+        if (args and (args[0] is None or
+                      isinstance(args[0], str) and not args[0])):
+            return None
+        return super().__new__(cls)
+
+    def __init__(self, val: Union[str, _DT, datetime.datetime]) -> None:
+        """Initialize an instance of DT object.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
         Parameters
         ----------
-        val : str
+        val : str or DT or datetime.datetime
             A string conformant to the DT definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+            or a :class:`datetime.datetime` object,
+            or another :class:`~pydicom.valuerep.DT` object
         """
-        if val is None:
-            return None
-
+        super().__init__()
         if isinstance(val, str):
-            if val.strip() == '':
-                return None
-
-            match = cls._regex_dt.match(val)
-            if not match or len(val) > 26:
-                raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'DT' "
-                    "object"
-                )
-
-            dt_match = match.group(2)
-            args = [
-                int(dt_match[0:4]),  # year
-                1 if len(dt_match) < 6 else int(dt_match[4:6]),  # month
-                1 if len(dt_match) < 8 else int(dt_match[6:8]),  # day
-                0 if len(dt_match) < 10 else int(dt_match[8:10]),  # hour
-                0 if len(dt_match) < 12 else int(dt_match[10:12]),  # minute
-                0 if len(dt_match) < 14 else int(dt_match[12:14]),  # second
-            ]
-            # microsecond
-            if len(dt_match) >= 14 and match.group(4):
-                args.append(int(match.group(4).rstrip().ljust(6, '0')))
-            else:
-                args.append(0)
-
-            # Timezone offset
-            tz_match = match.group(5)
-            args.append(cls._utc_offset(tz_match) if tz_match else None)
-
-            if args[5] == 60:
-                warnings.warn(
-                    "'datetime.datetime' doesn't allow a value of '60' for "
-                    "the seconds component, changing to '59'"
-                )
-                args[5] = 59
-
-            return super().__new__(cls, *args)
-
-        if isinstance(val, datetime.datetime):
-            return super().__new__(
-                cls, *val.timetuple()[:6], val.microsecond, val.tzinfo
-            )
-
-        try:
-            return super().__new__(cls, val)
-        except Exception as exc:
-            raise ValueError(
-                f"Unable to convert '{val}' to 'DT' object"
-            ) from exc
-
-    def __init__(self, val: Union[str, _DT, datetime.datetime]) -> None:
-        if isinstance(val, str):
+            self.wrapped: datetime.datetime = self._datetime_from_str(val)
             self.original_string = val
-        elif isinstance(val, DT) and hasattr(val, 'original_string'):
+        elif isinstance(val, DT):
+            self.wrapped = val.wrapped
             self.original_string = val.original_string
         elif isinstance(val, datetime.datetime):
+            self.wrapped = val
             self.original_string = (
                 f"{val.year:04}{val.month:02}{val.day:02}"
                 f"{val.hour:02}{val.minute:02}{val.second:02}"
@@ -260,9 +262,46 @@ class DT(_DateTimeBase, datetime.datetime):
                 self.original_string += (
                     f"{sign}{offset_min // 60:02}{offset_min % 60:02}"
                 )
+        else:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'DT' object"
+            )
+
+    def _datetime_from_str(self, val: str) -> datetime.datetime:
+        match = self.__class__._regex_dt.match(val)
+        if not match or len(val) > 26:
+            raise ValueError(
+                f"Unable to convert non-conformant value '{val}' to 'DT' "
+                "object"
+            )
+
+        dt_match = match.group(2)
+        year = int(dt_match[0:4])
+        month = 1 if len(dt_match) < 6 else int(dt_match[4:6])
+        day = 1 if len(dt_match) < 8 else int(dt_match[6:8])
+        hour = 0 if len(dt_match) < 10 else int(dt_match[8:10])
+        minutes = 0 if len(dt_match) < 12 else int(dt_match[10:12])
+        seconds = 0 if len(dt_match) < 14 else int(dt_match[12:14])
+        if len(dt_match) >= 14 and match.group(4):
+            microseconds = int(match.group(4).rstrip().ljust(6, '0'))
+        else:
+            microseconds = 0
+
+        # Timezone offset
+        tz_match = match.group(5)
+        tz_info = self._utc_offset(tz_match) if tz_match else None
+
+        if seconds == 60:
+            warnings.warn(
+                "'datetime.datetime' doesn't allow a value of '60' for "
+                "the seconds component, changing to '59'"
+            )
+            seconds = 59
+        return datetime.datetime(year, month, day, hour, minutes, seconds,
+                                 microseconds, tz_info)
 
 
-class TM(_DateTimeBase, datetime.time):
+class TM(_DateTimeBase):
     """Store value for an element with VR **TM** as :class:`datetime.time`.
 
     Note that the :class:`datetime.time` base class is immutable.
@@ -274,85 +313,75 @@ class TM(_DateTimeBase, datetime.time):
         r"(?(7)(\.(?P<ms>([0-9]{1,6})?))?))$"
     )
 
-    def __new__(
-        cls: Type[_TM], val: Union[None, str, _TM, datetime.time]
-    ) -> Optional[_TM]:
-        """Create an instance of TM object from a string.
+    def __new__(cls, *args, **kwargs) -> Optional["TM"]:
+        """
+        Creates a new TM object, except when ``None`` or an empty string is
+        passed as the first argument.
+        """
+        if (args and (args[0] is None or
+                      isinstance(args[0], str) and not args[0])):
+            return None
+        return super().__new__(cls)
+
+    def __init__(self, val: Union[str, _TM, datetime.time]) -> None:
+        """Initialize an instance of TM object from a string.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
         Parameters
         ----------
-        val : str
+        val : str or DT or datetime.time
             A string conformant to the TM definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
+            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+            or a :class:`datetime.time` object,
+            or another :class:`~pydicom.valuerep.TM` object
         """
-        if val is None:
-            return None
-
+        super().__init__()
         if isinstance(val, str):
             if val.strip() == '':
-                return None  # empty time
-
-            match = cls._RE_TIME.match(val)
-            if not match:
-                raise ValueError(
-                    f"Unable to convert non-conformant value '{val}' to 'TM' "
-                    "object"
-                )
-
-            hour = int(match.group('h'))
-            minute = 0 if match.group('m') is None else int(match.group('m'))
-            second = 0 if match.group('s') is None else int(match.group('s'))
-
-            if second == 60:
-                warnings.warn(
-                    "'datetime.time' doesn't allow a value of '60' for the "
-                    "seconds component, changing to '59'"
-                )
-                second = 59
-
-            microsecond = 0
-            if match.group('ms'):
-                microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
-
-            return super().__new__(cls, hour, minute, second, microsecond)
-
-        if isinstance(val, datetime.time):
-            return super().__new__(
-                cls, val.hour, val.minute, val.second, val.microsecond
-            )
-
-        try:
-            return super().__new__(cls, val)
-        except Exception as exc:
-            raise ValueError(
-                f"Unable to convert '{val}' to 'TM' object"
-            ) from exc
-
-    def __init__(self, val: Union[str, _TM, datetime.time]) -> None:
-        if isinstance(val, str):
+                return  # empty time
             self.original_string = val
-        elif isinstance(val, TM) and hasattr(val, 'original_string'):
-            self.original_string = val.original_string
+            self.wrapped: datetime.time = self._time_from_str(val)
         elif isinstance(val, datetime.time):
+            self.wrapped = val
             self.original_string = (
                 f"{val.hour:02}{val.minute:02}{val.second:02}"
             )
             # milliseconds are seldom used, add them only if needed
             if val.microsecond > 0:
                 self.original_string += f".{val.microsecond:06}"
-
-    if platform.python_implementation() == "PyPy":
-        # Workaround for CPython/PyPy bug in time.__reduce_ex__()
-        #   caused by returning (time, ...) rather than (self.__class__, ...)
-        def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-            return (
-                self.__class__,
-                super()._getstate(protocol),
-                self.__getstate__()
+        elif isinstance(val, TM):
+            self.original_string = val.original_string
+            self.wrapped = val.wrapped
+        else:
+            raise ValueError(
+                f"Unable to convert '{val}' to 'TM' object"
             )
+
+    def _time_from_str(self, val: str) -> Optional[datetime.time]:
+        match = self.__class__._RE_TIME.match(val)
+        if not match:
+            raise ValueError(
+                f"Unable to convert non-conformant value '{val}' to 'TM' "
+                "object"
+            )
+
+        hour = int(match.group('h'))
+        minute = 0 if match.group('m') is None else int(match.group('m'))
+        second = 0 if match.group('s') is None else int(match.group('s'))
+
+        if second == 60:
+            warnings.warn(
+                "'datetime.time' doesn't allow a value of '60' for the "
+                "seconds component, changing to '59'"
+            )
+            second = 59
+
+        microsecond = 0
+        if match.group('ms'):
+            microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
+        return datetime.time(hour, minute, second, microsecond)
 
 
 # Regex to match strings that represent valid DICOM decimal strings (DS)
