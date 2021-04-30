@@ -1,4 +1,4 @@
-"""Unit tests for the pydicom.encoders module."""
+"""Unit tests for the pydicom.encoders module and Dataset.compress()."""
 
 import pytest
 
@@ -10,63 +10,325 @@ except ImportError:
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.encoders import EncoderFactory, process
-from pydicom.uid import RLELossless, ExplicitVRLittleEndian
+from pydicom.encoders import Encoder, parallel_encode, RLELosslessEncoder
+from pydicom.uid import (
+    UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC
+)
 
 
-def test_encoder_import():
-    from pydicom.encoders import RLELosslessEncoder
+class TestEncoder:
+    """Non-encoding tests for encoders.Encoder"""
+    def setup(self):
+        self.enc = Encoder(UID('1.2.3'))
 
-    enc = RLELosslessEncoder
-    print(enc.name)
-    print(enc._available)
-    print(enc._unavailable)
+    def test_init(self):
+        """Test creating a new Encoder"""
+        uid = UID('1.2.3')
+        enc = Encoder(uid)
+        assert {} == enc._available
+        assert {} == enc._unavailable
+        assert '<' == enc._defaults['byteorder']
+        assert uid == enc._defaults['transfer_syntax_uid']
 
-def test_compress():
-    ds = get_testdata_file("CT_small.dcm", read=True)
-    ds.compress(RLELossless)
-    assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21820 == len(ds.PixelData)
-    assert 1 == ds.PlanarConfiguration
+    def test_properties(self):
+        """Test Encoder properties"""
+        enc = Encoder(RLELossless)
+        assert 'RLELosslessEncoder' == enc.name
+        assert RLELossless == enc.UID
+        assert not enc.is_available
 
-def test_compress_with_plugin():
-    ds = get_testdata_file("CT_small.dcm", read=True)
-    ds.compress(RLELossless, encoding_plugin='pydicom')
-    assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21118 == len(ds.PixelData)
-    assert 1 == ds.PlanarConfiguration
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_add_plugin_available(self):
+        """Test adding an available plugin."""
+        assert not self.enc.is_available
+        self.enc.add_plugin(
+            "foo",
+            (
+                'pydicom.pixel_data_handlers.rle_handler',
+                '_wrap_rle_encode_frame'
+            ),
+            "plugin custom error"
+        )
+        assert "foo" in self.enc._available
+        assert {} == self.enc._unavailable
+        assert self.enc.is_available
 
-    ds.compress(RLELossless, encoding_plugin='pylibjpeg')
-    assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21820 == len(ds.PixelData)
-    assert 1 == ds.PlanarConfiguration
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    def test_add_plugin_unavailable(self):
+        """Test adding an unavailable plugin."""
+        enc = Encoder(RLELossless)
+        assert not enc.is_available
+        enc.add_plugin(
+            "foo",
+            (
+                'pydicom.pixel_data_handlers.rle_handler',
+                '_wrap_rle_encode_frame'
+            ),
+            "plugin custom error"
+        )
+        assert {} == enc._available
+        assert "foo" in enc._unavailable
+        assert ("numpy", ) == enc._unavailable["foo"]
+        assert not enc.is_available
 
-def test_compress_arr():
-    ds = get_testdata_file("CT_small.dcm", read=True)
-    arr = ds.pixel_array
-    del ds.PixelData
-    ds.compress(RLELossless, arr)
-    assert RLELossless == ds.file_meta.TransferSyntaxUID
-    assert 21820 == len(ds.PixelData)
-    assert 1 == ds.PlanarConfiguration
+    def test_add_plugin_module_import_failure(self):
+        """Test a module import failure when adding a plugin."""
+        enc = Encoder(RLELossless)
 
+        msg = r"No module named 'badpath'"
+        with pytest.raises(ModuleNotFoundError, match=msg):
+            enc.add_plugin(
+                "foo",
+                (
+                    'badpath.pixel_data_handlers.rle_handler',
+                    '_wrap_rle_encode_frame'
+                ),
+                "plugin custom error"
+            )
+        assert {} == enc._available
+        assert {} == enc._unavailable
 
-def test_process():
-    """Test that the encoder system can be used with multiprocessing."""
-    datasets = ["CT_small.dcm", "MR_small.dcm"]
-    datasets = [get_testdata_file(f, read=True) for f in datasets]
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is available")
+    def test_add_plugin_function_missing(self):
+        """Test encoding function missing when adding a plugin."""
+        enc = Encoder(RLELossless)
 
-    ds = process(datasets, uid=RLELossless)
-    print(ds[0].file_meta.TransferSyntaxUID)
+        msg = (
+            r"module 'pydicom.pixel_data_handlers.rle_handler' has no "
+            r"attribute 'bad_function_name'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            enc.add_plugin(
+                "foo",
+                (
+                    'pydicom.pixel_data_handlers.rle_handler',
+                    'bad_function_name'
+                ),
+                "plugin custom error"
+            )
+        assert {} == enc._available
+        assert {} == enc._unavailable
 
-    print(datasets[0].file_meta.TransferSyntaxUID)
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    def test_add_plugin_twice(self):
+        """Test adding a plugin that already exists."""
+        self.enc.add_plugin(
+            "foo",
+            (
+                'pydicom.pixel_data_handlers.rle_handler',
+                '_wrap_rle_encode_frame'
+            ),
+            "plugin custom error"
+        )
+        assert 'foo' in self.enc._available
+        assert {} == self.enc._unavailable
+
+        msg = r"'Encoder' already has a plugin named 'foo'"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.add_plugin(
+                "foo",
+                (
+                    'pydicom.pixel_data_handlers.rle_handler',
+                    '_wrap_rle_encode_frame'
+                ),
+            )
+        assert 'foo' in self.enc._available
+        assert {} == self.enc._unavailable
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    def test_remove_plugin(self):
+        """Test removing a plugin."""
+        self.enc.add_plugin(
+            "foo",
+            (
+                'pydicom.pixel_data_handlers.rle_handler',
+                '_wrap_rle_encode_frame'
+            ),
+        )
+        self.enc.add_plugin(
+            "bar",
+            (
+                'pydicom.pixel_data_handlers.rle_handler',
+                '_wrap_rle_encode_frame'
+            ),
+        )
+        assert 'foo' in self.enc._available
+        assert 'bar' in self.enc._available
+        assert {} == self.enc._unavailable
+        assert self.enc.is_available
+
+        self.enc.remove_plugin("foo")
+        assert 'bar' in self.enc._available
+        assert self.enc.is_available
+
+        self.enc.remove_plugin("bar")
+        assert {} == self.enc._available
+        assert not self.enc.is_available
+
+    def test_remove_plugin_raises(self):
+        """Test removing a plugin that doesn't exist raises exception"""
+        msg = r"Unable to remove 'foo', no such plugin"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.remove_plugin('foo')
+
+    def test_check_kwargs_missing(self):
+        """Test _check_kwargs"""
+        enc = Encoder(RLELossless)
+        kwargs = {
+            'rows': 0,
+            'columns': 0,
+            'samples_per_pixel': 0,
+            'bits_allocated': 0,
+            'bits_stored': 0,
+            'pixel_representation': 0,
+            'photometric_interpretation': 'RGB'
+        }
+        assert enc._check_kwargs(kwargs) is None
+
+        del kwargs['columns']
+        del kwargs['bits_allocated']
+        msg = r"Missing expected arguments: 'columns', 'bits_allocated'"
+        with pytest.raises(TypeError, match=msg):
+            enc._check_kwargs(kwargs)
+
+    def test_kwargs_from_ds(self):
+        """Test Encoder.kwargs_from_ds()"""
+        # Note no NumberOfFrames element
+        ds = Dataset()
+        ds.Rows = 10
+        ds.Columns = 12
+        ds.SamplesPerPixel = 1
+        ds.BitsAllocated = 8
+        ds.BitsStored = 8
+        ds.PixelRepresentation = 0
+        ds.PhotometricInterpretation = 'RGB'
+
+        enc = Encoder(RLELossless)
+        kwargs = enc.kwargs_from_ds(ds)
+        assert 1 == kwargs['number_of_frames']
+        assert enc._check_kwargs(kwargs) is None
+
+        # Test conversion of empty *Number of Frames*
+        ds.NumberOfFrames = None
+        kwargs = enc.kwargs_from_ds(ds)
+        assert 1 == kwargs['number_of_frames']
+
+        # Test already present *Number of Frames* is unaffected
+        ds.NumberOfFrames = 10
+        kwargs = enc.kwargs_from_ds(ds)
+        assert 10 == kwargs['number_of_frames']
+
+        # Test missing elements
+        del ds.Columns
+        del ds.BitsAllocated
+
+        msg = (
+            r"The following required elements are missing from the dataset: "
+            r"'Columns', 'BitsAllocated'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            enc.kwargs_from_ds(ds)
+
+        # Test VM 0
+        ds.Columns = None
+        ds.BitsAllocated = None
+
+        msg = (
+            r"The following required dataset elements have a VM of 0: "
+            r"'Columns', 'BitsAllocated'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            enc.kwargs_from_ds(ds)
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    def test_missing_dependencies(self):
+        """Test the required encoder being unavailable."""
+        enc = RLELosslessEncoder
+        s = enc.missing_dependencies
+        assert (
+            "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle" == s[0]
+        )
+        assert "pydicom - requires numpy" == s[1]
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-class TestEncoderFactory_ProcessFrame:
-    """Tests for encoders.EncoderFactory._process_frame."""
+class TestEncoder_Encode:
+    """Tests for Encoder.encode() and related methods."""
+    # Passing bytes
+    def test_encode_bytes(self):
+        """Test encoding bytes"""
+        pass
+
+    def test_encode_bytes_specific(self):
+        """Test encoding bytes with a specific encoder"""
+        pass
+
+    def test_encode_bytes_short(self):
+        """Test encode(bytes) with short data"""
+        pass
+
+    def test_encode_bytes_padded(self):
+        """Test encode(bytes) with padded data"""
+        pass
+
+    def test_encode_bytes_multiframe(self):
+        """Test encode(bytes, idx)"""
+        pass
+
+    def test_encode_bytes_multiframe_no_idx_raises(self):
+        """Test encode(bytes) with multiframe data."""
+        pass
+
+    # Passing ndarray
+    def test_encode_array(self):
+        """Test encode(ndarray)"""
+        pass
+
+    # Passing Dataset
+    def test_encode_dataset(self):
+        """Test encode with a dataset."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds.compress(RLELossless)
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21820 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+
+    # TODO: move to the pylibjpeg encoder tests
+    def test_encode_dataset_specific(self):
+        """Test encoding an dataset with a specific encoder"""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds.compress(RLELossless, encoding_plugin='pydicom')
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21118 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+
+        ds.compress(RLELossless, encoding_plugin='pylibjpeg')
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21820 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+
+    def test_encode_dataset_decompress_specific(self):
+        """Test encoding a compressed dataset with specific decoder"""
+        pass
+
+    def test_process_no_plugins(self):
+        """Test process() with no available plugins"""
+        pass
+
+    def test_process_specify_plugin(self):
+        """Test process() with specific plugin"""
+        pass
+
+    def test_process_encode_exceptions(self):
+        """Test process() with encoding exceptions"""
+        pass
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestEncoder_Preprocess:
+    """Tests for Encoder._preprocess()."""
     def setup(self):
-        self.e = EncoderFactory(RLELossless)
+        self.e = Encoder(RLELossless)
         self.ds = ds = Dataset()
         ds.Rows = 1
         ds.Columns = 3
@@ -75,6 +337,7 @@ class TestEncoderFactory_ProcessFrame:
         ds.BitsAllocated = 8
         ds.BitsStored = 8
         ds.NumberOfFrames = 1
+        ds.PhotometricInterpretation = 'RGB'
 
         self.arr_3s = np.asarray(
             [
@@ -87,57 +350,55 @@ class TestEncoderFactory_ProcessFrame:
         )
         assert (4, 2, 3) == self.arr_3s.shape
 
-    def test_bad_arr_shape_raises(self):
+    def test_invalid_arr_shape_raises(self):
         """Test that an array size and dataset mismatch raise exceptions"""
         # 1D arrays
         arr = np.asarray((1, 2, 3, 4))
-        msg = r"The shape of the array doesn't match the dataset"
+        msg = (
+            r"Unable to encode as the shape of the ndarray \(4,\) "
+            r"doesn't match the values for the rows, columns and samples "
+            r"per pixel"
+        )
 
+        kwargs = self.e.kwargs_from_ds(self.ds)
         assert (4, ) == arr.shape
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
         # 2D arrays
         arr = np.asarray([[1, 2, 3, 4]])
         assert (1, 4) == arr.shape
+        msg = r"Unable to encode as the shape of the ndarray \(1, 4\) "
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
         self.ds.Rows = 2
         self.ds.Columns = 2
         self.ds.SamplesPerPixel = 3
         arr = np.asarray([[1, 2], [3, 4]])
         assert (2, 2) == arr.shape
+        msg = r"Unable to encode as the shape of the ndarray \(2, 2\) "
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
         # 3D arrays
         self.ds.Rows = 3
         arr = np.asarray([[[1, 2, 1], [3, 4, 1]]])
         assert (1, 2, 3) == arr.shape
+        msg = r"Unable to encode as the shape of the ndarray \(1, 2, 3\) "
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
-        # 4D arrays
-        arr = np.asarray([[[[1, 2, 1], [3, 4, 1]]]])
-        assert (1, 1, 2, 3) == arr.shape
-        msg = r"The maximum supported array dimensions is 4"
+    def test_invalid_arr_dtype_raises(self):
+        """Test an invalid arr dtype raises exception."""
+        arr = np.asarray(('a', 'b', 'c'))
+        msg = (
+            r"Unable to encode as the ndarray's dtype '<U1' is not supported"
+        )
+
+        kwargs = self.e.kwargs_from_ds(self.ds)
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
-
-    def test_invalid_bits_allocated_raises(self):
-        """Test exception raised for invalid Bits Allocated"""
-        self.ds.BitsAllocated = 9
-        self.ds.BitsStored = 8
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        arr = np.asarray([1, 2, 3], dtype='|u1')
-        msg = r"Unsupported 'Bits Allocated' must be 8, 16, 32 or 64"
-        with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
     def test_invalid_pixel_representation_raises(self):
         """Test exception raised if pixel representation/dtype mismatch"""
@@ -147,39 +408,90 @@ class TestEncoderFactory_ProcessFrame:
         self.ds.PixelRepresentation = 0
         self.ds.Rows = 1
         self.ds.Columns = 3
+        kwargs = self.e.kwargs_from_ds(self.ds)
 
         arr = np.asarray([1, 2, 3], dtype='|i1')
-        msg = r"Incompatible array dtype and dataset 'Pixel Representation'"
+        msg = (
+            r"Unable to encode as the ndarray's dtype 'int8' is not "
+            r"consistent with pixel representation '0' \(unsigned int\)"
+        )
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
-        self.ds.PixelRepresentation = 1
         arr = np.asarray([1, 2, 3], dtype='|u1')
+        kwargs['pixel_representation'] = 1
+        msg = (
+            r"Unable to encode as the ndarray's dtype 'uint8' is not "
+            r"consistent with pixel representation '1' \(signed int\)"
+        )
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
-    @pytest.mark.skip()
-    def test_invalid_samples_per_pixel_raises(self):
-        """Test exception raised if pixel representation/dtype mismatch"""
+    def test_invalid_bits_allocated_raises(self):
+        """Test exception raised for invalid Bits Allocated"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
         self.ds.SamplesPerPixel = 1
         self.ds.PixelRepresentation = 0
         self.ds.Rows = 1
         self.ds.Columns = 3
+        kwargs = self.e.kwargs_from_ds(self.ds)
+
+        arr = np.asarray([1, 2, 3], dtype='|u1')
+        kwargs['bits_stored'] = 9
+        msg = (
+            r"Unable to encode as the bits stored value is greater than the "
+            r"bits allocated value"
+        )
+        with pytest.raises(ValueError, match=msg):
+            self.e._preprocess(arr, **kwargs)
+
+        kwargs['bits_stored'] = 8
+        kwargs['bits_allocated'] = 9
+
+        msg = (
+            r"Unable to encode as a bits allocated value of 9 is not "
+            r"supported \(must be 8, 16, 32 or 64\)"
+        )
+        with pytest.raises(ValueError, match=msg):
+            self.e._preprocess(arr, **kwargs)
+
+        kwargs['bits_allocated'] = 16
+        msg = (
+            r"Unable to encode as the ndarray's dtype 'uint8' is not "
+            r"consistent with a bits allocated value of 16"
+        )
+        with pytest.raises(ValueError, match=msg):
+            self.e._preprocess(arr, **kwargs)
+
+    def test_invalid_samples_per_pixel_raises(self):
+        """Test exception raised spp is invalid"""
+        self.ds.BitsAllocated = 8
+        self.ds.BitsStored = 8
+        self.ds.SamplesPerPixel = 2
+        self.ds.PixelRepresentation = 0
+        self.ds.Rows = 2
+        self.ds.Columns = 2
+        kwargs = self.e.kwargs_from_ds(self.ds)
 
         arr = np.asarray([1, 2, 3], dtype='|i1')
-        msg = r"Incompatible array dtype and dataset 'Pixel Representation'"
+        msg = (
+            r"Unable to encode as a samples per pixel value of 2 is not "
+            r"supported \(must be 1 or 3\)"
+        )
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
-        self.ds.PixelRepresentation = 1
-        arr = np.asarray([1, 2, 3], dtype='|u1')
+        arr = np.asarray([[1, 2], [1, 3]], dtype='|i1')
+        kwargs['samples_per_pixel'] = 3
+        msg = (
+            r"Unable to encode as the shape of the ndarray \(2, 2\) is not "
+            r"consistent with a samples per pixel value of 3"
+        )
         with pytest.raises(ValueError, match=msg):
-            self.e._process_frame(arr, self.ds)
+            self.e._preprocess(arr, **kwargs)
 
-    # Unsigned 8-bit processing
-    def test_u08_1s_as_u08(self):
+    def test_u08_1s(self):
         """Test processing u8/1s"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
@@ -190,41 +502,12 @@ class TestEncoderFactory_ProcessFrame:
 
         arr = np.asarray([1, 2, 3], dtype='|u1')
         assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
+        kwargs = self.e.kwargs_from_ds(self.ds)
+        out = self.e._preprocess(arr, **kwargs)
         assert 3 == len(out)
         assert b"\x01\x02\x03" == out
 
-    def test_u08_1s_as_u16(self):
-        """Test processing u8/1s w/ upsize to u16"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        arr = np.asarray([1, 2, 3], dtype='|u1')
-        assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
-        assert 6 == len(out)
-        assert b"\x01\x00\x02\x00\x03\x00" == out
-
-    def test_u08_1s_as_u32(self):
-        """Test processing u8/1s w/ upsize to u32"""
-        self.ds.BitsAllocated = 32
-        self.ds.BitsStored = 32
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        arr = np.asarray([1, 2, 3], dtype='|u1')
-        assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
-        assert 12 == len(out)
-        assert b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00" == out
-
-    def test_u08_3s_as_u08(self):
+    def test_u08_3s(self):
         """Test processing u8/3s"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
@@ -235,12 +518,12 @@ class TestEncoderFactory_ProcessFrame:
 
         arr = self.arr_3s.astype('|u1')
         assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
+        kwargs = self.e.kwargs_from_ds(self.ds)
+        out = self.e._preprocess(arr, **kwargs)
         assert 24 == len(out)
         assert bytes(range(1, 25)) == out
 
-    # Signed 8-bit processing
-    def test_i08_1s_as_i08(self):
+    def test_i08_1s(self):
         """Test processing i8/1s"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
@@ -251,41 +534,12 @@ class TestEncoderFactory_ProcessFrame:
 
         arr = np.asarray([-128, 0, 127], dtype='|i1')
         assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
+        kwargs = self.e.kwargs_from_ds(self.ds)
+        out = self.e._preprocess(arr, **kwargs)
         assert 3 == len(out)
         assert b"\x80\x00\x7f" == out
 
-    def test_i08_1s_as_i16(self):
-        """Test processing i8/1s w/ upsize to i16"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        arr = np.asarray([-128, 0, 127], dtype='|i1')
-        assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
-        assert 6 == len(out)
-        assert b"\x80\xff\x00\x00\x7f\x00" == out
-
-    def test_i08_1s_as_i32(self):
-        """Test processing i8/1s w/ upsize to i32"""
-        self.ds.BitsAllocated = 32
-        self.ds.BitsStored = 32
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        arr = np.asarray([-128, 0, 127], dtype='|i1')
-        assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
-        assert 12 == len(out)
-        assert b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00" == out
-
-    def test_u08_3s_as_u08(self):
+    def test_u08_3s(self):
         """Test processing i8/3s"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
@@ -296,47 +550,12 @@ class TestEncoderFactory_ProcessFrame:
 
         arr = self.arr_3s.astype('|i1')
         assert 1 == arr.dtype.itemsize
-        out = self.e._process_frame(arr, self.ds)
+        kwargs = self.e.kwargs_from_ds(self.ds)
+        out = self.e._preprocess(arr, **kwargs)
         assert 24 == len(out)
         assert bytes(range(1, 25)) == out
 
-    # Unsigned 16-bit processing
-    def test_u16_1s_as_u08(self):
-        """Test processing u16/1s w/ downsize to u8"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        for dtype in ('>u2', '<u2', '=u2'):
-            arr = np.asarray([255, 127, 0], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 3 == len(out)
-            assert b"\xff\x7f\x00" == out
-
-    def test_u16_1s_as_u08_overflow_raises(self):
-        """Test processing u16/1s w/ downsize to u8 raises on overflow"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>u2', '<u2', '=u2'):
-            arr = np.asarray([256, 2, 3], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_u16_1s_as_u16(self):
+    def test_u16_1s(self):
         """Test processing u16/1s"""
         self.ds.BitsAllocated = 16
         self.ds.BitsStored = 16
@@ -348,27 +567,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>u2', '<u2', '=u2'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
             assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 6 == len(out)
             assert b"\x01\x00\x02\x00\x03\x00" == out
 
-    def test_u16_1s_as_u32(self):
-        """Test processing u16/1s w/ upsize to u32"""
-        self.ds.BitsAllocated = 32
-        self.ds.BitsStored = 32
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        for dtype in ('>u2', '<u2', '=u2'):
-            arr = np.asarray([1, 2, 3], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 12 == len(out)
-            assert b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00" == out
-
-    def test_u16_3s_as_u16(self):
+    def test_u16_3s(self):
         """Test processing u16/3s"""
         self.ds.BitsAllocated = 16
         self.ds.BitsStored = 16
@@ -381,52 +585,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>u2', '<u2', '=u2'):
             arr = self.arr_3s.astype(dtype)
             assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 48 == len(out)
             assert ref == out
 
-    # Signed 16-bit processing
-    def test_i16_1s_as_i08(self):
-        """Test processing i16/1s w/ downsize to i8"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        for dtype in ('>i2', '<i2', '=i2'):
-            arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 3 == len(out)
-            assert b"\x80\x00\x7f" == out
-
-    def test_i16_1s_as_i08_overflow_raises(self):
-        """Test processing i16/1s w/ downsize to i8 raises on overflow"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>i2', '<i2', '=i2'):
-            arr = np.asarray([-129, 2, 3], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-            arr = np.asarray([128, 2, 3], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_i16_1s_as_i16(self):
+    def test_i16_1s(self):
         """Test processing i16/1s"""
         self.ds.BitsAllocated = 16
         self.ds.BitsStored = 16
@@ -438,27 +602,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>i2', '<i2', '=i2'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
             assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 6 == len(out)
             assert b"\x80\xff\x00\x00\x7f\x00" == out
 
-    def test_i16_1s_as_i32(self):
-        """Test processing i16/1s w/ upsize to i32"""
-        self.ds.BitsAllocated = 32
-        self.ds.BitsStored = 32
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-        self.ds.SamplesPerPixel = 1
-
-        for dtype in ('>i2', '<i2', '=i2'):
-            arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 12 == len(out)
-            assert b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00" == out
-
-    def test_i16_3s_as_i16(self):
+    def test_i16_3s(self):
         """Test processing i16/3s"""
         self.ds.BitsAllocated = 16
         self.ds.BitsStored = 16
@@ -471,82 +620,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>i2', '<i2', '=i2'):
             arr = self.arr_3s.astype(dtype)
             assert 2 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 48 == len(out)
             assert ref == out
 
-    # Unsigned 32-bit processing
-    def test_u32_1s_as_u08(self):
-        """Test processing u32/1s w/ downsize to u8"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        for dtype in ('>u4', '<u4', '=u4'):
-            arr = np.asarray([255, 127, 0], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 3 == len(out)
-            assert b"\xff\x7f\x00" == out
-
-    def test_u32_1s_as_u08_overflow_raises(self):
-        """Test processing u32/1s w/ downsize to u8 raises on overflow"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>u4', '<u4', '=u4'):
-            arr = np.asarray([256, 2, 3], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_u32_1s_as_u16(self):
-        """Test processing u32/1s w/ downsize to u16"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        for dtype in ('>u4', '<u4', '=u4'):
-            arr = np.asarray([1, 2, 3], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 6 == len(out)
-            assert b"\x01\x00\x02\x00\x03\x00" == out
-
-    def test_u32_1s_as_u16_overflow_raises(self):
-        """Test processing u32/1s w/ downsize to u16 raises on overflow"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 0
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>u4', '<u4', '=u4'):
-            arr = np.asarray([65536, 2, 3], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_u32_1s_as_u32(self):
+    def test_u32_1s(self):
         """Test processing u32/1s"""
         self.ds.BitsAllocated = 32
         self.ds.BitsStored = 32
@@ -559,11 +638,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>u4', '<u4', '=u4'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
             assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 12 == len(out)
             assert ref == out
 
-    def test_u32_3s_as_u32(self):
+    def test_u32_3s(self):
         """Test processing u32/3s"""
         self.ds.BitsAllocated = 32
         self.ds.BitsStored = 32
@@ -577,92 +657,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>u4', '<u4', '=u4'):
             arr = self.arr_3s.astype(dtype)
             assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 96 == len(out)
             assert ref == out
 
-    # Signed 32-bit processing
-    def test_i32_1s_as_i08(self):
-        """Test processing i32/1s w/ downsize to i8"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        for dtype in ('>i4', '<i4', '=i4'):
-            arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 3 == len(out)
-            assert b"\x80\x00\x7f" == out
-
-    def test_i32_1s_as_i08_overflow_raises(self):
-        """Test processing i32/1s w/ downsize to i8 raises on overflow"""
-        self.ds.BitsAllocated = 8
-        self.ds.BitsStored = 8
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>i4', '<i4', '=i4'):
-            arr = np.asarray([-129, 0, 127], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-            arr = np.asarray([-128, 0, 128], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_i32_1s_as_i16(self):
-        """Test processing i32/1s w/ downsize to i16"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        for dtype in ('>i4', '<i4', '=i4'):
-            arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
-            assert 6 == len(out)
-            assert b"\x80\xff\x00\x00\x7f\x00" == out
-
-    def test_i32_1s_as_i16_overflow_raises(self):
-        """Test processing u32/1s w/ downsize to u16 raises on overflow"""
-        self.ds.BitsAllocated = 16
-        self.ds.BitsStored = 16
-        self.ds.SamplesPerPixel = 1
-        self.ds.PixelRepresentation = 1
-        self.ds.Rows = 1
-        self.ds.Columns = 3
-
-        msg = (
-            r"Cannot modify the array to match 'Bits Allocated' without "
-            r"clipping the pixel values"
-        )
-        for dtype in ('>i4', '<i4', '=i4'):
-            arr = np.asarray([-32769, 0, 127], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-            arr = np.asarray([-128, 0, 32768], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
-            with pytest.raises(ValueError, match=msg):
-                self.e._process_frame(arr, self.ds)
-
-    def test_i32_1s_as_i32(self):
+    def test_i32_1s(self):
         """Test processing i32/1s"""
         self.ds.BitsAllocated = 32
         self.ds.BitsStored = 32
@@ -675,11 +675,12 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>i4', '<i4', '=i4'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
             assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 12 == len(out)
             assert ref == out
 
-    def test_i32_3s_as_i32(self):
+    def test_i32_3s(self):
         """Test processing i32/3s"""
         self.ds.BitsAllocated = 32
         self.ds.BitsStored = 32
@@ -693,6 +694,56 @@ class TestEncoderFactory_ProcessFrame:
         for dtype in ('>i4', '<i4', '=i4'):
             arr = self.arr_3s.astype(dtype)
             assert 4 == arr.dtype.itemsize
-            out = self.e._process_frame(arr, self.ds)
+            kwargs = self.e.kwargs_from_ds(self.ds)
+            out = self.e._preprocess(arr, **kwargs)
             assert 96 == len(out)
             assert ref == out
+
+
+class TestDatasetCompress:
+    """Tests for Dataset.compress()."""
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_compress_inplace(self):
+        """Test encode with a dataset."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds.compress(RLELossless)
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21820 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+
+        # Test encapsulated, test uncompressed == original
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_compress_arr(self):
+        """Test encode with a dataset."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        arr = ds.pixel_array
+        del ds.PixelData
+        ds.compress(RLELossless, arr)
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21820 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    def test_encoder_unavailable(self):
+        """Test the required encoder being unavailable."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        msg = (
+            r"The 'RLE Lossless' encoder is unavailable because its encoding "
+            r"plugins are missing dependencies:\n    pylibjpeg - requires "
+            r"numpy, pylibjpeg and pylibjpeg-rle\n    pydicom - requires numpy"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.compress(RLELossless)
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    def test_uid_not_supported(self):
+        """Test the UID not having any encoders."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+
+        msg = (
+            r"No pixel data encoders have been implemented for "
+            r"'JPEG 2000 Part 2 Multi-component Image Compression'"
+        )
+        with pytest.raises(NotImplementedError, match=msg):
+            ds.compress(JPEG2000MC)

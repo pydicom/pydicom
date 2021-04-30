@@ -32,6 +32,7 @@ Save encoded *Pixel Data* to file (single or multi-framed):
 """
 from importlib import import_module
 import multiprocessing
+from pathlib import Path
 import sys
 from typing import (
     Callable, Generator, Tuple, List, Optional, Dict, Any, Union, cast
@@ -50,8 +51,8 @@ except ImportError:
 
 # TODO:
 # Add docs for requirements of a plugin
-class EncoderFactory:
-    """Factory class for data encoders.
+class Encoder:
+    """Class for data encoders.
 
     .. versionadded:: 2.2
     """
@@ -75,7 +76,7 @@ class EncoderFactory:
             'byteorder': '<',
         }
 
-    # TODO: err_msg is probably redundant, but would be nice for complicated cases
+    # TODO: Add link to doc on plugin requirements
     def add_plugin(
         self, label: str, path: Tuple[str, str], err_msg: Optional[str] = None
     ) -> None:
@@ -98,15 +99,17 @@ class EncoderFactory:
             )
 
         module = import_module(path[0])
-        dependencies = getattr(module, "ENCODER_DEPENDENCIES")
 
+        # `is_available(UID)` is required for plugins
         if module.is_available(self.UID):  # type: ignore[attr-defined]
             self._available[label] = getattr(module, path[1])
         else:
-            self._unavailable[label] = (dependencies, err_msg)
+            # `ENCODER_DEPENDENCIES[UID]` is required for plugins
+            self._unavailable[label] = module.ENCODER_DEPENDENCIES[self.UID]
 
     @staticmethod
-    def _check_kwargs(kwargs: Dict[str, Any]) -> None:
+    def _check_kwargs(kwargs: Dict[str, Union[int, str]]) -> None:
+        """Raise TypeError if `kwargs` is missing required keys."""
         required_keys = [
             'rows', 'columns', 'samples_per_pixel', 'bits_allocated',
             'bits_stored', 'pixel_representation', 'photometric_interpretation'
@@ -117,6 +120,7 @@ class EncoderFactory:
                 f"Missing expected arguments: {', '.join(missing)}"
             )
 
+    # TODO: test
     def encode(
         self,
         src: Union[bytes, "np.ndarray", "Dataset"],
@@ -207,6 +211,8 @@ class EncoderFactory:
             f"not '{src.__class__.__name__}'"
         )
 
+    # TODO: add validity check for kwargs
+    # TODO: test
     def _encode_array(
         self,
         arr: "np.ndarray",
@@ -215,16 +221,22 @@ class EncoderFactory:
         **kwargs
     ) -> bytes:
         """Return a single encoded frame from `arr`."""
-        # TODO: add validity check for kwargs
+        if len(arr.shape) > 4:
+            raise ValueError(f"Unable to encode {len(arr.shape)}D ndarrays")
 
-        if idx is None and kwargs.get('number_of_frames', 1) > 1:
-            raise ValueError("FIXME")
-        else:
+        if kwargs.get('number_of_frames', 1) > 1 or len(arr.shape) == 4:
+            if idx is None:
+                raise ValueError(
+                    "The frame 'idx' is required for multi-frame pixel data"
+                )
+
             arr = arr[idx]
 
         src = self._preprocess(arr, **kwargs)
         return self._process(src, encoding_plugin, **kwargs)
 
+    # TODO: test
+    # TODO: add validity check for kwargs
     def _encode_bytes(
         self,
         src: bytes,
@@ -262,6 +274,8 @@ class EncoderFactory:
 
         raise ValueError("The 'idx' parameter is required with multiple frames")
 
+    # TODO: exception message
+    # TODO: test
     def _encode_dataset(
         self,
         ds: "Dataset",
@@ -288,9 +302,12 @@ class EncoderFactory:
 
         arr = ds.pixel_array
 
-        if idx is None and kwargs['number_of_frames'] > 1:
-            raise ValueError("FIXME")
-        else:
+        if kwargs['number_of_frames'] > 1 or len(arr.shape) == 4:
+            if idx is None:
+                raise ValueError(
+                    "The frame 'idx' is required for multi-frame pixel data"
+                )
+
             arr = arr[idx]
 
         src = self._preprocess(arr, **kwargs)
@@ -303,6 +320,7 @@ class EncoderFactory:
         """
         return bool(self._available)
 
+    # TODO: test
     def iter_encode(
         self,
         src: Union[bytes, "np.ndarray", "Dataset"],
@@ -426,13 +444,13 @@ class EncoderFactory:
         missing = [f"'{kw}'" for kw in required if kw not in ds]
         if missing:
             raise AttributeError(
-                "The following required elements are missing: "
-                f"{', '.join(missing)}"
+                "The following required elements are missing from the "
+                f"dataset: {', '.join(missing)}"
             )
         empty = [f"'{kw}'" for kw in required if ds[kw].VM == 0]
         if empty:
             raise AttributeError(
-                "The following required elements have a VM of 0: "
+                "The following required dataset elements have a VM of 0: "
                 f"{', '.join(empty)}"
             )
 
@@ -463,21 +481,20 @@ class EncoderFactory:
         """Return the name of the encoder."""
         return f"{self.UID.keyword}Encoder"
 
-    # TODO: maybe remove
     @property
-    def plugins(self) -> List[str]:
-        """Return a list of labels for the encoder's plugins (both available
-        and unavailable).
-        """
-        return list(self._available.keys()) + list(self._unavailable.keys())
+    def missing_dependencies(self) -> List[str]:
+        """Return nice strings for plugins when missing dependencies"""
+        s = []
+        for label, deps in self._unavailable.items():
+            if len(deps) > 1:
+                s.append(
+                    f"{label} - requires {', '.join(deps[:-1])} and {deps[-1]}"
+                )
+            else:
+                s.append(f"{label} - requires {deps[0]}")
 
-    # TODO: maybe remove
-    @property
-    def plugin_dependencies(self) -> List[str]:
-        # What is this for?
-        pass
+        return s
 
-    # FIXME
     def _preprocess(self, arr: "np.ndarray", **kwargs) -> bytes:
         """Preprocess `arr` before encoding to ensure it meets requirements.
 
@@ -506,7 +523,6 @@ class EncoderFactory:
         bytes
             The pixel data in `arr` converted to little-endian ordered bytes.
         """
-        # Check *Rows*, *Columns*, *Samples per Pixel* match array
         rows: int = kwargs['rows']
         cols: int = kwargs['columns']
         samples_per_pixel: int = kwargs['samples_per_pixel']
@@ -515,69 +531,90 @@ class EncoderFactory:
         bits_stored: int = kwargs['bits_stored']
         pixel_repr: int = kwargs['pixel_representation']
 
-        _shape_check = {
+        shape = arr.shape
+        dims = len(shape)
+        dtype = arr.dtype
+
+        # Ensure *Samples per Pixel* value is supported
+        if samples_per_pixel not in (1, 3):
+            raise ValueError(
+                "Unable to encode as a samples per pixel value of "
+                f"{samples_per_pixel} is not supported (must be 1 or 3)"
+            )
+
+        # Check shape/length of `arr` matches
+        valid_shapes = {
             1: (rows * cols * samples_per_pixel, ),
             2: (rows, cols),
             3: (rows, cols, samples_per_pixel),
         }
 
-        if len(arr.shape) > 3:
-            raise ValueError("The maximum supported array dimensions is 4")
+        if valid_shapes[dims] != shape:
+            raise ValueError(
+                f"Unable to encode as the shape of the ndarray {shape} "
+                "doesn't match the values for the rows, columns and samples "
+                "per pixel"
+            )
 
-        # FIXME: 1D array fail on first condition, add test
-        if (
-            (samples_per_pixel > 1 and len(arr.shape) != 3)
-            or (_shape_check[len(arr.shape)] != arr.shape)
-        ):
-            raise ValueError("The shape of the array doesn't match the dataset")
+        if samples_per_pixel > 1 and dims == 2:
+            raise ValueError(
+                f"Unable to encode as the shape of the ndarray {shape} "
+                "is not consistent with a samples per pixel value of 3"
+            )
 
-        # Check *Pixel Representation* matches array
         ui = [
-            np.issubdtype(arr.dtype, np.unsignedinteger),
-            np.issubdtype(arr.dtype, np.signedinteger)
+            np.issubdtype(dtype, np.unsignedinteger),
+            np.issubdtype(dtype, np.signedinteger)
         ]
-
-        # FIXME: add test
         if not any(ui):
             raise ValueError(
-                "Invalid dtype kind, must be signed or unsigned integer"
+                f"Unable to encode as the ndarray's dtype '{dtype}' is "
+                "not supported"
             )
 
+        # Check *Pixel Representation* is consistent with `arr`
         if not ui[pixel_repr]:
+            s = ['unsigned', 'signed'][pixel_repr]
             raise ValueError(
-                "Incompatible array dtype and dataset 'Pixel Representation'"
+                f"Unable to encode as the ndarray's dtype '{dtype}' is "
+                f"not consistent with pixel representation '{pixel_repr}' "
+                f"({s} int)"
             )
 
-        # Ensure *Bits Allocated* value is supported
+        # Checks for *Bits Allocated*
         if bits_allocated not in (8, 16, 32, 64):
             raise ValueError(
-                "Unsupported 'Bits Allocated' must be 8, 16, 32 or 64"
+                "Unable to encode as a bits allocated value of "
+                f"{bits_allocated} is not supported (must be 8, 16, 32 or 64)"
             )
 
-        # Ensure *Samples per Pixel* value is supported
-        if samples_per_pixel not in (1, 3):
-            raise ValueError("Unsupported 'Samples per Pixel' must be 1 or 3")
-
-        # Change array itemsize to match *Bits Allocated*, if possible
-        if bytes_allocated != arr.dtype.itemsize:
-            raise ValueError("The array itemsize doesn't match bits allocated")
+        if bytes_allocated != dtype.itemsize:
+            raise ValueError(
+                f"Unable to encode as the ndarray's dtype '{dtype}' is "
+                "not consistent with a bits allocated value of "
+                f"{bits_allocated}"
+            )
 
         if bits_allocated < bits_stored:
-            raise ValueError("bits allocated must be >= bits stored")
+            raise ValueError(
+                "Unable to encode as the bits stored value is greater than "
+                "the bits allocated value"
+            )
 
         # Convert the array to the required byte order (little-endian)
-        system_endianness = '<' if sys.byteorder == 'little' else '>'
+        sys_endianness = '<' if sys.byteorder == 'little' else '>'
         # `byteorder` may be
         #   '|': none available, such as for 8 bit -> ignore
         #   '=': native system endianness -> change to '<' or '>'
         #   '<' or '>': little or big
-        byteorder = arr.dtype.byteorder
-        byteorder = system_endianness if byteorder == '=' else byteorder
+        byteorder = dtype.byteorder
+        byteorder = sys_endianness if byteorder == '=' else byteorder
         if byteorder == '>':
-            arr = arr.astype(arr.dtype.newbyteorder('<'))
+            arr = arr.astype(dtype.newbyteorder('<'))
 
         return arr.tobytes()
 
+    # TODO: test
     def _process(
         self,
         src: bytes,
@@ -613,9 +650,6 @@ class EncoderFactory:
         # Add our defaults, but don't overwrite existing options
         kwargs = {**self._defaults, **kwargs}
 
-        # Process the pixel array and convert to little-endian ordered bytes
-        #src = self._preprocess(src, **kwargs)
-
         failed_encoders: List[Tuple[str, str]] = []
         if plugin:
             # Try specific encoder
@@ -647,9 +681,10 @@ class EncoderFactory:
         """
         if label in self._available:
             del self._available[label]
-
-        if label in self._unavailable:
+        elif label in self._unavailable:
             del self._unavailable
+        else:
+            raise ValueError(f"Unable to remove '{label}', no such plugin'")
 
     @property
     def UID(self) -> UID:
@@ -658,7 +693,7 @@ class EncoderFactory:
 
 
 # Encoder names should be f"{UID.keyword}Encoder"
-RLELosslessEncoder = EncoderFactory(RLELossless)
+RLELosslessEncoder = Encoder(RLELossless)
 """An *RLE Lossless** encoder for *Pixel Data*.
 
 .. versionadded:: 2.2
@@ -666,7 +701,6 @@ RLELosslessEncoder = EncoderFactory(RLELossless)
 RLELosslessEncoder.add_plugin(
     'pylibjpeg',
     ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
-    'numpy and pylibjpeg (with the pylibjpeg-rle plugin)'
 )
 RLELosslessEncoder.add_plugin(
     'pydicom',
@@ -680,7 +714,7 @@ _PIXEL_DATA_ENCODERS = {
 }
 
 
-def get_encoder(uid: str, encoder_type: str = 'PixelData') -> EncoderFactory:
+def get_encoder(uid: str) -> Encoder:
     """Return an encoder for `uid`.
 
     .. versionadded:: 2.2
@@ -694,11 +728,11 @@ def get_encoder(uid: str, encoder_type: str = 'PixelData') -> EncoderFactory:
         )
 
 
-# TODO: better name
 # TODO: use standalone encoding func so can modify in place
-def process(
-    datasets: List["Dataset"],
+def parallel_encode(
+    path: Union[str, Path],
     uid: str,
+    recurse: bool = True,
     nprocs: int = multiprocessing.cpu_count(),
     **kwargs
 ) -> List["Dataset"]:

@@ -1654,7 +1654,17 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         from pydicom.encoders import get_encoder
         from pydicom.encaps import encapsulate, encapsulate_extended
 
+        # Raises NotImplementedError if `uid` is not supported
         encoder = get_encoder(uid)
+        if not encoder.is_available:
+            missing = "\n".join(
+                [f"    {s}" for s in encoder.missing_dependencies]
+            )
+            raise RuntimeError(
+                f"The '{uid.name}' encoder is unavailable because its "
+                f"encoding plugins are missing dependencies:\n"
+                f"{missing}"
+            )
 
         if arr is None:
             # Encode the current *Pixel Data* (will decode first if required)
