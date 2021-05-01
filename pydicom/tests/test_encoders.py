@@ -17,7 +17,8 @@ except ImportError:
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.encoders import Encoder, RLELosslessEncoder
+from pydicom.encoders import RLELosslessEncoder
+from pydicom.encoders.base import Encoder
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC
