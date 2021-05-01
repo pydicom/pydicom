@@ -57,7 +57,7 @@ from pydicom.pixel_data_handlers.util import (
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
 from pydicom.uid import (
     ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
-    RLELossless, PYDICOM_IMPLEMENTATION_UID
+    RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
 )
 from pydicom.waveforms import numpy_handler as wave_handler
 
@@ -1566,7 +1566,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         self._pixel_id = get_image_pixel_ids(self)
 
-    # TODO: docstring, typing check
+    # TODO: docstring
     def compress(
         self,
         uid: str,
@@ -1663,6 +1663,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         from pydicom.encoders import get_encoder
         from pydicom.encaps import encapsulate, encapsulate_extended
+
+        uid = UID(uid)
 
         # Raises NotImplementedError if `uid` is not supported
         encoder = get_encoder(uid)

@@ -374,7 +374,7 @@ def _rle_decode_segment(data):
 
 # RLE encoding functions
 def _wrap_rle_encode_frame(src: bytes, **kwargs) -> bytes:
-    """Play nice with the new encoder interface.
+    """Wrapper for use with the encoder interface.
 
     .. versionadded:: 2.2
 
@@ -383,7 +383,7 @@ def _wrap_rle_encode_frame(src: bytes, **kwargs) -> bytes:
     src : bytes
         A single frame of image data to be RLE encoded.
     **kwargs
-
+        Optional parameters for the encoding function.
 
     Returns
     -------

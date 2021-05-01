@@ -1,41 +1,11 @@
-"""Bulk data encoding.
+"""Bulk data encoding."""
 
-Examples
---------
-
-Recurse through the current directory and compress all the datasets:
-
-.. codeblock:: python
-
-    from pathlib import Path
-
-    from pydicom import dcmread
-    from pydicom.uid import RLELossless
-
-    for p in Path().glob('**/*'):
-        ds = dcmread(p)
-        ds.compress(RLELossless)
-        ds.save_as(p)
-
-Save encoded *Pixel Data* to file (single or multi-framed):
-
-.. codeblock:: python
-
-    from pydicom import dcmread
-    from pydicom.data import get_testdata_file
-    from pydicom.encoders import RLELosslessEncoder as encoder
-
-    ds = get_testdata_file("CT_small.dcm", read=True)
-
-    with open('pixel_data.rle', 'wb') as f:
-        f.write(encoder.encode(..., ds, frame=0))  # no arr :< -> add new method
-"""
 from importlib import import_module
 import multiprocessing
 from pathlib import Path
 import sys
 from typing import (
-    Callable, Generator, Tuple, List, Optional, Dict, Any, Union, cast
+    Callable, Generator, Tuple, List, Optional, Dict, Union, cast
 )
 
 from pydicom.dataset import Dataset
@@ -77,9 +47,7 @@ class Encoder:
         }
 
     # TODO: Add link to doc on plugin requirements
-    def add_plugin(
-        self, label: str, path: Tuple[str, str], err_msg: Optional[str] = None
-    ) -> None:
+    def add_plugin(self, label: str, path: Tuple[str, str]) -> None:
         """Add an encoding plugin to the encoder.
 
         Parameters
@@ -89,9 +57,6 @@ class Encoder:
         path : Tuple[str, str]
             The module import path and the encoding function name (e.g.
             ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
-        err_msg : str
-            A message that may be displayed if unable to use the plugin's
-            encoding function due to missing dependencies.
         """
         if label in self._available or label in self._unavailable:
             raise ValueError(
@@ -105,7 +70,7 @@ class Encoder:
             self._available[label] = getattr(module, path[1])
         else:
             # `ENCODER_DEPENDENCIES[UID]` is required for plugins
-            self._unavailable[label] = module.ENCODER_DEPENDENCIES[self.UID]
+            self._unavailable[label] = module.ENCODER_DEPENDENCIES[self.UID]  # type: ignore[attr-defined]
 
     @staticmethod
     def _check_kwargs(kwargs: Dict[str, Union[int, str]]) -> None:
@@ -658,7 +623,10 @@ class Encoder:
                 f"dependencies:\n{missing}"
             )
 
-        if plugin and plugin not in {**self._unavailable, **self._available}:
+        all_plugins = (
+            list(self._unavailable.keys()) + list(self._available.keys())
+        )
+        if plugin and plugin not in all_plugins:
             raise ValueError(
                 f"No plugin named '{plugin}' has been added to the "
                 f"'{self.name}'"
@@ -756,64 +724,3 @@ def get_encoder(uid: str) -> Encoder:
         raise NotImplementedError(
             f"No pixel data encoders have been implemented for '{uid.name}'"
         )
-
-
-# TODO: use standalone encoding func so can modify in place
-def parallel_encode(
-    path: Union[str, Path],
-    uid: str,
-    recurse: bool = True,
-    nprocs: int = multiprocessing.cpu_count(),
-    **kwargs
-) -> None:
-    """Use :mod:`multiprocessing` to compress the *Pixel Data* in multiple
-    `datasets`.
-
-    .. versionadded:: 2.2
-
-    Calls the :meth:`~pydicom.dataset.Dataset.compress` method on each of the
-    `datasets`.
-
-    Parameters
-    ----------
-    datasets : list of pydicom.dataset.Dataset
-        The datasets to use.
-    uid : str
-        The *Transfer Syntax UID* to use for compressing.
-    **kwargs
-        Optional parameters to pass to
-        :meth:`~pydicomd.dataset.Dataset.compress`
-
-    Returns
-    -------
-    List[Dataset]
-        The datasets with compressed *Pixel Data*.
-    """
-    # Based on https://stackoverflow.com/a/16071616/12606901
-    def func(q_in, q_out) -> None:
-        while True:
-            idx, ds = q_in.get()
-            if idx is None:
-                break
-
-            ds.compress(uid, **kwargs)
-            q_out.put((idx, ds))
-
-    q_in  = multiprocessing.Queue(1)  # type: ignore[var-annotated]
-    q_out = multiprocessing.Queue()  # type: ignore[var-annotated]
-
-    proc = [
-        multiprocessing.Process(target=func, args=(q_in, q_out))
-        for _ in range(nprocs)
-    ]
-    for p in proc:
-        p.daemon = True
-        p.start()
-
-    sent = [q_in.put((idx, ds)) for idx, ds in enumerate(datasets)]  # type: ignore[func-returns-value]
-    [q_in.put((None, None)) for _ in range(nprocs)]  # type: ignore[func-returns-value]
-    result = [q_out.get() for _ in range(len(sent))]
-
-    [p.join() for p in proc]  # type: ignore[func-returns-value]
-
-    #return [ds for idx, ds in sorted(result)]

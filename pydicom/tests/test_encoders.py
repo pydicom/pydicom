@@ -17,7 +17,7 @@ except ImportError:
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.encoders import Encoder, parallel_encode, RLELosslessEncoder
+from pydicom.encoders import Encoder, RLELosslessEncoder
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC
@@ -55,7 +55,6 @@ class TestEncoder:
                 'pydicom.pixel_data_handlers.rle_handler',
                 '_wrap_rle_encode_frame'
             ),
-            "plugin custom error"
         )
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
@@ -72,7 +71,6 @@ class TestEncoder:
                 'pydicom.pixel_data_handlers.rle_handler',
                 '_wrap_rle_encode_frame'
             ),
-            "plugin custom error"
         )
         assert {} == enc._available
         assert "foo" in enc._unavailable
@@ -91,7 +89,6 @@ class TestEncoder:
                     'badpath.pixel_data_handlers.rle_handler',
                     '_wrap_rle_encode_frame'
                 ),
-                "plugin custom error"
             )
         assert {} == enc._available
         assert {} == enc._unavailable
@@ -112,7 +109,6 @@ class TestEncoder:
                     'pydicom.pixel_data_handlers.rle_handler',
                     'bad_function_name'
                 ),
-                "plugin custom error"
             )
         assert {} == enc._available
         assert {} == enc._unavailable
@@ -126,7 +122,6 @@ class TestEncoder:
                 'pydicom.pixel_data_handlers.rle_handler',
                 '_wrap_rle_encode_frame'
             ),
-            "plugin custom error"
         )
         assert 'foo' in self.enc._available
         assert {} == self.enc._unavailable
