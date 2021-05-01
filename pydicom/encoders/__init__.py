@@ -211,8 +211,6 @@ class Encoder:
             f"not '{src.__class__.__name__}'"
         )
 
-    # TODO: add validity check for kwargs
-    # TODO: test
     def _encode_array(
         self,
         arr: "np.ndarray",
@@ -221,6 +219,8 @@ class Encoder:
         **kwargs
     ) -> bytes:
         """Return a single encoded frame from `arr`."""
+        self._check_kwargs(kwargs)
+
         if len(arr.shape) > 4:
             raise ValueError(f"Unable to encode {len(arr.shape)}D ndarrays")
 
@@ -235,8 +235,6 @@ class Encoder:
         src = self._preprocess(arr, **kwargs)
         return self._process(src, encoding_plugin, **kwargs)
 
-    # TODO: test
-    # TODO: add validity check for kwargs
     def _encode_bytes(
         self,
         src: bytes,
@@ -245,6 +243,8 @@ class Encoder:
         **kwargs
     ) -> bytes:
         """Return a single encoded frame from `src`."""
+        self._check_kwargs(kwargs)
+
         rows: int = kwargs['rows']
         columns: int = kwargs['columns']
         samples_per_pixel: int = kwargs['samples_per_pixel']
@@ -253,29 +253,35 @@ class Encoder:
 
         # Expected length of a single frame
         expected_len = rows * columns * samples_per_pixel * bytes_allocated
-        whole_frames = expected_len // len(src)
+        whole_frames = len(src) // expected_len
 
         # Insufficient data
         if whole_frames == 0:
-            raise ValueError("Insufficient data too short")
+            raise ValueError(
+                "Unable to encode as the actual length of the frame "
+                f"({len(src)} bytes) is less than the expected length "
+                f"of {expected_len} bytes"
+            )
 
         # Single frame with matching length or with padding
         if whole_frames == 1:
-            return self._process(src[:expected_len], encoding_plugin, **kwargs)
+            return self._process(
+                src[:expected_len], plugin=encoding_plugin, **kwargs
+            )
 
         # Multiple frames
         if idx is not None:
             frame_offset = idx * expected_len
             return self._process(
                 src[frame_offset:frame_offset + expected_len],
-                encoding_plugin,
+                plugin=encoding_plugin,
                 **kwargs
             )
 
-        raise ValueError("The 'idx' parameter is required with multiple frames")
+        raise ValueError(
+            "The frame 'idx' is required for multi-frame pixel data"
+        )
 
-    # TODO: exception message
-    # TODO: test
     def _encode_dataset(
         self,
         ds: "Dataset",
@@ -285,10 +291,7 @@ class Encoder:
         **kwargs
     ) -> bytes:
         """Return a single encoded frame from the *Pixel Data* in `ds`."""
-        try:
-            kwargs.update(self.kwargs_from_ds(ds))
-        except AttributeError as exc:
-            raise AttributeError("FIXME") from exc
+        kwargs.update(self.kwargs_from_ds(ds))
 
         tsyntax = cast(UID, ds.file_meta.TransferSyntaxUID)
         if not tsyntax.is_compressed:
@@ -615,6 +618,8 @@ class Encoder:
         return arr.tobytes()
 
     # TODO: test
+    # TODO: handle exceptions in plugins
+    # TODO: good exception message for complete failure
     def _process(
         self,
         src: bytes,

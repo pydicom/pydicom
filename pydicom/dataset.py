@@ -1633,10 +1633,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
             use when compressing the pixel data.
         arr : numpy.ndarray, optional
-            An :class:`~numpy.ndarray` containing uncompressed pixel data. The
-            shape and contents of the array should match the dataset.
-            If `arr` is not used then the existing *Pixel Data* in the dataset
-            will be decompressed (if required) and compressed.
+            Compress the uncompressed pixel data in `arr` and use it
+            to set the *Pixel Data*. If `arr` is not used then the
+            existing *Pixel Data* in the dataset will be decompressed (if
+            required) and compressed instead. The :attr:`~numpy.shape`,
+            :class:`~numpy.dtype` and contents of the array should match the
+            dataset.
         encoding_plugin : str, optional
             FIXME
             Force the use of `encoding_plugin` to compress the pixel data. See
@@ -1683,9 +1685,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 **kwargs
             )
 
+        # Encode!
         encoded = [f for f in frame_iterator]
 
-        # Encapsulate the *Pixel Data*
+        # Encapsulate the encoded *Pixel Data*
         nr_frames = getattr(self, "NumberOfFrames", 1) or 1
         total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
         if total > 2**32 - 1:

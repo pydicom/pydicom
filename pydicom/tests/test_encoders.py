@@ -11,6 +11,7 @@ except ImportError:
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.encoders import Encoder, parallel_encode, RLELosslessEncoder
+from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC
 )
@@ -254,62 +255,187 @@ class TestEncoder:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Encode:
     """Tests for Encoder.encode() and related methods."""
+    def setup(self):
+        self.enc = RLELosslessEncoder
+        self.ds = get_testdata_file("CT_small.dcm", read=True)
+        self.ds_enc = get_testdata_file("MR_small_RLE.dcm", read=True)
+        self.ds_enc_mf = get_testdata_file("emri_small_RLE.dcm", read=True)
+        self.bytes = self.ds.PixelData
+        self.arr = self.ds.pixel_array
+        self.kwargs = self.enc.kwargs_from_ds(self.ds)
+
+    def test_invalid_type_raises(self):
+        """Test exception raised if passing invalid type."""
+        enc = RLELosslessEncoder
+        msg = (
+            r"'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
+            rf"not 'str'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            enc.encode('abc')
+
     # Passing bytes
-    def test_encode_bytes(self):
+    def test_bytes(self):
         """Test encoding bytes"""
-        pass
+        assert 32768 == len(self.bytes)
+        out = self.enc.encode(self.bytes, **self.kwargs)
+        assert len(self.bytes) > len(out)
 
-    def test_encode_bytes_specific(self):
+    def test_bytes_specific(self):
         """Test encoding bytes with a specific encoder"""
-        pass
+        out = self.enc.encode(
+            self.bytes, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(out)
 
-    def test_encode_bytes_short(self):
-        """Test encode(bytes) with short data"""
-        pass
+    def test_bytes_short_raises(self):
+        """Test encoding bytes with short data raises exception"""
+        msg = (
+            r"Unable to encode as the actual length of the frame \(32767 "
+            r"bytes\) is less than the expected length of 32768 bytes"
+        )
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(self.bytes[:-1], **self.kwargs)
 
-    def test_encode_bytes_padded(self):
-        """Test encode(bytes) with padded data"""
-        pass
+    def test_bytes_padded(self):
+        """Test encoding bytes with padded data"""
+        out = self.enc.encode(
+            self.bytes + b'\x00\x00', encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(out)
 
-    def test_encode_bytes_multiframe(self):
-        """Test encode(bytes, idx)"""
-        pass
+    def test_bytes_multiframe(self):
+        """Test encoding multiframe bytes with idx"""
+        out = self.enc.encode(
+            self.bytes * 2, idx=0, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(out)
 
-    def test_encode_bytes_multiframe_no_idx_raises(self):
-        """Test encode(bytes) with multiframe data."""
-        pass
+    def test_bytes_multiframe_no_idx_raises(self):
+        """Test encoding multiframe bytes without idx raises exception"""
+        msg = r"The frame 'idx' is required for multi-frame pixel data"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(self.bytes * 2, **self.kwargs)
 
     # Passing ndarray
-    def test_encode_array(self):
-        """Test encode(ndarray)"""
-        pass
+    def test_array(self):
+        """Test encode with an array"""
+        out = self.enc.encode(self.arr, **self.kwargs)
+        assert len(self.arr.tobytes()) > len(out)
+
+    def test_array_specific(self):
+        """Test encoding with a specific plugin"""
+        out = self.enc.encode(
+            self.arr, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(out)
+
+    def test_array_multiframe(self):
+        """Test encoding a multiframe array with idx"""
+        arr = np.stack((self.arr, self.arr))
+        assert (2, 128, 128) == arr.shape
+        self.kwargs['number_of_frames'] = 2
+        out = self.enc.encode(
+            arr, idx=0, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(out)
+
+    def test_array_invalid_dims_raises(self):
+        """Test encoding an array with too many dimensions raises"""
+        arr = np.zeros((1, 2, 3, 4, 5))
+        assert (1, 2, 3, 4, 5) == arr.shape
+        msg = r"Unable to encode 5D ndarrays"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(arr, **self.kwargs)
+
+    def test_array_multiframe_no_idx_raises(self):
+        """Test encoding a multiframe array without idx raises"""
+        arr = np.stack((self.arr, self.arr))
+        assert (2, 128, 128) == arr.shape
+        self.kwargs['number_of_frames'] = 2
+        msg = r"The frame 'idx' is required for multi-frame pixel data"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(arr, **self.kwargs)
 
     # Passing Dataset
-    def test_encode_dataset(self):
-        """Test encode with a dataset."""
-        ds = get_testdata_file("CT_small.dcm", read=True)
-        ds.compress(RLELossless)
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21820 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
+    def test_unc_dataset(self):
+        """Test encoding an uncompressed dataset"""
+        assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(self.ds)
+        assert len(self.ds.PixelData) > len(out)
 
-    # TODO: move to the pylibjpeg encoder tests
-    def test_encode_dataset_specific(self):
-        """Test encoding an dataset with a specific encoder"""
-        ds = get_testdata_file("CT_small.dcm", read=True)
-        ds.compress(RLELossless, encoding_plugin='pydicom')
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21118 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
+    def test_unc_dataset_specific(self):
+        """Test encoding an uncompressed dataset with specific plugin"""
+        assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(self.ds, encoding_plugin='pydicom')
+        assert 21098 == len(out)
 
-        ds.compress(RLELossless, encoding_plugin='pylibjpeg')
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21820 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
+    def test_unc_dataset_multiframe(self):
+        """Test encode(Dataset, idx) for an uncompressed tsyntax"""
+        assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
+        self.ds.NumberOfFrames = 2
+        self.ds.PixelData = self.ds.PixelData * 2
+        out = self.enc.encode(self.ds, idx=0)
+        assert len(self.ds.PixelData) > len(out)
 
-    def test_encode_dataset_decompress_specific(self):
-        """Test encoding a compressed dataset with specific decoder"""
-        pass
+    def test_unc_dataset_multiframe_no_idx_raises(self):
+        """Test encode(Dataset) raises if no idx"""
+        assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
+        self.ds.NumberOfFrames = 2
+        self.ds.PixelData = self.ds.PixelData * 2
+        msg = r"The frame 'idx' is required for multi-frame pixel data"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(self.ds)
+
+    def test_enc_dataset(self):
+        """Test encoding a compressed dataset"""
+        ds = self.ds_enc
+        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(ds)
+        uncompressed_len = get_expected_length(ds, 'bytes')
+        assert uncompressed_len > len(out)
+
+    def test_enc_dataset_specific_enc(self):
+        """Test encoding a compressed dataset with specified encoder plugin"""
+        ds = self.ds_enc
+        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(ds, encoding_plugin='pydicom')
+        assert 6072 == len(out)
+
+    def test_enc_dataset_specific_dec(self):
+        """Test encoding a compressed dataset with specified decoder plugin"""
+        ds = self.ds_enc
+        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(
+            ds,
+            encoding_plugin='pydicom',
+            decoding_plugin='rle_handler'
+        )
+        assert 6072 == len(out)
+
+    def test_enc_dataset_multiframe(self):
+        """Test encoding a multiframe compressed dataset"""
+        ds = self.ds_enc_mf
+        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        out = self.enc.encode(ds, idx=0)
+        uncompressed_len = get_expected_length(ds, 'bytes')
+        assert uncompressed_len / ds.NumberOfFrames > len(out)
+
+    def test_enc_dataset_multiframe_no_idx_raises(self):
+        """Test encoding a multiframe compressed dataset raises if no idx"""
+        ds = self.ds_enc_mf
+        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        msg = r"The frame 'idx' is required for multi-frame pixel data"
+        with pytest.raises(ValueError, match=msg):
+            self.enc.encode(ds)
+
+    def test_dataset_missing_elem_raises(self):
+        """Test encode raises if missing required element"""
+        assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
+        del self.ds.Rows
+        msg = r"required elements are missing from the dataset: 'Rows'"
+        with pytest.raises(AttributeError, match=msg):
+            self.enc.encode(self.ds)
 
     def test_process_no_plugins(self):
         """Test process() with no available plugins"""
@@ -317,6 +443,10 @@ class TestEncoder_Encode:
 
     def test_process_specify_plugin(self):
         """Test process() with specific plugin"""
+        pass
+
+    def test_process_specify_plugin_unavailable_raises(self):
+        """Test encoding bytes with a specific encoder"""
         pass
 
     def test_process_encode_exceptions(self):
