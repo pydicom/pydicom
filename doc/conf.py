@@ -13,8 +13,9 @@
 # values that are commented out
 # serve to show the default.
 
-import sys
+from datetime import datetime
 import os
+import sys
 
 import sphinx_rtd_theme
 import pydicom
@@ -137,7 +138,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pydicom'
-copyright = '2008-2020, Darcy Mason and pydicom contributors'
+year = datetime.now().strftime('%Y')
+copyright = '2008-{}, Darcy Mason and pydicom contributors'.format(year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

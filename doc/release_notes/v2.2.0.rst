@@ -1,13 +1,16 @@
 Version 2.2.0
 =================================
 
-Changelog
----------
+Changes
+-------
 
 * Data elements with a VR of **AT** must now be set with values
   acceptable to :func:`~pydicom.tag.Tag`, and are always stored as a
   :class:`~pydicom.tag.BaseTag`.  Previously, any Python type could be
   set.
+* :meth:`BaseTag.__eq__()<pydicom.tag.BaseTag.__eq__>` returns ``False`` rather
+  than raising an exception when the operand cannot be converted to
+  :class:`~pydicom.tag.BaseTag` (:pr:`1327`)
 
 Enhancements
 ------------
@@ -47,31 +50,23 @@ Enhancements
   from individual components of names (``family_name``, ``given_name``, etc.).
   See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
   :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
-* Added library support so that files can be downloaded
-  not only through ``urllib.request`` but also through the ``requests`` package.
-  If you run into problems using ``urllib.request``,
-  a more powerful ``requests`` package will be recommended via log messages.
-  (:pr:`1340`)
-* Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
+* Added support for downloading the large test files with the `requests
+  <https://docs.python-requests.org/en/master/>`_ package in addition to
+  :mod:`urllib.request` (:pr:`1340`)
+* Ensured :func:`~pydicom.pixel_data_handlers.util.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
-* Added support for faster decoding (~4-5x) encoding (~25x) of *RLE Lossless*
+* Added support for faster decoding (~4-5x) and encoding (~25x) of *RLE Lossless*
   *Pixel Data* via the `pylibjpeg-rle
-  <https://github.com/pydicom/pylibjpeg-rle>`_ plugin.
+  <https://github.com/pydicom/pylibjpeg-rle>`_ plugin (:pr:`1361`, :pr:`1372`).
 * Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for
   compressing uncompressed pixel data using a given encoding format as specified
-  by a UID. Only *RLE Lossless* is currently supported.
-* Added ``encoders`` module and :attr:`~pydicom.encoders.RLELosslessEncoder`
-* Added `read` parameter to :func:`~pydicom.data.data_manager.get_testdata_file`
-  to allow reading and returning the corresponding dataset.
+  by a UID. Only *RLE Lossless* is currently supported (:pr:`1372`)
+* Added :mod:`~pydicom.encoders` module and
+  :attr:`~pydicom.encoders.RLELosslessEncoder` (:pr:`1372`)
+* Added `read` parameter to :func:`~pydicom.data.get_testdata_file`
+  to allow reading and returning the corresponding dataset (:pr:`1372`)
 
-
-Changes
--------
-
-* :meth:`BaseTag.__eq__()<pydicom.tag.BaseTag.__eq__>` returns ``False`` rather
-  than raising an exception when the operand cannot be converted to
-  :class:`~pydicom.tag.BaseTag` (:pr:`1327`)
 
 Fixes
 -----

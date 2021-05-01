@@ -1,3 +1,5 @@
+.. _guide_encoder_plugins:
+
 ==========================
 Pixel Data Encoder Plugins
 ==========================
@@ -13,42 +15,42 @@ performs the actual conversion.
 
 An encoding plugin must implement three objects within the same module:
 
-* An encoding function with the following function signature:
+* A function that performs the encoding with the following function signature:
 
-  .. codeblock:: python
+  .. code-block:: python
 
       def foo(src: bytes, **kwargs: Dict[str, Any]) -> bytes:
 
   Where
 
-  * `src` is a :class:`bytes` instance containing the raw uncompressed
-    data to be encoded. When the data contains multi-byte values (i.e. such
-    as 16-bit pixels), then by default the data will use little-endian byte
-    ordering. Support for big-endian byte ordering by the encoding function
-    is completely optional.
+  * `src` is the raw uncompressed data to be encoded as :class:`bytes`. When
+    the data in `src` represents multi-byte values
+    (such as 16-bit pixels), then `src` will use little-endian byte
+    ordering by default. Support for big-endian byte ordering by the encoding
+    function is completely optional.
   * `kwargs` is a :class:`dict` which at a minimum contains the following
     required keys:
 
-    * :class:`~pydicom.uid.UID` ``'transfer_syntax_uid'``: the intended
+    * ``'transfer_syntax_uid'``: :class:`~pydicom.uid.UID` - the intended
       *Transfer Syntax UID* of the encoded data.
-    * :class:`str` ``'byteorder'``: the byte ordering used by `src`, ``'<'''
+    * ``'byteorder'``: :class:`str` - the byte ordering used by `src`, ``'<'``
       for little-endian (the default), ``'>'`` for big-endian.
-    * :class:`int` ``'rows'``: the number of rows of pixels in the `src`.
-    * :class:`int` ``'columns'``: the number of columns of pixels in the
+    * ``'rows'``: :class:`int` - the number of rows of pixels in the `src`.
+    * ``'columns'``: :class:`int` -  the number of columns of pixels in the
       `src`.
-    * :class:`int` ``'samples_per_pixel'``: the number of samples used per
-      pixel, e.g. 1 for greyscale images or 3 for RGB.
-    * :class:`int` ``'number_of_frames'``: the number of image frames
+    * ``'samples_per_pixel'``: :class:`int` - the number of samples used per
+      pixel, e.g. 1 for grayscale images or 3 for RGB.
+    * ``'number_of_frames'``: :class:`int` - the number of image frames
       contained in `src`
-    * :class:`int` ``'bits_allocated'``: the number of bits used to contain
+    * ``'bits_allocated'``: :class:`int` - the number of bits used to contain
       each pixel in `src`, should be 8, 16, 32 or 64.
-    * :class:`int` ``'bits_stored'``: the number of bits actually used by
+    * ``'bits_stored'``: :class:`int` - the number of bits actually used by
       each pixel in `src`, e.g. 12-bit pixel data (range 0 to 4095) will be
       contained by 16-bits (range 0 to 65535).
-    * :class:`int` ``'pixel_representation'``: the type of data in `src`,
+    * ``'pixel_representation'``: :class:`int` - the type of data in `src`,
       ``0`` for unsigned integers, ``1`` for 2's complement (signed)
       integers.
-    * :class:`str` ``'photometric_interpretation'``: the intended colorspace
+    * ``'photometric_interpretation'``: :class:`str` - the intended colorspace
       of the encoded data, such as ``'YBR'``
 
     `kwargs` may also contain optional parameters intended to be used
@@ -61,9 +63,9 @@ An encoding plugin must implement three objects within the same module:
   data in a format meeting the requirements of the corresponding *Transfer
   syntax UID* as :class:`bytes`.
 
-* A function named `is_available` with the following signature:
+* A function named ``is_available`` with the following signature:
 
-  .. codeblock:: python
+  .. code-block:: python
 
       def is_available(uid: pydicom.uid.UID) -> bool:
 
@@ -72,10 +74,10 @@ An encoding plugin must implement three objects within the same module:
   its dependencies met then it should return ``True``, otherwise it should
   return ``False``.
 
-* A dict named ``ENCODER_DEPENDENCIES`` with the type
+* A :class:`dict` named ``ENCODER_DEPENDENCIES`` with the type
   ``Dict[pydicom.uid.UID, Tuple[str, ...]``, such as:
 
-  .. codeblock:: python
+  .. code-block:: python
 
       from pydicom.uid import RLELossless, JPEG20000
 
@@ -100,13 +102,13 @@ path to the encoder function's module', 'encoder function name')``. For
 example, if you'd import your encoder function `my_encoder_func` with
 ``from my_package.encoders import my_func``, then you'd do the following:
 
-.. codeblock:: python
+.. code-block:: python
 
     from pydicom.encoders import RLELosslessEncoder
 
     RLELosslessEncoder.add_plugin(
-        'my_encoder',
-        ('my_package.encoders', 'my_encoder_func')
+        'my_encoder',  # the plugin's label
+        ('my_package.encoders', 'my_encoder_func')  # the import paths
     )
 
 The ``my_package.encoders`` module must contain the encoding function and the

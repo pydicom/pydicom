@@ -38,6 +38,7 @@ in the table below.
 from itertools import groupby
 from struct import pack, unpack
 import sys
+from typing import Optional
 
 try:
     import numpy as np
@@ -58,7 +59,7 @@ DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
-def is_available(uid=None):
+def is_available(uid: Optional[pydicom.uid.UID] = None) -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 

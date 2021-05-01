@@ -3,7 +3,8 @@
 Pixel Data Encoders (:mod:`pydicom.encoders`)
 =============================================
 
-Class instances for compressing (7FE0,0010) *Pixel Data*.
+:class:`~pydicom.encoders.base.Encoder` class instances for compressing
+(7FE0,0010) *Pixel Data*.
 
 .. currentmodule:: pydicom.encoders
 
@@ -13,7 +14,7 @@ Class instances for compressing (7FE0,0010) *Pixel Data*.
    RLELosslessEncoder
 
 
-Utilities
+Encoder utilities
 
 .. autosummary::
    :toctree: generated/
@@ -23,7 +24,12 @@ Utilities
 
 Base encoder class used by all encoders
 
+.. currentmodule:: pydicom.encoders.base
+
 .. autosummary::
    :toctree: generated/
 
-   base.Encoder
+   Encoder
+
+.. automodule:: pydicom.encoders
+  :members:

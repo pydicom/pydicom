@@ -1,8 +1,4 @@
-"""Bulk data encoding.
-
-See the :doc:`Pixel Data Encoder<guides/encoder_plugins>` documentation for
-plugin requirements.
-"""
+"""Bulk data encoding."""
 
 from importlib import import_module
 import sys
@@ -20,9 +16,15 @@ try:
 except ImportError:
     pass
 
-# TODO: docstrings
+# TODO: Finish docstrings
 class Encoder:
-    """Class for data encoders.
+    """Factory class for data encoders.
+
+    Every available ``Encoder`` instance in *pydicom* corresponds directly
+    to a single DICOM *Transfer Syntax UID*, and provides a
+    mechanism for converting raw unencoded source data to meet the
+    requirements of that transfer syntax using one or more
+    :ref:`encoding plugins<guide_encoder_plugins>`.
 
     .. versionadded:: 2.2
     """
@@ -42,22 +44,22 @@ class Encoder:
         self._unavailable: Dict[str, Tuple[str, ...]] = {}
         # Default encoding options
         self._defaults = {
-            'transfer_syntax_uid': self.UID,
-            'byteorder': '<',
+            'transfer_syntax_uid': self.UID,  # Intended transfer syntax
+            'byteorder': '<',  # Byte ordering of `src` passed to plugins
         }
 
     def add_plugin(self, label: str, path: Tuple[str, str]) -> None:
         """Add an encoding plugin to the encoder.
 
         The requirements for encoding plugins are available
-        :doc:`here<guides/encoder_plugins>`.
+        :ref:`here<guide_encoder_plugins>`.
 
         Parameters
         ----------
         label : str
             The label to use for the plugin, should be unique for the encoder.
         path : Tuple[str, str]
-            The module import path and the encoding function name (e.g.
+            The module import path and the encoding function's name (e.g.
             ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
         """
         if label in self._available or label in self._unavailable:
@@ -89,9 +91,11 @@ class Encoder:
                 f"Missing expected arguments: {', '.join(missing)}"
             )
 
+    # TODO: encoding_plugin: add link to available plugins
+    # TODO: kwargs: add link to documentation on plugin options
     def encode(
         self,
-        src: Union[bytes, "np.ndarray", "Dataset"],
+        src: Union[bytes, "numpy.ndarray", Dataset],
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -104,9 +108,9 @@ class Encoder:
         src : bytes, numpy.ndarray or pydicom.dataset.Dataset
             Single or multi-frame pixel data as one of the following:
 
-            * :class`bytes`: the uncompressed little-endian ordered pixel data
+            * :class:`bytes`: the uncompressed little-endian ordered pixel data
             * :class:`~numpy.ndarray`: the uncompressed pixel data, should be
-              shaped as:
+              :attr:`shaped<numpy.ndarray.shape>` as:
 
               * (Rows, Columns) for single frame, single sample data.
               * (Rows, Columns, Samples) for single frame, multi-sample data.
@@ -116,44 +120,47 @@ class Encoder:
 
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a suitable pixel data handler
-              must be available to decompress it.
+              *Pixel Data* is compressed then a :ref:`suitable pixel data
+              handler <guide_compressed>` must be available to
+              decompress it.
         idx : int, optional
             Required when `src` contains multiple frames, this is the index
             of the frame to be encoded.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
-            `encoding_plugin` is not specified then all available plugins will
-            be tried.
+            `encoding_plugin` is not specified then all available
+            plugins will be tried (default).
         decoding_plugin : str, optional
             If `src` is a :class:`~pydicom.dataset.Dataset` containing
-            compressed *Pixel Data* then this is the name of the pixel data
-            decoding handler. If `decoding_plugin` is not specified then all
-            available handlers will be tried.
+            compressed *Pixel Data* then this is the name of the
+            :mod:`pixel data decoding handler<pydicom.pixel_data_handlers>`.
+            If `decoding_plugin` is not specified then all available
+            handlers will be tried (default).
         **kwargs
             The following keyword parameters are required when `src` is
             :class:`bytes` or :class:`~numpy.ndarray`:
 
-            * ``'rows': int`` - the number of rows of pixels in `src`,
+            * ``'rows'``: :class:`int` - the number of rows of pixels in `src`,
               maximum 65535.
-            * ``'columns': int`` - the number of columns of pixels in `src`,
-              maximum 65535.
-            * ``'number_of_frames: int'`` - the number of frames in `src`.
-            * ``'samples_per_pixel': int`` - the number of samples per pixel in
-              `src`, should be 1 or 3.
-            * ``'bits_allocated': int`` - the number of bits used to contain
-              the each pixel, should be 8, 16, 32 or 64.
-            * ``'bits_stored': int`` - the number of bits actually used per
-              pixel. For example, an ndarray `src` might have a
-              :class:`~numpy.dtype` of 'uint16' (range 0 to 65535) but only
-              contain 12-bit pixel values (range 0 to 4095).
-            * ``'pixel_representation': int`` - the type of data being encoded,
-              ``0`` for unsigned, ``1`` for 2's complement (signed)
-            * ``'photometric_interpretation': str`` - the intended color space
-              of the pixel data, such as ``'YBR_FULL'``.
+            * ``'columns'``: :class:`int` - the number of columns of pixels in
+              `src`, maximum 65535.
+            * ``'number_of_frames'``: :class:`int` - the number of frames
+              in `src`.
+            * ``'samples_per_pixel'``: :class:`int` - the number of samples
+              per pixel in `src`, should be 1 or 3.
+            * ``'bits_allocated'``: :class:`int` - the number of bits used
+              to contain each pixel, should be 8, 16, 32 or 64.
+            * ``'bits_stored'``: :class:`int` - the number of bits actually
+              used per pixel. For example, an ``ndarray`` `src` might have a
+              :class:`~numpy.dtype` of ``'uint16'`` (range 0 to 65535) but
+              only contain 12-bit pixel values (range 0 to 4095).
+            * ``'pixel_representation'``: :class:`int` - the type of data
+              being encoded, ``0`` for unsigned, ``1`` for 2's complement
+              (signed)
+            * ``'photometric_interpretation'``: :class:`str` - the intended
+              color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
-            FIXME
-            Additional keyword parameters for the encoding plugin may also be
+            Optional keyword parameters for the encoding plugin may also be
             present. See the documentation for the encoding plugins for what
             options are available.
 
@@ -180,7 +187,7 @@ class Encoder:
 
     def _encode_array(
         self,
-        arr: "np.ndarray",
+        arr: "numpy.ndarray",
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         **kwargs
@@ -251,7 +258,7 @@ class Encoder:
 
     def _encode_dataset(
         self,
-        ds: "Dataset",
+        ds: Dataset,
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -285,14 +292,16 @@ class Encoder:
 
     @property
     def is_available(self) -> bool:
-        """Return ``True`` if the encoder has available plugins and can be
+        """Return ``True`` if the encoder has plugins available that can be
         used to encode data, ``False`` otherwise.
         """
         return bool(self._available)
 
+    # TODO: encoding_plugin: add link to available plugins
+    # TODO: kwargs: add link to documentation on plugin options
     def iter_encode(
         self,
-        src: Union[bytes, "np.ndarray", "Dataset"],
+        src: Union[bytes, "numpy.ndarray", Dataset],
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs
@@ -304,57 +313,56 @@ class Encoder:
         src : bytes, numpy.ndarray or pydicom.dataset.Dataset
             Single or multi-frame pixel data as one of the following:
 
-            * :class`bytes`: the uncompressed little-endian ordered pixel data
+            * :class:`bytes`: the uncompressed little-endian ordered pixel data
             * :class:`~numpy.ndarray`: the uncompressed pixel data, should be
-              shaped as:
+              :attr:`shaped<numpy.ndarray.shape>` as:
 
               * (Rows, Columns) for single frame, single sample data.
               * (Rows, Columns, Samples) for single frame, multi-sample data.
               * (Frames, Rows, Columns) for multi-frame, single sample data.
               * (Frames, Rows, Columns, Samples) for multi-frame and
                 multi-sample data.
-              * or the corresponding 1D array you'd get from ``arr.ravel()``.
 
-            * :class:`~pydicom.dataset.Dataset`: the the dataset containing
+            * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a suitable pixel data handler
-              must be available to decompress it.
-        idx : int, optional
-            Required when `src` contains multiple frames, this is the index
-            of the frame to be encoded.
+              *Pixel Data* is compressed then a :ref:`suitable pixel data
+              handler <guide_compressed>` must be available to
+              decompress it.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
-            `encoding_plugin` is not specified then all available plugins will
-            be tried.
+            `encoding_plugin` is not specified then all available
+            plugins will be tried (default).
         decoding_plugin : str, optional
-            The name of the pixel data decoding handler to use if `src`
-            is a :class:`~pydicom.dataset.Dataset` containing compressed
-            *Pixel Data*. If `decoding_plugin` is not specified then all
-            available handlers will be tried.
+            If `src` is a :class:`~pydicom.dataset.Dataset` containing
+            compressed *Pixel Data* then this is the name of the
+            :mod:`pixel data decoding handler<pydicom.pixel_data_handlers>`.
+            If `decoding_plugin` is not specified then all available
+            handlers will be tried (default).
         **kwargs
             The following keyword parameters are required when `src` is
             :class:`bytes` or :class:`~numpy.ndarray`:
 
-            * ``'rows': int`` - the number of rows in `src`, maximum 65535.
-            * ``'columns': int`` - the number of columns in `src`, maximum
-              65535.
-            * ``'number_of_frames: int'`` - the number of frames in `src`,
-              required if the number of frames is greater than 1.
-            * ``'samples_per_pixel': int`` - the number of samples per pixel in
-              `src`, should be 1 or 3.
-            * ``'bits_allocated': int`` - the number of bits used to contain
-              the pixel data, should be 8, 16, 32 or 64.
-            * ``'bits_stored': int`` - the number of bits actually used per
-              pixel in `src`. For example, an ndarray `src` might have a
-              :class:`~numpy.dtype` of 'uint16' (range 0 to 65535) but only
-              contain 12-bit pixel values (range 0 to 4095).
-            * ``'pixel_representation': int`` - the type of data being encoded,
-              0 for unsigned, 1 for 2's complement
-            * ``'photometric_interpretation': str`` - the colorspace of the
-              pixel data, such as ``'RGB'``.
+            * ``'rows'``: :class:`int` - the number of rows of pixels in `src`,
+              maximum 65535.
+            * ``'columns'``: :class:`int` - the number of columns of pixels in
+              `src`, maximum 65535.
+            * ``'number_of_frames'``: :class:`int` - the number of frames
+              in `src`.
+            * ``'samples_per_pixel'``: :class:`int` - the number of samples
+              per pixel in `src`, should be 1 or 3.
+            * ``'bits_allocated'``: :class:`int` - the number of bits used
+              to contain each pixel, should be 8, 16, 32 or 64.
+            * ``'bits_stored'``: :class:`int` - the number of bits actually
+              used per pixel. For example, an ``ndarray`` `src` might have a
+              :class:`~numpy.dtype` of ``'uint16'`` (range 0 to 65535) but
+              only contain 12-bit pixel values (range 0 to 4095).
+            * ``'pixel_representation'``: :class:`int` - the type of data
+              being encoded, ``0`` for unsigned, ``1`` for 2's complement
+              (signed)
+            * ``'photometric_interpretation'``: :class:`str` - the intended
+              color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
-            FIXME
-            Additional keyword parameters for the encoding plugin may also be
+            Optional keyword parameters for the encoding plugin may also be
             present. See the documentation for the encoding plugins for what
             options are available.
 
@@ -382,7 +390,7 @@ class Encoder:
             )
 
     @staticmethod
-    def kwargs_from_ds(ds: "Dataset") -> Dict[str, Union[int, str]]:
+    def kwargs_from_ds(ds: Dataset) -> Dict[str, Union[int, str]]:
         """Return a *kwargs* dict from `ds`.
 
         Parameters
@@ -396,14 +404,15 @@ class Encoder:
             A dict with the following keys, with values from the corresponding
             dataset elements:
 
-            * `rows`: int
-            * `columns`: int
-            * `samples_per_pixel`: int
-            * `number_of_frames`: int, default ``1`` if not present
-            * `bits_allocated`: int
-            * `bits_stored`: int
-            * `pixel_representation`: int
-            * `photometric_interpretation`: str
+            * ``'rows'``: :class:`int`
+            * ``'columns'``: :class:`int`
+            * ``'samples_per_pixel'``: :class:`int`
+            * ``'number_of_frames'``: :class:`int`, default ``1`` if not
+              present
+            * ``'bits_allocated'``: :class:`int`
+            * ``'bits_stored'``: :class:`int`
+            * ``'pixel_representation'``: :class:`int`
+            * ``'photometric_interpretation'``: :class:`str`
         """
         required = [
             "Rows", "Columns", "SamplesPerPixel", "BitsAllocated",
@@ -446,13 +455,10 @@ class Encoder:
         }
 
     @property
-    def name(self) -> str:
-        """Return the name of the encoder."""
-        return f"{self.UID.keyword}Encoder"
-
-    @property
     def missing_dependencies(self) -> List[str]:
-        """Return nice strings for plugins when missing dependencies"""
+        """Return nice strings for plugins when missing dependencies as
+        List[str].
+        """
         s = []
         for label, deps in self._unavailable.items():
             if len(deps) > 1:
@@ -464,7 +470,12 @@ class Encoder:
 
         return s
 
-    def _preprocess(self, arr: "np.ndarray", **kwargs) -> bytes:
+    @property
+    def name(self) -> str:
+        """Return the name of the encoder as :class:`str`."""
+        return f"{self.UID.keyword}Encoder"
+
+    def _preprocess(self, arr: "numpy.ndarray", **kwargs) -> bytes:
         """Preprocess `arr` before encoding to ensure it meets requirements.
 
         `arr` will be checked against the required keys in `kwargs` before
@@ -687,19 +698,12 @@ class Encoder:
 
     @property
     def UID(self) -> UID:
-        """Return the *Transfer Syntax UID* corresponding to the encoder"""
+        """Return the encoder's corresponding *Transfer Syntax UID* as UID."""
         return self._uid
 
 
 # Encoder names should be f"{UID.keyword}Encoder"
 RLELosslessEncoder = Encoder(RLELossless)
-"""An *RLE Lossless* encoder.
-
-.. versionadded:: 2.2
-
-See the :class:`~pydicom.encoders.base.Encoder` API reference for instance
-methods and attributes.
-"""
 RLELosslessEncoder.add_plugin(
     'pylibjpeg',
     ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
@@ -712,18 +716,51 @@ RLELosslessEncoder.add_plugin(
 
 # Available pixel data encoders
 _PIXEL_DATA_ENCODERS = {
-    RLELossless: RLELosslessEncoder,
+    # UID: (encoder, 'versionadded')
+    RLELossless: (RLELosslessEncoder, '2.2'),
 }
 
 
+# TODO: add link to plugin docs
+def _build_encoder_docstrings() -> None:
+    """Override the default Encoder docstring."""
+    for enc, versionadded in _PIXEL_DATA_ENCODERS.values():
+        uid = enc.UID
+        available = enc._available.keys()
+        unavailable = enc._unavailable.keys()
+        plugins = list(available) + list(unavailable)
+
+        s = [f"A *Pixel Data* encoder for *{uid.name}* - ``{uid}``"]
+        s.append("")
+        s.append(f".. versionadded:: {versionadded}")
+        s.append("")
+        s.append(f"Encoding plugins: {', '.join(sorted(plugins))}")
+        s.append("")
+        s.append(
+            "See the :class:`~pydicom.encoders.base.Encoder` "
+            "reference for instance methods and attributes."
+        )
+        enc.__doc__ = "\n".join(s)
+
+
+_build_encoder_docstrings()
+
+
 def get_encoder(uid: str) -> Encoder:
-    """Return an encoder for `uid`.
+    """Return the pixel data encoder corresponding to `uid`.
 
     .. versionadded:: 2.2
+
+    +--------------------------------------+--------------------+
+    | Transfer Syntax                      | Version added      |
+    +----------------+---------------------+                    +
+    | Name           | UID                 |                    |
+    +================+=====================+====================+
+    | *RLE Lossless* | 1.2.840.10008.1.2.5 | 2.2                |
+    +----------------+---------------------+--------------------+
     """
-    uid = cast(UID, UID(uid))
     try:
-        return _PIXEL_DATA_ENCODERS[uid]
+        return _PIXEL_DATA_ENCODERS[UID(uid)][0]
     except KeyError:
         raise NotImplementedError(
             f"No pixel data encoders have been implemented for '{uid.name}'"

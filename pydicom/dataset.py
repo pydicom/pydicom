@@ -1570,7 +1570,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def compress(
         self,
         uid: str,
-        arr: Optional["np.ndarray"] = None,
+        arr: Optional["numpy.ndarray"] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         encapsulate_ext: bool = False,
@@ -1602,7 +1602,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         * (0028,0006) *Planar Configuration*
         * (7FE0,0010) *Pixel Data*
 
-        If the compressed pixel data is too large for the basic encapsulation
+        If the compressed pixel data is too large for basic encapsulation
         then :dcm:`extended encapsulation <part03/sect_C.7.6.3.html>` will be
         used instead, in which case the following elements will also be added:
 
@@ -1622,7 +1622,6 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         Compress the existing *Pixel Data* in place:
 
-        >>> from pydicom import dcmread
         >>> from pydicom.data import get_testdata_file
         >>> from pydicom.uid import RLELossless
         >>> ds = get_testdata_file("CT_small.dcm", read=True)
@@ -1638,27 +1637,27 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             Compress the uncompressed pixel data in `arr` and use it
             to set the *Pixel Data*. If `arr` is not used then the
             existing *Pixel Data* in the dataset will be decompressed (if
-            required) and compressed instead. The :attr:`~numpy.shape`,
+            required) and compressed instead. The :attr:`~numpy.ndarray.shape`,
             :class:`~numpy.dtype` and contents of the array should match the
             dataset.
         encoding_plugin : str, optional
-            FIXME
-            Force the use of `encoding_plugin` to compress the pixel data. See
-            doc link for a list of packages available for each UID and
-            their dependencies.
+            TODO: doc link to plugins
+            Use the `encoding_plugin` to compress the pixel data. See
+            **doc link** for a list of packages available for each UID and
+            their dependencies. If not specified then all available plugins
+            will be tried (default).
         decoding_plugin : str, optional
-            FIXME
             If `arr` is not used and the existing *Pixel Data* is compressed
-            then the named of the handler to use to decompress it. If not
-            specified then all available handlers will be tried.
+            then the name of the :mod:`image data handler
+            <pydicom.pixel_data_handlers>` to use to decompress it. If not
+            specified then all available handlers will be tried (default).
         encapsulate_ext : bool, optional
-            FIXME
             If ``True`` then force the use extended encapsulation. If ``False``
-            (default) then extended encapsulation will be still be used
-            if needed for large amounts of compressed *Pixel Data*, but will
-            otherwise use basic encapsulation.
+            (default) then extended encapsulation will be used
+            if needed for large amounts of compressed *Pixel Data*, but
+            will otherwise default to basic encapsulation.
         **kwargs
-            FIXME
+            TODO: doc link to plugins
             Optional parameters to pass to the compression function.
         """
         from pydicom.encoders import get_encoder
