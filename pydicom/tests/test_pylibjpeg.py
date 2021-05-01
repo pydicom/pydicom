@@ -8,7 +8,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, get_j2k_parameters
+    convert_color_space, get_j2k_parameters, get_expected_length
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -801,3 +801,19 @@ class TestRLE:
 
         with pytest.raises(StopIteration):
             next(frame_generator)
+
+
+@pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
+class TestRLEEncoding:
+    def test_encode(self):
+        ds = dcmread(EXPL)
+        assert 'PlanarConfiguration' not in ds
+        expected = get_expected_length(ds, 'bytes')
+        assert expected == len(ds.PixelData)
+        ref = ds.pixel_array
+        del ds.PixelData
+        ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
+        assert expected > len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+        assert np.array_equal(ref, ds.pixel_array)
+        assert id(ref) != id(ds.pixel_array)
