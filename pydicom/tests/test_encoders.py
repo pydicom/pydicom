@@ -267,7 +267,7 @@ class TestEncoder_Encode:
         self.arr = self.ds.pixel_array
         self.kwargs = self.enc.kwargs_from_ds(self.ds)
 
-    def test_invalid_type_raises(self):
+    def test_encode_invalid_type_raises(self):
         """Test exception raised if passing invalid type."""
         enc = RLELosslessEncoder
         msg = (
@@ -276,6 +276,16 @@ class TestEncoder_Encode:
         )
         with pytest.raises(TypeError, match=msg):
             enc.encode('abc')
+
+    def test_iter_encode_invalid_type_raises(self):
+        """Test exception raised if passing invalid type."""
+        enc = RLELosslessEncoder
+        msg = (
+            r"'src' must be bytes, numpy.ndarray or pydicom.dataset.Dataset, "
+            rf"not 'str'"
+        )
+        with pytest.raises(TypeError, match=msg):
+            next(enc.iter_encode('abc'))
 
     # Passing bytes
     def test_bytes(self):
@@ -309,6 +319,7 @@ class TestEncoder_Encode:
 
     def test_bytes_multiframe(self):
         """Test encoding multiframe bytes with idx"""
+        self.kwargs['number_of_frames'] = 2
         out = self.enc.encode(
             self.bytes * 2, idx=0, encoding_plugin='pydicom', **self.kwargs
         )
@@ -319,6 +330,17 @@ class TestEncoder_Encode:
         msg = r"The frame 'idx' is required for multi-frame pixel data"
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(self.bytes * 2, **self.kwargs)
+
+    def test_bytes_iter_encode(self):
+        """Test encoding multiframe bytes with iter_encode"""
+        self.kwargs['number_of_frames'] = 2
+        gen = self.enc.iter_encode(
+            self.bytes * 2, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(next(gen))
+        assert 21098 == len(next(gen))
+        with pytest.raises(StopIteration):
+            next(gen)
 
     # Passing ndarray
     def test_array(self):
@@ -360,6 +382,19 @@ class TestEncoder_Encode:
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(arr, **self.kwargs)
 
+    def test_array_iter_encode(self):
+        """Test encoding a multiframe array with iter_encode"""
+        arr = np.stack((self.arr, self.arr))
+        assert (2, 128, 128) == arr.shape
+        self.kwargs['number_of_frames'] = 2
+        gen = self.enc.iter_encode(
+            arr, encoding_plugin='pydicom', **self.kwargs
+        )
+        assert 21098 == len(next(gen))
+        assert 21098 == len(next(gen))
+        with pytest.raises(StopIteration):
+            next(gen)
+
     # Passing Dataset
     def test_unc_dataset(self):
         """Test encoding an uncompressed dataset"""
@@ -374,7 +409,7 @@ class TestEncoder_Encode:
         assert 21098 == len(out)
 
     def test_unc_dataset_multiframe(self):
-        """Test encode(Dataset, idx) for an uncompressed tsyntax"""
+        """Test encoding a multiframe uncompressed dataset"""
         assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
         self.ds.NumberOfFrames = 2
         self.ds.PixelData = self.ds.PixelData * 2
@@ -382,13 +417,25 @@ class TestEncoder_Encode:
         assert len(self.ds.PixelData) > len(out)
 
     def test_unc_dataset_multiframe_no_idx_raises(self):
-        """Test encode(Dataset) raises if no idx"""
+        """Test encoding multiframe uncompressed dataset without idx raises"""
         assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
         self.ds.NumberOfFrames = 2
         self.ds.PixelData = self.ds.PixelData * 2
         msg = r"The frame 'idx' is required for multi-frame pixel data"
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(self.ds)
+
+    def test_unc_iter_encode(self):
+        """Test iter_encode with an uncompressed dataset"""
+        self.ds.NumberOfFrames = 2
+        self.ds.PixelData = self.ds.PixelData * 2
+        gen = self.enc.iter_encode(self.ds, encoding_plugin='pydicom')
+        out = next(gen)
+        assert len(self.ds.PixelData) > len(out)
+        out = next(gen)
+        assert len(self.ds.PixelData) > len(out)
+        with pytest.raises(StopIteration):
+            next(gen)
 
     def test_enc_dataset(self):
         """Test encoding a compressed dataset"""
@@ -407,10 +454,9 @@ class TestEncoder_Encode:
 
     def test_enc_dataset_specific_dec(self):
         """Test encoding a compressed dataset with specified decoder plugin"""
-        ds = self.ds_enc
-        assert ds.file_meta.TransferSyntaxUID.is_compressed
+        assert self.ds_enc.file_meta.TransferSyntaxUID.is_compressed
         out = self.enc.encode(
-            ds,
+            self.ds_enc,
             encoding_plugin='pydicom',
             decoding_plugin='rle_handler'
         )
@@ -432,6 +478,19 @@ class TestEncoder_Encode:
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(ds)
 
+    def test_enc_iter_encode(self):
+        """Test iter_encode with a compressed dataset"""
+        assert self.ds_enc.file_meta.TransferSyntaxUID.is_compressed
+        gen = self.enc.iter_encode(
+            self.ds_enc,
+            encoding_plugin='pydicom',
+            decoding_plugin='rle_handler'
+        )
+        out = next(gen)
+        assert 6072 == len(out)
+        with pytest.raises(StopIteration):
+            next(gen)
+
     def test_dataset_missing_elem_raises(self):
         """Test encode raises if missing required element"""
         assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
@@ -439,7 +498,6 @@ class TestEncoder_Encode:
         msg = r"required elements are missing from the dataset: 'Rows'"
         with pytest.raises(AttributeError, match=msg):
             self.enc.encode(self.ds)
-
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -459,8 +517,8 @@ class TestEncoder_Preprocess:
 
         self.arr_3s = np.asarray(
             [
-                [[ 1,  2,  3], [ 4,  5,  6]],
-                [[ 7,  8,  9], [10, 11, 12]],
+                [[1, 2, 3], [4, 5, 6]],
+                [[7, 8, 9], [10, 11, 12]],
                 [[13, 14, 15], [16, 17, 18]],
                 [[19, 20, 21], [22, 23, 24]],
             ],

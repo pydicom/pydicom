@@ -55,13 +55,13 @@ Enhancements
 * Ensured :func:`~pydicom.pixel_data_handlers.utils.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
-* Added support for faster (~4-5x) decoding of *RLE Lossless* encoded *Pixel
-  Data* via the `pylibjpeg-rle <https://github.com/pydicom/pylibjpeg-rle>`_ plugin.
-* Added support for faster (~25x) encoding of *Pixel Data* using *RLE Lossless* via
-  the ``pylibjpeg-rle`` plugin.
+* Added support for faster decoding (~4-5x) encoding (~25x) of *RLE Lossless*
+  *Pixel Data* via the `pylibjpeg-rle
+  <https://github.com/pydicom/pylibjpeg-rle>`_ plugin.
 * Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for
   compressing uncompressed pixel data using a given encoding format as specified
   by a UID. Only *RLE Lossless* is currently supported.
+* Added ``encoders`` module and :attr:`~pydicom.encoders.RLELosslessEncoder`
 * Added `read` parameter to :func:`~pydicom.data.data_manager.get_testdata_file`
   to allow reading and returning the corresponding dataset.
 
