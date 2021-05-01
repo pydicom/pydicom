@@ -8,6 +8,13 @@ try:
 except ImportError:
     HAVE_NP = False
 
+try:
+    import pylibjpeg
+    HAVE_PYLJ = True
+except ImportError:
+    HAVE_PYLJ = False
+
+
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.encoders import Encoder, parallel_encode, RLELosslessEncoder
@@ -437,21 +444,6 @@ class TestEncoder_Encode:
         with pytest.raises(AttributeError, match=msg):
             self.enc.encode(self.ds)
 
-    def test_process_no_plugins(self):
-        """Test process() with no available plugins"""
-        pass
-
-    def test_process_specify_plugin(self):
-        """Test process() with specific plugin"""
-        pass
-
-    def test_process_specify_plugin_unavailable_raises(self):
-        """Test encoding bytes with a specific encoder"""
-        pass
-
-    def test_process_encode_exceptions(self):
-        """Test process() with encoding exceptions"""
-        pass
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -830,31 +822,106 @@ class TestEncoder_Preprocess:
             assert ref == out
 
 
+class TestEncoder_Process:
+    """Tests for Encoder._process."""
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    def test_no_plugins(self):
+        """Test with no available plugins"""
+        msg = (
+            r"Unable to encode because the encoding plugins are missing "
+            r"dependencies:\n    pylibjpeg - requires numpy, pylibjpeg and "
+            r"pylibjpeg-rle\n    pydicom - requires numpy"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            RLELosslessEncoder._process(b'')
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_specify_plugin(self):
+        """Test with specific plugin"""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        enc = RLELosslessEncoder
+        kwargs = enc.kwargs_from_ds(ds)
+        out = enc._process(ds.PixelData, plugin='pydicom', **kwargs)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_specify_invalid_plugin_raises(self):
+        """Test an invalid plugin raises exception"""
+        msg = (
+            r"No plugin named 'foo' has been added to the 'RLELosslessEncoder'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            RLELosslessEncoder._process(b'', plugin='foo')
+
+    @pytest.mark.skipif(
+        not HAVE_NP or HAVE_PYLJ,
+        reason="Numpy unavailable or pylibjpeg available"
+    )
+    def test_specify_plugin_unavailable_raises(self):
+        """Test with specific unavailable plugin"""
+        enc = RLELosslessEncoder
+        assert enc.is_available
+        msg = (
+            r"Unable to encode with the 'pylibjpeg' encoding plugin because "
+            r"it's missing dependencies - requires numpy, pylibjpeg and "
+            r"pylibjpeg-rle"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            enc._process(b'', plugin='pylibjpeg')
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_specify_plugin_encoding_exception(self):
+        """Test an encoding exception occurring with a specific plugin"""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        enc = RLELosslessEncoder
+        kwargs = enc.kwargs_from_ds(ds)
+        kwargs['bits_allocated'] = []
+
+        msg = (
+            r"Unable to encode as an exception was raised by the 'pydicom' "
+            r"plugin's encoding function"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            enc._process(ds.PixelData, plugin='pydicom', **kwargs)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    def test_encoding_exceptions(self):
+        """Test an encoding exception occurring in all plugins"""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        enc = RLELosslessEncoder
+        kwargs = enc.kwargs_from_ds(ds)
+        kwargs['bits_allocated'] = []
+
+        msg = (
+            r"Unable to encode as exceptions were raised by all the available "
+            r"plugins:\n"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            enc._process(ds.PixelData, **kwargs)
+
+
 class TestDatasetCompress:
     """Tests for Dataset.compress()."""
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_inplace(self):
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
-        ds.compress(RLELossless)
+        ds.compress(RLELossless, encoding_plugin='pydicom')
         assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21820 == len(ds.PixelData)
+        assert 21118 == len(ds.PixelData)
         assert 1 == ds.PlanarConfiguration
 
-        # Test encapsulated, test uncompressed == original
-
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
         arr = ds.pixel_array
         del ds.PixelData
-        ds.compress(RLELossless, arr)
+        ds.compress(RLELossless, arr, encoding_plugin='pydicom')
         assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21820 == len(ds.PixelData)
+        assert 21118 == len(ds.PixelData)
         assert 1 == ds.PlanarConfiguration
 
-    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self):
         """Test the required encoder being unavailable."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -866,7 +933,7 @@ class TestDatasetCompress:
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
 
-    @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_uid_not_supported(self):
         """Test the UID not having any encoders."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -877,3 +944,30 @@ class TestDatasetCompress:
         )
         with pytest.raises(NotImplementedError, match=msg):
             ds.compress(JPEG2000MC)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_encapsulate_extended(self):
+        """Test forcing extended encapsulation."""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        assert 'ExtendedOffsetTable' not in ds
+        assert 'ExtendedOffsetTableLengths' not in ds
+
+        ds.compress(
+            RLELossless, encapsulate_ext=True, encoding_plugin='pydicom'
+        )
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 21114 == len(ds.PixelData)
+        assert 1 == ds.PlanarConfiguration
+        assert b'\x00' * 8 == ds.ExtendedOffsetTable
+        assert b'\x6a\x52' + b'\x00' * 6 == ds.ExtendedOffsetTableLengths
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_round_trip(self):
+        """Test an encoding round-trip"""
+        ds = get_testdata_file("MR_small_RLE.dcm", read=True)
+        original = ds.PixelData
+        arr = ds.pixel_array
+        del ds.PixelData
+        ds.compress(RLELossless, arr, encoding_plugin="pydicom")
+        assert id(arr) != id(ds.pixel_array)
+        assert np.array_equal(arr, ds.pixel_array)

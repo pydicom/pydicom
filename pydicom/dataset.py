@@ -1566,12 +1566,14 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         self._pixel_id = get_image_pixel_ids(self)
 
+    # TODO: docstring, typing check
     def compress(
         self,
         uid: str,
         arr: Optional["np.ndarray"] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
+        encapsulate_ext: bool = False,
         **kwargs
     ) -> None:
         """Compress and update the dataset in-place with the resulting
@@ -1649,6 +1651,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             If `arr` is not used and the existing *Pixel Data* is compressed
             then the named of the handler to use to decompress it. If not
             specified then all available handlers will be tried.
+        encapsulate_ext : bool, optional
+            FIXME
+            If ``True`` then force the use extended encapsulation. If ``False``
+            (default) then extended encapsulation will be still be used
+            if needed for large amounts of compressed *Pixel Data*, but will
+            otherwise use basic encapsulation.
         **kwargs
             FIXME
             Optional parameters to pass to the compression function.
@@ -1691,7 +1699,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         # Encapsulate the encoded *Pixel Data*
         nr_frames = getattr(self, "NumberOfFrames", 1) or 1
         total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
-        if total > 2**32 - 1:
+        if encapsulate_ext or total > 2**32 - 1:
             (self.PixelData,
              self.ExtendedOffsetTable,
              self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)

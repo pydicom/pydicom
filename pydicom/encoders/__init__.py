@@ -120,7 +120,6 @@ class Encoder:
                 f"Missing expected arguments: {', '.join(missing)}"
             )
 
-    # TODO: test
     def encode(
         self,
         src: Union[bytes, "np.ndarray", "Dataset"],
@@ -618,8 +617,6 @@ class Encoder:
         return arr.tobytes()
 
     # TODO: test
-    # TODO: handle exceptions in plugins
-    # TODO: good exception message for complete failure
     def _process(
         self,
         src: bytes,
@@ -652,28 +649,56 @@ class Encoder:
             If `arr` contains multiple frames but the `idx` of the frame
             to be encoded is not specified.
         """
-        # Add our defaults, but don't overwrite existing options
+        if not self.is_available:
+            missing = "\n".join(
+                [f"    {s}" for s in self.missing_dependencies]
+            )
+            raise RuntimeError(
+                f"Unable to encode because the encoding plugins are missing "
+                f"dependencies:\n{missing}"
+            )
+
+        if plugin and plugin not in {**self._unavailable, **self._available}:
+            raise ValueError(
+                f"No plugin named '{plugin}' has been added to the "
+                f"'{self.name}'"
+            )
+
+        if plugin and plugin in self._unavailable:
+            deps = self._unavailable[plugin]
+            missing = deps[0]
+            if len(deps) > 1:
+                missing = f"{', '.join(deps[:-1])} and {deps[-1]}"
+            raise RuntimeError(
+                f"Unable to encode with the '{plugin}' encoding plugin "
+                f"because it's missing dependencies - requires {missing}"
+            )
+
+        # Add our defaults, but don't override existing options
         kwargs = {**self._defaults, **kwargs}
 
-        failed_encoders: List[Tuple[str, str]] = []
         if plugin:
             # Try specific encoder
-            #try:
-            return self._available[plugin](src, **kwargs)
-            #except Exception as exc:
-            #failed_encoders.append(plugin)
-        else:
-            # Try all available encoders
-            for name, func in self._available.items():
-                #try:
-                return func(src, **kwargs)
-                #except Exception as exc:
-                #failed_encoders.append((name, exc))
+            try:
+                return self._available[plugin](src, **kwargs)
+            except Exception as exc:
+                raise RuntimeError(
+                    "Unable to encode as an exception was raised by the "
+                    f"'{plugin}' plugin's encoding function"
+                ) from exc
 
-        # TODO: better exception message -> add exception to msg
+        # Try all available encoders
+        failure_messages: List[str] = []
+        for name, func in self._available.items():
+            try:
+                return func(src, **kwargs)
+            except Exception as exc:
+                failure_messages.append(f"{name}: {str(exc)}")
+
+        messages = '\n  '.join(failure_messages)
         raise RuntimeError(
-            f"Unable to encode the pixel data using the following packages: "
-            f"{','.join([i[0] for i in failed_encoders])}"
+            "Unable to encode as exceptions were raised by all the "
+            f"available plugins:\n  {messages}"
         )
 
     def remove_plugin(self, label: str) -> None:
@@ -740,7 +765,7 @@ def parallel_encode(
     recurse: bool = True,
     nprocs: int = multiprocessing.cpu_count(),
     **kwargs
-) -> List["Dataset"]:
+) -> None:
     """Use :mod:`multiprocessing` to compress the *Pixel Data* in multiple
     `datasets`.
 
@@ -791,4 +816,4 @@ def parallel_encode(
 
     [p.join() for p in proc]  # type: ignore[func-returns-value]
 
-    return [ds for idx, ds in sorted(result)]
+    #return [ds for idx, ds in sorted(result)]
