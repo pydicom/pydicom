@@ -132,10 +132,7 @@ Installing GDCM
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
 Unfortunately there's no easy way to install the Python GDCM bindings
-using pip. :gh:`This page
-<pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda>`
-has instructions for installing in a virtual environment in Ubuntu
-19.04+ or Debian Buster+ using the ``python3-gdcm`` package.
+using pip.
 
 Through conda::
 
@@ -146,8 +143,8 @@ Installing pylibjpeg
 --------------------
 
 `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ is a Python framework for
-decompressing JPEG, JPEG-LS, JPEG 2000 and RLE images provided a suitable plugin
-is installed.
+decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
+RLE images provided a suitable plugin is installed.
 
 Using pip::
 
