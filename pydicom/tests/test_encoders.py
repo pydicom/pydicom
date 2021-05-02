@@ -172,18 +172,19 @@ class TestEncoder:
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_remove_plugin_unavailable(self):
         """Test removing a plugin."""
-        self.enc.add_plugin(
+        enc = Encoder(RLELossless)
+        enc.add_plugin(
             "foo",
             (
                 'pydicom.pixel_data_handlers.rle_handler',
                 '_wrap_rle_encode_frame'
             ),
         )
-        assert 'bar' in self.enc._unavailable
-        assert {} == self.enc._available
+        assert 'bar' in enc._unavailable
+        assert {} == enc._available
 
-        self.enc.remove_plugin("bar")
-        assert {} ==  self.enc._unavailable
+        enc.remove_plugin("bar")
+        assert {} ==  enc._unavailable
 
     def test_remove_plugin_raises(self):
         """Test removing a plugin that doesn't exist raises exception"""
