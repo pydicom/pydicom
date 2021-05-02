@@ -817,7 +817,6 @@ class TestRLEEncoding:
         del ds.PixelData
         ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
         assert expected > len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
         assert np.array_equal(ref, ds.pixel_array)
         assert id(ref) != id(ds.pixel_array)
 
