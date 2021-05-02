@@ -822,7 +822,7 @@ class TestRLEEncoding:
 
     def test_encode_bit(self):
         """Test encoding big-endian src"""
-        ds = dcmread(EXPL)
+        ds = dcmread(IMPL)
         ref = ds.pixel_array
         ds.compress(
             RLELossless,
@@ -830,5 +830,5 @@ class TestRLEEncoding:
             byteorder='>',
             encoding_plugin='pylibjpeg'
         )
-        assert np.array_equal(ref, ds.pixel_array)
+        assert np.array_equal(ref.newbyteorder('>'), ds.pixel_array)
         assert id(ref) != id(ds.pixel_array)
