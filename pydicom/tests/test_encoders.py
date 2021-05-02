@@ -180,10 +180,10 @@ class TestEncoder:
                 '_wrap_rle_encode_frame'
             ),
         )
-        assert 'bar' in enc._unavailable
+        assert 'foo' in enc._unavailable
         assert {} == enc._available
 
-        enc.remove_plugin("bar")
+        enc.remove_plugin("foo")
         assert {} ==  enc._unavailable
 
     def test_remove_plugin_raises(self):

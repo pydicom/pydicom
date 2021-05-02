@@ -35,6 +35,7 @@ import weakref
 
 if TYPE_CHECKING:
     try:
+        import numpy
         import numpy as np
     except ImportError:
         pass

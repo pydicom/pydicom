@@ -693,7 +693,7 @@ class Encoder:
         if label in self._available:
             del self._available[label]
         elif label in self._unavailable:
-            del self._unavailable
+            del self._unavailable[label]
         else:
             raise ValueError(f"Unable to remove '{label}', no such plugin'")
 
