@@ -331,7 +331,7 @@ def test_unsupported_syntaxes():
     for syntax in SUPPORTED_SYNTAXES:
         assert syntax not in UNSUPPORTED_SYNTAXES
 
-
+print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
 class TestHandler:
     """Tests for handling Pixel Data with the handler."""
@@ -361,7 +361,7 @@ class TestHandler:
                 ds.pixel_array
 
     @pytest.mark.skipif(
-        HAVE_LJ and HAVE_OJ and HAVE_RLE, reason="plugins available"
+        HAVE_LJ or HAVE_OJ or HAVE_RLE, reason="plugins available"
     )
     def test_no_plugins_raises(self):
         """Test exception raised if required plugin missing."""
@@ -381,6 +381,7 @@ class TestHandler:
         with pytest.raises(RuntimeError, match=msg):
             ds.pixel_array
 
+        # Don't use pydicom decoder
         ds = dcmread(RLE_8_1_1F)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-rle' "
