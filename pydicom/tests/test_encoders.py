@@ -978,20 +978,22 @@ class TestDatasetCompress:
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
         ds.compress(RLELossless, encoding_plugin='pydicom')
+        assert 1 == ds.SamplesPerPixel
         assert RLELossless == ds.file_meta.TransferSyntaxUID
         assert 21118 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
+        assert 'PlanarConfiguration' not in ds
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
+        assert hasattr(ds, 'file_meta')
         arr = ds.pixel_array
         del ds.PixelData
+        del ds.file_meta
         ds.compress(RLELossless, arr, encoding_plugin='pydicom')
         assert RLELossless == ds.file_meta.TransferSyntaxUID
         assert 21118 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self):
@@ -1029,7 +1031,6 @@ class TestDatasetCompress:
         )
         assert RLELossless == ds.file_meta.TransferSyntaxUID
         assert 21114 == len(ds.PixelData)
-        assert 1 == ds.PlanarConfiguration
         assert b'\x00' * 8 == ds.ExtendedOffsetTable
         assert b'\x6a\x52' + b'\x00' * 6 == ds.ExtendedOffsetTableLengths
 
@@ -1043,3 +1044,14 @@ class TestDatasetCompress:
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
         assert id(arr) != id(ds.pixel_array)
         assert np.array_equal(arr, ds.pixel_array)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_planar_configuration(self):
+        """Test Planar Configuration added if Samples per Pixel > 1"""
+        ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)
+        del ds.PlanarConfiguration
+        assert 3 == ds.SamplesPerPixel
+        assert 'PlanarConfiguration' not in ds
+        ds.compress(RLELossless, encoding_plugin='pydicom')
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert 1 == ds.PlanarConfiguration

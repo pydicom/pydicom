@@ -1600,8 +1600,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         or modify the following elements:
 
         * (0002,0010) *Transfer Syntax UID*
-        * (0028,0006) *Planar Configuration*
         * (7FE0,0010) *Pixel Data*
+
+        If *Samples per Pixel* is greater than 1 then the following element
+        will also be added:
+
+        * (0028,0006) *Planar Configuration*
 
         If the compressed pixel data is too large for basic encapsulation
         then :dcm:`extended encapsulation <part03/sect_C.7.6.3.html>` will be
@@ -1714,9 +1718,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self.file_meta.TransferSyntaxUID = uid
 
         # Add or update any other required elements
-        self.PlanarConfiguration = 0
-        if uid == RLELossless:
-            self.PlanarConfiguration = 1
+        if self.SamplesPerPixel > 1:
+            self.PlanarConfiguration = 1 if uid == RLELossless else 0
 
     def decompress(self, handler_name: str = '') -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
