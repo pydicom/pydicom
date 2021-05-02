@@ -86,7 +86,7 @@ An encoding plugin must implement three objects within the same module:
           JPEG2000: ('numpy', 'gdcm'),
       }
 
-  This will be used to provide the user will a list of missing dependencies
+  This will be used to provide the user with a list of missing dependencies
   required by the plugin.
 
 An example of the requirements of a plugin is available `here

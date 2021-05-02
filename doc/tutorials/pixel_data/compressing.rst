@@ -19,13 +19,13 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 .. code-block:: bash
 
-    python -m pip install -U pydicom>=2.2 numpy pylibjpeg pylibjpeg-rle
+    python -m pip install -U pydicom>=2.2 numpy pylibjpeg
 
 .. code-block:: bash
 
     conda install numpy
     conda install -c conda-forge pydicom>=2.2
-    pip intall pylibjpeg pylibjpeg-rle
+    pip install pylibjpeg
 
 
 Introduction

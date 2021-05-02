@@ -605,14 +605,22 @@ class Encoder:
 
         Parameters
         ----------
-        arr : numpy.ndarray
-            An :class:`~numpy.ndarray` containing single or multi-framed
-            image data to be encoded.
+        src : bytes
+            A single uncompressed frame of little-endian ordered pixel data.
         plugin : str, optional
             The name of the encoding plugin to use. If not specified then all
             available plugins will be tried.
         **kwargs
             Required parameters:
+
+            * ``'rows'``: :class:`int`
+            * ``'columns'``: :class:`int`
+            * ``'number_of_frames'``: :class:`int`
+            * ``'samples_per_pixel'``: :class:`int`
+            * ``'bits_allocated'``: :class:`int`
+            * ``'bits_stored'``: :class:`int`
+            * ``'pixel_representation'``: :class:`int`
+            * ``'photometric_interpretation'``: :class:`str`
 
             May also contain optional parameters for the encoding function.
 
@@ -620,12 +628,6 @@ class Encoder:
         ------
         bytes
             The encoded pixel data frame.
-
-        Raises
-        ------
-        ValueError
-            If `arr` contains multiple frames but the `idx` of the frame
-            to be encoded is not specified.
         """
         if not self.is_available:
             missing = "\n".join(
