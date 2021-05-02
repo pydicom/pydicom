@@ -131,8 +131,9 @@ Installing GDCM
 `GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-Unfortunately there's no easy way to install the Python GDCM bindings
-using pip.
+Using pip::
+
+  pip install python-gdcm
 
 Through conda::
 
