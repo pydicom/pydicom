@@ -1,4 +1,4 @@
-.. _api_decoders:
+.. _api_encoders:
 
 Pixel Data Encoders (:mod:`pydicom.encoders`)
 =============================================

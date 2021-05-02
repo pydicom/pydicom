@@ -185,6 +185,7 @@ class TestEncoder:
             'bits_allocated': 0,
             'bits_stored': 0,
             'pixel_representation': 0,
+            'number_of_frames': 0,
             'photometric_interpretation': 'RGB'
         }
         assert enc._check_kwargs(kwargs) is None

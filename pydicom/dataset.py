@@ -50,6 +50,7 @@ from pydicom.datadict import (
     dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.fileutil import path_from_pathlike
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, reshape_pixel_array, get_image_pixel_ids
@@ -1660,7 +1661,6 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             </guides/encoder_plugin_options>` for more information.
         """
         from pydicom.encoders import get_encoder
-        from pydicom.encaps import encapsulate, encapsulate_extended
 
         uid = UID(uid)
 

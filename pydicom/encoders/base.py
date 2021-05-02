@@ -48,7 +48,7 @@ class Encoder:
             'byteorder': '<',  # Byte ordering of `src` passed to plugins
         }
 
-    def add_plugin(self, label: str, path: Tuple[str, str]) -> None:
+    def add_plugin(self, label: str, import_path: Tuple[str, str]) -> None:
         """Add an encoding plugin to the encoder.
 
         The requirements for encoding plugins are available
@@ -58,7 +58,7 @@ class Encoder:
         ----------
         label : str
             The label to use for the plugin, should be unique for the encoder.
-        path : Tuple[str, str]
+        import_path : Tuple[str, str]
             The module import path and the encoding function's name (e.g.
             ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
         """
@@ -67,11 +67,11 @@ class Encoder:
                 f"'{self.name}' already has a plugin named '{label}'"
             )
 
-        module = import_module(path[0])
+        module = import_module(import_path[0])
 
         # `is_available(UID)` is required for plugins
         if module.is_available(self.UID):  # type: ignore[attr-defined]
-            self._available[label] = getattr(module, path[1])
+            self._available[label] = getattr(module, import_path[1])
         else:
             # `ENCODER_DEPENDENCIES[UID]` is required for plugins
             deps = module.ENCODER_DEPENDENCIES  # type: ignore[attr-defined]
@@ -99,7 +99,7 @@ class Encoder:
         decoding_plugin: str = '',
         **kwargs
     ) -> bytes:
-        """Return pixel data from `src` as encoded :class:`bytes`.
+        """Return an encoded frame of the pixel data from `src` :class:`bytes`.
 
         Parameters
         ----------
@@ -161,7 +161,7 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the :doc:`encoding plugins options
+            present. See the :doc:`encoding plugin options
             </guides/encoder_plugin_options>` for more information.
 
         Returns
@@ -363,7 +363,7 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the :doc:`encoding plugins options
+            present. See the :doc:`encoding plugin options
             </guides/encoder_plugin_options>` for more information.
 
         Yields
@@ -456,7 +456,7 @@ class Encoder:
 
     @property
     def missing_dependencies(self) -> List[str]:
-        """Return nice strings for plugins when missing dependencies as
+        """Return nice strings for plugins with missing dependencies as
         List[str].
         """
         s = []
@@ -698,7 +698,9 @@ class Encoder:
 
     @property
     def UID(self) -> UID:
-        """Return the encoder's corresponding *Transfer Syntax UID* as UID."""
+        """Return the encoder's corresponding *Transfer Syntax UID* as
+        :class:`~pydicom.uid.UID`.
+        """
         return self._uid
 
 

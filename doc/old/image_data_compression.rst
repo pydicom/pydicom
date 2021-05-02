@@ -30,6 +30,8 @@ for more information.
 
 .. code-block:: python
 
+    from typing import List, Tuple
+
     from pydicom import dcmread
     from pydicom.data import get_testdata_file
     from pydicom.encaps import encapsulate, encapsulate_extended
@@ -50,7 +52,7 @@ for more information.
     ds.save_as("CT_small_compressed_basic.dcm")
 
     # Extended encapsulation
-    result: Tuple(bytes, bytes, bytes) = encapsulate_extended(frames)
+    result: Tuple[bytes, bytes, bytes] = encapsulate_extended(frames)
     ds.PixelData = result[0]
     ds.ExtendedOffsetTable = result[1]
     ds.ExtendedOffsetTableLength = result[2]
