@@ -69,11 +69,15 @@ class TestTM:
 
     def test_str(self):
         """Test str(TM)."""
-        x = pydicom.valuerep.TM("212223")
-        assert "212223" == str(x)
-        del x.original_string
-        assert not hasattr(x, 'original_string')
-        assert "21:22:23" == str(x)
+        assert "212223.1234" == str(pydicom.valuerep.TM("212223.1234"))
+        assert "212223" == str(pydicom.valuerep.TM("212223"))
+        assert "212223" == str(pydicom.valuerep.TM("212223"))
+        assert "2122" == str(pydicom.valuerep.TM("2122"))
+        assert "21" == str(pydicom.valuerep.TM("21"))
+        assert "212223" == str(pydicom.valuerep.TM(time(21, 22, 23)))
+        assert "212223.000024" == str(
+            pydicom.valuerep.TM(time(21, 22, 23, 24)))
+        assert "010203" == str(pydicom.valuerep.TM(time(1, 2, 3)))
 
     def test_new_empty_str(self):
         """Test converting an empty string."""
@@ -185,6 +189,18 @@ class TestDT:
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DT("a2000,00,00")
 
+    def test_str(self):
+        dt = datetime(1911, 12, 13, 21, 21, 23)
+        assert "19111213212123" == str(pydicom.valuerep.DT(dt))
+        assert "19111213212123" == str(pydicom.valuerep.DT("19111213212123"))
+        assert "1001.02.03" == str(pydicom.valuerep.DA("1001.02.03"))
+        tz_info = timezone(timedelta(seconds=21600), '+0600')
+        dt = datetime(2022, 1, 2, 8, 9, 7, 123456, tzinfo=tz_info)
+        assert "20220102080907.123456+0600" == str(pydicom.valuerep.DT(dt))
+        tz_info = timezone(timedelta(seconds=-23400), '-0630')
+        dt = datetime(2022, 12, 31, 23, 59, 59, 42, tzinfo=tz_info)
+        assert "20221231235959.000042-0630" == str(pydicom.valuerep.DT(dt))
+
 
 class TestDA:
     """Unit tests for pickling DA"""
@@ -212,6 +228,11 @@ class TestDA:
         msg = r"Unable to convert '123456' to 'DA' object"
         with pytest.raises(ValueError, match=msg):
             pydicom.valuerep.DA(123456)
+
+    def test_str(self):
+        assert "10010203" == str(pydicom.valuerep.DA(date(1001, 2, 3)))
+        assert "10010203" == str(pydicom.valuerep.DA("10010203"))
+        assert "1001.02.03" == str(pydicom.valuerep.DA("1001.02.03"))
 
 
 class TestIsValidDS:

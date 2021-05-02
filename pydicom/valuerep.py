@@ -135,6 +135,8 @@ class DA(_DateTimeBase, datetime.date):
             self.original_string = val
         elif isinstance(val, DA) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
+        elif isinstance(val, datetime.date):
+            self.original_string = f"{val.year}{val.month:02}{val.day:02}"
 
 
 class DT(_DateTimeBase, datetime.datetime):
@@ -242,6 +244,22 @@ class DT(_DateTimeBase, datetime.datetime):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
+        elif isinstance(val, datetime.datetime):
+            self.original_string = (
+                f"{val.year:04}{val.month:02}{val.day:02}"
+                f"{val.hour:02}{val.minute:02}{val.second:02}"
+            )
+            # milliseconds are seldom used, add them only if needed
+            if val.microsecond > 0:
+                self.original_string += f".{val.microsecond:06}"
+            if val.tzinfo is not None:
+                offset = val.tzinfo.utcoffset(val)
+                offset_min = offset.days * 24 * 60 + offset.seconds // 60
+                sign = "+" if offset_min >= 0 else "-"
+                offset_min = abs(offset_min)
+                self.original_string += (
+                    f"{sign}{offset_min // 60:02}{offset_min % 60:02}"
+                )
 
 
 class TM(_DateTimeBase, datetime.time):
@@ -318,6 +336,13 @@ class TM(_DateTimeBase, datetime.time):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
+        elif isinstance(val, datetime.time):
+            self.original_string = (
+                f"{val.hour:02}{val.minute:02}{val.second:02}"
+            )
+            # milliseconds are seldom used, add them only if needed
+            if val.microsecond > 0:
+                self.original_string += f".{val.microsecond:06}"
 
     if platform.python_implementation() == "PyPy":
         # Workaround for CPython/PyPy bug in time.__reduce_ex__()
