@@ -12,6 +12,7 @@ from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import UID, RLELossless
 
 try:
+    import numpy
     import numpy as np
 except ImportError:
     pass
@@ -767,8 +768,9 @@ def get_encoder(uid: str) -> Encoder:
     | *RLE Lossless* | 1.2.840.10008.1.2.5 | 2.2                |
     +----------------+---------------------+--------------------+
     """
+    uid = UID(uid)
     try:
-        return _PIXEL_DATA_ENCODERS[UID(uid)][0]
+        return _PIXEL_DATA_ENCODERS[uid][0]
     except KeyError:
         raise NotImplementedError(
             f"No pixel data encoders have been implemented for '{uid.name}'"

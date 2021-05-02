@@ -49,13 +49,17 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
     get_url_map, get_data_dir
 )
+
+if TYPE_CHECKING:
+    from pydicom import Dataset
+
 
 DATA_ROOT = os.fspath(Path(__file__).parent.resolve())
 """The absolute path to the pydicom/data directory."""
@@ -323,6 +327,7 @@ def get_testdata_file(
     if matches:
         path = os.fspath(matches[0])
         return dcmread(path, force=True) if read else path
+
     # Check external data sources
     for lib, source in external_data_sources().items():
         try:
@@ -348,6 +353,8 @@ def get_testdata_file(
                     f"A download failure occurred while attempting to "
                     f"retrieve {name}"
                 )
+
+    return None
 
 
 def get_testdata_files(pattern: str = "**/*") -> List[str]:

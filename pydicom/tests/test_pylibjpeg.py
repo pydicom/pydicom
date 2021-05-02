@@ -807,6 +807,7 @@ class TestRLE:
 @pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
 class TestRLEEncoding:
     def test_encode(self):
+        """Test encoding"""
         ds = dcmread(EXPL)
         assert 'PlanarConfiguration' not in ds
         expected = get_expected_length(ds, 'bytes')
@@ -816,5 +817,18 @@ class TestRLEEncoding:
         ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
         assert expected > len(ds.PixelData)
         assert 1 == ds.PlanarConfiguration
+        assert np.array_equal(ref, ds.pixel_array)
+        assert id(ref) != id(ds.pixel_array)
+
+    def test_encode_bit(self):
+        """Test encoding big-endian src"""
+        ds = dcmread(EXPL)
+        ref = ds.pixel_array
+        ds.compress(
+            RLELossless,
+            ds.PixelData,
+            byteorder='>',
+            encoding_plugin='pylibjpeg'
+        )
         assert np.array_equal(ref, ds.pixel_array)
         assert id(ref) != id(ds.pixel_array)
