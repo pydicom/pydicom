@@ -184,7 +184,7 @@ class TestEncoder:
         assert {} == enc._available
 
         enc.remove_plugin("foo")
-        assert {} ==  enc._unavailable
+        assert {} == enc._unavailable
 
     def test_remove_plugin_raises(self):
         """Test removing a plugin that doesn't exist raises exception"""

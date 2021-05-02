@@ -331,6 +331,7 @@ def test_unsupported_syntaxes():
     for syntax in SUPPORTED_SYNTAXES:
         assert syntax not in UNSUPPORTED_SYNTAXES
 
+
 print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
 class TestHandler:
