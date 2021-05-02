@@ -11,7 +11,7 @@ This tutorial is about compressing a dataset's *Pixel Data* and covers
 * Compressing data using *pydicom*
 
 It's assumed that you're already familiar with the :doc:`dataset basics
-<dataset_basics>`.
+<../dataset_basics>`.
 
 
 Introduction
@@ -116,7 +116,7 @@ A specific encoding plugin can be used by passing the plugin name via the
 
 Change the compression on an already compressed dataset. Because this requires
 that the *Pixel Data* be uncompressed, a matching
-:doc:`image data handler<image_data_handlers>` for the initial compression
+:doc:`image data handler</old/image_data_handlers>` for the initial compression
 method is required.
 
 .. code-block:: python

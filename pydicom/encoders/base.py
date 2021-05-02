@@ -24,7 +24,7 @@ class Encoder:
     to a single DICOM *Transfer Syntax UID*, and provides a
     mechanism for converting raw unencoded source data to meet the
     requirements of that transfer syntax using one or more
-    :ref:`encoding plugins<guide_encoder_plugins>`.
+    :doc:`encoding plugins</guides/encoder_plugins>`.
 
     .. versionadded:: 2.2
     """
@@ -52,7 +52,7 @@ class Encoder:
         """Add an encoding plugin to the encoder.
 
         The requirements for encoding plugins are available
-        :ref:`here<guide_encoder_plugins>`.
+        :doc:`here</guides/encoder_plugins>`.
 
         Parameters
         ----------
@@ -118,8 +118,8 @@ class Encoder:
 
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a :ref:`suitable pixel data
-              handler <guide_compressed>` must be available to
+              *Pixel Data* is compressed then a :doc:`suitable pixel data
+              handler </old/image_data_handlers>` must be available to
               decompress it.
         idx : int, optional
             Required when `src` contains multiple frames, this is the index
@@ -161,8 +161,8 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the :ref:`encoding plugins options
-            <guide_encoder_plugin_opts>` for more information.
+            present. See the :doc:`encoding plugins options
+            </guides/encoder_plugin_options>` for more information.
 
         Returns
         -------
@@ -323,8 +323,8 @@ class Encoder:
 
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
               the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a :ref:`suitable pixel data
-              handler <guide_compressed>` must be available to
+              *Pixel Data* is compressed then a :doc:`suitable pixel data
+              handler </old/image_data_handlers>` must be available to
               decompress it.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
@@ -363,8 +363,8 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the :ref:`encoding plugins options
-            <guide_encoder_plugin_opts>` for more information.
+            present. See the :doc:`encoding plugins options
+            </guides/encoder_plugin_options>` for more information.
 
         Yields
         ------
