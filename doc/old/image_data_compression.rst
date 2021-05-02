@@ -7,9 +7,6 @@ Compressing *Pixel Data*
 
 .. rubric:: How to compress Pixel Data
 
-Introduction
-------------
-
 Compressing using third-party packages
 --------------------------------------
 

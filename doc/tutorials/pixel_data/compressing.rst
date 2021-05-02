@@ -111,7 +111,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 Compressing using pydicom
 -------------------------
 
-Currently, only the *RLE Lossless* transfer syntax is support for
+Currently, only the *RLE Lossless* transfer syntax is supported for
 compressing *Pixel Data* natively using *pydicom*. The easiest method is to
 pass the UID for *RLE Lossless* to :func:`Dataset.compress()
 <pydicom.dataset.Dataset.compress>`:
