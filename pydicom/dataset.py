@@ -1566,7 +1566,6 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         self._pixel_id = get_image_pixel_ids(self)
 
-    # TODO: docstring
     def compress(
         self,
         uid: str,
@@ -1641,11 +1640,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             :class:`~numpy.dtype` and contents of the array should match the
             dataset.
         encoding_plugin : str, optional
-            TODO: doc link to plugins
-            Use the `encoding_plugin` to compress the pixel data. See
-            **doc link** for a list of packages available for each UID and
-            their dependencies. If not specified then all available plugins
-            will be tried (default).
+            Use the `encoding_plugin` to compress the pixel data. See the
+            :ref:`user guide <guide_compression>` for a list of plugins
+            available for each UID and their dependencies. If not specified
+            then all available plugins will be tried (default).
         decoding_plugin : str, optional
             If `arr` is not used and the existing *Pixel Data* is compressed
             then the name of the :mod:`image data handler
@@ -1657,8 +1655,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             if needed for large amounts of compressed *Pixel Data*, but
             will otherwise default to basic encapsulation.
         **kwargs
-            TODO: doc link to plugins
-            Optional parameters to pass to the compression function.
+            Optional keyword parameters for the encoding plugin may also be
+            present. See the :ref:`encoding plugins options
+            <guide_encoder_plugin_opts>` for more information.
         """
         from pydicom.encoders import get_encoder
         from pydicom.encaps import encapsulate, encapsulate_extended

@@ -16,7 +16,7 @@ try:
 except ImportError:
     pass
 
-# TODO: Finish docstrings
+
 class Encoder:
     """Factory class for data encoders.
 
@@ -91,8 +91,6 @@ class Encoder:
                 f"Missing expected arguments: {', '.join(missing)}"
             )
 
-    # TODO: encoding_plugin: add link to available plugins
-    # TODO: kwargs: add link to documentation on plugin options
     def encode(
         self,
         src: Union[bytes, "numpy.ndarray", Dataset],
@@ -129,7 +127,9 @@ class Encoder:
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available
-            plugins will be tried (default).
+            plugins will be tried (default). For information on the available
+            plugins for each encoder see the
+            :mod:`API documentation<pydicom.encoders>`.
         decoding_plugin : str, optional
             If `src` is a :class:`~pydicom.dataset.Dataset` containing
             compressed *Pixel Data* then this is the name of the
@@ -161,8 +161,8 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the documentation for the encoding plugins for what
-            options are available.
+            present. See the :ref:`encoding plugins options
+            <guide_encoder_plugin_opts>` for more information.
 
         Returns
         -------
@@ -297,8 +297,6 @@ class Encoder:
         """
         return bool(self._available)
 
-    # TODO: encoding_plugin: add link to available plugins
-    # TODO: kwargs: add link to documentation on plugin options
     def iter_encode(
         self,
         src: Union[bytes, "numpy.ndarray", Dataset],
@@ -331,7 +329,9 @@ class Encoder:
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available
-            plugins will be tried (default).
+            plugins will be tried (default). For information on the available
+            plugins for each encoder see the
+            :mod:`API documentation<pydicom.encoders>`.
         decoding_plugin : str, optional
             If `src` is a :class:`~pydicom.dataset.Dataset` containing
             compressed *Pixel Data* then this is the name of the
@@ -363,8 +363,8 @@ class Encoder:
               color space of the encoded pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
-            present. See the documentation for the encoding plugins for what
-            options are available.
+            present. See the :ref:`encoding plugins options
+            <guide_encoder_plugin_opts>` for more information.
 
         Yields
         ------
@@ -721,20 +721,26 @@ _PIXEL_DATA_ENCODERS = {
 }
 
 
-# TODO: add link to plugin docs
 def _build_encoder_docstrings() -> None:
     """Override the default Encoder docstring."""
+    plugin_doc_links = {
+        'pydicom': ":ref:`pydicom <encoder_plugin_pydicom>`",
+        'pylibjpeg': ":ref:`pylibjpeg <encoder_plugin_pylibjpeg>`",
+    }
+
     for enc, versionadded in _PIXEL_DATA_ENCODERS.values():
         uid = enc.UID
         available = enc._available.keys()
         unavailable = enc._unavailable.keys()
         plugins = list(available) + list(unavailable)
 
+        plugins = [plugin_doc_links[name] for name in sorted(plugins)]
+
         s = [f"A *Pixel Data* encoder for *{uid.name}* - ``{uid}``"]
         s.append("")
         s.append(f".. versionadded:: {versionadded}")
         s.append("")
-        s.append(f"Encoding plugins: {', '.join(sorted(plugins))}")
+        s.append(f"Encoding plugins: {', '.join(plugins)}")
         s.append("")
         s.append(
             "See the :class:`~pydicom.encoders.base.Encoder` "
