@@ -4,7 +4,7 @@
 Pixel Data Encoder Plugins
 ==========================
 
-*Pixel Data* encoding in *pydicom* uses an :class:`~pydicom.encoders.Encoder`
+*Pixel Data* encoding in *pydicom* uses an :class:`~pydicom.encoders.base.Encoder`
 instance for the specific *Transfer Syntax* as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
 and how to add them to *pydicom*. For a more general introduction to compression

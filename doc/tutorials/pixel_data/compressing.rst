@@ -17,10 +17,10 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 **Prerequisites**
 
-This tutorial uses optional packages that are required for
-*RLE Lossless* compression of *Pixel Data*. For information on what packages
-are required to compress other transfer syntaxes see the :doc:`image
-compression guide</old/image_data_compression>`.
+This tutorial uses packages in addition to *pydicom* that are not installed
+by default but are required for *RLE Lossless* compression of *Pixel Data*.
+For more information on what packages are available to compress a given
+transfer syntax see the :doc:`image compression guide</old/image_data_compression>`.
 
 Installing using pip:
 
