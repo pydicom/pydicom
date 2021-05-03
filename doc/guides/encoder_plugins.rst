@@ -67,7 +67,7 @@ An encoding plugin must implement three objects within the same module:
   At a minimum the encoding function must support the encoding of
   little-endian byte ordered data and should return the encoded
   data in a format meeting the requirements of the corresponding *Transfer
-  syntax UID* as :class:`bytes`.
+  Syntax UID* as :class:`bytes`.
 
 * A function named ``is_available`` with the following signature:
 
@@ -85,7 +85,7 @@ An encoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      from pydicom.uid import RLELossless, JPEG20000
+      from pydicom.uid import RLELossless, JPEG2000
 
       ENCODER_DEPENDENCIES = {
           RLELossless: ('numpy', 'pillow', 'imagecodecs'),
@@ -106,7 +106,8 @@ Additional plugins can be added to an existing encoder with the
 a unique :class:`str` `plugin_label`, and a :class:`tuple` of ``('the import
 path to the encoder function's module', 'encoder function name')``. For
 example, if you'd import your encoder function `my_encoder_func` with
-``from my_package.encoders import my_func``, then you'd do the following:
+``from my_package.encoders import my_encoder_func``, then you'd do the
+following:
 
 .. code-block:: python
 
