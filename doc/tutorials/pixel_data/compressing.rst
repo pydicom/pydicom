@@ -17,6 +17,11 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 **Prerequisites**
 
+This tutorial uses optional packages that are required for
+*RLE Lossless* compression of *Pixel Data*. For information on what packages
+are required to compress other transfer syntaxes see the :doc:`image
+compression guide</old/image_data_compression>`.
+
 Installing using pip:
 
 .. code-block:: bash
