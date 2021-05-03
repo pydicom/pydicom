@@ -17,9 +17,13 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 
 **Prerequisites**
 
+Installing using pip:
+
 .. code-block:: bash
 
     python -m pip install -U pydicom>=2.2 numpy pylibjpeg
+
+Installing on conda:
 
 .. code-block:: bash
 
