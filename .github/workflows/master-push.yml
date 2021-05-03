@@ -108,7 +108,7 @@ jobs:
       if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
-        python -m pip uninstall -y pylibjpeg-openjpeg
+        python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
