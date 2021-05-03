@@ -2,23 +2,19 @@
 """Special classes for DICOM value representations (VR)"""
 
 import datetime
-from decimal import Decimal
-from math import floor, isfinite, log10
-import platform
 import re
 import sys
-from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator, AnyStr,
-    Callable, Iterator, overload
-)
-from typing import Sequence as SequenceType
 import warnings
+from decimal import Decimal
+from math import floor, isfinite, log10
+from typing import Sequence as SequenceType
+from typing import (
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator, Callable
+)
 
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.multival import MultiValue
-from pydicom.uid import UID
-
 
 # Types
 _T = TypeVar('_T')
@@ -84,23 +80,23 @@ class DA(_DateTimeBase, datetime.date):
 
     Note that the :class:`datetime.date` base class is immutable.
     """
-    def __new__(
-        cls: Type[_DA], val: Union[None, str, _DA, datetime.date]
-    ) -> Optional[_DA]:
+    def __new__(cls: Type[_DA], *args, **kwargs) -> Optional[_DA]:
         """Create an instance of DA object.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        Parameters
-        ----------
-        val : str
-            A string conformant to the DA definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
+        The arguments (``*args`` and ``**kwargs``) are either the ones
+        inherited from :class:`datetime.date`, or the first argument is
+        a string conformant to the DA definition in the DICOM Standard,
+        Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+        or it is a :class:`datetime.date` object, or an object of type
+        :class:`~pydicom.valuerep.DA`.
         """
-        if val is None:
+        if not args or args[0] is None:
             return None
 
+        val = args[0]
         if isinstance(val, str):
             if val.strip() == '':
                 return None  # empty date
@@ -123,14 +119,15 @@ class DA(_DateTimeBase, datetime.date):
             return super().__new__(cls, val.year, val.month, val.day)
 
         try:
-            return super().__new__(cls, val)
+            return super().__new__(cls, *args, **kwargs)
         except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'DA' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _DA, datetime.date]) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """Create a new **DA** element value."""
+        val = args[0]
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DA) and hasattr(val, 'original_string'):
@@ -171,23 +168,23 @@ class DT(_DateTimeBase, datetime.datetime):
             name=value
         )
 
-    def __new__(
-        cls: Type[_DT], val: Union[None, str, _DT, datetime.datetime]
-    ) -> Optional[_DT]:
+    def __new__(cls: Type[_DT], *args, **kwargs) -> Optional[_DT]:
         """Create an instance of DT object.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        Parameters
-        ----------
-        val : str
-            A string conformant to the DT definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
+        The arguments (``*args`` and ``**kwargs``) are either the ones
+        inherited from :class:`datetime.datetime`, or the first argument is
+        a string conformant to the DT definition in the DICOM Standard,
+        Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+        or it is a :class:`datetime.datetime` object, or an object of type
+        :class:`~pydicom.valuerep.DT`.
         """
-        if val is None:
+        if not args or args[0] is None:
             return None
 
+        val = args[0]
         if isinstance(val, str):
             if val.strip() == '':
                 return None
@@ -233,13 +230,15 @@ class DT(_DateTimeBase, datetime.datetime):
             )
 
         try:
-            return super().__new__(cls, val)
+            return super().__new__(cls, *args, **kwargs)
         except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'DT' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _DT, datetime.datetime]) -> None:
+    def __init__(self, *args, **kwargs) -> None:
+        """Create a new **DT** element value."""
+        val = args[0]
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, DT) and hasattr(val, 'original_string'):
@@ -274,23 +273,23 @@ class TM(_DateTimeBase, datetime.time):
         r"(?(7)(\.(?P<ms>([0-9]{1,6})?))?))$"
     )
 
-    def __new__(
-        cls: Type[_TM], val: Union[None, str, _TM, datetime.time]
-    ) -> Optional[_TM]:
+    def __new__(cls: Type[_TM], *args, **kwargs) -> Optional[_TM]:
         """Create an instance of TM object from a string.
 
         Raise an exception if the string cannot be parsed or the argument
         is otherwise incompatible.
 
-        Parameters
-        ----------
-        val : str
-            A string conformant to the TM definition in the DICOM Standard,
-            Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`.
+        The arguments (``*args`` and ``**kwargs``) are either the ones
+        inherited from :class:`datetime.time`, or the first argument is
+        a string conformant to the TM definition in the DICOM Standard,
+        Part 5, :dcm:`Table 6.2-1<part05/sect_6.2.html#table_6.2-1>`,
+        or it is a :class:`datetime.time` object, or an object of type
+        :class:`~pydicom.valuerep.TM`.
         """
-        if val is None:
+        if not args or args[0] is None:
             return None
 
+        val = args[0]
         if isinstance(val, str):
             if val.strip() == '':
                 return None  # empty time
@@ -325,13 +324,15 @@ class TM(_DateTimeBase, datetime.time):
             )
 
         try:
-            return super().__new__(cls, val)
+            return super().__new__(cls, *args, **kwargs)
         except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'TM' object"
             ) from exc
 
-    def __init__(self, val: Union[str, _TM, datetime.time]) -> None:
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
+        val = args[0]
         if isinstance(val, str):
             self.original_string = val
         elif isinstance(val, TM) and hasattr(val, 'original_string'):
@@ -343,16 +344,6 @@ class TM(_DateTimeBase, datetime.time):
             # milliseconds are seldom used, add them only if needed
             if val.microsecond > 0:
                 self.original_string += f".{val.microsecond:06}"
-
-    if platform.python_implementation() == "PyPy":
-        # Workaround for CPython/PyPy bug in time.__reduce_ex__()
-        #   caused by returning (time, ...) rather than (self.__class__, ...)
-        def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-            return (
-                self.__class__,
-                super()._getstate(protocol),
-                self.__getstate__()
-            )
 
 
 # Regex to match strings that represent valid DICOM decimal strings (DS)
