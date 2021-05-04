@@ -8,7 +8,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, get_j2k_parameters
+    convert_color_space, get_j2k_parameters, get_expected_length
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -332,6 +332,7 @@ def test_unsupported_syntaxes():
         assert syntax not in UNSUPPORTED_SYNTAXES
 
 
+print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
 class TestHandler:
     """Tests for handling Pixel Data with the handler."""
@@ -361,7 +362,7 @@ class TestHandler:
                 ds.pixel_array
 
     @pytest.mark.skipif(
-        HAVE_LJ and HAVE_OJ and HAVE_RLE, reason="plugins available"
+        HAVE_LJ or HAVE_OJ or HAVE_RLE, reason="plugins available"
     )
     def test_no_plugins_raises(self):
         """Test exception raised if required plugin missing."""
@@ -381,6 +382,7 @@ class TestHandler:
         with pytest.raises(RuntimeError, match=msg):
             ds.pixel_array
 
+        # Don't use pydicom decoder
         ds = dcmread(RLE_8_1_1F)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-rle' "
@@ -801,3 +803,32 @@ class TestRLE:
 
         with pytest.raises(StopIteration):
             next(frame_generator)
+
+
+@pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
+class TestRLEEncoding:
+    def test_encode(self):
+        """Test encoding"""
+        ds = dcmread(EXPL)
+        assert 'PlanarConfiguration' not in ds
+        expected = get_expected_length(ds, 'bytes')
+        assert expected == len(ds.PixelData)
+        ref = ds.pixel_array
+        del ds.PixelData
+        ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
+        assert expected > len(ds.PixelData)
+        assert np.array_equal(ref, ds.pixel_array)
+        assert id(ref) != id(ds.pixel_array)
+
+    def test_encode_bit(self):
+        """Test encoding big-endian src"""
+        ds = dcmread(IMPL)
+        ref = ds.pixel_array
+        ds.compress(
+            RLELossless,
+            ds.PixelData,
+            byteorder='>',
+            encoding_plugin='pylibjpeg'
+        )
+        assert np.array_equal(ref.newbyteorder('>'), ds.pixel_array)
+        assert id(ref) != id(ds.pixel_array)

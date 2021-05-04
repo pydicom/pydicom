@@ -38,6 +38,7 @@ in the table below.
 from itertools import groupby
 from struct import pack, unpack
 import sys
+from typing import Optional
 
 try:
     import numpy as np
@@ -52,14 +53,13 @@ import pydicom.uid
 
 HANDLER_NAME = 'RLE Lossless'
 
-DEPENDENCIES = {
-    'numpy': ('http://www.numpy.org/', 'NumPy'),
-}
+ENCODER_DEPENDENCIES = {pydicom.uid.RLELossless: ('numpy', )}
+DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
 
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
-def is_available():
+def is_available(uid: Optional[pydicom.uid.UID] = None) -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 
@@ -374,6 +374,29 @@ def _rle_decode_segment(data):
 
 
 # RLE encoding functions
+def _wrap_rle_encode_frame(src: bytes, **kwargs) -> bytes:
+    """Wrapper for use with the encoder interface.
+
+    .. versionadded:: 2.2
+
+    Parameters
+    ----------
+    src : bytes
+        A single frame of image data to be RLE encoded.
+    **kwargs
+        Optional parameters for the encoding function.
+
+    Returns
+    -------
+    bytes
+        An RLE encoded frame.
+    """
+    bytes_allocated = kwargs['bits_allocated'] // 8
+    arr = np.frombuffer(src, dtype=f'<u{bytes_allocated}')
+
+    return bytes(rle_encode_frame(arr))
+
+
 def rle_encode_frame(arr):
     """Return an :class:`numpy.ndarray` image frame as RLE encoded
     :class:`bytearray`.

@@ -12,4 +12,6 @@ pydicom:
 
    element_value_types
    cli/cli_guide
+   encoder_plugins
+   encoder_plugin_options
    writing_documentation

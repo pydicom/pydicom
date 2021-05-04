@@ -9,3 +9,7 @@ Overlay Data Handlers (:mod:`pydicom.overlays`)
    :toctree: generated/
 
    numpy_handler
+
+
+.. automodule:: pydicom.overlays
+   :members:
