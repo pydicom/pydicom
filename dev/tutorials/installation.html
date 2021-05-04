@@ -146,6 +146,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
@@ -345,10 +346,10 @@ decompress JPEG-LS images.</p>
 <h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
-<p>Unfortunately there’s no easy way to install the Python GDCM bindings
-using pip. <a class="reference external" href="https://github.com/pydicom/pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda">This page</a>
-has instructions for installing in a virtual environment in Ubuntu
-19.04+ or Debian Buster+ using the <code class="docutils literal notranslate"><span class="pre">python3-gdcm</span></code> package.</p>
+<p>Using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">gdcm</span>
+</pre></div>
+</div>
 <p>Through conda:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">gdcm</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
@@ -357,8 +358,8 @@ has instructions for installing in a virtual environment in Ubuntu
 <div class="section" id="installing-pylibjpeg">
 <h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> is a Python framework for
-decompressing JPEG, JPEG-LS, JPEG 2000 and RLE images provided a suitable plugin
-is installed.</p>
+decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
+RLE images provided a suitable plugin is installed.</p>
 <p>Using pip:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pylibjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">libjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">openjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">rle</span>
 </pre></div>
@@ -403,7 +404,7 @@ within the <code class="docutils literal notranslate"><span class="pre">pydicom<
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>

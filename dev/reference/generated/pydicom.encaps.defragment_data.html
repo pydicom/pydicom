@@ -121,6 +121,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a><ul class="current">
@@ -229,7 +230,7 @@
 <h1>pydicom.encaps.defragment_data<a class="headerlink" href="#pydicom-encaps-defragment-data" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.encaps.defragment_data">
-<code class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></code><code class="sig-name descname"><span class="pre">defragment_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1230b4571/pydicom/encaps.py#L439"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.defragment_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.encaps.</span></code><code class="sig-name descname"><span class="pre">defragment_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f36517e10/pydicom/encaps.py#L439"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encaps.defragment_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read encapsulated data and return the fragments as one continuous bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -260,7 +261,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>

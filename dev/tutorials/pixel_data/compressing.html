@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Compressing Pixel Data &mdash; pydicom 2.2.0.dev0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Waveforms" href="../waveforms.html" />
+    <link rel="prev" title="Dataset basics: read, access, modify, write" href="../dataset_basics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0.dev0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">How to install pydicom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../virtualenvs.html">Creating and managing virtual environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Compressing <em>Pixel Data</em></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encapsulating-data-compressed-by-third-party-packages">Encapsulating data compressed by third-party packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compressing-using-pydicom">Compressing using pydicom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compressing-datasets-in-a-directory-with-multiprocessing">Compressing datasets in a directory with <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveforms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../filesets.html">DICOM File-sets and DICOMDIR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sr_basics.html">Structured Reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dicom_json.html">Introduction to JSON support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_code.html">Contributing a source code change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing_docs.html">Contributing a documentation change</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Compressing <em>Pixel Data</em></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compressing-pixel-data">
+<h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial is about compressing a dataset’s <em>Pixel Data</em> and covers</p>
+<ul class="simple">
+<li><p>An introduction to compression</p></li>
+<li><p>Using data compressed by third-party packages</p></li>
+<li><p>Compressing data using <em>pydicom</em></p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> to compress the contents of a directory</p></li>
+</ul>
+<p>It’s assumed that you’re already familiar with the <a class="reference internal" href="../dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
+<p><strong>Prerequisites</strong></p>
+<p>This tutorial uses packages in addition to <em>pydicom</em> that are not installed
+by default, but are required for <em>RLE Lossless</em> compression of <em>Pixel Data</em>.
+For more information on what packages are available to compress a given
+transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html"><span class="doc">image compression guide</span></a>.</p>
+<p>Installing using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install -U pydicom&gt;<span class="o">=</span><span class="m">2</span>.2 numpy pylibjpeg
+</pre></div>
+</div>
+<p>Installing on conda:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy
+conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">2</span>.2
+pip install pylibjpeg
+</pre></div>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>DICOM conformant applications are usually required to support the
+<em>Little Endian Implicit VR</em> transfer syntax, which is an uncompressed (native)
+transfer syntax. This means that datasets using <em>Little Endian Implicit VR</em> have
+no compression of their <em>Pixel Data</em>. So if all applications are required to
+support it, why do we need <em>Pixel Data</em> compression?</p>
+<p>The answer, of course, is file size. A <em>CT Image</em> instance
+typically consists of 1024 x 1024 16-bit pixels, and a CT scan may have
+hundreds of instances, giving a total series size of hundreds of megabytes.
+When you factor in other SOP Classes such as <em>Whole Slide Microscopy</em> which
+uses even larger full color images, the size of the uncompressed <em>Pixel Data</em>
+may get into the gigabyte territory. Being able to compress these images can
+result in significantly reduced file sizes.</p>
+<p>However, with the exception of <em>RLE Lossless</em>, <em>pydicom</em> doesn’t currently
+offer any native support for compression of <em>Pixel Data</em>. This means that it’s
+entirely up to you to compress the <em>Pixel Data</em> in a manner conformant to
+the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">requirements of the DICOM Standard</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We recommend that you use <a class="reference external" href="http://gdcm.sourceforge.net/wiki/index.php/Main_Page">GDCM</a> for <em>Pixel Data</em>
+compression as it provides support for all the most commonly used
+<em>Transfer Syntaxes</em> and being another DICOM library, should do so in
+a conformant manner.</p>
+</div>
+<p>The general requirements for compressed <em>Pixel Data</em> in the DICOM Standard are:</p>
+<ul class="simple">
+<li><p>Each frame of pixel data must be encoded separately</p></li>
+<li><p>All the encoded frames must then be encapsulated, either using a
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">basic</a> or <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">extended offset table</a></p></li>
+</ul>
+<p>Each <em>Transfer Syntax</em> has it’s own specific requirements, found
+in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/PS3.5.html">Part 5 of the DICOM Standard</a>.</p>
+</div>
+<div class="section" id="encapsulating-data-compressed-by-third-party-packages">
+<h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Permalink to this headline">¶</a></h2>
+<p>Once you’ve used a third-party package to compress the <em>Pixel Data</em>,
+<em>pydicom</em> can be used to encapsulate and add it to the
+dataset, with either the <a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a> or
+<a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="kn">from</span> <span class="nn">pydicom.encaps</span> <span class="kn">import</span> <span class="n">encapsulate</span><span class="p">,</span> <span class="n">encapsulate_extended</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># Use third-party package to compress</span>
+<span class="c1"># Let&#39;s assume it compresses to JPEG 2000 (lossless)</span>
+<span class="n">frames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">third_party_compression_func</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Set the *Transfer Syntax UID* appropriately</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
+
+<span class="c1"># Basic encapsulation</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_basic.dcm&quot;</span><span class="p">)</span>
+
+<span class="c1"># Extended encapsulation</span>
+<span class="n">result</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]</span> <span class="o">=</span> <span class="n">encapsulate_extended</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTable</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ExtendedOffsetTableLength</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_ext.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compressing-using-pydicom">
+<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this headline">¶</a></h2>
+<p>Currently, only the <em>RLE Lossless</em> transfer syntax is supported for
+compressing <em>Pixel Data</em> natively using <em>pydicom</em>. The easiest method is to
+pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_rle.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will compress the existing <em>Pixel Data</em> and update the <em>Transfer Syntax
+UID</em> before saving the dataset to file as  <cite>CT_small_rle.dcm</cite>.</p>
+<p>If you’re creating a dataset from scratch you can instead pass a
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to be compressed and used as the <em>Pixel Data</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;i2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.20)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents
+of <cite>arr</cite> must match the corresponding elements in the dataset, such as <em>Rows</em>,
+<em>Columns</em>, <em>Samples per Pixel</em>, etc. If they don’t match you’ll get an
+exception:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;i2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">compress</span>
+    <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
+  File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">&lt;listcomp&gt;</span>
+    <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
+  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">382</span>, in <span class="n">iter_encode</span>
+    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_array</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">209</span>, in <span class="n">_encode_array</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">533</span>, in <span class="n">_preprocess</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="gr">ValueError</span>: <span class="n">Unable to encode as the shape of the ndarray (128, 129) doesn&#39;t match the values for the rows, columns and samples per pixel</span>
+</pre></div>
+</div>
+<p>A specific encoding plugin can be used by passing the plugin name via the
+<cite>encoding_plugin</cite> argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s1">&#39;pylibjpeg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The plugins available for each encoder are listed in the
+<a class="reference internal" href="../../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">reference</span></code></a> for the encoder type.</p>
+<p>You can also change the compression on an already compressed dataset. Because
+this requires that the <em>Pixel Data</em> be uncompressed, a matching
+<a class="reference internal" href="../../old/image_data_handlers.html"><span class="doc">image data handler</span></a> for the initial compression
+method is required.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;US1_J2KR.dcm&quot;</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span>
+<span class="go">&#39;YBR_RCT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">PhotometricInterpretation</span> <span class="o">=</span> <span class="s2">&quot;RGB&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that in this case we also needed to change the <em>Photometric
+Interpretation</em>, from the original value of <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code> when the dataset
+was using <em>JPEG 2000 Lossless</em> compression to <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code> after decompression
+and recompression using <em>RLE Lossless</em>.</p>
+</div>
+<div class="section" id="compressing-datasets-in-a-directory-with-multiprocessing">
+<h2>Compressing datasets in a directory with <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code><a class="headerlink" href="#compressing-datasets-in-a-directory-with-multiprocessing" title="Permalink to this headline">¶</a></h2>
+<p>Our final example is to show how the <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module can be
+used to compress all the datasets in a directory:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
+
+<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
+<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+
+<span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s2">&quot;pylibjpeg&quot;</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">cpu_count</span><span class="p">())</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">compress</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.dcm&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../waveforms.html" class="btn btn-neutral float-right" title="Waveforms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../dataset_basics.html" class="btn btn-neutral float-left" title="Dataset basics: read, access, modify, write" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -191,13 +191,21 @@
             
   <div class="section" id="version-2-2-0">
 <h1>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
 acceptable to <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a>, and are always stored as a
 <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a>.  Previously, any Python type could be
 set.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTag.__eq__()</span></code> returns <code class="docutils literal notranslate"><span class="pre">False</span></code> rather
+than raising an exception when the operand cannot be converted to
+<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DA.__str__()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">DT.__str__()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">TM.__str__()</span></code> return valid DICOM
+strings instead of the formatted date and time representations
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1262">#1262</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="enhancements">
@@ -245,29 +253,20 @@ the string representations of these objects when they are constructed.</p></li>
 from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
 See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components_veterinary" title="pydicom.valuerep.PersonName.from_named_components_veterinary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components_veterinary()</span></code></a>.</p></li>
-<li><p>Added library support so that files can be downloaded
-not only through <code class="docutils literal notranslate"><span class="pre">urllib.request</span></code> but also through the <code class="docutils literal notranslate"><span class="pre">requests</span></code> package.
-If you run into problems using <code class="docutils literal notranslate"><span class="pre">urllib.request</span></code>,
-a more powerful <code class="docutils literal notranslate"><span class="pre">requests</span></code> package will be recommended via log messages.
-(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
-<li><p>Ensured <code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code> uses
+<li><p>Added support for downloading the large test files with the <a class="reference external" href="https://docs.python-requests.org/en/master/">requests</a> package in addition to
+<a class="reference external" href="https://docs.python.org/3/library/urllib.request.html#module-urllib.request" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">urllib.request</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
+<li><p>Ensured <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> uses
 32-bit floats for calculation, added <cite>per_frame</cite> flag to allow frame-by-frame
 processing and improved the speed by ~20-60% (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
-<li><p>Added support for faster decoding of <em>RLE Lossless</em> encoded <em>Pixel Data</em> via
-the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin.</p></li>
-</ul>
-</div>
-<div class="section" id="changes">
-<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTag.__eq__()</span></code> returns <code class="docutils literal notranslate"><span class="pre">False</span></code> rather
-than raising an exception when the operand cannot be converted to
-<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DA.__str__()</span></code>,
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">DT.__str__()</span></code> and
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">TM.__str__()</span></code> return valid DICOM
-strings instead of the formatted date and time representations
-(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1262">#1262</a>)</p></li>
+<li><p>Added support for faster decoding (~4-5x) and encoding (~25x) of <em>RLE Lossless</em>
+<em>Pixel Data</em> via the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1361">#1361</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> function for
+compressing uncompressed pixel data using a given encoding format as specified
+by a UID. Only <em>RLE Lossless</em> is currently supported (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encoders</span></code></a> module and
+<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
+<li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
+to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
@@ -298,7 +297,7 @@ rather than YBR with the Pillow pixel data handler (<a class="reference external
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>

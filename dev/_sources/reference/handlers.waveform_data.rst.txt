@@ -9,3 +9,7 @@ Waveform Data Handlers (:mod:`pydicom.waveforms`)
    :toctree: generated/
 
    numpy_handler
+
+
+.. automodule:: pydicom.waveforms
+   :members:

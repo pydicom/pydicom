@@ -17,6 +17,7 @@
       ~Dataset.add
       ~Dataset.add_new
       ~Dataset.clear
+      ~Dataset.compress
       ~Dataset.convert_pixel_data
       ~Dataset.copy
       ~Dataset.data_element

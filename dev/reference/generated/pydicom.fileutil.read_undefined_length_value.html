@@ -121,6 +121,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -232,7 +233,7 @@
 <h1>pydicom.fileutil.read_undefined_length_value<a class="headerlink" href="#pydicom-fileutil-read-undefined-length-value" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.fileutil.read_undefined_length_value">
-<code class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></code><code class="sig-name descname"><span class="pre">read_undefined_length_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8192</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1230b4571/pydicom/fileutil.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></code><code class="sig-name descname"><span class="pre">read_undefined_length_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8192</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f36517e10/pydicom/fileutil.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read until <cite>delimiter_tag</cite> and return the value up to that point.</p>
 <p>On completion, the file will be set to the first byte after the delimiter
 and its following four zero bytes.</p>
@@ -275,7 +276,7 @@ and its following four zero bytes.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>

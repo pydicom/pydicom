@@ -121,6 +121,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -229,7 +230,7 @@
 <h1>pydicom.uid.UID<a class="headerlink" href="#pydicom-uid-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="pydicom.uid.UID">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></code><code class="sig-name descname"><span class="pre">UID</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1230b4571/pydicom/uid.py#L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></code><code class="sig-name descname"><span class="pre">UID</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f36517e10/pydicom/uid.py#L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">UID</span>
@@ -545,7 +546,7 @@ private.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>

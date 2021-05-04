@@ -17,6 +17,7 @@
       ~FileMetaDataset.add
       ~FileMetaDataset.add_new
       ~FileMetaDataset.clear
+      ~FileMetaDataset.compress
       ~FileMetaDataset.convert_pixel_data
       ~FileMetaDataset.copy
       ~FileMetaDataset.data_element

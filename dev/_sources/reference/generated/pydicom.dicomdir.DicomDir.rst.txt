@@ -17,6 +17,7 @@
       ~DicomDir.add
       ~DicomDir.add_new
       ~DicomDir.clear
+      ~DicomDir.compress
       ~DicomDir.convert_pixel_data
       ~DicomDir.copy
       ~DicomDir.data_element

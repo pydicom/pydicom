@@ -127,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -222,7 +223,7 @@
 <h1>pydicom.data.get_testdata_file<a class="headerlink" href="#pydicom-data-get-testdata-file" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pydicom.data.get_testdata_file">
-<code class="sig-prename descclassname"><span class="pre">pydicom.data.</span></code><code class="sig-name descname"><span class="pre">get_testdata_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1230b4571/pydicom/data/data_manager.py#L282"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.data.get_testdata_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">pydicom.data.</span></code><code class="sig-name descname"><span class="pre">get_testdata_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">read</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Dataset</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f36517e10/pydicom/data/data_manager.py#L286"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.data.get_testdata_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an absolute path to the first matching dataset with filename
 <cite>name</cite>.</p>
 <div class="versionadded">
@@ -235,15 +236,24 @@ pydicom/pydicom-data repository.</p>
 <p><span class="versionmodified changed">Changed in version 2.1: </span>Modified to search locally available external data sources and the
 pydicom/pydicom-data repository</p>
 </div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 2.2: </span>Added the <cite>read</cite> keyword parameter.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The full file name (without path)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The full file name (without path)</p></li>
+<li><p><strong>read</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then use <a class="reference internal" href="pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> to read the
+file and return the corresponding
+<a class="reference internal" href="pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>. Default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The absolute path of the file if found, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dd class="field-even"><p>The absolute path of the file if found, the dataset itself if <cite>read</cite> is
+<code class="docutils literal notranslate"><span class="pre">True</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if the file is not found.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,7 +274,7 @@ pydicom/pydicom-data repository</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2008-2020, Darcy Mason and pydicom contributors.
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
