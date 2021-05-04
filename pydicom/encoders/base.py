@@ -62,6 +62,14 @@ class Encoder:
         import_path : Tuple[str, str]
             The module import path and the encoding function's name (e.g.
             ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
+
+        Raises
+        ------
+        ModuleNotFoundError
+            If the module import path is incorrect or unavailable.
+        AttributeError
+            If the plugin's encoding function, `is_available()` or
+            `ENCODER_DEPENDENCIES` aren't found in the module.
         """
         if label in self._available or label in self._unavailable:
             raise ValueError(
@@ -601,7 +609,7 @@ class Encoder:
         plugin: str = '',
         **kwargs
     ) -> bytes:
-        """Return an encoded frame from `arr` as :class:`bytes`.
+        """Return an encoded frame from `src` as :class:`bytes`.
 
         Parameters
         ----------

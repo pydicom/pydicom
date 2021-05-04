@@ -18,7 +18,7 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 **Prerequisites**
 
 This tutorial uses packages in addition to *pydicom* that are not installed
-by default but are required for *RLE Lossless* compression of *Pixel Data*.
+by default, but are required for *RLE Lossless* compression of *Pixel Data*.
 For more information on what packages are available to compress a given
 transfer syntax see the :doc:`image compression guide</old/image_data_compression>`.
 
@@ -40,7 +40,7 @@ Installing on conda:
 Introduction
 ------------
 
-At a minimum, DICOM conformant applications are required to support the
+DICOM conformant applications are usually required to support the
 *Little Endian Implicit VR* transfer syntax, which is an uncompressed (native)
 transfer syntax. This means that datasets using *Little Endian Implicit VR* have
 no compression of their *Pixel Data*. So if all applications are required to
@@ -93,7 +93,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
     from pydicom import dcmread
     from pydicom.data import get_testdata_file
     from pydicom.encaps import encapsulate, encapsulate_extended
-    from pydicom.uid import JPEG2000
+    from pydicom.uid import JPEG2000Lossless
 
     path = get_testdata_file("CT_small.dcm")
     ds = dcmread(path)
@@ -103,7 +103,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
     frames: List[bytes] = third_party_compression_func(...)
 
     # Set the *Transfer Syntax UID* appropriately
-    ds.file_meta.TransferSyntaxUID = JPEG2000
+    ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
@@ -135,9 +135,8 @@ pass the UID for *RLE Lossless* to :func:`Dataset.compress()
     >>> ds.compress(RLELossless)
     >>> ds.save_as("CT_small_rle.dcm")
 
-This will compress the existing *Pixel Data*, update the *Transfer Syntax UID*
-and add a *Planar Configuration* element to the dataset before saving it to
-file as `CT_small_rle.dcm`.
+This will compress the existing *Pixel Data* and update the *Transfer Syntax
+UID* before saving the dataset to file as  `CT_small_rle.dcm`.
 
 If you're creating a dataset from scratch you can instead pass a
 :class:`~numpy.ndarray` to be compressed and used as the *Pixel Data*:
@@ -189,7 +188,17 @@ method is required.
 .. code-block:: python
 
     >>> ds = get_testdata_file("US1_J2KR.dcm", read=True)
+    >>> ds.SamplesPerPixel
+    3
+    >>> ds.PhotometricInterpretation
+    'YBR_RCT'
+    >>> ds.PhotometricInterpretation = "RGB"
     >>> ds.compress(RLELossless)
+
+Note that in this case we also needed to change the *Photometric
+Interpretation*, from the original value of ``'YBR_RCT'`` when the dataset
+was using *JPEG 2000 Lossless* compression to ``'RGB'`` after decompression
+and recompression using *RLE Lossless*.
 
 
 Compressing datasets in a directory with ``multiprocessing``

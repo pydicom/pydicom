@@ -57,7 +57,7 @@ An encoding plugin must implement three objects within the same module:
       ``0`` for unsigned integers, ``1`` for 2's complement (signed)
       integers.
     * ``'photometric_interpretation'``: :class:`str` - the intended colorspace
-      of the encoded data, such as ``'YBR'``
+      of the encoded data, such as ``'YBR_FULL'``
 
     `kwargs` may also contain optional parameters intended to be used
     with the encoder function to allow customization of the encoding process

@@ -1570,7 +1570,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     def compress(
         self,
-        uid: str,
+        transfer_syntax_uid: str,
         arr: Optional["numpy.ndarray"] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -1635,7 +1635,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         Parameters
         ----------
-        uid : pydicom.uid.UID
+        transfer_syntax_uid : pydicom.uid.UID
             The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
             use when compressing the pixel data.
         arr : numpy.ndarray, optional
@@ -1667,7 +1667,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         from pydicom.encoders import get_encoder
 
-        uid = UID(uid)
+        uid = UID(transfer_syntax_uid)
 
         # Raises NotImplementedError if `uid` is not supported
         encoder = get_encoder(uid)
