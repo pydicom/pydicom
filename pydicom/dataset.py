@@ -1657,10 +1657,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             <pydicom.pixel_data_handlers>` to use to decompress it. If not
             specified then all available handlers will be tried (default).
         encapsulate_ext : bool, optional
-            If ``True`` then force the use encapsulation with an extended
-            offset table. If ``False`` (default) then an extended offset table
-            will be used if needed for large amounts of compressed *Pixel
-            Data*, but will otherwise default to a basic offset table.
+            If ``True`` then force the addition of an extended offset table.
+            If ``False`` (default) then an extended offset table
+            will be added if needed for large amounts of compressed *Pixel
+            Data*, but will otherwise default to just the basic offset table.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
