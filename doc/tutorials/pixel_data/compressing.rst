@@ -104,9 +104,9 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
     # Let's assume it compresses to JPEG 2000 (lossless)
     frames: List[bytes] = third_party_compression_func(...)
 
-    # Set the *Transfer Syntax UID* and *Photometric Interpretation* appropriately
+    # Set the *Transfer Syntax UID* appropriately
     ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
-    ds.PhotometricInterpretation = 'YBR_RCT'  # for J2K lossless
+    # For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
