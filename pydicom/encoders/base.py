@@ -68,8 +68,8 @@ class Encoder:
         ModuleNotFoundError
             If the module import path is incorrect or unavailable.
         AttributeError
-            If the plugin's encoding function, `is_available()` or
-            `ENCODER_DEPENDENCIES` aren't found in the module.
+            If the plugin's encoding function, ``is_available()`` or
+            ``ENCODER_DEPENDENCIES`` aren't found in the module.
         """
         if label in self._available or label in self._unavailable:
             raise ValueError(
@@ -108,7 +108,8 @@ class Encoder:
         decoding_plugin: str = '',
         **kwargs
     ) -> bytes:
-        """Return an encoded frame of the pixel data from `src` :class:`bytes`.
+        """Return an encoded frame of the pixel data in `src` as
+        :class:`bytes`.
 
         Parameters
         ----------

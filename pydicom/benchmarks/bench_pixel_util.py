@@ -1,6 +1,8 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Benchmarks for the pixel data utilities."""
 
+import numpy as np
+
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers.util import convert_color_space

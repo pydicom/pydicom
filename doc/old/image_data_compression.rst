@@ -18,9 +18,11 @@ dataset.
 The requirements for compressed *Pixel Data* in the DICOM Standard are:
 
 * Each frame of pixel data must be encoded separately
-* All the encoded frames must then be encapsulated, either using a :func:`basic
-  <pydicom.encaps.encapsulate>` or :func:`extended offset table
-  <pydicom.encaps.encapsulate_extended>`.
+* All the encoded frames must then be :func:`encapsulated
+  <pydicom.encaps.encapsulate> using a basic offset table. When the amount
+  of encoded data is too large for the basic offset table then the use of
+  the :func:`extended offset table <pydicom.encaps.encapsulate_extended>` is
+  recommended.
 
 See the :dcm:`relevant sections of the DICOM Standard<part05/sect_8.2.html>`
 for more information.
@@ -41,8 +43,9 @@ for more information.
     # Let's assume it compresses to JPEG 2000 (lossless)
     frames: List[bytes] = third_party_compression_func(...)
 
-    # Set the *Transfer Syntax UID* appropriately
+    # Set the *Transfer Syntax UID* and *Photometric Interpretation* appropriately
     ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
+    ds.PhotometricInterpretation = 'YBR_RCT'  # for J2K lossless
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
@@ -58,6 +61,11 @@ for more information.
 
 Compressing using pydicom
 -------------------------
+
+.. _guide_compression_supported:
+
+Supported Transfer Syntaxes
+...........................
 
 *Pixel Data* can be compressed natively using *pydicom* for the following
 transfer syntaxes:
@@ -79,16 +87,16 @@ transfer syntaxes:
 |              |                     |                  | `pylibjpeg-rle <rle_>`_ |
 +              +                     +------------------+-------------------------+
 |              |                     | gdcm             | `numpy <np_>`_,         |
-|              |                     |                  | `gdcm <gdcm_>`_,        |
+|              |                     |                  | `gdcm <gdcm_>`_         |
 +--------------+---------------------+------------------+-------------------------+
 
 | :sup:`1` *~25x slower than the other plugins*
 
-Usage
-.....
+Compressing with ``Dataset.compress()``
+.......................................
 
-Use :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` to compress
-an uncompressed dataset in-place:
+The :meth:`Dataset.compress()<pydicom.dataset.Dataset.compress>` method can
+be used to compress an uncompressed dataset in-place:
 
 .. code-block:: python
 
@@ -117,5 +125,13 @@ method is required.
 
     # Requires a JPEG 2000 compatible image data handler
     ds = get_testdata_file("US1_J2KR.dcm", read=True)
+    ds.PhotometricInterpretation = 'RGB'
     ds.compress(RLELossless)
     ds.save_as("US1_RLE.dcm")
+
+Note that the *Photometric Interpretation* in this case has been changed from
+``'YBR_RCT'``, which is the value for when it is J2K compressed, to ``'RGB'``
+which is the correct value for this particular dataset once the *Pixel Data*
+is RLE compressed. It's up to you to ensure that the the correct *Photometric
+Interpretation* has been set prior to actually calling
+:meth:`~pydicom.dataset.Dataset.compress`.

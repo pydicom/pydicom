@@ -100,7 +100,7 @@ def _rle_encode(src, **kwargs):
             f"The 'gdcm' plugin is unable to encode {bits_allocated}-bit data"
         )
 
-    # Creata a gdcm.Image with the uncompressed `src` data
+    # Create a gdcm.Image with the uncompressed `src` data
     image = _create_gdcm_image(src, **kwargs)
 
     # Converts an image to match the set transfer syntax
