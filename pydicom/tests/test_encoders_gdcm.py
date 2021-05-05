@@ -1,7 +1,5 @@
 """Generic tests for RLELosslessEncoder plugins."""
 
-import numpy as np
-
 import pytest
 
 from pydicom import dcmread
@@ -17,6 +15,7 @@ HAVE_GDCM = 'gdcm' in RLELosslessEncoder._available
 
 if HAVE_GDCM:
     from gdcm import Version
+    import numpy as np
     GDCM_VERSION = [int(c) for c in Version.GetVersion().split('.')]
 
 # EXPL: Explicit VR Little Endian
