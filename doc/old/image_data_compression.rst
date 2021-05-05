@@ -18,9 +18,9 @@ dataset.
 The requirements for compressed *Pixel Data* in the DICOM Standard are:
 
 * Each frame of pixel data must be encoded separately
-* All the encoded frames must then be encapsulated, either using :func:`basic
-  <pydicom.encaps.encapsulate>` or :func:`extended encapsulation
-  <pydicom.encaps.encapsulate_extended>`
+* All the encoded frames must then be encapsulated, either using a :func:`basic
+  <pydicom.encaps.encapsulate>` or :func:`extended offset table
+  <pydicom.encaps.encapsulate_extended>`.
 
 See the :dcm:`relevant sections of the DICOM Standard<part05/sect_8.2.html>`
 for more information.
@@ -32,7 +32,7 @@ for more information.
     from pydicom import dcmread
     from pydicom.data import get_testdata_file
     from pydicom.encaps import encapsulate, encapsulate_extended
-    from pydicom.uid import JPEG2000
+    from pydicom.uid import JPEG2000Lossless
 
     path = get_testdata_file("CT_small.dcm")
     ds = dcmread(path)
@@ -42,7 +42,7 @@ for more information.
     frames: List[bytes] = third_party_compression_func(...)
 
     # Set the *Transfer Syntax UID* appropriately
-    ds.file_meta.TransferSyntaxUID = JPEG2000
+    ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
@@ -65,6 +65,7 @@ transfer syntaxes:
 .. _np: http://numpy.org/
 .. _pylj: https://github.com/pydicom/pylibjpeg
 .. _rle: https://github.com/pydicom/pylibjpeg-rle
+.. _gdcm: http://gdcm.sourceforge.net/
 
 +------------------------------------+--------------------+-------------------------+
 | Transfer Syntax                    | Plugin names       | Dependencies            |
@@ -76,9 +77,13 @@ transfer syntaxes:
 |              |                     | pylibjpeg :sup:`1` | `numpy <np_>`_,         |
 |              |                     |                    | `pylibjpeg <pylj_>`_,   |
 |              |                     |                    | `pylibjpeg-rle <rle_>`_ |
++              +                     +--------------------+-------------------------+
+|              |                     | gdcm :sup:`2`      | `numpy <np_>`_,         |
+|              |                     |                    | `gdcm <gdcm_>`_,        |
 +--------------+---------------------+--------------------+-------------------------+
 
 | :sup:`1` *~25x faster than the pydicom plugin*
+| :sup:`2` *~?x faster than the pydicom plugin*
 
 Usage
 .....

@@ -1607,20 +1607,21 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         * (0028,0006) *Planar Configuration*
 
-        If the compressed pixel data is too large for basic encapsulation
-        then :dcm:`extended encapsulation <part03/sect_C.7.6.3.html>` will be
-        used instead, in which case the following elements will also be added:
+        If the compressed pixel data is too large for encapsulation using a
+        basic offset table then an :dcm:`extended offset table
+        <part03/sect_C.7.6.3.html>` will be used instead, in which case the
+        following elements will also be added:
 
         * (7FE0,0001) *Extended Offset Table*
         * (7FE0,0002) *Extended Offset Table Lengths*
 
         **Supported Transfer Syntax UIDs**
 
-        +--------------------------------------+--------------------+
-        | UID                                  | Plugins            |
-        +======================================+====================+
-        | *RLE Lossless* - 1.2.840.10008.1.2.5 | pydicom, pylibjpeg |
-        +--------------------------------------+--------------------+
+        +--------------------------------------+--------------------------+
+        | UID                                  | Plugins                  |
+        +======================================+==========================+
+        | *RLE Lossless* - 1.2.840.10008.1.2.5 | pydicom, pylibjpeg, gdcm |
+        +--------------------------------------+--------------------------+
 
         Examples
         --------
@@ -1656,10 +1657,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             <pydicom.pixel_data_handlers>` to use to decompress it. If not
             specified then all available handlers will be tried (default).
         encapsulate_ext : bool, optional
-            If ``True`` then force the use extended encapsulation. If ``False``
-            (default) then extended encapsulation will be used
-            if needed for large amounts of compressed *Pixel Data*, but
-            will otherwise default to basic encapsulation.
+            If ``True`` then force the use encapsulation with an extended
+            offset table. If ``False`` (default) then an extended offset table
+            will be used if needed for large amounts of compressed *Pixel
+            Data*, but will otherwise default to a basic offset table.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
@@ -1710,6 +1711,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
              self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
         else:
             self.PixelData = encapsulate(encoded)
+
+        self['PixelData'].is_undefined_length = True
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, 'file_meta'):

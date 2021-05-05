@@ -20,6 +20,19 @@ pydicom
 |:attr:`RLELosslessEncoder`| (none available)                |
 +--------------------------+----------+--------+-------------+
 
+.. _encoder_plugin_gdcm:
+
+gdcm
+=====
+
++--------------------------+----------+--------+-------------+
+| Encoder                  | Options                         |
++                          +----------+--------+-------------+
+|                          | Key      | Value  | Description |
++==========================+==========+========+=============+
+|:attr:`RLELosslessEncoder`| (none available)                |
++--------------------------+----------+--------+-------------+
+
 
 .. _encoder_plugin_pylibjpeg:
 

@@ -982,6 +982,7 @@ class TestDatasetCompress:
         assert RLELossless == ds.file_meta.TransferSyntaxUID
         assert 21118 == len(ds.PixelData)
         assert 'PlanarConfiguration' not in ds
+        assert ds['PixelData'].is_undefined_length
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
