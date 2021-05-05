@@ -11,12 +11,15 @@ from pydicom.pixel_data_handlers.util import reshape_pixel_array
 from pydicom.uid import RLELossless, JPEG2000, ExplicitVRLittleEndian
 
 
-HAVE_GDCM = 'gdcm' in RLELosslessEncoder._available
-
-if HAVE_GDCM:
-    from gdcm import Version
+try:
+    import gdcm
     import numpy as np
+    from gdcm import Version
     GDCM_VERSION = [int(c) for c in Version.GetVersion().split('.')]
+    HAVE_GDCM = True
+except ImportError:
+    HAVE_GDCM = False
+    GDCM_VERSION = [0, 0, 0]
 
 # EXPL: Explicit VR Little Endian
 EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")

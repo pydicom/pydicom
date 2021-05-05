@@ -14,6 +14,12 @@ try:
 except ImportError:
     HAVE_PYLJ = False
 
+try:
+    import gdcm
+    HAVE_GDCM = True
+except ImportError:
+    HAVE_GDCM = False
+
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
@@ -267,10 +273,11 @@ class TestEncoder:
         """Test the required encoder being unavailable."""
         enc = RLELosslessEncoder
         s = enc.missing_dependencies
+        assert s[0] == "gdcm - requires gdcm"
         assert (
-            "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle" == s[0]
+            s[1] == "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         )
-        assert "pydicom - requires numpy" == s[1]
+        assert s[2] == "pydicom - requires numpy"
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -901,8 +908,10 @@ class TestEncoder_Process:
         """Test with no available plugins"""
         msg = (
             r"Unable to encode because the encoding plugins are missing "
-            r"dependencies:\n    pylibjpeg - requires numpy, pylibjpeg and "
-            r"pylibjpeg-rle\n    pydicom - requires numpy"
+            r"dependencies:\n"
+            r"    gdcm - requires gdcm\n"
+            r"    pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle\n"
+            r"    pydicom - requires numpy"
         )
         with pytest.raises(RuntimeError, match=msg):
             RLELosslessEncoder._process(b'')
@@ -925,8 +934,8 @@ class TestEncoder_Process:
             RLELosslessEncoder._process(b'', plugin='foo')
 
     @pytest.mark.skipif(
-        not HAVE_NP or HAVE_PYLJ,
-        reason="Numpy unavailable or pylibjpeg available"
+        not HAVE_NP or HAVE_PYLJ or HAVE_GDCM,
+        reason="Numpy unavailable or other plugin available"
     )
     def test_specify_plugin_unavailable_raises(self):
         """Test with specific unavailable plugin"""
@@ -1002,8 +1011,10 @@ class TestDatasetCompress:
         ds = get_testdata_file("CT_small.dcm", read=True)
         msg = (
             r"The 'RLE Lossless' encoder is unavailable because its encoding "
-            r"plugins are missing dependencies:\n    pylibjpeg - requires "
-            r"numpy, pylibjpeg and pylibjpeg-rle\n    pydicom - requires numpy"
+            r"plugins are missing dependencies:\n"
+            r"    gdcm - requires gdcm\n"
+            r"    pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle\n"
+            r"    pydicom - requires numpy"
         )
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
