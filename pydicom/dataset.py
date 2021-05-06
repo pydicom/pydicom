@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import datadict, jsonrep, config
+from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -2683,6 +2683,30 @@ class FileDataset(Dataset):
             )
 
         return NotImplemented
+
+    def __deepcopy__(self, _) -> "FileDataset":
+        """Return a deep copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
+
+        Returns
+        -------
+        FileDataset
+            A deep copy of the file data set.
+        """
+        copied = self.__class__(
+            self.filename, self, self.preamble, self.file_meta,
+            self.is_implicit_VR, self.is_little_endian
+        )
+        filename = self.filename
+        self.filename = None
+        for (k, v) in self.__dict__.items():
+            copied.__dict__[k] = copy.deepcopy(v)
+        # if the filename is a string, no copying is needed
+        # if it is a file-like, copying is not wanted, see #1147
+        copied.filename = filename
+        self.filename = filename
+        return copied
 
 
 def validate_file_meta(

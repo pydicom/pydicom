@@ -90,3 +90,4 @@ Fixes
   :class:`~pydicom.valuerep.PersonName` (:issue:`1338`)
 * Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
   rather than YBR with the Pillow pixel data handler (:pr:`878`)
+* Allow to deepcopy a `~pydicom.dataset.FileDataset` object (:issue:`1147`)

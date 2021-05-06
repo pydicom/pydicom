@@ -2,6 +2,7 @@
 """Unit tests for the pydicom.dataset module."""
 
 import copy
+import io
 import math
 import pickle
 import weakref
@@ -1857,6 +1858,25 @@ class TestFileDataset:
         di = dict()
         expected_diff = {'__class__', '__doc__', '__hash__'}
         assert expected_diff == set(dir(di)) - set(dir(ds))
+
+    def test_copy_filedataset(self):
+        with open(get_testdata_file('CT_small.dcm'), 'rb') as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+        buff.close()
+        ds_copy = copy.copy(ds)
+        assert ds_copy == ds
+
+    def test_deepcopy_filedataset(self):
+        # regression test for #1147
+        with open(get_testdata_file('CT_small.dcm'), 'rb') as fb:
+            data = fb.read()
+        buff = io.BytesIO(data)
+        ds = pydicom.dcmread(buff)
+        # buff.close()
+        ds_copy = copy.deepcopy(ds)
+        assert ds_copy == ds
 
 
 class TestDatasetOverlayArray:
