@@ -279,6 +279,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes, encoding_plugin='pydicom', **self.kwargs
         )
+        print(" ".join([f"{b:02x}" for b in out[64:128]]))
         assert len(out) == 21098
 
     def test_bytes_short_raises(self):

@@ -40,6 +40,10 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
     bytes
         An RLE encoded frame.
     """
+    # TODO: add checks
+    if kwargs.get('byteorder', '<') == '>':
+        raise ValueError("TODO")
+
     samples_per_pixel = kwargs['samples_per_pixel']
     bytes_allocated = kwargs['bits_allocated'] // 8
 
@@ -90,12 +94,10 @@ def _encode_segment(src: bytes, **kwargs) -> bytearray:
         Standard. Odd length encoded segments are padded by a trailing ``0x00``
         to be even length.
     """
-    row_length = kwargs['columns']
-
     out = bytearray()
-    for idx in range(kwargs['rows']):
-        offset = idx * row_length
-        out.extend(_encode_row(src[offset:offset + row_length]))
+    row_length = kwargs['columns']
+    for idx in range(0, len(src), row_length):
+        out.extend(_encode_row(src[idx:idx + row_length]))
 
     # Pad odd length data with a trailing 0x00 byte
     out.extend(b'\x00' * (len(out) % 2))
@@ -127,7 +129,7 @@ def _encode_row(src: bytes) -> bytes:
     out_extend = out.extend
 
     literal = []
-    for _, group in groupby(list(src)):
+    for _, group in groupby(src):
         group = list(group)
         if len(group) == 1:
             literal.append(group[0])
@@ -211,7 +213,8 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
         'rows': shape[0],
         'columns': shape[1],
         'samples_per_pixel': 3 if len(shape) == 3 else 1,
-        'number_of_frames': 1
+        'number_of_frames': 1,
+        'byteorder': '<',
     }
 
     sys_endianness = '<' if sys.byteorder == 'little' else '>'
