@@ -1,3 +1,4 @@
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Bulk data encoding."""
 
 from importlib import import_module
@@ -718,12 +719,10 @@ class Encoder:
 # Encoder names should be f"{UID.keyword}Encoder"
 RLELosslessEncoder = Encoder(RLELossless)
 RLELosslessEncoder.add_plugin(
-    'pylibjpeg',
-    ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
+    'pylibjpeg', ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
 )
 RLELosslessEncoder.add_plugin(
-    'pydicom',
-    ('pydicom.pixel_data_handlers.rle_handler', '_wrap_rle_encode_frame'),
+    'pydicom', ('pydicom.encoders.pydicom', '_encode_frame'),
 )
 
 
