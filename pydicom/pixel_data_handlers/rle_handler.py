@@ -35,21 +35,23 @@ in the table below.
 
 """
 
-from itertools import groupby
-from struct import pack, unpack
-import sys
-from typing import Optional, List
+from struct import unpack
+from typing import List, TYPE_CHECKING, cast
+
 
 try:
-    import numpy as np
+    import numpy as np  # type: ignore[import]
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
-#from pydicom.encoders.rle import rle_encode_frame  # backwards compatibility
+from pydicom.encoders.pydicom import rle_encode_frame  # backwards compatibility
 import pydicom.uid
+
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'RLE Lossless'
@@ -142,11 +144,11 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
-    nr_bits = ds.BitsAllocated
-    nr_samples = ds.SamplesPerPixel
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
-    rows = ds.Rows
-    cols = ds.Columns
+    nr_bits = cast(int, ds.BitsAllocated)
+    nr_samples = cast(int, ds.SamplesPerPixel)
+    nr_frames = cast(int, getattr(ds, 'NumberOfFrames', 1) or 1)
+    rows = cast(int, ds.Rows)
+    cols = cast(int, ds.Columns)
 
     # Decompress each frame of the pixel data
     pixel_data = bytearray()

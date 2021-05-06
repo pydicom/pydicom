@@ -51,11 +51,7 @@ class TestEncoder:
         """Test adding an available plugin."""
         assert not self.enc.is_available
         self.enc.add_plugin(
-            "foo",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
@@ -67,11 +63,7 @@ class TestEncoder:
         enc = Encoder(RLELossless)
         assert not enc.is_available
         enc.add_plugin(
-            "foo",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         assert {} == enc._available
         assert "foo" in enc._unavailable
@@ -84,13 +76,7 @@ class TestEncoder:
 
         msg = r"No module named 'badpath'"
         with pytest.raises(ModuleNotFoundError, match=msg):
-            enc.add_plugin(
-                "foo",
-                (
-                    'badpath.pixel_data_handlers.rle_handler',
-                    '_wrap_rle_encode_frame'
-                ),
-            )
+            enc.add_plugin("foo", ('badpath', '_encode_frame'))
         assert {} == enc._available
         assert {} == enc._unavailable
 
@@ -100,16 +86,12 @@ class TestEncoder:
         enc = Encoder(RLELossless)
 
         msg = (
-            r"module 'pydicom.pixel_data_handlers.rle_handler' has no "
+            r"module 'pydicom.encoders.pydicom' has no "
             r"attribute 'bad_function_name'"
         )
         with pytest.raises(AttributeError, match=msg):
             enc.add_plugin(
-                "foo",
-                (
-                    'pydicom.pixel_data_handlers.rle_handler',
-                    'bad_function_name'
-                ),
+                "foo", ('pydicom.encoders.pydicom', 'bad_function_name'),
             )
         assert {} == enc._available
         assert {} == enc._unavailable
@@ -118,11 +100,7 @@ class TestEncoder:
     def test_add_plugin_twice(self):
         """Test adding a plugin that already exists."""
         self.enc.add_plugin(
-            "foo",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         assert 'foo' in self.enc._available
         assert {} == self.enc._unavailable
@@ -130,11 +108,7 @@ class TestEncoder:
         msg = r"'Encoder' already has a plugin named 'foo'"
         with pytest.raises(ValueError, match=msg):
             self.enc.add_plugin(
-                "foo",
-                (
-                    'pydicom.pixel_data_handlers.rle_handler',
-                    '_wrap_rle_encode_frame'
-                ),
+                "foo", ('pydicom.encoders.pydicom', '_encode_frame')
             )
         assert 'foo' in self.enc._available
         assert {} == self.enc._unavailable
@@ -143,18 +117,10 @@ class TestEncoder:
     def test_remove_plugin(self):
         """Test removing a plugin."""
         self.enc.add_plugin(
-            "foo",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         self.enc.add_plugin(
-            "bar",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "bar", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         assert 'foo' in self.enc._available
         assert 'bar' in self.enc._available
@@ -174,11 +140,7 @@ class TestEncoder:
         """Test removing a plugin."""
         enc = Encoder(RLELossless)
         enc.add_plugin(
-            "foo",
-            (
-                'pydicom.pixel_data_handlers.rle_handler',
-                '_wrap_rle_encode_frame'
-            ),
+            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
         )
         assert 'foo' in enc._unavailable
         assert {} == enc._available
@@ -308,7 +270,7 @@ class TestEncoder_Encode:
     # Passing bytes
     def test_bytes(self):
         """Test encoding bytes"""
-        assert 32768 == len(self.bytes)
+        assert len(self.bytes) == 32768
         out = self.enc.encode(self.bytes, **self.kwargs)
         assert len(self.bytes) > len(out)
 
@@ -317,7 +279,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_bytes_short_raises(self):
         """Test encoding bytes with short data raises exception"""
@@ -333,7 +295,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes + b'\x00\x00', encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_bytes_multiframe(self):
         """Test encoding multiframe bytes with idx"""
@@ -341,7 +303,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes * 2, idx=0, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_bytes_multiframe_no_idx_raises(self):
         """Test encoding multiframe bytes without idx raises exception"""
@@ -355,8 +317,8 @@ class TestEncoder_Encode:
         gen = self.enc.iter_encode(
             self.bytes * 2, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(next(gen))
-        assert 21098 == len(next(gen))
+        assert len(next(gen)) == 21098
+        assert len(next(gen)) == 21098
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -371,22 +333,22 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.arr, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_array_multiframe(self):
         """Test encoding a multiframe array with idx"""
         arr = np.stack((self.arr, self.arr))
-        assert (2, 128, 128) == arr.shape
+        assert arr.shape == (2, 128, 128)
         self.kwargs['number_of_frames'] = 2
         out = self.enc.encode(
             arr, idx=0, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_array_invalid_dims_raises(self):
         """Test encoding an array with too many dimensions raises"""
         arr = np.zeros((1, 2, 3, 4, 5))
-        assert (1, 2, 3, 4, 5) == arr.shape
+        assert arr.shape == (1, 2, 3, 4, 5)
         msg = r"Unable to encode 5D ndarrays"
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(arr, **self.kwargs)
@@ -394,7 +356,7 @@ class TestEncoder_Encode:
     def test_array_multiframe_no_idx_raises(self):
         """Test encoding a multiframe array without idx raises"""
         arr = np.stack((self.arr, self.arr))
-        assert (2, 128, 128) == arr.shape
+        assert arr.shape == (2, 128, 128)
         self.kwargs['number_of_frames'] = 2
         msg = r"The frame 'idx' is required for multi-frame pixel data"
         with pytest.raises(ValueError, match=msg):
@@ -403,13 +365,13 @@ class TestEncoder_Encode:
     def test_array_iter_encode(self):
         """Test encoding a multiframe array with iter_encode"""
         arr = np.stack((self.arr, self.arr))
-        assert (2, 128, 128) == arr.shape
+        assert arr.shape == (2, 128, 128)
         self.kwargs['number_of_frames'] = 2
         gen = self.enc.iter_encode(
             arr, encoding_plugin='pydicom', **self.kwargs
         )
-        assert 21098 == len(next(gen))
-        assert 21098 == len(next(gen))
+        assert len(next(gen)) == 21098
+        assert len(next(gen)) == 21098
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -424,7 +386,7 @@ class TestEncoder_Encode:
         """Test encoding an uncompressed dataset with specific plugin"""
         assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
         out = self.enc.encode(self.ds, encoding_plugin='pydicom')
-        assert 21098 == len(out)
+        assert len(out) == 21098
 
     def test_unc_dataset_multiframe(self):
         """Test encoding a multiframe uncompressed dataset"""
@@ -468,7 +430,7 @@ class TestEncoder_Encode:
         ds = self.ds_enc
         assert ds.file_meta.TransferSyntaxUID.is_compressed
         out = self.enc.encode(ds, encoding_plugin='pydicom')
-        assert 6072 == len(out)
+        assert len(out) == 6072
 
     def test_enc_dataset_specific_dec(self):
         """Test encoding a compressed dataset with specified decoder plugin"""
@@ -478,7 +440,7 @@ class TestEncoder_Encode:
             encoding_plugin='pydicom',
             decoding_plugin='rle_handler'
         )
-        assert 6072 == len(out)
+        assert len(out) == 6072
 
     def test_enc_dataset_multiframe(self):
         """Test encoding a multiframe compressed dataset"""
@@ -505,7 +467,7 @@ class TestEncoder_Encode:
             decoding_plugin='rle_handler'
         )
         out = next(gen)
-        assert 6072 == len(out)
+        assert len(out) == 6072
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -542,7 +504,7 @@ class TestEncoder_Preprocess:
             ],
             '|u1'
         )
-        assert (4, 2, 3) == self.arr_3s.shape
+        assert self.arr_3s.shape == (4, 2, 3)
 
     def test_invalid_arr_shape_raises(self):
         """Test that an array size and dataset mismatch raise exceptions"""
@@ -555,13 +517,13 @@ class TestEncoder_Preprocess:
         )
 
         kwargs = self.e.kwargs_from_ds(self.ds)
-        assert (4, ) == arr.shape
+        assert arr.shape == (4, )
         with pytest.raises(ValueError, match=msg):
             self.e._preprocess(arr, **kwargs)
 
         # 2D arrays
         arr = np.asarray([[1, 2, 3, 4]])
-        assert (1, 4) == arr.shape
+        assert arr.shape == (1, 4)
         msg = r"Unable to encode as the shape of the ndarray \(1, 4\) "
         with pytest.raises(ValueError, match=msg):
             self.e._preprocess(arr, **kwargs)
@@ -570,7 +532,7 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 2
         self.ds.SamplesPerPixel = 3
         arr = np.asarray([[1, 2], [3, 4]])
-        assert (2, 2) == arr.shape
+        assert arr.shape == (2, 2)
         msg = r"Unable to encode as the shape of the ndarray \(2, 2\) "
         with pytest.raises(ValueError, match=msg):
             self.e._preprocess(arr, **kwargs)
@@ -578,7 +540,7 @@ class TestEncoder_Preprocess:
         # 3D arrays
         self.ds.Rows = 3
         arr = np.asarray([[[1, 2, 1], [3, 4, 1]]])
-        assert (1, 2, 3) == arr.shape
+        assert arr.shape == (1, 2, 3)
         msg = r"Unable to encode as the shape of the ndarray \(1, 2, 3\) "
         with pytest.raises(ValueError, match=msg):
             self.e._preprocess(arr, **kwargs)
@@ -695,10 +657,10 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 3
 
         arr = np.asarray([1, 2, 3], dtype='|u1')
-        assert 1 == arr.dtype.itemsize
+        assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
         out = self.e._preprocess(arr, **kwargs)
-        assert 3 == len(out)
+        assert len(out) == 3
         assert b"\x01\x02\x03" == out
 
     def test_u08_3s(self):
@@ -711,11 +673,11 @@ class TestEncoder_Preprocess:
         self.ds.SamplesPerPixel = 3
 
         arr = self.arr_3s.astype('|u1')
-        assert 1 == arr.dtype.itemsize
+        assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
         out = self.e._preprocess(arr, **kwargs)
-        assert 24 == len(out)
-        assert bytes(range(1, 25)) == out
+        assert len(out) == 24
+        assert out == bytes(range(1, 25))
 
     def test_i08_1s(self):
         """Test processing i8/1s"""
@@ -727,11 +689,11 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 3
 
         arr = np.asarray([-128, 0, 127], dtype='|i1')
-        assert 1 == arr.dtype.itemsize
+        assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
         out = self.e._preprocess(arr, **kwargs)
-        assert 3 == len(out)
-        assert b"\x80\x00\x7f" == out
+        assert len(out) == 3
+        assert out == b"\x80\x00\x7f"
 
     def test_u08_3s(self):
         """Test processing i8/3s"""
@@ -743,11 +705,11 @@ class TestEncoder_Preprocess:
         self.ds.SamplesPerPixel = 3
 
         arr = self.arr_3s.astype('|i1')
-        assert 1 == arr.dtype.itemsize
+        assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
         out = self.e._preprocess(arr, **kwargs)
-        assert 24 == len(out)
-        assert bytes(range(1, 25)) == out
+        assert len(out) == 24
+        assert out == bytes(range(1, 25))
 
     def test_u16_1s(self):
         """Test processing u16/1s"""
@@ -760,11 +722,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>u2', '<u2', '=u2'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 2
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 6 == len(out)
-            assert b"\x01\x00\x02\x00\x03\x00" == out
+            assert len(out) == 6
+            assert out == b"\x01\x00\x02\x00\x03\x00"
 
     def test_u16_3s(self):
         """Test processing u16/3s"""
@@ -778,11 +740,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>u2', '<u2', '=u2'):
             arr = self.arr_3s.astype(dtype)
-            assert 2 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 2
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 48 == len(out)
-            assert ref == out
+            assert len(out) == 48
+            assert out == ref
 
     def test_i16_1s(self):
         """Test processing i16/1s"""
@@ -795,11 +757,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>i2', '<i2', '=i2'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 2 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 2
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 6 == len(out)
-            assert b"\x80\xff\x00\x00\x7f\x00" == out
+            assert len(out) == 6
+            assert out == b"\x80\xff\x00\x00\x7f\x00"
 
     def test_i16_3s(self):
         """Test processing i16/3s"""
@@ -813,11 +775,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>i2', '<i2', '=i2'):
             arr = self.arr_3s.astype(dtype)
-            assert 2 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 2
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 48 == len(out)
-            assert ref == out
+            assert len(out) == 48
+            assert out == ref
 
     def test_u32_1s(self):
         """Test processing u32/1s"""
@@ -831,11 +793,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>u4', '<u4', '=u4'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 4
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 12 == len(out)
-            assert ref == out
+            assert len(out) == 12
+            assert out == ref
 
     def test_u32_3s(self):
         """Test processing u32/3s"""
@@ -850,11 +812,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>u4', '<u4', '=u4'):
             arr = self.arr_3s.astype(dtype)
-            assert 4 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 4
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 96 == len(out)
-            assert ref == out
+            assert len(out) == 96
+            assert out == ref
 
     def test_i32_1s(self):
         """Test processing i32/1s"""
@@ -868,11 +830,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>i4', '<i4', '=i4'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
-            assert 4 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 4
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 12 == len(out)
-            assert ref == out
+            assert len(out) == 12
+            assert out == ref
 
     def test_i32_3s(self):
         """Test processing i32/3s"""
@@ -887,11 +849,11 @@ class TestEncoder_Preprocess:
 
         for dtype in ('>i4', '<i4', '=i4'):
             arr = self.arr_3s.astype(dtype)
-            assert 4 == arr.dtype.itemsize
+            assert arr.dtype.itemsize == 4
             kwargs = self.e.kwargs_from_ds(self.ds)
             out = self.e._preprocess(arr, **kwargs)
-            assert 96 == len(out)
-            assert ref == out
+            assert len(out) == 96
+            assert out == ref
 
 
 class TestEncoder_Process:
@@ -978,9 +940,9 @@ class TestDatasetCompress:
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
         ds.compress(RLELossless, encoding_plugin='pydicom')
-        assert 1 == ds.SamplesPerPixel
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21118 == len(ds.PixelData)
+        assert ds.SamplesPerPixel == 1
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21118
         assert 'PlanarConfiguration' not in ds
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -992,8 +954,8 @@ class TestDatasetCompress:
         del ds.PixelData
         del ds.file_meta
         ds.compress(RLELossless, arr, encoding_plugin='pydicom')
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21118 == len(ds.PixelData)
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21118
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self):
@@ -1029,10 +991,10 @@ class TestDatasetCompress:
         ds.compress(
             RLELossless, encapsulate_ext=True, encoding_plugin='pydicom'
         )
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 21114 == len(ds.PixelData)
-        assert b'\x00' * 8 == ds.ExtendedOffsetTable
-        assert b'\x6a\x52' + b'\x00' * 6 == ds.ExtendedOffsetTableLengths
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert len(ds.PixelData) == 21114
+        assert ds.ExtendedOffsetTable == b'\x00' * 8
+        assert ds.ExtendedOffsetTableLengths == b'\x6a\x52' + b'\x00' * 6
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_round_trip(self):
@@ -1042,7 +1004,7 @@ class TestDatasetCompress:
         arr = ds.pixel_array
         del ds.PixelData
         ds.compress(RLELossless, arr, encoding_plugin="pydicom")
-        assert id(arr) != id(ds.pixel_array)
+        assert id(ds.pixel_array) != id(arr)
         assert np.array_equal(arr, ds.pixel_array)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -1050,8 +1012,8 @@ class TestDatasetCompress:
         """Test Planar Configuration added if Samples per Pixel > 1"""
         ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)
         del ds.PlanarConfiguration
-        assert 3 == ds.SamplesPerPixel
+        assert ds.SamplesPerPixel == 3
         assert 'PlanarConfiguration' not in ds
         ds.compress(RLELossless, encoding_plugin='pydicom')
-        assert RLELossless == ds.file_meta.TransferSyntaxUID
-        assert 1 == ds.PlanarConfiguration
+        assert ds.file_meta.TransferSyntaxUID == RLELossless
+        assert ds.PlanarConfiguration == 1

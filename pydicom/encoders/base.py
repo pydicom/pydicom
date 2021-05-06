@@ -4,16 +4,19 @@
 from importlib import import_module
 import sys
 from typing import (
-    Callable, Generator, Tuple, List, Optional, Dict, Union, cast
+    Callable, Generator, Tuple, List, Optional, Dict, Union, cast,
+    TYPE_CHECKING
 )
 
-from pydicom.dataset import Dataset
 from pydicom.encaps import encapsulate
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import UID, RLELossless
 
+if TYPE_CHECKING:
+    from pydicom.dataset import Dataset
+
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     import numpy as np
 except ImportError:
     pass
@@ -103,7 +106,7 @@ class Encoder:
 
     def encode(
         self,
-        src: Union[bytes, "numpy.ndarray", Dataset],
+        src: Union[bytes, "numpy.ndarray", "Dataset"],
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -179,6 +182,8 @@ class Encoder:
         bytes
             The encoded pixel data.
         """
+        from pydicom.dataset import Dataset
+
         if isinstance(src, Dataset):
             return self._encode_dataset(
                 src, idx, encoding_plugin, decoding_plugin, **kwargs
@@ -268,7 +273,7 @@ class Encoder:
 
     def _encode_dataset(
         self,
-        ds: Dataset,
+        ds: "Dataset",
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -309,7 +314,7 @@ class Encoder:
 
     def iter_encode(
         self,
-        src: Union[bytes, "numpy.ndarray", Dataset],
+        src: Union[bytes, "numpy.ndarray", "Dataset"],
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs
@@ -381,6 +386,8 @@ class Encoder:
         bytes
             An encoded frame of pixel data.
         """
+        from pydicom.dataset import Dataset
+
         if isinstance(src, Dataset):
             nr_frames = cast(Optional[str], src.get('NumberOfFrames', 1))
             for idx in range(int(nr_frames or 1)):
@@ -400,7 +407,7 @@ class Encoder:
             )
 
     @staticmethod
-    def kwargs_from_ds(ds: Dataset) -> Dict[str, Union[int, str]]:
+    def kwargs_from_ds(ds: "Dataset") -> Dict[str, Union[int, str]]:
         """Return a *kwargs* dict from `ds`.
 
         Parameters

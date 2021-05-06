@@ -1,6 +1,10 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
+from itertools import groupby
+from struct import pack
+import sys
+
 from pydicom.uid import RLELossless
 
 try:
@@ -21,16 +25,13 @@ def is_available(uid: str) -> bool:
     return HAVE_RLE
 
 
-# New methods for use with RLELosslessEncoder
 def _encode_frame(src: bytes, **kwargs) -> bytes:
     """Wrapper for use with the encoder interface.
-
-    .. versionadded:: 2.2
 
     Parameters
     ----------
     src : bytes
-        A single frame of image data to be RLE encoded.
+        A single frame of little-endian ordered image data to be RLE encoded.
     **kwargs
         Optional parameters for the encoding function.
 
@@ -40,21 +41,16 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
         An RLE encoded frame.
     """
     samples_per_pixel = kwargs['samples_per_pixel']
+    bytes_allocated = kwargs['bits_allocated'] // 8
 
     rle_data = bytearray()
-
     seg_lengths = []
-    if samples_per_pixel == 3
-        for idx in range(samples_per_pixel):
-            # Need a contiguous array in order to be able to split it up
-            # into byte segments
-            segments = _encode_plane(src[idx::samples_per_pixel], **kwargs)
-            for segment in segments:
-                rle_data.extend(segment)
-                seg_lengths.append(len(segment))
-    else:
-        # Samples Per Pixel = 1
-        for segment in _encode_plane(src, **kwargs):
+
+    stride = bytes_allocated * samples_per_pixel
+    for sample_nr in range(samples_per_pixel):
+        for byte_offset in reversed(range(bytes_allocated)):
+            idx = byte_offset + bytes_allocated * sample_nr
+            segment = _encode_segment(src[idx::stride], **kwargs)
             rle_data.extend(segment)
             seg_lengths.append(len(segment))
 
@@ -71,35 +67,7 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
     # Add trailing padding to make up the rest of the header (if required)
     rle_header.extend(b'\x00' * (64 - len(rle_header)))
 
-    return rle_header + rle_data
-
-
-def _encode_plane(src: bytes, **kwargs) -> Generator[bytearray, None, None]:
-    """Yield RLE encoded segments from an image plane as bytearray.
-
-    A plane of N-byte samples must be split into N segments, with each segment
-    containing the same byte of the N-byte samples. For example, in a plane
-    containing 16 bits per sample, the first segment will contain the most
-    significant 8 bits of the samples and the second segment the 8 least
-    significant bits. Each segment is RLE encoded prior to being yielded.
-
-    Parameters
-    ----------
-    src : bytes
-        A 2D ndarray containing a single plane of the image data to be RLE
-        encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
-        uint32, int16, etc.).
-
-    Yields
-    ------
-    bytearray
-        An RLE encoded segment of the plane, following the format specified
-        by the DICOM Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`.
-        The segments are yielded in order from most significant to least.
-    """
-    bytes_per_sample = kwargs['bits_allocated'] // 8
-    for offset in range(bytes_per_sample - 1, -1, -1):
-        yield _encode_segment(src[offset::bytes_per_sample], **kwargs)
+    return bytes(rle_header + rle_data)
 
 
 def _encode_segment(src: bytes, **kwargs) -> bytearray:
@@ -159,7 +127,7 @@ def _encode_row(src: bytes) -> bytes:
     out_extend = out.extend
 
     literal = []
-    for key, group in groupby(list(src)):
+    for _, group in groupby(list(src)):
         group = list(group)
         if len(group) == 1:
             literal.append(group[0])
@@ -194,11 +162,15 @@ def _encode_row(src: bytes) -> bytes:
 
 
 # Old function kept for backwards compatibility
-def rle_encode_frame(arr: "numpy.ndarray") -> bytearray:
+def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
     """Return an :class:`numpy.ndarray` image frame as RLE encoded
     :class:`bytearray`.
 
     .. versionadded:: 1.3
+
+    .. deprecated:: 2.2
+
+        Use :meth:`~pydicom.dataset.Dataset.compress` instead
 
     Parameters
     ----------
@@ -208,7 +180,7 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytearray:
 
     Returns
     -------
-    bytearray
+    bytes
         An RLE encoded frame, including the RLE header, following the format
         specified by the DICOM Standard, Part 5,
         :dcm:`Annex G<part05/chapter_G.html>`.
@@ -238,7 +210,8 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytearray:
         'bits_allocated': arr.dtype.itemsize * 8,
         'rows': shape[0],
         'columns': shape[1],
-        'samples_per_pixel': 3 if len(arr.shape) == 3 else 1,
+        'samples_per_pixel': 3 if len(shape) == 3 else 1,
+        'number_of_frames': 1
     }
 
     sys_endianness = '<' if sys.byteorder == 'little' else '>'
@@ -247,4 +220,4 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytearray:
     if byteorder == '>':
         arr = arr.astype(dtype.newbyteorder('<'))
 
-    return _encode(arr.tobytes(), **kwargs)
+    return _encode_frame(arr.tobytes(), **kwargs)
