@@ -279,8 +279,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes, encoding_plugin='pydicom', **self.kwargs
         )
-        print(" ".join([f"{b:02x}" for b in out[64:128]]))
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_bytes_short_raises(self):
         """Test encoding bytes with short data raises exception"""
@@ -296,7 +295,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes + b'\x00\x00', encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_bytes_multiframe(self):
         """Test encoding multiframe bytes with idx"""
@@ -304,7 +303,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.bytes * 2, idx=0, encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_bytes_multiframe_no_idx_raises(self):
         """Test encoding multiframe bytes without idx raises exception"""
@@ -318,8 +317,8 @@ class TestEncoder_Encode:
         gen = self.enc.iter_encode(
             self.bytes * 2, encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(next(gen)) == 21098
-        assert len(next(gen)) == 21098
+        assert len(next(gen)) == 21350
+        assert len(next(gen)) == 21350
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -334,7 +333,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             self.arr, encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_array_multiframe(self):
         """Test encoding a multiframe array with idx"""
@@ -344,7 +343,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(
             arr, idx=0, encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_array_invalid_dims_raises(self):
         """Test encoding an array with too many dimensions raises"""
@@ -371,8 +370,8 @@ class TestEncoder_Encode:
         gen = self.enc.iter_encode(
             arr, encoding_plugin='pydicom', **self.kwargs
         )
-        assert len(next(gen)) == 21098
-        assert len(next(gen)) == 21098
+        assert len(next(gen)) == 21350
+        assert len(next(gen)) == 21350
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -387,7 +386,7 @@ class TestEncoder_Encode:
         """Test encoding an uncompressed dataset with specific plugin"""
         assert not self.ds.file_meta.TransferSyntaxUID.is_compressed
         out = self.enc.encode(self.ds, encoding_plugin='pydicom')
-        assert len(out) == 21098
+        assert len(out) == 21350
 
     def test_unc_dataset_multiframe(self):
         """Test encoding a multiframe uncompressed dataset"""
@@ -431,7 +430,7 @@ class TestEncoder_Encode:
         ds = self.ds_enc
         assert ds.file_meta.TransferSyntaxUID.is_compressed
         out = self.enc.encode(ds, encoding_plugin='pydicom')
-        assert len(out) == 6072
+        assert len(out) == 6154
 
     def test_enc_dataset_specific_dec(self):
         """Test encoding a compressed dataset with specified decoder plugin"""
@@ -441,7 +440,7 @@ class TestEncoder_Encode:
             encoding_plugin='pydicom',
             decoding_plugin='rle_handler'
         )
-        assert len(out) == 6072
+        assert len(out) == 6154
 
     def test_enc_dataset_multiframe(self):
         """Test encoding a multiframe compressed dataset"""
@@ -468,7 +467,7 @@ class TestEncoder_Encode:
             decoding_plugin='rle_handler'
         )
         out = next(gen)
-        assert len(out) == 6072
+        assert len(out) == 6154
         with pytest.raises(StopIteration):
             next(gen)
 
@@ -943,7 +942,7 @@ class TestDatasetCompress:
         ds.compress(RLELossless, encoding_plugin='pydicom')
         assert ds.SamplesPerPixel == 1
         assert ds.file_meta.TransferSyntaxUID == RLELossless
-        assert len(ds.PixelData) == 21118
+        assert len(ds.PixelData) == 21370
         assert 'PlanarConfiguration' not in ds
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
@@ -956,7 +955,7 @@ class TestDatasetCompress:
         del ds.file_meta
         ds.compress(RLELossless, arr, encoding_plugin='pydicom')
         assert ds.file_meta.TransferSyntaxUID == RLELossless
-        assert len(ds.PixelData) == 21118
+        assert len(ds.PixelData) == 21370
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
     def test_encoder_unavailable(self):
@@ -993,9 +992,9 @@ class TestDatasetCompress:
             RLELossless, encapsulate_ext=True, encoding_plugin='pydicom'
         )
         assert ds.file_meta.TransferSyntaxUID == RLELossless
-        assert len(ds.PixelData) == 21114
+        assert len(ds.PixelData) == 21366
         assert ds.ExtendedOffsetTable == b'\x00' * 8
-        assert ds.ExtendedOffsetTableLengths == b'\x6a\x52' + b'\x00' * 6
+        assert ds.ExtendedOffsetTableLengths == b'\x66\x53' + b'\x00' * 6
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_round_trip(self):
