@@ -1660,7 +1660,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             If ``True`` then force the addition of an extended offset table.
             If ``False`` (default) then an extended offset table
             will be added if needed for large amounts of compressed *Pixel
-            Data*, will otherwise default to just the basic offset table.
+            Data*, otherwise just the basic offset table will be used.
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
