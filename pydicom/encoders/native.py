@@ -30,7 +30,12 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
     src : bytes
         A single frame of little-endian ordered image data to be RLE encoded.
     **kwargs
-        Optional parameters for the encoding function.
+        Required parameters:
+
+        * `rows`: int
+        * `columns`: int
+        * `samples_per_pixel`: int
+        * `bits_allocated`: int
 
     Returns
     -------
@@ -88,7 +93,7 @@ def _encode_segment(src: bytes, **kwargs) -> bytearray:
 
     Parameters
     ----------
-    src : numpy.ndarray
+    src : bytes
         The little-endian ordered data to be encoded, representing a Byte
         Segment as in the DICOM Standard, Part 5,
         :dcm:`Annex G.2<part05/sect_G.2.html>`.
@@ -219,7 +224,6 @@ def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
         'rows': shape[0],
         'columns': shape[1],
         'samples_per_pixel': 3 if len(shape) == 3 else 1,
-        'number_of_frames': 1,
         'byteorder': '<',
     }
 
