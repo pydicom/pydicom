@@ -51,7 +51,7 @@ class TestEncoder:
         """Test adding an available plugin."""
         assert not self.enc.is_available
         self.enc.add_plugin(
-            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+            "foo", ('pydicom.encoders.native', '_encode_frame')
         )
         assert "foo" in self.enc._available
         assert {} == self.enc._unavailable
@@ -88,12 +88,12 @@ class TestEncoder:
         enc = Encoder(RLELossless)
 
         msg = (
-            r"module 'pydicom.encoders.pydicom' has no "
+            r"module 'pydicom.encoders.native' has no "
             r"attribute 'bad_function_name'"
         )
         with pytest.raises(AttributeError, match=msg):
             enc.add_plugin(
-                "foo", ('pydicom.encoders.pydicom', 'bad_function_name'),
+                "foo", ('pydicom.encoders.native', 'bad_function_name'),
             )
         assert {} == enc._available
         assert {} == enc._unavailable
@@ -102,7 +102,7 @@ class TestEncoder:
     def test_add_plugin_twice(self):
         """Test adding a plugin that already exists."""
         self.enc.add_plugin(
-            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+            "foo", ('pydicom.encoders.native', '_encode_frame')
         )
         assert 'foo' in self.enc._available
         assert {} == self.enc._unavailable
@@ -110,7 +110,7 @@ class TestEncoder:
         msg = r"'Encoder' already has a plugin named 'foo'"
         with pytest.raises(ValueError, match=msg):
             self.enc.add_plugin(
-                "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+                "foo", ('pydicom.encoders.native', '_encode_frame')
             )
         assert 'foo' in self.enc._available
         assert {} == self.enc._unavailable
@@ -119,10 +119,10 @@ class TestEncoder:
     def test_remove_plugin(self):
         """Test removing a plugin."""
         self.enc.add_plugin(
-            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+            "foo", ('pydicom.encoders.native', '_encode_frame')
         )
         self.enc.add_plugin(
-            "bar", ('pydicom.encoders.pydicom', '_encode_frame')
+            "bar", ('pydicom.encoders.native', '_encode_frame')
         )
         assert 'foo' in self.enc._available
         assert 'bar' in self.enc._available

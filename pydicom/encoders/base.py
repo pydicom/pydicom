@@ -734,7 +734,7 @@ RLELosslessEncoder.add_plugin(
     'pylibjpeg', ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
 )
 RLELosslessEncoder.add_plugin(
-    'pydicom', ('pydicom.encoders.pydicom', '_encode_frame'),
+    'pydicom', ('pydicom.encoders.native', '_encode_frame'),
 )
 
 

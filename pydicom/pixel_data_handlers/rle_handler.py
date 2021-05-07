@@ -47,7 +47,7 @@ except ImportError:
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
-from pydicom.encoders.pydicom import rle_encode_frame  # backwards compat.
+from pydicom.encoders.native import rle_encode_frame  # backwards compat.
 import pydicom.uid
 
 if TYPE_CHECKING:
