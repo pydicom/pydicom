@@ -234,6 +234,13 @@ class TestEncoder:
         )
         assert "pydicom - requires numpy" == s[1]
 
+    def test_missing_no_dependencies(self):
+        """Test an encoder with no dependencies being unavailable."""
+        enc = self.enc
+        enc._unavailable['foo'] = ()
+        s = enc.missing_dependencies
+        assert 'foo - plugin indicating it is unavailable' == s[0]
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Encode:

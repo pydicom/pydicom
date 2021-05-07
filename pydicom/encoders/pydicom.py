@@ -7,22 +7,15 @@ import sys
 
 from pydicom.uid import RLELossless
 
-try:
-    import numpy
-    import numpy as np
-    HAVE_RLE = True
-except ImportError:
-    HAVE_RLE = False
 
-
-ENCODER_DEPENDENCIES = {RLELossless: ('numpy', )}
+ENCODER_DEPENDENCIES = {RLELossless: ()}
 
 
 def is_available(uid: str) -> bool:
     """Return ``True`` if a pixel data encoder for `uid` is available for use,
     ``False`` otherwise.
     """
-    return HAVE_RLE
+    return True
 
 
 def _encode_frame(src: bytes, **kwargs) -> bytes:
@@ -40,21 +33,30 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
     bytes
         An RLE encoded frame.
     """
-    # TODO: add checks
     if kwargs.get('byteorder', '<') == '>':
-        raise ValueError("TODO")
+        raise ValueError(
+            "Unsupported option for the 'pydicom' encoding plugin: "
+            f"\"byteorder = '{kwargs['byteorder']}'\""
+        )
 
     samples_per_pixel = kwargs['samples_per_pixel']
-    bytes_allocated = kwargs['bits_allocated'] // 8
+    bits_allocated = kwargs['bits_allocated']
+    bytes_allocated = bits_allocated // 8
+
+    nr_segments = bytes_allocated * samples_per_pixel
+    if nr_segments > 15:
+        raise ValueError(
+            "Unable to encode as the DICOM standard only allows "
+            "a maximum of 15 segments in RLE encoded data"
+        )
 
     rle_data = bytearray()
     seg_lengths = []
 
-    stride = bytes_allocated * samples_per_pixel
     for sample_nr in range(samples_per_pixel):
         for byte_offset in reversed(range(bytes_allocated)):
             idx = byte_offset + bytes_allocated * sample_nr
-            segment = _encode_segment(src[idx::stride], **kwargs)
+            segment = _encode_segment(src[idx::nr_segments], **kwargs)
             rle_data.extend(segment)
             seg_lengths.append(len(segment))
 

@@ -18,7 +18,7 @@ from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
 from pydicom.encoders import RLELosslessEncoder
 from pydicom.encoders.pydicom import (
-    _encode_frame, _encode_segment, _encode_row, HAVE_RLE
+    _encode_frame, _encode_segment, _encode_row
 )
 from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame, _rle_decode_segment, rle_encode_frame
@@ -97,8 +97,7 @@ REFERENCE_ENCODE_ROW = [
 ]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestRLEEncodeRow:
+class TestEncodeRow:
     """Tests for rle_handler._encode_row."""
     @pytest.mark.parametrize('src, output', REFERENCE_ENCODE_ROW)
     def test_encode(self, src, output):
@@ -106,8 +105,8 @@ class TestRLEEncodeRow:
         assert output == _encode_row(src)
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestRLEEncodeFrame:
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestEncodeFrame:
     """Tests for rle_handler._encode_frame."""
     def setup(self):
         """Setup the tests."""
@@ -234,16 +233,12 @@ class TestRLEEncodeFrame:
 
     def test_16_segments_raises(self):
         """Test that trying to encode 16-segments raises exception."""
-        arr = np.asarray([[[1, 2, 3, 4]]], dtype='uint32')
-        assert (1, 1, 4) == arr.shape
-        assert 4 == arr.dtype.itemsize
-
         msg = (
             r"Unable to encode as the DICOM standard only allows "
             r"a maximum of 15 segments in RLE encoded data"
         )
         with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(arr)
+            _encode_frame(b'', samples_per_pixel=3, bits_allocated=64)
 
     def test_15_segment(self):
         """Test encoding 15-segments works as expected."""
@@ -285,20 +280,6 @@ class TestRLEEncodeFrame:
             b'\x00\x07\x00\x08\x00\x09\x00\x0a\x00\x0b\x00\x0c'
             b'\x00\x0d\x00\x0e\x00\x0f'
         ) == encoded[64:]
-
-    def test_encoding_multiple_frames_raises(self):
-        """Test encoding multiple framed pixel data raises exception."""
-        # Note: only works with multi-sample data
-        ds = dcmread(EXPL_8_3_2F)
-        assert ds.NumberOfFrames > 1
-        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
-
-        msg = (
-            r"Unable to encode multiple frames at once, please encode one "
-            r"frame at a time"
-        )
-        with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(ds.pixel_array)
 
     def test_single_row_1sample(self):
         """Test encoding a single row of 1 sample/pixel data."""
@@ -345,9 +326,9 @@ class TestRLEEncodeFrame:
         ) == encoded[64:]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestRLEEncodeSegment:
+class TestEncodeSegment:
     """Tests for rle_handler._encode_segment."""
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_one_row(self):
         """Test encoding data that contains only a single row."""
         ds = dcmread(RLE_8_1_1F)
@@ -381,3 +362,74 @@ class TestRLEEncodeSegment:
         redecoded = _rle_decode_segment(encoded)
         assert ds.Rows * ds.Columns == len(redecoded)
         assert decoded == redecoded
+
+
+# Tests for deprecated rle_encode_frame() function
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+class TestRLEEncodeFrame:
+    """Tests for rle_encode_frame()."""
+    def test_16_segments_raises(self):
+        """Test that trying to encode 16-segments raises exception."""
+        arr = np.asarray([[[1, 2, 3, 4]]], dtype='uint32')
+        assert (1, 1, 4) == arr.shape
+        assert 4 == arr.dtype.itemsize
+
+        msg = (
+            r"Unable to encode as the DICOM standard only allows "
+            r"a maximum of 15 segments in RLE encoded data"
+        )
+        with pytest.raises(ValueError, match=msg):
+            rle_encode_frame(arr)
+
+    def test_encoding_multiple_frames_raises(self):
+        """Test encoding multiple framed pixel data raises exception."""
+        # Note: only works with multi-sample data
+        ds = dcmread(EXPL_8_3_2F)
+        assert ds.NumberOfFrames > 1
+        kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
+
+        msg = (
+            r"Unable to encode multiple frames at once, please encode one "
+            r"frame at a time"
+        )
+        with pytest.raises(ValueError, match=msg):
+            rle_encode_frame(ds.pixel_array)
+
+    def test_functional(self):
+        """Test function works OK."""
+        ds = dcmread(EXPL_16_3_1F)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 16
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        encoded = rle_encode_frame(ref)
+        decoded = _rle_decode_frame(
+            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
+        )
+        ds.PlanarConfiguration = 1
+        arr = np.frombuffer(decoded, '<u2')
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)
+
+    def test_big_endian_arr(self):
+        """Test using a big endian array works."""
+        ds = dcmread(EXPL_16_3_1F)
+        ref = ds.pixel_array
+        assert ds.BitsAllocated == 16
+        assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
+
+        arr = ref.newbyteorder('>')
+        assert id(arr) != id(ref)
+        assert arr.dtype == '>u2'
+        encoded = rle_encode_frame(arr)
+        decoded = _rle_decode_frame(
+            encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
+        )
+        ds.PlanarConfiguration = 1
+        arr = np.frombuffer(decoded, '<u2')
+        arr = reshape_pixel_array(ds, arr)
+
+        assert np.array_equal(ref, arr)

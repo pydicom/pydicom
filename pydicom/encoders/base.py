@@ -289,6 +289,7 @@ class Encoder:
             )
 
         # Pixel Data is compressed
+        # Note that from this point on we require at least numpy be available
         if decoding_plugin:
             ds.convert_pixel_data(handler_name=decoding_plugin)
 
@@ -478,7 +479,11 @@ class Encoder:
         """
         s = []
         for label, deps in self._unavailable.items():
-            if len(deps) > 1:
+            if not deps:
+                # A plugin might have no dependencies and be unavailable for
+                #   other reasons
+                s.append(f"{label} - plugin indicating it is unavailable")
+            elif len(deps) > 1:
                 s.append(
                     f"{label} - requires {', '.join(deps[:-1])} and {deps[-1]}"
                 )
