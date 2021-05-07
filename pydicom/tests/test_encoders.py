@@ -63,11 +63,13 @@ class TestEncoder:
         enc = Encoder(RLELossless)
         assert not enc.is_available
         enc.add_plugin(
-            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+            "foo", ('pydicom.encoders.pylibjpeg', 'encode_pixel_data')
         )
-        assert {} == enc._available
+        assert enc._available == {}
         assert "foo" in enc._unavailable
-        assert ("numpy", ) == enc._unavailable["foo"]
+        assert enc._unavailable["foo"] == (
+            "numpy", "pylibjpeg", "pylibjpeg-rle"
+        )
         assert not enc.is_available
 
     def test_add_plugin_module_import_failure(self):
@@ -140,7 +142,7 @@ class TestEncoder:
         """Test removing a plugin."""
         enc = Encoder(RLELossless)
         enc.add_plugin(
-            "foo", ('pydicom.encoders.pydicom', '_encode_frame')
+            "foo", ('pydicom.encoders.pylibjpeg', 'encode_pixel_data')
         )
         assert 'foo' in enc._unavailable
         assert {} == enc._available
@@ -232,7 +234,6 @@ class TestEncoder:
         assert (
             "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle" == s[0]
         )
-        assert "pydicom - requires numpy" == s[1]
 
     def test_missing_no_dependencies(self):
         """Test an encoder with no dependencies being unavailable."""
@@ -868,13 +869,17 @@ class TestEncoder_Process:
     @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
     def test_no_plugins(self):
         """Test with no available plugins"""
+        enc = Encoder(RLELossless)
+        enc.add_plugin(
+            'foo', ('pydicom.encoders.pylibjpeg', 'encode_pixel_data')
+        )
         msg = (
             r"Unable to encode because the encoding plugins are missing "
-            r"dependencies:\n    pylibjpeg - requires numpy, pylibjpeg and "
-            r"pylibjpeg-rle\n    pydicom - requires numpy"
+            r"dependencies:\n    foo - requires numpy, pylibjpeg and "
+            r"pylibjpeg-rle"
         )
         with pytest.raises(RuntimeError, match=msg):
-            RLELosslessEncoder._process(b'')
+            enc._process(b'')
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy unavailable")
     def test_specify_plugin(self):
@@ -965,13 +970,14 @@ class TestDatasetCompress:
         assert len(ds.PixelData) == 21370
 
     @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
-    def test_encoder_unavailable(self):
+    def test_encoder_unavailable(self, monkeypatch):
         """Test the required encoder being unavailable."""
         ds = get_testdata_file("CT_small.dcm", read=True)
+        monkeypatch.delitem(RLELosslessEncoder._available, 'pydicom')
         msg = (
             r"The 'RLE Lossless' encoder is unavailable because its encoding "
             r"plugins are missing dependencies:\n    pylibjpeg - requires "
-            r"numpy, pylibjpeg and pylibjpeg-rle\n    pydicom - requires numpy"
+            r"numpy, pylibjpeg and pylibjpeg-rle"
         )
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)

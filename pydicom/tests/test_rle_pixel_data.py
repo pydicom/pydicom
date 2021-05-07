@@ -909,7 +909,7 @@ class TestNumpy_RLEDecodeFrame:
 
     def test_8bit_1sample(self):
         """Test decoding 8-bit, 1 sample/pixel."""
-        header = b'\x01\x00\x00\x00' +  b'\x40\x00\x00\x00'
+        header = b'\x01\x00\x00\x00\x40\x00\x00\x00'
         header += (64 - len(header)) * b'\x00'
         # 2 x 3 data
         # 0, 64, 128, 160, 192, 255

@@ -433,3 +433,8 @@ class TestRLEEncodeFrame:
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)
+
+    def test_old_import_path(self):
+        """Test the old import path is OK."""
+        from pydicom.pixel_data_handlers import rle_handler
+        assert hasattr(rle_handler, "rle_encode_frame")
