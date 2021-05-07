@@ -242,6 +242,13 @@ class TestEncoder:
         s = enc.missing_dependencies
         assert 'foo - plugin indicating it is unavailable' == s[0]
 
+    def test_missing_one_dependency(self):
+        """Test an encoder with one dependency being unavailable."""
+        enc = self.enc
+        enc._unavailable['foo'] = ('bar', )
+        s = enc.missing_dependencies
+        assert 'foo - requires bar' == s[0]
+
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Encode:

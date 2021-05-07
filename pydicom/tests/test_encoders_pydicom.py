@@ -24,6 +24,7 @@ from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame, _rle_decode_segment, rle_encode_frame
 )
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
+from pydicom.uid import RLELossless
 
 
 # EXPL: Explicit VR Little Endian
@@ -324,6 +325,15 @@ class TestEncodeFrame:
             b'\x04\x00\x01\x02\x03\x04'
             b'\x04\x00\x01\x02\x03\x04'
         ) == encoded[64:]
+
+    def test_invalid_byteorder_raises(self):
+        """Test big endian `src` raises an exception."""
+        msg = (
+            r"Unsupported option for the 'pydicom' encoding plugin: "
+            r"\"byteorder = '>'\""
+        )
+        with pytest.raises(ValueError, match=msg):
+            _encode_frame(b'', byteorder='>')
 
 
 class TestEncodeSegment:

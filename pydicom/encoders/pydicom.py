@@ -4,6 +4,10 @@
 from itertools import groupby
 from struct import pack
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy  # type: ignore[import]
 
 from pydicom.uid import RLELossless
 
