@@ -1866,6 +1866,8 @@ class TestFileDataset:
         ds = pydicom.dcmread(buff)
         buff.close()
         ds_copy = copy.copy(ds)
+        assert ds.filename is not None
+        assert ds_copy.filename is None
         assert ds_copy == ds
 
     def test_deepcopy_filedataset(self):
@@ -1874,8 +1876,10 @@ class TestFileDataset:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
-        # buff.close()
+        buff.close()
         ds_copy = copy.deepcopy(ds)
+        assert ds.filename is not None
+        assert ds_copy.filename is None
         assert ds_copy == ds
 
 

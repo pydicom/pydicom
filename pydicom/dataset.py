@@ -2675,14 +2675,52 @@ class FileDataset(Dataset):
             return True
 
         if isinstance(other, self.__class__):
+            # exclude the filename from the comparison if both objects have
+            # a file-like or None as the file name
+            excludes = ['_dict']
+            if (not isinstance(self.filename, str) and
+                    not isinstance(other.filename, str)):
+                excludes.append('filename')
             return (
-                _dict_equal(self, other)
-                and _dict_equal(
-                    self.__dict__, other.__dict__, exclude=['_dict']
-                )
+                    _dict_equal(self, other) and
+                    _dict_equal(self.__dict__, other.__dict__,
+                                exclude=excludes)
             )
 
         return NotImplemented
+
+    def _copy_implementation(self, copy_function: Callable) -> "FileDataset":
+        """Implementation of ``__copy__`` and ``__deepcopy__``.
+        Sets the filename to ``None`` if it isn't a string,
+        and copies all other attributes using `copy_function`.
+        """
+        copied = self.__class__(
+            self.filename, self, self.preamble, self.file_meta,
+            self.is_implicit_VR, self.is_little_endian
+        )
+        filename = self.filename
+        if filename is not None and not isinstance(filename, str):
+            warnings.warn("The 'filename' attribute of the dataset is a "
+                          "file-like object and will be set to None "
+                          "in the copied object")
+            self.filename = None
+        for (k, v) in self.__dict__.items():
+            copied.__dict__[k] = copy_function(v)
+
+        self.filename = filename
+        return copied
+
+    def __copy__(self) -> "FileDataset":
+        """Return a shallow copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
+
+        Returns
+        -------
+        FileDataset
+            A shallow copy of the file data set.
+        """
+        return self._copy_implementation(copy.copy)
 
     def __deepcopy__(self, _) -> "FileDataset":
         """Return a deep copy of the file dataset.
@@ -2694,19 +2732,7 @@ class FileDataset(Dataset):
         FileDataset
             A deep copy of the file data set.
         """
-        copied = self.__class__(
-            self.filename, self, self.preamble, self.file_meta,
-            self.is_implicit_VR, self.is_little_endian
-        )
-        filename = self.filename
-        self.filename = None
-        for (k, v) in self.__dict__.items():
-            copied.__dict__[k] = copy.deepcopy(v)
-        # if the filename is a string, no copying is needed
-        # if it is a file-like, copying is not wanted, see #1147
-        copied.filename = filename
-        self.filename = filename
-        return copied
+        return self._copy_implementation(copy.deepcopy)
 
 
 def validate_file_meta(
