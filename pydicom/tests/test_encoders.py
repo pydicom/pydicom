@@ -991,10 +991,10 @@ class TestDatasetCompress:
         monkeypatch.delitem(RLELosslessEncoder._available, 'pydicom')
         msg = (
             r"The 'RLE Lossless' encoder is unavailable because its encoding "
-            r"plugins are missing dependencies:\n    pylibjpeg - requires "
-            r"numpy, pylibjpeg and pylibjpeg-rle"
+            r"plugins are missing dependencies:\n"
+            r"    gdcm - requires gdcm\n"
+            r"    pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         )
-        # r"    gdcm - requires gdcm\n"
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
 

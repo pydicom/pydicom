@@ -16,7 +16,7 @@ Changes
   :meth:`TM.__str__()<pydicom.valuerep.TM.__str__>` return valid DICOM
   strings instead of the formatted date and time representations
   (:issue:`1262`)
-* :func:`~pydicom.pixel_data_handlers.rle_handler.rle_encode_frame` is
+* :func:`~pydicom.encoders.native.rle_encode_frame` is
   deprecated and will be removed in v3.0, use
   :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
