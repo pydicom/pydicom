@@ -68,8 +68,10 @@ Enhancements
 * Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for
   compressing uncompressed pixel data using a given encoding format as specified
   by a UID. Only *RLE Lossless* is currently supported (:pr:`1372`)
-* Added :mod:`~pydicom.encoders` module and
-  :attr:`~pydicom.encoders.RLELosslessEncoder` (:pr:`1372`)
+* Added :mod:`~pydicom.encoders` module and the following encoders:
+
+  * :attr:`~pydicom.encoders.RLELosslessEncoder` with 'pydicom', 'pylibjpeg'
+    and 'gdcm' plugins
 * Added `read` parameter to :func:`~pydicom.data.get_testdata_file`
   to allow reading and returning the corresponding dataset (:pr:`1372`)
 

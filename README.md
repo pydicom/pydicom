@@ -66,12 +66,14 @@ array([[175, 180, 166, ..., 203, 207, 216],
 ```
 ### Compressed *Pixel Data*
 #### JPEG, JPEG-LS and JPEG 2000
-Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/dev/old/image_data_handlers.html#guide-compressed).
+Converting JPEG compressed *Pixel Data* to an ``ndarray`` requires installing one or more additional Python libraries. For information on which libraries are required, see the [pixel data handler documentation](https://pydicom.github.io/pydicom/stable/old/image_data_handlers.html#guide-compressed).
 
 Compressing data into one of the JPEG formats is not currently supported.
 
 #### RLE
-RLE encoded *Pixel Data* only requires NumPy, and compression and decompression are both supported.
+Encoding and decoding RLE *Pixel Data* only requires NumPy, however it can
+be quite slow. You may want to consider [installing one or more additional
+Python libraries](https://pydicom.github.io/pydicom/stable/old/image_data_compression.html) to speed up the process.
 
 ## Examples
 More [examples](https://pydicom.github.io/pydicom/stable/auto_examples/index.html) are available in the documentation.
