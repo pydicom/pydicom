@@ -118,7 +118,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#encapsulating-data-compressed-by-third-party-packages">Encapsulating data compressed by third-party packages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#compressing-using-pydicom">Compressing using pydicom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#compressing-datasets-in-a-directory-with-multiprocessing">Compressing datasets in a directory with <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../waveforms.html">Waveforms</a></li>
@@ -218,14 +217,13 @@
 <li><p>An introduction to compression</p></li>
 <li><p>Using data compressed by third-party packages</p></li>
 <li><p>Compressing data using <em>pydicom</em></p></li>
-<li><p>Using <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code> to compress the contents of a directory</p></li>
 </ul>
 <p>It’s assumed that you’re already familiar with the <a class="reference internal" href="../dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
 <p><strong>Prerequisites</strong></p>
 <p>This tutorial uses packages in addition to <em>pydicom</em> that are not installed
 by default, but are required for <em>RLE Lossless</em> compression of <em>Pixel Data</em>.
 For more information on what packages are available to compress a given
-transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html"><span class="doc">image compression guide</span></a>.</p>
+transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression guide</span></a>.</p>
 <p>Installing using pip:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install -U pydicom&gt;<span class="o">=</span><span class="m">2</span>.2 numpy pylibjpeg
 </pre></div>
@@ -241,7 +239,7 @@ pip install pylibjpeg
 <p>DICOM conformant applications are usually required to support the
 <em>Little Endian Implicit VR</em> transfer syntax, which is an uncompressed (native)
 transfer syntax. This means that datasets using <em>Little Endian Implicit VR</em> have
-no compression of their <em>Pixel Data</em>. So if all applications are required to
+no compression of their <em>Pixel Data</em>. So if applications are required to
 support it, why do we need <em>Pixel Data</em> compression?</p>
 <p>The answer, of course, is file size. A <em>CT Image</em> instance
 typically consists of 1024 x 1024 16-bit pixels, and a CT scan may have
@@ -264,8 +262,9 @@ a conformant manner.</p>
 <p>The general requirements for compressed <em>Pixel Data</em> in the DICOM Standard are:</p>
 <ul class="simple">
 <li><p>Each frame of pixel data must be encoded separately</p></li>
-<li><p>All the encoded frames must then be encapsulated, either using a
-<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">basic</a> or <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">extended offset table</a></p></li>
+<li><p>All the encoded frames must then be <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a>.</p></li>
+<li><p>When the amount of encoded frame data is very large
+then it’s recommended (but not required) that an <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">extended offset table</a> also be included with the dataset</p></li>
 </ul>
 <p>Each <em>Transfer Syntax</em> has it’s own specific requirements, found
 in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/PS3.5.html">Part 5 of the DICOM Standard</a>.</p>
@@ -292,6 +291,7 @@ dataset, with either the <a class="reference internal" href="../../reference/gen
 
 <span class="c1"># Set the *Transfer Syntax UID* appropriately</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">file_meta</span><span class="o">.</span><span class="n">TransferSyntaxUID</span> <span class="o">=</span> <span class="n">JPEG2000Lossless</span>
+<span class="c1"># For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged</span>
 
 <span class="c1"># Basic encapsulation</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
@@ -372,31 +372,8 @@ method is required.</p>
 </div>
 <p>Note that in this case we also needed to change the <em>Photometric
 Interpretation</em>, from the original value of <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code> when the dataset
-was using <em>JPEG 2000 Lossless</em> compression to <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code> after decompression
-and recompression using <em>RLE Lossless</em>.</p>
-</div>
-<div class="section" id="compressing-datasets-in-a-directory-with-multiprocessing">
-<h2>Compressing datasets in a directory with <code class="docutils literal notranslate"><span class="pre">multiprocessing</span></code><a class="headerlink" href="#compressing-datasets-in-a-directory-with-multiprocessing" title="Permalink to this headline">¶</a></h2>
-<p>Our final example is to show how the <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module can be
-used to compress all the datasets in a directory:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
-
-<span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
-<span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
-
-<span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s2">&quot;pylibjpeg&quot;</span><span class="p">)</span>
-    <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">write_like_original</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-
-    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">cpu_count</span><span class="p">())</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
-        <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">compress</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.dcm&#39;</span><span class="p">))</span>
-</pre></div>
-</div>
+was using <em>JPEG 2000 Lossless</em> compression to <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, which for this dataset
+will be the correct value after recompressing using <em>RLE Lossless</em>.</p>
 </div>
 </div>
 

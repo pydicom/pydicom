@@ -263,8 +263,12 @@ processing and improved the speed by ~20-60% (<a class="reference external" href
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> function for
 compressing uncompressed pixel data using a given encoding format as specified
 by a UID. Only <em>RLE Lossless</em> is currently supported (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
-<li><p>Added <a class="reference internal" href="../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encoders</span></code></a> module and
-<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encoders</span></code></a> module and the following encoders:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> with ‘pydicom’, ‘pylibjpeg’
+and ‘gdcm’ plugins</p></li>
+</ul>
+</li>
 <li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
 to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
 </ul>
