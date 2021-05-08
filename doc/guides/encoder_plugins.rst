@@ -56,7 +56,7 @@ An encoding plugin must implement three objects within the same module:
     * ``'pixel_representation'``: :class:`int` - the type of data in `src`,
       ``0`` for unsigned integers, ``1`` for 2's complement (signed)
       integers.
-    * ``'photometric_interpretation'``: :class:`str` - the intended colorspace
+    * ``'photometric_interpretation'``: :class:`str` - the intended color space
       of the encoded data, such as ``'YBR_FULL'``
 
     `kwargs` may also contain optional parameters intended to be used

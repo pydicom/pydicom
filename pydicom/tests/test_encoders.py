@@ -14,6 +14,12 @@ try:
 except ImportError:
     HAVE_PYLJ = False
 
+try:
+    import gdcm
+    HAVE_GDCM = True
+except ImportError:
+    HAVE_GDCM = False
+
 
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
@@ -231,8 +237,9 @@ class TestEncoder:
         """Test the required encoder being unavailable."""
         enc = RLELosslessEncoder
         s = enc.missing_dependencies
+        assert s[0] == "gdcm - requires gdcm"
         assert (
-            "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle" == s[0]
+            s[1] == "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         )
 
     def test_missing_no_dependencies(self):
@@ -906,8 +913,8 @@ class TestEncoder_Process:
             RLELosslessEncoder._process(b'', plugin='foo')
 
     @pytest.mark.skipif(
-        not HAVE_NP or HAVE_PYLJ,
-        reason="Numpy unavailable or pylibjpeg available"
+        not HAVE_NP or HAVE_PYLJ or HAVE_GDCM,
+        reason="Numpy unavailable or other plugin available"
     )
     def test_specify_plugin_unavailable_raises(self):
         """Test with specific unavailable plugin"""
@@ -963,6 +970,7 @@ class TestDatasetCompress:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert len(ds.PixelData) == 21370
         assert 'PlanarConfiguration' not in ds
+        assert ds['PixelData'].is_undefined_length
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
@@ -986,6 +994,7 @@ class TestDatasetCompress:
             r"plugins are missing dependencies:\n    pylibjpeg - requires "
             r"numpy, pylibjpeg and pylibjpeg-rle"
         )
+        # r"    gdcm - requires gdcm\n"
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
 

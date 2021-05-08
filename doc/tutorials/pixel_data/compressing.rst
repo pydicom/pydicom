@@ -9,7 +9,6 @@ This tutorial is about compressing a dataset's *Pixel Data* and covers
 * An introduction to compression
 * Using data compressed by third-party packages
 * Compressing data using *pydicom*
-* Using ``multiprocessing`` to compress the contents of a directory
 
 It's assumed that you're already familiar with the :doc:`dataset basics
 <../dataset_basics>`.
@@ -20,7 +19,8 @@ It's assumed that you're already familiar with the :doc:`dataset basics
 This tutorial uses packages in addition to *pydicom* that are not installed
 by default, but are required for *RLE Lossless* compression of *Pixel Data*.
 For more information on what packages are available to compress a given
-transfer syntax see the :doc:`image compression guide</old/image_data_compression>`.
+transfer syntax see the :ref:`image compression guide
+<guide_compression_supported>`.
 
 Installing using pip:
 
@@ -43,7 +43,7 @@ Introduction
 DICOM conformant applications are usually required to support the
 *Little Endian Implicit VR* transfer syntax, which is an uncompressed (native)
 transfer syntax. This means that datasets using *Little Endian Implicit VR* have
-no compression of their *Pixel Data*. So if all applications are required to
+no compression of their *Pixel Data*. So if applications are required to
 support it, why do we need *Pixel Data* compression?
 
 The answer, of course, is file size. A *CT Image* instance
@@ -70,9 +70,11 @@ the :dcm:`requirements of the DICOM Standard<part05/sect_8.2.html>`.
 The general requirements for compressed *Pixel Data* in the DICOM Standard are:
 
 * Each frame of pixel data must be encoded separately
-* All the encoded frames must then be encapsulated, either using a
-  :dcm:`basic <part05/sect_A.4.html>` or :dcm:`extended offset table
-  <part03/sect_C.7.6.3.html>`
+* All the encoded frames must then be :dcm:`encapsulated
+  <part05/sect_A.4.html>`.
+* When the amount of encoded frame data is very large
+  then it's recommended (but not required) that an :dcm:`extended offset table
+  <part03/sect_C.7.6.3.html>` also be included with the dataset
 
 Each *Transfer Syntax* has it's own specific requirements, found
 in :dcm:`Part 5 of the DICOM Standard<part05/PS3.5.html>`.
@@ -104,6 +106,7 @@ dataset, with either the :func:`~pydicom.encaps.encapsulate` or
 
     # Set the *Transfer Syntax UID* appropriately
     ds.file_meta.TransferSyntaxUID = JPEG2000Lossless
+    # For *Samples per Pixel* 1 the *Photometric Interpretation* is unchanged
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
@@ -197,31 +200,5 @@ method is required.
 
 Note that in this case we also needed to change the *Photometric
 Interpretation*, from the original value of ``'YBR_RCT'`` when the dataset
-was using *JPEG 2000 Lossless* compression to ``'RGB'`` after decompression
-and recompression using *RLE Lossless*.
-
-
-Compressing datasets in a directory with ``multiprocessing``
-------------------------------------------------------------
-
-Our final example is to show how the :mod:`multiprocessing` module can be
-used to compress all the datasets in a directory:
-
-.. code-block:: python
-
-    from pathlib import Path
-    from multiprocessing import Pool, cpu_count
-
-    from pydicom import dcmread
-    from pydicom.uid import RLELossless
-
-    def compress(path: Path) -> None:
-        ds = dcmread(path)
-        ds.compress(RLELossless, encoding_plugin="pylibjpeg")
-        ds.save_as(path, write_like_original=False)
-
-    if __name__ == "__main__":
-        path = Path().resolve()
-
-        with Pool(processes=cpu_count()) as pool:
-            pool.map(compress, path.glob('*.dcm'))
+was using *JPEG 2000 Lossless* compression to ``'RGB'``, which for this dataset
+will be the correct value after recompressing using *RLE Lossless*.

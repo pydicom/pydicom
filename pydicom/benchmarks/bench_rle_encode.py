@@ -93,3 +93,10 @@ class TimeDatasetCompress:
             self.ds.compress(
                 RLELossless, self.arr8_1, encoding_plugin='pylibjpeg'
             )
+
+    def time_gdcm(self):
+        """Time the GDCM C++ RLE encoder."""
+        for _ in range(self.no_runs):
+            self.ds.compress(
+                RLELossless, self.arr8_1, encoding_plugin='gdcm'
+            )
