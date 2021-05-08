@@ -16,7 +16,10 @@ Changes
   :meth:`TM.__str__()<pydicom.valuerep.TM.__str__>` return valid DICOM
   strings instead of the formatted date and time representations
   (:issue:`1262`)
-
+* If comparing :class:`~pydicom.dataset.FileDataset` instances, the file
+  metadata is now ignored. This makes it possible to compare a
+  :class:`~pydicom.dataset.FileDataset` object with a
+  :class:`~pydicom.dataset.Dataset` object.
 
 Enhancements
 ------------

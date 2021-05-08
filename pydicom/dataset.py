@@ -2561,6 +2561,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     __repr__ = __str__
 
 
+_FileDataset = TypeVar("_FileDataset", bound="FileDataset")
+
+
 class FileDataset(Dataset):
     """An extension of :class:`Dataset` to make reading and writing to
     file-like easier.
@@ -2675,12 +2678,10 @@ class FileDataset(Dataset):
             return True
 
         if isinstance(other, self.__class__):
-            # exclude the filename from the comparison if both objects have
-            # a file-like or None as the file name
-            excludes = ['_dict']
-            if (not isinstance(self.filename, str) and
-                    not isinstance(other.filename, str)):
-                excludes.append('filename')
+            # exclude all metadata from the comparison
+            # only the actual dataset content shall be compared
+            excludes = ("_dict", 'filename', "preamble", "file_meta",
+                        "is_implicit_VR", "is_little_endian", "timestamp")
             return (
                     _dict_equal(self, other) and
                     _dict_equal(self.__dict__, other.__dict__,
@@ -2689,7 +2690,7 @@ class FileDataset(Dataset):
 
         return NotImplemented
 
-    def _copy_implementation(self, copy_function: Callable) -> "FileDataset":
+    def _copy_implementation(self, copy_function: Callable) -> _FileDataset:
         """Implementation of ``__copy__`` and ``__deepcopy__``.
         Sets the filename to ``None`` if it isn't a string,
         and copies all other attributes using `copy_function`.
@@ -2710,7 +2711,7 @@ class FileDataset(Dataset):
         self.filename = filename
         return copied
 
-    def __copy__(self) -> "FileDataset":
+    def __copy__(self) -> _FileDataset:
         """Return a shallow copy of the file dataset.
         Make sure that the filename is not copied in case it is a file-like
         object.
@@ -2722,7 +2723,7 @@ class FileDataset(Dataset):
         """
         return self._copy_implementation(copy.copy)
 
-    def __deepcopy__(self, _) -> "FileDataset":
+    def __deepcopy__(self, _) -> _FileDataset:
         """Return a deep copy of the file dataset.
         Make sure that the filename is not copied in case it is a file-like
         object.

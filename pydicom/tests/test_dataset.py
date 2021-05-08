@@ -1806,23 +1806,23 @@ class TestFileDataset:
         assert [1, 2, 1] == ds1.PixelSpacing
 
     def test_equality_file_meta(self):
-        """Dataset: equality returns correct value if with metadata"""
+        """Dataset: equality ignores metadata"""
         d = dcmread(self.test_file)
         e = dcmread(self.test_file)
         assert d == e
 
         e.is_implicit_VR = not e.is_implicit_VR
-        assert not d == e
+        assert d == e
 
         e.is_implicit_VR = not e.is_implicit_VR
         assert d == e
         e.is_little_endian = not e.is_little_endian
-        assert not d == e
+        assert d == e
 
         e.is_little_endian = not e.is_little_endian
         assert d == e
         e.filename = 'test_filename.dcm'
-        assert not d == e
+        assert d == e
 
     def test_creation_with_container(self):
         """FileDataset.__init__ works OK with a container such as gzip"""
@@ -1860,27 +1860,44 @@ class TestFileDataset:
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
     def test_copy_filedataset(self):
-        with open(get_testdata_file('CT_small.dcm'), 'rb') as fb:
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
-        ds_copy = copy.copy(ds)
+        msg = ("The 'filename' attribute of the dataset is a "
+               "file-like object and will be set to None")
+        with pytest.warns(UserWarning, match=msg):
+            ds_copy = copy.copy(ds)
         assert ds.filename is not None
         assert ds_copy.filename is None
         assert ds_copy == ds
 
     def test_deepcopy_filedataset(self):
         # regression test for #1147
-        with open(get_testdata_file('CT_small.dcm'), 'rb') as fb:
+        with open(get_testdata_file("CT_small.dcm"), "rb") as fb:
             data = fb.read()
         buff = io.BytesIO(data)
         ds = pydicom.dcmread(buff)
         buff.close()
-        ds_copy = copy.deepcopy(ds)
+        msg = ("The 'filename' attribute of the dataset is a "
+               "file-like object and will be set to None")
+        with pytest.warns(UserWarning, match=msg):
+            ds_copy = copy.deepcopy(ds)
         assert ds.filename is not None
         assert ds_copy.filename is None
         assert ds_copy == ds
+
+    def test_equality_with_different_metadata(self):
+        ds = dcmread(get_testdata_file("CT_small.dcm"))
+        ds2 = copy.deepcopy(ds)
+        assert ds == ds2
+        ds.filename = "foo.dcm"
+        ds.is_implicit_VR = not ds.is_implicit_VR
+        ds.is_little_endian = not ds.is_little_endian
+        ds.file_meta = None
+        ds.preamble = None
+        assert ds == ds2
 
 
 class TestDatasetOverlayArray:
