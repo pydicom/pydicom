@@ -2661,35 +2661,6 @@ class FileDataset(Dataset):
                 statinfo = os.stat(filename)
                 self.timestamp = statinfo.st_mtime
 
-    def __eq__(self, other: object) -> bool:
-        """Compare `self` and `other` for equality.
-
-        Returns
-        -------
-        bool
-            The result if `self` and `other` are the same class
-        NotImplemented
-            If `other` is not the same class as `self` then returning
-            :class:`NotImplemented` delegates the result to
-            ``superclass.__eq__(subclass)``.
-        """
-        # When comparing against self this will be faster
-        if other is self:
-            return True
-
-        if isinstance(other, self.__class__):
-            # exclude all metadata from the comparison
-            # only the actual dataset content shall be compared
-            excludes = ("_dict", 'filename', "preamble", "file_meta",
-                        "is_implicit_VR", "is_little_endian", "timestamp")
-            return (
-                    _dict_equal(self, other) and
-                    _dict_equal(self.__dict__, other.__dict__,
-                                exclude=excludes)
-            )
-
-        return NotImplemented
-
     def _copy_implementation(self, copy_function: Callable) -> _FileDataset:
         """Implementation of ``__copy__`` and ``__deepcopy__``.
         Sets the filename to ``None`` if it isn't a string,
