@@ -16,15 +16,5 @@ Pixel Data Handlers (:mod:`pydicom.pixel_data_handlers`)
    rle_handler
 
 
-.. currentmodule:: pydicom.encoders.native
-
-.. autosummary::
-   :toctree: generated/
-   
-   rle_encode_frame
-
-
-
-
 .. automodule:: pydicom.pixel_data_handlers
    :members:

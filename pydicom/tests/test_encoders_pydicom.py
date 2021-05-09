@@ -21,8 +21,9 @@ from pydicom.encoders.native import (
     _encode_frame, _encode_segment, _encode_row
 )
 from pydicom.pixel_data_handlers.rle_handler import (
-    _rle_decode_frame, _rle_decode_segment, rle_encode_frame
+    _rle_decode_frame, _rle_decode_segment
 )
+from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
 from pydicom.uid import RLELossless
 

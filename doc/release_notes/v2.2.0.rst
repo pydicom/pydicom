@@ -20,7 +20,7 @@ Changes
   metadata is now ignored. This makes it possible to compare a
   :class:`~pydicom.dataset.FileDataset` object with a
   :class:`~pydicom.dataset.Dataset` object.
-* :func:`~pydicom.encoders.native.rle_encode_frame` is
+* :func:`~pydicom.pixel_data_handlers.rle_handler.rle_encode_frame` is
   deprecated and will be removed in v3.0, use
   :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.

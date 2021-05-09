@@ -4,10 +4,6 @@
 from itertools import groupby
 from struct import pack
 import sys
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import numpy  # type: ignore[import]
 
 from pydicom.uid import RLELossless
 
@@ -172,65 +168,3 @@ def _encode_row(src: bytes) -> bytes:
         out_extend(_run)
 
     return pack('{}B'.format(len(out)), *out)
-
-
-# Old function kept for backwards compatibility
-def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
-    """Return an :class:`numpy.ndarray` image frame as RLE encoded
-    :class:`bytearray`.
-
-    .. versionadded:: 1.3
-
-    .. deprecated:: 2.2
-
-        Use :meth:`~pydicom.dataset.Dataset.compress` instead
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        A 2D (if *Samples Per Pixel* = 1) or 3D (if *Samples Per Pixel* = 3)
-        ndarray containing a single frame of the image to be RLE encoded.
-
-    Returns
-    -------
-    bytes
-        An RLE encoded frame, including the RLE header, following the format
-        specified by the DICOM Standard, Part 5,
-        :dcm:`Annex G<part05/chapter_G.html>`.
-    """
-    shape = arr.shape
-    if len(shape) > 3:
-        # Note: only raises if multi-sample pixel data with multiple frames
-        raise ValueError(
-            "Unable to encode multiple frames at once, please encode one "
-            "frame at a time"
-        )
-
-    # Check the expected number of segments
-    nr_segments = arr.dtype.itemsize
-    if len(shape) == 3:
-        # Number of samples * bytes per sample
-        nr_segments *= shape[-1]
-
-    if nr_segments > 15:
-        raise ValueError(
-            "Unable to encode as the DICOM standard only allows "
-            "a maximum of 15 segments in RLE encoded data"
-        )
-
-    dtype = arr.dtype
-    kwargs = {
-        'bits_allocated': arr.dtype.itemsize * 8,
-        'rows': shape[0],
-        'columns': shape[1],
-        'samples_per_pixel': 3 if len(shape) == 3 else 1,
-        'byteorder': '<',
-    }
-
-    sys_endianness = '<' if sys.byteorder == 'little' else '>'
-    byteorder = dtype.byteorder
-    byteorder = sys_endianness if byteorder == '=' else byteorder
-    if byteorder == '>':
-        arr = arr.astype(dtype.newbyteorder('<'))
-
-    return _encode_frame(arr.tobytes(), **kwargs)
