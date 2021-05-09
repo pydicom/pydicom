@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Command-line Interface Guide &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -216,7 +220,7 @@
            <div itemprop="articleBody">
             
   <p class="rubric">pydicom command-line interface</p>
-<div class="section" id="command-line-interface-guide">
+<section id="command-line-interface-guide">
 <span id="cli-guide"></span><h1>Command-line Interface Guide<a class="headerlink" href="#command-line-interface-guide" title="Permalink to this headline">¶</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>
@@ -229,7 +233,7 @@
 <li><p><a class="reference internal" href="#extending-the-cli" id="id4">Extending the CLI</a></p></li>
 </ul>
 </div>
-<div class="section" id="introduction">
+<section id="introduction">
 <span id="cli-intro"></span><h2><a class="toc-backref" href="#contents">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Starting in v2.2, <em>pydicom</em> offers a useful command-line interface (CLI) for
 exploring DICOM files, and access to the <cite>codify</cite> option for creating pydicom
@@ -301,7 +305,7 @@ by typing <code class="docutils literal notranslate"><span class="pre">pydicom</
 <span class="go">-q, --quiet           Only show basic information</span>
 </pre></div>
 </div>
-<div class="section" id="installing-the-pydicom-cli">
+<section id="installing-the-pydicom-cli">
 <h3>Installing the pydicom CLI<a class="headerlink" href="#installing-the-pydicom-cli" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> command should automatically be available after you
 <cite>pip install pydicom</cite>.  It should not require any updates to the system
@@ -312,8 +316,8 @@ the <cite>pydicom</cite> repository root. This has to be repeated for any change
 <cite>setup.py</cite> (e.g. to add a new subcommand).</p>
 <p>If you are developing subcommands within your own package, you will need to
 reinstall your package similar to the above as you add entry points.</p>
-</div>
-<div class="section" id="combining-with-other-clis">
+</section>
+<section id="combining-with-other-clis">
 <h3>Combining with other CLIs<a class="headerlink" href="#combining-with-other-clis" title="Permalink to this headline">¶</a></h3>
 <p>CLIs are useful for general exploration while programming, but also can be
 combined with other command-line filters for additional functionality. The
@@ -364,9 +368,9 @@ to see any filtered results in relation to their parent Sequences.</p>
 <p>See the <a class="reference internal" href="#cli-show"><span class="std std-ref">pydicom show command</span></a> section for more examples of the <cite>show</cite>
 command, its options, and the ability to show only data elements or sequences
 within the file.</p>
-</div>
-</div>
-<div class="section" id="pydicom-show-command">
+</section>
+</section>
+<section id="pydicom-show-command">
 <span id="cli-show"></span><h2><a class="toc-backref" href="#contents"><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span></code> command</a><a class="headerlink" href="#pydicom-show-command" title="Permalink to this headline">¶</a></h2>
 <p>The <cite>pydicom show</cite> command displays representation of DICOM files or parts of them
 from a command-line terminal.</p>
@@ -487,8 +491,8 @@ different SOP classes are shown. Currently “Image Storage” and “RT Plan St
 classes have custom extra information.  Please submit an issue on the <em>pydicom</em>
 issues list or a pull request to help us expand the list of custom
 ‘quiet’ mode SOP Classes.</p>
-</div>
-<div class="section" id="pydicom-codify-command">
+</section>
+<section id="pydicom-codify-command">
 <span id="cli-codify"></span><h2><a class="toc-backref" href="#contents"><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command</a><a class="headerlink" href="#pydicom-codify-command" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command takes a DICOM file and produces Python code to
 recreate that file, or, optionally a subset within that file.</p>
@@ -502,7 +506,7 @@ sequences.</p>
 file, which may include private health information or other sensitive
 information.</p>
 </div>
-<div class="section" id="a-simple-example">
+<section id="a-simple-example">
 <h3>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h3>
 <p>A simple example of using the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pydicom codify pydicom::rtplan.dcm
@@ -528,8 +532,8 @@ ds.StudyTime = &#39;153557&#39;
 </div>
 <p>Note that prefixing the file specification with <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> will read the file
 from the <em>pydicom</em> test data files rather than from the file system.</p>
-</div>
-<div class="section" id="command-options">
+</section>
+<section id="command-options">
 <h3>Command options<a class="headerlink" href="#command-options" title="Permalink to this headline">¶</a></h3>
 <p>In the above example, the output was directed to screen, because no output file
 was specified. To see the available command options, use the <code class="docutils literal notranslate"><span class="pre">help</span></code> command:</p>
@@ -575,8 +579,8 @@ would be a <code class="docutils literal notranslate"><span class="pre">ds.save_
 <p>By default, any private data elements within the file are not translated
 to code.  If you want to include them, use the <code class="docutils literal notranslate"><span class="pre">-p</span></code> parameter.</p>
 </div>
-</div>
-<div class="section" id="codifying-a-part-of-a-dicom-file">
+</section>
+<section id="codifying-a-part-of-a-dicom-file">
 <h3>Codifying a part of a DICOM file<a class="headerlink" href="#codifying-a-part-of-a-dicom-file" title="Permalink to this headline">¶</a></h3>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">filespec</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, as for
 <a class="reference internal" href="#cli-show"><span class="std std-ref">the show command</span></a>, allows you to specify a data element within the file,
@@ -610,9 +614,9 @@ but could be useful as a model when creating
 more complete code.  For example, issuing code for one item in a
 <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> could be the starting point towards a loop
 producing a number of sequence items.</p>
-</div>
-</div>
-<div class="section" id="extending-the-cli">
+</section>
+</section>
+<section id="extending-the-cli">
 <span id="cli-dev"></span><h2><a class="toc-backref" href="#contents">Extending the CLI</a><a class="headerlink" href="#extending-the-cli" title="Permalink to this headline">¶</a></h2>
 <p>Developers can create their own ‘subcommands’ for the <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> command,
 by adding entry points to their package’s setup.py file, specifying a callback
@@ -685,8 +689,8 @@ however, if you think your command has general use, please consider contributing
 it to <em>pydicom</em>: in that case, change the entry points in the <em>pydicom</em>
 <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, and add a module under <code class="docutils literal notranslate"><span class="pre">pydicom.cli</span></code> and create a
 pull request.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

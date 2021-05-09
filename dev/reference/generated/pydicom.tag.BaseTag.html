@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom.tag.BaseTag &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -229,16 +233,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-tag-basetag">
+  <section id="pydicom-tag-basetag">
 <h1>pydicom.tag.BaseTag<a class="headerlink" href="#pydicom-tag-basetag" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.tag.BaseTag">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pydicom.tag.</span></code><code class="sig-name descname"><span class="pre">BaseTag</span></code><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/tag.py#L140"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicom.tag.</span></span><span class="sig-name descname"><span class="pre">BaseTag</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/tag.py#L140"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a DICOM element (group, element) tag.</p>
 <p>Tags are represented as an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 <dl class="py method">
-<dt id="pydicom.tag.BaseTag.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.tag.BaseTag.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.tag.BaseTag.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -305,33 +309,33 @@
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt id="pydicom.tag.BaseTag.elem">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">elem</span></code><a class="headerlink" href="#pydicom.tag.BaseTag.elem" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.elem">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">elem</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#pydicom.tag.BaseTag.elem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tag’s element number as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.tag.BaseTag.element">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">element</span></code><a class="headerlink" href="#pydicom.tag.BaseTag.element" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.element">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">element</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#pydicom.tag.BaseTag.element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tag’s element number as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.tag.BaseTag.group">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">group</span></code><a class="headerlink" href="#pydicom.tag.BaseTag.group" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.group">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#pydicom.tag.BaseTag.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tag’s group number as <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.tag.BaseTag.is_private">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_private</span></code><a class="headerlink" href="#pydicom.tag.BaseTag.is_private" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.is_private">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_private</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.tag.BaseTag.is_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the tag is private (has an odd group number).</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.tag.BaseTag.is_private_creator">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_private_creator</span></code><a class="headerlink" href="#pydicom.tag.BaseTag.is_private_creator" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.is_private_creator">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_private_creator</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.tag.BaseTag.is_private_creator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the tag is a private creator.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.1.</span></p>
@@ -340,7 +344,7 @@
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>

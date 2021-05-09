@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom.fileutil.read_undefined_length_value &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -229,11 +233,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-fileutil-read-undefined-length-value">
+  <section id="pydicom-fileutil-read-undefined-length-value">
 <h1>pydicom.fileutil.read_undefined_length_value<a class="headerlink" href="#pydicom-fileutil-read-undefined-length-value" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pydicom.fileutil.read_undefined_length_value">
-<code class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></code><code class="sig-name descname"><span class="pre">read_undefined_length_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8192</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileutil.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileutil.read_undefined_length_value">
+<span class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></span><span class="sig-name descname"><span class="pre">read_undefined_length_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter_tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8192</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileutil.py#L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.read_undefined_length_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read until <cite>delimiter_tag</cite> and return the value up to that point.</p>
 <p>On completion, the file will be set to the first byte after the delimiter
 and its following four zero bytes.</p>
@@ -260,7 +264,7 @@ and its following four zero bytes.</p>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>

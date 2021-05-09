@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Version 2.2.0 &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -189,9 +193,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-2-2-0">
+  <section id="version-2-2-0">
 <h1>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="changes">
+<section id="changes">
 <h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
@@ -206,9 +210,13 @@ than raising an exception when the operand cannot be converted to
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">TM.__str__()</span></code> return valid DICOM
 strings instead of the formatted date and time representations
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1262">#1262</a>)</p></li>
+<li><p>If comparing <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instances, the file
+metadata is now ignored. This makes it possible to compare a
+<a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> object with a
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> object.</p></li>
 </ul>
-</div>
-<div class="section" id="enhancements">
+</section>
+<section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
 <ul>
 <li><p>Added a command-line interface for pydicom.  Current subcommands are:</p>
@@ -272,8 +280,8 @@ and ‘gdcm’ plugins</p></li>
 <li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
 to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
 </ul>
-</div>
-<div class="section" id="fixes">
+</section>
+<section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
@@ -287,9 +295,10 @@ standard workflow if <cite>setuptools</cite> are not installed (<a class="refere
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1338">#1338</a>)</p></li>
 <li><p>Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
 rather than YBR with the Pillow pixel data handler (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/878">#878</a>)</p></li>
+<li><p>Allow to deepcopy a <cite>~pydicom.dataset.FileDataset</cite> object (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1147">#1147</a>)</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

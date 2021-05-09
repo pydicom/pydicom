@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Version 1.0.0 &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -189,13 +193,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="version-1-0-0">
+  <section id="version-1-0-0">
 <h1>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this headline">¶</a></h1>
 <p>This is a major release, with major changes, including backwards-incompatible
 changes.</p>
-<div class="section" id="changelog">
+<section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="major-changes">
+<section id="major-changes">
 <h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>full Python 3 compatibility - one code base for both Python 2 and Python 3</p></li>
@@ -213,8 +217,8 @@ files</p></li>
 <li><p>DICOM dictionary updated to 2017c</p></li>
 <li><p>cleaned up DICOM dictionary code, old non-DICOM-keyword code removed</p></li>
 </ul>
-</div>
-<div class="section" id="other-enhancements">
+</section>
+<section id="other-enhancements">
 <h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
@@ -244,8 +248,8 @@ information</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> changed to <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>, <code class="docutils literal notranslate"><span class="pre">write_file</span></code> to <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> for
 greater clarity. Previous names still available for backwards compatibility.</p></li>
 </ul>
-</div>
-<div class="section" id="infrastructure">
+</section>
+<section id="infrastructure">
 <h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
@@ -259,8 +263,8 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <li><p>added PyPy support</p></li>
 <li><p>removed support for Python 2.6, added support for Python 3.6</p></li>
 </ul>
-</div>
-<div class="section" id="fixes">
+</section>
+<section id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
@@ -274,9 +278,9 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <li><p>fixed Latin5 (Turkish) character set handling</p></li>
 <li><p>a lot of other small fixes…</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>

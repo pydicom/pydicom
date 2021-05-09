@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Compressing Pixel Data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -214,10 +218,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="compressing-pixel-data">
+  <section id="compressing-pixel-data">
 <span id="guide-compression"></span><h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to compress Pixel Data</p>
-<div class="section" id="compressing-using-third-party-packages">
+<section id="compressing-using-third-party-packages">
 <h2>Compressing using third-party packages<a class="headerlink" href="#compressing-using-third-party-packages" title="Permalink to this headline">¶</a></h2>
 <p>Because <em>pydicom</em> currently offers limited support for compressing <em>Pixel Data</em>
 you’ll have to rely on third-party packages to perform the actual compression.
@@ -261,10 +265,10 @@ for more information.</p>
 <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_ext.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="compressing-using-pydicom">
+</section>
+<section id="compressing-using-pydicom">
 <h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="supported-transfer-syntaxes">
+<section id="supported-transfer-syntaxes">
 <span id="guide-compression-supported"></span><h3>Supported Transfer Syntaxes<a class="headerlink" href="#supported-transfer-syntaxes" title="Permalink to this headline">¶</a></h3>
 <p><em>Pixel Data</em> can be compressed natively using <em>pydicom</em> for the following
 transfer syntaxes:</p>
@@ -304,8 +308,8 @@ transfer syntaxes:</p>
 <div class="line-block">
 <div class="line"><sup>1</sup> <em>~25x slower than the other plugins</em></div>
 </div>
-</div>
-<div class="section" id="compressing-with-dataset-compress">
+</section>
+<section id="compressing-with-dataset-compress">
 <h3>Compressing with <code class="docutils literal notranslate"><span class="pre">Dataset.compress()</span></code><a class="headerlink" href="#compressing-with-dataset-compress" title="Permalink to this headline">¶</a></h3>
 <p>The <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> method can
 be used to compress an uncompressed dataset in-place:</p>
@@ -340,9 +344,9 @@ which is the correct value for this particular dataset once the <em>Pixel Data</
 is RLE compressed. It’s up to you to ensure that the the correct <em>Photometric
 Interpretation</em> has been set prior to actually calling
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>

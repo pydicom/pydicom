@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Reading and writing DICOM files &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -195,10 +199,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="reading-and-writing-dicom-files">
+  <section id="reading-and-writing-dicom-files">
 <span id="api-filereader"></span><h1>Reading and writing DICOM files<a class="headerlink" href="#reading-and-writing-dicom-files" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">Common pydicom functions called by user code</p>
-<div class="section" id="file-reading-parsing">
+<section id="file-reading-parsing">
 <h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this headline">¶</a></h2>
 <p>The main function to read and parse DICOM files using <em>pydicom</em> is
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>. It’s part of the
@@ -213,8 +217,8 @@ imported</p>
 </div></blockquote>
 <p>If you need fine control over the reading, you can either call
 <a class="reference internal" href="../reference/generated/pydicom.filereader.read_partial.html#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_partial()</span></code></a> or use <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p>
-</div>
-<div class="section" id="file-writing">
+</section>
+<section id="file-writing">
 <h2>File Writing<a class="headerlink" href="#file-writing" title="Permalink to this headline">¶</a></h2>
 <p>DICOM files can also be written using <em>pydicom</em>. There are two ways to do this.</p>
 <ul class="simple">
@@ -224,8 +228,8 @@ imported</p>
 <li><p>The second is to use the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.save_as()</span></code></a>
 method on a <code class="docutils literal notranslate"><span class="pre">FileDataset</span></code> or <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> instance.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom.fileset.RecordNode &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -221,15 +225,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-fileset-recordnode">
+  <section id="pydicom-fileset-recordnode">
 <h1>pydicom.fileset.RecordNode<a class="headerlink" href="#pydicom-fileset-recordnode" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.fileset.RecordNode">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></code><code class="sig-name descname"><span class="pre">RecordNode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L169"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">RecordNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L169"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of a DICOMDIR’s directory record.</p>
 <dl class="py attribute">
-<dt id="pydicom.fileset.RecordNode.children">
-<code class="sig-name descname"><span class="pre">children</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.children" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.children">
+<span class="sig-name descname"><span class="pre">children</span></span><a class="headerlink" href="#pydicom.fileset.RecordNode.children" title="Permalink to this definition">¶</a></dt>
 <dd><p>The current node’s child nodes (if any)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -239,8 +243,8 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pydicom.fileset.RecordNode.instance">
-<code class="sig-name descname"><span class="pre">instance</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.instance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.instance">
+<span class="sig-name descname"><span class="pre">instance</span></span><a class="headerlink" href="#pydicom.fileset.RecordNode.instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>If the current node is a leaf node, a
 <a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> for the corresponding SOP
 Instance.</p>
@@ -252,8 +256,8 @@ Instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.RecordNode.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L181"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L181"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <code class="docutils literal notranslate"><span class="pre">RecordNode</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -335,8 +339,8 @@ Instance.</p>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="pydicom.fileset.RecordNode.add">
-<code class="sig-name descname"><span class="pre">add</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L207"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.add" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L207"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a leaf to the tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -347,70 +351,70 @@ Instance.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.ancestors">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">ancestors</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.ancestors" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.ancestors">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ancestors</span></span><em class="property"><span class="pre">:</span> <span class="pre">List[pydicom.fileset.RecordNode]</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.ancestors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of the current node’s ancestors, ordered from nearest
 to furthest.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.component">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">component</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.component" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.component">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">component</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.component" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a File ID component as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for the current node.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.depth">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">depth</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.depth" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.depth">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">depth</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.depth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of nodes to the level below the tree root</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.file_set">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">file_set</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.file_set" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.file_set">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">file_set</span></span><em class="property"><span class="pre">:</span> <span class="pre">pydicom.fileset.FileSet</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.file_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tree’s <a class="reference internal" href="pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.has_instance">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">has_instance</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.has_instance" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.has_instance">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">has_instance</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.has_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the current node corresponds to an instance.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.index">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">index</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.index" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.index">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">index</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the index of the current node amongst its siblings.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.is_root">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_root</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.is_root" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.is_root">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_root</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.is_root" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the current node is the tree’s root node.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.key">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">key</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.key" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.key">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a unique key for the node’s record as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.next">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">next</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.next" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.next">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">next</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[pydicom.fileset.RecordNode]</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the node after the current one (if any), or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.parent">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">parent</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.parent" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.parent">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">parent</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[pydicom.fileset.RecordNode]</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the current node’s parent (if it has one).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.RecordNode.prettify">
-<code class="sig-name descname"><span class="pre">prettify</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent_char</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L460"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.prettify" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.prettify">
+<span class="sig-name descname"><span class="pre">prettify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent_char</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'</span>&#160; <span class="pre">'</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L460"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.prettify" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tree structure as a list of pretty strings, starting at
 the current node (unless the current node is the root node).</p>
 <dl class="field-list simple">
@@ -420,21 +424,21 @@ the current node (unless the current node is the root node).</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.previous">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">previous</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.previous" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.previous">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">previous</span></span><em class="property"><span class="pre">:</span> <span class="pre">pydicom.fileset.RecordNode</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.previous" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the node before the current one (if any), or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.record_type">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">record_type</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.record_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.record_type">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">record_type</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.record_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the record’s <em>Directory Record Type</em> as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.RecordNode.remove">
-<code class="sig-name descname"><span class="pre">remove</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L589"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.remove" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L589"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a leaf from the tree</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -445,20 +449,20 @@ the current node (unless the current node is the root node).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.RecordNode.reverse">
-<code class="sig-name descname"><span class="pre">reverse</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/0d2eaf882/pydicom/fileset.py#L603"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.reverse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.reverse">
+<span class="sig-name descname"><span class="pre">reverse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef60223de/pydicom/fileset.py#L603"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.RecordNode.reverse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield nodes up to the level below the tree’s root node.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.RecordNode.root">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">root</span></code><a class="headerlink" href="#pydicom.fileset.RecordNode.root" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.RecordNode.root">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">root</span></span><em class="property"><span class="pre">:</span> <span class="pre">pydicom.fileset.RecordNode</span></em><a class="headerlink" href="#pydicom.fileset.RecordNode.root" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the tree’s root node.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>

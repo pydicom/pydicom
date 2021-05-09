@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>DICOM File-sets and DICOMDIR &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -219,7 +223,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="dicom-file-sets-and-dicomdir">
+  <section id="dicom-file-sets-and-dicomdir">
 <h1>DICOM File-sets and DICOMDIR<a class="headerlink" href="#dicom-file-sets-and-dicomdir" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial is about DICOM File-sets and covers</p>
 <ul class="simple">
@@ -235,7 +239,7 @@ accessing its managed SOP instances</p></li>
 <li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">DICOM File Service</a></p></li>
 <li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part12/ps3.12.html">Media Formats and Physical Media for Media Interchange</a></p></li>
 </ul>
-<div class="section" id="the-dicom-file-set">
+<section id="the-dicom-file-set">
 <h2>The DICOM File-set<a class="headerlink" href="#the-dicom-file-set" title="Permalink to this headline">¶</a></h2>
 <p>A File-set is a collection of DICOM files that share a common naming
 space. Most people have probably interacted with a File-set without being aware
@@ -244,7 +248,7 @@ data that are given to a patient after a medical procedure (such as an MR or
 ultrasound).</p>
 <p>The specification for File-sets is given in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part10/chapter_8.html">Part 10 of the DICOM
 Standard</a>.</p>
-<div class="section" id="the-dicomdir-file">
+<section id="the-dicomdir-file">
 <h3>The DICOMDIR file<a class="headerlink" href="#the-dicomdir-file" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -296,9 +300,9 @@ given in <a class="reference external" href="http://dicom.nema.org/medical/dicom
 <p>Here we have a <code class="docutils literal notranslate"><span class="pre">'PATIENT'</span></code> record, which from <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html#table_F.5-1">Table F.5-1</a> we see must also contain <em>Patient’s Name</em>
 and <em>Patient ID</em> elements. The full list of available record types and their
 requirements is in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_F.5.html">Annex F.5 of Part 3 of the DICOM Standard</a>.</p>
-</div>
-</div>
-<div class="section" id="fileset">
+</section>
+</section>
+<section id="fileset">
 <h2>FileSet<a class="headerlink" href="#fileset" title="Permalink to this headline">¶</a></h2>
 <p>While it’s possible to access everything within a File-set using the DICOMDIR
 dataset, making changes to an existing File-set quickly becomes complicated
@@ -306,7 +310,7 @@ due to the need to add and remove directory records, recalculate the
 byte offsets for existing records and manage the corresponding file
 system changes. A more user-friendly way to interact with one is via the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class.</p>
-<div class="section" id="loading-existing-file-sets">
+<section id="loading-existing-file-sets">
 <h3>Loading existing File-sets<a class="headerlink" href="#loading-existing-file-sets" title="Permalink to this headline">¶</a></h3>
 <p>To load an existing File-set just pass a DICOMDIR
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or the path to the DICOMDIR file to
@@ -419,8 +423,8 @@ parameter:</p>
 <span class="go">3</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="creating-a-new-file-set">
+</section>
+<section id="creating-a-new-file-set">
 <h3>Creating a new File-set<a class="headerlink" href="#creating-a-new-file-set" title="Permalink to this headline">¶</a></h3>
 <p>You can create a new File-set by creating a new
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> instance:</p>
@@ -430,10 +434,10 @@ parameter:</p>
 <p>This will create a completely conformant File-set, however it won’t contain
 any SOP instances. Since empty File-sets aren’t very useful, our next step
 will be to add some.</p>
-</div>
-<div class="section" id="modifying-a-file-set">
+</section>
+<section id="modifying-a-file-set">
 <h3>Modifying a File-set<a class="headerlink" href="#modifying-a-file-set" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="fileset-and-staging">
+<section id="fileset-and-staging">
 <h4><a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> and staging<a class="headerlink" href="#fileset-and-staging" title="Permalink to this headline">¶</a></h4>
 <p>Before we go any further we need to discuss how the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class manages changes to the File-set.
@@ -474,8 +478,8 @@ directory structure</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">additions</span></code>: <em>N</em> SOP instances will be added to the File-set</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">removals</span></code>:  <em>M</em> SOP instances will be removed from the File-set</p></li>
 </ul>
-</div>
-<div class="section" id="adding-sop-instances">
+</section>
+<section id="adding-sop-instances">
 <h4>Adding SOP instances<a class="headerlink" href="#adding-sop-instances" title="Permalink to this headline">¶</a></h4>
 <p>The simplest way to add new SOP instances to the File-set is with the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method, which takes the path to the
@@ -541,8 +545,8 @@ let’s update the instance and try adding it again:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="removing-instances">
+</section>
+<section id="removing-instances">
 <h4>Removing instances<a class="headerlink" href="#removing-instances" title="Permalink to this headline">¶</a></h4>
 <p>SOP instances can be removed from the File-set with the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.remove" title="pydicom.fileset.FileSet.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove()</span></code></a> method, which takes the
@@ -558,9 +562,9 @@ let’s update the instance and try adding it again:</p>
 <span class="go">1</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="applying-the-changes">
+</section>
+</section>
+<section id="applying-the-changes">
 <h3>Applying the changes<a class="headerlink" href="#applying-the-changes" title="Permalink to this headline">¶</a></h3>
 <p>Let’s add a couple of SOP instances back to the File-set:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">))</span>
@@ -661,15 +665,15 @@ directory structure:</p>
 <span class="go">/tmp/tmpu068kdwp/PT000000/ST000001/SE000000/IM000003</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="conclusion">
+</section>
+</section>
+<section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial you’ve learned about DICOM File-sets and the DICOMDIR file.
 You should now be able to use the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class
 to create new File-sets, and to load, search and modify existing ones.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

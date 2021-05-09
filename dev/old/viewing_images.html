@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Viewing Images &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -213,10 +217,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="viewing-images">
+  <section id="viewing-images">
 <span id="id1"></span><h1>Viewing Images<a class="headerlink" href="#viewing-images" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to use other packages with pydicom to view DICOM images</p>
-<div class="section" id="introduction">
+<section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Pydicom is mainly concerned with getting at the DICOM data elements in files,
 but it is often desirable to view pixel data as an image.
@@ -231,8 +235,8 @@ programs available</p></li>
 <li><p>use pydicom with <a class="reference external" href="http://www.wxpython.org/">wxPython</a></p></li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="using-pydicom-with-matplotlib">
+</section>
+<section id="using-pydicom-with-matplotlib">
 <h2>Using pydicom with matplotlib<a class="headerlink" href="#using-pydicom-with-matplotlib" title="Permalink to this headline">¶</a></h2>
 <p>Matplotlib is available at <a class="reference external" href="https://matplotlib.org/">https://matplotlib.org/</a>. It
 can take 2D image information from <code class="docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code> and display it.
@@ -248,28 +252,28 @@ Here is an example:</p>
 </div>
 <a class="reference external image-reference" href="./../auto_examples/input_output/plot_printing_dataset.html"><img alt="../_images/sphx_glr_plot_read_dicom_001.png" class="align-center" src="../_images/sphx_glr_plot_read_dicom_001.png" style="width: 384.0px; height: 288.0px;" /></a>
 <p>Thanks to Roy Keyes for pointing out how to do this.</p>
-</div>
-<div class="section" id="using-pydicom-with-tkinter">
+</section>
+<section id="using-pydicom-with-tkinter">
 <h2>Using pydicom with Tkinter<a class="headerlink" href="#using-pydicom-with-tkinter" title="Permalink to this headline">¶</a></h2>
 <p>The program <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py">pydicom_Tkinter.py</a>
 in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository demonstrates how to show an image using the
 Tkinter graphics system, which comes by default with most Python installations.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.</p>
-</div>
-<div class="section" id="using-pydicom-with-python-imaging-library-pil">
+</section>
+<section id="using-pydicom-with-python-imaging-library-pil">
 <h2>Using pydicom with Python Imaging Library (PIL)<a class="headerlink" href="#using-pydicom-with-python-imaging-library-pil" title="Permalink to this headline">¶</a></h2>
 <p>The module <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py">pydicom_PIL.py</a>
 in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository
 uses PIL’s <code class="docutils literal notranslate"><span class="pre">Image.show()</span></code> method after creating an Image instance
 from the pixel data and some basic information about it (bit depth, LUTs, etc).</p>
-</div>
-<div class="section" id="using-pydicom-with-wxpython">
+</section>
+<section id="using-pydicom-with-wxpython">
 <h2>Using pydicom with wxPython<a class="headerlink" href="#using-pydicom-with-wxpython" title="Permalink to this headline">¶</a></h2>
 <p>The module <a class="reference external" href="https://github.com/pydicom/contrib-pydicom/blob/master/viewers/imViewer_Simple.py">imViewer-Simple.py</a>
 in the <code class="docutils literal notranslate"><span class="pre">contrib-pydicom</span></code> repository uses wxPython (also PIL, but it notes that it
 may not be strictly necessary) to display an image from a pydicom dataset.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

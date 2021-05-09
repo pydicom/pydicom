@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Waveforms &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -210,7 +214,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="waveforms">
+  <section id="waveforms">
 <h1>Waveforms<a class="headerlink" href="#waveforms" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial is about understanding waveforms in DICOM datasets and covers:</p>
 <ul class="simple">
@@ -234,7 +238,7 @@ conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">
 <li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part17/sect_C.5.html">Waveform Information Model</a></p></li>
 <li><p><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Waveform IODs</a></p></li>
 </ul>
-<div class="section" id="waveforms-in-dicom">
+<section id="waveforms-in-dicom">
 <h2>Waveforms in DICOM<a class="headerlink" href="#waveforms-in-dicom" title="Permalink to this headline">¶</a></h2>
 <p>There are a number of DICOM <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.html">Information Object Definitions</a> (IODs) that contain
 waveforms, such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>,
@@ -294,8 +298,8 @@ defining information for each channel is available in the (5400,0200)
 <span class="go">Channel 12: Lead V6 (microvolt)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="decoding-waveform-data">
+</section>
+<section id="decoding-waveform-data">
 <h2>Decoding <em>Waveform Data</em><a class="headerlink" href="#decoding-waveform-data" title="Permalink to this headline">¶</a></h2>
 <p>The combined sample data for each multiplex is stored in the corresponding
 (5400,1010) <em>Waveform Data</em> element:</p>
@@ -359,8 +363,8 @@ within the <em>Waveform Sequence</em>:</p>
 <span class="go">(1200, 12)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="encoding-waveform-data">
+</section>
+<section id="encoding-waveform-data">
 <h2>Encoding <em>Waveform Data</em><a class="headerlink" href="#encoding-waveform-data" title="Permalink to this headline">¶</a></h2>
 <p>Having seen how to decode and view a waveform then next step is creating our
 own multiplex group. The new group will contain two channels
@@ -434,8 +438,8 @@ Interpretation</em> element values to match our data representation type:</p>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/waveforms_encode.png"><img alt="../_images/waveforms_encode.png" class="align-center" src="../_images/waveforms_encode.png" style="width: 800px;" /></a>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

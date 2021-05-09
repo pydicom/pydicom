@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pydicom.config.pixel_data_handlers &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
@@ -37,6 +40,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -236,11 +240,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pydicom-config-pixel-data-handlers">
+  <section id="pydicom-config-pixel-data-handlers">
 <h1>pydicom.config.pixel_data_handlers<a class="headerlink" href="#pydicom-config-pixel-data-handlers" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
-<dt id="pydicom.config.pixel_data_handlers">
-<code class="sig-prename descclassname"><span class="pre">pydicom.config.</span></code><code class="sig-name descname"><span class="pre">pixel_data_handlers</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.numpy_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/numpy_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.rle_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/rle_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.gdcm_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/gdcm_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.pillow_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/pillow_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.jpeg_ls_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/jpeg_ls_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.pylibjpeg_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/pylibjpeg_handler.py'&gt;]</span></em><a class="headerlink" href="#pydicom.config.pixel_data_handlers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.config.pixel_data_handlers">
+<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">pixel_data_handlers</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.numpy_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/numpy_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.rle_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/rle_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.gdcm_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/gdcm_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.pillow_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/pillow_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.jpeg_ls_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/jpeg_ls_handler.py'&gt;,</span> <span class="pre">&lt;module</span> <span class="pre">'pydicom.pixel_data_handlers.pylibjpeg_handler'</span> <span class="pre">from</span> <span class="pre">'/home/circleci/project/pydicom/pixel_data_handlers/pylibjpeg_handler.py'&gt;]</span></em><a class="headerlink" href="#pydicom.config.pixel_data_handlers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handlers for converting (7FE0,0010) <em>Pixel Data</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -274,7 +278,7 @@ syntax, then this fact is announced in a <a class="reference external" href="htt
 exception.</p>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
