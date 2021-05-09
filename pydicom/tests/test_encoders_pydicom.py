@@ -233,16 +233,28 @@ class TestEncodeFrame:
         assert np.array_equal(ref, arr)
 
     def test_16_segments_raises(self):
-        """Test that trying to encode 16-segments raises exception."""
+        """Test trying to encode more than 15 segments raises exception."""
+        arr = np.asarray(
+            [[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]]],
+            dtype='uint8'
+        )
+        assert (1, 1, 16) == arr.shape
+        assert 1 == arr.dtype.itemsize
         msg = (
             r"Unable to encode as the DICOM standard only allows "
             r"a maximum of 15 segments in RLE encoded data"
         )
         with pytest.raises(ValueError, match=msg):
-            _encode_frame(b'', samples_per_pixel=3, bits_allocated=64)
+            _encode_frame(
+                arr.tobytes(),
+                rows=1,
+                columns=1,
+                samples_per_pixel=16,
+                bits_allocated=8
+            )
 
     def test_15_segment(self):
-        """Test encoding 15-segments works as expected."""
+        """Test encoding 15 segments works as expected."""
         arr = np.asarray(
             [[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]]],
             dtype='uint8'

@@ -717,7 +717,7 @@ class TestEncoder_Preprocess:
         assert len(out) == 3
         assert out == b"\x80\x00\x7f"
 
-    def test_u08_3s(self):
+    def test_i08_3s(self):
         """Test processing i8/3s"""
         self.ds.BitsAllocated = 8
         self.ds.BitsStored = 8
@@ -974,7 +974,7 @@ class TestDatasetCompress:
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
-        """Test encode with a dataset."""
+        """Test encode with an arr."""
         ds = get_testdata_file("CT_small.dcm", read=True)
         assert hasattr(ds, 'file_meta')
         arr = ds.pixel_array
