@@ -160,7 +160,7 @@ class TestAT:
 
 class TestDataSetToJson:
     def test_json_from_dicom_file(self, no_numpy_use):
-        ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
+        ds1 = dcmread(get_testdata_file("CT_small.dcm"))
         ds_json = ds1.to_json()
         ds2 = Dataset.from_json(ds_json)
         assert ds1 == ds2

@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import datadict, jsonrep, config
+from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -2561,6 +2561,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     __repr__ = __str__
 
 
+_FileDataset = TypeVar("_FileDataset", bound="FileDataset")
+
+
 class FileDataset(Dataset):
     """An extension of :class:`Dataset` to make reading and writing to
     file-like easier.
@@ -2658,31 +2661,50 @@ class FileDataset(Dataset):
                 statinfo = os.stat(filename)
                 self.timestamp = statinfo.st_mtime
 
-    def __eq__(self, other: object) -> bool:
-        """Compare `self` and `other` for equality.
+    def _copy_implementation(self, copy_function: Callable) -> _FileDataset:
+        """Implementation of ``__copy__`` and ``__deepcopy__``.
+        Sets the filename to ``None`` if it isn't a string,
+        and copies all other attributes using `copy_function`.
+        """
+        copied = self.__class__(
+            self.filename, self, self.preamble, self.file_meta,
+            self.is_implicit_VR, self.is_little_endian
+        )
+        filename = self.filename
+        if filename is not None and not isinstance(filename, str):
+            warnings.warn("The 'filename' attribute of the dataset is a "
+                          "file-like object and will be set to None "
+                          "in the copied object")
+            self.filename = None
+        for (k, v) in self.__dict__.items():
+            copied.__dict__[k] = copy_function(v)
+
+        self.filename = filename
+        return copied
+
+    def __copy__(self) -> _FileDataset:
+        """Return a shallow copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
 
         Returns
         -------
-        bool
-            The result if `self` and `other` are the same class
-        NotImplemented
-            If `other` is not the same class as `self` then returning
-            :class:`NotImplemented` delegates the result to
-            ``superclass.__eq__(subclass)``.
+        FileDataset
+            A shallow copy of the file data set.
         """
-        # When comparing against self this will be faster
-        if other is self:
-            return True
+        return self._copy_implementation(copy.copy)
 
-        if isinstance(other, self.__class__):
-            return (
-                _dict_equal(self, other)
-                and _dict_equal(
-                    self.__dict__, other.__dict__, exclude=['_dict']
-                )
-            )
+    def __deepcopy__(self, _) -> _FileDataset:
+        """Return a deep copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
 
-        return NotImplemented
+        Returns
+        -------
+        FileDataset
+            A deep copy of the file data set.
+        """
+        return self._copy_implementation(copy.deepcopy)
 
 
 def validate_file_meta(

@@ -1375,15 +1375,14 @@ class TestFileSet:
         root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
         assert root in s
         assert 1 == len(paths)
-        # Only want to compare Dataset rather than FileDataset
-        assert Dataset(ct) == dcmread(paths[0])
+        assert ct == dcmread(paths[0])
 
         # Calling write() again shouldn't change anything
         ds2, paths = write_fs(fs)
-        assert Dataset(ds) == ds2
+        assert ds == ds2
         assert ds2.filename == ds.filename
         assert 1 == len(paths)
-        assert Dataset(ct) == dcmread(paths[0])
+        assert ct == dcmread(paths[0])
 
     def test_add_bad_dataset(self, ct):
         """Test adding a dataset missing Type 1 element value."""
