@@ -1,7 +1,7 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
-from itertools import groupby
+from itertools import groupby, islice
 from struct import pack
 import sys
 
@@ -143,23 +143,28 @@ def _encode_row(src: bytes) -> bytes:
         else:
             if literal:
                 # Literal runs
-                for ii in range(0, len(literal), 128):
-                    _run = literal[ii:ii + 128]
-                    out_append(len(_run) - 1)
-                    out_extend(_run)
+                nr_full_runs, len_partial_run = divmod(len(literal), 128)
+                for idx in range(nr_full_runs):
+                    idx *= 128
+                    out_append(127)
+                    out_extend(literal[idx:idx + 128])
+
+                if len_partial_run:
+                    out_append(len_partial_run - 1)
+                    out_extend(literal[-len_partial_run:])
 
                 literal = []
 
-            # Replicate run
-            for ii in range(0, len(group), 128):
-                if len(group[ii:ii + 128]) > 1:
-                    # Replicate run
-                    out_append(257 - len(group[ii:ii + 128]))
-                    out_append(group[0])
-                else:
-                    # Literal run only if last replicate part is length 1
-                    out_append(0)
-                    out_append(group[0])
+            # Replicate runs
+            nr_full_runs, len_partial_run = divmod(len(group), 128)
+            if nr_full_runs:
+                out_extend((129, group[0]) * nr_full_runs)
+
+            if len_partial_run > 1:
+                out_extend((257 - len_partial_run, group[0]))
+            elif len_partial_run == 1:
+                # Literal run - only if last replicate part is length 1
+                out_extend((0, group[0]))
 
     # Final literal run if literal isn't followed by a replicate run
     for ii in range(0, len(literal), 128):
