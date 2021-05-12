@@ -20,6 +20,10 @@ Changes
   metadata is now ignored. This makes it possible to compare a
   :class:`~pydicom.dataset.FileDataset` object with a
   :class:`~pydicom.dataset.Dataset` object.
+* :func:`~pydicom.pixel_data_handlers.rle_handler.rle_encode_frame` is
+  deprecated and will be removed in v3.0, use
+  :meth:`~pydicom.dataset.Dataset.compress` or
+  :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
 
 Enhancements
 ------------
@@ -65,7 +69,8 @@ Enhancements
 * Ensured :func:`~pydicom.pixel_data_handlers.util.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
-* Added support for faster decoding (~4-5x) and encoding (~25x) of *RLE Lossless*
+* Optimisations for RLE encoding using *pydicom* (~40% faster).
+* Added support for faster decoding (~4-5x) and encoding (~20x) of *RLE Lossless*
   *Pixel Data* via the `pylibjpeg-rle
   <https://github.com/pydicom/pylibjpeg-rle>`_ plugin (:pr:`1361`, :pr:`1372`).
 * Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for

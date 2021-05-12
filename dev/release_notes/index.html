@@ -376,6 +376,10 @@ strings instead of the formatted date and time representations
 metadata is now ignored. This makes it possible to compare a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> object with a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> object.</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.rle_handler.html#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">rle_encode_frame()</span></code></a> is
+deprecated and will be removed in v3.0, use
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
+<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -428,7 +432,8 @@ See <a class="reference internal" href="../reference/generated/pydicom.valuerep.
 <li><p>Ensured <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> uses
 32-bit floats for calculation, added <cite>per_frame</cite> flag to allow frame-by-frame
 processing and improved the speed by ~20-60% (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
-<li><p>Added support for faster decoding (~4-5x) and encoding (~25x) of <em>RLE Lossless</em>
+<li><p>Optimisations for RLE encoding using <em>pydicom</em> (~40% faster).</p></li>
+<li><p>Added support for faster decoding (~4-5x) and encoding (~20x) of <em>RLE Lossless</em>
 <em>Pixel Data</em> via the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1361">#1361</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> function for
 compressing uncompressed pixel data using a given encoding format as specified
