@@ -9,7 +9,9 @@ from pathlib import Path
 import re
 import shutil
 from tempfile import TemporaryDirectory
-from typing import Generator, Optional, Union, Any, BinaryIO, List
+from typing import (
+    Generator, Optional, Union, Any, BinaryIO, List, cast, Iterable, TypeVar
+)
 import warnings
 
 from pydicom.charset import default_encoding
@@ -166,7 +168,11 @@ def is_conformant_file_id(path: Path) -> bool:
     return False
 
 
-class RecordNode:
+RN = TypeVar('RN', bound=RecordNode)
+
+
+# Iterable provides the __iter__ method.
+class RecordNode(Iterable[RN]):
     """Representation of a DICOMDIR's directory record.
 
     Attributes
@@ -186,10 +192,10 @@ class RecordNode:
         record : pydicom.dataset.Dataset, optional
             A *Directory Record Sequence's* directory record.
         """
-        self.children = []
-        self.instance = None
-        self._parent = None
-        self._record = None
+        self.children: List[RN] = []
+        self.instance: Optional[FileInstance] = None
+        self._parent: Optional[RN] = None
+        self._record: Dataset
 
         if record:
             self._set_record(record)
@@ -204,7 +210,7 @@ class RecordNode:
         self._offset_next = 0
         self._offset_lower = 0
 
-    def add(self, leaf: "RecordNode") -> None:
+    def add(self, leaf: RN) -> None:
         """Add a leaf to the tree.
 
         Parameters
@@ -228,7 +234,7 @@ class RecordNode:
         node.parent = current
 
     @property
-    def ancestors(self) -> List["RecordNode"]:
+    def ancestors(self) -> List[RN]:
         """Return a list of the current node's ancestors, ordered from nearest
         to furthest.
         """
@@ -261,14 +267,14 @@ class RecordNode:
 
         return f"{prefix}{idx}"
 
-    def __contains__(self, key: Union[str, "RecordNode"]) -> bool:
+    def __contains__(self, key: Union[str, RN]) -> bool:
         """Return ``True`` if the current node has a child matching `key`."""
         if isinstance(key, RecordNode):
             key = key.key
 
         return key in [child.key for child in self.children]
 
-    def __delitem__(self, key: Union[str, "RecordNode"]) -> None:
+    def __delitem__(self, key: Union[str, RN]) -> None:
         """Remove one of the current node's children and if the current node
         becomes childless recurse upwards and delete it from its parent.
         """
@@ -354,9 +360,9 @@ class RecordNode:
         if "ReferencedFileID" in self._record:
             elem = self._record["ReferencedFileID"]
             if elem.VM == 1:
-                return Path(self._record.ReferencedFileID)
+                return Path(cast(str, self._record.ReferencedFileID))
             if elem.VM > 1:
-                return Path(*self._record.ReferencedFileID)
+                return Path(*cast(List[str], self._record.ReferencedFileID))
 
             return None
 
@@ -367,7 +373,7 @@ class RecordNode:
         """Return the tree's :class:`~pydicom.fileset.FileSet`."""
         return self.root.file_set
 
-    def __getitem__(self, key: Union[str, "RecordNode"]) -> "RecordNode":
+    def __getitem__(self, key: Union[str, RN]) -> RN:
         """Return the current node's child using it's
         :attr:`~pydicom.fileset.RecordNode.key`
         """
@@ -398,14 +404,14 @@ class RecordNode:
         """Return ``True`` if the current node is the tree's root node."""
         return False
 
-    def __iter__(self) -> Generator["RecordNode", None, None]:
+    def __iter__(self) -> Generator[RN, None, None]:
         """Yield this node (unless it's the root node) and all nodes below it.
         """
         if not self.is_root:
             yield self
 
         for child in self.children:
-            yield from iter(child)
+            yield from child
 
     @property
     def key(self) -> str:
@@ -413,21 +419,21 @@ class RecordNode:
         rtype = self.record_type
         if rtype == "PATIENT":
             # PS3.3, Annex F.5.1: Each Patient ID is unique within a File-set
-            return self._record.PatientID
+            return cast(str, self._record.PatientID)
         if rtype == "STUDY":
             # PS3.3, Annex F.5.2: Type 1C
             if "StudyInstanceUID" in self._record:
-                return self._record.StudyInstanceUID
+                return cast(UID, self._record.StudyInstanceUID)
             else:
-                return self._record.ReferencedSOPInstanceUIDInFile
+                return cast(UID, self._record.ReferencedSOPInstanceUIDInFile)
         if rtype == "SERIES":
-            return self._record.SeriesInstanceUID
+            return cast(UID, self._record.SeriesInstanceUID)
         if rtype == "PRIVATE":
-            return self._record.PrivateRecordUID
+            return cast(UID, self._record.PrivateRecordUID)
 
         # PS3.3, Table F.3-3: Required if record references an instance
         try:
-            return self._record.ReferencedSOPInstanceUIDInFile
+            return cast(UID, self._record.ReferencedSOPInstanceUIDInFile)
         except AttributeError as exc:
             raise AttributeError(
                 f"Invalid '{rtype}' record - missing required element "
@@ -435,7 +441,7 @@ class RecordNode:
             ) from exc
 
     @property
-    def next(self) -> Union["RecordNode", None]:
+    def next(self) -> Union[RN, None]:
         """Return the node after the current one (if any), or ``None``."""
         if not self.parent:
             return None
@@ -446,12 +452,12 @@ class RecordNode:
             return None
 
     @property
-    def parent(self) -> Union["RecordNode", None]:
+    def parent(self) -> Union[RN, None]:
         """Return the current node's parent (if it has one)."""
         return self._parent
 
     @parent.setter
-    def parent(self, node: "RecordNode") -> None:
+    def parent(self, node: RN) -> None:
         """Set the parent of the current node."""
         self._parent = node
         if node is not None and self not in node.children:
@@ -530,7 +536,7 @@ class RecordNode:
         return s
 
     @property
-    def previous(self) -> "RecordNode":
+    def previous(self) -> RN:
         """Return the node before the current one (if any), or ``None``."""
         if not self.parent:
             return None
@@ -586,7 +592,7 @@ class RecordNode:
         """Return the record's *Directory Record Type* as :class:`str`."""
         return self._record.DirectoryRecordType
 
-    def remove(self, node: "RecordNode") -> None:
+    def remove(self, node: RN) -> None:
         """Remove a leaf from the tree
 
         Parameters
@@ -600,7 +606,7 @@ class RecordNode:
 
         del node.parent[node]
 
-    def reverse(self) -> Generator["RecordNode", None, None]:
+    def reverse(self) -> Iterable[RN]:
         """Yield nodes up to the level below the tree's root node."""
         node = self
         while node.parent:
@@ -611,7 +617,7 @@ class RecordNode:
             yield node
 
     @property
-    def root(self) -> "RecordNode":
+    def root(self) -> RN:
         """Return the tree's root node."""
         if self.parent:
             return self.parent.root
