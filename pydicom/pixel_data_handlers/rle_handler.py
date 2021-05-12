@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Use the `numpy <https://numpy.org/>`_ package to convert RLE lossless *Pixel
 Data* to a :class:`numpy.ndarray`.
 
@@ -35,36 +35,37 @@ in the table below.
 
 """
 
-from itertools import groupby
-from struct import pack, unpack
+from struct import unpack
 import sys
-from typing import Optional
+from typing import List, TYPE_CHECKING, cast
 
 try:
-    import numpy as np
+    import numpy as np  # type: ignore[import]
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
 from pydicom.pixel_data_handlers.util import pixel_dtype
+from pydicom.encoders.native import _encode_frame
 import pydicom.uid
+
+if TYPE_CHECKING:
+    import numpy  # type: ignore[import]
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'RLE Lossless'
-
-ENCODER_DEPENDENCIES = {pydicom.uid.RLELossless: ('numpy', )}
 DEPENDENCIES = {'numpy': ('http://www.numpy.org/', 'NumPy')}
-
 SUPPORTED_TRANSFER_SYNTAXES = [pydicom.uid.RLELossless]
 
 
-def is_available(uid: Optional[pydicom.uid.UID] = None) -> bool:
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_RLE
 
 
-def supports_transfer_syntax(transfer_syntax):
+def supports_transfer_syntax(transfer_syntax: str) -> bool:
     """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
@@ -76,7 +77,7 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def needs_to_convert_to_RGB(ds):
+def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
@@ -85,7 +86,7 @@ def needs_to_convert_to_RGB(ds):
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(ds):
+def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
@@ -94,7 +95,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds):
     return False
 
 
-def get_pixeldata(ds, rle_segment_order='>'):
+def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
     """Return an :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
@@ -144,29 +145,32 @@ def get_pixeldata(ds, rle_segment_order='>'):
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
-    nr_bits = ds.BitsAllocated
-    nr_samples = ds.SamplesPerPixel
-    nr_frames = getattr(ds, 'NumberOfFrames', 1)
-    rows = ds.Rows
-    cols = ds.Columns
+    nr_bits = cast(int, ds.BitsAllocated)
+    nr_samples = cast(int, ds.SamplesPerPixel)
+    nr_frames = cast(int, getattr(ds, 'NumberOfFrames', 1) or 1)
+    rows = cast(int, ds.Rows)
+    cols = cast(int, ds.Columns)
 
     # Decompress each frame of the pixel data
     pixel_data = bytearray()
     if nr_frames > 1:
         for rle_frame in decode_data_sequence(ds.PixelData):
-            frame = _rle_decode_frame(rle_frame, rows, cols, nr_samples,
-                                      nr_bits)
+            frame = _rle_decode_frame(
+                rle_frame, rows, cols, nr_samples, nr_bits, rle_segment_order
+            )
             pixel_data.extend(frame)
     else:
-        frame = _rle_decode_frame(defragment_data(ds.PixelData),
-                                  rows, cols, nr_samples, nr_bits)
-
+        frame = _rle_decode_frame(
+            defragment_data(ds.PixelData),
+            rows,
+            cols,
+            nr_samples,
+            nr_bits,
+            rle_segment_order
+        )
         pixel_data.extend(frame)
 
-    # The segment order should be big endian by default but make it possible
-    #   to switch if the RLE is non-conformant
-    dtype = pixel_dtype(ds).newbyteorder(rle_segment_order)
-    arr = np.frombuffer(pixel_data, dtype)
+    arr = np.frombuffer(pixel_data, pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
@@ -174,8 +178,7 @@ def get_pixeldata(ds, rle_segment_order='>'):
     return arr
 
 
-# RLE decoding functions
-def _parse_rle_header(header):
+def _parse_rle_header(header: bytes) -> List[int]:
     """Return a list of byte offsets for the segments in RLE data.
 
     **RLE Header Format**
@@ -244,7 +247,14 @@ def _parse_rle_header(header):
     return list(offsets)
 
 
-def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
+def _rle_decode_frame(
+    data: bytes,
+    rows: int,
+    columns: int,
+    nr_samples: int,
+    nr_bits: int,
+    segment_order: str = '>'
+) -> bytearray:
     """Decodes a single frame of RLE encoded data.
 
     Each frame may contain up to 15 segments of encoded data.
@@ -261,11 +271,14 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
         Number of samples per pixel (e.g. 3 for RGB data).
     nr_bits : int
         Number of bits per sample - must be a multiple of 8
+    segment_order : str
+        The segment order of the `data`, '>' for big endian (default),
+        '<' for little endian (non-conformant).
 
     Returns
     -------
     bytearray
-        The frame's decoded data in big endian and planar configuration 1
+        The frame's decoded data in little endian and planar configuration 1
         byte ordering (i.e. for RGB data this is all red pixels then all
         green then all blue, with the bytes for each pixel ordered from
         MSB to LSB when reading left to right).
@@ -273,7 +286,7 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     if nr_bits % 8:
         raise NotImplementedError(
             "Unable to decode RLE encoded pixel data with a (0028,0100) "
-            "'Bits Allocated' value of {}".format(nr_bits)
+            f"'Bits Allocated' value of {nr_bits}"
         )
 
     # Parse the RLE Header
@@ -285,8 +298,8 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
     if nr_segments != nr_samples * bytes_per_sample:
         raise ValueError(
             "The number of RLE segments in the pixel data doesn't match the "
-            "expected amount ({} vs. {} segments)"
-            .format(nr_segments, nr_samples * bytes_per_sample)
+            f"expected amount ({nr_segments} vs. "
+            f"{nr_samples * bytes_per_sample} segments)"
         )
 
     # Ensure the last segment gets decoded
@@ -297,42 +310,48 @@ def _rle_decode_frame(data, rows, columns, nr_samples, nr_bits):
 
     # Example:
     # RLE encoded data is ordered like this (for 16-bit, 3 sample):
-    #  Segment: 1     | 2     | 3     | 4     | 5     | 6
+    #  Segment: 0     | 1     | 2     | 3     | 4     | 5
     #           R MSB | R LSB | G MSB | G LSB | B MSB | B LSB
     #  A segment contains only the MSB or LSB parts of all the sample pixels
 
     # To minimise the amount of array manipulation later, and to make things
     # faster we interleave each segment in a manner consistent with a planar
-    # configuration of 1 (and maintain big endian byte ordering):
+    # configuration of 1 (and use little endian byte ordering):
     #    All red samples             | All green samples           | All blue
     #    Pxl 1   Pxl 2   ... Pxl N   | Pxl 1   Pxl 2   ... Pxl N   | ...
-    #    MSB LSB MSB LSB ... MSB LSB | MSB LSB MSB LSB ... MSB LSB | ...
+    #    LSB MSB LSB MSB ... LSB MSB | LSB MSB LSB MSB ... LSB MSB | ...
 
     # `stride` is the total number of bytes of each sample plane
     stride = bytes_per_sample * rows * columns
     for sample_number in range(nr_samples):
-        for byte_offset in range(bytes_per_sample):
+        le_gen = range(bytes_per_sample)
+        byte_offsets = le_gen if segment_order == '<' else reversed(le_gen)
+        for byte_offset in byte_offsets:
             # Decode the segment
-            # ii is 0, 1, 2, 3, ..., (nr_segments - 1)
             ii = sample_number * bytes_per_sample + byte_offset
+            # ii is 1, 0, 3, 2, 5, 4 for the example above
+            # This is where the segment order correction occurs
             segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
             # Check that the number of decoded pixels is correct
             if len(segment) != rows * columns:
                 raise ValueError(
                     "The amount of decoded RLE segment data doesn't match the "
-                    "expected amount ({} vs. {} bytes)"
-                    .format(len(segment), rows * columns)
+                    f"expected amount ({len(segment)} vs. "
+                    f"{rows * columns} bytes)"
                 )
 
-            # For 100 pixel/plane, 32-bit, 3 sample data `start` will be
+            if segment_order == '>':
+                byte_offset = bytes_per_sample - byte_offset - 1
+
+            # For 100 pixel/plane, 32-bit, 3 sample data, `start` will be
             #   0, 1, 2, 3, 400, 401, 402, 403, 800, 801, 802, 803
-            start = byte_offset + sample_number * stride
+            start = byte_offset + (sample_number * stride)
             decoded[start:start + stride:bytes_per_sample] = segment
 
     return decoded
 
 
-def _rle_decode_segment(data):
+def _rle_decode_segment(data: bytes) -> bytearray:
     """Return a single segment of decoded RLE data as bytearray.
 
     Parameters
@@ -345,7 +364,6 @@ def _rle_decode_segment(data):
     bytearray
         The decoded segment.
     """
-
     data = bytearray(data)
     result = bytearray()
     pos = 0
@@ -373,35 +391,16 @@ def _rle_decode_segment(data):
     return result
 
 
-# RLE encoding functions
-def _wrap_rle_encode_frame(src: bytes, **kwargs) -> bytes:
-    """Wrapper for use with the encoder interface.
-
-    .. versionadded:: 2.2
-
-    Parameters
-    ----------
-    src : bytes
-        A single frame of image data to be RLE encoded.
-    **kwargs
-        Optional parameters for the encoding function.
-
-    Returns
-    -------
-    bytes
-        An RLE encoded frame.
-    """
-    bytes_allocated = kwargs['bits_allocated'] // 8
-    arr = np.frombuffer(src, dtype=f'<u{bytes_allocated}')
-
-    return bytes(rle_encode_frame(arr))
-
-
-def rle_encode_frame(arr):
+# Old function kept for backwards compatibility
+def rle_encode_frame(arr: "numpy.ndarray") -> bytes:
     """Return an :class:`numpy.ndarray` image frame as RLE encoded
     :class:`bytearray`.
 
     .. versionadded:: 1.3
+
+    .. deprecated:: 2.2
+
+        Use :meth:`~pydicom.dataset.Dataset.compress` instead
 
     Parameters
     ----------
@@ -411,7 +410,7 @@ def rle_encode_frame(arr):
 
     Returns
     -------
-    bytearray
+    bytes
         An RLE encoded frame, including the RLE header, following the format
         specified by the DICOM Standard, Part 5,
         :dcm:`Annex G<part05/chapter_G.html>`.
@@ -436,166 +435,19 @@ def rle_encode_frame(arr):
             "a maximum of 15 segments in RLE encoded data"
         )
 
-    rle_data = bytearray()
-    seg_lengths = []
-    if len(shape) == 3:
-        # Samples Per Pixel > 1
-        for ii in range(arr.shape[-1]):
-            # Need a contiguous array in order to be able to split it up
-            # into byte segments
-            for segment in _rle_encode_plane(arr[..., ii].copy()):
-                rle_data.extend(segment)
-                seg_lengths.append(len(segment))
-    else:
-        # Samples Per Pixel = 1
-        for segment in _rle_encode_plane(arr):
-            rle_data.extend(segment)
-            seg_lengths.append(len(segment))
+    dtype = arr.dtype
+    kwargs = {
+        'bits_allocated': arr.dtype.itemsize * 8,
+        'rows': shape[0],
+        'columns': shape[1],
+        'samples_per_pixel': 3 if len(shape) == 3 else 1,
+        'byteorder': '<',
+    }
 
-    # Add the number of segments to the header
-    rle_header = bytearray(pack('<L', len(seg_lengths)))
+    sys_endianness = '<' if sys.byteorder == 'little' else '>'
+    byteorder = dtype.byteorder
+    byteorder = sys_endianness if byteorder == '=' else byteorder
+    if byteorder == '>':
+        arr = arr.astype(dtype.newbyteorder('<'))
 
-    # Add the segment offsets, starting at 64 for the first segment
-    # We don't need an offset to any data at the end of the last segment
-    offsets = [64]
-    for ii, length in enumerate(seg_lengths[:-1]):
-        offsets.append(offsets[ii] + length)
-    rle_header.extend(pack('<{}L'.format(len(offsets)), *offsets))
-
-    # Add trailing padding to make up the rest of the header (if required)
-    rle_header.extend(b'\x00' * (64 - len(rle_header)))
-
-    return rle_header + rle_data
-
-
-def _rle_encode_plane(arr):
-    """Yield RLE encoded segments from an image plane as bytearray.
-
-    A plane of N-byte samples must be split into N segments, with each segment
-    containing the same byte of the N-byte samples. For example, in a plane
-    containing 16 bits per sample, the first segment will contain the most
-    significant 8 bits of the samples and the second segment the 8 least
-    significant bits. Each segment is RLE encoded prior to being yielded.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        A 2D ndarray containing a single plane of the image data to be RLE
-        encoded. The dtype of the array should be a multiple of 8 (i.e. uint8,
-        uint32, int16, etc.).
-
-    Yields
-    ------
-    bytearray
-        An RLE encoded segment of the plane, following the format specified
-        by the DICOM Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`.
-        The segments are yielded in order from most significant to least.
-    """
-    # Determine the byte order of the array
-    byte_order = arr.dtype.byteorder
-    if byte_order == '=':
-        byte_order = '<' if sys.byteorder == 'little' else '>'
-
-    # Re-view the N-bit array data as N / 8 x uint8s
-    arr8 = arr.view(np.uint8)
-
-    # Reshape the uint8 array data into 1 or more segments and encode
-    bytes_per_sample = arr.dtype.itemsize
-    for ii in range(bytes_per_sample):
-        # If the original byte order is little endian we need to segment
-        #   in reverse order
-        if byte_order == '<':
-            ii = bytes_per_sample - ii - 1
-        segment = arr8.ravel()[ii::bytes_per_sample].reshape(arr.shape)
-
-        yield _rle_encode_segment(segment)
-
-
-def _rle_encode_segment(arr):
-    """Return a 2D numpy ndarray as an RLE encoded bytearray.
-
-    Each row of the image is encoded separately as required by the DICOM
-    Standard.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        A 2D ndarray of 8-bit uint data, representing a Byte Segment as in
-        the DICOM Standard, Part 5, :dcm:`Annex G.2<part05/sect_G.2.html>`.
-
-    Returns
-    -------
-    bytearray
-        The RLE encoded segment, following the format specified by the DICOM
-        Standard. Odd length encoded segments are padded by a trailing ``0x00``
-        to be even length.
-    """
-    out = bytearray()
-    if len(arr.shape) > 1:
-        for row in arr:
-            out.extend(_rle_encode_row(row))
-    else:
-        out.extend(_rle_encode_row(arr))
-
-    # Pad odd length data with a trailing 0x00 byte
-    out.extend(b'\x00' * (len(out) % 2))
-
-    return out
-
-
-def _rle_encode_row(arr):
-    """Return a numpy array as an RLE encoded bytearray.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        A 1D ndarray of 8-bit uint data.
-
-    Returns
-    -------
-    bytes
-        The RLE encoded row, following the format specified by the DICOM
-        Standard, Part 5, :dcm:`Annex G<part05/chapter_G.html>`
-
-    Notes
-    -----
-    * 2-byte repeat runs are always encoded as Replicate Runs rather than
-      only when not preceeded by a Literal Run as suggested by the Standard.
-    """
-    out = []
-    out_append = out.append
-    out_extend = out.extend
-
-    literal = []
-    for key, group in groupby(arr.astype('uint8').tolist()):
-        group = list(group)
-        if len(group) == 1:
-            literal.append(group[0])
-        else:
-            if literal:
-                # Literal runs
-                for ii in range(0, len(literal), 128):
-                    _run = literal[ii:ii + 128]
-                    out_append(len(_run) - 1)
-                    out_extend(_run)
-
-                literal = []
-
-            # Replicate run
-            for ii in range(0, len(group), 128):
-                if len(group[ii:ii + 128]) > 1:
-                    # Replicate run
-                    out_append(257 - len(group[ii:ii + 128]))
-                    out_append(group[0])
-                else:
-                    # Literal run only if last replicate part is length 1
-                    out_append(0)
-                    out_append(group[0])
-
-    # Final literal run if literal isn't followed by a replicate run
-    for ii in range(0, len(literal), 128):
-        _run = literal[ii:ii + 128]
-        out_append(len(_run) - 1)
-        out_extend(_run)
-
-    return pack('{}B'.format(len(out)), *out)
+    return _encode_frame(arr.tobytes(), **kwargs)

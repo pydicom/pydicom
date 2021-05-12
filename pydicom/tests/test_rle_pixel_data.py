@@ -23,16 +23,14 @@ There are the following possibilities:
 """
 
 from struct import pack, unpack
-import sys
 
 import pytest
 
-from pydicom import dcmread, Dataset
+from pydicom import dcmread
 import pydicom.config
 from pydicom.data import get_testdata_file
-from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
-from pydicom.uid import RLELossless, UID, AllTransferSyntaxes
+from pydicom.uid import RLELossless, AllTransferSyntaxes
 
 try:
     import numpy as np
@@ -50,10 +48,6 @@ try:
         _rle_decode_frame,
         _rle_decode_segment,
         _parse_rle_header,
-        rle_encode_frame,
-        _rle_encode_plane,
-        _rle_encode_segment,
-        _rle_encode_row,
     )
     HAVE_RLE = RLE_HANDLER.HAVE_RLE
 except ImportError:
@@ -208,15 +202,15 @@ class TestNoNumpy_NoRLEHandler:
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
         ds = dcmread(RLE_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 6128 == len(ds.PixelData)
+        assert ds.PatientName == 'CompressedSamples^MR1'
+        assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.PatientName == data[1]
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
@@ -253,15 +247,15 @@ class TestNoNumpy_RLEHandler:
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
         ds = dcmread(RLE_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 6128 == len(ds.PixelData)
+        assert ds.PatientName == 'CompressedSamples^MR1'
+        assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.PatientName == data[1]
 
     def test_unsupported_pixel_array_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
@@ -311,8 +305,8 @@ class TestNumpy_NoRLEHandler:
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
         ds = dcmread(RLE_16_1_1F)
-        assert 'CompressedSamples^MR1' == ds.PatientName
-        assert 6128 == len(ds.PixelData)
+        assert ds.PatientName == 'CompressedSamples^MR1'
+        assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
@@ -357,21 +351,21 @@ class TestNumpy_RLEHandler:
         ds = dcmread(EXPL_16_1_1F)
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
-            exc_msg = (
+            msg = (
                 r"Unable to decode pixel data with a transfer syntax UID of "
                 r"'{}'".format(uid)
             )
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError, match=msg):
                 ds.pixel_array
-            with pytest.raises(NotImplementedError, match=exc_msg):
+            with pytest.raises(NotImplementedError, match=msg):
                 ds.decompress(handler_name='rle')
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
         ds = dcmread(fpath)
-        assert data[0] == ds.file_meta.TransferSyntaxUID
-        assert data[1] == ds.PatientName
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.PatientName == data[1]
         assert len(ds.PixelData)
 
     def test_pixel_array_signed(self):
@@ -384,17 +378,17 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
 
         assert not np.array_equal(arr, ref)
-        assert (600, 800) == arr.shape
-        assert -12 == arr[0].min() == arr[0].max()
-        assert (1, -10, 1) == tuple(arr[300, 491:494])
-        assert 0 == arr[-1].min() == arr[-1].max()
+        assert arr.shape == (600, 800)
+        assert arr[0].max() == arr[0].min() == -12
+        assert tuple(arr[300, 491:494]) == (1, -10, 1)
+        assert arr[-1].min() == arr[-1].max() == 0
 
     def test_pixel_array_1bit_raises(self):
         """Test pixel_array for 1-bit raises exception."""
         ds = dcmread(RLE_8_3_1F)
         ds.BitsAllocated = 1
-        with pytest.raises(NotImplementedError,
-                           match="Bits Allocated' value of 1"):
+        msg = r"Bits Allocated' value of 1"
+        with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_pixel_array_8bit_1sample_1f(self):
@@ -403,33 +397,34 @@ class TestNumpy_RLEHandler:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
+        assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         ref = _get_pixel_array(EXPL_8_1_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
         assert np.array_equal(arr, ref)
-        assert (600, 800) == arr.shape
-        assert 244 == arr[0].min() == arr[0].max()
-        assert (1, 246, 1) == tuple(arr[300, 491:494])
-        assert 0 == arr[-1].min() == arr[-1].max()
+        assert arr.shape == (600, 800)
+        assert arr[0].min() == arr[0].max() == 244
+        assert tuple(arr[300, 491:494]) == (1, 246, 1)
+        assert arr[-1].min() == arr[-1].max() == 0
 
     def test_decompress_with_handler(self):
         """Test that decompress works with the correct handler."""
         ds = dcmread(RLE_8_1_1F)
-        with pytest.raises(ValueError,
-                           match="'zip' is not a known handler name"):
+        msg = r"'zip' is not a known handler name"
+        with pytest.raises(ValueError, match=msg):
             ds.decompress(handler_name='zip')
         with pytest.raises(NotImplementedError, match='Unable to decode*'):
             ds.decompress(handler_name='numpy')
+
         ds.decompress(handler_name='rle')
         assert hasattr(ds, '_pixel_array')
         arr = ds.pixel_array
-        assert (600, 800) == arr.shape
-        assert 244 == arr[0].min() == arr[0].max()
-        assert (1, 246, 1) == tuple(arr[300, 491:494])
-        assert 0 == arr[-1].min() == arr[-1].max()
+        assert arr.shape == (600, 800)
+        assert arr[0].min() == arr[0].max() == 244
+        assert tuple(arr[300, 491:494]) == (1, 246, 1)
+        assert arr[-1].min() == arr[-1].max() == 0
 
     def test_pixel_array_8bit_1sample_2f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
@@ -438,16 +433,16 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 2
+        assert ds.PixelRepresentation == 0
         ref = _get_pixel_array(EXPL_8_1_2F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
         assert np.array_equal(arr, ref)
-        assert (2, 600, 800) == arr.shape
-        assert 244 == arr[0, 0].min() == arr[0, 0].max()
-        assert (1, 246, 1) == tuple(arr[0, 300, 491:494])
-        assert 0 == arr[0, -1].min() == arr[0, -1].max()
+        assert arr.shape == (2, 600, 800)
+        assert 244 == arr[0, 0].min() == arr[0, 0].max() == 244
+        assert tuple(arr[0, 300, 491:494]) == (1, 246, 1)
+        assert arr[0, -1].min() == arr[0, -1].max() == 0
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
@@ -458,23 +453,24 @@ class TestNumpy_RLEHandler:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         ref = _get_pixel_array(EXPL_8_3_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
         assert np.array_equal(arr, ref)
-        assert (255, 0, 0) == tuple(arr[5, 50, :])
-        assert (255, 128, 128) == tuple(arr[15, 50, :])
-        assert (0, 255, 0) == tuple(arr[25, 50, :])
-        assert (128, 255, 128) == tuple(arr[35, 50, :])
-        assert (0, 0, 255) == tuple(arr[45, 50, :])
-        assert (128, 128, 255) == tuple(arr[55, 50, :])
-        assert (0, 0, 0) == tuple(arr[65, 50, :])
-        assert (64, 64, 64) == tuple(arr[75, 50, :])
-        assert (192, 192, 192) == tuple(arr[85, 50, :])
-        assert (255, 255, 255) == tuple(arr[95, 50, :])
+
+        assert tuple(arr[5, 50, :]) == (255, 0, 0)
+        assert tuple(arr[15, 50, :]) == (255, 128, 128)
+        assert tuple(arr[25, 50, :]) == (0, 255, 0)
+        assert tuple(arr[35, 50, :]) == (128, 255, 128)
+        assert tuple(arr[45, 50, :]) == (0, 0, 255)
+        assert tuple(arr[55, 50, :]) == (128, 128, 255)
+        assert tuple(arr[65, 50, :]) == (0, 0, 0)
+        assert tuple(arr[75, 50, :]) == (64, 64, 64)
+        assert tuple(arr[85, 50, :]) == (192, 192, 192)
+        assert tuple(arr[95, 50, :]) == (255, 255, 255)
 
     def test_pixel_array_8bit_3sample_2f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
@@ -483,25 +479,25 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
+        assert ds.PixelRepresentation == 0
         ref = _get_pixel_array(EXPL_8_3_2F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
         assert np.array_equal(arr, ref)
 
         # Frame 1
         frame = arr[0]
-        assert (255, 0, 0) == tuple(frame[5, 50, :])
-        assert (255, 128, 128) == tuple(frame[15, 50, :])
-        assert (0, 255, 0) == tuple(frame[25, 50, :])
-        assert (128, 255, 128) == tuple(frame[35, 50, :])
-        assert (0, 0, 255) == tuple(frame[45, 50, :])
-        assert (128, 128, 255) == tuple(frame[55, 50, :])
-        assert (0, 0, 0) == tuple(frame[65, 50, :])
-        assert (64, 64, 64) == tuple(frame[75, 50, :])
-        assert (192, 192, 192) == tuple(frame[85, 50, :])
-        assert (255, 255, 255) == tuple(frame[95, 50, :])
+        assert tuple(frame[5, 50, :]) == (255, 0, 0)
+        assert tuple(frame[15, 50, :]) == (255, 128, 128)
+        assert tuple(frame[25, 50, :]) == (0, 255, 0)
+        assert tuple(frame[35, 50, :]) == (128, 255, 128)
+        assert tuple(frame[45, 50, :]) == (0, 0, 255)
+        assert tuple(frame[55, 50, :]) == (128, 128, 255)
+        assert tuple(frame[65, 50, :]) == (0, 0, 0)
+        assert tuple(frame[75, 50, :]) == (64, 64, 64)
+        assert tuple(frame[85, 50, :]) == (192, 192, 192)
+        assert tuple(frame[95, 50, :]) == (255, 255, 255)
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
@@ -518,13 +514,12 @@ class TestNumpy_RLEHandler:
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<i2'
         assert np.array_equal(arr, ref)
-        assert (64, 64) == arr.shape
-
-        assert (422, 319, 361) == tuple(arr[0, 31:34])
-        assert (366, 363, 322) == tuple(arr[31, :3])
-        assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+        assert arr.shape == (64, 64)
+        assert tuple(arr[0, 31:34]) == (422, 319, 361)
+        assert tuple(arr[31, :3]) == (366, 363, 322)
+        assert tuple(arr[-1, -3:]) == (1369, 1129, 862)
 
     def test_pixel_array_16bit_1sample_10f(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
@@ -533,28 +528,29 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 10
+        assert ds.PixelRepresentation == 0
         ref = _get_pixel_array(EXPL_16_1_10F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u2'
         assert np.array_equal(arr, ref)
-        assert (10, 64, 64) == arr.shape
+        assert arr.shape == (10, 64, 64)
 
         # Frame 1
-        assert (206, 197, 159) == tuple(arr[0, 0, 31:34])
-        assert (49, 78, 128) == tuple(arr[0, 31, :3])
-        assert (362, 219, 135) == tuple(arr[0, -1, -3:])
+        assert tuple(arr[0, 0, 31:34]) == (206, 197, 159)
+        assert tuple(arr[0, 31, :3]) == (49, 78, 128)
+        assert tuple(arr[0, -1, -3:]) == (362, 219, 135)
 
         # Frame 5
-        assert (67, 82, 44) == tuple(arr[4, 0, 31:34])
-        assert (37, 41, 17) == tuple(arr[4, 31, :3])
-        assert (225, 380, 355) == tuple(arr[4, -1, -3:])
+        assert tuple(arr[4, 0, 31:34]) == (67, 82, 44)
+        assert tuple(arr[4, 31, :3]) == (37, 41, 17)
+        assert tuple(arr[4, -1, -3:]) == (225, 380, 355)
 
         # Frame 10
-        assert (72, 86, 69) == tuple(arr[-1, 0, 31:34])
-        assert (25, 4, 9) == tuple(arr[-1, 31, :3])
-        assert (227, 300, 147) == tuple(arr[-1, -1, -3:])
+        assert tuple(arr[-1, 0, 31:34]) == (72, 86, 69)
+        assert tuple(arr[-1, 31, :3]) == (25, 4, 9)
+        assert tuple(arr[-1, -1, -3:]) == (227, 300, 147)
 
     def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
@@ -562,24 +558,25 @@ class TestNumpy_RLEHandler:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_16_3_1F)
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u2'
         assert np.array_equal(ds.pixel_array, ref)
 
-        assert (65535, 0, 0) == tuple(arr[5, 50, :])
-        assert (65535, 32896, 32896) == tuple(arr[15, 50, :])
-        assert (0, 65535, 0) == tuple(arr[25, 50, :])
-        assert (32896, 65535, 32896) == tuple(arr[35, 50, :])
-        assert (0, 0, 65535) == tuple(arr[45, 50, :])
-        assert (32896, 32896, 65535) == tuple(arr[55, 50, :])
-        assert (0, 0, 0) == tuple(arr[65, 50, :])
-        assert (16448, 16448, 16448) == tuple(arr[75, 50, :])
-        assert (49344, 49344, 49344) == tuple(arr[85, 50, :])
-        assert (65535, 65535, 65535) == tuple(arr[95, 50, :])
+        assert tuple(arr[5, 50, :]) == (65535, 0, 0)
+        assert tuple(arr[15, 50, :]) == (65535, 32896, 32896)
+        assert tuple(arr[25, 50, :]) == (0, 65535, 0)
+        assert tuple(arr[35, 50, :]) == (32896, 65535, 32896)
+        assert tuple(arr[45, 50, :]) == (0, 0, 65535)
+        assert tuple(arr[55, 50, :]) == (32896, 32896, 65535)
+        assert tuple(arr[65, 50, :]) == (0, 0, 0)
+        assert tuple(arr[75, 50, :]) == (16448, 16448, 16448)
+        assert tuple(arr[85, 50, :]) == (49344, 49344, 49344)
+        assert tuple(arr[95, 50, :]) == (65535, 65535, 65535)
 
     def test_pixel_array_16bit_3sample_2f(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
@@ -588,25 +585,26 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
+        assert ds.PixelRepresentation == 0
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_16_3_2F)
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u2'
         assert np.array_equal(ds.pixel_array, ref)
 
         # Frame 1
         frame = arr[0]
-        assert (65535, 0, 0) == tuple(frame[5, 50, :])
-        assert (65535, 32896, 32896) == tuple(frame[15, 50, :])
-        assert (0, 65535, 0) == tuple(frame[25, 50, :])
-        assert (32896, 65535, 32896) == tuple(frame[35, 50, :])
-        assert (0, 0, 65535) == tuple(frame[45, 50, :])
-        assert (32896, 32896, 65535) == tuple(frame[55, 50, :])
-        assert (0, 0, 0) == tuple(frame[65, 50, :])
-        assert (16448, 16448, 16448) == tuple(frame[75, 50, :])
-        assert (49344, 49344, 49344) == tuple(frame[85, 50, :])
-        assert (65535, 65535, 65535) == tuple(frame[95, 50, :])
+        assert tuple(frame[5, 50, :]) == (65535, 0, 0)
+        assert tuple(frame[15, 50, :]) == (65535, 32896, 32896)
+        assert tuple(frame[25, 50, :]) == (0, 65535, 0)
+        assert tuple(frame[35, 50, :]) == (32896, 65535, 32896)
+        assert tuple(frame[45, 50, :]) == (0, 0, 65535)
+        assert tuple(frame[55, 50, :]) == (32896, 32896, 65535)
+        assert tuple(frame[65, 50, :]) == (0, 0, 0)
+        assert tuple(frame[75, 50, :]) == (16448, 16448, 16448)
+        assert tuple(frame[85, 50, :]) == (49344, 49344, 49344)
+        assert tuple(frame[95, 50, :]) == (65535, 65535, 65535)
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
@@ -617,17 +615,19 @@ class TestNumpy_RLEHandler:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
+        assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         ref = _get_pixel_array(EXPL_32_1_1F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u4'
         assert np.array_equal(arr, ref)
-        assert (10, 10) == arr.shape
-        assert (1249000, 1249000, 1250000) == tuple(arr[0, :3])
-        assert (1031000, 1029000, 1027000) == tuple(arr[4, 3:6])
-        assert (803000, 801000, 798000) == tuple(arr[-1, -3:])
+        assert arr.shape == (10, 10)
+
+        assert tuple(arr[0, :3]) == (1249000, 1249000, 1250000)
+        assert tuple(arr[4, 3:6]) == (1031000, 1029000, 1027000)
+        assert tuple(arr[-1, -3:]) == (803000, 801000, 798000)
 
     def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
@@ -636,28 +636,29 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 15
+        assert ds.PixelRepresentation == 0
         ref = _get_pixel_array(EXPL_32_1_15F)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u4'
         assert np.array_equal(arr, ref)
-        assert (15, 10, 10) == arr.shape
+        assert arr.shape == (15, 10, 10)
 
         # Frame 1
-        assert (1249000, 1249000, 1250000) == tuple(arr[0, 0, :3])
-        assert (1031000, 1029000, 1027000) == tuple(arr[0, 4, 3:6])
-        assert (803000, 801000, 798000) == tuple(arr[0, -1, -3:])
+        assert tuple(arr[0, 0, :3]) == (1249000, 1249000, 1250000)
+        assert tuple(arr[0, 4, 3:6]) == (1031000, 1029000, 1027000)
+        assert tuple(arr[0, -1, -3:]) == (803000, 801000, 798000)
 
         # Frame 8
-        assert (1253000, 1253000, 1249000) == tuple(arr[7, 0, :3])
-        assert (1026000, 1023000, 1022000) == tuple(arr[7, 4, 3:6])
-        assert (803000, 803000, 803000) == tuple(arr[7, -1, -3:])
+        assert tuple(arr[7, 0, :3]) == (1253000, 1253000, 1249000)
+        assert tuple(arr[7, 4, 3:6]) == (1026000, 1023000, 1022000)
+        assert tuple(arr[7, -1, -3:]) == (803000, 803000, 803000)
 
         # Frame 15
-        assert (1249000, 1250000, 1251000) == tuple(arr[-1, 0, :3])
-        assert (1031000, 1031000, 1031000) == tuple(arr[-1, 4, 3:6])
-        assert (801000, 800000, 799000) == tuple(arr[-1, -1, -3:])
+        assert tuple(arr[-1, 0, :3]) == (1249000, 1250000, 1251000)
+        assert tuple(arr[-1, 4, 3:6]) == (1031000, 1031000, 1031000)
+        assert tuple(arr[-1, -1, -3:]) == (801000, 800000, 799000)
 
     def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
@@ -665,24 +666,25 @@ class TestNumpy_RLEHandler:
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
+        assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_32_3_1F)
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u4'
         assert np.array_equal(ds.pixel_array, ref)
 
-        assert (4294967295, 0, 0) == tuple(arr[5, 50, :])
-        assert (4294967295, 2155905152, 2155905152) == tuple(arr[15, 50, :])
-        assert (0, 4294967295, 0) == tuple(arr[25, 50, :])
-        assert (2155905152, 4294967295, 2155905152) == tuple(arr[35, 50, :])
-        assert (0, 0, 4294967295) == tuple(arr[45, 50, :])
-        assert (2155905152, 2155905152, 4294967295) == tuple(arr[55, 50, :])
-        assert (0, 0, 0) == tuple(arr[65, 50, :])
-        assert (1077952576, 1077952576, 1077952576) == tuple(arr[75, 50, :])
-        assert (3233857728, 3233857728, 3233857728) == tuple(arr[85, 50, :])
-        assert (4294967295, 4294967295, 4294967295) == tuple(arr[95, 50, :])
+        assert tuple(arr[5, 50, :]) == (4294967295, 0, 0)
+        assert tuple(arr[15, 50, :]) == (4294967295, 2155905152, 2155905152)
+        assert tuple(arr[25, 50, :]) == (0, 4294967295, 0)
+        assert tuple(arr[35, 50, :]) == (2155905152, 4294967295, 2155905152)
+        assert tuple(arr[45, 50, :]) == (0, 0, 4294967295)
+        assert tuple(arr[55, 50, :]) == (2155905152, 2155905152, 4294967295)
+        assert tuple(arr[65, 50, :]) == (0, 0, 0)
+        assert tuple(arr[75, 50, :]) == (1077952576, 1077952576, 1077952576)
+        assert tuple(arr[85, 50, :]) == (3233857728, 3233857728, 3233857728)
+        assert tuple(arr[95, 50, :]) == (4294967295, 4294967295, 4294967295)
 
     def test_pixel_array_32bit_3sample_2f(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
@@ -691,24 +693,25 @@ class TestNumpy_RLEHandler:
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
+        assert ds.PixelRepresentation == 0
         arr = ds.pixel_array
         ref = _get_pixel_array(EXPL_32_3_2F)
 
         assert arr.flags.writeable
-
+        assert arr.dtype == '<u4'
         assert np.array_equal(ds.pixel_array, ref)
 
         # Frame 1
-        assert (4294967295, 0, 0) == tuple(arr[0, 5, 50, :])
-        assert (4294967295, 2155905152, 2155905152) == tuple(arr[0, 15, 50, :])
-        assert (0, 4294967295, 0) == tuple(arr[0, 25, 50, :])
-        assert (2155905152, 4294967295, 2155905152) == tuple(arr[0, 35, 50, :])
-        assert (0, 0, 4294967295) == tuple(arr[0, 45, 50, :])
-        assert (2155905152, 2155905152, 4294967295) == tuple(arr[0, 55, 50, :])
-        assert (0, 0, 0) == tuple(arr[0, 65, 50, :])
-        assert (1077952576, 1077952576, 1077952576) == tuple(arr[0, 75, 50, :])
-        assert (3233857728, 3233857728, 3233857728) == tuple(arr[0, 85, 50, :])
-        assert (4294967295, 4294967295, 4294967295) == tuple(arr[0, 95, 50, :])
+        assert tuple(arr[0, 5, 50, :]) == (4294967295, 0, 0)
+        assert tuple(arr[0, 15, 50, :]) == (4294967295, 2155905152, 2155905152)
+        assert tuple(arr[0, 25, 50, :]) == (0, 4294967295, 0)
+        assert tuple(arr[0, 35, 50, :]) == (2155905152, 4294967295, 2155905152)
+        assert tuple(arr[0, 45, 50, :]) == (0, 0, 4294967295)
+        assert tuple(arr[0, 55, 50, :]) == (2155905152, 2155905152, 4294967295)
+        assert tuple(arr[0, 65, 50, :]) == (0, 0, 0)
+        assert tuple(arr[0, 75, 50, :]) == (1077952576, 1077952576, 1077952576)
+        assert tuple(arr[0, 85, 50, :]) == (3233857728, 3233857728, 3233857728)
+        assert tuple(arr[0, 95, 50, :]) == (4294967295, 4294967295, 4294967295)
 
         # Frame 2 is frame 1 inverted
         assert np.array_equal((2**ds.BitsAllocated - 1) - arr[1], arr[0])
@@ -736,8 +739,8 @@ class TestNumpy_GetPixelData:
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
         ds = dcmread(EXPL_16_1_1F)
-        with pytest.raises(NotImplementedError,
-                           match='syntax is not supported by the RLE pixel'):
+        msg = r'syntax is not supported by the RLE pixel'
+        with pytest.raises(NotImplementedError, match=msg):
             get_pixeldata(ds)
 
     def test_change_photometric_interpretation(self):
@@ -774,20 +777,22 @@ class TestNumpy_GetPixelData:
         # Big endian
         arr = get_pixeldata(ds, rle_segment_order='>')
         arr = reshape_pixel_array(ds, arr)
+        assert arr.dtype == '<i2'
 
-        assert (64, 64) == arr.shape
-        assert (422, 319, 361) == tuple(arr[0, 31:34])
-        assert (366, 363, 322) == tuple(arr[31, :3])
-        assert (1369, 1129, 862) == tuple(arr[-1, -3:])
+        assert arr.shape == (64, 64)
+        assert tuple(arr[0, 31:34]) == (422, 319, 361)
+        assert tuple(arr[31, :3]) == (366, 363, 322)
+        assert tuple(arr[-1, -3:]) == (1369, 1129, 862)
 
         # Little endian
         arr = get_pixeldata(ds, rle_segment_order='<')
         arr = reshape_pixel_array(ds, arr)
+        assert arr.dtype == '<i2'
 
-        assert (64, 64) == arr.shape
-        assert (-23039, 16129, 26881) == tuple(arr[0, 31:34])
-        assert (28161, 27393, 16897) == tuple(arr[31, :3])
-        assert (22789, 26884, 24067) == tuple(arr[-1, -3:])
+        assert arr.shape == (64, 64)
+        assert tuple(arr[0, 31:34]) == (-23039, 16129, 26881)
+        assert tuple(arr[31, :3]) == (28161, 27393, 16897)
+        assert tuple(arr[-1, -3:]) == (22789, 26884, 24067)
 
 
 # RLE encodes data by first splitting a frame into 8-bit segments
@@ -826,8 +831,8 @@ class TestNumpy_RLEParseHeader:
     def test_invalid_header_length(self):
         """Test exception raised if header is not 64 bytes long."""
         for length in [0, 1, 63, 65]:
-            with pytest.raises(ValueError,
-                               match='RLE header can only be 64 bytes long'):
+            msg = r'RLE header can only be 64 bytes long'
+            with pytest.raises(ValueError, match=msg):
                 _parse_rle_header(b'\x00' * length)
 
     def test_invalid_nr_segments_raises(self):
@@ -846,7 +851,7 @@ class TestNumpy_RLEParseHeader:
         header.extend(b'\x00' * (64 - len(header)))
 
         assert len(header) == 64
-        assert offsets == _parse_rle_header(header)
+        assert _parse_rle_header(header) == offsets
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
@@ -872,47 +877,46 @@ class TestNumpy_RLEDecodeFrame:
             r"expected amount \({} vs. {} segments\)".format(actual, expected)
         )
         with pytest.raises(ValueError, match=msg):
-            _rle_decode_frame(header,
-                              rows=1,
-                              columns=1,
-                              nr_samples=samples,
-                              nr_bits=bits)
+            _rle_decode_frame(
+                header, rows=1, columns=1, nr_samples=samples, nr_bits=bits
+            )
 
     def test_invalid_frame_data_raises(self):
         """Test that invalid segment data raises exception."""
         ds = dcmread(RLE_16_1_1F)
         pixel_data = defragment_data(ds.PixelData)
         # Missing byte
-        with pytest.raises(ValueError,
-                           match=r'amount \(4095 vs. 4096 bytes\)'):
-            _rle_decode_frame(pixel_data[:-1],
-                              ds.Rows,
-                              ds.Columns,
-                              ds.SamplesPerPixel,
-                              ds.BitsAllocated)
+        msg = r"amount \(4095 vs. 4096 bytes\)"
+        with pytest.raises(ValueError, match=msg):
+            _rle_decode_frame(
+                pixel_data[:-1],
+                ds.Rows,
+                ds.Columns,
+                ds.SamplesPerPixel,
+                ds.BitsAllocated
+            )
 
         # Extra byte
-        with pytest.raises(ValueError,
-                           match=r'amount \(4097 vs. 4096 bytes\)'):
-            _rle_decode_frame(pixel_data + b'\x00\x01',
-                              ds.Rows,
-                              ds.Columns,
-                              ds.SamplesPerPixel,
-                              ds.BitsAllocated)
+        msg = r'amount \(4097 vs. 4096 bytes\)'
+        with pytest.raises(ValueError, match=msg):
+            _rle_decode_frame(
+                pixel_data + b'\x00\x01',
+                ds.Rows,
+                ds.Columns,
+                ds.SamplesPerPixel,
+                ds.BitsAllocated
+            )
 
     def test_8bit_1sample(self):
         """Test decoding 8-bit, 1 sample/pixel."""
-        header = (
-            b'\x01\x00\x00\x00'
-            b'\x40\x00\x00\x00'
-        )
+        header = b'\x01\x00\x00\x00\x40\x00\x00\x00'
         header += (64 - len(header)) * b'\x00'
         # 2 x 3 data
         # 0, 64, 128, 160, 192, 255
         data = b'\x05\x00\x40\x80\xA0\xC0\xFF'
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 8)
-        arr = np.frombuffer(decoded, np.dtype('>u1'))
-        assert [0, 64, 128, 160, 192, 255] == arr.tolist()
+        arr = np.frombuffer(decoded, np.dtype('|u1'))
+        assert arr.tolist() == [0, 64, 128, 160, 192, 255]
 
     def test_8bit_3sample(self):
         """Test decoding 8-bit, 3 sample/pixel."""
@@ -931,11 +935,11 @@ class TestNumpy_RLEDecodeFrame:
             b'\x05\x01\x40\x80\xA0\xC0\xFE'  # G
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 8)
-        arr = np.frombuffer(decoded, np.dtype('>u1'))
+        arr = np.frombuffer(decoded, np.dtype('|u1'))
         # Ordered all R, all G, all B
-        assert [0, 64, 128, 160, 192, 255] == arr[:6].tolist()
-        assert [255, 192, 128, 64, 0, 255] == arr[6:12].tolist()
-        assert [1, 64, 128, 160, 192, 254] == arr[12:].tolist()
+        assert arr[:6].tolist() == [0, 64, 128, 160, 192, 255]
+        assert arr[6:12].tolist() == [255, 192, 128, 64, 0, 255]
+        assert arr[12:].tolist() == [1, 64, 128, 160, 192, 254]
 
     def test_16bit_1sample(self):
         """Test decoding 16-bit, 1 sample/pixel."""
@@ -952,8 +956,8 @@ class TestNumpy_RLEDecodeFrame:
             b'\x05\x00\x01\x00\xFF\x00\xFF'  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 16)
-        arr = np.frombuffer(decoded, np.dtype('>u2'))
-        assert [0, 1, 256, 255, 65280, 65535] == arr.tolist()
+        arr = np.frombuffer(decoded, np.dtype('<u2'))
+        assert arr.tolist() == [0, 1, 256, 255, 65280, 65535]
 
     def test_16bit_3sample(self):
         """Test decoding 16-bit, 3 sample/pixel."""
@@ -978,10 +982,10 @@ class TestNumpy_RLEDecodeFrame:
             b'\x05\x01\x01\x00\xFF\x00\xFE'  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 16)
-        arr = np.frombuffer(decoded, np.dtype('>u2'))
-        assert [0, 1, 256, 255, 65280, 65535] == arr[:6].tolist()
-        assert [65535, 1, 256, 255, 65280, 0] == arr[6:12].tolist()
-        assert [1, 1, 256, 255, 65280, 65534] == arr[12:].tolist()
+        arr = np.frombuffer(decoded, np.dtype('<u2'))
+        assert arr[:6].tolist() == [0, 1, 256, 255, 65280, 65535]
+        assert arr[6:12].tolist() == [65535, 1, 256, 255, 65280, 0]
+        assert arr[12:].tolist() == [1, 1, 256, 255, 65280, 65534]
 
     def test_32bit_1sample(self):
         """Test decoding 32-bit, 1 sample/pixel."""
@@ -1002,8 +1006,8 @@ class TestNumpy_RLEDecodeFrame:
             b'\x05\x00\x00\x00\x00\x01\xFF'  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 1, 32)
-        arr = np.frombuffer(decoded, np.dtype('>u4'))
-        assert [0, 16777216, 65536, 256, 1, 4294967295] == arr.tolist()
+        arr = np.frombuffer(decoded, np.dtype('<u4'))
+        assert arr.tolist() == [0, 16777216, 65536, 256, 1, 4294967295]
 
     def test_32bit_3sample(self):
         """Test decoding 32-bit, 3 sample/pixel."""
@@ -1040,10 +1044,10 @@ class TestNumpy_RLEDecodeFrame:
             b'\x05\x01\x00\x00\x00\x01\xFE'  # LSB
         )
         decoded = _rle_decode_frame(header + data, 2, 3, 3, 32)
-        arr = np.frombuffer(decoded, np.dtype('>u4'))
-        assert [0, 16777216, 65536, 256, 1, 4294967295] == arr[:6].tolist()
-        assert [4294967295, 16777216, 65536, 256, 1, 0] == arr[6:12].tolist()
-        assert [1, 16777216, 65536, 256, 1, 4294967294] == arr[12:].tolist()
+        arr = np.frombuffer(decoded, np.dtype('<u4'))
+        assert arr[:6].tolist() == [0, 16777216, 65536, 256, 1, 4294967295]
+        assert arr[6:12].tolist() == [4294967295, 16777216, 65536, 256, 1, 0]
+        assert arr[12:].tolist() == [1, 16777216, 65536, 256, 1, 4294967294]
 
 
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
@@ -1077,7 +1081,7 @@ class TestNumpy_RLEDecodeSegment:
         # For n == 128, do nothing
         # data is only noop, 0x80 = 128
         data = b'\x80\x80\x80'
-        assert b'' == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b''
 
         # noop at start, data after
         data = (
@@ -1086,10 +1090,10 @@ class TestNumpy_RLEDecodeSegment:
             b'\xFE\x01'  # Copy
             b'\x80'
         )
-        assert (
+        assert bytes(_rle_decode_segment(data)) == (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_segment(data))
+        )
 
         # data at start, noop middle, data at end
         data = (
@@ -1098,10 +1102,10 @@ class TestNumpy_RLEDecodeSegment:
             b'\xFE\x01'  # Copy
             b'\x80'
         )
-        assert (
+        assert bytes(_rle_decode_segment(data)) == (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_segment(data))
+        )
 
         # data at start, noop end
         # Copy 6 bytes literally, then 3 x 0x01
@@ -1110,556 +1114,33 @@ class TestNumpy_RLEDecodeSegment:
             b'\xFE\x01'
             b'\x80'
         )
-        assert (
+        assert bytes(_rle_decode_segment(data)) == (
             b'\x01\x02\x03\x04\x05\x06'
             b'\x01\x01\x01'
-        ) == bytes(_rle_decode_segment(data))
+        )
 
     def test_literal(self):
         """Test literal output."""
         # For n < 128, read the next (n + 1) bytes literally
         # n = 0 (0x80 is 128 -> no operation)
         data = b'\x00\x02\x80'
-        assert b'\x02' == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b'\x02'
         # n = 1
         data = b'\x01\x02\x03\x80'
-        assert b'\x02\x03' == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b'\x02\x03'
         # n = 127
         data = b'\x7f' + b'\x40' * 128 + b'\x80'
-        assert b'\x40' * 128 == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b'\x40' * 128
 
     def test_copy(self):
         """Test copy output."""
         # For n > 128, copy the next byte (257 - n) times
         # n = 255, copy x2 (0x80 is 128 -> no operation)
         data = b'\xFF\x02\x80'
-        assert b'\x02\x02' == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b'\x02\x02'
         # n = 254, copy x3
         data = b'\xFE\x02\x80'
-        assert b'\x02\x02\x02' == bytes(_rle_decode_segment(data))
+        assert bytes(_rle_decode_segment(data)) == b'\x02\x02\x02'
         # n = 129, copy x128
         data = b'\x81\x02\x80'
-        assert b'\x02' * 128 == bytes(_rle_decode_segment(data))
-
-
-# Tests for RLE encoding
-REFERENCE_ENCODE_ROW = [
-    # Input, output
-    ([], b''),
-    # Replicate run tests
-    # 2 (min) replicate
-    ([0] * 2, b'\xff\x00'),
-    ([0] * 3, b'\xfe\x00'),
-    ([0] * 64, b'\xc1\x00'),
-    ([0] * 127, b'\x82\x00'),
-    # 128 (max) replicate
-    ([0] * 128, b'\x81\x00'),
-    # 128 (max) replicate, 1 (min) literal
-    ([0] * 129, b'\x81\x00\x00\x00'),
-    # 128 (max) replicate, 2 (min) replicate
-    ([0] * 130, b'\x81\x00\xff\x00'),
-    # 128 (max) x 5 replicates
-    ([0] * 128 * 5, b'\x81\x00' * 5),
-    # Literal run tests
-    # 1 (min) literal
-    ([0], b'\x00\x00'),
-    ([0, 1], b'\x01\x00\x01'),
-    ([0, 1, 2], b'\x02\x00\x01\x02'),
-    ([0, 1] * 32, b'\x3f' + b'\x00\x01' * 32),
-    # 127 literal
-    ([0, 1] * 63 + [2], b'\x7e' + b'\x00\x01' * 63 + b'\x02'),
-    # 128 literal (max)
-    ([0, 1] * 64, b'\x7f' + b'\x00\x01' * 64),
-    # 128 (max) literal, 1 (min) literal
-    ([0, 1] * 64 + [2], b'\x7f' + b'\x00\x01' * 64 + b'\x00\x02'),
-    # 128 (max) x 5 literals
-    ([0, 1] * 64 * 5, (b'\x7f' + b'\x00\x01' * 64) * 5),
-    # Combination run tests
-    # 1 (min) literal, 1 (min) replicate
-    ([0, 1, 1], b'\x00\x00\xff\x01'),
-    # 1 (min) literal, 128 (max) replicate
-    ([0] + [1] * 128, b'\x00\x00\x81\x01'),
-    # 128 (max) literal, 2 (min) replicate
-    ([0, 1] * 64 + [2] * 2, b'\x7f' + b'\x00\x01' * 64 + b'\xff\x02'),
-    # 128 (max) literal, 128 (max) replicate
-    ([0, 1] * 64 + [2] * 128, b'\x7f' + b'\x00\x01' * 64 + b'\x81\x02'),
-    # 2 (min) replicate, 1 (min) literal
-    ([0, 0, 1], b'\xff\x00\x00\x01'),
-    # 2 (min) replicate, 128 (max) literal
-    ([0, 0] + [1, 2] * 64, b'\xff\x00\x7f' + b'\x01\x02' * 64),
-    # 128 (max) replicate, 1 (min) literal
-    ([0] * 128 + [1], b'\x81\x00\x00\x01'),
-    # 128 (max) replicate, 128 (max) literal
-    ([0] * 128 + [1, 2] * 64, b'\x81\x00\x7f' + b'\x01\x02' * 64),
-]
-
-
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeRow:
-    """Tests for rle_handler._rle_encode_row."""
-    @pytest.mark.parametrize('input, output', REFERENCE_ENCODE_ROW)
-    def test_encode(self, input, output):
-        """Test encoding an empty row."""
-        assert output == _rle_encode_row(np.asarray(input))
-
-
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeFrame:
-    """Tests for rle_handler.rle_encode_frame."""
-    def setup(self):
-        """Setup the tests."""
-        # Create a dataset skeleton for use in the cycle tests
-        ds = Dataset()
-        ds.file_meta = FileMetaDataset()
-        ds.file_meta.TransferSyntaxUID = '1.2.840.10008.1.2'
-        ds.Rows = 2
-        ds.Columns = 4
-        ds.SamplesPerPixel = 3
-        ds.PlanarConfiguration = 1
-        self.ds = ds
-
-    def test_cycle_8bit_1sample(self):
-        """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_8_1_1F)
-        ref = ds.pixel_array
-        assert 8 == ds.BitsAllocated
-        assert 1 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint8').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_cycle_8bit_3sample(self):
-        """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_8_3_1F)
-        ref = ds.pixel_array
-        assert 8 == ds.BitsAllocated
-        assert 3 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        arr = np.frombuffer(decoded, 'uint8')
-        # The decoded data is planar configuration 1
-        ds.PlanarConfiguration = 1
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_cycle_16bit_1sample(self):
-        """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_16_1_1F)
-        ref = ds.pixel_array
-        assert 16 == ds.BitsAllocated
-        assert 1 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint16').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_cycle_16bit_3sample(self):
-        """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_16_3_1F)
-        ref = ds.pixel_array
-        assert 16 == ds.BitsAllocated
-        assert 3 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint16').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
-        # The decoded data is planar configuration 1
-        ds.PlanarConfiguration = 1
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_cycle_32bit_1sample(self):
-        """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_32_1_1F)
-        ref = ds.pixel_array
-        assert 32 == ds.BitsAllocated
-        assert 1 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint32').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_cycle_32bit_3sample(self):
-        """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_32_3_1F)
-        ref = ds.pixel_array
-        assert 32 == ds.BitsAllocated
-        assert 3 == ds.SamplesPerPixel
-
-        encoded = rle_encode_frame(ref)
-        decoded = _rle_decode_frame(encoded, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        dtype = np.dtype('uint32').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype)
-        # The decoded data is planar configuration 1
-        ds.PlanarConfiguration = 1
-        arr = reshape_pixel_array(ds, arr)
-
-        assert np.array_equal(ref, arr)
-
-    def test_16_segments_raises(self):
-        """Test that trying to encode 16-segments raises exception."""
-        arr = np.asarray([[[1, 2, 3, 4]]], dtype='uint32')
-        assert (1, 1, 4) == arr.shape
-        assert 4 == arr.dtype.itemsize
-
-        msg = (
-            r"Unable to encode as the DICOM standard only allows "
-            r"a maximum of 15 segments in RLE encoded data"
-        )
-        with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(arr)
-
-    def test_15_segment(self):
-        """Test encoding 15-segments works as expected."""
-        arr = np.asarray(
-            [[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]]],
-            dtype='uint8'
-        )
-        assert (1, 1, 15) == arr.shape
-        assert 1 == arr.dtype.itemsize
-
-        encoded = rle_encode_frame(arr)
-        header = (
-            b'\x0f\x00\x00\x00'
-            b'\x40\x00\x00\x00'
-            b'\x42\x00\x00\x00'
-            b'\x44\x00\x00\x00'
-            b'\x46\x00\x00\x00'
-            b'\x48\x00\x00\x00'
-            b'\x4a\x00\x00\x00'
-            b'\x4c\x00\x00\x00'
-            b'\x4e\x00\x00\x00'
-            b'\x50\x00\x00\x00'
-            b'\x52\x00\x00\x00'
-            b'\x54\x00\x00\x00'
-            b'\x56\x00\x00\x00'
-            b'\x58\x00\x00\x00'
-            b'\x5a\x00\x00\x00'
-            b'\x5c\x00\x00\x00'
-        )
-        assert header == encoded[:64]
-        assert (
-            b'\x00\x01\x00\x02\x00\x03\x00\x04\x00\x05\x00\x06'
-            b'\x00\x07\x00\x08\x00\x09\x00\x0a\x00\x0b\x00\x0c'
-            b'\x00\x0d\x00\x0e\x00\x0f'
-        ) == encoded[64:]
-
-    def test_encoding_multiple_frames_raises(self):
-        """Test encoding multiple framed pixel data raises exception."""
-        # Note: only works with multi-sample data
-        ds = dcmread(EXPL_8_3_2F)
-        arr = ds.pixel_array
-        assert ds.NumberOfFrames > 1
-        assert len(arr.shape) == 4
-        msg = (
-            r"Unable to encode multiple frames at once, please encode one "
-            r"frame at a time"
-        )
-        with pytest.raises(ValueError, match=msg):
-            rle_encode_frame(arr)
-
-    def test_single_row_1sample(self):
-        """Test encoding a single row of 1 sample/pixel data."""
-        # Rows 1, Columns 5, SamplesPerPixel 1
-        arr = np.asarray([[0, 1, 2, 3, 4]], dtype='uint8')
-        assert (1, 5) == arr.shape
-        encoded = rle_encode_frame(arr)
-        header = b'\x01\x00\x00\x00\x40\x00\x00\x00' + b'\x00' * 56
-        assert header == encoded[:64]
-        assert b'\x04\x00\x01\x02\x03\x04' == encoded[64:]
-
-    def test_single_row_3sample(self):
-        """Test encoding a single row of 3 samples/pixel data."""
-        # Rows 1, Columns 5, SamplesPerPixel 3
-        arr = np.asarray(
-            [[[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [4, 4, 4]]],
-            dtype='uint8'
-        )
-        assert (1, 5, 3) == arr.shape
-        encoded = rle_encode_frame(arr)
-        header = (
-            b'\x03\x00\x00\x00'
-            b'\x40\x00\x00\x00'
-            b'\x46\x00\x00\x00'
-            b'\x4c\x00\x00\x00'
-        )
-        header += b'\x00' * (64 - len(header))
-        assert header == encoded[:64]
-        assert (
-            b'\x04\x00\x01\x02\x03\x04'
-            b'\x04\x00\x01\x02\x03\x04'
-            b'\x04\x00\x01\x02\x03\x04'
-        ) == encoded[64:]
-
-
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodePlane:
-    """Tests for rle_handler._rle_encode_plane."""
-    def test_8bit(self):
-        """Test encoding an 8-bit plane into 1 segment."""
-        ds = dcmread(RLE_8_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
-        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
-        # Re-encode the decoded data
-        encoded = bytearray()
-        nr_segments = 0
-        for segment in _rle_encode_plane(arr):
-            encoded.extend(segment)
-            nr_segments += 1
-
-        # Add header
-        header = b'\x01\x00\x00\x00\x40\x00\x00\x00'
-        header += b'\x00' * (64 - len(header))
-
-        assert 1 == nr_segments
-
-        # Decode the re-encoded data and check that it's the same
-        redecoded = _rle_decode_frame(header + encoded,
-                                      ds.Rows, ds.Columns,
-                                      ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.SamplesPerPixel == len(redecoded)
-        assert decoded == redecoded
-
-    def test_16bit(self):
-        """Test encoding a 16-bit plane into 2 segments."""
-        ds = dcmread(RLE_16_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
-
-        # `decoded` is in big endian byte ordering
-        dtype = np.dtype('uint16').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
-
-        # Re-encode the decoded data
-        encoded = bytearray()
-        nr_segments = 0
-        offsets = [64]
-        for segment in _rle_encode_plane(arr):
-            offsets.append(offsets[nr_segments] + len(segment))
-            encoded.extend(segment)
-            nr_segments += 1
-
-        assert 2 == nr_segments
-
-        # Add header
-        header = b'\x02\x00\x00\x00'
-        header += pack('<2L', *offsets[:-1])
-        header += b'\x00' * (64 - len(header))
-
-        # Decode the re-encoded data and check that it's the same
-        redecoded = _rle_decode_frame(header + encoded,
-                                      ds.Rows, ds.Columns,
-                                      ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
-        assert decoded == redecoded
-
-    def test_16bit_segment_order(self):
-        """Test that the segment order per 16-bit sample is correct."""
-        # Native byte ordering
-        data = b'\x00\x00\x01\xFF\xFE\x00\xFF\xFF\x10\x12'
-        dtype = np.dtype('uint16')
-        arr = np.frombuffer(data, dtype)
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 2 == len(segments)
-
-        # Each segment should start with a literal run marker of 0x04
-        # and MSB should be first segment, then LSB in second
-        if sys.byteorder == 'little':
-            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
-            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
-        else:
-            assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
-            assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
-
-        # Little endian
-        arr = np.frombuffer(data, dtype.newbyteorder('<'))
-        assert [0, 65281, 254, 65535, 4624] == arr.tolist()
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 2 == len(segments)
-        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[0]
-        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[1]
-
-        # Big endian
-        arr = np.frombuffer(data, dtype.newbyteorder('>'))
-        assert [0, 511, 65024, 65535, 4114] == arr.tolist()
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 2 == len(segments)
-        assert b'\x04\x00\x01\xFE\xFF\x10' == segments[0]
-        assert b'\x04\x00\xFF\x00\xFF\x12' == segments[1]
-
-    def test_32bit(self):
-        """Test encoding a 32-bit plane into 4 segments."""
-        ds = dcmread(RLE_32_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_frame(pixel_data, ds.Rows, ds.Columns,
-                                    ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(decoded)
-
-        # `decoded` is in big endian byte ordering
-        dtype = np.dtype('uint32').newbyteorder('>')
-        arr = np.frombuffer(decoded, dtype).reshape(ds.Rows, ds.Columns)
-
-        # Re-encode the decoded data
-        encoded = bytearray()
-        nr_segments = 0
-        offsets = [64]
-        for segment in _rle_encode_plane(arr):
-            offsets.append(offsets[nr_segments] + len(segment))
-            encoded.extend(segment)
-            nr_segments += 1
-
-        assert 4 == nr_segments
-
-        # Add header
-        header = b'\x04\x00\x00\x00'
-        header += pack('<4L', *offsets[:-1])
-        header += b'\x00' * (64 - len(header))
-
-        # Decode the re-encoded data and check that it's the same
-        redecoded = _rle_decode_frame(header + encoded,
-                                      ds.Rows, ds.Columns,
-                                      ds.SamplesPerPixel, ds.BitsAllocated)
-        assert ds.Rows * ds.Columns * ds.BitsAllocated // 8 == len(redecoded)
-        assert decoded == redecoded
-
-    def test_32bit_segment_order(self):
-        """Test that the segment order per 32-bit sample is correct."""
-        # Native byte ordering
-        data = b'\x00\x00\x00\x00\x01\xFF\xFE\x0A\xFF\xFC\x10\x12'
-        dtype = np.dtype('uint32')
-        arr = np.frombuffer(data, dtype)
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 4 == len(segments)
-
-        # Each segment should start with a literal run marker of 0x02
-        if sys.byteorder == 'little':
-            assert b'\x02\x00\x0A\x12' == segments[0]
-            assert b'\x02\x00\xFE\x10' == segments[1]
-            assert b'\x02\x00\xFF\xFC' == segments[2]
-            assert b'\x02\x00\x01\xFF' == segments[3]
-        else:
-            assert b'\x02\x00\x01\xFF' == segments[0]
-            assert b'\x02\x00\xFF\xFC' == segments[1]
-            assert b'\x02\x00\xFE\x10' == segments[2]
-            assert b'\x02\x00\x0A\x12' == segments[3]
-
-        # Little endian
-        arr = np.frombuffer(data, dtype.newbyteorder('<'))
-        assert [0, 184483585, 303103231] == arr.tolist()
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 4 == len(segments)
-        assert b'\x02\x00\x0A\x12' == segments[0]
-        assert b'\x02\x00\xFE\x10' == segments[1]
-        assert b'\x02\x00\xFF\xFC' == segments[2]
-        assert b'\x02\x00\x01\xFF' == segments[3]
-
-        # Big endian
-        arr = np.frombuffer(data, dtype.newbyteorder('>'))
-        assert [0, 33553930, 4294709266] == arr.tolist()
-
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        assert 4 == len(segments)
-        assert b'\x02\x00\x01\xFF' == segments[0]
-        assert b'\x02\x00\xFF\xFC' == segments[1]
-        assert b'\x02\x00\xFE\x10' == segments[2]
-        assert b'\x02\x00\x0A\x12' == segments[3]
-
-    def test_padding(self):
-        """Test that odd length encoded segments are padded."""
-        data = b'\x00\x04\x01\x15'
-        arr = np.frombuffer(data, 'uint8')
-        segments = []
-        for segment in _rle_encode_plane(arr):
-            segments.append(segment)
-
-        # The segment should start with a literal run marker of 0x03
-        #   then 4 bytes of RLE encoded data, then 0x00 padding
-        assert b'\x03\x00\x04\x01\x15\x00' == segments[0]
-
-
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
-class TestNumpy_RLEEncodeSegment:
-    """Tests for rle_handler._rle_encode_segment."""
-    def test_one_row(self):
-        """Test encoding data that contains only a single row."""
-        ds = dcmread(RLE_8_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_segment(pixel_data[64:])
-        assert ds.Rows * ds.Columns == len(decoded)
-        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
-
-        # Re-encode a single row of the decoded data
-        row = arr[0]
-        assert (ds.Columns,) == row.shape
-        encoded = _rle_encode_segment(row)
-
-        # Decode the re-encoded data and check that it's the same
-        redecoded = _rle_decode_segment(encoded)
-        assert ds.Columns == len(redecoded)
-        assert decoded[:ds.Columns] == redecoded
-
-    def test_cycle(self):
-        """Test the decoded data remains the same after encoding/decoding."""
-        ds = dcmread(RLE_8_1_1F)
-        pixel_data = defragment_data(ds.PixelData)
-        decoded = _rle_decode_segment(pixel_data[64:])
-        assert ds.Rows * ds.Columns == len(decoded)
-        arr = np.frombuffer(decoded, 'uint8').reshape(ds.Rows, ds.Columns)
-        # Re-encode the decoded data
-        encoded = _rle_encode_segment(arr)
-
-        # Decode the re-encoded data and check that it's the same
-        redecoded = _rle_decode_segment(encoded)
-        assert ds.Rows * ds.Columns == len(redecoded)
-        assert decoded == redecoded
+        assert bytes(_rle_decode_segment(data)) == b'\x02' * 128

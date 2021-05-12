@@ -88,8 +88,7 @@ class TestRLELossless:
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
 
-        # The pydicom RLE decoder returns BE ordered data
-        arr = np.frombuffer(decoded, '>i2')
+        arr = np.frombuffer(decoded, '<i2')
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)
@@ -109,7 +108,7 @@ class TestRLELossless:
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
-        arr = np.frombuffer(decoded, '>u2')
+        arr = np.frombuffer(decoded, '<u2')
         # The decoded data is planar configuration 1
         ds.PlanarConfiguration = 1
         arr = reshape_pixel_array(ds, arr)
@@ -130,7 +129,7 @@ class TestRLELossless:
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
-        arr = np.frombuffer(decoded, '>u4')
+        arr = np.frombuffer(decoded, '<u4')
         arr = reshape_pixel_array(ds, arr)
 
         assert np.array_equal(ref, arr)
@@ -151,7 +150,7 @@ class TestRLELossless:
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
-        arr = np.frombuffer(decoded, '>u4')
+        arr = np.frombuffer(decoded, '<u4')
         # The decoded data is planar configuration 1
         ds.PlanarConfiguration = 1
         arr = reshape_pixel_array(ds, arr)
