@@ -1664,7 +1664,7 @@ class TestFileSet:
         assert fs._path is None
         assert uid != fs._uid
         assert fs._uid.is_valid
-        assert fs._ds is None
+        assert fs._ds == Dataset()
         assert fs._descriptor is None
         assert fs._charset is None
         assert [] == fs._tree.children
