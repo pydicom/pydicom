@@ -10,8 +10,8 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import (
-    Generator, Optional, Union, Any, BinaryIO, List, cast, Iterable, TypeVar,
-    NamedTuple, get_type_hints, Dict, Callable
+    Generator, Optional, Union, Any, List, cast, Iterable, TypeVar,
+    Dict, Callable
 )
 import warnings
 
@@ -169,10 +169,6 @@ def is_conformant_file_id(path: Path) -> bool:
     return False
 
 
-#"RecordNode" = TypeVar('"RecordNode"', bound=RecordNode)
-
-
-# Iterable provides the __iter__ method.
 class RecordNode(Iterable["RecordNode"]):
     """Representation of a DICOMDIR's directory record.
 
@@ -811,9 +807,8 @@ class FileInstance:
             return False
 
         if self["ReferencedFileID"].VM == 1:
-            return [self.ReferencedFileID] != cast(
-                str, self.FileID
-            ).split(os.path.sep)
+            file_id = cast(str, self.FileID).split(os.path.sep)
+            return [self.ReferencedFileID] != file_id
 
         return self.ReferencedFileID != self.FileID.split(os.path.sep)
 
