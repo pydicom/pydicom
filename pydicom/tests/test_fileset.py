@@ -473,7 +473,7 @@ class TestRecordNode:
 
         assert "ROOT" == str(root)
 
-        msg = r"'NoneType' object has no attribute 'DirectoryRecordType'"
+        msg = r"'RootNode' object has no attribute '_record'"
         with pytest.raises(AttributeError, match=msg):
             root.key
 

@@ -195,7 +195,7 @@ class RecordNode(Iterable["RecordNode"]):
         """
         self.children: List["RecordNode"] = []
         self.instance: Optional[FileInstance] = None
-        self._parent: "RecordNode" = None
+        self._parent: Optional["RecordNode"] = None
         self._record: Dataset
 
         if record:
@@ -455,7 +455,7 @@ class RecordNode(Iterable["RecordNode"]):
     @property
     def parent(self) -> "RecordNode":
         """Return the current node's parent (if it has one)."""
-        return self._parent
+        return cast("RecordNode", self._parent)
 
     @parent.setter
     def parent(self, node: "RecordNode") -> None:
@@ -684,10 +684,6 @@ class RootNode(RecordNode):
         super().__init__()
 
         self._fs = fs
-        self.children = []
-        self.instance = None
-        self._parent = None
-        self._record = None
 
     @property
     def file_set(self) -> "FileSet":
@@ -928,7 +924,10 @@ class FileInstance:
         if self.for_addition:
             return os.fspath(cast(Path, self._stage_path))
 
-        return os.fspath(Path(self.file_set.path) / self.node._file_id)
+        # If not staged for addition then File Set must exist on file system
+        return os.fspath(
+            cast(Path, self.file_set.path) / cast(Path, self.node._file_id)
+        )
 
     @property
     def SOPClassUID(self) -> UID:
@@ -1656,7 +1655,9 @@ class FileSet:
 
         self.clear()
         self._id = cast(Optional[str], ds.get("FileSetID", None))
-        uid = ds.file_meta.get("MediaStorageSOPInstanceUID")
+        uid = cast(
+            Optional[UID], ds.file_meta.get("MediaStorageSOPInstanceUID")
+        )
         if not uid:
             uid = generate_uid()
             ds.file_meta.MediaStorageSOPInstanceUID = uid
@@ -1683,13 +1684,14 @@ class FileSet:
                 continue
 
             try:
-                (self.path / file_id).resolve(strict=True)
+                # self.path is already set at this point
+                (cast(Path, self.path) / file_id).resolve(strict=True)
             except FileNotFoundError:
                 bad_instances.append(instance)
                 warnings.warn(
                     "The referenced SOP Instance for the directory record at "
                     f"offset {instance.node._offset} does not exist: "
-                    f"{self.path / file_id}"
+                    f"{cast(Path, self.path) / file_id}"
                 )
                 continue
             # If the instance's existing directory structure doesn't match
@@ -1795,7 +1797,8 @@ class FileSet:
             if file_id is None:
                 continue
 
-            path = Path(self.path) / file_id
+            # self.path is set for an existing File Set
+            path = cast(Path, self.path) / file_id
             if node.record_type == "PRIVATE":
                 instance = self.add_custom(path, node)
             else:
@@ -1805,7 +1808,7 @@ class FileSet:
             instance.node._record.ReferencedFileID = original_value
 
     @property
-    def path(self) -> Union[str, None]:
+    def path(self) -> Optional[str]:
         """Return the absolute path to the File-set root directory as
         :class:`str` (if set) or ``None`` otherwise.
         """
@@ -2085,7 +2088,7 @@ class FileSet:
             return
 
         # Path to the DICOMDIR file
-        p = self._path / 'DICOMDIR'
+        p = cast(Path, self._path) / 'DICOMDIR'
 
         # Re-use the existing directory structure if only moves or removals
         #   are required and `use_existing` is True
