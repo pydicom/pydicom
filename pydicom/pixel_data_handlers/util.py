@@ -3,7 +3,9 @@
 
 from struct import unpack
 from sys import byteorder
-from typing import Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast
+from typing import (
+    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast, Iterable
+)
 import warnings
 
 try:
@@ -16,7 +18,7 @@ from pydicom.data import get_palette_files
 from pydicom.uid import UID
 
 if TYPE_CHECKING:
-    from pydicom.dataset import Dataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 
 def apply_color_lut(
@@ -112,6 +114,8 @@ def apply_color_lut(
         except KeyError:
             raise ValueError("Unknown palette '{}'".format(palette))
 
+    ds = cast("Dataset", ds)
+
     # C.8.16.2.1.1.1: Supplemental Palette Color LUT
     # TODO: Requires greyscale visualisation pipeline
     if getattr(ds, 'PixelPresentation', None) in ['MIXED', 'COLOR']:
@@ -124,7 +128,7 @@ def apply_color_lut(
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 
     # All channels are supposed to be identical
-    lut_desc = ds.RedPaletteColorLookupTableDescriptor
+    lut_desc = cast(List[int], ds.RedPaletteColorLookupTableDescriptor)
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
 
@@ -137,22 +141,28 @@ def apply_color_lut(
     luts = []
     if 'RedPaletteColorLookupTableData' in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
-        r_lut = ds.RedPaletteColorLookupTableData
-        g_lut = ds.GreenPaletteColorLookupTableData
-        b_lut = ds.BluePaletteColorLookupTableData
-        a_lut = getattr(ds, 'AlphaPaletteColorLookupTableData', None)
+        r_lut = cast(bytes, ds.RedPaletteColorLookupTableData)
+        g_lut = cast(bytes, ds.GreenPaletteColorLookupTableData)
+        b_lut = cast(bytes, ds.BluePaletteColorLookupTableData)
+        a_lut = cast(
+            Optional[bytes],
+            getattr(ds, 'AlphaPaletteColorLookupTableData', None)
+        )
 
         actual_depth = len(r_lut) / nr_entries * 8
         dtype = np.dtype('uint{:.0f}'.format(actual_depth))
 
-        for lut in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
-            luts.append(np.frombuffer(lut, dtype=dtype))
+        for lut_bytes in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
+            luts.append(np.frombuffer(lut_bytes, dtype=dtype))
     elif 'SegmentedRedPaletteColorLookupTableData' in ds:
         # Segmented LUT Data is described by PS3.3, C.7.9.2
-        r_lut = ds.SegmentedRedPaletteColorLookupTableData
-        g_lut = ds.SegmentedGreenPaletteColorLookupTableData
-        b_lut = ds.SegmentedBluePaletteColorLookupTableData
-        a_lut = getattr(ds, 'SegmentedAlphaPaletteColorLookupTableData', None)
+        r_lut = cast(bytes, ds.SegmentedRedPaletteColorLookupTableData)
+        g_lut = cast(bytes, ds.SegmentedGreenPaletteColorLookupTableData)
+        b_lut = cast(bytes, ds.SegmentedBluePaletteColorLookupTableData)
+        a_lut = cast(
+            Optional[bytes],
+            getattr(ds, 'SegmentedAlphaPaletteColorLookupTableData', None)
+        )
 
         endianness = '<' if ds.is_little_endian else '>'
         byte_depth = nominal_depth // 8
@@ -162,15 +172,15 @@ def apply_color_lut(
         for seg in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             len_seg = len(seg) // byte_depth
             s_fmt = endianness + str(len_seg) + fmt
-            lut = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
-            luts.append(np.asarray(lut, dtype=dtype))
+            lut_ints = _expand_segmented_lut(unpack(s_fmt, seg), s_fmt)
+            luts.append(np.asarray(lut_ints, dtype=dtype))
     else:
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 
     if actual_depth not in [8, 16]:
         raise ValueError(
-            "The bit depth of the LUT data '{:.1f}' is invalid (only 8 or 16 "
-            "bits per entry allowed)".format(actual_depth)
+            f"The bit depth of the LUT data '{actual_depth:.1f}' "
+            "is invalid (only 8 or 16 bits per entry allowed)"
         )
 
     lut_lengths = [len(ii) for ii in luts]
@@ -235,20 +245,21 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     if 'ModalityLUTSequence' in ds:
-        item = ds.ModalityLUTSequence[0]
-        nr_entries = item.LUTDescriptor[0] or 2**16
-        first_map = item.LUTDescriptor[1]
-        nominal_depth = item.LUTDescriptor[2]
+        item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
+        nr_entries = cast(List[int], item.LUTDescriptor)[0] or 2**16
+        first_map = cast(List[int], item.LUTDescriptor)[1]
+        nominal_depth = cast(List[int], item.LUTDescriptor)[2]
 
         dtype = 'uint{}'.format(nominal_depth)
 
         # Ambiguous VR, US or OW
+        lut_data: Iterable[int]
         if item['LUTData'].VR == 'OW':
             endianness = '<' if ds.is_little_endian else '>'
             unpack_fmt = '{}{}H'.format(endianness, nr_entries)
-            lut_data = unpack(unpack_fmt, item.LUTData)
+            lut_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
-            lut_data = item.LUTData
+            lut_data = cast(List[int], item.LUTData)
         lut_data = np.asarray(lut_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
@@ -262,8 +273,8 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
         return lut_data[clipped_iv]
     elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
-        arr = arr.astype(np.float64) * ds.RescaleSlope
-        arr += ds.RescaleIntercept
+        arr = arr.astype(np.float64) * cast(float, ds.RescaleSlope)
+        arr += cast(float, ds.RescaleIntercept)
 
     return arr
 
@@ -331,6 +342,7 @@ def apply_voi_lut(
     """
     valid_voi = False
     if 'VOILUTSequence' in ds:
+        ds.VOILUTSequence = cast(List["Dataset"], ds.VOILUTSequence)
         valid_voi = None not in [
             ds.VOILUTSequence[0].get('LUTDescriptor', None),
             ds.VOILUTSequence[0].get('LUTData', None)
@@ -405,12 +417,13 @@ def apply_voi(
         )
 
     # VOI LUT Sequence contains one or more items
-    item = ds.VOILUTSequence[index]
-    nr_entries = item.LUTDescriptor[0] or 2**16
-    first_map = item.LUTDescriptor[1]
+    item = cast(List["Dataset"], ds.VOILUTSequence)[index]
+    lut_descriptor = cast(List[int], item.LUTDescriptor)
+    nr_entries = lut_descriptor[0] or 2**16
+    first_map = lut_descriptor[1]
 
     # PS3.3 C.8.11.3.1.5: may be 8, 10-16
-    nominal_depth = item.LUTDescriptor[2]
+    nominal_depth = lut_descriptor[2]
     if nominal_depth in list(range(10, 17)):
         dtype = 'uint16'
     elif nominal_depth == 8:
@@ -421,12 +434,13 @@ def apply_voi(
         )
 
     # Ambiguous VR, US or OW
+    lut_data: Iterable[int]
     if item['LUTData'].VR == 'OW':
         endianness = '<' if ds.is_little_endian else '>'
         unpack_fmt = f'{endianness}{nr_entries}H'
-        lut_data = unpack(unpack_fmt, item.LUTData)
+        lut_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
     else:
-        lut_data = item.LUTData
+        lut_data = cast(List[int], item.LUTData)
     lut_data = np.asarray(lut_data, dtype=dtype)
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
@@ -500,16 +514,24 @@ def apply_windowing(
     voi_func = cast(str, getattr(ds, 'VOILUTFunction', 'LINEAR')).upper()
     # VR DS, VM 1-n
     elem = ds['WindowCenter']
-    center = elem.value[index] if elem.VM > 1 else elem.value
+    center = (
+        cast(List[float], elem.value)[index] if elem.VM > 1 else elem.value
+    )
+    center = cast(float, center)
     elem = ds['WindowWidth']
-    width = elem.value[index] if elem.VM > 1 else elem.value
+    width = cast(List[float], elem.value)[index] if elem.VM > 1 else elem.value
+    width = cast(float, width)
 
     # The output range depends on whether or not a modality LUT or rescale
     #   operation has been applied
+    ds.BitsStored = cast(int, ds.BitsStored)
+    y_min: float
+    y_max: float
     if 'ModalityLUTSequence' in ds:
         # Unsigned - see PS3.3 C.11.1.1.1
         y_min = 0
-        bit_depth = ds.ModalityLUTSequence[0].LUTDescriptor[2]
+        item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
+        bit_depth = cast(List[int], item.LUTDescriptor)[2]
         y_max = 2**bit_depth - 1
     elif ds.PixelRepresentation == 0:
         # Unsigned
@@ -523,6 +545,8 @@ def apply_windowing(
     slope = ds.get('RescaleSlope', None)
     intercept = ds.get('RescaleIntercept', None)
     if slope is not None and intercept is not None:
+        ds.RescaleSlope = cast(float, ds.RescaleSlope)
+        ds.RescaleIntercept = cast(float, ds.RescaleIntercept)
         # Otherwise its the actual data range
         y_min = y_min * ds.RescaleSlope + ds.RescaleIntercept
         y_max = y_max * ds.RescaleSlope + ds.RescaleIntercept
@@ -873,7 +897,7 @@ def _expand_segmented_lut(
         else:
             raise ValueError(
                 "Error expanding a segmented palette lookup table: "
-                "unknown segment type '{}'".format(opcode)
+                f"unknown segment type '{opcode}'"
             )
 
         segments_read += 1
@@ -926,14 +950,18 @@ def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
         The expected length of the *Pixel Data* in either whole bytes or
         pixels, excluding the NULL trailing padding byte for odd length data.
     """
-    length: int = ds.Rows * ds.Columns * ds.SamplesPerPixel
+    rows = cast(int, ds.Rows)
+    columns = cast(int, ds.Columns)
+    samples_per_pixel = cast(int, ds.SamplesPerPixel)
+    bits_allocated = cast(int, ds.BitsAllocated)
+
+    length = rows * columns * samples_per_pixel
     length *= get_nr_frames(ds)
 
     if unit == 'pixels':
         return length
 
     # Correct for the number of bytes per pixel
-    bits_allocated = cast(int, ds.BitsAllocated)
     if bits_allocated == 1:
         # Determine the nearest whole number of bytes needed to contain
         #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
@@ -1116,14 +1144,17 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         raise ImportError("Numpy is required to determine the dtype.")
 
     if ds.is_little_endian is None:
-        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
+        file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+        ds.is_little_endian = (
+            cast(UID, file_meta.TransferSyntaxUID).is_little_endian
+        )
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
         #   Data representation of the pixel samples
         #   0x0000 - unsigned int
         #   0x0001 - 2's complement (signed int)
-        pixel_repr = ds.PixelRepresentation
+        pixel_repr = cast(int, ds.PixelRepresentation)
         if pixel_repr == 0:
             dtype_str = 'uint'
         elif pixel_repr == 1:
@@ -1131,8 +1162,8 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         else:
             raise ValueError(
                 "Unable to determine the data type to use to contain the "
-                "Pixel Data as a value of '{}' for '(0028,0103) Pixel "
-                "Representation' is invalid".format(pixel_repr)
+                f"Pixel Data as a value of '{pixel_repr}' for '(0028,0103) "
+                "Pixel Representation' is invalid"
             )
     else:
         dtype_str = 'float'
@@ -1141,7 +1172,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     #   The number of bits allocated for each pixel sample
     #   PS3.5 8.1.1: Bits Allocated shall either be 1 or a multiple of 8
     #   For bit packed data we use uint8
-    bits_allocated = ds.BitsAllocated
+    bits_allocated = cast(int, ds.BitsAllocated)
     if bits_allocated == 1:
         dtype_str = 'uint8'
     elif bits_allocated > 0 and bits_allocated % 8 == 0:
@@ -1149,8 +1180,8 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     else:
         raise ValueError(
             "Unable to determine the data type to use to contain the "
-            "Pixel Data as a value of '{}' for '(0028,0100) Bits "
-            "Allocated' is invalid".format(bits_allocated)
+            f"Pixel Data as a value of '{bits_allocated}' for '(0028,0100) "
+            "Bits Allocated' is invalid"
         )
 
     # Check to see if the dtype is valid for numpy
@@ -1158,8 +1189,8 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         dtype = np.dtype(dtype_str)
     except TypeError:
         raise NotImplementedError(
-            "The data type '{}' needed to contain the Pixel Data is not "
-            "supported by numpy".format(dtype_str)
+            f"The data type '{dtype_str}' needed to contain the Pixel Data "
+            "is not supported by numpy"
         )
 
     # Correct for endianness of the system vs endianness of the dataset
@@ -1254,25 +1285,24 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
         raise ImportError("Numpy is required to reshape the pixel array.")
 
     nr_frames = get_nr_frames(ds)
-    nr_samples = ds.SamplesPerPixel
+    nr_samples = cast(int, ds.SamplesPerPixel)
 
     if nr_frames < 1:
         raise ValueError(
-            "Unable to reshape the pixel array as a value of {} for "
+            f"Unable to reshape the pixel array as a value of {nr_frames} for "
             "(0028,0008) 'Number of Frames' is invalid."
-            .format(nr_frames)
         )
 
     if nr_samples < 1:
         raise ValueError(
-            "Unable to reshape the pixel array as a value of {} for "
-            "(0028,0002) 'Samples per Pixel' is invalid."
-            .format(nr_samples)
+            f"Unable to reshape the pixel array as a value of {nr_samples} "
+            "for (0028,0002) 'Samples per Pixel' is invalid."
         )
 
     # Valid values for Planar Configuration are dependent on transfer syntax
     if nr_samples > 1:
-        transfer_syntax = ds.file_meta.TransferSyntaxUID
+        file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+        transfer_syntax = cast(UID, file_meta.TransferSyntaxUID)
         if transfer_syntax in ['1.2.840.10008.1.2.4.50',
                                '1.2.840.10008.1.2.4.57',
                                '1.2.840.10008.1.2.4.70',
@@ -1288,34 +1318,36 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
 
         if planar_configuration not in [0, 1]:
             raise ValueError(
-                "Unable to reshape the pixel array as a value of {} for "
-                "(0028,0006) 'Planar Configuration' is invalid."
-                .format(planar_configuration)
+                "Unable to reshape the pixel array as a value of "
+                f"{planar_configuration} for (0028,0006) 'Planar "
+                "Configuration' is invalid."
             )
 
+    rows = cast(int, ds.Rows)
+    columns = cast(int, ds.Columns)
     if nr_frames > 1:
         # Multi-frame
         if nr_samples == 1:
             # Single plane
-            arr = arr.reshape(nr_frames, ds.Rows, ds.Columns)
+            arr = arr.reshape(nr_frames, rows, columns)
         else:
             # Multiple planes, usually 3
             if planar_configuration == 0:
-                arr = arr.reshape(nr_frames, ds.Rows, ds.Columns, nr_samples)
+                arr = arr.reshape(nr_frames, rows, columns, nr_samples)
             else:
-                arr = arr.reshape(nr_frames, nr_samples, ds.Rows, ds.Columns)
+                arr = arr.reshape(nr_frames, nr_samples, rows, columns)
                 arr = arr.transpose(0, 2, 3, 1)
     else:
         # Single frame
         if nr_samples == 1:
             # Single plane
-            arr = arr.reshape(ds.Rows, ds.Columns)
+            arr = arr.reshape(rows, columns)
         else:
             # Multiple planes, usually 3
             if planar_configuration == 0:
-                arr = arr.reshape(ds.Rows, ds.Columns, nr_samples)
+                arr = arr.reshape(rows, columns, nr_samples)
             else:
-                arr = arr.reshape(nr_samples, ds.Rows, ds.Columns)
+                arr = arr.reshape(nr_samples, rows, columns)
                 arr = arr.transpose(1, 2, 0)
 
     return arr

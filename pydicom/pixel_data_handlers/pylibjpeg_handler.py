@@ -1,4 +1,5 @@
 # Copyright 2020 pydicom authors. See LICENSE file for details.
+# type: ignore[import]
 """Use the `pylibjpeg <https://github.com/pydicom/pylibjpeg/>`_ package
 to convert supported pixel data to a :class:`numpy.ndarray`.
 
@@ -48,10 +49,10 @@ values given in the table below.
 """
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, cast
 
 if TYPE_CHECKING:
-    from pydicom.dataset import Dataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 try:
     import numpy as np
@@ -191,7 +192,9 @@ def as_array(ds: "Dataset") -> "np.ndarray":
     return reshape_pixel_array(ds, get_pixeldata(ds))
 
 
-def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
+def generate_frames(
+    ds: "Dataset", reshape: bool = True
+) -> Iterable["np.ndarray"]:
     """Yield a *Pixel Data* frame from `ds` as an :class:`~numpy.ndarray`.
 
     .. versionadded:: 2.1
@@ -220,7 +223,8 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
     RuntimeError
         If the plugin required to decode the pixel data is not installed.
     """
-    tsyntax = ds.file_meta.TransferSyntaxUID
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+    tsyntax = file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
     if tsyntax not in _DECODERS:
         if tsyntax in _OPENJPEG_SYNTAXES:
@@ -247,12 +251,16 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
+    tsyntax = cast(UID, tsyntax)
     decoder = _DECODERS[tsyntax]
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 
     nr_frames = getattr(ds, "NumberOfFrames", 1)
     pixel_module = ds.group_dataset(0x0028)
     dtype = pixel_dtype(ds)
+
+    bits_stored = cast(int, ds.BitsStored)
+    bits_allocated = cast(int, ds.BitsAllocated)
 
     for frame in generate_pixel_data_frame(ds.PixelData, nr_frames):
         arr = decoder(frame, pixel_module)
@@ -263,8 +271,10 @@ def generate_frames(ds: "Dataset", reshape: bool = True) -> "np.ndarray":
         ):
             param = get_j2k_parameters(frame)
             j2k_sign = param.setdefault('is_signed', True)
-            j2k_precision = param.setdefault('precision', ds.BitsStored)
-            shift = ds.BitsAllocated - j2k_precision
+            j2k_precision = cast(
+                int, param.setdefault('precision', bits_stored)
+            )
+            shift = bits_allocated - j2k_precision
             if shift and not j2k_sign and j2k_sign != ds.PixelRepresentation:
                 # Convert unsigned J2K data to 2s complement
                 # Can only get here if parsed J2K codestream OK
