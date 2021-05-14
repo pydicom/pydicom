@@ -6,7 +6,7 @@
 import re
 from io import BytesIO
 from struct import (unpack, calcsize)
-from typing import Optional, Union, List, Tuple, Dict, Callable
+from typing import Optional, Union, List, Tuple, Dict, Callable, cast
 from typing import Sequence as SequenceType
 
 # don't import datetime_conversion directly
@@ -56,7 +56,7 @@ def convert_tag(
         The decoded tag.
     """
     fmt = "<HH" if is_little_endian else ">HH"
-    value: Tuple[int, int] = unpack(fmt, byte_string[offset:offset + 4])
+    value = cast(Tuple[int, int], unpack(fmt, byte_string[offset:offset + 4]))
     return TupleTag(value)
 
 
@@ -378,11 +378,12 @@ def convert_numbers(
     length = len(byte_string)
 
     if length % bytes_per_value != 0:
+        bstr = " ".join([f"{b:02X}" for b in byte_string])
         raise BytesLengthException(
             "Expected total bytes to be an even multiple of bytes per value. "
-            f"Instead received {byte_string} with length {length} and struct "
-            f"format '{struct_format}' which corresponds to bytes per value "
-            f"of {bytes_per_value}."
+            f"Instead received {bstr} with length {length} and struct "
+            f"format '{struct_format}' which corresponds to bytes per "
+            f"value of {bytes_per_value}."
         )
 
     format_string = f"{endianChar}{length // bytes_per_value}{struct_format}"
@@ -722,7 +723,7 @@ def convert_value(
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string
     if isinstance(converters[VR], tuple):
-        converter, num_format = converters[VR]
+        converter, num_format = cast(tuple, converters[VR])
     else:
         converter = converters[VR]
         num_format = None
@@ -784,16 +785,7 @@ convert_retry_VR_order = [
 # the converter maps to a tuple
 # (function, struct_format)
 # (struct_format in python struct module style)
-_ConverterType = Dict[
-    str,
-    Union[
-        # Non-text and non-numeric VRs, Text VRs and PN, SQ
-        Callable[..., Union[object, SequenceType[object]]],
-        # Numeric VRs
-        Tuple[Callable[..., Union[object, SequenceType[object]]], str],
-    ]
-]
-converters: _ConverterType = {
+converters = {
     'AE': convert_AE_string,
     'AS': convert_string,
     'AT': convert_ATvalue,
