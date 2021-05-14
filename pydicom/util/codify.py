@@ -1,4 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# type: ignore
 """
 Produce runnable python code which can recreate DICOM objects or files.
 

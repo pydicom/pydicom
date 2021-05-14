@@ -72,8 +72,10 @@ def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
         return arg
 
     if arg2 is not None:
-        arg = (arg, arg2)  # act as if was passed a single tuple
+        # act as if was passed a single tuple
+        arg = (arg, arg2)  # type: ignore[assignment]
 
+    long_value: Optional[int]
     if isinstance(arg, (tuple, list)):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
@@ -145,11 +147,11 @@ class BaseTag(int):
     # Override comparisons so can convert "other" to Tag as necessary
     #   See Ordering Comparisons at:
     #   http://docs.python.org/dev/3.0/whatsnew/3.0.html
-    def __le__(self, other: object) -> bool:
+    def __le__(self, other: Any) -> bool:
         """Return ``True`` if `self`  is less than or equal to `other`."""
         return self == other or self < other
 
-    def __lt__(self, other: object) -> bool:
+    def __lt__(self, other: Any) -> bool:
         """Return ``True`` if `self` is less than `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -160,15 +162,15 @@ class BaseTag(int):
 
         return int(self) < int(other)
 
-    def __ge__(self, other: object) -> bool:
+    def __ge__(self, other: Any) -> bool:
         """Return ``True`` if `self` is greater than or equal to `other`."""
         return self == other or self > other
 
-    def __gt__(self, other: object) -> bool:
+    def __gt__(self, other: Any) -> bool:
         """Return ``True`` if `self` is greater than `other`."""
         return not (self == other or self < other)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Return ``True`` if `self` equals `other`."""
         # Check if comparing with another Tag object; if not, create a temp one
         if not isinstance(other, int):
@@ -179,7 +181,7 @@ class BaseTag(int):
 
         return int(self) == int(other)
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """Return ``True`` if `self` does not equal `other`."""
         return not self == other
 

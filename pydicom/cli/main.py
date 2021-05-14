@@ -11,7 +11,7 @@ import argparse
 import sys
 import pkg_resources
 import re
-from typing import Tuple
+from typing import Tuple, cast
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
@@ -132,7 +132,7 @@ def filespec_parser(filespec: str):
 
     # Get the pydicom test filename even without prefix, in case user forgot it
     try:
-        pydicom_filename = get_testdata_file(filename)
+        pydicom_filename = cast(str, get_testdata_file(filename))
     except NotImplementedError:  # will get this if absolute path passed
         pydicom_filename = ""
 
