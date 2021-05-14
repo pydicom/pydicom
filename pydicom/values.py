@@ -378,11 +378,10 @@ def convert_numbers(
     length = len(byte_string)
 
     if length % bytes_per_value != 0:
-        bstr = " ".join([f"{b:02X}" for b in byte_string])
         raise BytesLengthException(
             "Expected total bytes to be an even multiple of bytes per value. "
-            f"Instead received {bstr} with length {length} and struct "
-            f"format '{struct_format}' which corresponds to bytes per "
+            f"Instead received {byte_string!r} with length {length} and "
+            f"struct format '{struct_format}' which corresponds to bytes per "
             f"value of {bytes_per_value}."
         )
 

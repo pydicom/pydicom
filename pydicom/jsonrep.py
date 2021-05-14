@@ -4,7 +4,7 @@
 import base64
 from inspect import signature
 import inspect
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, Any, cast
 import warnings
 
 from pydicom.tag import BaseTag
@@ -97,15 +97,20 @@ class JsonDataElementConverter:
         self.vr = vr
         self.value = value
         self.value_key = value_key
-        if (
-            bulk_data_uri_handler and
-            len(signature(bulk_data_uri_handler).parameters) == 1
-        ):
-            def wrapped_bulk_data_handler(tag, vr, value):
-                return bulk_data_uri_handler(value)
-            self.bulk_data_element_handler = wrapped_bulk_data_handler
+        self.bulk_data_element_handler: Callable[[BaseTag, str, str], Any]
+
+        handler = bulk_data_uri_handler
+
+        if handler and len(signature(handler).parameters) == 1:
+
+            def wrapper(tag: BaseTag, vr: str, value: str) -> Any:
+                x = cast(Callable[[str], Any], handler)
+                return x(value)
+
+            self.bulk_data_element_handler = wrapper
         else:
-            self.bulk_data_element_handler = bulk_data_uri_handler
+            handler = cast(Callable[[BaseTag, str, str], Any], handler)
+            self.bulk_data_element_handler = handler
 
     def get_element_values(self):
         """Return a the data element value or list of values.
