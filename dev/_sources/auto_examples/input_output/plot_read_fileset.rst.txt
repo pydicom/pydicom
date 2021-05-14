@@ -105,7 +105,7 @@ This example shows how to read and interact with a DICOM File-set.
     Found 0 instances with PhotometricInterpretation='MONOCHROME1' without loading the stored instances and 3 instances with loading
 
     Original File-set still at /home/circleci/project/pydicom/data/test_files/dicomdirtests
-    File-set copied to /tmp/tmpa_is22gz and contains the following files:
+    File-set copied to /tmp/tmp0co8qoyl and contains the following files:
       DICOMDIR
       PT000000/ST000000/SE000000/IM000000
       PT000000/ST000000/SE000001/IM000000
@@ -270,7 +270,7 @@ This example shows how to read and interact with a DICOM File-set.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.292 seconds)
+   **Total running time of the script:** ( 0 minutes  0.254 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_fileset.py:

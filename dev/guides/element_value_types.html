@@ -237,16 +237,18 @@ never have a VM greater than 1.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 5%" />
-<col style="width: 24%" />
-<col style="width: 23%" />
-<col style="width: 47%" />
+<col style="width: 4%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 34%" />
+<col style="width: 28%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>VR</p></th>
 <th class="head"><p>Name</p></th>
 <th class="head"><p>Set using</p></th>
-<th class="head"><p>Stored as</p></th>
+<th class="head"><p>Stored as (T)</p></th>
+<th class="head"><p>Type hint for element value</p></th>
 </tr>
 </thead>
 <tbody>
@@ -255,6 +257,8 @@ never have a VM greater than 1.</p></li>
 Entity</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td rowspan="11"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>AS</p></td>
 <td><p>Age String</p></td>
@@ -319,6 +323,7 @@ or <a class="reference external" href="https://docs.python.org/3/library/functio
 <td><p>Long Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td rowspan="7"><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>OB</p></td>
 <td><p>Other Byte</p></td>
@@ -355,6 +360,8 @@ Very Long</p></td>
 <td><p>Person Name</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a></p></td>
+<td rowspan="3"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>SH</p></td>
 <td><p>Short String</p></td>
@@ -371,22 +378,29 @@ Very Long</p></td>
 Items</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></p></td>
+<td><p>MutableSequence[
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>]</p></td>
 </tr>
 <tr class="row-even"><td><p>SS</p></td>
 <td><p>Signed Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>ST</p></td>
 <td><p>Short Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>SV</p></td>
 <td><p>Signed 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td rowspan="5"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>TM</p></td>
 <td><p>Time</p></td>
@@ -415,6 +429,7 @@ Identifier (UID)</p></td>
 <td><p>Unknown</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
+<td rowspan="2"><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>UR</p></td>
 <td><p>URI/URL</p></td>
@@ -425,17 +440,22 @@ Identifier (UID)</p></td>
 <td><p>Unsigned Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-even"><td><p>UT</p></td>
 <td><p>Unlimited Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p>Optional[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>UV</p></td>
 <td><p>Unsigned 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 </tbody>
 </table>
