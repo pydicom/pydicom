@@ -21,7 +21,7 @@ except ImportError:
     HAVE_REQUESTS = False
 
 try:
-    import tqdm
+    import tqdm  # type: ignore[import]
 
     if HAVE_REQUESTS is False:
         class DownloadProgressBar(tqdm.tqdm):
@@ -65,7 +65,7 @@ def calculate_file_hash(fpath: os.PathLike) -> str:
     return hasher.hexdigest()
 
 
-def get_config_dir() -> os.PathLike:
+def get_config_dir() -> pathlib.Path:
     """Return the path to the pydicom config directory, creating it if required
 
     The config directory will be named ``.pydicom`` and will be created in the
@@ -122,7 +122,7 @@ def download_with_progress(url: str, fpath: os.PathLike) -> None:
             urllib.request.urlretrieve(url, filename)
 
 
-def get_data_dir() -> os.PathLike:
+def get_data_dir() -> pathlib.Path:
     """Return the path to the cache directory, creating it if required."""
     data_dir = get_config_dir() / "data"
     data_dir.mkdir(exist_ok=True)
