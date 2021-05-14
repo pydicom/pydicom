@@ -1189,8 +1189,8 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         dtype = np.dtype(dtype_str)
     except TypeError:
         raise NotImplementedError(
-            f"The data type '{dtype_str}' needed to contain the Pixel Data is not "
-            "supported by numpy"
+            f"The data type '{dtype_str}' needed to contain the Pixel Data "
+            "is not supported by numpy"
         )
 
     # Correct for endianness of the system vs endianness of the dataset
