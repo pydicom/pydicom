@@ -52,7 +52,7 @@ import logging
 from typing import TYPE_CHECKING, Iterable, cast
 
 if TYPE_CHECKING:
-    from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 try:
     import numpy as np

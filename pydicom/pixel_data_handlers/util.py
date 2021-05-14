@@ -18,7 +18,7 @@ from pydicom.data import get_palette_files
 from pydicom.uid import UID
 
 if TYPE_CHECKING:
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 
 def apply_color_lut(

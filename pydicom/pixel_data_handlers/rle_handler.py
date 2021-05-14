@@ -52,7 +52,7 @@ import pydicom.uid
 
 if TYPE_CHECKING:
     import numpy  # type: ignore[import]
-    from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 
 HANDLER_NAME = 'RLE Lossless'
@@ -95,7 +95,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     return False
 
 
-def get_pixeldata(ds: "FileDataset", rle_segment_order: str = '>') -> "np.ndarray":
+def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
     """Return an :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
@@ -127,7 +127,7 @@ def get_pixeldata(ds: "FileDataset", rle_segment_order: str = '>') -> "np.ndarra
         If the actual length of the pixel data doesn't match the expected
         length.
     """
-    file_meta = cast("FileMetaDataset", ds.file_meta)
+    file_meta = cast("FileMetaDataset", ds.file_meta)  # type: ignore[has-type]
     transfer_syntax = file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
