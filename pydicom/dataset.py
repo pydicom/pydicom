@@ -1577,8 +1577,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         encapsulate_ext: bool = False,
         **kwargs
     ) -> None:
-        """Compress and update the dataset in-place with the resulting
-        :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
+        """Compress and update an uncompressed dataset in-place with the
+        resulting :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
 
         .. versionadded:: 2.2
 
@@ -1609,7 +1609,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         If the compressed pixel data is too large for encapsulation using a
         basic offset table then an :dcm:`extended offset table
-        <part03/sect_C.7.6.3.html>` will be used instead, in which case the
+        <part03/sect_C.7.6.3.html>` will also be used, in which case the
         following elements will also be added:
 
         * (7FE0,0001) *Extended Offset Table*
@@ -1617,16 +1617,18 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         **Supported Transfer Syntax UIDs**
 
-        +--------------------------------------+--------------------------+
-        | UID                                  | Plugins                  |
-        +======================================+==========================+
-        | *RLE Lossless* - 1.2.840.10008.1.2.5 | pydicom, pylibjpeg, gdcm |
-        +--------------------------------------+--------------------------+
+        +----------------------+----------+----------------------------------+
+        | UID                  | Plugins  | Encoding Guide                   |
+        +======================+==========+==================================+
+        | *RLE Lossless* -     |pydicom,  | :doc:`RLE Lossless               |
+        | 1.2.840.10008.1.2.5  |pylibjpeg,| </guides/encoding/rle_lossless>` |
+        |                      |gdcm      |                                  |
+        +----------------------+----------+----------------------------------+
 
         Examples
         --------
 
-        Compress the existing *Pixel Data* in place:
+        Compress the existing uncompressed *Pixel Data* in place:
 
         >>> from pydicom.data import get_testdata_file
         >>> from pydicom.uid import RLELossless
@@ -1642,20 +1644,16 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         arr : numpy.ndarray, optional
             Compress the uncompressed pixel data in `arr` and use it
             to set the *Pixel Data*. If `arr` is not used then the
-            existing *Pixel Data* in the dataset will be decompressed (if
-            required) and compressed instead. The :attr:`~numpy.ndarray.shape`,
-            :class:`~numpy.dtype` and contents of the array should match the
-            dataset.
+            existing *Pixel Data* in the dataset will be compressed instead.
+            The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
+            contents of the array should match the dataset.
         encoding_plugin : str, optional
             Use the `encoding_plugin` to compress the pixel data. See the
             :doc:`user guide </old/image_data_compression>` for a list of
             plugins available for each UID and their dependencies. If not
             specified then all available plugins will be tried (default).
         decoding_plugin : str, optional
-            If `arr` is not used and the existing *Pixel Data* is compressed
-            then the name of the :mod:`image data handler
-            <pydicom.pixel_data_handlers>` to use to decompress it. If not
-            specified then all available handlers will be tried (default).
+            Placeholder for future functionality.
         encapsulate_ext : bool, optional
             If ``True`` then force the addition of an extended offset table.
             If ``False`` (default) then an extended offset table
@@ -1664,7 +1662,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         **kwargs
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
-            </guides/encoder_plugin_options>` for more information.
+            </guides/encoding/encoder_plugin_options>` for more information.
         """
         from pydicom.encoders import get_encoder
 
@@ -1683,7 +1681,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             )
 
         if arr is None:
-            # Encode the current *Pixel Data* (will decode first if required)
+            # Encode the current *Pixel Data*
             frame_iterator = encoder.iter_encode(
                 self,
                 encoding_plugin=encoding_plugin,

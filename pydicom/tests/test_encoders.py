@@ -27,7 +27,7 @@ from pydicom.encoders import RLELosslessEncoder
 from pydicom.encoders.base import Encoder
 from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
-    UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC
+    UID, RLELossless, ExplicitVRLittleEndian, JPEG2000MC, JPEG2000Lossless
 )
 
 
@@ -242,6 +242,19 @@ class TestEncoder:
             s[1] == "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         )
 
+    def test_invalid_profile_raises(self):
+        """Test an invalid encoding profile raises exception."""
+        ds = get_testdata_file("rtdose_1frame.dcm", read=True)
+        assert ds.BitsAllocated == 32  # Invalid for RLE Lossless
+        msg = (
+            r"Unable to encode as one or more of 'photometric "
+            r"interpretation', 'samples per pixel', 'bits allocated', 'bits "
+            r"stored' or 'pixel representation' is not valid for 'RLE "
+            r"Lossless'"
+        )
+        with pytest.raises(ValueError, match=msg):
+            ds.compress(RLELossless)
+
     def test_missing_no_dependencies(self):
         """Test an encoder with no dependencies being unavailable."""
         enc = self.enc
@@ -439,6 +452,7 @@ class TestEncoder_Encode:
         with pytest.raises(StopIteration):
             next(gen)
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_dataset(self):
         """Test encoding a compressed dataset"""
         ds = self.ds_enc
@@ -447,6 +461,7 @@ class TestEncoder_Encode:
         uncompressed_len = get_expected_length(ds, 'bytes')
         assert uncompressed_len > len(out)
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_dataset_specific_enc(self):
         """Test encoding a compressed dataset with specified encoder plugin"""
         ds = self.ds_enc
@@ -454,6 +469,7 @@ class TestEncoder_Encode:
         out = self.enc.encode(ds, encoding_plugin='pydicom')
         assert len(out) == 6154
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_dataset_specific_dec(self):
         """Test encoding a compressed dataset with specified decoder plugin"""
         assert self.ds_enc.file_meta.TransferSyntaxUID.is_compressed
@@ -464,6 +480,7 @@ class TestEncoder_Encode:
         )
         assert len(out) == 6154
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_dataset_multiframe(self):
         """Test encoding a multiframe compressed dataset"""
         ds = self.ds_enc_mf
@@ -472,6 +489,7 @@ class TestEncoder_Encode:
         uncompressed_len = get_expected_length(ds, 'bytes')
         assert uncompressed_len / ds.NumberOfFrames > len(out)
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_dataset_multiframe_no_idx_raises(self):
         """Test encoding a multiframe compressed dataset raises if no idx"""
         ds = self.ds_enc_mf
@@ -480,6 +498,7 @@ class TestEncoder_Encode:
         with pytest.raises(ValueError, match=msg):
             self.enc.encode(ds)
 
+    @pytest.mark.xfail(reason="Changing compression not implemented yet")
     def test_enc_iter_encode(self):
         """Test iter_encode with a compressed dataset"""
         assert self.ds_enc.file_meta.TransferSyntaxUID.is_compressed
@@ -506,7 +525,7 @@ class TestEncoder_Encode:
 class TestEncoder_Preprocess:
     """Tests for Encoder._preprocess()."""
     def setup(self):
-        self.e = Encoder(RLELossless)
+        self.e = Encoder(JPEG2000Lossless)
         self.ds = ds = Dataset()
         ds.Rows = 1
         ds.Columns = 3
@@ -629,7 +648,7 @@ class TestEncoder_Preprocess:
 
         msg = (
             r"Unable to encode as a bits allocated value of 9 is not "
-            r"supported \(must be 8, 16, 32 or 64\)"
+            r"supported \(must be a multiple of 8\)"
         )
         with pytest.raises(ValueError, match=msg):
             self.e._preprocess(arr, **kwargs)
@@ -678,6 +697,9 @@ class TestEncoder_Preprocess:
         self.ds.Rows = 1
         self.ds.Columns = 3
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         arr = np.asarray([1, 2, 3], dtype='|u1')
         assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
@@ -693,6 +715,9 @@ class TestEncoder_Preprocess:
         self.ds.Rows = 4
         self.ds.Columns = 2
         self.ds.SamplesPerPixel = 3
+
+        # Override the encoding profile validation
+        self.e._uid = None
 
         arr = self.arr_3s.astype('|u1')
         assert arr.dtype.itemsize == 1
@@ -710,6 +735,9 @@ class TestEncoder_Preprocess:
         self.ds.Rows = 1
         self.ds.Columns = 3
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         arr = np.asarray([-128, 0, 127], dtype='|i1')
         assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
@@ -726,6 +754,9 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 2
         self.ds.SamplesPerPixel = 3
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         arr = self.arr_3s.astype('|i1')
         assert arr.dtype.itemsize == 1
         kwargs = self.e.kwargs_from_ds(self.ds)
@@ -741,6 +772,9 @@ class TestEncoder_Preprocess:
         self.ds.Rows = 1
         self.ds.Columns = 3
         self.ds.SamplesPerPixel = 1
+
+        # Override the encoding profile validation
+        self.e._uid = None
 
         for dtype in ('>u2', '<u2', '=u2'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
@@ -760,6 +794,9 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 2
         ref = b''.join([bytes([b]) + b'\x00' for b in bytes(range(1, 25))])
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         for dtype in ('>u2', '<u2', '=u2'):
             arr = self.arr_3s.astype(dtype)
             assert arr.dtype.itemsize == 2
@@ -776,6 +813,9 @@ class TestEncoder_Preprocess:
         self.ds.Rows = 1
         self.ds.Columns = 3
         self.ds.SamplesPerPixel = 1
+
+        # Override the encoding profile validation
+        self.e._uid = None
 
         for dtype in ('>i2', '<i2', '=i2'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
@@ -795,6 +835,9 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 2
         ref = b''.join([bytes([b]) + b'\x00' for b in bytes(range(1, 25))])
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         for dtype in ('>i2', '<i2', '=i2'):
             arr = self.arr_3s.astype(dtype)
             assert arr.dtype.itemsize == 2
@@ -813,6 +856,9 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 3
         ref = b"\x01\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00"
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         for dtype in ('>u4', '<u4', '=u4'):
             arr = np.asarray([1, 2, 3], dtype=dtype)
             assert arr.dtype.itemsize == 4
@@ -829,8 +875,10 @@ class TestEncoder_Preprocess:
         self.ds.PixelRepresentation = 0
         self.ds.Rows = 4
         self.ds.Columns = 2
-
         ref = b''.join([bytes([b]) + b'\x00' * 3 for b in bytes(range(1, 25))])
+
+        # Override the encoding profile validation
+        self.e._uid = None
 
         for dtype in ('>u4', '<u4', '=u4'):
             arr = self.arr_3s.astype(dtype)
@@ -850,6 +898,9 @@ class TestEncoder_Preprocess:
         self.ds.Columns = 3
         ref = b"\x80\xff\xff\xff\x00\x00\x00\x00\x7f\x00\x00\x00"
 
+        # Override the encoding profile validation
+        self.e._uid = None
+
         for dtype in ('>i4', '<i4', '=i4'):
             arr = np.asarray([-128, 0, 127], dtype=dtype)
             assert arr.dtype.itemsize == 4
@@ -866,8 +917,10 @@ class TestEncoder_Preprocess:
         self.ds.PixelRepresentation = 1
         self.ds.Rows = 4
         self.ds.Columns = 2
-
         ref = b''.join([bytes([b]) + b'\x00' * 3 for b in bytes(range(1, 25))])
+
+        # Override the encoding profile validation
+        self.e._uid = None
 
         for dtype in ('>i4', '<i4', '=i4'):
             arr = self.arr_3s.astype(dtype)
@@ -961,7 +1014,6 @@ class TestEncoder_Process:
 
 class TestDatasetCompress:
     """Tests for Dataset.compress()."""
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_inplace(self):
         """Test encode with a dataset."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -972,7 +1024,6 @@ class TestDatasetCompress:
         assert 'PlanarConfiguration' not in ds
         assert ds['PixelData'].is_undefined_length
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_compress_arr(self):
         """Test encode with an arr."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -998,7 +1049,6 @@ class TestDatasetCompress:
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_uid_not_supported(self):
         """Test the UID not having any encoders."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -1008,9 +1058,8 @@ class TestDatasetCompress:
             r"'JPEG 2000 Part 2 Multi-component Image Compression'"
         )
         with pytest.raises(NotImplementedError, match=msg):
-            ds.compress(JPEG2000MC)
+            ds.compress(JPEG2000MC, encoding_plugin='pydicom')
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_encapsulate_extended(self):
         """Test forcing extended encapsulation."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -1025,7 +1074,6 @@ class TestDatasetCompress:
         assert ds.ExtendedOffsetTable == b'\x00' * 8
         assert ds.ExtendedOffsetTableLengths == b'\x66\x53' + b'\x00' * 6
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_round_trip(self):
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)
@@ -1036,7 +1084,6 @@ class TestDatasetCompress:
         assert id(ds.pixel_array) != id(arr)
         assert np.array_equal(arr, ds.pixel_array)
 
-    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
     def test_planar_configuration(self):
         """Test Planar Configuration added if Samples per Pixel > 1"""
         ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)
@@ -1046,3 +1093,17 @@ class TestDatasetCompress:
         ds.compress(RLELossless, encoding_plugin='pydicom')
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.PlanarConfiguration == 1
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
+    def test_override_kwargs(self):
+        """Test we can override using kwargs."""
+        ds = get_testdata_file("SC_rgb_small_odd.dcm", read=True)
+        ref = ds.pixel_array
+        del ds.PlanarConfiguration
+        ds.SamplesPerPixel = 1
+        assert 'PlanarConfiguration' not in ds
+        ds.compress(
+            RLELossless, encoding_plugin='pydicom', samples_per_pixel=3
+        )
+        ds.SamplesPerPixel = 3
+        assert np.array_equal(ref, ds.pixel_array)

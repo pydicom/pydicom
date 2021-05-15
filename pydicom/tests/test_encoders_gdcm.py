@@ -125,7 +125,8 @@ class TestRLELossless:
         assert ds.PhotometricInterpretation == 'MONOCHROME2'
 
         enc = RLELosslessEncoder
-        encoded = enc.encode(ds, idx=0, encoding_plugin='gdcm')
+        kwargs = enc.kwargs_from_ds(ds)
+        encoded = enc.encode(ds.PixelData, encoding_plugin='gdcm', **kwargs)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
@@ -146,7 +147,8 @@ class TestRLELossless:
         assert ds.PlanarConfiguration == 0
 
         enc = RLELosslessEncoder
-        encoded = enc.encode(ds, idx=0, encoding_plugin='gdcm')
+        kwargs = enc.kwargs_from_ds(ds)
+        encoded = enc.encode(ds.PixelData, encoding_plugin='gdcm', **kwargs)
         decoded = _rle_decode_frame(
             encoded, ds.Rows, ds.Columns, ds.SamplesPerPixel, ds.BitsAllocated
         )
