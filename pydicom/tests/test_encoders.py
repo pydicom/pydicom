@@ -1024,6 +1024,7 @@ class TestDatasetCompress:
         assert 'PlanarConfiguration' not in ds
         assert ds['PixelData'].is_undefined_length
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
     def test_compress_arr(self):
         """Test encode with an arr."""
         ds = get_testdata_file("CT_small.dcm", read=True)
@@ -1074,6 +1075,7 @@ class TestDatasetCompress:
         assert ds.ExtendedOffsetTable == b'\x00' * 8
         assert ds.ExtendedOffsetTableLengths == b'\x66\x53' + b'\x00' * 6
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
     def test_round_trip(self):
         """Test an encoding round-trip"""
         ds = get_testdata_file("MR_small_RLE.dcm", read=True)

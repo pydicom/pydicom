@@ -278,7 +278,6 @@ class Encoder:
             "The frame 'idx' is required for multi-frame pixel data"
         )
 
-    # TODO: test kwargs overrides
     def _encode_dataset(
         self,
         ds: "Dataset",
