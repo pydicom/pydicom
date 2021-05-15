@@ -6,7 +6,11 @@
 from io import BytesIO
 import os
 from struct import (Struct, unpack)
-from typing import BinaryIO, Union, Optional, List, Tuple, AnyStr
+import sys
+from typing import (
+    BinaryIO, Union, Optional, List, Tuple, Any, Callable, cast,
+    MutableSequence, Type, Iterator, Dict
+)
 import warnings
 import zlib
 
@@ -20,23 +24,28 @@ from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomFile
-from pydicom.fileutil import read_undefined_length_value, path_from_pathlike
+from pydicom.fileutil import (
+    read_undefined_length_value, path_from_pathlike, PathType, _unpack_tag
+)
 from pydicom.misc import size_in_bytes
 from pydicom.sequence import Sequence
-from pydicom.tag import (ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag)
+from pydicom.tag import (
+    ItemTag, SequenceDelimiterTag, TupleTag, Tag, BaseTag, TagListType
+)
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
 from pydicom.valuerep import extra_length_VRs
 
 
-def data_element_generator(fp,
-                           is_implicit_VR,
-                           is_little_endian,
-                           stop_when=None,
-                           defer_size=None,
-                           encoding=default_encoding,
-                           specific_tags=None):
-
+def data_element_generator(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
+    defer_size: Optional[Union[int, str]] = None,
+    encoding: Union[str, MutableSequence[str]] = default_encoding,
+    specific_tags: Optional[List[BaseTag]] = None
+) -> Iterator[Union[RawDataElement, DataElement]]:
     """Create a generator to efficiently return the raw data elements.
 
     .. note::
@@ -57,24 +66,17 @@ def data_element_generator(fp,
         If ``None`` (default), then the whole file is read. A callable which
         takes tag, VR, length, and returns ``True`` or ``False``. If it
         returns ``True``, ``read_data_element`` will just return.
-    defer_size : int, str, None, optional
+    defer_size : int or str, optional
         See :func:`dcmread` for parameter info.
-    encoding :
+    encoding : Union[str, MutableSequence[str]]
         Encoding scheme
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
 
-    Returns
+    Yields
     -------
-    VR : str or None
-        ``None`` if implicit VR, otherwise the VR read from the file.
-    length : int
-        The length of the DICOM data element (could be DICOM "undefined
-        length" ``0xFFFFFFFFL``)
-    value_bytes : bytes or str
-        The raw bytes from the DICOM file (not parsed into Python types)
-    is_little_endian : bool
-        ``True`` if transfer syntax is little endian; else ``False``.
+    RawDataElement or DataElement
+        Yields DataElement for SQ, RawDataElement otherwise.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -95,6 +97,7 @@ def data_element_generator(fp,
     # With a generator, state is stored, so we can break down
     #    into the individual cases, and not have to check them again for each
     #    data element
+    from pydicom.values import convert_string
 
     if is_little_endian:
         endian_chr = "<"
@@ -125,13 +128,15 @@ def data_element_generator(fp,
         tag_set.add(Tag(0x00080005))  # Specific Character Set
 
     while True:
+        # VR: Optional[str]
+
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
             return  # at end of file
+
         if debugging:
-            debug_msg = "{0:08x}: {1}".format(fp.tell() - 8,
-                                              bytes2hex(bytes_read))
+            debug_msg = f"{fp.tell() - 8:08x}: {bytes2hex(bytes_read)}"
 
         if is_implicit_VR:
             # must reset VR each time; could have set last iteration (e.g. SQ)
@@ -197,8 +202,12 @@ def data_element_generator(fp,
                              "Skipping forward to next data element.")
                 fp.seek(fp_tell() + length)
             else:
-                value = (fp_read(length) if length > 0
-                         else empty_value_for_VR(VR, raw=True))
+                value = (
+                    fp_read(length) if length > 0
+                    else cast(
+                        Optional[bytes], empty_value_for_VR(VR, raw=True)
+                    )
+                )
                 if debugging:
                     dotdot = "..." if length > 20 else "   "
                     displayed_value = value[:20] if value else b''
@@ -208,8 +217,10 @@ def data_element_generator(fp,
 
             # If the tag is (0008,0005) Specific Character Set, then store it
             if tag == BaseTag(0x00080005):
-                from pydicom.values import convert_string
-                encoding = convert_string(value or b'', is_little_endian)
+                # *Specific Character String* is b'' for empty value
+                encoding = convert_string(
+                    cast(bytes, value) or b'', is_little_endian
+                )
                 # Store the encoding value in the generator
                 # for use with future elements (SQs)
                 encoding = convert_encodings(encoding)
@@ -236,7 +247,7 @@ def data_element_generator(fp,
                 except KeyError:
                     # Look ahead to see if it consists of items
                     # and is thus a SQ
-                    next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))
+                    next_tag = _unpack_tag(fp_read(4), endian_chr)
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
                     if next_tag == ItemTag:
@@ -244,12 +255,16 @@ def data_element_generator(fp,
 
             if VR == 'SQ':
                 if debugging:
-                    msg = "{0:08x}: Reading/parsing undefined length sequence"
-                    logger_debug(msg.format(fp_tell()))
+                    logger_debug(
+                        f"{fp_tell():08X}: Reading/parsing undefined length "
+                        "sequence"
+                    )
+
                 seq = read_sequence(fp, is_implicit_VR,
                                     is_little_endian, length, encoding)
                 if has_tag_set and tag not in tag_set:
                     continue
+
                 yield DataElement(tag, VR, seq, value_tell,
                                   is_undefined_length=True)
             else:
@@ -262,12 +277,18 @@ def data_element_generator(fp,
                 # tags with undefined length are skipped after read
                 if has_tag_set and tag not in tag_set:
                     continue
+
                 yield RawDataElement(tag, VR, length, value, value_tell,
                                      is_implicit_VR, is_little_endian)
 
 
-def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
-                    is_sequence):
+def _is_implicit_vr(
+    fp: BinaryIO,
+    implicit_vr_is_assumed: bool,
+    is_little_endian: bool,
+    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]],
+    is_sequence: bool
+) -> bool:
     """Check if the real VR is explicit or implicit.
 
     Parameters
@@ -297,23 +318,25 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
         return True
 
     tag_bytes = fp.read(4)
-    vr = fp.read(2)
-    if len(vr) < 2:
+    raw_vr = fp.read(2)
+    if len(raw_vr) < 2:
         return implicit_vr_is_assumed
+
 
     # it is sufficient to check if the VR is in valid ASCII range, as it is
     # extremely unlikely that the tag length accidentally has such a
     # representation - this would need the first tag to be longer than 16kB
     # (e.g. it should be > 0x4141 = 16705 bytes)
-    found_implicit = not (0x40 < vr[0] < 0x5B and 0x40 < vr[1] < 0x5B)
-
+    found_implicit = not (0x40 < raw_vr[0] < 0x5B and 0x40 < raw_vr[1] < 0x5B)
     if found_implicit != implicit_vr_is_assumed:
         # first check if the tag still belongs to the dataset if stop_when
         # is given - if not, the dataset is empty and we just return
         endian_chr = "<" if is_little_endian else ">"
-        tag = TupleTag(unpack(endian_chr + "HH", tag_bytes))
+        tag = _unpack_tag(tag_bytes, endian_chr)
+        vr = raw_vr.decode(default_encoding)
         if stop_when is not None and stop_when(tag, vr, 0):
             return found_implicit
+
         # sequences with undefined length can be encoded in implicit VR,
         # see PS 3.5, section 6.2.2
         if found_implicit and is_sequence:
@@ -322,18 +345,26 @@ def _is_implicit_vr(fp, implicit_vr_is_assumed, is_little_endian, stop_when,
         # got to the real problem - warn or raise depending on config
         found_vr = 'implicit' if found_implicit else 'explicit'
         expected_vr = 'implicit' if not found_implicit else 'explicit'
-        message = ('Expected {0} VR, but found {1} VR - using {1} VR for '
-                   'reading'.format(expected_vr, found_vr))
+        msg = f"Expected {expected_vr} VR, but found {found_vr} VR"
         if config.enforce_valid_values:
-            raise InvalidDicomError(message)
-        warnings.warn(message, UserWarning)
+            raise InvalidDicomError(msg)
+
+        warnings.warn(msg + f" - using {found_vr} VR for reading", UserWarning)
+
     return found_implicit
 
 
-def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
-                 stop_when=None, defer_size=None,
-                 parent_encoding=default_encoding, specific_tags=None,
-                 at_top_level=True):
+def read_dataset(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    bytelength: Optional[int] = None,
+    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
+    defer_size: Optional[Union[int, str]] = None,
+    parent_encoding: Union[str, MutableSequence[str]] = default_encoding,
+    specific_tags: Optional[List[BaseTag]] = None,
+    at_top_level: bool = True
+) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
     dataset in the file.
 
@@ -374,11 +405,12 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         A collection (dictionary) of DICOM
         :class:`~pydicom.dataelem.DataElement` instances.
     """
-    raw_data_elements = dict()
+    raw_data_elements: Dict[BaseTag, Union[RawDataElement, DataElement]] = {}
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
         fp, is_implicit_VR, is_little_endian, stop_when,
-        is_sequence=not at_top_level)
+        is_sequence=not at_top_level
+    )
     fp.seek(fp_start)
     de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
                                     stop_when, defer_size, parent_encoding,
@@ -403,9 +435,14 @@ def read_dataset(fp, is_implicit_VR, is_little_endian, bytelength=None,
         logger.error(details)
 
     ds = Dataset(raw_data_elements)
+    encoding: Union[str, MutableSequence[str]]
     if 0x00080005 in raw_data_elements:
-        char_set = DataElement_from_raw(raw_data_elements[0x00080005]).value
-        encoding = convert_encodings(char_set)
+        char_set = DataElement_from_raw(
+            raw_data_elements[TupleTag((0x0008, 0x0005))]
+        ).value
+        encoding = convert_encodings(
+            cast(Union[str, List[str]], char_set)
+        )
     else:
         encoding = parent_encoding
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
@@ -417,36 +454,44 @@ def read_sequence(
     is_implicit_VR: bool,
     is_little_endian: bool,
     bytelength: int,
-    encoding: Union[str, List[str]],
+    encoding: Union[str, MutableSequence[str]],
     offset: int = 0
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
     :class:`list` of :class:`Datasets<pydicom.dataset.Dataset>`.
     """
-
     seq = []  # use builtin list to start for speed, convert to Sequence at end
     is_undefined_length = False
     if bytelength != 0:  # SQ of length 0 possible (PS 3.5-2008 7.5.1a (p.40)
         if bytelength == 0xffffffff:
             is_undefined_length = True
-            bytelength = None
+            bytelength = 0
+
         fp_tell = fp.tell  # for speed in loop
         fpStart = fp_tell()
         while (not bytelength) or (fp_tell() - fpStart < bytelength):
             file_tell = fp.tell()
-            dataset = read_sequence_item(fp, is_implicit_VR, is_little_endian,
-                                         encoding, offset)
+            dataset = read_sequence_item(
+                fp, is_implicit_VR, is_little_endian, encoding, offset
+            )
             if dataset is None:  # None is returned if hit Sequence Delimiter
                 break
+
             dataset.file_tell = file_tell + offset
             seq.append(dataset)
-    seq = Sequence(seq)
-    seq.is_undefined_length = is_undefined_length
-    return seq
+
+    sequence = Sequence(seq)
+    sequence.is_undefined_length = is_undefined_length
+    return sequence
 
 
-def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
-                       offset=0):
+def read_sequence_item(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    encoding: Union[str, MutableSequence[str]],
+    offset: int = 0
+) -> Optional[Dataset]:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
     """
@@ -459,23 +504,33 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
     except BaseException:
-        raise IOError("No tag to read at file position "
-                      "{0:05x}".format(fp.tell() + offset))
+        raise IOError(
+            f"No tag to read at file position {fp.tell() + offset:X}"
+        )
+
     tag = (group, element)
     if tag == SequenceDelimiterTag:  # No more items, time to stop reading
         logger.debug(
-            "{0:08x}: {1}".format(fp.tell() - 8 + offset, "End of Sequence"))
+            f"{fp.tell() - 8 + offset:08x}: End of Sequence"
+        )
         if length != 0:
-            logger.warning("Expected 0x00000000 after delimiter, found 0x%x, "
-                           "at position 0x%x" % (
-                               length, fp.tell() - 4 + offset))
+            logger.warning(
+                f"Expected 0x00000000 after delimiter, found 0x{length:X}, "
+                f"at position 0x{fp.tell() - 4 + offset:X}"
+            )
         return None
+
     if tag != ItemTag:
-        logger.warning("Expected sequence item with tag %s at file position "
-                       "0x%x" % (ItemTag, fp.tell() - 4 + offset))
+        logger.warning(
+            f"Expected sequence item with tag {ItemTag} at file position "
+            f"0x{fp.tell() - 4 + offset:X}"
+        )
     else:
-        logger.debug("{0:08x}: {1}  Found Item tag (start of item)".format(
-            fp.tell() - 4 + offset, bytes2hex(bytes_read)))
+        logger.debug(
+            f"{fp.tell() - 4 + offset:08x}: {bytes2hex(bytes_read)}  "
+            "Found Item tag (start of item)"
+        )
+
     if length == 0xFFFFFFFF:
         ds = read_dataset(fp, is_implicit_VR, is_little_endian,
                           bytelength=None, parent_encoding=encoding,
@@ -486,12 +541,14 @@ def read_sequence_item(fp, is_implicit_VR, is_little_endian, encoding,
                           parent_encoding=encoding,
                           at_top_level=False)
         ds.is_undefined_length_sequence_item = False
-        logger.debug("%08x: Finished sequence item" % (fp.tell() + offset,))
+
+        logger.debug(f"{fp.tell() + offset:08X}: Finished sequence item")
+
     ds.seq_item_tell = seq_item_tell
     return ds
 
 
-def _read_command_set_elements(fp):
+def _read_command_set_elements(fp: BinaryIO) -> Dataset:
     """Return a Dataset containing any Command Set (0000,eeee) elements
     in `fp`.
 
@@ -516,12 +573,15 @@ def _read_command_set_elements(fp):
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return (tag.group != 0)
 
-    command_set = read_dataset(fp, is_implicit_VR=True, is_little_endian=True,
-                               stop_when=_not_group_0000)
-    return command_set
+    return read_dataset(
+        fp,
+        is_implicit_VR=True,
+        is_little_endian=True,
+        stop_when=_not_group_0000
+    )
 
 
-def _read_file_meta_info(fp):
+def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
     """Return a Dataset containing any File Meta (0002,eeee) elements in `fp`.
 
     File Meta elements are always Explicit VR Little Endian (DICOM Standard,
@@ -548,10 +608,10 @@ def _read_file_meta_info(fp):
 
     start_file_meta = fp.tell()
     file_meta = FileMetaDataset(
-                    read_dataset(
-                        fp, is_implicit_VR=False, is_little_endian=True,
-                        stop_when=_not_group_0002
-                    )
+        read_dataset(
+            fp, is_implicit_VR=False, is_little_endian=True,
+            stop_when=_not_group_0002
+        )
     )
     if not file_meta._dict:
         return file_meta
@@ -564,10 +624,10 @@ def _read_file_meta_info(fp):
     except NotImplementedError:
         fp.seek(start_file_meta)
         file_meta = FileMetaDataset(
-                        read_dataset(
-                            fp, is_implicit_VR=True, is_little_endian=True,
-                            stop_when=_not_group_0002
-                        )
+            read_dataset(
+                fp, is_implicit_VR=True, is_little_endian=True,
+                stop_when=_not_group_0002
+            )
         )
 
     # Log if the Group Length doesn't match actual length
@@ -575,31 +635,31 @@ def _read_file_meta_info(fp):
         # FileMetaInformationGroupLength must be 12 bytes long and its value
         #   counts from the beginning of the next element to the end of the
         #   file meta elements
-        length_file_meta = fp.tell() - (start_file_meta + 12)
-        if file_meta.FileMetaInformationGroupLength != length_file_meta:
-            logger.info("_read_file_meta_info: (0002,0000) 'File Meta "
-                        "Information Group Length' value doesn't match the "
-                        "actual File Meta Information length ({0} vs {1} "
-                        "bytes)."
-                        .format(file_meta.FileMetaInformationGroupLength,
-                                length_file_meta))
+        actual_len = fp.tell() - (start_file_meta + 12)
+        elem_len = file_meta.FileMetaInformationGroupLength
+        if elem_len != actual_len:
+            logger.info(
+                "_read_file_meta_info: (0002,0000) 'File Meta Information "
+                "Group Length' value doesn't match the actual File Meta "
+                f"Information length ({elem_len} vs {actual_len} bytes)"
+            )
 
     return file_meta
 
 
-def read_file_meta_info(filename):
+def read_file_meta_info(filename: PathType) -> FileMetaDataset:
     """Read and return the DICOM file meta information only.
 
     This function is meant to be used in user code, for quickly going through
     a series of files to find one which is referenced to a particular SOP,
     without having to read the entire files.
     """
-    with DicomFile(filename, 'rb') as fp:
+    with open(filename, 'rb') as fp:
         read_preamble(fp, False)  # if no header, raise exception
         return _read_file_meta_info(fp)
 
 
-def read_preamble(fp, force):
+def read_preamble(fp: BinaryIO, force: bool) -> Optional[bytes]:
     """Return the 128-byte DICOM preamble in `fp` if present.
 
     `fp` should be positioned at the start of the file-like. If the preamble
@@ -617,7 +677,7 @@ def read_preamble(fp, force):
 
     Returns
     -------
-    preamble : str/bytes or None
+    preamble : bytes or None
         The 128-byte DICOM preamble will be returned if the appropriate prefix
         ('DICM') is found at byte offset 128. Returns ``None`` if the 'DICM'
         prefix is not found and `force` is ``True``.
@@ -636,7 +696,7 @@ def read_preamble(fp, force):
     preamble = fp.read(128)
     if config.debugging:
         sample = bytes2hex(preamble[:8]) + "..." + bytes2hex(preamble[-8:])
-        logger.debug("{0:08x}: {1}".format(fp.tell() - 128, sample))
+        logger.debug(f"{fp.tell() - 128:08x}: {sample}")
 
     logger.debug("Reading File Meta Information prefix...")
     magic = fp.read(4)
@@ -645,24 +705,34 @@ def read_preamble(fp, force):
             "File is not conformant with the DICOM File Format: 'DICM' "
             "prefix is missing from the File Meta Information header "
             "or the header itself is missing. Assuming no header and "
-            "continuing.")
-        preamble = None
+            "continuing."
+        )
         fp.seek(0)
-    elif magic != b"DICM" and not force:
-        raise InvalidDicomError("File is missing DICOM File Meta Information "
-                                "header or the 'DICM' prefix is missing from "
-                                "the header. Use force=True to force reading.")
+        return None
+
+    if magic != b"DICM" and not force:
+        raise InvalidDicomError(
+            "File is missing DICOM File Meta Information header or the 'DICM' "
+            "prefix is missing from the header. Use force=True to force "
+            "reading."
+        )
     else:
-        logger.debug("{0:08x}: 'DICM' prefix found".format(fp.tell() - 4))
+        logger.debug(f"{fp.tell() - 4:08x}: 'DICM' prefix found")
+
     return preamble
 
 
-def _at_pixel_data(tag, VR, length):
+def _at_pixel_data(tag: BaseTag, VR: Optional[str], length: int) -> bool:
     return tag == (0x7fe0, 0x0010)
 
 
-def read_partial(fileobj, stop_when=None, defer_size=None,
-                 force=False, specific_tags=None):
+def read_partial(
+    fileobj: BinaryIO,
+    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
+    defer_size: Optional[Union[int, str]] = None,
+    force: bool = False,
+    specific_tags: Optional[List[BaseTag]] = None
+) -> Union[FileDataset, DicomDir]:
     """Parse a DICOM file until a condition is met.
 
     Parameters
@@ -779,9 +849,12 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
         # warning already logged in read_dataset
 
     # Add the command set elements to the dataset (if any)
-    dataset.update(command_set._dict)
+    dataset.update(command_set)
 
-    class_uid = file_meta_dataset.get("MediaStorageSOPClassUID", None)
+    dataset_class: Union[Type[DicomDir], Type[FileDataset]]
+    class_uid = cast(
+        pydicom.uid.UID, file_meta_dataset.get("MediaStorageSOPClassUID", None)
+    )
     if class_uid and class_uid.name == "Media Storage Directory Storage":
         warnings.warn(
             "The 'DicomDir' class is deprecated and will be removed in v3.0, "
@@ -801,11 +874,11 @@ def read_partial(fileobj, stop_when=None, defer_size=None,
 
 
 def dcmread(
-    fp: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+    fp: Union[PathType, BinaryIO],
     defer_size: Optional[Union[str, int]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,
-    specific_tags: Optional[List[Union[int, str, Tuple[int]]]] = None
+    specific_tags: Optional[TagListType] = None
 ) -> Union[FileDataset, DicomDir]:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
@@ -816,16 +889,42 @@ def dcmread(
     or the entire *File Meta Information* is missing) then you will have to
     set `force` to ``True``.
 
+    .. deprecated:: 2.2
+
+        Returning a :class:`~pydicom.dicomdir.DicomDir` is deprecated and
+        will be removed in v3.0. Use :class:`~pydicom.fileset.FileSet` instead.
+
+
+    Examples
+    --------
+    Read and return a dataset stored in accordance with the DICOM File Format:
+
+    >>> ds = pydicom.dcmread("CT_small.dcm")
+    >>> ds.PatientName
+
+    Read and return a dataset not in accordance with the DICOM File Format:
+
+    >>> ds = pydicom.dcmread("rtplan.dcm", force=True)
+    >>> ds.PatientName
+
+    Use within a context manager:
+
+    >>> with pydicom.dcmread("rtplan.dcm") as ds:
+    ...     ds.PatientName
+
     Parameters
     ----------
     fp : str or PathLike or file-like
-        Either a file-like object, or a string containing the file name. If a
-        file-like object, the caller is responsible for closing it.
-    defer_size : int or str or None, optional
-        If ``None`` (default), all elements are read into memory. If specified,
+        Either a file-like object, a string containing the file name or the
+        path to the file. The file-like object must have ``seek()``,
+        ``read()`` and ``tell()`` methods and the caller is responsible for
+        closing it (if required).
+    defer_size : int or str, optional
+        If not used then all elements are read into memory. If specified,
         then if a data element's stored value is larger than `defer_size`, the
-        value is not read into memory until it is accessed in code. Specify an
-        integer (bytes), or a string value with units, e.g. "512 KB", "2 MB".
+        value is not read into memory until it is accessed in code. Should be
+        the number of bytes to be read as :class:`int` or as a :class:`str`
+        with units, e.g. ``'512 KB'``, ``'2 MB'``.
     stop_before_pixels : bool, optional
         If ``False`` (default), the full file will be read and parsed. Set
         ``True`` to stop before reading (7FE0,0010) *Pixel Data* (and all
@@ -836,8 +935,8 @@ def dcmread(
         missing the *File Meta Information* header. Set to ``True`` to force
         reading even if no *File Meta Information* header is found.
     specific_tags : list of (int or str or 2-tuple of int), optional
-        If not ``None``, only the tags in the list are returned. The list
-        elements can be tags or tag names. Note that the element (0008,0005)
+        If used the only the supplied tags will be returned. The supplied
+        elements can be tags or keywords. Note that the element (0008,0005)
         *Specific Character Set* is always returned if present - this ensures
         correct decoding of returned text values.
 
@@ -862,23 +961,6 @@ def dcmread(
         Data class that is returned.
     pydicom.filereader.read_partial
         Only read part of a DICOM file, stopping on given conditions.
-
-    Examples
-    --------
-    Read and return a dataset stored in accordance with the DICOM File Format:
-
-    >>> ds = pydicom.dcmread("rtplan.dcm")
-    >>> ds.PatientName
-
-    Read and return a dataset not in accordance with the DICOM File Format:
-
-    >>> ds = pydicom.dcmread("rtplan.dcm", force=True)
-    >>> ds.PatientName
-
-    Use within a context manager:
-
-    >>> with pydicom.dcmread("rtplan.dcm") as ds:
-    >>>     ds.PatientName
     """
     # Open file if not already a file object
     caller_owns_file = True
@@ -908,6 +990,11 @@ def dcmread(
     # Convert size to defer reading into bytes
     defer_size = size_in_bytes(defer_size)
 
+    if specific_tags:
+        specific_tags = [Tag(t) for t in specific_tags]
+
+    specific_tags = cast(Optional[List[BaseTag]], specific_tags)
+
     # Iterate through all items and store them --include file meta if present
     stop_when = None
     if stop_before_pixels:
@@ -922,10 +1009,22 @@ def dcmread(
     return dataset
 
 
-read_file = dcmread  # used read_file until pydicom 1.0. Kept for compatibility
+def __getattr__(name):
+    if name == 'read_file':
+        warnings.warn(
+            "'read_file' is deprecated and will be removed in v3.0, use "
+            "'dcmread' instead",
+            DeprecationWarning
+        )
+        return globals()['dcmread']
+
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
+if sys.version_info[:2] < (3, 7):
+    read_file = dcmread
 
 
-def read_dicomdir(filename="DICOMDIR"):
+def read_dicomdir(filename: PathType = "DICOMDIR") -> DicomDir:
     """Read a DICOMDIR file and return a :class:`~pydicom.dicomdir.DicomDir`.
 
     This is a wrapper around :func:`dcmread` which gives a default file name.
@@ -949,37 +1048,42 @@ def read_dicomdir(filename="DICOMDIR"):
     InvalidDicomError
         Raised if filename is not a DICOMDIR file.
     """
-    # dcmread will return a DicomDir instance if file is one.
     warnings.warn(
         "'read_dicomdir()' is deprecated and will be removed in v3.0, use "
         "'dcmread()' instead",
         DeprecationWarning
     )
 
-    # Read the file as usual.
-    ds = dcmread(filename)
-    # Here, check that it is in fact DicomDir
+    str_or_obj = path_from_pathlike(filename)
+    ds = dcmread(str_or_obj)
     if not isinstance(ds, DicomDir):
-        msg = "File '{0}' is not a Media Storage Directory file".format(
-            filename)
-        raise InvalidDicomError(msg)
+        raise InvalidDicomError(
+            f"File '{filename!r}' is not a Media Storage Directory file"
+        )
+
     return ds
 
 
-def data_element_offset_to_value(is_implicit_VR, VR):
+def data_element_offset_to_value(
+    is_implicit_VR: bool, VR: Optional[str]
+) -> int:
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:
-        offset = 8  # tag of 4 plus 4-byte length
-    else:
-        if VR in extra_length_VRs:
-            offset = 12  # tag 4 + 2 VR + 2 reserved + 4 length
-        else:
-            offset = 8  # tag 4 + 2 VR + 2 length
-    return offset
+        return 8  # tag of 4 plus 4-byte length
+
+    VR = cast(str, VR)
+    if VR in extra_length_VRs:
+        return 12  # tag 4 + 2 VR + 2 reserved + 4 length
+
+    return 8  # tag 4 + 2 VR + 2 length
 
 
-def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
-                               raw_data_elem):
+def read_deferred_data_element(
+    fileobj_type: Any,
+    filename_or_obj: Union[PathType, BinaryIO],
+    timestamp: Optional[float],
+    raw_data_elem: RawDataElement
+) -> Union[RawDataElement, DataElement]:
     """Read the previously deferred value from the file into memory
     and return a raw data element.
 
@@ -995,8 +1099,9 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
     filename_or_obj : str or file-like
         The filename of the original file if one exists, or the file-like
         object where the data element persists.
-    timestamp : time or None
-        The time the original file has been read, if not a file-like.
+    timestamp : float or None
+        The time (as given by stat.st_mtime) the original file has been
+        read, if not a file-like.
     raw_data_elem : dataelem.RawDataElement
         The raw data element with no value set.
 
@@ -1018,41 +1123,53 @@ def read_deferred_data_element(fileobj_type, filename_or_obj, timestamp,
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
     if filename_or_obj is None:
-        raise IOError("Deferred read -- original filename not stored. "
-                      "Cannot re-open")
-    is_filename = isinstance(filename_or_obj, str)
+        raise IOError(
+            "Deferred read -- original filename not stored. Cannot re-open"
+        )
 
     # Check that the file is the same as when originally read
-    if is_filename and not os.path.exists(filename_or_obj):
-        raise IOError("Deferred read -- original file "
-                      "{0:s} is missing".format(filename_or_obj))
-    if timestamp is not None:
-        statinfo = os.stat(filename_or_obj)
-        if statinfo.st_mtime != timestamp:
-            warnings.warn("Deferred read warning -- file modification time "
-                          "has changed.")
+    is_filename = isinstance(filename_or_obj, str)
+    if isinstance(filename_or_obj, str):
+        if not os.path.exists(filename_or_obj):
+            raise IOError(
+                f"Deferred read -- original file {filename_or_obj} is missing"
+            )
+
+        if timestamp is not None:
+            statinfo = os.stat(filename_or_obj)
+            if statinfo.st_mtime != timestamp:
+                warnings.warn(
+                    "Deferred read warning -- file modification time has "
+                    "changed"
+                )
 
     # Open the file, position to the right place
-    fp = (fileobj_type(filename_or_obj, 'rb')
-          if is_filename else filename_or_obj)
+    fp = (
+        fileobj_type(filename_or_obj, 'rb') if is_filename
+        else filename_or_obj
+    )
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
     fp.seek(raw_data_elem.value_tell - offset)
-    elem_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                      defer_size=None)
+    elem_gen = data_element_generator(
+        fp, is_implicit_VR, is_little_endian, defer_size=None
+    )
 
     # Read the data element and check matches what was stored before
-    data_elem = next(elem_gen)
+    elem = next(elem_gen)
     fp.close()
-    if data_elem.VR != raw_data_elem.VR:
-        raise ValueError("Deferred read VR {0:s} does not match "
-                         "original {1:s}".format(data_elem.VR,
-                                                 raw_data_elem.VR))
-    if data_elem.tag != raw_data_elem.tag:
-        raise ValueError("Deferred read tag {0!r} does not match "
-                         "original {1!r}".format(data_elem.tag,
-                                                 raw_data_elem.tag))
+    if elem.VR != raw_data_elem.VR:
+        raise ValueError(
+            f"Deferred read VR {elem.VR} does not match original "
+            f"{raw_data_elem.VR}"
+        )
+
+    if elem.tag != raw_data_elem.tag:
+        raise ValueError(
+            f"Deferred read tag {elem.tag!r} does not match "
+            f"original {raw_data_elem.tag!r}"
+        )
 
     # Everything is ok, now this object should act like usual DataElement
-    return data_elem
+    return elem

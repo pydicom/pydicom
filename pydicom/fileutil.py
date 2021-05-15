@@ -2,12 +2,16 @@
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
 from struct import pack, unpack
+from typing import Union, BinaryIO
 
 from pydicom.misc import size_in_bytes
-from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag
+from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
 from pydicom.datadict import dictionary_description
 
 from pydicom.config import logger
+
+
+PathType = Union[str, bytes, os.PathLike]
 
 
 def absorb_delimiter_item(fp, is_little_endian, delimiter):
@@ -393,7 +397,9 @@ def read_delimiter_item(fp, delimiter):
                     "got %d at file position 0x%x", length, fp.tell() - 4)
 
 
-def path_from_pathlike(file_object):
+def path_from_pathlike(
+    file_object: Union[PathType, BinaryIO]
+) -> Union[str, BinaryIO]:
     """Returns the path if `file_object` is a path-like object, otherwise the
     original `file_object`.
 
@@ -411,3 +417,7 @@ def path_from_pathlike(file_object):
         return os.fspath(file_object)
     except TypeError:
         return file_object
+
+
+def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
+    return TupleTag(unpack(f"{endianness}HH", b))

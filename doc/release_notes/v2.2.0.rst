@@ -24,6 +24,8 @@ Changes
   deprecated and will be removed in v3.0, use
   :meth:`~pydicom.dataset.Dataset.compress` or
   :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
+* :func:`~pydicom.filereader.read_file` is deprecated and will be removed in
+  v3.0, use :func:`~pydicom.filereader.dcmread` instead.
 
 Enhancements
 ------------

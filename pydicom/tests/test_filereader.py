@@ -19,11 +19,12 @@ from pydicom import config
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
-from pydicom.filereader import dcmread, read_dataset, read_dicomdir
+from pydicom.filereader import (
+    dcmread, read_dataset, read_dicomdir, data_element_generator
+)
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import data_element_generator
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -917,11 +918,7 @@ class TestIncorrectVR:
 
     def test_implicit_vr_expected_explicit_used_strict(
             self, enforce_valid_values):
-        msg = (
-            "Expected implicit VR, but found explicit VR - "
-            "using explicit VR for reading"
-        )
-
+        msg = "Expected implicit VR, but found explicit VR"
         with pytest.raises(InvalidDicomError, match=msg):
             read_dataset(
                 self.ds_explicit, is_implicit_VR=True, is_little_endian=True
@@ -943,10 +940,7 @@ class TestIncorrectVR:
 
     def test_explicit_vr_expected_implicit_used_strict(
             self, enforce_valid_values):
-        msg = (
-            "Expected explicit VR, but found implicit VR - "
-            "using implicit VR for reading"
-        )
+        msg = "Expected explicit VR, but found implicit VR"
         with pytest.raises(InvalidDicomError, match=msg):
             read_dataset(
                 self.ds_implicit, is_implicit_VR=False, is_little_endian=True
@@ -1641,3 +1635,18 @@ def test_read_dicomdir_deprecated():
     )
     with pytest.warns(DeprecationWarning, match=msg):
         ds = read_dicomdir(get_testdata_file("DICOMDIR"))
+
+
+def test_read_file_deprecated():
+    """Test deprecation warning for read_file()."""
+    if sys.version_info[:2] < (3, 7):
+        from pydicom.filereader import read_file
+    else:
+        msg = (
+            r"'read_file' is deprecated and will be removed in v3.0, use "
+            r"'dcmread' instead"
+        )
+        with pytest.warns(DeprecationWarning, match=msg):
+            from pydicom.filereader import read_file
+
+    assert read_file == dcmread

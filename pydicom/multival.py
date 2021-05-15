@@ -5,7 +5,7 @@ or any list of items that must all be the same type.
 
 from typing import (
     Iterable, Union, List, overload, Optional, Callable, Any, cast,
-    TypeVar, MutableSequence, Generator
+    TypeVar, MutableSequence, Generator, Iterator
 )
 from typing import Sequence as SequenceType
 
@@ -96,7 +96,7 @@ class MultiValue(MutableSequence[_ItemType]):
     def insert(self, position: int, val: _T) -> None:
         self._list.insert(position, self.type_constructor(val))
 
-    def __iter__(self) -> Generator[_ItemType, None, None]:
+    def __iter__(self) -> Iterator[_ItemType]:
         yield from self._list
 
     def __len__(self) -> int:

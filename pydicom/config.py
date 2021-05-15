@@ -376,6 +376,7 @@ ValueError: Invalid value used with the 'in' operator: must be an
 element tag as a 2-tuple or int, or an element keyword
 """
 
+debugging: bool
 
 def debug(debug_on=True, default_handler=True):
     """Turn on/off debugging of DICOM file reading and writing.

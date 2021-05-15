@@ -9,7 +9,7 @@ stored as a single number and separated to (group, element) as required.
 #       element
 from contextlib import contextmanager
 import traceback
-from typing import Tuple, Optional, Union, Any, Iterator
+from typing import Tuple, Optional, Union, Any, Iterator, List
 
 
 @contextmanager
@@ -34,6 +34,9 @@ def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
 
 # Type that can be used where a parameter is a tag or keyword
 TagType = Union[int, str, Tuple[int, int], "BaseTag"]
+TagListType = Union[
+    List[int], List[str], List[Tuple[int, int]], List["BaseTag"]
+]
 
 
 def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":

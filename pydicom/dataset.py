@@ -28,7 +28,7 @@ from types import ModuleType, TracebackType
 from typing import (
     TYPE_CHECKING, Optional, Tuple, Union, List, Any, ItemsView,
     KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr,
-    Callable, TypeVar, Type, overload
+    Callable, TypeVar, Type, overload, MutableSequence
 )
 import warnings
 import weakref
@@ -1179,7 +1179,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self,
         is_implicit_vr: Optional[bool],
         is_little_endian: Optional[bool],
-        character_encoding: Optional[str]
+        character_encoding: Optional[Union[str, MutableSequence[str]]]
     ) -> None:
         """Set the values for the original transfer syntax and encoding.
 
@@ -2305,7 +2305,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         return dir(self)
 
     def update(
-        self, dictionary: Union[Dict[str, object], Dict[TagType, DataElement]]
+        self,
+        d: Union[
+            Dict[str, Any],
+            Dict[TagType, Union[DataElement, RawDataElement]],
+            "Dataset"
+        ]
     ) -> None:
         """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
@@ -2315,7 +2320,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             The :class:`dict` or :class:`Dataset` to use when updating the
             current object.
         """
-        for key, value in list(dictionary.items()):
+        for key, value in list(d.items()):
             if isinstance(key, str):
                 setattr(self, key, value)
             else:
