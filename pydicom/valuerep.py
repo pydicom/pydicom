@@ -772,7 +772,7 @@ def MultiString(
     if len(splitup) == 1:
         return valtype(splitup[0])
 
-    return  MultiValue(valtype, splitup)
+    return MultiValue(valtype, splitup)
 
 
 def _verify_encodings(encodings):

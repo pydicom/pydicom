@@ -2,7 +2,7 @@
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
 from struct import pack, unpack
-from typing import Union, BinaryIO
+from typing import Union, BinaryIO, Optional, Tuple, cast
 
 from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
@@ -14,7 +14,9 @@ from pydicom.config import logger
 PathType = Union[str, bytes, os.PathLike]
 
 
-def absorb_delimiter_item(fp, is_little_endian, delimiter):
+def absorb_delimiter_item(
+    fp: BinaryIO, is_little_endian: bool, delimiter: BaseTag
+) -> None:
     """Read (and ignore) undefined length sequence or item terminators."""
     if is_little_endian:
         struct_format = "<HHL"
@@ -23,15 +25,17 @@ def absorb_delimiter_item(fp, is_little_endian, delimiter):
     group, elem, length = unpack(struct_format, fp.read(8))
     tag = TupleTag((group, elem))
     if tag != delimiter:
-        msg = ("Did not find expected delimiter '%s'" %
-               dictionary_description(delimiter))
-        msg += ", instead found %s at file position 0x%x" % (
-            str(tag), fp.tell() - 8)
-        logger.warn(msg)
+        logger.warn(
+            "Did not find expected delimiter "
+            f"'{dictionary_description(delimiter)}', instead found "
+            f"{tag} at file position 0x{fp.tell() - 8:X}"
+        )
         fp.seek(fp.tell() - 8)
         return
+
     logger.debug("%04x: Found Delimiter '%s'", fp.tell() - 8,
                  dictionary_description(delimiter))
+
     if length == 0:
         logger.debug("%04x: Read 0 bytes after delimiter", fp.tell() - 4)
     else:
@@ -39,14 +43,19 @@ def absorb_delimiter_item(fp, is_little_endian, delimiter):
                      fp.tell() - 4, length)
 
 
-def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
+def find_bytes(
+    fp: BinaryIO,
+    bytes_to_find: bytes,
+    read_size: int = 128,
+    rewind: bool = True
+) -> Optional[int]:
     """Read in the file until a specific byte sequence found.
 
     Parameters
     ----------
     fp : file-like
         The file-like to search.
-    bytes_to_find : str
+    bytes_to_find : bytes
         Contains the bytes to find. Must be in correct endian order already.
     read_size : int
         Number of bytes to read at a time.
@@ -90,14 +99,17 @@ def find_bytes(fp, bytes_to_find, read_size=128, rewind=True):
         fp.seek(data_start)
     else:
         fp.seek(found_at + len(bytes_to_find))
+
     return found_at
 
 
-def read_undefined_length_value(fp,
-                                is_little_endian,
-                                delimiter_tag,
-                                defer_size=None,
-                                read_size=1024 * 8):
+def read_undefined_length_value(
+    fp: BinaryIO,
+    is_little_endian: bool,
+    delimiter_tag: BaseTag,
+    defer_size: Optional[int] = None,
+    read_size: int = 1024 * 8
+) -> Optional[bytes]:
     """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
@@ -119,7 +131,7 @@ def read_undefined_length_value(fp,
 
     Returns
     -------
-    delimiter : str or None
+    delimiter : bytes or None
         The file delimiter.
 
     Raises
@@ -204,7 +216,9 @@ def read_undefined_length_value(fp,
         return b"".join(value_chunks)
 
 
-def _try_read_encapsulated_pixel_data(fp, is_little_endian, defer_size=None):
+def _try_read_encapsulated_pixel_data(
+    fp: BinaryIO, is_little_endian: bool, defer_size: Optional[int] = None
+) -> Tuple[bool, Optional[bytes]]:
     """Attempt to read an undefined length value item as if it were
     encapsulated pixel data as defined in PS3.5 section A.4.
 
@@ -314,8 +328,13 @@ def _try_read_encapsulated_pixel_data(fp, is_little_endian, defer_size=None):
     return (True, value)
 
 
-def find_delimiter(fp, delimiter, is_little_endian, read_size=128,
-                   rewind=True):
+def find_delimiter(
+    fp: BinaryIO,
+    delimiter: BaseTag,
+    is_little_endian: bool,
+    read_size: int = 128,
+    rewind: bool = True
+) -> Optional[int]:
     """Return file position where 4-byte delimiter is located.
 
     Parameters
@@ -339,16 +358,21 @@ def find_delimiter(fp, delimiter, is_little_endian, read_size=128,
     if not is_little_endian:
         struct_format = ">H"
     delimiter = Tag(delimiter)
-    bytes_to_find = pack(struct_format, delimiter.group) + pack(
-        struct_format, delimiter.elem)
+    bytes_to_find = (
+        pack(struct_format, delimiter.group)
+        + pack(struct_format, delimiter.elem)
+    )
+
     return find_bytes(fp, bytes_to_find, read_size=read_size, rewind=rewind)
 
 
-def length_of_undefined_length(fp,
-                               delimiter,
-                               is_little_endian,
-                               read_size=128,
-                               rewind=True):
+def length_of_undefined_length(
+    fp: BinaryIO,
+    delimiter: BaseTag,
+    is_little_endian: bool,
+    read_size: int = 128,
+    rewind: bool = True
+) -> Optional[int]:
     """Search through the file to find the delimiter and return the length
     of the data element.
 
@@ -377,9 +401,12 @@ def length_of_undefined_length(fp,
     """
     data_start = fp.tell()
     delimiter_pos = find_delimiter(
-        fp, delimiter, is_little_endian, rewind=rewind)
-    length = delimiter_pos - data_start
-    return length
+        fp, delimiter, is_little_endian, rewind=rewind
+    )
+    if delimiter_pos is not None:
+        return delimiter_pos - data_start
+
+    return None
 
 
 def read_delimiter_item(fp, delimiter):
@@ -414,10 +441,10 @@ def path_from_pathlike(
         itself in case of an object not representing a path.
     """
     try:
-        return os.fspath(file_object)
+        return os.fspath(file_object)  # type: ignore[arg-type]
     except TypeError:
-        return file_object
+        return cast(BinaryIO, file_object)
 
 
 def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
-    return TupleTag(unpack(f"{endianness}HH", b))
+    return TupleTag(cast(Tuple[int, int], unpack(f"{endianness}HH", b)))

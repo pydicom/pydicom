@@ -120,7 +120,7 @@ def data_element_generator(
     logger_debug = logger.debug
     debugging = config.debugging
     element_struct_unpack = element_struct.unpack
-    defer_size = size_in_bytes(defer_size)
+    defer_size = cast(int, size_in_bytes(defer_size))
 
     tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
     has_tag_set = bool(tag_set)
@@ -1019,6 +1019,7 @@ def __getattr__(name):
         return globals()['dcmread']
 
     raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 if sys.version_info[:2] < (3, 7):
     read_file = dcmread
