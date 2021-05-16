@@ -81,7 +81,7 @@ You might be asking why you would convert uncompressed RGB pixel data to YCbCr
 using YCbCr data should result in a higher compression ratio than
 with RGB, while YCbCr data is usually converted back to RGB before viewing.
 The decision to change the color space should be made with the intended
-usage of your dataset and the effect that a lossy operation will have on in mind.
+usage of your dataset in mind.
 
 
 Available Plugins
