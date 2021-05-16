@@ -38,15 +38,14 @@ Glossary
     When compressing pixel data using one of the JPEG encodings it's important
     to know if the encoder is performing any color space transformation prior
     to compression, as this needs to be taken into account when setting
-    the *Photometric Interpretation*. This reason this is important is that
-    if the encoder does perform a transform and the decoder doesn't, then
-    having a correct *Photometric Interpretation* makes it possible for the end
-    user to determine which inverse transformation to use to return the pixel
-    data to its original color space.
+    the *Photometric Interpretation*. This is important when an encoder
+    performs a transformation and the decoder doesn't, since having a correct
+    *Photometric Interpretation* makes it possible to determine which inverse
+    transformation to use to return the pixel data to its original color space.
 
     For more detailed information on each of the defined photometric
     interpretations refer to :dcm:`Annex C.7.6.3.1
-    <part03/sect_C.7.6.3.1.2.html#sect_C.7.6.3.1.2>` of Part 3 of the DICOM
+    <part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>` of Part 3 of the DICOM
     Standard.
 
     Allowed values: ``'MONOCHROME1'``, ``'MONOCHROME2'``, ``'PALETTE COLOR'``,
