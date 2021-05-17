@@ -174,7 +174,7 @@ class DataElement:
         self,
         tag: Union[int, str, Tuple[int, int]],
         VR: str,
-        value: object,
+        value: Any,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False
@@ -244,8 +244,8 @@ class DataElement:
         value_key: Union[str, None],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], object],
-                Callable[[str], object]
+                Callable[[BaseTag, str, str], Any],
+                Callable[[str], Any]
             ]
         ] = None
     ) -> _DataElement:
@@ -293,7 +293,7 @@ class DataElement:
         self,
         bulk_data_element_handler: Optional[Callable[["DataElement"], str]],
         bulk_data_threshold: int
-    ) -> Dict[str, object]:
+    ) -> Dict[str, Any]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
@@ -382,8 +382,8 @@ class DataElement:
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[["DataElement"], str]] = None,  # noqa
-        dump_handler: Optional[Callable[[Dict[object, object]], str]] = None
-    ) -> Dict[str, object]:
+        dump_handler: Optional[Callable[[Dict[Any, Any]], str]] = None
+    ) -> Dict[str, Any]:
         """Return a JSON representation of the :class:`DataElement`.
 
         .. versionadded:: 1.3
@@ -423,12 +423,12 @@ class DataElement:
         )
 
     @property
-    def value(self) -> object:
+    def value(self) -> Any:
         """Return the element's value."""
         return self._value
 
     @value.setter
-    def value(self, val: object) -> None:
+    def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
@@ -490,7 +490,7 @@ class DataElement:
         """
         self._value = self.empty_value
 
-    def _convert_value(self, val: object) -> object:
+    def _convert_value(self, val: Any) -> Any:
         """Convert `val` to an appropriate type and return the result.
 
         Uses the element's VR in order to determine the conversion method and
@@ -511,7 +511,7 @@ class DataElement:
         else:
             return MultiValue(self._convert, val)
 
-    def _convert(self, val: object) -> object:
+    def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
@@ -614,7 +614,7 @@ class DataElement:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
 
-    def __getitem__(self, key: int) -> object:
+    def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]

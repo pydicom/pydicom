@@ -3,7 +3,7 @@
 
 import codecs
 import re
-from typing import List, Set, Dict, Optional, Union, TYPE_CHECKING
+from typing import List, Set, Dict, Optional, Union, TYPE_CHECKING, cast
 import warnings
 
 from pydicom import config
@@ -820,10 +820,12 @@ def decode_element(
     if elem.VR == "PN":
         if elem.VM == 1:
             # elem.value: Union[PersonName, bytes]
-            elem.value = elem.value.decode(encodings)
+            elem.value = cast(PersonName, elem.value).decode(encodings)
         else:
             # elem.value: Iterable[Union[PersonName, bytes]]
-            elem.value = [val.decode(encodings) for val in elem.value]
+            elem.value = [
+                cast(PersonName, vv).decode(encodings) for vv in elem.value
+            ]
     elif elem.VR in text_VRs:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
