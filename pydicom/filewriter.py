@@ -535,18 +535,18 @@ def write_data_element(
 
         encodings = encodings or [default_encoding]
         encodings = convert_encodings(encodings)
-        func, param = writers[VR]
+        fn, param = writers[VR]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
             if VR in text_VRs or VR in ('PN', 'SQ'):
-                func(buffer, elem, encodings=encodings)  # type: ignore[operator]
+                fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
                 # numeric format parameter
                 if param is not None:
-                    func(buffer, elem, param)  # type: ignore[operator]
+                    fn(buffer, elem, param)  # type: ignore[operator]
                 else:
-                    func(buffer, elem)  # type: ignore[operator]
+                    fn(buffer, elem)  # type: ignore[operator]
 
     # valid pixel data with undefined length shall contain encapsulated
     # data, e.g. sequence items - raise ValueError otherwise (see #238)
