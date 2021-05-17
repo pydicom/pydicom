@@ -1722,7 +1722,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         # Add or update any other required elements
         if self.SamplesPerPixel > 1:
-            self.PlanarConfiguration = 1 if uid == RLELossless else 0
+            self.PlanarConfiguration: int = 1 if uid == RLELossless else 0
 
     def decompress(self, handler_name: str = '') -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
@@ -2604,7 +2604,7 @@ class FileDataset(Dataset):
         filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
         dataset: Dataset,
         preamble: Optional[bytes] = None,
-        file_meta: Optional[Dataset] = None,
+        file_meta: Optional["FileMetaDataset"] = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True
     ) -> None:
@@ -2634,7 +2634,7 @@ class FileDataset(Dataset):
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
-        self.file_meta = file_meta
+        self.file_meta: Optional["FileMetaDataset"] = file_meta
         self.is_implicit_VR = is_implicit_VR
         self.is_little_endian = is_little_endian
         filename = None

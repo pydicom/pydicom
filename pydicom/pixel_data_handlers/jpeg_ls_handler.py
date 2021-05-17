@@ -11,7 +11,7 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import jpeg_ls
+    import jpeg_ls  # type: ignore[import]
     HAVE_JPEGLS = True
 except ImportError:
     HAVE_JPEGLS = False

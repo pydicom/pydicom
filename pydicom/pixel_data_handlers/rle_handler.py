@@ -52,7 +52,7 @@ import pydicom.uid
 
 if TYPE_CHECKING:
     import numpy  # type: ignore[import]
-    from pydicom.dataset import Dataset
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 
 HANDLER_NAME = 'RLE Lossless'
@@ -127,7 +127,8 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
         If the actual length of the pixel data doesn't match the expected
         length.
     """
-    transfer_syntax = ds.file_meta.TransferSyntaxUID
+    file_meta = cast("FileMetaDataset", ds.file_meta)  # type: ignore[has-type]
+    transfer_syntax = file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
     if transfer_syntax not in SUPPORTED_TRANSFER_SYNTAXES:
         raise NotImplementedError(
