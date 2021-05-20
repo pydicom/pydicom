@@ -67,6 +67,7 @@ Or download the missing files to the local cache (after installing *pydicom*)::
 
 
 .. _tut_install_libs:
+.. _tut_install_np:
 
 Install the optional libraries
 ==============================
@@ -87,6 +88,8 @@ need to be installed. See :ref:`this page <guide_compressed>` for a list of
 which library is needed to handle a given JPEG format, as specified by
 the dataset's (0002,0010) *Transfer Syntax UID* value.
 
+
+.. _tut_install_pil:
 
 Installing Pillow
 -----------------
@@ -125,6 +128,8 @@ Through conda::
   pip install git+https://github.com/Who8MyLunch/CharPyLS
 
 
+.. _tut_install_gdcm:
+
 Installing GDCM
 ---------------
 
@@ -139,6 +144,8 @@ Through conda::
 
   conda install gdcm -c conda-forge
 
+
+.. _tut_install_pylj:
 
 Installing pylibjpeg
 --------------------

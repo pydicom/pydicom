@@ -19,7 +19,7 @@ The requirements for compressed *Pixel Data* in the DICOM Standard are:
 
 * Each frame of pixel data must be encoded separately
 * All the encoded frames must then be :func:`encapsulated
-  <pydicom.encaps.encapsulate> using a basic offset table. When the amount
+  <pydicom.encaps.encapsulate>` using a basic offset table. When the amount
   of encoded data is too large for the basic offset table then the use of
   the :func:`extended offset table <pydicom.encaps.encapsulate_extended>` is
   recommended.
@@ -86,11 +86,10 @@ transfer syntaxes:
 |              |                     |                  | `pylibjpeg <pylj_>`_,   |
 |              |                     |                  | `pylibjpeg-rle <rle_>`_ |
 +              +                     +------------------+-------------------------+
-|              |                     | gdcm             | `numpy <np_>`_,         |
-|              |                     |                  | `gdcm <gdcm_>`_         |
+|              |                     | gdcm             | `gdcm <gdcm_>`_         |
 +--------------+---------------------+------------------+-------------------------+
 
-| :sup:`1` *~25x slower than the other plugins*
+| :sup:`1` *~20x slower than the other plugins*
 
 Compressing with ``Dataset.compress()``
 .......................................
@@ -116,22 +115,25 @@ A specific encoding plugin can be used by passing the plugin name via the
     ds.save_as("CT_small_rle.dcm")
 
 
-Change the compression on an already compressed dataset. Because this requires
-that the *Pixel Data* be uncompressed, a matching
-:doc:`image data handler<image_data_handlers>` for the initial compression
-method is required.
+Implicitly changing the compression on an already compressed dataset is not
+currently supported, however it can still be done explicitly by decompressing
+prior to calling :meth:`~pydicom.dataset.Dataset.compress`. In the example
+below, a matching :doc:`image data handler<image_data_handlers>` for the
+original transfer syntax - *JPEG 2000 Lossless* - is required.
 
 .. code-block:: python
 
     # Requires a JPEG 2000 compatible image data handler
     ds = get_testdata_file("US1_J2KR.dcm", read=True)
+    arr = ds.pixel_array
     ds.PhotometricInterpretation = 'RGB'
-    ds.compress(RLELossless)
+    ds.compress(RLELossless, arr)
     ds.save_as("US1_RLE.dcm")
 
 Note that the *Photometric Interpretation* in this case has been changed from
-``'YBR_RCT'``, which is the value for when it is J2K compressed, to ``'RGB'``
+``'YBR_RCT'``, which is the value for when it's J2K compressed, to ``'RGB'``
 which is the correct value for this particular dataset once the *Pixel Data*
 is RLE compressed. It's up to you to ensure that the the correct *Photometric
-Interpretation* has been set prior to actually calling
+Interpretation* has been set and that the decompressed pixel data is in the
+correct color space prior to actually calling
 :meth:`~pydicom.dataset.Dataset.compress`.

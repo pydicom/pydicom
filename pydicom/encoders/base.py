@@ -4,13 +4,16 @@
 from importlib import import_module
 import sys
 from typing import (
-    Callable, Generator, Tuple, List, Optional, Dict, Union, cast,
+    Callable, Iterator, Tuple, List, Optional, Dict, Union, cast, Iterable,
     TYPE_CHECKING
 )
 
 from pydicom.encaps import encapsulate
 from pydicom.pixel_data_handlers.util import get_expected_length
-from pydicom.uid import UID, RLELossless
+from pydicom.uid import (
+    UID, JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1,
+    JPEGLSLossless, JPEGLSNearLossless, JPEG2000Lossless, JPEG2000, RLELossless
+)
 
 if TYPE_CHECKING:
     from pydicom.dataset import Dataset
@@ -26,10 +29,10 @@ class Encoder:
     """Factory class for data encoders.
 
     Every available ``Encoder`` instance in *pydicom* corresponds directly
-    to a single DICOM *Transfer Syntax UID*, and provides a
-    mechanism for converting raw unencoded source data to meet the
-    requirements of that transfer syntax using one or more
-    :doc:`encoding plugins</guides/encoder_plugins>`.
+    to a single DICOM *Transfer Syntax UID*, and provides a  mechanism for
+    converting raw unencoded source data to meet the requirements of that
+    transfer syntax using one or more :doc:`encoding plugins
+    </guides/encoding/encoder_plugins>`.
 
     .. versionadded:: 2.2
     """
@@ -57,7 +60,7 @@ class Encoder:
         """Add an encoding plugin to the encoder.
 
         The requirements for encoding plugins are available
-        :doc:`here</guides/encoder_plugins>`.
+        :doc:`here</guides/encoding/encoder_plugins>`.
 
         Parameters
         ----------
@@ -120,7 +123,6 @@ class Encoder:
         src : bytes, numpy.ndarray or pydicom.dataset.Dataset
             Single or multi-frame pixel data as one of the following:
 
-            * :class:`bytes`: the uncompressed little-endian ordered pixel data
             * :class:`~numpy.ndarray`: the uncompressed pixel data, should be
               :attr:`shaped<numpy.ndarray.shape>` as:
 
@@ -135,6 +137,9 @@ class Encoder:
               *Pixel Data* is compressed then a :doc:`suitable pixel data
               handler </old/image_data_handlers>` must be available to
               decompress it.
+            * :class:`bytes`: the uncompressed little-endian ordered pixel
+              data. Using ``bytes`` as the `src` will bypass some of the
+              validation checks and is only recommended for advanced users.
         idx : int, optional
             Required when `src` contains multiple frames, this is the index
             of the frame to be encoded.
@@ -145,11 +150,7 @@ class Encoder:
             plugins for each encoder see the
             :mod:`API documentation<pydicom.encoders>`.
         decoding_plugin : str, optional
-            If `src` is a :class:`~pydicom.dataset.Dataset` containing
-            compressed *Pixel Data* then this is the name of the
-            :mod:`pixel data decoding handler<pydicom.pixel_data_handlers>`.
-            If `decoding_plugin` is not specified then all available
-            handlers will be tried (default).
+            Placeholder for future functionality.
         **kwargs
             The following keyword parameters are required when `src` is
             :class:`bytes` or :class:`~numpy.ndarray`:
@@ -163,7 +164,7 @@ class Encoder:
             * ``'samples_per_pixel'``: :class:`int` - the number of samples
               per pixel in `src`, should be 1 or 3.
             * ``'bits_allocated'``: :class:`int` - the number of bits used
-              to contain each pixel, should be 8, 16, 32 or 64.
+              to contain each pixel, should be a multiple of 8.
             * ``'bits_stored'``: :class:`int` - the number of bits actually
               used per pixel. For example, an ``ndarray`` `src` might have a
               :class:`~numpy.dtype` of ``'uint16'`` (range 0 to 65535) but
@@ -172,11 +173,11 @@ class Encoder:
               being encoded, ``0`` for unsigned, ``1`` for 2's complement
               (signed)
             * ``'photometric_interpretation'``: :class:`str` - the intended
-              color space of the encoded pixel data, such as ``'YBR_FULL'``.
+              color space of the *encoded* pixel data, such as ``'YBR_FULL'``.
 
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugin options
-            </guides/encoder_plugin_options>` for more information.
+            </guides/encoding/encoder_plugin_options>` for more information.
 
         Returns
         -------
@@ -232,7 +233,12 @@ class Encoder:
         encoding_plugin: str = '',
         **kwargs
     ) -> bytes:
-        """Return a single encoded frame from `src`."""
+        """Return a single encoded frame from `src`.
+
+        Encoding :class:`bytes` will bypass a number of the validation checks.
+        This is to allow advanced users to intentionally perform non-conformant
+        encoding if they wish to do so.
+        """
         self._check_kwargs(kwargs)
 
         rows: int = kwargs['rows']
@@ -281,7 +287,8 @@ class Encoder:
         **kwargs
     ) -> bytes:
         """Return a single encoded frame from the *Pixel Data* in `ds`."""
-        kwargs.update(self.kwargs_from_ds(ds))
+        kwargs = {**self.kwargs_from_ds(ds), **kwargs}
+        self._validate_encoding_profile(**kwargs)
 
         tsyntax = cast(UID, ds.file_meta.TransferSyntaxUID)
         if not tsyntax.is_compressed:
@@ -290,22 +297,28 @@ class Encoder:
             )
 
         # Pixel Data is compressed
+        raise ValueError(
+            "The dataset must be decompressed and correct 'Transfer "
+            "Syntax UID' and 'Photometric Interpretation' values set before "
+            "attempting to compress"
+        )
+
         # Note that from this point on we require at least numpy be available
-        if decoding_plugin:
-            ds.convert_pixel_data(handler_name=decoding_plugin)
-
-        arr = ds.pixel_array
-
-        if kwargs['number_of_frames'] > 1 or len(arr.shape) == 4:
-            if idx is None:
-                raise ValueError(
-                    "The frame 'idx' is required for multi-frame pixel data"
-                )
-
-            arr = arr[idx]
-
-        src = self._preprocess(arr, **kwargs)
-        return self._process(src, encoding_plugin, **kwargs)
+        # if decoding_plugin:
+        #     ds.convert_pixel_data(handler_name=decoding_plugin)
+        #
+        # arr = ds.pixel_array
+        #
+        # if kwargs['number_of_frames'] > 1 or len(arr.shape) == 4:
+        #     if idx is None:
+        #         raise ValueError(
+        #             "The frame 'idx' is required for multi-frame pixel data"
+        #         )
+        #
+        #     arr = arr[idx]
+        #
+        # src = self._preprocess(arr, **kwargs)
+        # return self._process(src, encoding_plugin, **kwargs)
 
     @property
     def is_available(self) -> bool:
@@ -320,7 +333,7 @@ class Encoder:
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs
-    ) -> Generator[bytes, None, None]:
+    ) -> Iterator[bytes]:
         """Yield encoded frames of the pixel data in  `src` as :class:`bytes`.
 
         Parameters
@@ -328,7 +341,6 @@ class Encoder:
         src : bytes, numpy.ndarray or pydicom.dataset.Dataset
             Single or multi-frame pixel data as one of the following:
 
-            * :class:`bytes`: the uncompressed little-endian ordered pixel data
             * :class:`~numpy.ndarray`: the uncompressed pixel data, should be
               :attr:`shaped<numpy.ndarray.shape>` as:
 
@@ -343,6 +355,9 @@ class Encoder:
               *Pixel Data* is compressed then a :doc:`suitable pixel data
               handler </old/image_data_handlers>` must be available to
               decompress it.
+            * :class:`bytes`: the uncompressed little-endian ordered pixel
+              data. Using ``bytes`` as the `src` will bypass some of the
+              validation checks and is only recommended for advanced users.
         encoding_plugin : str, optional
             The name of the pixel data encoding plugin to use. If
             `encoding_plugin` is not specified then all available
@@ -368,7 +383,7 @@ class Encoder:
             * ``'samples_per_pixel'``: :class:`int` - the number of samples
               per pixel in `src`, should be 1 or 3.
             * ``'bits_allocated'``: :class:`int` - the number of bits used
-              to contain each pixel, should be 8, 16, 32 or 64.
+              to contain each pixel, should be a multiple of 8.
             * ``'bits_stored'``: :class:`int` - the number of bits actually
               used per pixel. For example, an ``ndarray`` `src` might have a
               :class:`~numpy.dtype` of ``'uint16'`` (range 0 to 65535) but
@@ -381,7 +396,7 @@ class Encoder:
 
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugin options
-            </guides/encoder_plugin_options>` for more information.
+            </guides/encoding/encoder_plugin_options>` for more information.
 
         Yields
         ------
@@ -504,6 +519,15 @@ class Encoder:
         `arr` will be checked against the required keys in `kwargs` before
         being converted to little-endian ordered bytes.
 
+        UID specific validation will also be performed to ensure `kwargs` meets
+        the requirements of Section 8 of Part 5 of the DICOM Standard.
+
+        Note that this pre-processing only occurs when an
+        :class:`~numpy.ndarray`  or :class:`~pydicom.dataset.Dataset` are
+        passed to ``encode`` or ``iter_encode``. This is a deliberate decision
+        to allow advanced users to bypass these restrictions by using
+        :class:`bytes` as a `src`.
+
         Parameters
         ----------
         arr : numpy.ndarray
@@ -585,10 +609,10 @@ class Encoder:
             )
 
         # Checks for *Bits Allocated*
-        if bits_allocated not in (8, 16, 32, 64):
+        if bits_allocated % 8:
             raise ValueError(
                 "Unable to encode as a bits allocated value of "
-                f"{bits_allocated} is not supported (must be 8, 16, 32 or 64)"
+                f"{bits_allocated} is not supported (must be a multiple of 8)"
             )
 
         if bytes_allocated != dtype.itemsize:
@@ -603,6 +627,9 @@ class Encoder:
                 "Unable to encode as the bits stored value is greater than "
                 "the bits allocated value"
             )
+
+        # UID specific validation based on Section 8 of Part 5
+        self._validate_encoding_profile(**kwargs)
 
         # Convert the array to the required byte order (little-endian)
         sys_endianness = '<' if sys.byteorder == 'little' else '>'
@@ -728,6 +755,113 @@ class Encoder:
         """
         return self._uid
 
+    def _validate_encoding_profile(self, **kwargs) -> None:
+        """Perform  UID specific validation of encoding parameters based on
+        Part 5, Section 8 of the DICOM Standard.
+
+        Encoding profiles should be:
+
+        Tuple[str, int, Iterable[int], Iterable[int], Iterable[int]] as
+        (
+            PhotometricInterpretation, SamplesPerPixel, PixelRepresentation,
+            BitsAllocated, BitsStored
+        )
+        """
+        if self.UID not in ENCODING_PROFILES:
+            return
+
+        # Test each profile and see if it matches `kwargs`
+        for (pi, spp, px_repr, bits_a, bits_s) in ENCODING_PROFILES[self.UID]:
+            try:
+                assert kwargs['photometric_interpretation'] == pi
+                assert kwargs['samples_per_pixel'] == spp
+                assert kwargs['pixel_representation'] in px_repr
+                assert kwargs['bits_allocated'] in bits_a
+                assert kwargs['bits_stored'] in bits_s
+            except AssertionError as exc:
+                continue
+
+            return
+
+        raise ValueError(
+            "Unable to encode as one or more of 'photometric interpretation', "
+            "'samples per pixel', 'bits allocated', 'bits stored' or "
+            f"'pixel representation' is not valid for '{self.UID.name}'"
+        )
+
+
+# UID: [
+#   Photometric Interpretation (the intended value *after* encoding),
+#   Samples per Pixel,
+#   Pixel Representation,
+#   Bits Allocated,
+#   Bits Stored,
+# ]
+ProfileType = Tuple[str, int, Iterable[int], Iterable[int], Iterable[int]]
+ENCODING_PROFILES: Dict[UID, List[ProfileType]] = {
+    JPEGBaseline8Bit: [  # 1.2.840.10008.1.2.4.50: Table 8.2.1-1 in PS3.5
+        ("MONOCHROME1", 1, (0, ), (8, ), (8, )),
+        ("MONOCHROME2", 1, (0, ), (8, ), (8, )),
+        ("YBR_FULL_422", 3, (0, ), (8, ), (8, )),
+        ("RGB", 3, (0, ), (8, ), (8, )),
+    ],
+    JPEGExtended12Bit: [  # 1.2.840.10008.1.2.4.51: Table 8.2.1-1 in PS3.5
+        ("MONOCHROME1", 1, (0, ), (8, ), (8, )),
+        ("MONOCHROME1", 1, (0, ), (16, ), (12, )),
+        ("MONOCHROME2", 1, (0, ), (8, ), (8, )),
+        ("MONOCHROME2", 1, (0, ), (16, ), (12, )),
+    ],
+    JPEGLosslessP14: [  # 1.2.840.10008.1.2.4.57: Table 8.2.1-2 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0, ), (8, 16), range(1, 17)),
+        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+    ],
+    JPEGLosslessSV1: [  # 1.2.840.10008.1.2.4.70: Table 8.2.1-2 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0, ), (8, 16), range(1, 17)),
+        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+    ],
+    JPEGLSLossless: [  # 1.2.840.10008.1.2.4.80: Table 8.2.3-1 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16), range(2, 17)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16), range(2, 17)),
+        ("PALETTE COLOR", 1, (0, ), (8, 16), range(2, 17)),
+        ("YBR_FULL", 3, (0, ), (8, ), range(2, 9)),
+        ("RGB", 3, (0, ), (8, 16), range(2, 17)),
+    ],
+    JPEGLSNearLossless: [  # 1.2.840.10008.1.2.4.81: Table 8.2.3-1 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16), range(2, 17)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16), range(2, 17)),
+        ("YBR_FULL", 3, (0, ), (8, ), range(2, 9)),
+        ("RGB", 3, (0, ), (8, 16), range(2, 17)),
+    ],
+    JPEG2000Lossless: [  # 1.2.840.10008.1.2.4.90: Table 8.2.4-1 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
+        ("YBR_RCT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("RGB", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_FULL", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+    ],
+    JPEG2000: [  # 1.2.840.10008.1.2.4.91: Table 8.2.4-1 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_RCT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_ICT", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("RGB", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+        ("YBR_FULL", 3, (0, ), (8, 16, 24, 32, 40), range(1, 39)),
+    ],
+    RLELossless: [  # 1.2.840.10008.1.2.5: Table 8.2.2-1 in PS3.5
+        ("MONOCHROME1", 1, (0, 1), (8, 16), range(1, 17)),
+        ("MONOCHROME2", 1, (0, 1), (8, 16), range(1, 17)),
+        ("PALETTE COLOR", 1, (0, ), (8, 16), range(1, 17)),
+        ("YBR_FULL", 3, (0, ), (8, ), range(1, 9)),
+        ("RGB", 3, (0, ), (8, 16), range(1, 17)),
+    ],
+}
 
 # Encoder names should be f"{UID.keyword}Encoder"
 RLELosslessEncoder = Encoder(RLELossless)
@@ -786,13 +920,13 @@ def get_encoder(uid: str) -> Encoder:
 
     .. versionadded:: 2.2
 
-    +--------------------------------------+--------------------+
-    | Transfer Syntax                      | Version added      |
-    +----------------+---------------------+                    +
-    | Name           | UID                 |                    |
-    +================+=====================+====================+
-    | *RLE Lossless* | 1.2.840.10008.1.2.5 | 2.2                |
-    +----------------+---------------------+--------------------+
+    +-----------------------------------------------+--------------------+
+    | Transfer Syntax                               | Version added      |
+    +----------------------+------------------------+                    +
+    | Name                 | UID                    |                    |
+    +======================+========================+====================+
+    | *RLE Lossless*       | 1.2.840.10008.1.2.5    | 2.2                |
+    +----------------------+------------------------+--------------------+
     """
     uid = UID(uid)
     try:

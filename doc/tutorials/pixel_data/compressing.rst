@@ -139,7 +139,7 @@ pass the UID for *RLE Lossless* to :func:`Dataset.compress()
     >>> ds.save_as("CT_small_rle.dcm")
 
 This will compress the existing *Pixel Data* and update the *Transfer Syntax
-UID* before saving the dataset to file as  `CT_small_rle.dcm`.
+UID* before saving the dataset to file as  ``CT_small_rle.dcm``.
 
 If you're creating a dataset from scratch you can instead pass a
 :class:`~numpy.ndarray` to be compressed and used as the *Pixel Data*:
@@ -183,10 +183,11 @@ A specific encoding plugin can be used by passing the plugin name via the
 The plugins available for each encoder are listed in the
 :mod:`API reference<pydicom.encoders>` for the encoder type.
 
-You can also change the compression on an already compressed dataset. Because
-this requires that the *Pixel Data* be uncompressed, a matching
-:doc:`image data handler</old/image_data_handlers>` for the initial compression
-method is required.
+Implicitly changing the compression on an already compressed dataset is not
+currently supported, however it can still be done explicitly by decompressing
+prior to calling :meth:`~pydicom.dataset.Dataset.compress`. In the example
+below, a matching :doc:`image data handler</old/image_data_handlers>` for the
+original transfer syntax - *JPEG 2000 Lossless* - is required.
 
 .. code-block:: python
 
