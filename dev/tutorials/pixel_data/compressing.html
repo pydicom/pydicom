@@ -325,7 +325,7 @@ pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="..
 </pre></div>
 </div>
 <p>This will compress the existing <em>Pixel Data</em> and update the <em>Transfer Syntax
-UID</em> before saving the dataset to file as  <cite>CT_small_rle.dcm</cite>.</p>
+UID</em> before saving the dataset to file as  <code class="docutils literal notranslate"><span class="pre">CT_small_rle.dcm</span></code>.</p>
 <p>If you’re creating a dataset from scratch you can instead pass a
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to be compressed and used as the <em>Pixel Data</em>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -361,10 +361,11 @@ exception:</p>
 </div>
 <p>The plugins available for each encoder are listed in the
 <a class="reference internal" href="../../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">API</span> <span class="pre">reference</span></code></a> for the encoder type.</p>
-<p>You can also change the compression on an already compressed dataset. Because
-this requires that the <em>Pixel Data</em> be uncompressed, a matching
-<a class="reference internal" href="../../old/image_data_handlers.html"><span class="doc">image data handler</span></a> for the initial compression
-method is required.</p>
+<p>Implicitly changing the compression on an already compressed dataset is not
+currently supported, however it can still be done explicitly by decompressing
+prior to calling <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a>. In the example
+below, a matching <a class="reference internal" href="../../old/image_data_handlers.html"><span class="doc">image data handler</span></a> for the
+original transfer syntax - <em>JPEG 2000 Lossless</em> - is required.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;US1_J2KR.dcm&quot;</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">SamplesPerPixel</span>
 <span class="go">3</span>

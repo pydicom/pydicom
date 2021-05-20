@@ -49,7 +49,7 @@ An encoding plugin must implement three objects within the same module:
     * ``'number_of_frames'``: :class:`int` - the number of image frames
       contained in `src`
     * ``'bits_allocated'``: :class:`int` - the number of bits used to contain
-      each pixel in `src`, should be 8, 16, 32 or 64.
+      each pixel in `src`, should be a multiple of 8.
     * ``'bits_stored'``: :class:`int` - the number of bits actually used by
       each pixel in `src`, e.g. 12-bit pixel data (range 0 to 4095) will be
       contained by 16-bits (range 0 to 65535).
