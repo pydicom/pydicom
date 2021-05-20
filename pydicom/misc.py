@@ -2,7 +2,7 @@
 """Miscellaneous helper functions"""
 
 
-_size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
+_size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024**3, TB=1024**4)
 
 
 def size_in_bytes(expr):

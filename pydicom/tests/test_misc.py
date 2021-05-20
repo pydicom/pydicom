@@ -46,6 +46,6 @@ class TestMisc:
         assert size_in_bytes('2gB') == 0x80000000
 
         with pytest.raises(ValueError):
-            size_in_bytes('2 TB')
+            size_in_bytes('2 PB')
         with pytest.raises(ValueError):
             size_in_bytes('KB 2')

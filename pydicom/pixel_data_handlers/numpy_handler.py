@@ -56,7 +56,9 @@ except ImportError:
 
 import warnings
 
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_expected_length
+from pydicom.pixel_data_handlers.util import (
+  pixel_dtype, get_expected_length, PIXEL_DATA_KEYWORDS
+)
 import pydicom.uid
 
 HANDLER_NAME = 'Numpy'
@@ -271,13 +273,19 @@ def get_pixeldata(ds, read_only=False):
         )
 
     # Check required elements
-    keywords = ['PixelData', 'FloatPixelData', 'DoubleFloatPixelData']
-    px_keyword = [kw for kw in keywords if kw in ds]
-    if len(px_keyword) != 1:
+
+    px_keyword = [kw for kw in PIXEL_DATA_KEYWORDS if kw in ds]
+    if len(px_keyword) > 1:
+        raise AttributeError(
+            "Unable to convert the pixel data: there is more than one pixel "
+            "data element in the dataset: "
+            f"found {', '.join(px_keyword)}"
+        )
+    elif len(px_keyword) == 0:
         raise AttributeError(
             "Unable to convert the pixel data: one of Pixel Data, Float "
             "Pixel Data or Double Float Pixel Data must be present in "
-            "the dataset"
+            "the dataset.  The file may not be a DICOM image file."
         )
 
     required_elements = [
