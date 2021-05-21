@@ -4,6 +4,7 @@
 from itertools import groupby, islice
 from struct import pack
 import sys
+from typing import List
 
 from pydicom.uid import RLELossless
 
@@ -131,13 +132,13 @@ def _encode_row(src: bytes) -> bytes:
     * 2-byte repeat runs are always encoded as Replicate Runs rather than
       only when not preceeded by a Literal Run as suggested by the Standard.
     """
-    out = []
+    out: List[int] = []
     out_append = out.append
     out_extend = out.extend
 
     literal = []
-    for _, group in groupby(src):
-        group = list(group)
+    for _, iter_group in groupby(src):
+        group = list(iter_group)
         if len(group) == 1:
             literal.append(group[0])
         else:

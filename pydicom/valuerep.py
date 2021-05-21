@@ -7,9 +7,9 @@ import sys
 import warnings
 from decimal import Decimal
 from math import floor, isfinite, log10
-from typing import Sequence as SequenceType
 from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator, Callable
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator,
+    Callable, MutableSequence, Sequence, cast
 )
 
 # don't import datetime_conversion directly
@@ -737,11 +737,15 @@ class IS(int):
         return f'"{super().__repr__()}"'
 
 
+def _as_str(s: str):
+    return str(s)
+
+
 def MultiString(
     val: str,
-    valtype: Optional[Union[Type[_T], Callable[[object], _T]]] = None
-) -> Union[_T, SequenceType[_T]]:
-    """Split a bytestring by delimiters if there are any
+    valtype: Optional[Callable[[str], _T]] = None
+) -> Union[_T, MutableSequence[_T]]:
+    """Split a string by delimiters if there are any
 
     Parameters
     ----------
@@ -756,7 +760,8 @@ def MultiString(
     valtype or MultiValue of valtype
         The split value as `valtype` or a :class:`list` of `valtype`.
     """
-    valtype = str if valtype is None else valtype
+    valtype = _as_str if valtype is None else valtype
+
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made
     # in PET files we are converting
@@ -765,8 +770,7 @@ def MultiString(
 
     splitup = val.split("\\")
     if len(splitup) == 1:
-        val = splitup[0]
-        return valtype(val) if val else val
+        return valtype(splitup[0])
 
     return MultiValue(valtype, splitup)
 
@@ -1122,9 +1126,9 @@ class PersonName:
 
     @staticmethod
     def _encode_component_groups(
-        alphabetic_group: SequenceType[Union[str, bytes]],
-        ideographic_group: SequenceType[Union[str, bytes]],
-        phonetic_group: SequenceType[Union[str, bytes]],
+        alphabetic_group: MutableSequence[Union[str, bytes]],
+        ideographic_group: MutableSequence[Union[str, bytes]],
+        phonetic_group: MutableSequence[Union[str, bytes]],
         encodings: Optional[List[str]] = None,
     ) -> bytes:
         """Creates a byte string for a person name from lists of parts.
@@ -1134,11 +1138,11 @@ class PersonName:
 
         Parameters
         ----------
-        alphabetic_group: SequenceType[Union[str, bytes]]
+        alphabetic_group: MutableSequence[Union[str, bytes]]
             List of components for the alphabetic group.
-        ideographic_group: SequenceType[Union[str, bytes]]
+        ideographic_group: MutableSequence[Union[str, bytes]]
             List of components for the ideographic group.
-        phonetic_group: SequenceType[Union[str, bytes]]
+        phonetic_group: MutableSequence[Union[str, bytes]]
             List of components for the phonetic group.
         encodings: Optional[List[str]]
             A list of encodings used for the other input parameters.

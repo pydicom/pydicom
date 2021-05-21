@@ -57,6 +57,8 @@ class Sequence(MultiValue[Dataset]):
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
 
+        self.is_undefined_length: bool
+
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)

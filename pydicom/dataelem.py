@@ -43,9 +43,8 @@ BINARY_VR_VALUES = [
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
 ]
 
-
 def empty_value_for_VR(
-    VR: str, raw: bool = False
+    VR: Optional[str], raw: bool = False
 ) -> Union[bytes, List[str], str, None]:
     """Return the value for an empty element for `VR`.
 
@@ -65,7 +64,7 @@ def empty_value_for_VR(
 
     Parameters
     ----------
-    VR : str
+    VR : str or None
         The VR of the corresponding element.
     raw : bool, optional
         If ``True``, returns the value for a :class:`RawDataElement`,
@@ -710,7 +709,7 @@ class RawDataElement(NamedTuple):
     tag: BaseTag
     VR: Optional[str]
     length: int
-    value: bytes
+    value: Optional[bytes]
     value_tell: int
     is_implicit_VR: bool
     is_little_endian: bool
@@ -757,7 +756,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 
 
 def DataElement_from_raw(
-    raw_data_element: RawDataElement,
+    raw_data_element: Union[DataElement, RawDataElement],
         encoding: Optional[List[str]] = None,
         dataset: Optional["Dataset"] = None
 ) -> DataElement:

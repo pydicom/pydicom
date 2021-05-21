@@ -4,8 +4,8 @@ or any list of items that must all be the same type.
 """
 
 from typing import (
-    Iterable, Union, List, overload, Iterator, Optional, Callable, Any, cast,
-    TypeVar, MutableSequence
+    Iterable, Union, List, overload, Optional, Callable, Any, cast,
+    TypeVar, MutableSequence, Generator, Iterator
 )
 from typing import Sequence as SequenceType
 
@@ -54,7 +54,7 @@ class MultiValue(MutableSequence[_ItemType]):
         def DS_IS_constructor(x: _T) -> _ItemType:
             return self.type_constructor(x) if x != '' else cast(_ItemType, x)
 
-        self._list = list()
+        self._list: List[_ItemType] = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):
             type_constructor = DS_IS_constructor
@@ -75,11 +75,11 @@ class MultiValue(MutableSequence[_ItemType]):
         self._list.extend([self.type_constructor(x) for x in val])
 
     def __iadd__(self, other: Iterable[_T]) -> MutableSequence[_ItemType]:
-        """Implement MultiValue() += [object]."""
+        """Implement MultiValue() += Iterable[Any]."""
         self._list += [self.type_constructor(x) for x in other]
         return self
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return self._list == other
 
     @overload
@@ -97,12 +97,12 @@ class MultiValue(MutableSequence[_ItemType]):
         self._list.insert(position, self.type_constructor(val))
 
     def __iter__(self) -> Iterator[_ItemType]:
-        return iter(self._list)
+        yield from self._list
 
     def __len__(self) -> int:
         return len(self._list)
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other: Any) -> bool:
         return self._list != other
 
     @overload
@@ -111,8 +111,8 @@ class MultiValue(MutableSequence[_ItemType]):
     @overload
     def __setitem__(self, idx: slice, val: Iterable[_T]) -> None: pass
 
-    def __setitem__(
-        self, idx: Union[slice, int], val: Union[Iterable[_T], _T]
+    def __setitem__(  # type: ignore[misc]
+        self, idx: Union[int, slice], val: Union[_T, Iterable[_T]]
     ) -> None:
         """Set an item of the list, making sure it is of the right VR type"""
         if isinstance(idx, slice):
@@ -123,12 +123,8 @@ class MultiValue(MutableSequence[_ItemType]):
             val = cast(_T, val)
             self._list.__setitem__(idx, self.type_constructor(val))
 
-    def sort(
-        self,
-        key: Optional[Callable[[_ItemType], object]] = None,
-        reverse: bool = False
-    ) -> None:
-        self._list.sort(key=key, reverse=reverse)
+    def sort(self, *args: Any, **kwargs: Any) -> None:
+        self._list.sort(*args, **kwargs)
 
     def __str__(self) -> str:
         if not self:

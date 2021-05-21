@@ -3,7 +3,9 @@
 
 import codecs
 import re
-from typing import List, Set, Dict, Optional, Union, TYPE_CHECKING, cast
+from typing import (
+    List, Set, Dict, Optional, Union, TYPE_CHECKING, MutableSequence, cast
+)
 import warnings
 
 from pydicom import config
@@ -635,7 +637,9 @@ def _encode_string_impl(
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(encodings: Union[str, List[str]]) -> List[str]:
+def convert_encodings(
+    encodings: Union[str, MutableSequence[str]]
+) -> List[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.

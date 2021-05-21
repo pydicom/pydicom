@@ -28,7 +28,7 @@ given in the table below.
 
 """
 
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Generator, cast, List
 
 try:
     import numpy as np
@@ -95,7 +95,7 @@ def generate_multiplex(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
-    for ii, item in enumerate(ds.WaveformSequence):
+    for ii, item in enumerate(cast(List["Dataset"], ds.WaveformSequence)):
         required_elements = [
             'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
             'WaveformBitsAllocated', 'WaveformSampleInterpretation',
@@ -110,24 +110,27 @@ def generate_multiplex(
             )
 
         # Determine the expected length of the data (without padding)
-        bytes_per_sample = item.WaveformBitsAllocated // 8
-        nr_samples = item.NumberOfWaveformSamples
-        nr_channels = item.NumberOfWaveformChannels
+        bytes_per_sample = cast(int, item.WaveformBitsAllocated) // 8
+        nr_samples = cast(int, item.NumberOfWaveformSamples)
+        nr_channels = cast(int, item.NumberOfWaveformChannels)
+        bits_allocated = cast(int, item.WaveformBitsAllocated)
+        sample_interpretation = cast(str, item.WaveformSampleInterpretation)
         expected_len = nr_samples * nr_channels * bytes_per_sample
 
         # Waveform Data is ordered as (C = channel, S = sample):
         # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
-        dtype = WAVEFORM_DTYPES[
-            (item.WaveformBitsAllocated, item.WaveformSampleInterpretation)
-        ]
-        arr = np.frombuffer(item.WaveformData[:expected_len], dtype=dtype)
+        dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
+        arr = np.frombuffer(
+            cast(bytes, item.WaveformData)[:expected_len], dtype=dtype
+        )
         # Reshape to (samples, channels) and make writeable
         arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
         if not as_raw:
             # Apply correction factor (if possible)
             arr = arr.astype('float')
-            for jj, ch in enumerate(item.ChannelDefinitionSequence):
+            seq = cast(List["Dataset"], item.ChannelDefinitionSequence)
+            for jj, ch in enumerate(seq):
                 baseline = ch.get("ChannelBaseline", 0.0)
                 sensitivity = ch.get("ChannelSensitivity", 1.0)
                 correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
@@ -171,7 +174,7 @@ def multiplex_array(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
-    item = ds.WaveformSequence[index]
+    item = cast(List["Dataset"], ds.WaveformSequence)[index]
     required_elements = [
         'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
         'WaveformBitsAllocated', 'WaveformSampleInterpretation',
@@ -186,27 +189,30 @@ def multiplex_array(
         )
 
     # Determine the expected length of the data (without padding)
-    bytes_per_sample = item.WaveformBitsAllocated // 8
-    nr_samples = item.NumberOfWaveformSamples
-    nr_channels = item.NumberOfWaveformChannels
+    bytes_per_sample = cast(int, item.WaveformBitsAllocated) // 8
+    nr_samples = cast(int, item.NumberOfWaveformSamples)
+    nr_channels = cast(int, item.NumberOfWaveformChannels)
+    bits_allocated = cast(int, item.WaveformBitsAllocated)
+    sample_interpretation = cast(str, item.WaveformSampleInterpretation)
     expected_len = nr_samples * nr_channels * bytes_per_sample
 
     # Waveform Data is ordered as (C = channel, S = sample):
     # C1S1, C2S1, ..., CnS1, C1S2, ..., CnS2, ..., C1Sm, ..., CnSm
-    dtype = WAVEFORM_DTYPES[
-        (item.WaveformBitsAllocated, item.WaveformSampleInterpretation)
-    ]
-    arr = np.frombuffer(item.WaveformData[:expected_len], dtype=dtype)
+    dtype = WAVEFORM_DTYPES[(bits_allocated, sample_interpretation)]
+    arr = np.frombuffer(
+        cast(bytes, item.WaveformData)[:expected_len], dtype=dtype
+    )
     # Reshape to (samples, channels) and make writeable
     arr = np.copy(arr.reshape(nr_samples, nr_channels))
 
     if not as_raw:
         # Apply correction factor (if possible)
         arr = arr.astype('float')
-        for jj, channel in enumerate(item.ChannelDefinitionSequence):
-            baseline = channel.get("ChannelBaseline", 0.0)
-            sensitivity = channel.get("ChannelSensitivity", 1.0)
-            correction = channel.get("ChannelSensitivityCorrectionFactor", 1.0)
+        seq = cast(List["Dataset"], item.ChannelDefinitionSequence)
+        for jj, ch in enumerate(seq):
+            baseline = ch.get("ChannelBaseline", 0.0)
+            sensitivity = ch.get("ChannelSensitivity", 1.0)
+            correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
             arr[..., jj] = (
                 (arr[..., jj] + baseline) * sensitivity * correction
             )

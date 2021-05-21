@@ -12,7 +12,7 @@ from typing import (
 try:
     from typing import Protocol  # added in 3.8
 except ImportError:
-    Protocol = object
+    Protocol = object  # type: ignore[assignment]
 
 from pydicom.tag import Tag, BaseTag, TagType
 
@@ -147,14 +147,14 @@ class DicomIO:
         if value:  # Little Endian
             self.read_US = self.read_leUS
             self.read_UL = self.read_leUL
-            self.write_US = self.write_leUS
-            self.write_UL = self.write_leUL
+            self.write_US = self.write_leUS  # type: ignore[assignment]
+            self.write_UL = self.write_leUL  # type: ignore[assignment]
             self.read_tag = self.read_le_tag
         else:  # Big Endian
             self.read_US = self.read_beUS
             self.read_UL = self.read_beUL
-            self.write_US = self.write_beUS
-            self.write_UL = self.write_beUL
+            self.write_US = self.write_beUS  # type: ignore[assignment]
+            self.write_UL = self.write_beUL  # type: ignore[assignment]
             self.read_tag = self.read_be_tag
 
     @property

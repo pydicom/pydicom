@@ -21,7 +21,7 @@ from pydicom.data import get_testdata_file, get_charset_files
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import dcmread, read_dataset, read_file
+from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (
     write_data_element, write_dataset, correct_ambiguous_vr,
     write_file_meta_info, correct_ambiguous_vr_element, write_numbers,
@@ -230,10 +230,10 @@ class TestWriteFile:
     def test_write_empty_sequence(self):
         """Make sure that empty sequence is correctly written."""
         # regression test for #1030
-        ds = read_file(get_testdata_file('test-SR.dcm'))
+        ds = dcmread(get_testdata_file('test-SR.dcm'))
         ds.save_as(self.file_out)
         self.file_out.seek(0)
-        ds = read_file(self.file_out)
+        ds = dcmread(self.file_out)
         assert ds.PerformedProcedureCodeSequence == []
 
     def test_write_deflated_retains_elements(self):
@@ -241,11 +241,11 @@ class TestWriteFile:
            and then read the output, to verify that the written file
            contains the same data.
            """
-        original = read_file(deflate_name)
+        original = dcmread(deflate_name)
         original.save_as(self.file_out)
 
         self.file_out.seek(0)
-        rewritten = read_file(self.file_out)
+        rewritten = dcmread(self.file_out)
 
         assert as_assertable(rewritten) == as_assertable(original)
 
@@ -254,7 +254,7 @@ class TestWriteFile:
            and then check the bytes in the output, to verify that the
            written file is deflated past the file meta information.
            """
-        original = read_file(deflate_name)
+        original = dcmread(deflate_name)
         original.save_as(self.file_out)
 
         first_byte_past_file_meta = 0x14e
