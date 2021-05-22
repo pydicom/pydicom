@@ -815,6 +815,7 @@ class TestRLEEncoding:
         assert expected == len(ds.PixelData)
         ref = ds.pixel_array
         del ds.PixelData
+        del ds._pixel_array
         ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
         assert expected > len(ds.PixelData)
         assert np.array_equal(ref, ds.pixel_array)
@@ -824,6 +825,7 @@ class TestRLEEncoding:
         """Test encoding big-endian src"""
         ds = dcmread(IMPL)
         ref = ds.pixel_array
+        del ds._pixel_array
         ds.compress(
             RLELossless,
             ds.PixelData,
@@ -831,4 +833,4 @@ class TestRLEEncoding:
             encoding_plugin='pylibjpeg'
         )
         assert np.array_equal(ref.newbyteorder('>'), ds.pixel_array)
-        assert id(ref) != id(ds.pixel_array)
+        assert ref is not ds.pixel_array
