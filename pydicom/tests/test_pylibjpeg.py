@@ -818,7 +818,7 @@ class TestRLEEncoding:
         ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
         assert expected > len(ds.PixelData)
         assert np.array_equal(ref, ds.pixel_array)
-        assert id(ref) != id(ds.pixel_array)
+        assert ref is not ds.pixel_array
 
     def test_encode_bit(self):
         """Test encoding big-endian src"""
