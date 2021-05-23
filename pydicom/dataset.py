@@ -26,9 +26,9 @@ import os.path
 import re
 from types import ModuleType, TracebackType
 from typing import (
-    TYPE_CHECKING, Optional, Tuple, Union, List, Any, ItemsView, cast,
-    KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr, Callable,
-    TypeVar, Type, overload, MutableSequence, MutableMapping
+    TYPE_CHECKING, Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
+    Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
+    MutableSequence, MutableMapping, AbstractSet
 )
 import warnings
 import weakref
@@ -774,7 +774,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         except KeyError:
             return default
 
-    def items(self) -> ItemsView[BaseTag, _DatasetValue]:
+    def items(  # type: ignore[override]
+        self
+    ) -> AbstractSet[Tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -784,9 +786,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             :class:`~pydicom.dataelem.DataElement`) items for the
             :class:`Dataset`.
         """
-        return self._dict.items()  # type: ignore[return-value]
+        return self._dict.items()
 
-    def keys(self) -> KeysView[BaseTag]:
+    def keys(self) -> AbstractSet[BaseTag]:  # type: ignore[override]
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
@@ -795,7 +797,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             The :class:`~pydicom.tag.BaseTag` of all the elements in
             the :class:`Dataset`.
         """
-        return self._dict.keys()  # type: ignore[return-value]
+        return self._dict.keys()
 
     def values(self) -> ValuesView[_DatasetValue]:
         """Return the :class:`Dataset` values to simulate :meth:`dict.values`.
