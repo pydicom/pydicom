@@ -2399,7 +2399,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @classmethod
     def from_json(
         cls: Type[_Dataset],
-        json_dataset: Union[Dict[str, Any], str],
+        json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
         bulk_data_uri_handler: Optional[
             Union[
                 Callable[[BaseTag, str, str], Any],
@@ -2415,9 +2415,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         Parameters
         ----------
-        json_dataset : dict or str
-            :class:`dict` or :class:`str` representing a DICOM Data Set
-            formatted based on the DICOM JSON Model.
+        json_dataset : dict, str, bytes or bytearray
+            :class:`dict`, :class:`str`, :class:`bytes` or :class:`bytearray`
+            representing a DICOM Data Set formatted based on the DICOM JSON
+            Model.
         bulk_data_uri_handler : callable, optional
             Callable function that accepts either the tag, vr and "BulkDataURI"
             or just the "BulkDataURI" of the JSON
@@ -2428,7 +2429,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         -------
         Dataset
         """
-        if isinstance(json_dataset, str):
+        if isinstance(json_dataset, (str, bytes, bytearray)):
             json_dataset = cast(Dict[str, Any], json.loads(json_dataset))
 
         dataset = cls()
