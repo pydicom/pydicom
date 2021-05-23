@@ -388,7 +388,7 @@ def read_dataset(
     parent_encoding : str or List[str]
         Optional encoding to use as a default in case (0008,0005) *Specific
         Character Set* isn't specified.
-    specific_tags : list of BaseTage, optional
+    specific_tags : list of BaseTag, optional
         See :func:`dcmread` for parameter info.
     at_top_level: bool
         If dataset is top level (not within a sequence).

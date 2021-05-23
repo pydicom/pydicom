@@ -27,8 +27,8 @@ import re
 from types import ModuleType, TracebackType
 from typing import (
     TYPE_CHECKING, Optional, Tuple, Union, List, Any, ItemsView, cast,
-    KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr, AbstractSet,
-    Callable, TypeVar, Type, overload, MutableSequence, MutableMapping
+    KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr, Callable,
+    TypeVar, Type, overload, MutableSequence, MutableMapping
 )
 import warnings
 import weakref
@@ -858,7 +858,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     def __getitem__(
         self, key: Union[slice, TagType]
-    ) -> Union["Dataset", DataElement,]:
+    ) -> Union["Dataset", DataElement]:
         """Operator for ``Dataset[key]`` request.
 
         Any deferred data elements will be read in and an attempt will be made
@@ -935,8 +935,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             if tag != BaseTag(0x00080005):
                 character_set = self.read_encoding or self._character_set
             else:
-                character_set  = default_encoding
-
+                character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
             self[tag] = DataElement_from_raw(data_elem, character_set, self)
 
@@ -1006,10 +1005,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 'Tag must be private if private creator is given')
 
         # find block with matching private creator
+        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
         data_el = next(
             (
-                el for el in self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
-                if el.value == private_creator
+                elem for elem in block if elem.value == private_creator
             ),
             None
         )
@@ -1062,7 +1061,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         if group % 2 == 0:
             raise ValueError('Group must be an odd number')
 
-        return [x.value for x in self[(group, 0x10):(group, 0x100)]]  # type: ignore[misc]
+        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        return [x.value for x in block]
 
     def get_private_item(
         self, group: int, element_offset: int, private_creator: str
@@ -1484,18 +1484,18 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         # Find all possible handlers that support the transfer syntax
         file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
-        tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+        ts = cast(UID, file_meta.TransferSyntaxUID)
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
-            and hh.supports_transfer_syntax(tsyntax)  # type: ignore[attr-defined]
+            and hh.supports_transfer_syntax(ts)  # type: ignore[attr-defined]
         ]
 
         # No handlers support the transfer syntax
         if not possible_handlers:
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
-                f"'{tsyntax}' ({tsyntax.name}) as there are no pixel data "
+                f"'{ts}' ({ts.name}) as there are no pixel data "
                 "handlers available that support it. Please see the pydicom "
                 "documentation for information on supported transfer syntaxes "
             )
@@ -2310,7 +2310,12 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         return dir(self)
 
     def update(  # type: ignore[override]
-        self, d: Union[Dict[str, Any], MutableMapping[BaseTag, _DatasetValue]]
+        self,
+        d: Union[
+            Dict[str, Any],
+            MutableMapping[BaseTag, _DatasetValue],
+            MutableMapping[TagType, _DatasetValue]
+        ]
     ) -> None:
         """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
@@ -2659,7 +2664,9 @@ class FileDataset(Dataset):
             if hasattr(filename_or_obj, "name"):
                 filename = filename_or_obj.name
             elif hasattr(filename_or_obj, "filename"):
-                filename = filename_or_obj.filename  # type: ignore[attr-defined]
+                filename = (
+                    filename_or_obj.filename  # type: ignore[attr-defined]
+                )
             else:
                 # e.g. came from BytesIO or something file-like
                 self.filename = filename_or_obj
