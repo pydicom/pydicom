@@ -251,6 +251,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.77.1.5.7': ('Ophthalmic Optical Coherence Tomography En Face Image Storage', 'SOP Class', '', '', 'OphthalmicOpticalCoherenceTomographyEnFaceImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.5.8': ('Ophthalmic Optical Coherence Tomography B-scan Volume Analysis Storage', 'SOP Class', '', '', 'OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.77.1.6': ('VL Whole Slide Microscopy Image Storage', 'SOP Class', '', '', 'VLWholeSlideMicroscopyImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.77.1.7': ('Dermoscopic Photography Image Storage', 'SOP Class', '', '', 'DermoscopicPhotographyImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.1': ('Lensometry Measurements Storage', 'SOP Class', '', '', 'LensometryMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.2': ('Autorefraction Measurements Storage', 'SOP Class', '', '', 'AutorefractionMeasurementsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.78.3': ('Keratometry Measurements Storage', 'SOP Class', '', '', 'KeratometryMeasurementsStorage'),  # noqa
@@ -285,6 +286,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.88.73': ('Patient Radiation Dose SR Storage', 'SOP Class', '', '', 'PatientRadiationDoseSRStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.88.74': ('Planned Imaging Agent Administration SR Storage', 'SOP Class', '', '', 'PlannedImagingAgentAdministrationSRStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.88.75': ('Performed Imaging Agent Administration SR Storage', 'SOP Class', '', '', 'PerformedImagingAgentAdministrationSRStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.88.76': ('Enhanced X-Ray Radiation Dose SR Storage', 'SOP Class', '', '', 'EnhancedXRayRadiationDoseSRStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.90.1': ('Content Assessment Results Storage', 'SOP Class', '', '', 'ContentAssessmentResultsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.1': ('Encapsulated PDF Storage', 'SOP Class', '', '', 'EncapsulatedPDFStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', '', 'EncapsulatedCDAStorage'),  # noqa
@@ -302,6 +304,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.200.4': ('Protocol Approval Information Model - FIND', 'SOP Class', '', '', 'ProtocolApprovalInformationModelFind'),  # noqa
     '1.2.840.10008.5.1.4.1.1.200.5': ('Protocol Approval Information Model - MOVE', 'SOP Class', '', '', 'ProtocolApprovalInformationModelMove'),  # noqa
     '1.2.840.10008.5.1.4.1.1.200.6': ('Protocol Approval Information Model - GET', 'SOP Class', '', '', 'ProtocolApprovalInformationModelGet'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.200.7': ('XA Defined Procedure Protocol Storage', 'SOP Class', '', '', 'XADefinedProcedureProtocolStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.200.8': ('XA Performed Procedure Protocol Storage', 'SOP Class', '', '', 'XAPerformedProcedureProtocolStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.1': ('RT Image Storage', 'SOP Class', '', '', 'RTImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.2': ('RT Dose Storage', 'SOP Class', '', '', 'RTDoseStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.3': ('RT Structure Set Storage', 'SOP Class', '', '', 'RTStructureSetStorage'),  # noqa
@@ -348,7 +352,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.20.3': ('Defined Procedure Protocol Information Model - GET', 'SOP Class', '', '', 'DefinedProcedureProtocolInformationModelGet'),  # noqa
     '1.2.840.10008.5.1.4.31': ('Modality Worklist Information Model - FIND', 'SOP Class', '', '', 'ModalityWorklistInformationModelFind'),  # noqa
     '1.2.840.10008.5.1.4.32': ('General Purpose Worklist Management Meta SOP Class', 'Meta SOP Class', '', 'Retired', 'GeneralPurposeWorklistManagementMeta'),  # noqa
-    '1.2.840.10008.5.1.4.32.1': ('General Purpose Worklist Information Model - FIND', 'SOP Class', '', 'Retired', 'GeneralPurposeWorklistInformationModelFIND'),  # noqa
+    '1.2.840.10008.5.1.4.32.1': ('General Purpose Worklist Information Model - FIND', 'SOP Class', '', 'Retired', 'GeneralPurposeWorklistInformationModelFind'),  # noqa
     '1.2.840.10008.5.1.4.32.2': ('General Purpose Scheduled Procedure Step SOP Class', 'SOP Class', '', 'Retired', 'GeneralPurposeScheduledProcedureStep'),  # noqa
     '1.2.840.10008.5.1.4.32.3': ('General Purpose Performed Procedure Step SOP Class', 'SOP Class', '', 'Retired', 'GeneralPurposePerformedProcedureStep'),  # noqa
     '1.2.840.10008.5.1.4.33': ('Instance Availability Notification SOP Class', 'SOP Class', '', '', 'InstanceAvailabilityNotification'),  # noqa
