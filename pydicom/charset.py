@@ -638,7 +638,7 @@ def _encode_string_impl(
 
 
 def convert_encodings(
-    encodings: Union[str, MutableSequence[str]]
+    encodings: Union[None, str, MutableSequence[str]]
 ) -> List[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
@@ -765,7 +765,7 @@ def _warn_about_invalid_encoding(
 
 
 def _handle_illegal_standalone_encodings(
-    encodings: List[str], py_encodings: List[str]
+    encodings: MutableSequence[str], py_encodings: List[str]
 ) -> List[str]:
     """Check for stand-alone encodings in multi-valued encodings.
     If the first encoding is a stand-alone encoding, the rest of the

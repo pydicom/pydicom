@@ -11,7 +11,7 @@ import base64
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type, List, NamedTuple
+    TypeVar, Type, List, NamedTuple, MutableSequence
 )
 import warnings
 
@@ -237,7 +237,7 @@ class DataElement:
     def from_json(
         cls: Type[_DataElement],
         dataset_class: Type[_Dataset],
-        tag: Union[BaseTag, int],
+        tag: Union[BaseTag, int, str],
         vr: str,
         value: object,
         value_key: Union[str, None],
@@ -256,7 +256,7 @@ class DataElement:
         ----------
         dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
-        tag : pydicom.tag.BaseTag or int
+        tag : pydicom.tag.BaseTag, int or str
             The data element tag.
         vr : str
             The data element value representation.
@@ -757,8 +757,8 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 
 def DataElement_from_raw(
     raw_data_element: Union[DataElement, RawDataElement],
-        encoding: Optional[List[str]] = None,
-        dataset: Optional["Dataset"] = None
+    encoding: Optional[Union[str, MutableSequence[str]]] = None,
+    dataset: Optional["Dataset"] = None
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -766,7 +766,7 @@ def DataElement_from_raw(
     ----------
     raw_data_element : RawDataElement
         The raw data to convert to a :class:`DataElement`.
-    encoding : list of str, optional
+    encoding : str or list of str, optional
         The character encoding of the raw data.
     dataset : Dataset, optional
         If given, used to resolve the VR for known private tags.
