@@ -675,7 +675,7 @@ class DSdecimal(Decimal):
 if config.use_DS_decimal:
     DSclass = DSdecimal
 else:
-    DSclass = DSfloat
+    DSclass = DSfloat  # type: ignore[assignment, misc]
 
 
 def DS(
@@ -699,7 +699,10 @@ def DS(
         if val == '':
             return ''
 
-    return DSclass(val, auto_format=auto_format)  # type: ignore[return-value]
+    if config.use_DS_decimal:
+        return DSdecimal(val, auto_format=auto_format)
+
+    return DSfloat(val, auto_format=auto_format)
 
 
 class IS(int):
