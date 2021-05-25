@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 default_encoding = "iso8859"
 
 # Map DICOM Specific Character Set to python equivalent
+# https://docs.python.org/3/library/codecs.html#standard-encodings
 python_encoding = {
 
     # default character set for DICOM
