@@ -76,7 +76,8 @@ def data_element_generator(
     Yields
     -------
     RawDataElement or DataElement
-        Yields DataElement for SQ, RawDataElement otherwise.
+        Yields DataElement for undefined length UN or SQ, RawDataElement
+        otherwise.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -1086,7 +1087,7 @@ def read_deferred_data_element(
     filename_or_obj: Union[PathType, BinaryIO],
     timestamp: Optional[float],
     raw_data_elem: RawDataElement
-) -> Union[RawDataElement, DataElement]:
+) -> RawDataElement:
     """Read the previously deferred value from the file into memory
     and return a raw data element.
 
@@ -1154,13 +1155,16 @@ def read_deferred_data_element(
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
+    # Seek back to the start of the deferred element
     fp.seek(raw_data_elem.value_tell - offset)
     elem_gen = data_element_generator(
         fp, is_implicit_VR, is_little_endian, defer_size=None
     )
 
     # Read the data element and check matches what was stored before
-    elem = next(elem_gen)
+    # The first element out of the iterator should be the same type as the
+    #   the deferred element == RawDataElement
+    elem = cast(RawDataElement, next(elem_gen))
     fp.close()
     if elem.VR != raw_data_elem.VR:
         raise ValueError(
