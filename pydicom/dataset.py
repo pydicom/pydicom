@@ -919,33 +919,39 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             except Exception as exc:
                 raise KeyError(f"'{key}'") from exc
 
-        data_elem = self._dict[tag]
-        if isinstance(data_elem, DataElement):
-            if data_elem.VR == 'SQ' and data_elem.value:
+        elem = self._dict[tag]
+        if isinstance(elem, DataElement):
+            if elem.VR == 'SQ' and elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
-                data_elem.value.parent = self
-            return data_elem
-        elif isinstance(data_elem, RawDataElement):
+                elem.value.parent = self
+            return elem
+
+        if isinstance(elem, RawDataElement):
             # If a deferred read, then go get the value now
-            if data_elem.value is None and data_elem.length != 0:
+            if elem.value is None and elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
-                data_elem = read_deferred_data_element(
-                    self.fileobj_type, self.filename, self.timestamp,
-                    data_elem)
+                # Union[RawDataElement, DataElement] ugh
+                elem = read_deferred_data_element(
+                    self.fileobj_type,
+                    self.filename,
+                    self.timestamp,
+                    elem
+                )
 
             if tag != BaseTag(0x00080005):
                 character_set = self.read_encoding or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set, self)
+            self[tag] = DataElement_from_raw(elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
-                    self[tag], self, data_elem[6])
+                    self[tag], self, elem[6]
+                )
 
         return cast(DataElement, self._dict.get(tag))
 

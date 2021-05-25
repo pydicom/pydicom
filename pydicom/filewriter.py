@@ -183,7 +183,7 @@ def correct_ambiguous_vr_element(
     """
     if 'or' in elem.VR:
         # convert raw data elements before handling them
-        if elem.is_raw:
+        if isinstance(elem, RawDataElement):
             elem = DataElement_from_raw(elem, dataset=ds)
             ds.__setitem__(elem.tag, elem)
 

@@ -692,7 +692,7 @@ def convert_UR_string(
 def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
-    encodings: Optional[Union[str, List[str]]] = None
+    encodings: Optional[Union[str, MutableSequence[str]]] = None
 ) -> Union[Any, MutableSequence[Any]]:
     """Return the element value decoded using the appropriate decoder.
 

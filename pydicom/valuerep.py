@@ -672,7 +672,10 @@ class DSdecimal(Decimal):
 
 
 # CHOOSE TYPE OF DS
-DSclass = DSdecimal if config.use_DS_decimal else DSfloat
+if config.use_DS_decimal:
+    DSclass = DSdecimal
+else:
+    DSclass = DSfloat
 
 
 def DS(

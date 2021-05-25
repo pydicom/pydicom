@@ -438,9 +438,10 @@ def read_dataset(
 
     encoding: Union[str, MutableSequence[str]]
     if 0x00080005 in raw_data_elements:
+        elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
         char_set = cast(
             Optional[Union[str, MutableSequence[str]]],
-            DataElement_from_raw(raw_data_elements[BaseTag(0x00080005)]).value
+            DataElement_from_raw(elem).value
         )
         encoding = convert_encodings(char_set)  # -> List[str]
     else:

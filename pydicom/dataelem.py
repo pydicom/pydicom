@@ -11,7 +11,7 @@ import base64
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type, List, NamedTuple, MutableSequence
+    TypeVar, Type, List, NamedTuple, MutableSequence, cast
 )
 import warnings
 
@@ -45,7 +45,7 @@ BINARY_VR_VALUES = [
 
 def empty_value_for_VR(
     VR: Optional[str], raw: bool = False
-) -> Union[bytes, List[str], str, None]:
+) -> Union[bytes, List[str], str, None, PersonName]:
     """Return the value for an empty element for `VR`.
 
     .. versionadded:: 1.4
@@ -315,7 +315,7 @@ class DataElement:
         dict
             Mapping representing a JSON encoded data element
         """
-        json_element = {'vr': self.VR, }
+        json_element: Dict[str, Any] = {'vr': self.VR}
         if self.VR in jsonrep.BINARY_VR_VALUES:
             if not self.is_empty:
                 binary_value = self.value
@@ -380,8 +380,12 @@ class DataElement:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[["DataElement"], str]] = None,  # noqa
-        dump_handler: Optional[Callable[[Dict[Any, Any]], str]] = None
+        bulk_data_element_handler: Optional[
+            Callable[["DataElement"], str]
+        ] = None,
+        dump_handler: Optional[
+            Callable[[Dict[Any, Any]], Dict[str, Any]]
+        ] = None
     ) -> Dict[str, Any]:
         """Return a JSON representation of the :class:`DataElement`.
 
@@ -438,7 +442,7 @@ class DataElement:
                  'OW or OB', 'UN'] and 'US' not in self.VR:
             try:
                 if _backslash_str in val:
-                    val = val.split(_backslash_str)
+                    val = cast(str, val).split(_backslash_str)
             except TypeError:
                 if _backslash_byte in val:
                     val = val.split(_backslash_byte)
@@ -466,7 +470,7 @@ class DataElement:
         return self.VM == 0
 
     @property
-    def empty_value(self) -> Union[bytes, List[str], None, str]:
+    def empty_value(self) -> Union[bytes, List[str], None, str, PersonName]:
         """Return the value for an empty element.
 
         .. versionadded:: 1.4
@@ -548,7 +552,7 @@ class DataElement:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -577,7 +581,7 @@ class DataElement:
 
         return NotImplemented
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 
@@ -756,7 +760,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 
 
 def DataElement_from_raw(
-    raw_data_element: Union[DataElement, RawDataElement],
+    raw_data_element: RawDataElement,
     encoding: Optional[Union[str, MutableSequence[str]]] = None,
     dataset: Optional["Dataset"] = None
 ) -> DataElement:
