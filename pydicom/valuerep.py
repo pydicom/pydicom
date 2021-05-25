@@ -794,6 +794,15 @@ def MultiString(
     return MultiValue(valtype, splitup)
 
 
+def _verify_encodings(encodings):
+    """Checks the encoding to ensure proper format"""
+    if encodings is not None:
+        if not isinstance(encodings, (list, tuple)):
+            return encodings,
+        return tuple(encodings)
+    return encodings
+
+
 def _decode_personname(components, encodings):
     """Return a list of decoded person name components.
 
@@ -871,25 +880,18 @@ class PersonName:
     def __init__(
         self,
         val: Union[bytes, str, "PersonName"],
-        encodings: Union[None, str, Sequence[str]] = default_encoding,
-        original_value: Optional[bytes] = None
+        encodings: Optional[Sequence[str]] = None,
+        original_string: Optional[bytes] = None
     ) -> None:
         """Create a new ``PersonName``.
 
-        .. versionchanged:: 2.2
-
-            The `original_string` keyword parameter was renamed to
-            'original_value' and `encodings` defaults to the Default Character
-            Repertoire (ISO-IR 6).
-
         Parameters
         ----------
-        val: str, bytes, PersonName or None
+        val: str, bytes, PersonName
             The value to use for the **PN** element.
-        encodings: str, list of str, optional
-            A list of the encodings used for the value. If no encodings are
-            supplied the Default Character Set ISO-IR 6 will be used.
-        original_value: bytes, optional
+        encodings: list of str, optional
+            A list of the encodings used for the value.
+        original_string: bytes, optional
             When creating a ``PersonName`` using a decoded string, this is the
             original encoded value.
 
@@ -899,40 +901,30 @@ class PersonName:
         components using the :meth:`from_named_components` and
         :meth:`from_named_components_veterinary` class methods.
         """
-        self._encoded_value: bytes
-
-        # The (alphabetic, ideographic, phonetic) person name components,
-        #   however zero, one, two or all three may be present.
-        #   Any of the components may also be absent
-        # Must be tuple so it can be hashed
-        self._components: Tuple[str, ...] = ()
-
-        # The encodings to use to decode the value (or to encode an
-        #   unencoded str)
-        self._encodings: Tuple[str, ...]
-
-        # Ensure `encodings` is List[str]
-        if isinstance(encodings, str) or encodings is None:
-            encodings = [encodings or default_encoding]
-
-        self._encodings = tuple(encodings)
+        self.original_string: bytes
+        self._components: Optional[Tuple[str, ...]] = None
 
         if isinstance(val, PersonName):
-            self._encodings = val.encodings
-            self._encoded_value = val.encoded_value
-            self._components = val.components
+            encodings = val.encodings
+            self.original_string = val.original_string
+            self._components = tuple(str(val).split('='))
         elif isinstance(val, bytes):
-            # this is the raw encoded value - decode it on demand
-            self._encoded_value = val
+            # this is the raw byte string - decode it on demand
+            self.original_string = val
+            self._components = None
         else:
-            # `val` is str
-            # When creating from `str` this should be the encoded value
-            self._encoded_value = original_value or b''
-            components: List[str] = val.split('=')
+            # val: str
+            # `val` is the decoded person name value
+            # `original_string`  should be the original encoded value
+            self.original_string = cast(bytes, original_string)
+            components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:
                 components.pop()
             self._components = tuple(components)
+
+            # if the encoding is not given, leave it as undefined (None)
+        self.encodings: List[str] = _verify_encodings(encodings)
 
     def _create_dict(self) -> Dict[str, str]:
         """Creates a dictionary of person name group and component names.
@@ -958,63 +950,12 @@ class PersonName:
             The (alphabetic, ideographic, phonetic) components of the
             decoded person name. Any of the components may be absent.
         """
-        if self._components:
-            return self._components
+        if self._components is None:
+            groups = self.original_string.split(b'=')
+            encodings = self.encodings or [default_encoding]
+            self._components = _decode_personname(groups, encodings)
 
-        self._components = _decode_personname(
-            self._encoded_value.split(b'='), self.encodings
-        )
         return self._components
-
-    @property
-    def encodings(self) -> Tuple[str, ...]:
-        """Return the encodings used as list of str.
-
-        Returns
-        -------
-        List[str]
-            A list containing the character set encodings used with the person
-            name.
-        """
-        return self._encodings
-
-    @property
-    def original_string(self) -> bytes:
-        """Get or set the encoded person name value as :class:`bytes`.
-
-        .. deprecated:: 2.2
-
-            Use `encoded_value` instead.
-        """
-        warnings.warn(
-            "The 'original_string' attribute is deprecated and "
-            "will be removed in v3.0, use 'encoded_value' instead",
-            DeprecationWarning
-        )
-        return self.encoded_value
-
-    @original_string.setter
-    def original_string(self, value: bytes) -> None:
-        """Set the encoded person name value as :class:`bytes`."""
-        warnings.warn(
-            "The 'original_string' attribute is deprecated and "
-            "will be removed in v3.0, use 'encoded_value' instead",
-            DeprecationWarning
-        )
-        self.encoded_value = value
-
-    @property
-    def encoded_value(self) -> bytes:
-        """Set or get the encoded person name value as :class:`bytes`.
-
-        .. versionadded:: 2.2
-        """
-        return self._encoded_value
-
-    @encoded_value.setter
-    def encoded_value(self, value: bytes) -> None:
-        """Set the encoded person name value as :class:`bytes`"""
-        self._encoded_value = value
 
     def _name_part(self, i: int) -> str:
         """Return the `i`th part of the name."""
@@ -1140,19 +1081,20 @@ class PersonName:
             the given encodings on demand. If the encodings are not given,
             the current object is returned.
         """
-        enc = self.encodings if not encodings else encodings
-
         # in the common case (encoding did not change) we decode on demand
-        if enc == self.encodings:
+        if encodings is None or encodings == self.encodings:
             return self
 
         # the encoding was unknown or incorrect - create a new
         # PersonName object with the changed encoding
-        if not self._encoded_value:
+        encodings = _verify_encodings(encodings)
+        if self.original_string is None:
             # if the original encoding was not set, we set it now
-            self._encoded_value = _encode_personname(self.components, enc)
+            self.original_string = _encode_personname(
+                self.components, self.encodings or [default_encoding]
+            )
 
-        return PersonName(self._encoded_value, enc)
+        return PersonName(self.original_string, encodings)
 
     def encode(self, encodings: Optional[List[str]] = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
@@ -1171,18 +1113,20 @@ class PersonName:
             available, otherwise each group of the patient name is encoded
             with the first matching of the given encodings.
         """
-        enc = self.encodings if not encodings else encodings
+        encodings = _verify_encodings(encodings) or self.encodings
 
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
-        if enc != self.encodings:
-            return _encode_personname(self.components, enc)
+        if encodings != self.encodings and self.encodings is not None:
+            return _encode_personname(self.components, encodings)
 
-        if not self._encoded_value:
+        if self.original_string is None:
             # if the original encoding was not set, we set it now
-            self._encoded_value = _encode_personname(self.components, enc)
+            self.original_string = _encode_personname(
+                self.components, encodings or [default_encoding]
+            )
 
-        return self._encoded_value
+        return self.original_string
 
     def family_comma_given(self) -> str:
         """Return the name as "Family, Given"."""
@@ -1194,13 +1138,13 @@ class PersonName:
 
     def __bool__(self) -> bool:
         """Return ``True`` if the name is not empty."""
-        if not self._encoded_value:
+        if not self.original_string:
             return (
                 bool(self.components)
                 and (len(self.components) > 1 or bool(self.components[0]))
             )
 
-        return bool(self._encoded_value)
+        return bool(self.original_string)
 
     @staticmethod
     def _encode_component_groups(
