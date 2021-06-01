@@ -8,7 +8,7 @@ import logging
 from typing import TYPE_CHECKING, cast
 import warnings
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset
 
 try:

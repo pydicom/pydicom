@@ -33,7 +33,7 @@ from typing import (
 import warnings
 import weakref
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     try:
         import numpy
         import numpy as np

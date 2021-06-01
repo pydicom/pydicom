@@ -17,7 +17,7 @@ except ImportError:
 from pydicom.data import get_palette_files
 from pydicom.uid import UID
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset
 
 

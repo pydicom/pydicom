@@ -15,7 +15,7 @@ from pydicom.uid import (
     JPEGLSLossless, JPEGLSNearLossless, JPEG2000Lossless, JPEG2000, RLELossless
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset
 
 try:
