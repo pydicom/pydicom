@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Pixel Data Encoder Plugins &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -215,14 +214,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="pixel-data-encoder-plugins">
+  <div class="section" id="pixel-data-encoder-plugins">
 <span id="guide-encoder-plugins"></span><h1>Pixel Data Encoder Plugins<a class="headerlink" href="#pixel-data-encoder-plugins" title="Permalink to this headline">¶</a></h1>
 <p><em>Pixel Data</em> encoding in <em>pydicom</em> uses an <a class="reference internal" href="../../reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder" title="pydicom.encoders.base.Encoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Encoder</span></code></a>
 instance for the specific <em>Transfer Syntax</em> as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
 and how to add them to <em>pydicom</em>. For a more general introduction to compression
 in <em>pydicom</em> see the <a class="reference internal" href="../../tutorials/pixel_data/compressing.html"><span class="doc">tutorial</span></a> instead.</p>
-<section id="plugin-requirements">
+<div class="section" id="plugin-requirements">
 <h2>Plugin Requirements<a class="headerlink" href="#plugin-requirements" title="Permalink to this headline">¶</a></h2>
 <p>Each available pixel data encoder in <em>pydicom</em> corresponds directly to a
 single DICOM <em>Transfer Syntax UID</em>, and is intended to provide a mechanism for
@@ -302,8 +301,8 @@ required by the plugin.</p>
 </li>
 </ul>
 <p>An example of the requirements of a plugin is available <a class="reference external" href="https://github.com/pydicom/pydicom/tree/master/pydicom/encoders/pylibjpeg.py">here</a>.</p>
-</section>
-<section id="adding-plugins-to-an-encoder">
+</div>
+<div class="section" id="adding-plugins-to-an-encoder">
 <h2>Adding Plugins to an Encoder<a class="headerlink" href="#adding-plugins-to-an-encoder" title="Permalink to this headline">¶</a></h2>
 <p>Additional plugins can be added to an existing encoder with the
 <a class="reference internal" href="../../reference/generated/pydicom.encoders.base.Encoder.html#pydicom.encoders.base.Encoder.add_plugin" title="pydicom.encoders.base.Encoder.add_plugin"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_plugin()</span></code></a> method, which takes the
@@ -322,8 +321,8 @@ following:</p>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">my_package.encoders</span></code> module must contain the encoding function and the
 <code class="docutils literal notranslate"><span class="pre">ENCODER_DEPENDENCIES</span></code> and <code class="docutils literal notranslate"><span class="pre">is_available</span></code> objects.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

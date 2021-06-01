@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Private Data Elements &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -216,10 +215,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="private-data-elements">
+  <div class="section" id="private-data-elements">
 <span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">Accessing or creating private data elements</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>The DICOM standard allows DICOM file creators to use <cite>private data elements</cite>
 to store information that is not defined by the DICOM standard itself.</p>
@@ -233,8 +232,8 @@ use of ‘private creator blocks’.  Pydicom (since v1.3) has some convenience
 functions to make creating private blocks and data elements easier.</p>
 <p>The sections below outlines accessing and creating private blocks and data
 elements using pydicom.</p>
-</section>
-<section id="displaying-private-data-elements-in-pydicom">
+</div>
+<div class="section" id="displaying-private-data-elements-in-pydicom">
 <h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Permalink to this headline">¶</a></h2>
 <p>Here is an example of some private tags displayed for pydicom’s test file
 ‘CT_small.dcm’:</p>
@@ -290,8 +289,8 @@ through it:</p>
 </div>
 <p>Using the private block like this is even more useful when creating your own
 private data elements, as shown in the next section.</p>
-</section>
-<section id="setting-private-data-elements-with-pydicom">
+</div>
+<div class="section" id="setting-private-data-elements-with-pydicom">
 <h2>Setting Private Data Elements with pydicom<a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Permalink to this headline">¶</a></h2>
 <p>The DICOM standard requires a private creator data element to identify and
 reserve a section of private tags. That name should be unique, and usually
@@ -317,8 +316,8 @@ with block object:</p>
 <span class="go">False</span>
 </pre></div>
 </div>
-</section>
-<section id="removing-all-private-data-elements">
+</div>
+<div class="section" id="removing-all-private-data-elements">
 <h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Permalink to this headline">¶</a></h2>
 <p>One part of anonymizing a DICOM file is to ensure that private data elements
 have been removed, as there is no guarantee as to what kind of information
@@ -330,8 +329,8 @@ might be contained in them.  Pydicom provides a convenient function
 <p>This can also be helpful during interactive sessions when exploring DICOM
 files, to remove a large number of lines from the display of a dataset –
 lines which may not provide useful information.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

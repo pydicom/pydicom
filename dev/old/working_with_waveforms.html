@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Working with Waveform Data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -214,10 +213,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="working-with-waveform-data">
+  <div class="section" id="working-with-waveform-data">
 <span id="id1"></span><h1>Working with Waveform Data<a class="headerlink" href="#working-with-waveform-data" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to work with waveform data in pydicom.</p>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Some DICOM SOP classes such as <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.2.html">Basic Voice Audio Waveform</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.34.3.html">12-Lead ECG</a>
 contain a (5400,0100) <em>Waveform Sequence</em> element,
@@ -244,8 +243,8 @@ corresponding (5400,1010) <em>Waveform Data</em> element.</p>
 <span class="go">(5400, 1010) Waveform Data                       OW: Array of 240000 elements</span>
 </pre></div>
 </div>
-</section>
-<section id="dataset-waveform-array">
+</div>
+<div class="section" id="dataset-waveform-array">
 <h2><code class="docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code><a class="headerlink" href="#dataset-waveform-array" title="Permalink to this headline">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -290,8 +289,8 @@ function with the <em>as_raw</em> keyword parameter instead:</p>
 <span class="go">       [  20,  110,   90, ..., -110, -120,  -90]], dtype=int16)</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

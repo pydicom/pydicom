@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Write DICOM data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -210,7 +209,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-write-dicom-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<section class="sphx-glr-example-title" id="write-dicom-data">
+<div class="sphx-glr-example-title section" id="write-dicom-data">
 <span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to write a DICOM file from scratch using pydicom. This
 example does not produce a DICOM standards compliant file as written, you will
@@ -218,32 +217,32 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpyv2dn_ic.dcm
+Writing test file /tmp/tmph8kh5n1s.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpd_kkktcr.dcm
-Load file /tmp/tmpyv2dn_ic.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpl4ahv1lz.dcm
+Load file /tmp/tmph8kh5n1s.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210521&#39;
-(0008, 0033) Content Time                        TM: &#39;180605.683013&#39;
+(0008, 0023) Content Date                        DA: &#39;20210601&#39;
+(0008, 0033) Content Time                        TM: &#39;190006.676900&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpyv2dn_ic.dcm ...
-Load file /tmp/tmpd_kkktcr.dcm ...
+Remove file /tmp/tmph8kh5n1s.dcm ...
+Load file /tmp/tmpl4ahv1lz.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210521&#39;
-(0008, 0033) Content Time                        TM: &#39;180605.683013&#39;
+(0008, 0023) Content Date                        DA: &#39;20210601&#39;
+(0008, 0033) Content Time                        TM: &#39;190006.676900&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpd_kkktcr.dcm ...
+Remove file /tmp/tmpl4ahv1lz.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -316,7 +315,7 @@ Remove file /tmp/tmpd_kkktcr.dcm ...
     <a href="https://docs.python.org/3/library/os.html#os.remove" title="os.remove" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.013 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7e3f494a513e0ac1eb4963e47afed114/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>
@@ -326,7 +325,7 @@ Remove file /tmp/tmpd_kkktcr.dcm ...
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</section>
+</div>
 
 
            </div>

@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Handling of compressed pixel data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -215,10 +214,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="handling-of-compressed-pixel-data">
+  <div class="section" id="handling-of-compressed-pixel-data">
 <span id="guide-compressed"></span><h1>Handling of compressed pixel data<a class="headerlink" href="#handling-of-compressed-pixel-data" title="Permalink to this headline">¶</a></h1>
 <p class="rubric">How to get compressed pixel data</p>
-<section id="preconditions">
+<div class="section" id="preconditions">
 <h2>Preconditions<a class="headerlink" href="#preconditions" title="Permalink to this headline">¶</a></h2>
 <p>To be able to decompress compressed DICOM pixel data, you need to install
 one or more packages that are able to handle the format the data
@@ -242,8 +241,8 @@ packages and cannot guarantee the correctness of the generated uncompressed
 pixel data. Be sure to verify the correctness of the output using other
 means before you use them for medical purposes.</p>
 </div>
-</section>
-<section id="supported-transfer-syntaxes">
+</div>
+<div class="section" id="supported-transfer-syntaxes">
 <h2>Supported Transfer Syntaxes<a class="headerlink" href="#supported-transfer-syntaxes" title="Permalink to this headline">¶</a></h2>
 <p>To get the transfer syntax of a dataset you can do:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
@@ -425,8 +424,8 @@ handled by the given packages:</p>
 <div class="line"><sup>5</sup> <em>with the pylibjpeg-libjpeg plugin</em></div>
 <div class="line"><sup>6</sup> <em>with the pylibjpeg-openjpeg plugin</em></div>
 </div>
-</section>
-<section id="usage">
+</div>
+<div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>To get uncompressed pixel data you have two options:</p>
 <ul class="simple">
@@ -443,8 +442,8 @@ transfer syntax of the data set, but not the <em>Photometric Interpretation</em>
 The <em>Photometric Interpretation</em> may not match the pixel data, depending on
 the used decompression handler.</p>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

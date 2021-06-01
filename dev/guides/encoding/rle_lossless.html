@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>RLE Lossless Encoding &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -216,13 +215,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="rle-lossless-encoding">
+  <div class="section" id="rle-lossless-encoding">
 <h1>RLE Lossless Encoding<a class="headerlink" href="#rle-lossless-encoding" title="Permalink to this headline">¶</a></h1>
 <p>The requirements for RLE encoding are defined in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.2.html">Section 8.2.2</a> and Annexes <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.2.html">A.4.2</a>
 and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_G.html">G</a> of Part 5 of the DICOM Standard. The
 underlying algorithm is based on the
 <a class="reference external" href="https://en.wikipedia.org/wiki/PackBits">PackBits</a> compression scheme.</p>
-<section id="valid-image-pixel-parameters">
+<div class="section" id="valid-image-pixel-parameters">
 <h2>Valid Image Pixel Parameters<a class="headerlink" href="#valid-image-pixel-parameters" title="Permalink to this headline">¶</a></h2>
 <p>The table below lists the valid <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a>
 module parameters for <em>Pixel Data</em> encoded using <em>RLE Lossless</em> encoding. For
@@ -325,8 +324,8 @@ using YCbCr data should result in a higher compression ratio than
 with RGB, while YCbCr data is usually converted back to RGB before viewing.
 The decision to change the color space should be made with the intended
 usage of your dataset in mind.</p>
-</section>
-<section id="available-plugins">
+</div>
+<div class="section" id="available-plugins">
 <h2>Available Plugins<a class="headerlink" href="#available-plugins" title="Permalink to this headline">¶</a></h2>
 <table class="docutils align-default">
 <colgroup>
@@ -367,8 +366,8 @@ usage of your dataset in mind.</p>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="examples">
+</div>
+<div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>Compressing grayscale pixel data in-place:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
@@ -417,8 +416,8 @@ new <em>SOP Instance UID</em>:</p>
 <span class="go">187460</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Compressing Pixel Data &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -214,7 +213,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="compressing-pixel-data">
+  <div class="section" id="compressing-pixel-data">
 <h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial is about compressing a dataset’s <em>Pixel Data</em> and covers</p>
 <ul class="simple">
@@ -238,7 +237,7 @@ conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">
 pip install pylibjpeg
 </pre></div>
 </div>
-<section id="introduction">
+<div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>DICOM conformant applications are usually required to support the
 <em>Little Endian Implicit VR</em> transfer syntax, which is an uncompressed (native)
@@ -272,8 +271,8 @@ then it’s recommended (but not required) that an <a class="reference external"
 </ul>
 <p>Each <em>Transfer Syntax</em> has it’s own specific requirements, found
 in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/PS3.5.html">Part 5 of the DICOM Standard</a>.</p>
-</section>
-<section id="encapsulating-data-compressed-by-third-party-packages">
+</div>
+<div class="section" id="encapsulating-data-compressed-by-third-party-packages">
 <h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Permalink to this headline">¶</a></h2>
 <p>Once you’ve used a third-party package to compress the <em>Pixel Data</em>,
 <em>pydicom</em> can be used to encapsulate and add it to the
@@ -309,8 +308,8 @@ dataset, with either the <a class="reference internal" href="../../reference/gen
 <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_ext.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="compressing-using-pydicom">
+</div>
+<div class="section" id="compressing-using-pydicom">
 <h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this headline">¶</a></h2>
 <p>Currently, only the <em>RLE Lossless</em> transfer syntax is supported for
 compressing <em>Pixel Data</em> natively using <em>pydicom</em>. The easiest method is to
@@ -379,8 +378,8 @@ original transfer syntax - <em>JPEG 2000 Lossless</em> - is required.</p>
 Interpretation</em>, from the original value of <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code> when the dataset
 was using <em>JPEG 2000 Lossless</em> compression to <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, which for this dataset
 will be the correct value after recompressing using <em>RLE Lossless</em>.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

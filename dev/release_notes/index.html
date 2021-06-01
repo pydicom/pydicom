@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Release notes &mdash; pydicom 2.2.0.dev0 documentation</title>
@@ -353,11 +352,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="release-notes">
+  <div class="section" id="release-notes">
 <h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
-<section id="version-2-2-0">
+<div class="section" id="version-2-2-0">
 <h2>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Permalink to this headline">¶</a></h2>
-<section id="changes">
+<div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
@@ -384,9 +383,10 @@ deprecated and will be removed in v3.0, use
 v3.0, use <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> instead.</p></li>
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">write_file()</span></code> is deprecated and will be removed in
 v3.0, use <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> instead.</p></li>
+<li><p>Data dictionaries updated to version 2021b of the DICOM Standard</p></li>
 </ul>
-</section>
-<section id="enhancements">
+</div>
+<div class="section" id="enhancements">
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>Added a command-line interface for pydicom.  Current subcommands are:</p>
@@ -451,8 +451,8 @@ and ‘gdcm’ plugins</p></li>
 <li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
 to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
 </ul>
-</section>
-<section id="fixes">
+</div>
+<div class="section" id="fixes">
 <h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
@@ -468,11 +468,11 @@ standard workflow if <cite>setuptools</cite> are not installed (<a class="refere
 rather than YBR with the Pillow pixel data handler (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/878">#878</a>)</p></li>
 <li><p>Allow to deepcopy a <cite>~pydicom.dataset.FileDataset</cite> object (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1147">#1147</a>)</p></li>
 </ul>
-</section>
-</section>
-<section id="version-2-1-1">
+</div>
+</div>
+<div class="section" id="version-2-1-1">
 <h2>Version 2.1.1<a class="headerlink" href="#version-2-1-1" title="Permalink to this headline">¶</a></h2>
-<section id="id1">
+<div class="section" id="id1">
 <h3>Fixes<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Remove <code class="docutils literal notranslate"><span class="pre">py.typed</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1251">#1251</a>)</p></li>
@@ -480,16 +480,16 @@ rather than YBR with the Pillow pixel data handler (<a class="reference external
 <li><p>Fix converting Sequences with Bulk Data when loading from JSON
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1254">#1254</a>)</p></li>
 </ul>
-</section>
-</section>
-<section id="version-2-1-0">
+</div>
+</div>
+<div class="section" id="version-2-1-0">
 <h2>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h2>
-<section id="changelog">
+<div class="section" id="changelog">
 <h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 </ul>
-<section id="id2">
+<div class="section" id="id2">
 <h4>Enhancements<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Large testing data is no longer distributed within the pydicom package
@@ -562,8 +562,8 @@ are convertible to integers without loss, e.g. “1.0” (<a class="reference ex
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> function for use when
 an Extended Offset Table is required (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1178">#1178</a>)</p></li>
 </ul>
-</section>
-<section id="id3">
+</div>
+<div class="section" id="id3">
 <h4>Changes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
@@ -614,8 +614,8 @@ instead</p></li>
 <li><p>The <a class="reference internal" href="../reference/generated/pydicom.config.overlay_data_handlers.html#pydicom.config.overlay_data_handlers" title="pydicom.config.overlay_data_handlers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">overlay_data_handlers</span></code></a> config option is
 deprecated, the default handler will always be used.</p></li>
 </ul>
-</section>
-<section id="id4">
+</div>
+<div class="section" id="id4">
 <h4>Fixes<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.copy()</span></code></a> now works as expected
@@ -639,12 +639,12 @@ adding working correctly when the <cite>default</cite> value is <code class="doc
 adding private elements when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
 <code class="docutils literal notranslate"><span class="pre">True</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1215">#1215</a>)</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-2-0-0">
+</div>
+</div>
+</div>
+<div class="section" id="version-2-0-0">
 <h2>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Permalink to this headline">¶</a></h2>
-<section id="id5">
+<div class="section" id="id5">
 <h3>Changelog<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Dropped support for Python 2 (only Python 3.5+ supported)</p></li>
@@ -666,7 +666,7 @@ are deprecated and will be removed in version 2.1</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataelem.isMultiValue</span></code> (previously deprecated) has been removed.
 Use <code class="docutils literal notranslate"><span class="pre">dataelem.DataElement.VM</span></code> instead.</p></li>
 </ul>
-<section id="id6">
+<div class="section" id="id6">
 <h4>Enhancements<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Allow PathLike objects for filename argument in <cite>dcmread</cite>, <cite>dcmwrite</cite> and
@@ -680,8 +680,8 @@ data elements with VR of <strong>DS</strong> or <strong>IS</strong> return a num
 (much faster for bigger arrays).  Both default to False to preserve previous
 behavior</p></li>
 </ul>
-</section>
-<section id="id7">
+</div>
+<div class="section" id="id7">
 <h4>Fixes<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed reading of datasets with an empty <cite>Specific Character Set</cite> tag
@@ -705,34 +705,34 @@ the Pillow pixel data handler as Pillow doesn’t support JPEG Lossless.
 <li><p>Fixed bug in updating <cite>pydicom.config.use_DS_Decimal</cite> flag
 in <a class="reference internal" href="../reference/generated/pydicom.config.DS_decimal.html#pydicom.config.DS_decimal" title="pydicom.config.DS_decimal"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS_decimal()</span></code></a></p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-1-4-1">
+</div>
+</div>
+</div>
+<div class="section" id="version-1-4-1">
 <h2>Version 1.4.1<a class="headerlink" href="#version-1-4-1" title="Permalink to this headline">¶</a></h2>
-<section id="id8">
+<div class="section" id="id8">
 <h3>Changelog<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
-<section id="id9">
+<div class="section" id="id9">
 <h4>Fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed writing of empty sequences (regression, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1030">#1030</a>)</p></li>
 </ul>
-</section>
-<section id="id10">
+</div>
+<div class="section" id="id10">
 <h4>Changes<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>In <cite>Dataset.to_json</cite> and <cite>Dataset.to_json_dict</cite>, the default of the
 <cite>bulk_data_threshold</cite> argument has changed to 1024, and is now ignored if
 no bulk data handler is set (see <a class="reference external" href="https://github.com/pydicom/pydicom/issues/1029">#1029</a>)</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-1-4-0">
+</div>
+</div>
+</div>
+<div class="section" id="version-1-4-0">
 <h2>Version 1.4.0<a class="headerlink" href="#version-1-4-0" title="Permalink to this headline">¶</a></h2>
-<section id="id11">
+<div class="section" id="id11">
 <h3>Changelog<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<section id="id12">
+<div class="section" id="id12">
 <h4>Fixes<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed handling of VRs AT and PN in json encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/915">#915</a>)</p></li>
@@ -767,8 +767,8 @@ the Pillow handler (<a class="reference external" href="https://github.com/pydic
 <li><p>Fixed parsing a DICOMDIR file with no records raising an exception
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1004">#1004</a>)</p></li>
 </ul>
-</section>
-<section id="id13">
+</div>
+<div class="section" id="id13">
 <h4>Enhancements<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added support for converting (60xx,3000) <em>Overlay Data</em> to a numpy ndarray
@@ -807,21 +807,21 @@ based on whether the Dataset’s Transfer Syntax is compressed (<a class="refere
 <a class="reference internal" href="../tutorials/sr_basics.html"><span class="doc">Structured Reporting tutorial</span></a> for more
 information</p></li>
 </ul>
-</section>
-<section id="id14">
+</div>
+<div class="section" id="id14">
 <h4>Changes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.encaps.get_frame_offsets.html#pydicom.encaps.get_frame_offsets" title="pydicom.encaps.get_frame_offsets"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame_offsets()</span></code></a> now returns whether the Basic Offset Table is empty and a list of the offsets.</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-1-3-0">
+</div>
+</div>
+</div>
+<div class="section" id="version-1-3-0">
 <h2>Version 1.3.0<a class="headerlink" href="#version-1-3-0" title="Permalink to this headline">¶</a></h2>
-<section id="id15">
+<div class="section" id="id15">
 <h3>Changelog<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
-</section>
-<section id="documentation">
+</div>
+<div class="section" id="documentation">
 <h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>New User Guide page for Python 2 support timeline</p></li>
@@ -829,7 +829,7 @@ information</p></li>
 <li><p>example loading set of CT slices and plotting axial, sagittal
 and coronal (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/789">#789</a>)</p></li>
 </ul>
-<section id="id16">
+<div class="section" id="id16">
 <h4>Changes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Removed deprecated uid variables, config.image_handlers and DeferredDataElement (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/760">#760</a>)</p></li>
@@ -842,8 +842,8 @@ trying to add a private tag</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset.Dataset.maxBytesToDisplay</span></code> also limits display length for
 non-binary VRs (by number of items) (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/666">#666</a>)</p></li>
 </ul>
-</section>
-<section id="id17">
+</div>
+<div class="section" id="id17">
 <h4>Enhancements<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">datadict.add_private_dict_entry</span></code> and
@@ -864,8 +864,8 @@ private dictionary</p></li>
 data set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/819">#819</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/issues/820">#820</a>)</p></li>
 <li><p>Added alpha conversion of Datasets to/from JSON format (Python 3 only)</p></li>
 </ul>
-</section>
-<section id="id18">
+</div>
+<div class="section" id="id18">
 <h4>Fixes<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Correctly handle <cite>Dataset.pop</cite> and <cite>Dataset.setdefault</cite> for tuple and
@@ -892,14 +892,14 @@ immutable (<a class="reference external" href="https://github.com/pydicom/pydico
 <li><p>Fix unknown VR exception message when VR isn’t ASCII (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/791">#791</a>)</p></li>
 <li><p>Fix jis-x-0201 characters encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/856">#856</a>)</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-1-2-0">
+</div>
+</div>
+</div>
+<div class="section" id="version-1-2-0">
 <h2>Version 1.2.0<a class="headerlink" href="#version-1-2-0" title="Permalink to this headline">¶</a></h2>
-<section id="id19">
+<div class="section" id="id19">
 <h3>Changelog<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
-<section id="id20">
+<div class="section" id="id20">
 <h4>Changes<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>PIL removed as a fallback if Pillow is not available in the pillow pixel data
@@ -922,8 +922,8 @@ handler’s <code class="docutils literal notranslate"><span class="pre">is_avai
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/291">#291</a>)</p></li>
 <li><p>The use of NumPyPy with PyPy is no longer supported, use NumPy instead.</p></li>
 </ul>
-</section>
-<section id="id21">
+</div>
+<div class="section" id="id21">
 <h4>Enhancements<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Updated DICOM dictionary for 2018c edition (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/677">#677</a>)</p></li>
@@ -947,8 +947,8 @@ SamplesPerPixel &gt; 1 (<a class="reference external" href="https://github.com/p
 <li><p>Small improvement in RLE decoding speed (~10%)</p></li>
 <li><p>Added support for non-conformant RLE segment ordering (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/729">#729</a>)</p></li>
 </ul>
-</section>
-<section id="id22">
+</div>
+<div class="section" id="id22">
 <h4>Fixes<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Removed unused <code class="docutils literal notranslate"><span class="pre">original_string</span></code> attribute from the <code class="docutils literal notranslate"><span class="pre">DataElement</span></code> class
@@ -970,14 +970,14 @@ syntaxes via a keyword argument for the numpy pixel data handler and should
 help reduce memory consumption if required. (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/717">#717</a>)</p></li>
 <li><p>Fixed deprecation warning in Python 3.7 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/740">#740</a>)</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-1-1-0">
+</div>
+</div>
+</div>
+<div class="section" id="version-1-1-0">
 <h2>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Permalink to this headline">¶</a></h2>
-<section id="id23">
+<div class="section" id="id23">
 <h3>Changelog<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
-<section id="id24">
+<div class="section" id="id24">
 <h4>Enhancements<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID.__str__</span></code> no longer returns the UID name (when known). The UID name is
@@ -992,8 +992,8 @@ be better than in pydicom 0.9.9 (<a class="reference external" href="https://git
 <li><p>updated DICOM dictionary for 2018b edition</p></li>
 <li><p>added full API documentation to pydicom documentation (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/649">#649</a>)</p></li>
 </ul>
-</section>
-<section id="id25">
+</div>
+<div class="section" id="id25">
 <h4>Fixes<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">UID</span></code> should behave as expected for a python <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass
@@ -1011,9 +1011,9 @@ present (<a class="reference external" href="https://github.com/pydicom/pydicom/
 <li><p>parent encoding was not used in sequences without own encoding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/625">#625</a>)</p></li>
 <li><p>fixed error handling for values too large to fit in VR IS (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/640">#640</a>)</p></li>
 </ul>
-</section>
-</section>
-<section id="other">
+</div>
+</div>
+<div class="section" id="other">
 <h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>A deprecation warning has been added for UID.__eq__ and UID.__ne__ when
@@ -1023,15 +1023,15 @@ performing the equivalent of <code class="docutils literal notranslate"><span cl
 respectively. E.g. UID(‘1.2.840.10008.1.1’) == ‘Verification SOP Class’ will
 return False. Use <code class="docutils literal notranslate"><span class="pre">UID.name</span> <span class="pre">==</span> <span class="pre">[UID</span> <span class="pre">name]</span></code> instead.</p></li>
 </ul>
-</section>
-</section>
-<section id="version-1-0-0">
+</div>
+</div>
+<div class="section" id="version-1-0-0">
 <h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this headline">¶</a></h2>
 <p>This is a major release, with major changes, including backwards-incompatible
 changes.</p>
-<section id="id26">
+<div class="section" id="id26">
 <h3>Changelog<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
-<section id="major-changes">
+<div class="section" id="major-changes">
 <h4>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>full Python 3 compatibility - one code base for both Python 2 and Python 3</p></li>
@@ -1049,8 +1049,8 @@ files</p></li>
 <li><p>DICOM dictionary updated to 2017c</p></li>
 <li><p>cleaned up DICOM dictionary code, old non-DICOM-keyword code removed</p></li>
 </ul>
-</section>
-<section id="other-enhancements">
+</div>
+<div class="section" id="other-enhancements">
 <h4>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
@@ -1080,8 +1080,8 @@ information</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">read_file</span></code> changed to <code class="docutils literal notranslate"><span class="pre">dcmread</span></code>, <code class="docutils literal notranslate"><span class="pre">write_file</span></code> to <code class="docutils literal notranslate"><span class="pre">dcmwrite</span></code> for
 greater clarity. Previous names still available for backwards compatibility.</p></li>
 </ul>
-</section>
-<section id="infrastructure">
+</div>
+<div class="section" id="infrastructure">
 <h4>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
@@ -1095,8 +1095,8 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <li><p>added PyPy support</p></li>
 <li><p>removed support for Python 2.6, added support for Python 3.6</p></li>
 </ul>
-</section>
-<section id="id27">
+</div>
+<div class="section" id="id27">
 <h4>Fixes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
@@ -1110,17 +1110,17 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 <li><p>fixed Latin5 (Turkish) character set handling</p></li>
 <li><p>a lot of other small fixes…</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-0-9-9">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-9">
 <h2>Version 0.9.9<a class="headerlink" href="#version-0-9-9" title="Permalink to this headline">¶</a></h2>
-<section id="id28">
+<div class="section" id="id28">
 <h3>Changelog<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
 <p>In addition to bug fixes, pydicom 0.9.9 contains updates for all DICOM
 dictionaries.  New features include DICOMDIR handling, and a utility module
 which produces python/pydicom source code to recreate a DICOM file.</p>
-<section id="id29">
+<div class="section" id="id29">
 <h4>Enhancements<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>All DICOM dictionaries updated (standard dictionary, UID dictionary, and
@@ -1133,31 +1133,31 @@ class. Example file <code class="docutils literal notranslate"><span class="pre"
 <li><p>setup.py uses ez_setup only if setuptools not already installed</p></li>
 <li><p>exceptions carry tag info with them, to aid in debugging</p></li>
 </ul>
-</section>
-<section id="contrib-file-changes">
+</div>
+<div class="section" id="contrib-file-changes">
 <h4>Contrib file changes<a class="headerlink" href="#contrib-file-changes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>pydicom_series:  force parameter added (Nil Goyette)</p></li>
 <li><p>dcm_qt_tree: switch to OrderedDict to preserve ordering of tags (Padraig Looney)</p></li>
 </ul>
-</section>
-<section id="other-contributors">
+</div>
+<div class="section" id="other-contributors">
 <h4>Other Contributors<a class="headerlink" href="#other-contributors" title="Permalink to this headline">¶</a></h4>
 <p>Other than Jonathan and myself, other contributors were: Rickard Holmberg,
 Julien Lamy, Yaroslav Halchenko, Mark White, Matthew Brett, Dimitri
 Papadopoulos, videan42 …(sorry if I’ve missed anyone).</p>
-</section>
-</section>
-</section>
-<section id="version-0-9-8">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-8">
 <h2>Version 0.9.8<a class="headerlink" href="#version-0-9-8" title="Permalink to this headline">¶</a></h2>
-<section id="id30">
+<div class="section" id="id30">
 <h3>Changelog<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <p>pydicom 0.9.8 is mainly a consolidation step before moving to official Python 3
 compatibility in pydicom 1.0.  It also reverts the change to using Decimal for
 VR of DS (in pydicom 0.9.7), due to performance issues. DS as Decimal is still
 available, but is off by default.</p>
-<section id="id31">
+<div class="section" id="id31">
 <h4>Major changes<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Requires Python 2.6 or later, in preparation for Python 3 compatibility</p></li>
@@ -1171,8 +1171,8 @@ r78ba350a3eb8)</p></li>
 <li><p>streamlined much code internally taking advantage of modern Python
 constructs: decorators, generators, etc</p></li>
 </ul>
-</section>
-<section id="bug-fixes">
+</div>
+<div class="section" id="bug-fixes">
 <h4>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fix for duplicate logger from Gunnar Schaefer. Fixes issue 107 (revision
@@ -1180,16 +1180,16 @@ constructs: decorators, generators, etc</p></li>
 <li><p>Fix rewind behavior in find_bytes (issue 60, revision 6b949a5b925b)</p></li>
 <li><p>Fix error in nested private sequences (issue 113, revision 84af4b240add)</p></li>
 </ul>
-</section>
-<section id="id32">
+</div>
+<div class="section" id="id32">
 <h4>Enhancements<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>UID generator added (Félix C. Morency) (revisions 0197b5846bb5 and
 3678b1be6aca, tests in f1ae573d9de5, 0411bab7c985)</p></li>
 <li><p>new PersonName3 class for Python 3: (revision 9b92b336e7d4)</p></li>
 </ul>
-</section>
-<section id="id33">
+</div>
+<div class="section" id="id33">
 <h4>Contrib file changes<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fix for pydicom_series for DS decimal (revision e830f30b6781)</p></li>
@@ -1198,17 +1198,17 @@ Qt. Contributed by Padraig Looney.</p></li>
 </ul>
 <p>Special acknowledgement to Jonathan Suever who contributed most of the Python 3
 work and many bug fixes.</p>
-</section>
-</section>
-</section>
-<section id="version-0-9-7">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-7">
 <h2>Version 0.9.7<a class="headerlink" href="#version-0-9-7" title="Permalink to this headline">¶</a></h2>
-<section id="id34">
+<div class="section" id="id34">
 <h3>Changelog<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
 <p>pydicom 0.9.7 resolves some remaining bugs before moving to Python 3
 compatibility. ** It is the last version which will run with Python &lt; 2.6 **
 (it will run with Python 2.4 to Python 2.7)</p>
-<section id="id35">
+<div class="section" id="id35">
 <h4>Major changes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added DICOM 2011 keywords. Old “named tags” still work, but will be
@@ -1233,8 +1233,8 @@ dicom.config.&lt;parameter&gt;={True|False}’ before setting values of data ele
 <p>Users are encouraged to switch to the official DICOM keywords, as these are now
 part of the standard, and promote consistency across programming languages and
 libraries.</p>
-</section>
-<section id="id36">
+</div>
+<div class="section" id="id36">
 <h4>Bug fixes<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>New way to read file meta information, not using the group length, instead
@@ -1246,8 +1246,8 @@ log a warning (revision b6b3658f3b14).</p></li>
 <li><p>Setting individual items in a DS or IS list now saves to file correctly</p></li>
 <li><p>Japanese and Korean encoding fixes (issue 110)</p></li>
 </ul>
-</section>
-<section id="id37">
+</div>
+<div class="section" id="id37">
 <h4>Other Enhancements<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>New Sequence class which verifies items are Datasets (issue 52)</p></li>
@@ -1262,22 +1262,22 @@ only on Python &gt;= 2.6 as previous versions do not call __dir__ method
 </ul>
 <p>Many of the bug fixes/enhancements were submitted by users. Many thanks to
 those who contributed.</p>
-</section>
-</section>
-</section>
-<section id="version-0-9-6">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-6">
 <h2>Version 0.9.6<a class="headerlink" href="#version-0-9-6" title="Permalink to this headline">¶</a></h2>
-<section id="id38">
+<div class="section" id="id38">
 <h3>Changelog<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h3>
 <p>pydicom 0.9.6 updates the dictionary to the DICOM 2011 standard, and has a
 number of bug fixes</p>
-<section id="id39">
+<div class="section" id="id39">
 <h4>Major changes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>updated the dictionary to the DICOM 2011 standard’s dictionary.</p></li>
 </ul>
-</section>
-<section id="id40">
+</div>
+<div class="section" id="id40">
 <h4>Bug fixes<a class="headerlink" href="#id40" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed bug in Dataset.file_metadata() and deprecated in favor of FileDataset
@@ -1287,24 +1287,24 @@ number of bug fixes</p>
 issue 97)</p></li>
 <li><p>Fixed bug in raising exception for unknown tag</p></li>
 </ul>
-</section>
-<section id="id41">
+</div>
+<div class="section" id="id41">
 <h4>Other<a class="headerlink" href="#id41" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>added example file write_new.py to show how to create DICOM files from scratch</p></li>
 <li><p>updated other example files</p></li>
 <li><p>more PEP-8 style changes</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-0-9-5">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-5">
 <h2>Version 0.9.5<a class="headerlink" href="#version-0-9-5" title="Permalink to this headline">¶</a></h2>
-<section id="id42">
+<div class="section" id="id42">
 <h3>Changelog<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
 <p>pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files
 also.</p>
-<section id="major-fixes-in-this-release">
+<div class="section" id="major-fixes-in-this-release">
 <h4>Major fixes in this release<a class="headerlink" href="#major-fixes-in-this-release" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>fix for incorrect pixel integer types which could lead to numeric errors
@@ -1314,8 +1314,8 @@ non-DICOM file (unless read_file keyword arg {{{force}}} is True) (revision
 fc790f01f5)</p></li>
 <li><p>fix recursion error on private data elements (issue 81, issue 84)</p></li>
 </ul>
-</section>
-<section id="other-fixes-in-this-release">
+</div>
+<div class="section" id="other-fixes-in-this-release">
 <h4>Other fixes in this release<a class="headerlink" href="#other-fixes-in-this-release" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fix for unicode decode failing with VM &gt; 1 (issue 78)</p></li>
@@ -1325,16 +1325,16 @@ fc790f01f5)</p></li>
 <li><p>Handle ‘OB/OW’ VR as well as ‘OW/OB’ (revision e3ee934bbc)</p></li>
 <li><p>Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)</p></li>
 </ul>
-</section>
-<section id="new-contrib-files">
+</div>
+<div class="section" id="new-contrib-files">
 <h4>New ‘Contrib’ files<a class="headerlink" href="#new-contrib-files" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>dicom_dao.py by Mike Wallace – CouchDB storage of DICOM info and binary data</p></li>
 <li><p>pydicom_series.py by Almar Klein – Reads files and separates into distinct
 series.</p></li>
 </ul>
-</section>
-<section id="id43">
+</div>
+<div class="section" id="id43">
 <h4>Other<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>switch to Distribute for packaging</p></li>
@@ -1342,12 +1342,12 @@ series.</p></li>
 <li><p>preliminary work on using sphinx for documentation</p></li>
 <li><p>preliminary work on better writing of files from scratch</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-0-9-4">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-4">
 <h2>Version 0.9.4<a class="headerlink" href="#version-0-9-4" title="Permalink to this headline">¶</a></h2>
-<section id="id44">
+<div class="section" id="id44">
 <h3>Changelog<a class="headerlink" href="#id44" title="Permalink to this headline">¶</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1358,7 +1358,7 @@ info. See item below.</p></li>
 Python 2.3)</p></li>
 </ul>
 </div>
-<section id="major-changes-additions-in-this-version">
+<div class="section" id="major-changes-additions-in-this-version">
 <h4>Major changes/additions in this version<a class="headerlink" href="#major-changes-additions-in-this-version" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>file reading code reorganized substantially</p></li>
@@ -1391,8 +1391,8 @@ Adit Panchal for these contributions.</p></li>
 <li><p>updates to pydicom’s DICOM data dictionary contributed by Adit Panchal:
 CP805/916; Supp 43 and 117 (and UID dict), Supp 119 and 122</p></li>
 </ul>
-</section>
-<section id="other-changes-and-bug-fixes">
+</div>
+<div class="section" id="other-changes-and-bug-fixes">
 <h4>Other changes and bug fixes<a class="headerlink" href="#other-changes-and-bug-fixes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Tag is now a factory function; the class is called !BaseTag. This was part of
@@ -1411,14 +1411,14 @@ message</p></li>
 <li><p>Tag fixes and enhancements : can create tags with hex string (group,
 elem). Allow lists as well as tuples (issue 47). Fix arg2=0 bug (issue 64).</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-0-9-3">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-3">
 <h2>Version 0.9.3<a class="headerlink" href="#version-0-9-3" title="Permalink to this headline">¶</a></h2>
-<section id="id45">
+<div class="section" id="id45">
 <h3>Changelog<a class="headerlink" href="#id45" title="Permalink to this headline">¶</a></h3>
-<section id="id46">
+<div class="section" id="id46">
 <h4>Major changes<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>changed to MIT-style license</p></li>
@@ -1430,8 +1430,8 @@ defer_size argument (r102, r103)</p></li>
 pixel_array rather than !ReadFile(), !SaveAs(), !PixelArray. Old names kept
 for now as aliases.</p></li>
 </ul>
-</section>
-<section id="id47">
+</div>
+<div class="section" id="id47">
 <h4>Other Enhancements<a class="headerlink" href="#id47" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>added DicomFileLike class to simplify and generalize access. Any object that
@@ -1443,8 +1443,8 @@ r113)</p></li>
 <li><p>made reading tolerant of truncated files – gives a warning, but returns
 dataset read to that point (r95)</p></li>
 </ul>
-</section>
-<section id="id48">
+</div>
+<div class="section" id="id48">
 <h4>Bug Fixes<a class="headerlink" href="#id48" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>fixed issue38, name collision for ‘Other Patient Ids’ as both data element
@@ -1457,22 +1457,22 @@ character (r104)</p></li>
 header (r109)</p></li>
 <li><p>fixed print recursion bug when printing a UID (r111)</p></li>
 </ul>
-</section>
-<section id="id49">
+</div>
+<div class="section" id="id49">
 <h4>Other<a class="headerlink" href="#id49" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>many of the example files updated</p></li>
 <li><p>updated anonymize example file to also deal with ‘OtherPatientIDs’ and
 ‘PatientsBirthDate’ (r98)</p></li>
 </ul>
-</section>
-</section>
-</section>
-<section id="version-0-9-2">
+</div>
+</div>
+</div>
+<div class="section" id="version-0-9-2">
 <h2>Version 0.9.2<a class="headerlink" href="#version-0-9-2" title="Permalink to this headline">¶</a></h2>
-<section id="id50">
+<div class="section" id="id50">
 <h3>Changelog<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
-<section id="id51">
+<div class="section" id="id51">
 <h4>Major changes<a class="headerlink" href="#id51" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Renamed Attribute class and related modules to !DataElement. Old code will
@@ -1483,8 +1483,8 @@ using Python unicode. Thus foreign languages can display names in Greek,
 Japanese, Chinese etc characters in environments which support unicode
 (demonstrated in dicomtree.py example using Tkinter GUI) (r64, r65)</p></li>
 </ul>
-</section>
-<section id="id52">
+</div>
+<div class="section" id="id52">
 <h4>Other Enhancements<a class="headerlink" href="#id52" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added support for auto-completion of dataset elements in ipython; also all
@@ -1500,8 +1500,8 @@ UID_dictionary used (r51).</p></li>
 <li><p>Added !DataElement.name property; synonym for !DataElement.description()
 function</p></li>
 </ul>
-</section>
-<section id="id53">
+</div>
+<div class="section" id="id53">
 <h4>Bug Fixes<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Fixed issue27, sequence with a single empty item read incorrectly</p></li>
@@ -1511,8 +1511,8 @@ function</p></li>
 <li><p>Fixed issue33, VR=UN being split on backslash (r70)</p></li>
 <li><p>Fixed issue18, util directory not installed (r45)</p></li>
 </ul>
-</section>
-<section id="id54">
+</div>
+<div class="section" id="id54">
 <h4>Other<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><p>Added example file myprint.py – shows how to custom format DICOM file
@@ -1523,10 +1523,10 @@ information (r67)</p></li>
 <li><p>Dataset.!PixelDataArray() NumPy array changed to property Dataset.!PixelArray</p></li>
 <li><p>changed to setuptools for packaging rather than distutils</p></li>
 </ul>
-</section>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
+</div>
 
 
            </div>
