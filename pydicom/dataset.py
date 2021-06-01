@@ -420,7 +420,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType]
-    ) -> None:
+    ) -> Optional[bool]:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
         return
