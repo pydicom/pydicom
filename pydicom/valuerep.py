@@ -695,7 +695,7 @@ class IS(int):
             return val
 
         if isinstance(val, str) and val.strip() == '':
-            return None
+            return ''
 
         try:
             newval: _IS = super().__new__(cls, val)

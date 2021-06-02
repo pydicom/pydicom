@@ -738,7 +738,7 @@ class TestIS:
     """Unit tests for IS"""
     def test_empty_value(self):
         assert IS(None) is None
-        assert IS("") is None
+        assert IS("") == ""
 
     def test_valid_value(self):
         assert 42 == IS(42)
