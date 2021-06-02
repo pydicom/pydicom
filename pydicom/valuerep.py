@@ -1347,9 +1347,6 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        if encodings is None:
-            encodings = [default_encoding]
-
         alphabetic_group: List[Union[str, bytes]] = [
             family_name,
             given_name,
@@ -1453,9 +1450,6 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        if encodings is None:
-            encodings = [default_encoding]
-
         alphabetic_group: List[Union[str, bytes]] = [
             responsible_party_name,
             patient_name,
