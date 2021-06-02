@@ -931,7 +931,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             # If a deferred read, then go get the value now
             if elem.value is None and elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
-                # Union[RawDataElement, DataElement] ugh
+
                 elem = read_deferred_data_element(
                     self.fileobj_type,
                     self.filename,
