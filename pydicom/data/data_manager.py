@@ -57,7 +57,7 @@ from pydicom.data.download import (
     get_url_map, get_data_dir
 )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom import Dataset
 
 

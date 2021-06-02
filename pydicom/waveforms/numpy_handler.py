@@ -36,7 +36,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 

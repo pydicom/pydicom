@@ -15,7 +15,7 @@ import warnings
 import zlib
 
 from pydicom import config
-from pydicom.charset import (default_encoding, convert_encodings)
+from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.dataelem import (DataElement, RawDataElement,
@@ -385,10 +385,10 @@ def read_dataset(
     defer_size : int, None, optional
         Size to avoid loading large elements in memory. See :func:`dcmread` for
         more parameter info.
-    parent_encoding :
+    parent_encoding : str or List[str]
         Optional encoding to use as a default in case (0008,0005) *Specific
         Character Set* isn't specified.
-    specific_tags : list or None
+    specific_tags : list of BaseTag, optional
         See :func:`dcmread` for parameter info.
     at_top_level: bool
         If dataset is top level (not within a sequence).
@@ -435,16 +435,17 @@ def read_dataset(
         logger.error(details)
 
     ds = Dataset(raw_data_elements)
+
     encoding: Union[str, MutableSequence[str]]
     if 0x00080005 in raw_data_elements:
-        char_set = DataElement_from_raw(
-            raw_data_elements[TupleTag((0x0008, 0x0005))]
-        ).value
-        encoding = convert_encodings(
-            cast(Union[str, List[str]], char_set)
+        char_set = cast(
+            Optional[Union[str, MutableSequence[str]]],
+            DataElement_from_raw(raw_data_elements[BaseTag(0x00080005)]).value
         )
+        encoding = convert_encodings(char_set)  # -> List[str]
     else:
-        encoding = parent_encoding
+        encoding = parent_encoding  # -> Union[str, MutableSequence[str]]
+
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
     return ds
 
