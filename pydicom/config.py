@@ -5,7 +5,6 @@
 
 import logging
 import os
-from typing import Optional
 
 have_numpy = True
 try:

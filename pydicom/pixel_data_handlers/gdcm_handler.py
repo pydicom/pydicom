@@ -3,7 +3,6 @@
 pixel transfer syntaxes.
 """
 
-import sys
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 

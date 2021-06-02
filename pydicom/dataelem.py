@@ -10,14 +10,13 @@ A DataElement has a tag,
 import base64
 import json
 from typing import (
-    Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type, List, NamedTuple, MutableSequence, cast
+    Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, TypeVar, Type,
+    List, NamedTuple, MutableSequence, cast
 )
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
-from pydicom import config
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -42,6 +41,7 @@ BINARY_VR_VALUES = [
     'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
 ]
+
 
 def empty_value_for_VR(
     VR: Optional[str], raw: bool = False

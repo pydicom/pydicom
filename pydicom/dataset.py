@@ -24,7 +24,7 @@ import json
 import os
 import os.path
 import re
-from types import ModuleType, TracebackType
+from types import TracebackType
 from typing import (
     TYPE_CHECKING, Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
     Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,

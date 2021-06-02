@@ -4,7 +4,7 @@
 import codecs
 import re
 from typing import (
-    List, Set, Dict, Optional, Union, TYPE_CHECKING, MutableSequence, cast
+    List, Set, Optional, Union, TYPE_CHECKING, MutableSequence, cast
 )
 import warnings
 

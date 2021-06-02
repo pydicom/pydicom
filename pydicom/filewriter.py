@@ -1,12 +1,11 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-import os
 from struct import pack
 import sys
 from typing import (
     Union, BinaryIO, Any, cast, Sequence, MutableSequence, Iterable, Optional,
-    List, Callable
+    List
 )
 import warnings
 import zlib

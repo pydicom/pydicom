@@ -9,7 +9,6 @@ from typing import (
 )
 
 from pydicom.encaps import encapsulate
-from pydicom.pixel_data_handlers.util import get_expected_length
 from pydicom.uid import (
     UID, JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1,
     JPEGLSLossless, JPEGLSNearLossless, JPEG2000Lossless, JPEG2000, RLELossless

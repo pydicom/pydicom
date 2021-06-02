@@ -8,8 +8,8 @@ import warnings
 from decimal import Decimal
 from math import floor, isfinite, log10
 from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator,
-    Callable, MutableSequence, Sequence, cast, Iterator
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Callable,
+    MutableSequence, Sequence, cast, Iterator
 )
 
 # don't import datetime_conversion directly

@@ -1,7 +1,6 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
-from collections import namedtuple
 import copy
 import os
 from os import PathLike
@@ -10,8 +9,7 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import (
-    Generator, Optional, Union, Any, List, cast, Iterable, TypeVar,
-    Dict, Callable
+    Generator, Optional, Union, Any, List, cast, Iterable, Dict, Callable
 )
 import warnings
 
@@ -1767,7 +1765,7 @@ class FileSet:
 
         if raise_orphans:
             raise ValueError(
-                f"The DICOMDIR contains orphaned directory records"
+                "The DICOMDIR contains orphaned directory records"
             )
 
         # DICOMDIR contains orphaned records

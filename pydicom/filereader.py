@@ -8,8 +8,8 @@ import os
 from struct import (Struct, unpack)
 import sys
 from typing import (
-    BinaryIO, Union, Optional, List, Tuple, Any, Callable, cast,
-    MutableSequence, Type, Iterator, Dict
+    BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
+    Type, Iterator, Dict
 )
 import warnings
 import zlib
@@ -17,13 +17,13 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR, tag_for_keyword
-from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw, empty_value_for_VR)
-from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
+from pydicom.datadict import dictionary_VR
+from pydicom.dataelem import (
+    DataElement, RawDataElement, DataElement_from_raw, empty_value_for_VR
+)
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import DicomFile
 from pydicom.fileutil import (
     read_undefined_length_value, path_from_pathlike, PathType, _unpack_tag
 )
@@ -322,7 +322,6 @@ def _is_implicit_vr(
     raw_vr = fp.read(2)
     if len(raw_vr) < 2:
         return implicit_vr_is_assumed
-
 
     # it is sufficient to check if the VR is in valid ASCII range, as it is
     # extremely unlikely that the tag length accidentally has such a

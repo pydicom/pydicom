@@ -69,7 +69,7 @@ class Sequence(MultiValue[Dataset]):
         of :class:`~pydicom.dataset.Dataset` instances.
         """
         if isinstance(val, Dataset):
-            raise TypeError(f"An iterable of 'Dataset' is required")
+            raise TypeError("An iterable of 'Dataset' is required")
 
         super().extend(val)
         for ds in val:
@@ -80,7 +80,7 @@ class Sequence(MultiValue[Dataset]):
     ) -> MutableSequence[Dataset]:
         """Implement Sequence() += [Dataset()]."""
         if isinstance(other, Dataset):
-            raise TypeError(f"An iterable of 'Dataset' is required")
+            raise TypeError("An iterable of 'Dataset' is required")
 
         result = super().__iadd__(other)
         for ds in other:
@@ -134,7 +134,7 @@ class Sequence(MultiValue[Dataset]):
         """
         if isinstance(idx, slice):
             if isinstance(val, Dataset):
-                raise TypeError(f"Can only assign an iterable of 'Dataset'")
+                raise TypeError("Can only assign an iterable of 'Dataset'")
 
             super().__setitem__(idx, val)
             for ds in val:
