@@ -704,6 +704,11 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0016008C: ('OB', '1', "GPS Area Information", '', 'GPSAreaInformation'),  # noqa
     0x0016008D: ('DT', '1', "GPS Date Stamp", '', 'GPSDateStamp'),  # noqa
     0x0016008E: ('IS', '1', "GPS Differential", '', 'GPSDifferential'),  # noqa
+    0x00161001: ('CS', '1', "Light Source Polarization", '', 'LightSourcePolarization'),  # noqa
+    0x00161002: ('DS', '1', "Emitter Color Temperature", '', 'EmitterColorTemperature'),  # noqa
+    0x00161003: ('CS', '1', "Contact Method", '', 'ContactMethod'),  # noqa
+    0x00161004: ('CS', '1-n', "Immersion Media", '', 'ImmersionMedia'),  # noqa
+    0x00161005: ('DS', '1', "Optical Magnification Factor", '', 'OpticalMagnificationFactor'),  # noqa
     0x00180010: ('LO', '1', "Contrast/Bolus Agent", '', 'ContrastBolusAgent'),  # noqa
     0x00180012: ('SQ', '1', "Contrast/Bolus Agent Sequence", '', 'ContrastBolusAgentSequence'),  # noqa
     0x00180013: ('FL', '1', "Contrast/Bolus T1 Relaxivity", '', 'ContrastBolusT1Relaxivity'),  # noqa
@@ -876,6 +881,24 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x001811A3: ('DS', '1', "Compression Pressure", '', 'CompressionPressure'),  # noqa
     0x001811A4: ('LO', '1', "Paddle Description", '', 'PaddleDescription'),  # noqa
     0x001811A5: ('DS', '1', "Compression Contact Area", '', 'CompressionContactArea'),  # noqa
+    0x001811B0: ('LO', '1', "Acquisition Mode", '', 'AcquisitionMode'),  # noqa
+    0x001811B1: ('LO', '1', "Dose Mode Name", '', 'DoseModeName'),  # noqa
+    0x001811B2: ('CS', '1', "Acquired Subtraction Mask Flag", '', 'AcquiredSubtractionMaskFlag'),  # noqa
+    0x001811B3: ('CS', '1', "Fluoroscopy Persistence Flag", '', 'FluoroscopyPersistenceFlag'),  # noqa
+    0x001811B4: ('CS', '1', "Fluoroscopy Last Image Hold Persistence Flag", '', 'FluoroscopyLastImageHoldPersistenceFlag'),  # noqa
+    0x001811B5: ('IS', '1', "Upper Limit Number Of Persistent Fluoroscopy Frames", '', 'UpperLimitNumberOfPersistentFluoroscopyFrames'),  # noqa
+    0x001811B6: ('CS', '1', "Contrast/Bolus Auto Injection Trigger Flag", '', 'ContrastBolusAutoInjectionTriggerFlag'),  # noqa
+    0x001811B7: ('FD', '1', "Contrast/Bolus Injection Delay", '', 'ContrastBolusInjectionDelay'),  # noqa
+    0x001811B8: ('SQ', '1', "XA Acquisition Phase Details Sequence", '', 'XAAcquisitionPhaseDetailsSequence'),  # noqa
+    0x001811B9: ('FD', '1', "XA Acquisition Frame Rate", '', 'XAAcquisitionFrameRate'),  # noqa
+    0x001811BA: ('SQ', '1', "XA Plane Details Sequence", '', 'XAPlaneDetailsSequence'),  # noqa
+    0x001811BB: ('LO', '1', "Acquisition Field of View Label", '', 'AcquisitionFieldOfViewLabel'),  # noqa
+    0x001811BC: ('SQ', '1', "X-Ray Filter Details Sequence", '', 'XRayFilterDetailsSequence'),  # noqa
+    0x001811BD: ('FD', '1', "XA Acquisition Duration", '', 'XAAcquisitionDuration'),  # noqa
+    0x001811BE: ('CS', '1', "Reconstruction Pipeline Type", '', 'ReconstructionPipelineType'),  # noqa
+    0x001811BF: ('SQ', '1', "Image Filter Details Sequence", '', 'ImageFilterDetailsSequence'),  # noqa
+    0x001811C0: ('CS', '1', "Applied Mask Subtraction Flag", '', 'AppliedMaskSubtractionFlag'),  # noqa
+    0x001811C1: ('SQ', '1', "Requested Series Description Code Sequence", '', 'RequestedSeriesDescriptionCodeSequence'),  # noqa
     0x00181200: ('DA', '1-n', "Date of Last Calibration", '', 'DateOfLastCalibration'),  # noqa
     0x00181201: ('TM', '1-n', "Time of Last Calibration", '', 'TimeOfLastCalibration'),  # noqa
     0x00181202: ('DT', '1', "DateTime of Last Calibration", '', 'DateTimeOfLastCalibration'),  # noqa
@@ -1045,6 +1068,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00186058: ('UL', '1-n', "Table of Pixel Values", '', 'TableOfPixelValues'),  # noqa
     0x0018605A: ('FL', '1-n', "Table of Parameter Values", '', 'TableOfParameterValues'),  # noqa
     0x00186060: ('FL', '1-n', "R Wave Time Vector", '', 'RWaveTimeVector'),  # noqa
+    0x00186070: ('US', '1', "Active Image Area Overlay Group", '', 'ActiveImageAreaOverlayGroup'),  # noqa
     0x00187000: ('CS', '1', "Detector Conditions Nominal Flag", '', 'DetectorConditionsNominalFlag'),  # noqa
     0x00187001: ('DS', '1', "Detector Temperature", '', 'DetectorTemperature'),  # noqa
     0x00187004: ('CS', '1', "Detector Type", '', 'DetectorType'),  # noqa
@@ -1274,7 +1298,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00189321: ('SQ', '1', "CT Exposure Sequence", '', 'CTExposureSequence'),  # noqa
     0x00189322: ('FD', '2', "Reconstruction Pixel Spacing", '', 'ReconstructionPixelSpacing'),  # noqa
     0x00189323: ('CS', '1-n', "Exposure Modulation Type", '', 'ExposureModulationType'),  # noqa
-    0x00189324: ('FD', '1', "Estimated Dose Saving", '', 'EstimatedDoseSaving'),  # noqa
+    0x00189324: ('FD', '1', "Estimated Dose Saving", 'Retired', 'EstimatedDoseSaving'),  # noqa
     0x00189325: ('SQ', '1', "CT X-Ray Details Sequence", '', 'CTXRayDetailsSequence'),  # noqa
     0x00189326: ('SQ', '1', "CT Position Sequence", '', 'CTPositionSequence'),  # noqa
     0x00189327: ('FD', '1', "Table Position", '', 'TablePosition'),  # noqa
@@ -2509,6 +2533,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0040A028: ('SQ', '1', "Documenting Organization Identifier Code Sequence (Trial)", 'Retired', 'DocumentingOrganizationIdentifierCodeSequenceTrial'),  # noqa
     0x0040A030: ('DT', '1', "Verification DateTime", '', 'VerificationDateTime'),  # noqa
     0x0040A032: ('DT', '1', "Observation DateTime", '', 'ObservationDateTime'),  # noqa
+    0x0040A033: ('DT', '1', "Observation Start DateTime", '', 'ObservationStartDateTime'),  # noqa
     0x0040A040: ('CS', '1', "Value Type", '', 'ValueType'),  # noqa
     0x0040A043: ('SQ', '1', "Concept Name Code Sequence", '', 'ConceptNameCodeSequence'),  # noqa
     0x0040A047: ('LO', '1', "Measurement Precision Description (Trial)", 'Retired', 'MeasurementPrecisionDescriptionTrial'),  # noqa
@@ -2604,6 +2629,14 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0040A731: ('SQ', '1', "Relationship Sequence (Trial)", 'Retired', 'RelationshipSequenceTrial'),  # noqa
     0x0040A732: ('SQ', '1', "Relationship Type Code Sequence (Trial)", 'Retired', 'RelationshipTypeCodeSequenceTrial'),  # noqa
     0x0040A744: ('SQ', '1', "Language Code Sequence (Trial)", 'Retired', 'LanguageCodeSequenceTrial'),  # noqa
+    0x0040A801: ('SQ', '1', "Tabulated Values Sequence", '', 'TabulatedValuesSequence'),  # noqa
+    0x0040A802: ('UL', '1', "Number of Table Rows", '', 'NumberOfTableRows'),  # noqa
+    0x0040A803: ('UL', '1', "Number of Table Columns", '', 'NumbeOfTableColumns'),  # noqa
+    0x0040A804: ('UL', '1', "Table Row Number", '', 'TableRowNumber'),  # noqa
+    0x0040A805: ('UL', '1', "Table Column Number", '', 'TableColumnNumber'),  # noqa
+    0x0040A806: ('SQ', '1', "Table Row Definition Sequence", '', 'TableRowDefinitionSequence'),  # noqa
+    0x0040A807: ('SQ', '1', "Table Column Definition Sequence", '', 'TableColumnDefinitionSequence'),  # noqa
+    0x0040A808: ('SQ', '1', "Cell Values Sequence", '', 'CellValuesSequence'),  # noqa
     0x0040A992: ('ST', '1', "Uniform Resource Locator (Trial)", 'Retired', 'UniformResourceLocatorTrial'),  # noqa
     0x0040B020: ('SQ', '1', "Waveform Annotation Sequence", '', 'WaveformAnnotationSequence'),  # noqa
     0x0040DB00: ('CS', '1', "Template Identifier", '', 'TemplateIdentifier'),  # noqa
@@ -3327,6 +3360,9 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0072007E: ('SS', '1-n', "Selector SS Value", '', 'SelectorSSValue'),  # noqa
     0x0072007F: ('UI', '1-n', "Selector UI Value", '', 'SelectorUIValue'),  # noqa
     0x00720080: ('SQ', '1', "Selector Code Sequence Value", '', 'SelectorCodeSequenceValue'),  # noqa
+    0x00720081: ('OV', '1', "Selector OV Value", '', 'SelectorOVValue'),  # noqa
+    0x00720082: ('SV', '1-n', "Selector SV Value", '', 'SelectorSVValue'),  # noqa
+    0x00720083: ('UV', '1-n', "Selector UV Value", '', 'SelectorUVValue'),  # noqa
     0x00720100: ('US', '1', "Number of Screens", '', 'NumberOfScreens'),  # noqa
     0x00720102: ('SQ', '1', "Nominal Screen Definition Sequence", '', 'NominalScreenDefinitionSequence'),  # noqa
     0x00720104: ('US', '1', "Number of Vertical Pixels", '', 'NumberOfVerticalPixels'),  # noqa
@@ -3772,11 +3808,12 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30060039: ('SQ', '1', "ROI Contour Sequence", '', 'ROIContourSequence'),  # noqa
     0x30060040: ('SQ', '1', "Contour Sequence", '', 'ContourSequence'),  # noqa
     0x30060042: ('CS', '1', "Contour Geometric Type", '', 'ContourGeometricType'),  # noqa
-    0x30060044: ('DS', '1', "Contour Slab Thickness", '', 'ContourSlabThickness'),  # noqa
-    0x30060045: ('DS', '3', "Contour Offset Vector", '', 'ContourOffsetVector'),  # noqa
+    0x30060044: ('DS', '1', "Contour Slab Thickness", 'Retired', 'ContourSlabThickness'),  # noqa
+    0x30060045: ('DS', '3', "Contour Offset Vector", 'Retired', 'ContourOffsetVector'),  # noqa
     0x30060046: ('IS', '1', "Number of Contour Points", '', 'NumberOfContourPoints'),  # noqa
     0x30060048: ('IS', '1', "Contour Number", '', 'ContourNumber'),  # noqa
-    0x30060049: ('IS', '1-n', "Attached Contours", '', 'AttachedContours'),  # noqa
+    0x30060049: ('IS', '1-n', "Attached Contours", 'Retired', 'AttachedContours'),  # noqa
+    0x3006004A: ('SQ', '1', "Source Pixel Planes Characteristics Sequence", '', 'SourcePixelPlanesCharacteristicsSequence'),  # noqa
     0x30060050: ('DS', '3-3n', "Contour Data", '', 'ContourData'),  # noqa
     0x30060080: ('SQ', '1', "RT ROI Observations Sequence", '', 'RTROIObservationsSequence'),  # noqa
     0x30060082: ('IS', '1', "Observation Number", '', 'ObservationNumber'),  # noqa

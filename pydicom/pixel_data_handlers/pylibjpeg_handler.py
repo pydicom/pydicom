@@ -51,7 +51,7 @@ values given in the table below.
 import logging
 from typing import TYPE_CHECKING, Iterable, cast
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset
 
 try:

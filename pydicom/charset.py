@@ -11,7 +11,7 @@ import warnings
 from pydicom import config
 from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
 
 

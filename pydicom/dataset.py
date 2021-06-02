@@ -33,7 +33,7 @@ from typing import (
 import warnings
 import weakref
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     try:
         import numpy
         import numpy as np
@@ -420,7 +420,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType]
-    ) -> None:
+    ) -> Optional[bool]:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
         return
@@ -2826,6 +2826,22 @@ class FileMetaDataset(Dataset):
         """
         super().__init__(*args, **kwargs)
         FileMetaDataset.validate(self._dict)
+
+        # Set type hints for the possible contents - VR, Type (1|1C|3)
+        self.FileMetaInformationGroupLength: int  # UL, 1
+        self.FileMetaInformationVersion: bytes  # OB, 1
+        self.MediaStorageSOPClassUID: UID  # UI, 1
+        self.MediaStorageSOPInstanceUID: UID  # UI, 1
+        self.TransferSyntaxUID: UID  # UI, 1
+        self.ImplementationClassUID: UID  # UI, 1
+        self.ImplementationVersionName: Optional[str]  # SH, 3
+        self.SourceApplicationEntityTitle: Optional[str]  # AE, 3
+        self.SendingApplicationEntityTitle: Optional[str]  # AE, 3
+        self.ReceivingApplicationEntityTitle: Optional[str]  # AE, 3
+        self.SourcePresentationAddress: Optional[str]  # UR, 3
+        self.ReceivingPresentationAddress: Optional[str]  # UR, 3
+        self.PrivateInformationCreatorUID: Optional[UID]  # UI, 3
+        self.PrivateInformation: bytes  # OB, 1C
 
     @staticmethod
     def validate(init_value: MutableMapping[BaseTag, _DatasetValue]) -> None:

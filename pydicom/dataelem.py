@@ -34,7 +34,7 @@ from pydicom.valuerep import PersonName
 if config.have_numpy:
     import numpy
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
