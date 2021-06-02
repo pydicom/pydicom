@@ -35,7 +35,7 @@ import weakref
 
 if TYPE_CHECKING:  # pragma: no cover
     try:
-        import numpy
+        import numpy  # type: ignore[import]
         import numpy as np
     except ImportError:
         pass
@@ -423,7 +423,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     ) -> Optional[bool]:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
-        return
+        return None
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
@@ -1468,8 +1468,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         handler = getattr(pydicom.config, handler_name)
 
-        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
-        tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", self).file_meta
+        file_meta = cast("FileMetaDataset", file_meta)
+        tsyntax = file_meta.TransferSyntaxUID
         if not handler.supports_transfer_syntax(tsyntax):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID"
@@ -1491,8 +1492,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
         # Find all possible handlers that support the transfer syntax
-        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
-        ts = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", self).file_meta
+        ts = cast("FileMetaDataset", file_meta).TransferSyntaxUID
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
@@ -2781,7 +2782,7 @@ def validate_file_meta(
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
         if 'ImplementationClassUID' not in file_meta:
-            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+            file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
         if 'ImplementationVersionName' not in file_meta:
             file_meta.ImplementationVersionName = (

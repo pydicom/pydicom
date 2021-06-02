@@ -32,7 +32,7 @@ import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import PersonName
 
 if config.have_numpy:
-    import numpy
+    import numpy  # type: ignore[import]
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

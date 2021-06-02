@@ -46,7 +46,7 @@ class Sequence(MultiValue[Dataset]):
         # Dataset IS iterable). This error, however, doesn't inform the user
         # that the actual issue is that their Dataset needs to be INSIDE an
         # iterable object
-        if isinstance(iterable, Dataset):  # type: ignore[unreachable]
+        if isinstance(iterable, Dataset):
             raise TypeError('The Sequence constructor requires an iterable')
 
         # the parent dataset
@@ -68,7 +68,7 @@ class Sequence(MultiValue[Dataset]):
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
         of :class:`~pydicom.dataset.Dataset` instances.
         """
-        if isinstance(val, Dataset):  # type: ignore[unreachable]
+        if isinstance(val, Dataset):
             raise TypeError(f"An iterable of 'Dataset' is required")
 
         super().extend(val)
@@ -79,7 +79,7 @@ class Sequence(MultiValue[Dataset]):
         self, other: Iterable[Dataset]
     ) -> MutableSequence[Dataset]:
         """Implement Sequence() += [Dataset()]."""
-        if isinstance(other, Dataset):  # type: ignore[unreachable]
+        if isinstance(other, Dataset):
             raise TypeError(f"An iterable of 'Dataset' is required")
 
         result = super().__iadd__(other)

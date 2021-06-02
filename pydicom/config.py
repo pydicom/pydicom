@@ -9,7 +9,7 @@ from typing import Optional
 
 have_numpy = True
 try:
-    import numpy
+    import numpy  # type: ignore[import]
 except ImportError:
     have_numpy = False
 

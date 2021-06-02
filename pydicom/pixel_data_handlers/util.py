@@ -9,7 +9,7 @@ from typing import (
 import warnings
 
 try:
-    import numpy as np
+    import numpy as np  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -18,7 +18,7 @@ from pydicom.data import get_palette_files
 from pydicom.uid import UID
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 
 def apply_color_lut(
@@ -253,14 +253,15 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         dtype = 'uint{}'.format(nominal_depth)
 
         # Ambiguous VR, US or OW
-        lut_data: Iterable[int]
+        unc_data: Iterable[int]
         if item['LUTData'].VR == 'OW':
             endianness = '<' if ds.is_little_endian else '>'
             unpack_fmt = '{}{}H'.format(endianness, nr_entries)
-            lut_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
+            unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
-            lut_data = cast(List[int], item.LUTData)
-        lut_data = np.asarray(lut_data, dtype=dtype)
+            unc_data = cast(List[int], item.LUTData)
+
+        lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
         clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
@@ -434,14 +435,15 @@ def apply_voi(
         )
 
     # Ambiguous VR, US or OW
-    lut_data: Iterable[int]
+    unc_data: Iterable[int]
     if item['LUTData'].VR == 'OW':
         endianness = '<' if ds.is_little_endian else '>'
         unpack_fmt = f'{endianness}{nr_entries}H'
-        lut_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
+        unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
     else:
-        lut_data = cast(List[int], item.LUTData)
-    lut_data = np.asarray(lut_data, dtype=dtype)
+        unc_data = cast(List[int], item.LUTData)
+
+    lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
     clipped_iv = np.zeros(arr.shape, dtype=dtype)
@@ -1144,10 +1146,9 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         raise ImportError("Numpy is required to determine the dtype.")
 
     if ds.is_little_endian is None:
-        file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-        ds.is_little_endian = (
-            cast(UID, file_meta.TransferSyntaxUID).is_little_endian
-        )
+        file_meta = cast("FileDataset", ds).file_meta
+        file_meta = cast("FileMetaDataset", file_meta)
+        ds.is_little_endian = file_meta.TransferSyntaxUID.is_little_endian
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
@@ -1301,8 +1302,9 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
 
     # Valid values for Planar Configuration are dependent on transfer syntax
     if nr_samples > 1:
-        file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-        transfer_syntax = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", ds).file_meta
+        file_meta = cast("FileMetaDataset", file_meta)
+        transfer_syntax = file_meta.TransferSyntaxUID
         if transfer_syntax in ['1.2.840.10008.1.2.4.50',
                                '1.2.840.10008.1.2.4.57',
                                '1.2.840.10008.1.2.4.70',

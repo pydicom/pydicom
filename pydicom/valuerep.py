@@ -333,15 +333,19 @@ class TM(_DateTimeBase, datetime.time):
             if match.group('ms'):
                 microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
-            return super().__new__(cls, hour, minute, second, microsecond)
+            return super().__new__(  # type: ignore[call-arg]
+                cls, hour, minute, second, microsecond
+            )
 
         if isinstance(val, datetime.time):
-            return super().__new__(
+            return super().__new__(  # type: ignore[call-arg]
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
         try:
-            return super().__new__(cls, *args, **kwargs)
+            return super().__new__(  # type: ignore[call-arg]
+                cls, *args, **kwargs
+            )
         except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'TM' object"
@@ -488,10 +492,10 @@ class DSfloat(float):
     """
     auto_format: bool
 
-    def __new__(  # type: ignore[misc]
-            cls: Type[_DSfloat],
-            val: Union[str, int, float, Decimal],
-            auto_format: bool = False
+    def __new__(
+        cls: Type[_DSfloat],
+        val: Union[str, int, float, Decimal],
+        auto_format: bool = False
     ) -> _DSfloat:
         return super().__new__(cls, val)
 

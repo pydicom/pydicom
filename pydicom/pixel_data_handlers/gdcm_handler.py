@@ -8,11 +8,11 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -115,8 +115,9 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     gdcm.DataElement
         The converted *Pixel Data* element.
     """
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+    file_meta = cast("FileDataset", ds).file_meta
+    file_meta = cast("FileMetaDataset", file_meta)
+    tsyntax = file_meta.TransferSyntaxUID
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
     if tsyntax.is_compressed:
         if getattr(ds, 'NumberOfFrames', 1) > 1:
@@ -168,8 +169,9 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
         gdcm.PhotometricInterpretation(pi_type)
     )
 
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+    file_meta = cast("FileDataset", ds).file_meta
+    file_meta = cast("FileMetaDataset", file_meta)
+    tsyntax = file_meta.TransferSyntaxUID
     ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
     image.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
     pixel_format = gdcm.PixelFormat(
@@ -285,8 +287,9 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             f"expected data {expected_length_pixels}"
         )
 
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+    file_meta = cast("FileDataset", ds).file_meta
+    file_meta = cast("FileMetaDataset", file_meta)
+    tsyntax = file_meta.TransferSyntaxUID
     if (
         config.APPLY_J2K_CORRECTIONS
         and tsyntax in [JPEG2000, JPEG2000Lossless]

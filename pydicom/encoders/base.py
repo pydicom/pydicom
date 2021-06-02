@@ -16,7 +16,7 @@ from pydicom.uid import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
     import numpy  # type: ignore[import]
@@ -290,10 +290,9 @@ class Encoder:
         kwargs = {**self.kwargs_from_ds(ds), **kwargs}
         self._validate_encoding_profile(**kwargs)
 
-        file_meta = (
-            cast("FileMetaDataset", ds.file_meta)  # type: ignore[has-type]
-        )
-        tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", ds).file_meta
+        file_meta = cast("FileMetaDataset", file_meta)
+        tsyntax = file_meta.TransferSyntaxUID
         if not tsyntax.is_compressed:
             return self._encode_bytes(
                 ds.PixelData, idx, encoding_plugin, **kwargs

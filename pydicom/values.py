@@ -26,9 +26,8 @@ from pydicom.valuerep import (
     MultiString, DA, DT, TM, TEXT_VR_DELIMS, DSfloat, DSdecimal, IS, text_VRs
 )
 
-
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     have_numpy = True
 except ImportError:
     have_numpy = False
