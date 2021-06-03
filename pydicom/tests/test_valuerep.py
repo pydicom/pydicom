@@ -1463,10 +1463,14 @@ VALUE_REFERENCE = [
     ("CS", str, (None, ""), ("foo", "bar"), 'QualityControlSubject'),
     ("DA", str, (None, ""), ("20010203", "20020304"), 'PatientBirthDate'),
     ("DS", str, (None, ""), ("-1.5", "3.2"), 'PatientWeight'),
+    ("DS", int, (None, ""), (-1, 3), 'PatientWeight'),
+    ("DS", float, (None, ""), (-1.5, 3.2), 'PatientWeight'),
     ("DT", str, (None, ""), ("20010203040506", "2000"), 'AcquisitionDateTime'),
     ("FD", float, (None, ), (-1.5, 3.2), 'RealWorldValueLUTData'),
     ("FL", float, (None, ), (-1.5, 3.2), 'VectorAccuracy'),
     ("IS", str, (None, ""), ("0", "25"), 'BeamNumber'),
+    ("IS", int, (None, ""), (0, 25), 'BeamNumber'),
+    ("IS", float, (None, ""), (0.0, 25.0), 'BeamNumber'),
     ("LO", str, (None, ""), ("foo", "bar"), 'DataSetSubtype'),
     ("LT", str, (None, ""), ("foo", "bar"), 'ExtendedCodeMeaning'),
     ("OB", bytes, (None, b""), (b"\x00\x01", ), 'FillPattern'),
@@ -1532,13 +1536,3 @@ class TestValueConsistency:
         elem = ds[keyword]
         assert elem.value == list(vmN)
         assert list(vmN) == elem.value
-
-    def test_ds_consistency(self):
-        """Consistency tests for DS classes."""
-        val = DSfloat("-1.5")
-        assert val == "-1.5"
-        assert "-1.5" == val
-
-        val = DSdecimal("-1.5")
-        assert val == "-1.5"
-        assert "-1.5" == val
