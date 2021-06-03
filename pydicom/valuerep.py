@@ -475,10 +475,12 @@ class DSfloat(float):
             auto_format: bool = False
     ) -> Optional[Union[str, _DSfloat]]:
         if val is None:
-            return None
-
-        if val == '':
             return val
+
+        if isinstance(val, str):
+            val = val.strip()
+            if val == '':
+                return val
 
         return super().__new__(cls, val)
 
@@ -494,7 +496,7 @@ class DSfloat(float):
         has_attribute = hasattr(val, 'original_string')
         pre_checked = False
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, (DSfloat, DSdecimal)):
             if val.auto_format:
                 auto_format = True  # override input parameter
@@ -534,6 +536,7 @@ class DSfloat(float):
     def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
+            print(type(other), str(self), other, str(self) == other)
             return str(self) == other
 
         return super().__eq__(other)
@@ -603,10 +606,12 @@ class DSdecimal(Decimal):
             A string or a number type which can be converted to a decimal.
         """
         if val is None:
-            return None
-
-        if val == '':
             return val
+
+        if isinstance(val, str):
+            val = val.strip()
+            if val == '':
+                return val
 
         if isinstance(val, float) and not config.allow_DS_float:
             raise TypeError(
@@ -632,7 +637,7 @@ class DSdecimal(Decimal):
         has_str = hasattr(val, 'original_string')
         pre_checked = False
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, (DSfloat, DSdecimal)):
             if val.auto_format:
                 auto_format = True  # override input parameter
@@ -653,7 +658,7 @@ class DSdecimal(Decimal):
                 self.original_string = format_number_as_ds(self)
 
         if config.enforce_valid_values:
-            if len(repr(self).strip('"')) > 16:
+            if len(repr(self).strip("'")) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
@@ -662,7 +667,7 @@ class DSdecimal(Decimal):
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-            if not is_valid_ds(repr(self).strip('"')):
+            if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 raise ValueError(
                     f'Value "{str(self)}" is not valid for elements with a VR '
@@ -752,8 +757,10 @@ class IS(int):
         if val is None:
             return val
 
-        if val == '':
-            return val
+        if isinstance(val, str):
+            val = val.strip()
+            if val == '':
+                return val
 
         try:
             newval = super().__new__(cls, val)
@@ -780,7 +787,7 @@ class IS(int):
     def __init__(self, val: Union[str, int, float, Decimal]) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 

@@ -513,6 +513,14 @@ class TestDSfloat:
         assert DSfloat('') == ''
         assert DSfloat(None) is None
 
+    def test_str_value(self):
+        """Test creating using str"""
+        assert DSfloat('1.20') == 1.2
+        assert DSfloat('1.20 ') == 1.2
+        assert DSfloat('1.20') != '1.2'
+        assert DSfloat('1.20') == '1.20'
+        assert DSfloat('1.20 ') == '1.20'
+
     def test_str(self):
         """Test DSfloat.__str__()."""
         val = DSfloat(1.1)
@@ -623,6 +631,52 @@ class TestDSfloat:
         with pytest.raises(ValueError):
             valuerep.DSfloat(val)
 
+    def test_comparison_operators(self):
+        """Tests for the comparison operators"""
+        float_decimal = DSfloat(Decimal(1234.5))
+        for val in (DSfloat("1234.5"), DSfloat(1234.5), float_decimal):
+            assert val == Decimal(1234.5)
+            assert val != Decimal(1235)
+            assert val < Decimal(1235)
+            assert val <= Decimal(1235)
+            assert val > Decimal(1233)
+            assert val >= Decimal(1233)
+
+            assert Decimal(1234.5) == val
+            assert Decimal(1235) != val
+            assert Decimal(1235) > val
+            assert Decimal(1235) >= val
+            assert Decimal(1233) < val
+            assert Decimal(1233) <= val
+
+            assert val == 1234.5
+            assert val != 1235.0
+            assert val < 1235.0
+            assert val <= 1235.0
+            assert val > 1233.0
+            assert val >= 1233.0
+
+            assert 1234.5 == val
+            assert 1235.0 != val
+            assert 1235.0 > val
+            assert 1235.0 >= val
+            assert 1233.0 < val
+            assert 1233.0 <= val
+
+            assert val == "1234.5"
+            assert val != "1235"
+            assert val < "1235"
+            assert val <= "1235"
+            assert val > "1233"
+            assert val >= "1233"
+
+            assert "1234.5" == val
+            assert "1235" != val
+            assert "1235" > val
+            assert "1235" >= val
+            assert "1233" < val
+            assert "1233" <= val
+
 
 class TestDSdecimal:
     """Unit tests for pickling DSdecimal"""
@@ -651,6 +705,13 @@ class TestDSdecimal:
         assert isinstance(DSdecimal(''), str)
         assert DSdecimal('') == ''
         assert DSdecimal(None) is None
+
+    def test_str_value(self):
+        """Test creating using str"""
+        assert DSdecimal('1.20') == '1.20'
+        assert DSdecimal('1.20 ') == '1.20'
+        assert DSdecimal('1.20') != '1.2'
+        assert DSdecimal('1.20 ') == Decimal('1.2')
 
     def test_DSfloat(self):
         """Test creating a value using DSfloat."""
@@ -744,12 +805,65 @@ class TestDSdecimal:
         assert str(y) == '3.14159265358979'
         assert repr(y) == repr("3.14159265358979")
 
+    def test_comparison_operators(self):
+        """Tests for the comparison operators"""
+        decimal_decimal = DSdecimal(Decimal(1234.5))
+        for val in (DSdecimal("1234.5"), DSdecimal(1234.5), decimal_decimal):
+            assert val == Decimal(1234.5)
+            assert val != Decimal(1235)
+            assert val < Decimal(1235)
+            assert val <= Decimal(1235)
+            assert val > Decimal(1233)
+            assert val >= Decimal(1233)
+
+            assert Decimal(1234.5) == val
+            assert Decimal(1235) != val
+            assert Decimal(1235) > val
+            assert Decimal(1235) >= val
+            assert Decimal(1233) < val
+            assert Decimal(1233) <= val
+
+            assert val == 1234.5
+            assert val != 1235.0
+            assert val < 1235.0
+            assert val <= 1235.0
+            assert val > 1233.0
+            assert val >= 1233.0
+
+            assert 1234.5 == val
+            assert 1235.0 != val
+            assert 1235.0 > val
+            assert 1235.0 >= val
+            assert 1233.0 < val
+            assert 1233.0 <= val
+
+            assert val == "1234.5"
+            assert val != "1235"
+            assert val < "1235"
+            assert val <= "1235"
+            assert val > "1233"
+            assert val >= "1233"
+
+            assert "1234.5" == val
+            assert "1235" != val
+            assert "1235" > val
+            assert "1235" >= val
+            assert "1233" < val
+            assert "1233" <= val
+
 
 class TestIS:
     """Unit tests for IS"""
     def test_empty_value(self):
         assert IS(None) is None
         assert IS("") == ""
+
+    def test_str_value(self):
+        """Test creating using str"""
+        assert IS('1') == 1
+        assert IS('1 ') == 1
+        assert IS('1') == '1'
+        assert IS('1 ') == '1'
 
     def test_valid_value(self):
         assert 42 == IS(42)
@@ -816,7 +930,7 @@ class TestIS:
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
-        for val in (IS("1234"), IS(1234)):
+        for val in (IS("1234"), IS(1234), IS(1234.0)):
             assert val == 1234
             assert val != 1235
             assert val < 1235
@@ -830,6 +944,20 @@ class TestIS:
             assert 1235 >= val
             assert 1233 < val
             assert 1233 <= val
+
+            assert val == 1234.0
+            assert val != 1235.0
+            assert val < 1235.0
+            assert val <= 1235.0
+            assert val > 1233.0
+            assert val >= 1233.0
+
+            assert 1234.0 == val
+            assert 1235.0 != val
+            assert 1235.0 > val
+            assert 1235.0 >= val
+            assert 1233.0 < val
+            assert 1233.0 <= val
 
             assert val == "1234"
             assert val != "1235"
