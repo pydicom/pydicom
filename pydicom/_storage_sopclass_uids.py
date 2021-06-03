@@ -96,6 +96,10 @@ CTPerformedProcedureProtocolStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.2')
 ProtocolApprovalStorage = UID(
     '1.2.840.10008.5.1.4.1.1.200.3')
+XADefinedProcedureProtocolStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.200.7')
+XAPerformedProcedureProtocolStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.200.8')
 UltrasoundMultiFrameImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.3.1')
 ParametricMapStorage = UID(
@@ -234,6 +238,8 @@ OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage = UID(
     '1.2.840.10008.5.1.4.1.1.77.1.5.8')
 VLWholeSlideMicroscopyImageStorage = UID(
     '1.2.840.10008.5.1.4.1.1.77.1.6')
+DermoscopicPhotographyImageStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.77.1.7')
 LensometryMeasurementsStorage = UID(
     '1.2.840.10008.5.1.4.1.1.78.1')
 AutorefractionMeasurementsStorage = UID(
@@ -294,6 +300,8 @@ PlannedImagingAgentAdministrationSRStorage = UID(
     '1.2.840.10008.5.1.4.1.1.88.74')
 PerformedImagingAgentAdministrationSRStorage = UID(
     '1.2.840.10008.5.1.4.1.1.88.75')
+EnhancedXRayRadiationDoseSRStorage = UID(
+    '1.2.840.10008.5.1.4.1.1.88.76')
 TwelveLeadECGWaveformStorage = UID(
     '1.2.840.10008.5.1.4.1.1.9.1.1')
 GeneralECGWaveformStorage = UID(

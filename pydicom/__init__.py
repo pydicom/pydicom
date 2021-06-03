@@ -27,12 +27,17 @@ Quick Start
    https://www.github.com/pydicom/pydicom
 
 """
-
+import warnings
 
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset
-from pydicom.filereader import dcmread, read_file
-from pydicom.filewriter import dcmwrite, write_file
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from pydicom.filereader import read_file
+    from pydicom.filewriter import write_file
+
+from pydicom.filereader import dcmread
+from pydicom.filewriter import dcmwrite
 from pydicom.sequence import Sequence
 
 from ._version import __version__, __version_info__, __dicom_version__

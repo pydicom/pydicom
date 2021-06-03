@@ -40,3 +40,11 @@ def no_datetime_conversion():
     config.datetime_conversion = False
     yield
     config.datetime_conversion = datetime_conversion
+
+
+@pytest.fixture
+def dont_replace_un_with_known_vr():
+    old_value = config.replace_un_with_known_vr
+    config.replace_un_with_known_vr = False
+    yield
+    config.replace_un_with_known_vr = old_value

@@ -23,7 +23,7 @@ jobs:
           - { pymedphys-dep: pymedphys, gdcm-dep: gdcm, os: ubuntu-latest, python-version: 3.8, jpeg-deps: pillow-jpegls }
           # Test all pixel data handlers for code coverage
           - os: ubuntu-latest
-            python-version: 3.8
+            python-version: 3.9
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
@@ -33,6 +33,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -88,11 +90,11 @@ jobs:
       if: ${{ matrix.gdcm-dep == 'gdcm' && steps.cache-gdcm.outputs.cache-hit != 'true' }}
       run: |
         sudo apt-get install -y --no-install-recommends build-essential swig python3-dev
-        sudo apt-get install -y ninja-build
+        sudo apt-get install -y ninja-build cmake
         git clone --branch release https://github.com/malaterre/GDCM.git
         mkdir gdcmbin
         cd gdcmbin
-        cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
+        /usr/bin/cmake -GNinja -DGDCM_WRAP_PYTHON=ON -DGDCM_BUILD_SHARED_LIBS=ON  ../GDCM
         ninja
         cd ..
     - name: Test with GDCM
@@ -108,9 +110,9 @@ jobs:
       if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
-        python -m pip uninstall -y pylibjpeg-openjpeg
+        python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
-        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
+        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test external sources using pydicom-data
@@ -121,11 +123,7 @@ jobs:
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
-      run: >
-        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash) || (sleep 30 && bash <(curl
-        --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash))
+      uses: codecov/codecov-action@v1
 
     - name: Install pymedphys
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}

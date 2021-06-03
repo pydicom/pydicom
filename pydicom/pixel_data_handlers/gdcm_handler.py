@@ -5,10 +5,10 @@ pixel transfer syntaxes.
 
 import sys
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-if TYPE_CHECKING:
-    from pydicom.dataset import Dataset
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset, FileMetaDataset
 
 
 try:
@@ -18,7 +18,7 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import gdcm
+    import gdcm  # type: ignore[import]
     from gdcm import DataElement
     HAVE_GDCM = True
     HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, 'SetByteStringValue')
@@ -67,8 +67,9 @@ def needs_to_convert_to_RGB(ds: "Dataset"):
 
     This affects JPEG transfer syntaxes.
     """
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
     should_convert = (
-        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+        file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
     )
     should_convert &= ds.SamplesPerPixel == 3
     return False
@@ -80,8 +81,9 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
     This affects JPEG transfer syntaxes.
     """
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
     should_change = (
-        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+        file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
     )
     should_change &= ds.SamplesPerPixel == 3
     return False
@@ -113,8 +115,10 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     gdcm.DataElement
         The converted *Pixel Data* element.
     """
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
-    if ds.file_meta.TransferSyntaxUID.is_compressed:
+    if tsyntax.is_compressed:
         if getattr(ds, 'NumberOfFrames', 1) > 1:
             pixel_data_sequence = (
                 pydicom.encaps.decode_data_sequence(ds.PixelData)
@@ -163,9 +167,10 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     image.SetPhotometricInterpretation(
         gdcm.PhotometricInterpretation(pi_type)
     )
-    ts_type = gdcm.TransferSyntax.GetTSType(
-        str.__str__(ds.file_meta.TransferSyntaxUID)
-    )
+
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+    ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
     image.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
     pixel_format = gdcm.PixelFormat(
         ds.SamplesPerPixel,
@@ -203,7 +208,7 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
         #   originate with
         new = ds.group_dataset(0x0028)
         new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
-        new.file_meta = ds.file_meta
+        new.file_meta = ds.file_meta  # type: ignore[has-type]
         tfile = NamedTemporaryFile('wb')
         new.save_as(tfile.name)
         fname = tfile.name
@@ -280,20 +285,24 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             f"expected data {expected_length_pixels}"
         )
 
+    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
+    tsyntax = cast(UID, file_meta.TransferSyntaxUID)
     if (
         config.APPLY_J2K_CORRECTIONS
-        and ds.file_meta.TransferSyntaxUID in [JPEG2000, JPEG2000Lossless]
+        and tsyntax in [JPEG2000, JPEG2000Lossless]
     ):
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         codestream = next(generate_pixel_data(ds.PixelData, nr_frames))[0]
 
         params = get_j2k_parameters(codestream)
-        j2k_precision = params.setdefault("precision", None)
+        j2k_precision = cast(
+            int, params.setdefault("precision", ds.BitsStored)
+        )
         j2k_sign = params.setdefault("is_signed", None)
 
         if not j2k_sign and ds.PixelRepresentation == 1:
             # Convert unsigned J2K data to 2's complement
-            shift = ds.BitsAllocated - j2k_precision
+            shift = cast(int, ds.BitsAllocated) - j2k_precision
             pixel_module = ds.group_dataset(0x0028)
             pixel_module.PixelRepresentation = 0
             dtype = pixel_dtype(pixel_module)

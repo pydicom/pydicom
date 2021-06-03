@@ -6,8 +6,9 @@
 import re
 from io import BytesIO
 from struct import (unpack, calcsize)
-from typing import Optional, Union, List, Tuple, Dict, Callable
-from typing import Sequence as SequenceType
+from typing import (
+    Optional, Union, List, Tuple, Dict, Callable, cast, MutableSequence, Any
+)
 
 # don't import datetime_conversion directly
 from pydicom import config
@@ -56,7 +57,7 @@ def convert_tag(
         The decoded tag.
     """
     fmt = "<HH" if is_little_endian else ">HH"
-    value: Tuple[int, int] = unpack(fmt, byte_string[offset:offset + 4])
+    value = cast(Tuple[int, int], unpack(fmt, byte_string[offset:offset + 4]))
     return TupleTag(value)
 
 
@@ -64,7 +65,7 @@ def convert_AE_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[str, SequenceType[str]]:
+) -> Union[str, MutableSequence[str]]:
     """Return a decoded 'AE' value.
 
     Elements with VR of 'AE' have non-significant leading and trailing spaces.
@@ -96,7 +97,7 @@ def convert_ATvalue(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[BaseTag, SequenceType[BaseTag]]:
+) -> Union[BaseTag, MutableSequence[BaseTag]]:
     """Return a decoded 'AT' value.
 
     Parameters
@@ -140,7 +141,7 @@ def convert_DA_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[str, DA, SequenceType[Union[str, DA]]]:
+) -> Union[str, DA, MutableSequence[str], MutableSequence[DA]]:
     """Return a decoded 'DA' value.
 
     Parameters
@@ -174,7 +175,10 @@ def convert_DS_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[DSfloat, DSdecimal, SequenceType[Union[DSfloat, DSdecimal]], "numpy.float64", "numpy.ndarray"]:  # noqa
+) -> Union[
+    pydicom.valuerep.DSclass, MutableSequence[pydicom.valuerep.DSclass],
+    "numpy.float64", "numpy.ndarray"
+]:
     """Return a decoded 'DS' value.
 
     .. versionchanged:: 2.0
@@ -231,7 +235,8 @@ def convert_DS_string(
             )
         value = numpy.fromstring(num_string, dtype='f8', sep="\\")
         if len(value) == 1:  # Don't use array for one number
-            value = value[0]
+            return value[0]
+
         return value
 
     return MultiString(num_string.strip(), valtype=pydicom.valuerep.DSclass)
@@ -250,7 +255,7 @@ def convert_DT_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[str, DT, SequenceType[Union[str, DT]]]:
+) -> Union[str, DT, MutableSequence[str], MutableSequence[DT]]:
     """Return a decoded 'DT' value.
 
     Parameters
@@ -284,7 +289,7 @@ def convert_IS_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[IS, SequenceType[IS], "numpy.int64", "numpy.ndarray"]:
+) -> Union[IS, MutableSequence[IS], "numpy.int64", "numpy.ndarray"]:
     """Return a decoded 'IS' value.
 
     .. versionchanged:: 2.0
@@ -344,7 +349,7 @@ def convert_numbers(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: str
-) -> Union[str, int, float, List[Union[int, float]]]:
+) -> Union[str, int, float, MutableSequence[int], MutableSequence[float]]:
     """Return a decoded numerical VR value.
 
     Given an encoded DICOM Element value, use `struct_format` and the
@@ -380,9 +385,9 @@ def convert_numbers(
     if length % bytes_per_value != 0:
         raise BytesLengthException(
             "Expected total bytes to be an even multiple of bytes per value. "
-            f"Instead received {byte_string} with length {length} and struct "
-            f"format '{struct_format}' which corresponds to bytes per value "
-            f"of {bytes_per_value}."
+            f"Instead received {byte_string!r} with length {length} and "
+            f"struct format '{struct_format}' which corresponds to bytes per "
+            f"value of {bytes_per_value}."
         )
 
     format_string = f"{endianChar}{length // bytes_per_value}{struct_format}"
@@ -441,7 +446,7 @@ def convert_OVvalue(
 
 def convert_PN(
     byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[PersonName, SequenceType[PersonName]]:
+) -> Union[PersonName, MutableSequence[PersonName]]:
     """Return a decoded 'PN' value.
 
     Parameters
@@ -470,7 +475,7 @@ def convert_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[str, SequenceType[str]]:
+) -> Union[str, MutableSequence[str]]:
     """Return a decoded string VR value.
 
     String VRs are 'AE', AS', 'CS' and optionally (depending on
@@ -495,7 +500,7 @@ def convert_string(
 
 def convert_text(
     byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[str, SequenceType[str]]:
+) -> Union[str, MutableSequence[str]]:
     """Return a decoded text VR value, ignoring backslashes.
 
     Text VRs are 'SH', 'LO' and 'UC'.
@@ -590,7 +595,7 @@ def convert_TM_string(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[str, TM, SequenceType[Union[str, TM]]]:
+) -> Union[str, TM, MutableSequence[str], MutableSequence[TM]]:
     """Return a decoded 'TM' value.
 
     Parameters
@@ -624,7 +629,7 @@ def convert_UI(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: Optional[str] = None
-) -> Union[pydicom.uid.UID, SequenceType[pydicom.uid.UID]]:
+) -> Union[pydicom.uid.UID, MutableSequence[pydicom.uid.UID]]:
     """Return a decoded 'UI' value.
 
     Elements with VR of 'UI' may have a non-significant trailing null ``0x00``.
@@ -687,8 +692,8 @@ def convert_UR_string(
 def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
-    encodings: Optional[List[str]] = None
-) -> Union[object, SequenceType[object]]:
+    encodings: Optional[Union[str, List[str]]] = None
+) -> Union[Any, MutableSequence[Any]]:
     """Return the element value decoded using the appropriate decoder.
 
     Parameters
@@ -722,7 +727,7 @@ def convert_value(
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string
     if isinstance(converters[VR], tuple):
-        converter, num_format = converters[VR]
+        converter, num_format = cast(tuple, converters[VR])
     else:
         converter = converters[VR]
         num_format = None
@@ -784,16 +789,7 @@ convert_retry_VR_order = [
 # the converter maps to a tuple
 # (function, struct_format)
 # (struct_format in python struct module style)
-_ConverterType = Dict[
-    str,
-    Union[
-        # Non-text and non-numeric VRs, Text VRs and PN, SQ
-        Callable[..., Union[object, SequenceType[object]]],
-        # Numeric VRs
-        Tuple[Callable[..., Union[object, SequenceType[object]]], str],
-    ]
-]
-converters: _ConverterType = {
+converters = {
     'AE': convert_AE_string,
     'AS': convert_string,
     'AT': convert_ATvalue,

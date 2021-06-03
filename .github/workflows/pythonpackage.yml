@@ -89,7 +89,7 @@ jobs:
         python-version:  [3.6, 3.7, 3.8, 3.9]
         include:
           - os: ubuntu-latest
-            python-version: 3.8
+            python-version: 3.9
             jpeg-deps: pillow-jpegls
             gdcm-dep: gdcm
             pylibjpeg-dep: pylibjpeg
@@ -98,6 +98,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -173,9 +175,9 @@ jobs:
       if: ${{ matrix.pylibjpeg-dep == 'pylibjpeg' }}
       run: |
         python -m pip install pylibjpeg
-        python -m pip uninstall -y pylibjpeg-openjpeg
+        python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
-        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg
+        python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test external sources using pydicom-data
@@ -185,8 +187,4 @@ jobs:
 
     - name: Send coverage results
       if: ${{ success() && matrix.coverage == 'coverage' }}
-      run: >
-        bash <(curl --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash) || (sleep 30 && bash <(curl
-        --connect-timeout 10 --retry 10 --retry-max-time
-        0 https://codecov.io/bash))
+      uses: codecov/codecov-action@v1

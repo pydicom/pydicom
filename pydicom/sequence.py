@@ -4,8 +4,8 @@
 Sequence is a list of pydicom Dataset objects.
 """
 from typing import (
-    Iterable, Optional, List, cast, Union, overload, MutableSequence
-)
+    Iterable, Optional, List, cast, Union, overload, MutableSequence,
+    Dict, Any)
 import weakref
 
 from pydicom.dataset import Dataset
@@ -56,6 +56,8 @@ class Sequence(MultiValue[Dataset]):
         self._list: List[Dataset] = []
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
+
+        self.is_undefined_length: bool
 
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
@@ -149,3 +151,14 @@ class Sequence(MultiValue[Dataset]):
     def __repr__(self) -> str:  # type: ignore[override]
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
+
+    def __getstate__(self) -> Dict[str, Any]:
+        # pickle cannot handle weakref - remove _parent
+        d = self.__dict__.copy()
+        del d['_parent']
+        return d
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        # re-add _parent - it will be set to the parent dataset on demand
+        self.__dict__['_parent'] = None

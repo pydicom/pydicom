@@ -473,7 +473,7 @@ class TestRecordNode:
 
         assert "ROOT" == str(root)
 
-        msg = r"'NoneType' object has no attribute 'DirectoryRecordType'"
+        msg = r"'RootNode' object has no attribute '_record'"
         with pytest.raises(AttributeError, match=msg):
             root.key
 
@@ -1375,15 +1375,14 @@ class TestFileSet:
         root = os.fspath(Path(*Path(tdir.name).parts[-2:]))
         assert root in s
         assert 1 == len(paths)
-        # Only want to compare Dataset rather than FileDataset
-        assert Dataset(ct) == dcmread(paths[0])
+        assert ct == dcmread(paths[0])
 
         # Calling write() again shouldn't change anything
         ds2, paths = write_fs(fs)
-        assert Dataset(ds) == ds2
+        assert ds == ds2
         assert ds2.filename == ds.filename
         assert 1 == len(paths)
-        assert Dataset(ct) == dcmread(paths[0])
+        assert ct == dcmread(paths[0])
 
     def test_add_bad_dataset(self, ct):
         """Test adding a dataset missing Type 1 element value."""
@@ -1665,7 +1664,7 @@ class TestFileSet:
         assert fs._path is None
         assert uid != fs._uid
         assert fs._uid.is_valid
-        assert fs._ds is None
+        assert fs._ds == Dataset()
         assert fs._descriptor is None
         assert fs._charset is None
         assert [] == fs._tree.children

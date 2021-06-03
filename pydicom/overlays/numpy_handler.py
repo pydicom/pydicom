@@ -28,7 +28,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 import warnings
 
 try:
@@ -39,7 +39,7 @@ except ImportError:
 
 from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
@@ -154,9 +154,8 @@ def reshape_overlay_array(elem: dict, arr: "np.ndarray") -> "np.ndarray":
 
     if nr_frames < 1:
         raise ValueError(
-            "Unable to reshape the overlay array as a value of {} for "
-            "(60xx,0015) 'Number of Frames in Overlay' is invalid."
-            .format(nr_frames)
+            f"Unable to reshape the overlay array as a value of {nr_frames} "
+            "for (60xx,0015) 'Number of Frames in Overlay' is invalid."
         )
 
     if nr_frames > 1:
@@ -207,52 +206,51 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     if missing:
         raise AttributeError(
             "Unable to convert the overlay data as the following required "
-            "elements are missing from the dataset: " + ", ".join(missing)
+            f"elements are missing from the dataset: {', '.join(missing)}"
         )
 
     # Grab the element values
-    elem = {kk: vv.value for kk, vv in elem.items()}
+    elem_values = {kk: vv.value for kk, vv in elem.items()}
 
     # Add in if not present
     nr_frames = ds.get((group, 0x0015), None)
     if nr_frames is None:
-        elem['NumberOfFramesInOverlay'] = 1
+        elem_values['NumberOfFramesInOverlay'] = 1
     else:
-        elem['NumberOfFramesInOverlay'] = nr_frames.value
+        elem_values['NumberOfFramesInOverlay'] = nr_frames.value
 
     # Calculate the expected length of the pixel data (in bytes)
     #   Note: this does NOT include the trailing null byte for odd length data
-    expected_len = get_expected_length(elem)
+    expected_len = get_expected_length(elem_values)
 
     # Check that the actual length of the pixel data is as expected
-    actual_length = len(elem['OverlayData'])
+    actual_length = len(cast(bytes, elem_values['OverlayData']))
 
     # Correct for the trailing NULL byte padding for odd length data
     padded_expected_len = expected_len + expected_len % 2
     if actual_length < padded_expected_len:
         if actual_length == expected_len:
             warnings.warn(
-                "The overlay data length is odd and misses a padding byte.")
+                "The overlay data length is odd and misses a padding byte."
+            )
         else:
             raise ValueError(
-                "The length of the overlay data in the dataset ({} bytes) "
-                "doesn't match the expected length ({} bytes). "
-                "The dataset may be corrupted or there may be an issue "
-                "with the overlay data handler."
-                .format(actual_length, padded_expected_len)
+                "The length of the overlay data in the dataset "
+                f"({actual_length} bytes) doesn't match the expected length "
+                f"({padded_expected_len} bytes). The dataset may be corrupted "
+                "or there may be an issue with the overlay data handler."
             )
     elif actual_length > padded_expected_len:
         # PS 3.5, Section 8.1.1
-        msg = (
-            "The length of the overlay data in the dataset ({} bytes) "
-            "indicates it contains excess padding. {} bytes will be removed "
+        warnings.warn(
+            f"The length of the overlay data in the dataset ({actual_length} "
+            "bytes) indicates it contains excess padding. "
+            f"{actual_length - expected_len} bytes will be removed "
             "from the end of the data"
-            .format(actual_length, actual_length - expected_len)
         )
-        warnings.warn(msg)
 
     # Unpack the pixel data into a 1D ndarray, skipping any trailing padding
-    nr_pixels = get_expected_length(elem, unit='pixels')
-    arr = unpack_bits(elem['OverlayData'])[:nr_pixels]
+    nr_pixels = get_expected_length(elem_values, unit='pixels')
+    arr = unpack_bits(elem_values['OverlayData'])[:nr_pixels]
 
-    return reshape_overlay_array(elem, arr)
+    return reshape_overlay_array(elem_values, arr)

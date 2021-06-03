@@ -6,13 +6,14 @@ pydicom User Guide
 
 .. toctree::
 
-   base_element.rst
-   writing_files.rst
-   working_with_pixel_data.rst
-   working_with_overlays.rst
-   working_with_waveforms.rst
-   image_data_handlers.rst
-   viewing_images.rst
-   private_data_elements.rst
-   best_practices.rst
-   python2_support.rst
+   base_element
+   writing_files
+   working_with_pixel_data
+   working_with_overlays
+   working_with_waveforms
+   image_data_handlers
+   image_data_compression
+   viewing_images
+   private_data_elements
+   best_practices
+   python2_support

@@ -11,7 +11,7 @@ import base64
 import json
 from typing import (
     Optional, Any, Optional, Tuple, Callable, Union, TYPE_CHECKING, Dict,
-    TypeVar, Type, List, NamedTuple
+    TypeVar, Type, List, NamedTuple, MutableSequence
 )
 import warnings
 
@@ -21,7 +21,7 @@ from pydicom import config
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
-                              repeater_has_tag)
+                              repeater_has_tag, private_dictionary_VR)
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
@@ -34,7 +34,7 @@ from pydicom.valuerep import PersonName
 if config.have_numpy:
     import numpy
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
@@ -43,9 +43,8 @@ BINARY_VR_VALUES = [
     'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
 ]
 
-
 def empty_value_for_VR(
-    VR: str, raw: bool = False
+    VR: Optional[str], raw: bool = False
 ) -> Union[bytes, List[str], str, None]:
     """Return the value for an empty element for `VR`.
 
@@ -65,10 +64,9 @@ def empty_value_for_VR(
 
     Parameters
     ----------
-    VR : str
+    VR : str or None
         The VR of the corresponding element.
-
-    raw : bool
+    raw : bool, optional
         If ``True``, returns the value for a :class:`RawDataElement`,
         otherwise for a :class:`DataElement`
 
@@ -80,11 +78,19 @@ def empty_value_for_VR(
     """
     if VR == 'SQ':
         return b'' if raw else []
+
     if config.use_none_as_empty_text_VR_value:
         return None
-    if VR in ('AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT',
-              'PN', 'SH', 'ST', 'TM', 'UC', 'UI', 'UR', 'UT'):
+
+    if VR == 'PN':
+        return b'' if raw else PersonName('')
+
+    if VR in (
+        'AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT', 'SH', 'ST', 'TM',
+        'UC', 'UI', 'UR', 'UT'
+    ):
         return b'' if raw else ''
+
     return None
 
 
@@ -167,7 +173,7 @@ class DataElement:
         self,
         tag: Union[int, str, Tuple[int, int]],
         VR: str,
-        value: object,
+        value: Any,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False
@@ -231,14 +237,14 @@ class DataElement:
     def from_json(
         cls: Type[_DataElement],
         dataset_class: Type[_Dataset],
-        tag: Union[BaseTag, int],
+        tag: Union[BaseTag, int, str],
         vr: str,
         value: object,
         value_key: Union[str, None],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], object],
-                Callable[[str], object]
+                Callable[[BaseTag, str, str], Any],
+                Callable[[str], Any]
             ]
         ] = None
     ) -> _DataElement:
@@ -250,7 +256,7 @@ class DataElement:
         ----------
         dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
-        tag : pydicom.tag.BaseTag or int
+        tag : pydicom.tag.BaseTag, int or str
             The data element tag.
         vr : str
             The data element value representation.
@@ -286,7 +292,7 @@ class DataElement:
         self,
         bulk_data_element_handler: Optional[Callable[["DataElement"], str]],
         bulk_data_threshold: int
-    ) -> Dict[str, object]:
+    ) -> Dict[str, Any]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
@@ -365,7 +371,7 @@ class DataElement:
                 else:
                     value = [self.value]
                 json_element['Value'] = [v for v in value]
-        if hasattr(json_element, 'Value'):
+        if 'Value' in json_element:
             json_element['Value'] = jsonrep.convert_to_python_number(
                 json_element['Value'], self.VR
             )
@@ -375,8 +381,8 @@ class DataElement:
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[["DataElement"], str]] = None,  # noqa
-        dump_handler: Optional[Callable[[Dict[object, object]], str]] = None
-    ) -> Dict[str, object]:
+        dump_handler: Optional[Callable[[Dict[Any, Any]], str]] = None
+    ) -> Dict[str, Any]:
         """Return a JSON representation of the :class:`DataElement`.
 
         .. versionadded:: 1.3
@@ -416,12 +422,12 @@ class DataElement:
         )
 
     @property
-    def value(self) -> object:
+    def value(self) -> Any:
         """Return the element's value."""
         return self._value
 
     @value.setter
-    def value(self, val: object) -> None:
+    def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
@@ -483,7 +489,7 @@ class DataElement:
         """
         self._value = self.empty_value
 
-    def _convert_value(self, val: object) -> object:
+    def _convert_value(self, val: Any) -> Any:
         """Convert `val` to an appropriate type and return the result.
 
         Uses the element's VR in order to determine the conversion method and
@@ -504,7 +510,7 @@ class DataElement:
         else:
             return MultiValue(self._convert, val)
 
-    def _convert(self, val: object) -> object:
+    def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
@@ -527,6 +533,8 @@ class DataElement:
             return UID(val) if val is not None else None
         elif self.VR == "PN":
             return PersonName(val)
+        elif self.VR == "AT" and (val == 0 or val):
+            return val if isinstance(val, BaseTag) else Tag(val)
         # Later may need this for PersonName as for UI,
         #    but needs more thought
         # elif self.VR == "PN":
@@ -605,7 +613,7 @@ class DataElement:
             repVal = repr(self.value)  # will tolerate unicode too
         return repVal
 
-    def __getitem__(self, key: int) -> object:
+    def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]
@@ -701,7 +709,7 @@ class RawDataElement(NamedTuple):
     tag: BaseTag
     VR: Optional[str]
     length: int
-    value: bytes
+    value: Optional[bytes]
     value_tell: int
     is_implicit_VR: bool
     is_little_endian: bool
@@ -715,8 +723,42 @@ class RawDataElement(NamedTuple):
 _LUT_DESCRIPTOR_TAGS = (0x00281101, 0x00281102, 0x00281103, 0x00283002)
 
 
+def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
+    """Return the VR for a known private tag, otherwise "UN".
+
+    Parameters
+    ----------
+    ds : Dataset, optional
+        The dataset needed for the private creator lookup.
+        If not given, "UN" is returned.
+    tag : BaseTag
+        The private tag to lookup. The caller has to ensure that the
+        tag is private.
+
+    Returns
+    -------
+    str
+        "LO" if the tag is a private creator, the VR of the private tag if
+        found in the private dictionary, or "UN".
+    """
+    if tag.is_private_creator:
+        return "LO"
+    # invalid private tags are handled as UN
+    if ds is not None and (tag.element & 0xff00):
+        private_creator_tag = tag.group << 16 | (tag.element >> 8)
+        private_creator = ds.get(private_creator_tag, "")
+        if private_creator:
+            try:
+                return private_dictionary_VR(tag, private_creator.value)
+            except KeyError:
+                pass
+    return "UN"
+
+
 def DataElement_from_raw(
-    raw_data_element: RawDataElement, encoding: Optional[List[str]] = None
+    raw_data_element: Union[DataElement, RawDataElement],
+    encoding: Optional[Union[str, MutableSequence[str]]] = None,
+    dataset: Optional["Dataset"] = None
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.
 
@@ -724,8 +766,10 @@ def DataElement_from_raw(
     ----------
     raw_data_element : RawDataElement
         The raw data to convert to a :class:`DataElement`.
-    encoding : list of str, optional
+    encoding : str or list of str, optional
         The character encoding of the raw data.
+    dataset : Dataset, optional
+        If given, used to resolve the VR for known private tags.
 
     Returns
     -------
@@ -760,10 +804,7 @@ def DataElement_from_raw(
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
                 # for VR for private tags see PS3.5, 6.2.2
-                if raw.tag.is_private_creator:
-                    VR = 'LO'
-                else:
-                    VR = 'UN'
+                VR = _private_vr_for_tag(dataset, raw.tag)
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:
@@ -777,15 +818,12 @@ def DataElement_from_raw(
                     VR = 'UN'
                     msg += " - setting VR to 'UN'"
                     warnings.warn(msg)
-    elif (VR == 'UN' and not raw.tag.is_private and
-          config.replace_un_with_known_vr):
+    elif VR == 'UN' and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
-        if (
-            raw.length == 0xffffffff
-            or raw.value is None
-            or len(raw.value) < 0xffff
-        ):
+        if raw.tag.is_private:
+            VR = _private_vr_for_tag(dataset, raw.tag)
+        elif raw.value is None or len(raw.value) < 0xffff:
             try:
                 VR = dictionary_VR(raw.tag)
             except KeyError:

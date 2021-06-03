@@ -21,7 +21,7 @@ from pydicom.data import get_testdata_file, get_charset_files
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dataelem import DataElement, RawDataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.filereader import dcmread, read_dataset, read_file
+from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (
     write_data_element, write_dataset, correct_ambiguous_vr,
     write_file_meta_info, correct_ambiguous_vr_element, write_numbers,
@@ -230,10 +230,10 @@ class TestWriteFile:
     def test_write_empty_sequence(self):
         """Make sure that empty sequence is correctly written."""
         # regression test for #1030
-        ds = read_file(get_testdata_file('test-SR.dcm'))
+        ds = dcmread(get_testdata_file('test-SR.dcm'))
         ds.save_as(self.file_out)
         self.file_out.seek(0)
-        ds = read_file(self.file_out)
+        ds = dcmread(self.file_out)
         assert ds.PerformedProcedureCodeSequence == []
 
     def test_write_deflated_retains_elements(self):
@@ -241,11 +241,11 @@ class TestWriteFile:
            and then read the output, to verify that the written file
            contains the same data.
            """
-        original = read_file(deflate_name)
+        original = dcmread(deflate_name)
         original.save_as(self.file_out)
 
         self.file_out.seek(0)
-        rewritten = read_file(self.file_out)
+        rewritten = dcmread(self.file_out)
 
         assert as_assertable(rewritten) == as_assertable(original)
 
@@ -254,7 +254,7 @@ class TestWriteFile:
            and then check the bytes in the output, to verify that the
            written file is deflated past the file meta information.
            """
-        original = read_file(deflate_name)
+        original = dcmread(deflate_name)
         original.save_as(self.file_out)
 
         first_byte_past_file_meta = 0x14e
@@ -300,8 +300,7 @@ class TestScratchWriteDateTime(TestWriteFile):
         DA_expected = date(1961, 8, 4)
         tzinfo = timezone(timedelta(seconds=-21600), '-0600')
         multi_DT_expected = (datetime(1961, 8, 4), datetime(
-            1963, 11, 22, 12, 30, 0, 0,
-            timezone(timedelta(seconds=-21600), '-0600')))
+            1963, 11, 22, 12, 30, 0, 0, tzinfo))
         multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
         TM_expected = time(11, 11, 11, 1)
         ds = dcmread(datetime_name)
@@ -1521,9 +1520,9 @@ class TestWriteToStandard:
         ds_expl = dcmread(fp)
 
         assert ds_expl[(0x0009, 0x0010)].VR == 'LO'  # private creator
-        assert ds_expl[(0x0009, 0x1001)].VR == 'UN'  # originally LO
-        assert ds_expl[(0x0009, 0x10e7)].VR == 'UN'  # originally UL
-        assert ds_expl[(0x0043, 0x1010)].VR == 'UN'  # originally US
+        assert ds_expl[(0x0009, 0x1001)].VR == 'LO'
+        assert ds_expl[(0x0009, 0x10e7)].VR == 'UL'
+        assert ds_expl[(0x0043, 0x1010)].VR == 'US'
 
     def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use):
         """Test converting an RGB dataset from implicit to explicit VR

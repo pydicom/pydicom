@@ -8,7 +8,7 @@ from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
 from pydicom.pixel_data_handlers.util import (
-    convert_color_space, get_j2k_parameters
+    convert_color_space, get_j2k_parameters, get_expected_length
 )
 from pydicom.uid import (
     ImplicitVRLittleEndian,
@@ -20,6 +20,7 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000Lossless,
     JPEG2000,
+    RLELossless,
     AllTransferSyntaxes
 )
 
@@ -39,17 +40,20 @@ try:
     HAVE_PYLIBJPEG = LJ_HANDLER.HAVE_PYLIBJPEG
     HAVE_LJ = LJ_HANDLER.HAVE_LIBJPEG
     HAVE_OJ = LJ_HANDLER.HAVE_OPENJPEG
+    HAVE_RLE = LJ_HANDLER.HAVE_RLE
 except ImportError:
     LJ_HANDLER = None
     HAVE_PYLIBJPEG = False
     HAVE_LJ = False
     HAVE_OJ = False
+    HAVE_RLE = False
 
 
 TEST_HANDLER = HAVE_NP and HAVE_PYLIBJPEG  # Run handler tests
 TEST_JPEG = TEST_HANDLER and HAVE_LJ  # Run 10918 JPEG tests
 TEST_JPEGLS = TEST_HANDLER and HAVE_LJ  # Run 14495 JPEG-LS tests
 TEST_JPEG2K = TEST_HANDLER and HAVE_OJ  # Run 15444 JPEG 2000 tests
+TEST_RLE = TEST_HANDLER and HAVE_RLE  # Run RLE Lossless tests
 
 
 SUPPORTED_SYNTAXES = [
@@ -60,7 +64,8 @@ SUPPORTED_SYNTAXES = [
     JPEGLSLossless,
     JPEGLSNearLossless,
     JPEG2000Lossless,
-    JPEG2000
+    JPEG2000,
+    RLELossless,
 ]
 UNSUPPORTED_SYNTAXES = list(
     set(AllTransferSyntaxes) ^ set(SUPPORTED_SYNTAXES)
@@ -71,15 +76,27 @@ IMPL = get_testdata_file("MR_small_implicit.dcm")
 EXPL = get_testdata_file("OBXXXX1A.dcm")
 EXPB = get_testdata_file("OBXXXX1A_expb.dcm")
 DEFL = get_testdata_file("image_dfl.dcm")
-RLE = get_testdata_file("MR_small_RLE.dcm")
 
 REFERENCE_DATA_UNSUPPORTED = [
     (IMPL, ('1.2.840.10008.1.2', 'CompressedSamples^MR1')),
     (EXPL, ('1.2.840.10008.1.2.1', 'OB^^^^')),
     (EXPB, ('1.2.840.10008.1.2.2', 'OB^^^^')),
     (DEFL, ('1.2.840.10008.1.2.1.99', '^^^^')),
-    (RLE, ('1.2.840.10008.1.2.5', 'CompressedSamples^MR1')),
 ]
+
+# RLE Lossless - PackBits algorithm
+RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
+RLE_8_1_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
+RLE_8_3_1F = get_testdata_file("SC_rgb_rle.dcm")
+RLE_8_3_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
+RLE_16_1_1F = get_testdata_file("MR_small_RLE.dcm")
+RLE_16_1_10F = get_testdata_file("emri_small_RLE.dcm")
+RLE_16_3_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
+RLE_16_3_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
+RLE_32_1_1F = get_testdata_file("rtdose_rle_1frame.dcm")
+RLE_32_1_15F = get_testdata_file("rtdose_rle.dcm")
+RLE_32_3_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
+RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
 
 # JPEG - ISO/IEC 10918 Standard
 # FMT_BA_BV_SPX_PR_FRAMESF_PI
@@ -315,6 +332,7 @@ def test_unsupported_syntaxes():
         assert syntax not in UNSUPPORTED_SYNTAXES
 
 
+print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
 class TestHandler:
     """Tests for handling Pixel Data with the handler."""
@@ -343,7 +361,9 @@ class TestHandler:
             with pytest.raises((NotImplementedError, RuntimeError)):
                 ds.pixel_array
 
-    @pytest.mark.skipif(HAVE_LJ and HAVE_OJ, reason="plugins available")
+    @pytest.mark.skipif(
+        HAVE_LJ or HAVE_OJ or HAVE_RLE, reason="plugins available"
+    )
     def test_no_plugins_raises(self):
         """Test exception raised if required plugin missing."""
         ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
@@ -357,6 +377,15 @@ class TestHandler:
         ds = dcmread(J2KI_08_08_3_0_1F_RGB)
         msg = (
             r"Unable to convert the Pixel Data as the 'pylibjpeg-openjpeg' "
+            r"plugin is not installed"
+        )
+        with pytest.raises(RuntimeError, match=msg):
+            ds.pixel_array
+
+        # Don't use pydicom decoder
+        ds = dcmread(RLE_8_1_1F)
+        msg = (
+            r"Unable to convert the Pixel Data as the 'pylibjpeg-rle' "
             r"plugin is not installed"
         )
         with pytest.raises(RuntimeError, match=msg):
@@ -520,6 +549,12 @@ class TestJPEG2K:
     @pytest.mark.parametrize('fpath, data', J2K_REFERENCE_DATA)
     def test_properties_as_array(self, fpath, data):
         """Test dataset, pixel_array and as_array() are as expected."""
+        req_fixes = [
+            J2KR_16_16_1_0_10F_M2,
+            J2KR_16_14_1_1_1F_M2,
+            J2KI_16_14_1_1_1F_M2
+        ]
+
         ds = dcmread(fpath)
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
@@ -528,14 +563,22 @@ class TestJPEG2K:
         assert getattr(ds, 'NumberOfFrames', 1) == data[4]
 
         # Check Dataset.pixel_array
-        arr = ds.pixel_array
+        if fpath in req_fixes:
+            with pytest.warns(UserWarning):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
 
         assert arr.flags.writeable
         assert data[5] == arr.shape
         assert arr.dtype == data[6]
 
         # Check handlers as_array() function
-        arr = as_array(ds)
+        if fpath in req_fixes:
+            with pytest.warns(UserWarning):
+                arr = as_array(ds)
+        else:
+            arr = as_array(ds)
 
         assert arr.flags.writeable
         assert data[5] == arr.shape
@@ -545,7 +588,11 @@ class TestJPEG2K:
     def test_array(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
-        arr = ds.pixel_array
+        if fixes:
+            with pytest.warns(UserWarning):
+                arr = ds.pixel_array
+        else:
+            arr = ds.pixel_array
 
         ref = dcmread(rpath).pixel_array
         assert np.array_equal(arr, ref)
@@ -559,7 +606,11 @@ class TestJPEG2K:
 
         nr_frames = getattr(ds, 'NumberOfFrames', 1)
         for ii in range(nr_frames):
-            arr = next(frame_generator)
+            if fixes:
+                with pytest.warns(UserWarning):
+                    arr = next(frame_generator)
+            else:
+                arr = next(frame_generator)
 
             if nr_frames > 1:
                 assert np.array_equal(arr, ref[ii, ...])
@@ -588,8 +639,7 @@ class TestJPEG2K:
         msg = (
             r"The \(0028,0103\) Pixel Representation value '0' \(unsigned\) "
             r"in the dataset does not match the format of the values found in "
-            r"the JPEG 2000 data 'signed'. It's recommended that you change "
-            r"the  Pixel Representation value to produce the correct output"
+            r"the JPEG 2000 data 'signed'"
         )
         with pytest.warns(UserWarning, match=msg):
             ds.pixel_array
@@ -637,7 +687,10 @@ class TestJPEG2K:
         params = get_j2k_parameters(bs)
         assert 13 == params["precision"]
         assert not params["is_signed"]
-        arr = ds.pixel_array
+
+        msg = r"value '1' \(signed\)"
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
 
         assert 'int16' == arr.dtype
         assert (512, 512) == arr.shape
@@ -650,3 +703,134 @@ class TestJPEG2K:
         assert [-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
             arr[328:338, 106].tolist()
         )
+
+
+RLE_REFERENCE_DATA = [
+    # fpath, (bits, nr samples, pixel repr, nr frames, shape, dtype)
+    (RLE_8_1_1F, (8, 1, 0, 1, (600, 800), 'uint8')),
+    (RLE_8_1_2F, (8, 1, 0, 2, (2, 600, 800), 'uint8')),
+    (RLE_8_3_1F, (8, 3, 0, 1, (100, 100, 3), 'uint8')),
+    (RLE_8_3_2F, (8, 3, 0, 2, (2, 100, 100, 3), 'uint8')),
+    (RLE_16_1_1F, (16, 1, 1, 1, (64, 64), 'int16')),
+    (RLE_16_1_10F, (16, 1, 0, 10, (10, 64, 64), 'uint16')),
+    (RLE_16_3_1F, (16, 3, 0, 1, (100, 100, 3), 'uint16')),
+    (RLE_16_3_2F, (16, 3, 0, 2, (2, 100, 100, 3), 'uint16')),
+    (RLE_32_1_1F, (32, 1, 0, 1, (10, 10), 'uint32')),
+    (RLE_32_1_15F, (32, 1, 0, 15, (15, 10, 10), 'uint32')),
+    (RLE_32_3_1F, (32, 3, 0, 1, (100, 100, 3), 'uint32')),
+    (RLE_32_3_2F, (32, 3, 0, 2, (2, 100, 100, 3), 'uint32')),
+]
+RLE_MATCHING_DATASETS = [
+    # (compressed, reference)
+    pytest.param(RLE_8_1_1F, get_testdata_file("OBXXXX1A.dcm")),
+    pytest.param(RLE_8_1_2F, get_testdata_file("OBXXXX1A_2frame.dcm")),
+    pytest.param(RLE_8_3_1F, get_testdata_file("SC_rgb.dcm")),
+    pytest.param(RLE_8_3_2F, get_testdata_file("SC_rgb_2frame.dcm")),
+    pytest.param(RLE_16_1_1F, get_testdata_file("MR_small.dcm")),
+    pytest.param(RLE_16_1_10F, get_testdata_file("emri_small.dcm")),
+    pytest.param(RLE_16_3_1F, get_testdata_file("SC_rgb_16bit.dcm")),
+    pytest.param(RLE_16_3_2F, get_testdata_file("SC_rgb_16bit_2frame.dcm")),
+    pytest.param(RLE_32_1_1F, get_testdata_file("rtdose_1frame.dcm")),
+    pytest.param(RLE_32_1_15F, get_testdata_file("rtdose.dcm")),
+    pytest.param(RLE_32_3_1F, get_testdata_file("SC_rgb_32bit.dcm")),
+    pytest.param(RLE_32_3_2F, get_testdata_file("SC_rgb_32bit_2frame.dcm")),
+]
+
+
+@pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
+class TestRLE:
+    def test_decompress_using_pylibjpeg(self):
+        """Test decompressing RLE with pylibjpeg handler succeeds."""
+        ds = dcmread(RLE_8_3_1F)
+        ds.decompress(handler_name='pylibjpeg')
+        arr = ds.pixel_array
+
+        ds = dcmread(get_testdata_file("SC_rgb.dcm"))
+        ref = ds.pixel_array
+        assert np.array_equal(arr, ref)
+
+    @pytest.mark.parametrize('fpath, data', RLE_REFERENCE_DATA)
+    def test_properties_as_array(self, fpath, data):
+        """Test dataset, pixel_array and as_array() are as expected."""
+        ds = dcmread(fpath)
+        assert RLELossless == ds.file_meta.TransferSyntaxUID
+        assert ds.BitsAllocated == data[0]
+        assert ds.SamplesPerPixel == data[1]
+        assert ds.PixelRepresentation == data[2]
+        assert getattr(ds, 'NumberOfFrames', 1) == data[3]
+
+        # Note: decompress modifies the dataset inplace
+        ds.decompress("pylibjpeg")
+
+        # Check Dataset.pixel_array
+        arr = ds.pixel_array
+        assert arr.flags.writeable
+        assert data[4] == arr.shape
+        assert arr.dtype == data[5]
+
+        # Check handler's as_array() function
+        ds = dcmread(fpath)
+        arr = as_array(ds)
+        assert arr.flags.writeable
+        assert data[4] == arr.shape
+        assert arr.dtype == data[5]
+
+    @pytest.mark.parametrize('fpath, rpath', RLE_MATCHING_DATASETS)
+    def test_array(self, fpath, rpath):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        ds.decompress("pylibjpeg")
+        arr = ds.pixel_array
+
+        ref = dcmread(rpath).pixel_array
+        assert np.array_equal(arr, ref)
+
+    @pytest.mark.parametrize('fpath, rpath', RLE_MATCHING_DATASETS)
+    def test_generate_frames(self, fpath, rpath):
+        """Test pixel_array returns correct values."""
+        ds = dcmread(fpath)
+        frame_generator = generate_frames(ds)
+        ref = dcmread(rpath).pixel_array
+
+        nr_frames = getattr(ds, 'NumberOfFrames', 1)
+        for ii in range(nr_frames):
+            arr = next(frame_generator)
+
+            if nr_frames > 1:
+                assert np.array_equal(arr, ref[ii, ...])
+            else:
+                assert np.array_equal(arr, ref)
+
+        with pytest.raises(StopIteration):
+            next(frame_generator)
+
+
+@pytest.mark.skipif(not TEST_RLE, reason="no -rle plugin")
+class TestRLEEncoding:
+    def test_encode(self):
+        """Test encoding"""
+        ds = dcmread(EXPL)
+        assert 'PlanarConfiguration' not in ds
+        expected = get_expected_length(ds, 'bytes')
+        assert expected == len(ds.PixelData)
+        ref = ds.pixel_array
+        del ds.PixelData
+        del ds._pixel_array
+        ds.compress(RLELossless, ref, encoding_plugin='pylibjpeg')
+        assert expected > len(ds.PixelData)
+        assert np.array_equal(ref, ds.pixel_array)
+        assert ref is not ds.pixel_array
+
+    def test_encode_bit(self):
+        """Test encoding big-endian src"""
+        ds = dcmread(IMPL)
+        ref = ds.pixel_array
+        del ds._pixel_array
+        ds.compress(
+            RLELossless,
+            ds.PixelData,
+            byteorder='>',
+            encoding_plugin='pylibjpeg'
+        )
+        assert np.array_equal(ref.newbyteorder('>'), ds.pixel_array)
+        assert ref is not ds.pixel_array

@@ -10,12 +10,20 @@ Command-line Interface Guide
 
 .. versionadded:: 2.2
 
-
 .. contents::
+    :depth: 1
     :local:
     :backlinks: top
 
-.. include:: ../cli/cli_intro.rst
-.. include:: ../cli/cli_show.rst
-.. include:: ../cli/cli_codify.rst
-.. include:: ../cli/cli_dev.rst
+
+.. _cli_intro:
+.. include:: cli_intro.rst
+
+.. _cli_show:
+.. include:: cli_show.rst
+
+.. _cli_codify:
+.. include:: cli_codify.rst
+
+.. _cli_dev:
+.. include:: cli_dev.rst

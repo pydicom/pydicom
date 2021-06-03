@@ -11,6 +11,7 @@ pydicom:
    :maxdepth: 1
 
    element_value_types
-   cli_guide
+   encoding/index
+   cli/cli_guide
+   glossary
    writing_documentation
-   

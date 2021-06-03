@@ -49,14 +49,16 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from pkg_resources import iter_entry_points
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional, TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (
     data_path_with_download, calculate_file_hash, get_cached_filehash,
     get_url_map, get_data_dir
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom import Dataset
 
 
 DATA_ROOT = os.fspath(Path(__file__).parent.resolve())
@@ -106,6 +108,9 @@ def get_external_sources() -> Dict:
     dict
         A dict of ``{'source name': <interface class instance>}``.
     """
+
+    from pkg_resources import iter_entry_points
+
     # Prefer pydicom-data as the source
     entry_point = "pydicom.data.external_sources"
     sources = {vv.name: vv.load()() for vv in iter_entry_points(entry_point)}
@@ -118,7 +123,15 @@ def get_external_sources() -> Dict:
     return out
 
 
-EXTERNAL_DATA_SOURCES = get_external_sources()
+_EXTERNAL_DATA_SOURCES: Optional[Dict] = None
+
+
+def external_data_sources() -> Dict:
+    """Return the available external data sources - loaded once."""
+    global _EXTERNAL_DATA_SOURCES
+    if _EXTERNAL_DATA_SOURCES is None:
+        _EXTERNAL_DATA_SOURCES = get_external_sources()
+    return _EXTERNAL_DATA_SOURCES
 
 
 def online_test_file_dummy_paths() -> Dict[str, str]:
@@ -151,7 +164,7 @@ def fetch_data_files():
         # Download missing files or files that don't match the hash
         try:
             data_path_with_download(p.name)
-        except Exception as exc:
+        except Exception:
             error.append(p.name)
 
     if error:
@@ -162,9 +175,9 @@ def fetch_data_files():
 
 
 def get_files(
-    base: Union[str, os.PathLike],
-    pattern: str = "**/*",
-    dtype: int = DataTypes.DATASET
+        base: Union[str, os.PathLike],
+        pattern: str = "**/*",
+        dtype: int = DataTypes.DATASET
 ) -> List[str]:
     """Return all matching file paths from the available data sources.
 
@@ -204,7 +217,7 @@ def get_files(
     files = [os.fspath(m) for m in base.glob(pattern)]
 
     # Search external sources
-    for lib, source in EXTERNAL_DATA_SOURCES.items():
+    for lib, source in external_data_sources().items():
         fpaths = source.get_paths(pattern, dtype)
         if lib == "pydicom-data":
             # For pydicom-data, check the hash against hashes.json
@@ -231,7 +244,7 @@ def get_files(
             real_online_file_paths.append(
                 os.fspath(data_path_with_download(filename))
             )
-        except Exception as exc:
+        except Exception:
             download_error = True
 
     files += real_online_file_paths
@@ -270,7 +283,9 @@ def get_palette_files(pattern: str = "**/*") -> List[str]:
     return files
 
 
-def get_testdata_file(name: str) -> str:
+def get_testdata_file(
+    name: str, read: bool = False
+) -> Union[str, "Dataset", None]:
     """Return an absolute path to the first matching dataset with filename
     `name`.
 
@@ -285,24 +300,36 @@ def get_testdata_file(name: str) -> str:
         Modified to search locally available external data sources and the
         pydicom/pydicom-data repository
 
+    .. versionchanged:: 2.2
+
+        Added the `read` keyword parameter.
+
     Parameters
     ----------
     name : str
         The full file name (without path)
+    read : bool, optional
+        If ``True`` then use :func:`~pydicom.filereader.dcmread` to read the
+        file and return the corresponding
+        :class:`~pydicom.dataset.FileDataset`. Default ``False``.
 
     Returns
     -------
-    str or None
-        The absolute path of the file if found, or ``None``.
+    str, pydicom.dataset.Dataset or None
+        The absolute path of the file if found, the dataset itself if `read` is
+        ``True``, or ``None`` if the file is not found.
     """
+    from pydicom.filereader import dcmread
+
     # Check pydicom local
     data_path = Path(DATA_ROOT) / 'test_files'
     matches = [m for m in data_path.rglob(name)]
     if matches:
-        return os.fspath(matches[0])
+        path = os.fspath(matches[0])
+        return dcmread(path, force=True) if read else path
 
     # Check external data sources
-    for lib, source in EXTERNAL_DATA_SOURCES.items():
+    for lib, source in external_data_sources().items():
         try:
             fpath = source.get_path(name, dtype=DataTypes.DATASET)
         except ValueError:
@@ -311,20 +338,23 @@ def get_testdata_file(name: str) -> str:
         # For pydicom-data, check the hash against hashes.json
         if lib == "pydicom-data":
             if fpath and _check_data_hash(fpath):
-                return fpath
+                return dcmread(fpath, force=True) if read else fpath
         elif fpath:
-            return fpath
+            return dcmread(fpath, force=True) if read else fpath
 
     # Try online
     for filename in get_url_map().keys():
         if filename == name:
             try:
-                return os.fspath(data_path_with_download(filename))
-            except Exception as exc:
+                path = os.fspath(data_path_with_download(filename))
+                return dcmread(path, force=True) if read else path
+            except Exception:
                 warnings.warn(
                     f"A download failure occurred while attempting to "
                     f"retrieve {name}"
                 )
+
+    return None
 
 
 def get_testdata_files(pattern: str = "**/*") -> List[str]:

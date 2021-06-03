@@ -3,13 +3,15 @@
 
 import codecs
 import re
-from typing import List, Set, Dict, Optional, Union, TYPE_CHECKING
+from typing import (
+    List, Set, Dict, Optional, Union, TYPE_CHECKING, MutableSequence, cast
+)
 import warnings
 
 from pydicom import config
 from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
 
 
@@ -635,7 +637,9 @@ def _encode_string_impl(
 #       is not present in a sequence item then it is inherited from its parent.
 
 
-def convert_encodings(encodings: Union[str, List[str]]) -> List[str]:
+def convert_encodings(
+    encodings: Union[None, str, MutableSequence[str]]
+) -> List[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -761,7 +765,7 @@ def _warn_about_invalid_encoding(
 
 
 def _handle_illegal_standalone_encodings(
-    encodings: List[str], py_encodings: List[str]
+    encodings: MutableSequence[str], py_encodings: List[str]
 ) -> List[str]:
     """Check for stand-alone encodings in multi-valued encodings.
     If the first encoding is a stand-alone encoding, the rest of the
@@ -820,10 +824,12 @@ def decode_element(
     if elem.VR == "PN":
         if elem.VM == 1:
             # elem.value: Union[PersonName, bytes]
-            elem.value = elem.value.decode(encodings)
+            elem.value = cast(PersonName, elem.value).decode(encodings)
         else:
             # elem.value: Iterable[Union[PersonName, bytes]]
-            elem.value = [val.decode(encodings) for val in elem.value]
+            elem.value = [
+                cast(PersonName, vv).decode(encodings) for vv in elem.value
+            ]
     elif elem.VR in text_VRs:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:

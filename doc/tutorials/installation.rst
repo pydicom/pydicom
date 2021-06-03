@@ -67,6 +67,7 @@ Or download the missing files to the local cache (after installing *pydicom*)::
 
 
 .. _tut_install_libs:
+.. _tut_install_np:
 
 Install the optional libraries
 ==============================
@@ -87,6 +88,8 @@ need to be installed. See :ref:`this page <guide_compressed>` for a list of
 which library is needed to handle a given JPEG format, as specified by
 the dataset's (0002,0010) *Transfer Syntax UID* value.
 
+
+.. _tut_install_pil:
 
 Installing Pillow
 -----------------
@@ -125,33 +128,35 @@ Through conda::
   pip install git+https://github.com/Who8MyLunch/CharPyLS
 
 
+.. _tut_install_gdcm:
+
 Installing GDCM
 ---------------
 
 `GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-Unfortunately there's no easy way to install the Python GDCM bindings
-using pip. :gh:`This page
-<pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda>`
-has instructions for installing in a virtual environment in Ubuntu
-19.04+ or Debian Buster+ using the ``python3-gdcm`` package.
+Using pip::
+
+  pip install python-gdcm
 
 Through conda::
 
   conda install gdcm -c conda-forge
 
 
+.. _tut_install_pylj:
+
 Installing pylibjpeg
 --------------------
 
 `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ is a Python framework for
-decompressing JPEG, JPEG-LS and JPEG 2000 images provided a suitable plugin
-is installed.
+decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
+RLE images provided a suitable plugin is installed.
 
 Using pip::
 
-  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg
+  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
 
 
 .. _tut_install_dev:

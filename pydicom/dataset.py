@@ -26,15 +26,16 @@ import os.path
 import re
 from types import ModuleType, TracebackType
 from typing import (
-    Generator, TYPE_CHECKING, Optional, Tuple, Union, List, ItemsView,
-    KeysView, Dict, ValuesView, Iterator, BinaryIO, AnyStr,
-    Callable, TypeVar, Type, overload
+    TYPE_CHECKING, Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
+    Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
+    MutableSequence, MutableMapping, AbstractSet
 )
 import warnings
 import weakref
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     try:
+        import numpy
         import numpy as np
     except ImportError:
         pass
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
 import pydicom  # for dcmwrite
 import pydicom.charset
 import pydicom.config
-from pydicom import datadict, jsonrep, config
+from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
@@ -50,13 +51,16 @@ from pydicom.datadict import (
     dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
+from pydicom.encaps import encapsulate, encapsulate_extended
 from pydicom.fileutil import path_from_pathlike
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, reshape_pixel_array, get_image_pixel_ids
 )
 from pydicom.tag import Tag, BaseTag, tag_in_exception, TagType
-from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
-                         ExplicitVRBigEndian, PYDICOM_IMPLEMENTATION_UID)
+from pydicom.uid import (
+    ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
+    RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
+)
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
@@ -199,7 +203,7 @@ class PrivateBlock:
 
 
 def _dict_equal(
-    a: "Dataset", b: object, exclude: Optional[List[str]] = None
+    a: "Dataset", b: Any, exclude: Optional[List[str]] = None
 ) -> bool:
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
@@ -371,27 +375,29 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     indent_chars = "   "
 
     def __init__(
-        self, *args: Dict[BaseTag, _DatasetValue], **kwargs: object
+        self, *args: MutableMapping[BaseTag, _DatasetValue], **kwargs
     ) -> None:
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
+
+        self._dict: MutableMapping[BaseTag, _DatasetValue]
         if not args:
-            self._dict: Dict[BaseTag, _DatasetValue] = {}
+            self._dict = {}
         elif isinstance(args[0], Dataset):
             self._dict = args[0]._dict
         else:
             self._dict = args[0]
+
         self.is_decompressed = False
 
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
-
         # set depending on the endianess of the read dataset
         self.read_little_endian: Optional[bool] = None
         # set depending on the VR handling of the read dataset
         self.read_implicit_vr: Optional[bool] = None
-        # set to the encoding the dataset had originally
-        self.read_encoding: Optional[str] = None
+        # The dataset's original character set encoding
+        self.read_encoding: Union[None, str, MutableSequence[str]] = None
 
         self.is_little_endian: Optional[bool] = None
         self.is_implicit_VR: Optional[bool] = None
@@ -402,6 +408,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         # known private creator blocks
         self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}
 
+        self._pixel_array: Optional["numpy.ndarray"] = None
         self._pixel_id: Dict[str, int] = {}
 
     def __enter__(self) -> "Dataset":
@@ -413,10 +420,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         exc_type: Optional[Type[BaseException]],
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType]
-    ) -> bool:
+    ) -> Optional[bool]:
         """Method invoked on exit from a with statement."""
-        # Returning False will re-raise any exceptions that occur
-        return False
+        # Returning anything other than True will re-raise any exceptions
+        return
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
@@ -430,7 +437,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         self[data_element.tag] = data_element
 
-    def add_new(self, tag: TagType, VR: str, value: object) -> None:
+    def add_new(self, tag: TagType, VR: str, value: Any) -> None:
         """Create a new element and add it to the :class:`Dataset`.
 
         Parameters
@@ -477,7 +484,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             return self[tag]
         return None
 
-    def __contains__(self, name: TagType) -> bool:
+    def __contains__(self, name: TagType) -> bool:  # type: ignore[override]
         """Simulate dict.__contains__() to handle DICOM keywords.
 
         Examples
@@ -503,8 +510,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             return Tag(name) in self._dict
         except Exception as exc:
             msg = (
-                "Invalid value used with the 'in' operator: must be an "
-                "element tag as a 2-tuple or int, or an element keyword"
+                f"Invalid value '{name}' used with the 'in' operator: must be "
+                "an element tag as a 2-tuple or int, or an element keyword"
             )
             if isinstance(exc, OverflowError):
                 msg = (
@@ -579,7 +586,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             The keyword for the DICOM element or the class attribute to delete.
         """
         # First check if a valid DICOM keyword and if we have that data element
-        tag = tag_for_keyword(name)
+        tag = cast(BaseTag, tag_for_keyword(name))
         if tag is not None and tag in self._dict:
             del self._dict[tag]
         # If not a DICOM name in this dataset, check for regular instance name
@@ -590,7 +597,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         else:
             raise AttributeError(name)
 
-    def __delitem__(self, key: Union[slice, TagType]) -> None:
+    def __delitem__(self, key: Union[slice, BaseTag, TagType]) -> None:
         """Intercept requests to delete an attribute by key.
 
         Examples
@@ -628,18 +635,16 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 # deleted - will be re-created on next access
                 if self._private_blocks and BaseTag(tag).is_private_creator:
                     self._private_blocks = {}
+        elif isinstance(key, BaseTag):
+            del self._dict[key]
+            if self._private_blocks and key.is_private_creator:
+                self._private_blocks = {}
         else:
-            # Assume is a standard tag (for speed in common case)
-            try:
-                del self._dict[key]
-                if self._private_blocks and BaseTag(key).is_private_creator:
-                    self._private_blocks = {}
             # If not a standard tag, than convert to Tag and try again
-            except KeyError:
-                tag = Tag(key)
-                del self._dict[tag]
-                if self._private_blocks and tag.is_private_creator:
-                    self._private_blocks = {}
+            tag = Tag(key)
+            del self._dict[tag]
+            if self._private_blocks and tag.is_private_creator:
+                self._private_blocks = {}
 
     def __dir__(self) -> List[str]:
         """Give a list of attributes available in the :class:`Dataset`.
@@ -691,7 +696,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         return sorted(allnames)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -713,22 +718,22 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         return NotImplemented
 
     @overload
-    def get(self, key: str, default: Optional[object] = None) -> object:
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         pass
 
     @overload
     def get(
         self,
         key: Union[int, Tuple[int, int], BaseTag],
-        default: Optional[object] = None
+        default: Optional[Any] = None
     ) -> DataElement:
         pass
 
     def get(
         self,
         key: Union[str, Union[int, Tuple[int, int], BaseTag]],
-        default: Optional[object] = None
-    ) -> Union[object, DataElement]:
+        default: Optional[Any] = None
+    ) -> Union[Any, DataElement]:
         """Simulate ``dict.get()`` to handle element tags and keywords.
 
         Parameters
@@ -769,7 +774,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         except KeyError:
             return default
 
-    def items(self) -> ItemsView[BaseTag, _DatasetValue]:
+    def items(  # type: ignore[override]
+        self
+    ) -> AbstractSet[Tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -781,7 +788,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return self._dict.items()
 
-    def keys(self) -> KeysView[BaseTag]:
+    def keys(self) -> AbstractSet[BaseTag]:  # type: ignore[override]
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
@@ -803,7 +810,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return self._dict.values()
 
-    def __getattr__(self, name: str) -> object:
+    def __getattr__(self, name: str) -> Any:
         """Intercept requests for :class:`Dataset` attribute names.
 
         If `name` matches a DICOM keyword, return the value for the
@@ -835,7 +842,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         return object.__getattribute__(self, name)
 
     @property
-    def _character_set(self) -> str:
+    def _character_set(self) -> List[str]:
         """The character set used to encode text values."""
         char_set = self.get(BaseTag(0x00080005), None)
         if not char_set:
@@ -932,7 +939,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set)
+            self[tag] = DataElement_from_raw(data_elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
@@ -940,7 +947,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, data_elem[6])
 
-        return self._dict.get(tag)
+        return cast(DataElement, self._dict.get(tag))
 
     def private_block(
         self, group: int, private_creator: str, create: bool = False
@@ -1000,10 +1007,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
                 'Tag must be private if private creator is given')
 
         # find block with matching private creator
+        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
         data_el = next(
             (
-                el for el in self[(group, 0x10):(group, 0x100)]
-                if el.value == private_creator
+                elem for elem in block if elem.value == private_creator
             ),
             None
         )
@@ -1056,7 +1063,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         if group % 2 == 0:
             raise ValueError('Group must be an odd number')
 
-        return [x.value for x in self[(group, 0x10):(group, 0x100)]]
+        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        return [x.value for x in block]
 
     def get_private_item(
         self, group: int, element_offset: int, private_creator: str
@@ -1175,7 +1183,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self,
         is_implicit_vr: Optional[bool],
         is_little_endian: Optional[bool],
-        character_encoding: Optional[str]
+        character_encoding: Union[None, str, MutableSequence[str]]
     ) -> None:
         """Set the values for the original transfer syntax and encoding.
 
@@ -1202,9 +1210,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         Dataset
             A :class:`Dataset` containing elements of the group specified.
         """
-        return self[(group, 0x0000):(group + 1, 0x0000)]
+        return self[(group, 0x0000):(group + 1, 0x0000)]  # type: ignore[misc]
 
-    def __iter__(self) -> Iterator[DataElement]:
+    def __iter__(self) -> Iterator[DataElement]:  # type: ignore[override]
         """Iterate through the top-level of the Dataset, yielding DataElements.
 
         Examples
@@ -1261,7 +1269,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """Return the number of elements in the top level of the dataset."""
         return len(self._dict)
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """Compare `self` and `other` for inequality."""
         return not self == other
 
@@ -1269,7 +1277,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
 
-    def pop(self, key: TagType, *args: object) -> _DatasetValue:
+    def pop(self, key: Union[BaseTag, TagType], *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
 
         Removes the element for `key` if it exists and returns it,
@@ -1290,7 +1298,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         Returns
         -------
-        The element for `key` if it exists, or the default value if given.
+        RawDataElement or DataElement
+            The element for `key` if it exists, or the default value if given.
 
         Raises
         ------
@@ -1303,7 +1312,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         except Exception:
             pass
 
-        return self._dict.pop(key, *args)
+        return self._dict.pop(cast(BaseTag, key), *args)
 
     def popitem(self) -> Tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
@@ -1315,7 +1324,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         return self._dict.popitem()
 
     def setdefault(
-        self, key: TagType, default: Optional[object] = None
+        self, key: TagType, default: Optional[Any] = None
     ) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
 
@@ -1449,23 +1458,24 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             # we allow both
             handler_name = 'jpegls_handler'
         if not hasattr(pydicom.config, handler_name):
-            raise ValueError("'{}' is not a known handler name".format(name))
+            raise ValueError(f"'{name}' is not a known handler name")
+
         handler = getattr(pydicom.config, handler_name)
 
-        transfer_syntax = self.file_meta.TransferSyntaxUID
-        if not handler.supports_transfer_syntax(transfer_syntax):
+        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
+        tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+        if not handler.supports_transfer_syntax(tsyntax):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID"
-                " of '{0}' ({1}) using the pixel data handler '{2}'. "
-                "Please see the pydicom documentation for information "
-                "on supported transfer syntaxes.".format(
-                    transfer_syntax, transfer_syntax.name, name)
+                f" of '{tsyntax}' ({tsyntax.name}) using the pixel data "
+                f"handler '{name}'. Please see the pydicom documentation for "
+                "information on supported transfer syntaxes."
             )
         if not handler.is_available():
             raise RuntimeError(
-                "The pixel data handler '{0}' is not available on your system."
-                " Please refer to the pydicom documentation for information "
-                "on installing needed packages.".format(name)
+                f"The pixel data handler '{name}' is not available on your "
+                "system. Please refer to the pydicom documentation for "
+                "information on installing needed packages."
             )
         # if the conversion fails, the exception is propagated up
         self._do_pixel_data_conversion(handler)
@@ -1475,26 +1485,29 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
         # Find all possible handlers that support the transfer syntax
-        transfer_syntax = self.file_meta.TransferSyntaxUID
+        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
+        ts = cast(UID, file_meta.TransferSyntaxUID)
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
-            if hh.supports_transfer_syntax(transfer_syntax)
+            if hh is not None
+            and hh.supports_transfer_syntax(ts)  # type: ignore[attr-defined]
         ]
 
         # No handlers support the transfer syntax
         if not possible_handlers:
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID of "
-                "'{0}' ({1}) as there are no pixel data handlers "
-                "available that support it. Please see the pydicom "
+                f"'{ts}' ({ts.name}) as there are no pixel data "
+                "handlers available that support it. Please see the pydicom "
                 "documentation for information on supported transfer syntaxes "
-                .format(transfer_syntax, transfer_syntax.name)
             )
 
         # Handlers that both support the transfer syntax and have their
         #   dependencies met
-        available_handlers = [hh for hh in possible_handlers if
-                              hh.is_available()]
+        available_handlers = [
+            hh for hh in possible_handlers
+            if hh.is_available()  # type: ignore[attr-defined]
+        ]
 
         # There are handlers that support the transfer syntax but none of them
         #   can be used as missing dependencies
@@ -1507,14 +1520,14 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             )
             pkg_msg = []
             for hh in possible_handlers:
-                hh_deps = hh.DEPENDENCIES
+                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    "{} (req. {})"
-                    .format(hh.HANDLER_NAME, ', '.join(names))
+                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"(req. {', '.join(names)})"
                 )
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
@@ -1533,7 +1546,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         # The only way to get to this point is if we failed to get the pixel
         #   array because all suitable handlers raised exceptions
         self._pixel_array = None
-        self._pixel_id = None
+        self._pixel_id = {}
 
         logger.info(
             "Unable to decode the pixel data using the following handlers: {}."
@@ -1542,11 +1555,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             "be able to decode the data"
             .format(", ".join([str(hh) for hh in available_handlers]))
         )
-        raise last_exception
+        raise last_exception  # type: ignore[misc]
 
-    def _do_pixel_data_conversion(
-        self, handler: Dict[str, ModuleType]
-    ) -> None:
+    def _do_pixel_data_conversion(self, handler: Any) -> None:
         """Do the actual data conversion using the given handler."""
 
         # Use the handler to get a 1D numpy array of the pixel data
@@ -1562,6 +1573,160 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             )
 
         self._pixel_id = get_image_pixel_ids(self)
+
+    def compress(
+        self,
+        transfer_syntax_uid: str,
+        arr: Optional["numpy.ndarray"] = None,
+        encoding_plugin: str = '',
+        decoding_plugin: str = '',
+        encapsulate_ext: bool = False,
+        **kwargs
+    ) -> None:
+        """Compress and update an uncompressed dataset in-place with the
+        resulting :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
+
+        .. versionadded:: 2.2
+
+        The dataset must already have the following
+        :dcm:`Image Pixel<part03/sect_C.7.6.3.html>` module elements present
+        with correct values that correspond to the resulting compressed
+        pixel data:
+
+        * (0028,0002) *Samples per Pixel*
+        * (0028,0004) *Photometric Interpretation*
+        * (0028,0008) *Number of Frames* (if more than 1 frame will be present)
+        * (0028,0010) *Rows*
+        * (0028,0011) *Columns*
+        * (0028,0100) *Bits Allocated*
+        * (0028,0101) *Bits Stored*
+        * (0028,0103) *Pixel Representation*
+
+        This method will add the file meta dataset if none is present and add
+        or modify the following elements:
+
+        * (0002,0010) *Transfer Syntax UID*
+        * (7FE0,0010) *Pixel Data*
+
+        If *Samples per Pixel* is greater than 1 then the following element
+        will also be added:
+
+        * (0028,0006) *Planar Configuration*
+
+        If the compressed pixel data is too large for encapsulation using a
+        basic offset table then an :dcm:`extended offset table
+        <part03/sect_C.7.6.3.html>` will also be used, in which case the
+        following elements will also be added:
+
+        * (7FE0,0001) *Extended Offset Table*
+        * (7FE0,0002) *Extended Offset Table Lengths*
+
+        **Supported Transfer Syntax UIDs**
+
+        +----------------------+----------+----------------------------------+
+        | UID                  | Plugins  | Encoding Guide                   |
+        +======================+==========+==================================+
+        | *RLE Lossless* -     |pydicom,  | :doc:`RLE Lossless               |
+        | 1.2.840.10008.1.2.5  |pylibjpeg,| </guides/encoding/rle_lossless>` |
+        |                      |gdcm      |                                  |
+        +----------------------+----------+----------------------------------+
+
+        Examples
+        --------
+
+        Compress the existing uncompressed *Pixel Data* in place:
+
+        >>> from pydicom.data import get_testdata_file
+        >>> from pydicom.uid import RLELossless
+        >>> ds = get_testdata_file("CT_small.dcm", read=True)
+        >>> ds.compress(RLELossless)
+        >>> ds.save_as("CT_small_rle.dcm")
+
+        Parameters
+        ----------
+        transfer_syntax_uid : pydicom.uid.UID
+            The UID of the :dcm:`transfer syntax<part05/chapter_10.html>` to
+            use when compressing the pixel data.
+        arr : numpy.ndarray, optional
+            Compress the uncompressed pixel data in `arr` and use it
+            to set the *Pixel Data*. If `arr` is not used then the
+            existing *Pixel Data* in the dataset will be compressed instead.
+            The :attr:`~numpy.ndarray.shape`, :class:`~numpy.dtype` and
+            contents of the array should match the dataset.
+        encoding_plugin : str, optional
+            Use the `encoding_plugin` to compress the pixel data. See the
+            :doc:`user guide </old/image_data_compression>` for a list of
+            plugins available for each UID and their dependencies. If not
+            specified then all available plugins will be tried (default).
+        decoding_plugin : str, optional
+            Placeholder for future functionality.
+        encapsulate_ext : bool, optional
+            If ``True`` then force the addition of an extended offset table.
+            If ``False`` (default) then an extended offset table
+            will be added if needed for large amounts of compressed *Pixel
+            Data*, otherwise just the basic offset table will be used.
+        **kwargs
+            Optional keyword parameters for the encoding plugin may also be
+            present. See the :doc:`encoding plugins options
+            </guides/encoding/encoder_plugin_options>` for more information.
+        """
+        from pydicom.encoders import get_encoder
+
+        uid = UID(transfer_syntax_uid)
+
+        # Raises NotImplementedError if `uid` is not supported
+        encoder = get_encoder(uid)
+        if not encoder.is_available:
+            missing = "\n".join(
+                [f"    {s}" for s in encoder.missing_dependencies]
+            )
+            raise RuntimeError(
+                f"The '{uid.name}' encoder is unavailable because its "
+                f"encoding plugins are missing dependencies:\n"
+                f"{missing}"
+            )
+
+        if arr is None:
+            # Encode the current *Pixel Data*
+            frame_iterator = encoder.iter_encode(
+                self,
+                encoding_plugin=encoding_plugin,
+                decoding_plugin=decoding_plugin,
+                **kwargs
+            )
+        else:
+            # Encode from an uncompressed pixel data array
+            kwargs.update(encoder.kwargs_from_ds(self))
+            frame_iterator = encoder.iter_encode(
+                arr,
+                encoding_plugin=encoding_plugin,
+                **kwargs
+            )
+
+        # Encode!
+        encoded = [f for f in frame_iterator]
+
+        # Encapsulate the encoded *Pixel Data*
+        nr_frames = getattr(self, "NumberOfFrames", 1) or 1
+        total = (nr_frames - 1) * 8 + sum([len(f) for f in encoded[:-1]])
+        if encapsulate_ext or total > 2**32 - 1:
+            (self.PixelData,
+             self.ExtendedOffsetTable,
+             self.ExtendedOffsetTableLengths) = encapsulate_extended(encoded)
+        else:
+            self.PixelData = encapsulate(encoded)
+
+        self['PixelData'].is_undefined_length = True
+
+        # Set the correct *Transfer Syntax UID*
+        if not hasattr(self, 'file_meta'):
+            self.file_meta = FileMetaDataset()
+
+        self.file_meta.TransferSyntaxUID = uid
+
+        # Add or update any other required elements
+        if self.SamplesPerPixel > 1:
+            self.PlanarConfiguration: int = 1 if uid == RLELossless else 0
 
     def decompress(self, handler_name: str = '') -> None:
         """Decompresses *Pixel Data* and modifies the :class:`Dataset`
@@ -1591,7 +1756,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         handler_name : str, optional
             The name of the pixel handler that shall be used to
             decode the data. Supported names are: ``'gdcm'``,
-            ``'pillow'``, ``'jpeg_ls'``, ``'rle'`` and ``'numpy'``.
+            ``'pillow'``, ``'jpeg_ls'``, ``'rle'``, ``'numpy'`` and
+            ``'pylibjpeg'``.
             If not used (the default), a matching handler is used from the
             handlers configured in :attr:`~pydicom.config.pixel_data_handlers`.
 
@@ -1654,7 +1820,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         from pydicom.config import overlay_data_handlers
 
         available_handlers = [
-            hh for hh in overlay_data_handlers if hh.is_available()
+            hh for hh in overlay_data_handlers
+            if hh.is_available()  # type: ignore[attr-defined]
         ]
         if not available_handlers:
             # For each of the handlers we want to find which
@@ -1665,14 +1832,14 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             )
             pkg_msg = []
             for hh in overlay_data_handlers:
-                hh_deps = hh.DEPENDENCIES
+                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    "{} (req. {})"
-                    .format(hh.HANDLER_NAME, ', '.join(names))
+                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"(req. {', '.join(names)})"
                 )
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
@@ -1681,7 +1848,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         for handler in available_handlers:
             try:
                 # Use the handler to get an ndarray of the pixel data
-                return handler.get_overlay_array(self, group)
+                func = handler.get_overlay_array  # type: ignore[attr-defined]
+                return func(self, group)
             except Exception as exc:
                 logger.debug(
                     "Exception raised by overlay data handler", exc_info=exc
@@ -1696,7 +1864,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             .format(", ".join([str(hh) for hh in available_handlers]))
         )
 
-        raise last_exception
+        raise last_exception  # type: ignore[misc]
 
     @property
     def pixel_array(self) -> "np.ndarray":
@@ -1714,7 +1882,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             :class:`numpy.ndarray`.
         """
         self.convert_pixel_data()
-        return self._pixel_array
+        return cast("numpy.ndarray", self._pixel_array)
 
     def waveform_array(self, index: int) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
@@ -1930,7 +2098,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         if enforce_standard:
             validate_file_meta(self.file_meta, enforce_standard=True)
 
-    def __setattr__(self, name: str, value: object) -> None:
+    def __setattr__(self, name: str, value: Any) -> None:
         """Intercept any attempts to set a value for an instance attribute.
 
         If name is a DICOM keyword, set the corresponding tag and DataElement.
@@ -2053,11 +2221,13 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         if elem_tag.is_private:
             # See PS 3.5-2008 section 7.8.1 (p. 44) for how blocks are reserved
             logger.debug(f"Setting private tag {elem_tag}")
-            private_block = elem_tag.elem >> 8
+            private_block = elem_tag.element >> 8
             private_creator_tag = Tag(elem_tag.group, private_block)
             if private_creator_tag in self and elem_tag != private_creator_tag:
-                if elem.is_raw:
-                    elem = DataElement_from_raw(elem, self._character_set)
+                if isinstance(elem, RawDataElement):
+                    elem = DataElement_from_raw(
+                        elem, self._character_set, self
+                    )
                 elem.private_creator = self[private_creator_tag].value
 
         self._dict[elem_tag] = elem
@@ -2141,8 +2311,13 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return dir(self)
 
-    def update(
-        self, dictionary: Union[Dict[str, object], Dict[TagType, DataElement]]
+    def update(  # type: ignore[override]
+        self,
+        d: Union[
+            Dict[str, Any],
+            MutableMapping[BaseTag, _DatasetValue],
+            MutableMapping[TagType, _DatasetValue]
+        ]
     ) -> None:
         """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
@@ -2152,11 +2327,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             The :class:`dict` or :class:`Dataset` to use when updating the
             current object.
         """
-        for key, value in list(dictionary.items()):
+        for key, value in list(d.items()):
             if isinstance(key, str):
                 setattr(self, key, value)
             else:
-                self[Tag(key)] = value
+                self[Tag(cast(int, key))] = value
 
     def iterall(self) -> Iterator[DataElement]:
         """Iterate through the :class:`Dataset`, yielding all the elements.
@@ -2224,11 +2399,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     @classmethod
     def from_json(
         cls: Type[_Dataset],
-        json_dataset: Union[Dict[str, bytes], str],
+        json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], object],
-                Callable[[str], object]
+                Callable[[BaseTag, str, str], Any],
+                Callable[[str], Any]
             ]
         ] = None
     ) -> _Dataset:
@@ -2240,9 +2415,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         Parameters
         ----------
-        json_dataset : dict or str
-            :class:`dict` or :class:`str` representing a DICOM Data Set
-            formatted based on the DICOM JSON Model.
+        json_dataset : dict, str, bytes or bytearray
+            :class:`dict`, :class:`str`, :class:`bytes` or :class:`bytearray`
+            representing a DICOM Data Set formatted based on the DICOM JSON
+            Model.
         bulk_data_uri_handler : callable, optional
             Callable function that accepts either the tag, vr and "BulkDataURI"
             or just the "BulkDataURI" of the JSON
@@ -2253,8 +2429,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         -------
         Dataset
         """
-        if not isinstance(json_dataset, dict):
-            json_dataset = json.loads(json_dataset)
+        if isinstance(json_dataset, (str, bytes, bytearray)):
+            json_dataset = cast(Dict[str, Any], json.loads(json_dataset))
+
         dataset = cls()
         for tag, mapping in json_dataset.items():
             vr = mapping['vr']
@@ -2276,8 +2453,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     def to_json_dict(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None  # noqa
-    ) -> _Dataset:
+        bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
+        suppress_invalid_tags: bool = False,
+    ) -> Dict[str, Any]:
         """Return a dictionary representation of the :class:`Dataset`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
@@ -2295,6 +2473,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             Callable function that accepts a bulk data element and returns a
             JSON representation of the data element (dictionary including the
             "vr" key and either the "InlineBinary" or the "BulkDataURI" key).
+        suppress_invalid_tags : bool, optional
+            Flag to specify if errors while serializing tags should be logged
+            and the tag dropped or if the error should be bubbled up.
 
         Returns
         -------
@@ -2305,17 +2486,24 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         for key in self.keys():
             json_key = '{:08X}'.format(key)
             data_element = self[key]
-            json_dataset[json_key] = data_element.to_json_dict(
-                bulk_data_element_handler=bulk_data_element_handler,
-                bulk_data_threshold=bulk_data_threshold
-            )
+            try:
+                json_dataset[json_key] = data_element.to_json_dict(
+                    bulk_data_element_handler=bulk_data_element_handler,
+                    bulk_data_threshold=bulk_data_threshold
+                )
+            except Exception as exc:
+                logger.error(f"Error while processing tag {json_key}")
+                if not suppress_invalid_tags:
+                    raise exc
+
         return json_dataset
 
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
-        dump_handler: Optional[Callable[["Dataset"], str]] = None
+        dump_handler: Optional[Callable[[Dict[str, Any]], str]] = None,
+        suppress_invalid_tags: bool = False,
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
 
@@ -2343,6 +2531,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
                 Make sure to use a dump handler that sorts the keys (see
                 example below) to create DICOM-conformant JSON.
+        suppress_invalid_tags : bool, optional
+            Flag to specify if errors while serializing tags should be logged
+            and the tag dropped or if the error should be bubbled up.
 
         Returns
         -------
@@ -2363,9 +2554,29 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             dump_handler = json_dump
 
         return dump_handler(
-            self.to_json_dict(bulk_data_threshold, bulk_data_element_handler))
+            self.to_json_dict(
+                bulk_data_threshold,
+                bulk_data_element_handler,
+                suppress_invalid_tags=suppress_invalid_tags
+            )
+        )
+
+    def __getstate__(self) -> Dict[str, Any]:
+        # pickle cannot handle weakref - remove parent
+        d = self.__dict__.copy()
+        del d['parent']
+        return d
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        # re-add parent - it will be set to the parent dataset on demand
+        # if the dataset is in a sequence
+        self.__dict__['parent'] = None
 
     __repr__ = __str__
+
+
+_FileDataset = TypeVar("_FileDataset", bound="FileDataset")
 
 
 class FileDataset(Dataset):
@@ -2403,7 +2614,7 @@ class FileDataset(Dataset):
         filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
         dataset: Dataset,
         preamble: Optional[bytes] = None,
-        file_meta: Optional[Dataset] = None,
+        file_meta: Optional["FileMetaDataset"] = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True
     ) -> None:
@@ -2433,11 +2644,15 @@ class FileDataset(Dataset):
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
-        self.file_meta = file_meta
-        self.is_implicit_VR = is_implicit_VR
-        self.is_little_endian = is_little_endian
-        filename = None
+        self.file_meta: Optional["FileMetaDataset"] = file_meta
+        self.is_implicit_VR: bool = is_implicit_VR
+        self.is_little_endian: bool = is_little_endian
+
+        filename: Optional[str] = None
         filename_or_obj = path_from_pathlike(filename_or_obj)
+        self.fileobj_type: Any
+        self.filename: Union[str, BinaryIO]
+
         if isinstance(filename_or_obj, str):
             filename = filename_or_obj
             self.fileobj_type = open
@@ -2449,11 +2664,12 @@ class FileDataset(Dataset):
             # use __class__ python <2.7?;
             # http://docs.python.org/reference/datamodel.html
             self.fileobj_type = filename_or_obj.__class__
-            if getattr(filename_or_obj, "name", False):
+            if hasattr(filename_or_obj, "name"):
                 filename = filename_or_obj.name
-            elif getattr(filename_or_obj, "filename",
-                         False):  # gzip python <2.7?
-                filename = filename_or_obj.filename
+            elif hasattr(filename_or_obj, "filename"):
+                filename = (
+                    filename_or_obj.filename  # type: ignore[attr-defined]
+                )
             else:
                 # e.g. came from BytesIO or something file-like
                 self.filename = filename_or_obj
@@ -2465,31 +2681,51 @@ class FileDataset(Dataset):
                 statinfo = os.stat(filename)
                 self.timestamp = statinfo.st_mtime
 
-    def __eq__(self, other: object) -> bool:
-        """Compare `self` and `other` for equality.
+    def _copy_implementation(self, copy_function: Callable) -> "FileDataset":
+        """Implementation of ``__copy__`` and ``__deepcopy__``.
+        Sets the filename to ``None`` if it isn't a string,
+        and copies all other attributes using `copy_function`.
+        """
+        copied = self.__class__(
+            self.filename, self, self.preamble, self.file_meta,
+            self.is_implicit_VR, self.is_little_endian
+        )
+        filename = self.filename
+        if filename is not None and not isinstance(filename, str):
+            warnings.warn("The 'filename' attribute of the dataset is a "
+                          "file-like object and will be set to None "
+                          "in the copied object")
+            self.filename = None  # type: ignore[assignment]
+        for (k, v) in self.__dict__.items():
+            copied.__dict__[k] = copy_function(v)
+
+        self.filename = filename
+
+        return copied
+
+    def __copy__(self) -> "FileDataset":
+        """Return a shallow copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
 
         Returns
         -------
-        bool
-            The result if `self` and `other` are the same class
-        NotImplemented
-            If `other` is not the same class as `self` then returning
-            :class:`NotImplemented` delegates the result to
-            ``superclass.__eq__(subclass)``.
+        FileDataset
+            A shallow copy of the file data set.
         """
-        # When comparing against self this will be faster
-        if other is self:
-            return True
+        return self._copy_implementation(copy.copy)
 
-        if isinstance(other, self.__class__):
-            return (
-                _dict_equal(self, other)
-                and _dict_equal(
-                    self.__dict__, other.__dict__, exclude=['_dict']
-                )
-            )
+    def __deepcopy__(self, _) -> "FileDataset":
+        """Return a deep copy of the file dataset.
+        Make sure that the filename is not copied in case it is a file-like
+        object.
 
-        return NotImplemented
+        Returns
+        -------
+        FileDataset
+            A deep copy of the file data set.
+        """
+        return self._copy_implementation(copy.deepcopy)
 
 
 def validate_file_meta(
@@ -2568,7 +2804,7 @@ class FileMetaDataset(Dataset):
     """
 
     def __init__(
-        self, *args: Dict[BaseTag, _DatasetValue], **kwargs: object
+        self, *args: MutableMapping[BaseTag, _DatasetValue], **kwargs
     ) -> None:
         """Initialize a FileMetaDataset
 
@@ -2586,7 +2822,7 @@ class FileMetaDataset(Dataset):
         FileMetaDataset.validate(self._dict)
 
     @staticmethod
-    def validate(init_value: Dict[BaseTag, _DatasetValue]) -> None:
+    def validate(init_value: MutableMapping[BaseTag, _DatasetValue]) -> None:
         """Raise errors if initialization value is not acceptable for file_meta
 
         Parameters
