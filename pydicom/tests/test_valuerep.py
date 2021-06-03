@@ -17,7 +17,8 @@ import pydicom
 from pydicom import config
 from pydicom import valuerep
 from pydicom.data import get_testdata_file
-from pydicom.valuerep import DS, IS
+from pydicom.dataset import Dataset
+from pydicom.valuerep import DS, IS, DSfloat, DSdecimal
 import pytest
 
 from pydicom.valuerep import PersonName
@@ -488,10 +489,10 @@ class TestDS:
 
     def test_float_values(self):
         val = DS(0.9)
-        assert isinstance(val, pydicom.valuerep.DSfloat)
+        assert isinstance(val, DSfloat)
         assert 0.9 == val
         val = DS("0.9")
-        assert isinstance(val, pydicom.valuerep.DSfloat)
+        assert isinstance(val, DSfloat)
         assert 0.9 == val
 
 
@@ -499,33 +500,41 @@ class TestDSfloat:
     """Unit tests for pickling DSfloat"""
     def test_pickling(self):
         # Check that a pickled DSFloat is read back properly
-        x = pydicom.valuerep.DSfloat(9.0)
+        x = DSfloat(9.0)
         x.original_string = "hello"
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
+    def test_new_empty(self):
+        """Test passing an empty value."""
+        assert isinstance(DSfloat(''), str)
+        assert DSfloat('') == ''
+        assert DSfloat(None) is None
+
     def test_str(self):
         """Test DSfloat.__str__()."""
-        val = pydicom.valuerep.DSfloat(1.1)
-        assert "1.1" == str(val)
+        val = DSfloat(1.1)
+        assert str(val) == '1.1'
 
-        val = pydicom.valuerep.DSfloat("1.1")
-        assert "1.1" == str(val)
+        val = DSfloat("1.1")
+        assert str(val) == '1.1'
 
     def test_repr(self):
         """Test DSfloat.__repr__()."""
-        val = pydicom.valuerep.DSfloat(1.1)
-        assert '"1.1"' == repr(val)
+        val = DSfloat(1.1)
+        assert repr(val) == "'1.1'"
 
-        val = pydicom.valuerep.DSfloat("1.1")
-        assert '"1.1"' == repr(val)
+        val = DSfloat("1.1")
+        assert repr(val) == "'1.1'"
+        assert repr(val) == repr("1.1")
+        assert repr(val) == repr('1.1')
 
     def test_DSfloat(self):
         """Test creating a value using DSfloat."""
-        x = pydicom.valuerep.DSfloat('1.2345')
-        y = pydicom.valuerep.DSfloat(x)
+        x = DSfloat('1.2345')
+        y = DSfloat(x)
         assert x == y
         assert y == x
         assert 1.2345 == y
@@ -533,54 +542,54 @@ class TestDSfloat:
 
     def test_DSdecimal(self):
         """Test creating a value using DSdecimal."""
-        x = pydicom.valuerep.DSdecimal('1.2345')
-        y = pydicom.valuerep.DSfloat(x)
+        x = DSdecimal('1.2345')
+        y = DSfloat(x)
         assert 1.2345 == y
         assert "1.2345" == y.original_string
 
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating floats"""
-        x = pydicom.valuerep.DSfloat(math.pi, auto_format=True)
+        x = DSfloat(math.pi, auto_format=True)
 
         # Float representation should be unaltered by truncation
         assert x == math.pi
         # String representations should be correctly formatted
         assert str(x) == '3.14159265358979'
-        assert repr(x) == '"3.14159265358979"'
+        assert repr(x) == repr('3.14159265358979')
 
     def test_auto_format_from_invalid_DS(self):
         """Test truncating floats"""
         # A DSfloat that has a non-valid string representation
-        x = pydicom.valuerep.DSfloat(math.pi)
+        x = DSfloat(math.pi)
 
         # Use this to initialise another with auto_format set to true
-        y = pydicom.valuerep.DSfloat(x, auto_format=True)
+        y = DSfloat(x, auto_format=True)
 
         # Float representation should be unaltered by truncation
         assert y == math.pi
         # String representations should be correctly formatted
         assert str(y) == '3.14159265358979'
-        assert repr(y) == '"3.14159265358979"'
+        assert repr(y) == repr("3.14159265358979")
 
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
-        x = pydicom.valuerep.DSfloat('3.141592653589793', auto_format=True)
+        x = DSfloat('3.141592653589793', auto_format=True)
 
         # Float representation should be unaltered by truncation
         assert x == float('3.141592653589793')
         # String representations should be correctly formatted
         assert str(x) == '3.14159265358979'
-        assert repr(x) == '"3.14159265358979"'
+        assert repr(x) == repr("3.14159265358979")
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
-        x = pydicom.valuerep.DSfloat('1.234e-1', auto_format=True)
+        x = DSfloat('1.234e-1', auto_format=True)
 
         # Float representation should be correct
         assert x == 0.1234
         # String representations should be unaltered
         assert str(x) == '1.234e-1'
-        assert repr(x) == '"1.234e-1"'
+        assert repr(x) == repr("1.234e-1")
 
     def test_enforce_valid_values_length(self, enforce_valid_true_fixture):
         """Test that errors are raised when length is too long."""
@@ -589,14 +598,14 @@ class TestDSfloat:
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
-        x = pydicom.valuerep.DSfloat(math.pi, auto_format=True)
-        y = pydicom.valuerep.DSfloat(x)
+        x = DSfloat(math.pi, auto_format=True)
+        y = DSfloat(x)
         assert x == y
         assert y == x
         assert y.auto_format
         assert math.pi == y
         assert str(y) == '3.14159265358979'
-        assert repr(y) == '"3.14159265358979"'
+        assert repr(y) == repr("3.14159265358979")
 
     @pytest.mark.parametrize(
         'val',
@@ -621,7 +630,7 @@ class TestDSdecimal:
         # Check that a pickled DSdecimal is read back properly
         # DSdecimal actually prefers original_string when
         # reading back
-        x = pydicom.valuerep.DSdecimal(19)
+        x = DSdecimal(19)
         x.original_string = "19"
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
@@ -633,18 +642,20 @@ class TestDSdecimal:
         with pytest.raises(
                 TypeError, match="cannot be instantiated with a float value"
         ):
-            pydicom.valuerep.DSdecimal(9.0)
+            DSdecimal(9.0)
         config.allow_DS_float = True
-        assert 9 == pydicom.valuerep.DSdecimal(9.0)
+        assert 9 == DSdecimal(9.0)
 
-    def test_new_empty_str(self):
-        """Test passing an empty string."""
-        assert pydicom.valuerep.DSdecimal('') is None
+    def test_new_empty(self):
+        """Test passing an empty value."""
+        assert isinstance(DSdecimal(''), str)
+        assert DSdecimal('') == ''
+        assert DSdecimal(None) is None
 
     def test_DSfloat(self):
         """Test creating a value using DSfloat."""
-        x = pydicom.valuerep.DSdecimal('1.2345')
-        y = pydicom.valuerep.DSdecimal(x)
+        x = DSdecimal('1.2345')
+        y = DSdecimal(x)
         assert x == y
         assert y == x
         assert Decimal("1.2345") == y
@@ -652,49 +663,49 @@ class TestDSdecimal:
 
     def test_DSdecimal(self):
         """Test creating a value using DSdecimal."""
-        x = pydicom.valuerep.DSfloat('1.2345')
-        y = pydicom.valuerep.DSdecimal(x)
+        x = DSfloat('1.2345')
+        y = DSdecimal(x)
         assert Decimal(1.2345) == y
         assert "1.2345" == y.original_string
 
     def test_repr(self):
         """Test repr(DSdecimal)."""
-        x = pydicom.valuerep.DSdecimal('1.2345')
-        assert '"1.2345"' == repr(x)
+        x = DSdecimal('1.2345')
+        assert repr(x) == repr('1.2345')
 
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating decimal"""
-        x = pydicom.valuerep.DSdecimal(Decimal(math.pi), auto_format=True)
+        x = DSdecimal(Decimal(math.pi), auto_format=True)
 
         # Decimal representation should be unaltered by truncation
         assert x == Decimal(math.pi)
         # String representations should be correctly formatted
         assert str(x) == '3.14159265358979'
-        assert repr(x) == '"3.14159265358979"'
+        assert repr(x) == repr("3.14159265358979")
 
     def test_auto_format_from_invalid_DS(self):
         """Test truncating floats"""
         # A DSdecimal that has a non-valid string representation
-        x = pydicom.valuerep.DSdecimal(math.pi)
+        x = DSdecimal(math.pi)
 
         # Use this to initialise another with auto_format set to true
-        y = pydicom.valuerep.DSdecimal(x, auto_format=True)
+        y = DSdecimal(x, auto_format=True)
 
         # Float representation should be unaltered by truncation
         assert y == math.pi
         # String representations should be correctly formatted
         assert str(y) == '3.14159265358979'
-        assert repr(y) == '"3.14159265358979"'
+        assert repr(y) == repr("3.14159265358979")
 
     def test_auto_format_invalid_string(self, enforce_valid_both_fixture):
         """If the user supplies an invalid string, this should be formatted."""
-        x = pydicom.valuerep.DSdecimal('3.141592653589793', auto_format=True)
+        x = DSdecimal('3.141592653589793', auto_format=True)
 
         # Decimal representation should be unaltered by truncation
         assert x == Decimal('3.141592653589793')
         # String representations should be correctly formatted
         assert str(x) == '3.14159265358979'
-        assert repr(x) == '"3.14159265358979"'
+        assert repr(x) == repr("3.14159265358979")
 
     @pytest.mark.parametrize(
         'val',
@@ -714,24 +725,24 @@ class TestDSdecimal:
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
-        x = pydicom.valuerep.DSdecimal('1.234e-1', auto_format=True)
+        x = DSdecimal('1.234e-1', auto_format=True)
 
         # Decimal representation should be correct
         assert x == Decimal('1.234e-1')
         # String representations should be unaltered
         assert str(x) == '1.234e-1'
-        assert repr(x) == '"1.234e-1"'
+        assert repr(x) == repr("1.234e-1")
 
     def test_DSdecimal_auto_format(self):
         """Test creating a value using DSdecimal copies auto_format"""
-        x = pydicom.valuerep.DSdecimal(math.pi, auto_format=True)
-        y = pydicom.valuerep.DSdecimal(x)
+        x = DSdecimal(math.pi, auto_format=True)
+        y = DSdecimal(x)
         assert x == y
         assert y == x
         assert y.auto_format
         assert math.pi == y
         assert str(y) == '3.14159265358979'
-        assert repr(y) == '"3.14159265358979"'
+        assert repr(y) == repr("3.14159265358979")
 
 
 class TestIS:
@@ -756,7 +767,7 @@ class TestIS:
 
     def test_pickling(self):
         # Check that a pickled IS is read back properly
-        x = pydicom.valuerep.IS(921)
+        x = IS(921)
         x.original_string = "hello"
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
@@ -766,7 +777,7 @@ class TestIS:
     def test_longint(self, allow_invalid_values):
         # Check that a long int is read properly
         # Will not work with enforce_valid_values
-        x = pydicom.valuerep.IS(3103050000)
+        x = IS(3103050000)
         data1_string = pickle.dumps(x)
         x2 = pickle.loads(data1_string)
         assert x.real == x2.real
@@ -778,29 +789,61 @@ class TestIS:
             r"to override the value check"
         )
         with pytest.raises(OverflowError, match=msg):
-            pydicom.valuerep.IS(3103050000)
+            IS(3103050000)
 
     def test_str(self):
         """Test IS.__str__()."""
-        val = pydicom.valuerep.IS(1)
-        assert "1" == str(val)
+        val = IS(1)
+        assert str(val) == '1'
 
-        val = pydicom.valuerep.IS("1")
-        assert "1" == str(val)
+        val = IS("1")
+        assert str(val) == '1'
 
-        val = pydicom.valuerep.IS("1.0")
-        assert "1.0" == str(val)
+        val = IS("1.0")
+        assert str(val) == '1.0'
 
     def test_repr(self):
         """Test IS.__repr__()."""
-        val = pydicom.valuerep.IS(1)
-        assert '"1"' == repr(val)
+        val = IS(1)
+        assert repr(val) == repr('1')
 
-        val = pydicom.valuerep.IS("1")
-        assert '"1"' == repr(val)
+        val = IS("1")
+        assert repr(val) == repr('1')
+        assert repr(val) == repr("1")
 
-        val = pydicom.valuerep.IS("1.0")
-        assert "1.0" == str(val)
+        val = IS("1.0")
+        assert str(val) == '1.0'
+
+    def test_comparison_operators(self):
+        """Tests for the comparison operators"""
+        for val in (IS("1234"), IS(1234)):
+            assert val == 1234
+            assert val != 1235
+            assert val < 1235
+            assert val <= 1235
+            assert val > 1233
+            assert val >= 1233
+
+            assert 1234 == val
+            assert 1235 != val
+            assert 1235 > val
+            assert 1235 >= val
+            assert 1233 < val
+            assert 1233 <= val
+
+            assert val == "1234"
+            assert val != "1235"
+            assert val < "1235"
+            assert val <= "1235"
+            assert val > "1233"
+            assert val >= "1233"
+
+            assert "1234" == val
+            assert "1235" != val
+            assert "1235" > val
+            assert "1235" >= val
+            assert "1233" < val
+            assert "1233" <= val
 
 
 class TestBadValueRead:
@@ -1282,3 +1325,92 @@ def test_person_name_unicode_warns():
             from pydicom.valuerep import PersonNameUnicode
 
         assert PersonNameUnicode == PersonName
+
+
+VALUE_REFERENCE = [
+    # (VR, Python setter type, (VM 0 values), (VM >= 1 values), keyword)
+    ("AE", str, (None, ""), ("foo", "bar"), 'Receiver'),
+    ("AS", str, (None, ""), ("foo", "bar"), 'PatientAge'),
+    ("AT", int, (None, ), (0, 2**32 - 1), 'OffendingElement'),
+    ("CS", str, (None, ""), ("foo", "bar"), 'QualityControlSubject'),
+    ("DA", str, (None, ""), ("20010203", "20020304"), 'PatientBirthDate'),
+    ("DS", str, (None, ""), ("-1.5", "3.2"), 'PatientWeight'),
+    ("DT", str, (None, ""), ("20010203040506", "2000"), 'AcquisitionDateTime'),
+    ("FD", float, (None, ), (-1.5, 3.2), 'RealWorldValueLUTData'),
+    ("FL", float, (None, ), (-1.5, 3.2), 'VectorAccuracy'),
+    ("IS", str, (None, ""), ("0", "25"), 'BeamNumber'),
+    ("LO", str, (None, ""), ("foo", "bar"), 'DataSetSubtype'),
+    ("LT", str, (None, ""), ("foo", "bar"), 'ExtendedCodeMeaning'),
+    ("OB", bytes, (None, b""), (b"\x00\x01", ), 'FillPattern'),
+    ("OD", bytes, (None, b""), (b"\x00\x01", ), 'DoubleFloatPixelData'),
+    ("OF", bytes, (None, b""), (b"\x00\x01", ), 'UValueData'),
+    ("OL", bytes, (None, b""), (b"\x00\x01", ), 'TrackPointIndexList'),
+    ("OV", bytes, (None, b""), (b"\x00\x01", ), 'SelectorOVValue'),
+    ("OW", bytes, (None, b""), (b"\x00\x01", ), 'TrianglePointIndexList'),
+    ("PN", str, (None, ""), ("foo", "bar"), 'PatientName'),
+    ("SH", str, (None, ""), ("foo", "bar"), 'CodeValue'),
+    ("SL", int, (None, ), (-2**31, 2**31 - 1), 'RationalNumeratorValue'),
+    ("SQ", list, ([], ), (Dataset(), Dataset()), 'BeamSequence'),
+    ("SS", int, (None, ), (-2**15, 2**15 - 1), 'SelectorSSValue'),
+    ("ST", str, (None, ""), ("foo", "bar"), 'InstitutionAddress'),
+    ("SV", int, (None, ), (-2**63, 2**63 - 1), 'SelectorSVValue'),
+    ("TM", str, (None, ""), ("123456", "000000"), 'StudyTime'),
+    ("UC", str, (None, ""), ("foo", "bar"), 'LongCodeValue'),
+    ("UI", str, (None, ""), ("foo", "bar"), 'SOPClassUID'),
+    ("UL", int, (None, ), (0, 2**32 - 1), 'SimpleFrameList'),
+    ("UN", bytes, (None, b""), (b"\x00\x01", ), 'SelectorUNValue'),
+    ("UR", str, (None, ""), ("foo", "bar"), 'CodingSchemeURL'),
+    ("US", int, (None, ), (0, 2**16 - 1), 'SourceAcquisitionBeamNumber'),
+    ("UT", str, (None, ""), ("foo", "bar"), 'StrainAdditionalInformation'),
+    ("UV", int, (None, ), (0, 2**64 - 1), 'SelectorUVValue')
+]
+
+
+class TestValueConsistency:
+    """Fundamental element value behaviour tests."""
+    @pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
+    def test_set_value(self, vr, pytype, vm0, vmN, keyword):
+        """Test that element values are set consistently"""
+        # Test VM = 0
+        ds = Dataset()
+        for value in vm0:
+            setattr(ds, keyword, value)
+            elem = ds[keyword]
+            assert elem.VR == vr
+            assert elem.value == value
+            assert value == elem.value
+
+        # Test VM = 1
+        ds = Dataset()
+        value = vmN[0]
+        if vr == 'SQ':
+            setattr(ds, keyword, [value])
+            elem = ds[keyword]
+            assert elem.value[0] == value
+            assert value == elem.value[0]
+        else:
+            setattr(ds, keyword, value)
+            elem = ds[keyword]
+            assert elem.value == value
+            assert value == elem.value
+
+        if vr[0] == 'O':
+            return
+
+        # Test VM > 1
+        ds = Dataset()
+        value = vmN[0]
+        setattr(ds, keyword, list(vmN))
+        elem = ds[keyword]
+        assert elem.value == list(vmN)
+        assert list(vmN) == elem.value
+
+    def test_ds_consistency(self):
+        """Consistency tests for DS classes."""
+        val = DSfloat("-1.5")
+        assert val == "-1.5"
+        assert "-1.5" == val
+
+        val = DSdecimal("-1.5")
+        assert val == "-1.5"
+        assert "-1.5" == val

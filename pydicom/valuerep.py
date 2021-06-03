@@ -473,7 +473,13 @@ class DSfloat(float):
             cls,
             val: Union[str, int, float, Decimal],
             auto_format: bool = False
-    ) -> [_DSfloat]:
+    ) -> Optional[Union[str, _DSfloat]]:
+        if val is None:
+            return None
+
+        if val == '':
+            return val
+
         return super().__new__(cls, val)
 
     def __init__(
@@ -525,6 +531,32 @@ class DSfloat(float):
                     'of DS'
                 )
 
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
+
+    def __lt__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) < other
+
+        return super().__lt__(other)
+
+    def __le__(self, other: Any) -> bool:
+        return self == other or self < other
+
+    def __ge__(self, other: Any) -> bool:
+        return self == other or self > other
+
+    def __gt__(self, other: Any) -> bool:
+        return not (self == other or self < other)
+
     def __str__(self) -> str:
         if hasattr(self, 'original_string') and not self.auto_format:
             return self.original_string
@@ -534,8 +566,9 @@ class DSfloat(float):
 
     def __repr__(self) -> str:
         if self.auto_format and hasattr(self, 'original_string'):
-            return f'"{self.original_string}"'
-        return f'"{super().__repr__()}"'
+            return f"'{self.original_string}'"
+
+        return f"'{super().__repr__()}'"
 
 
 class DSdecimal(Decimal):
@@ -560,7 +593,7 @@ class DSdecimal(Decimal):
         cls: Type[_DSdecimal],
         val: Union[str, int, float, Decimal],
         auto_format: bool = False
-    ) -> Optional[_DSdecimal]:
+    ) -> Optional[Union[str, _DSdecimal]]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
 
@@ -569,6 +602,12 @@ class DSdecimal(Decimal):
         val : str or numeric
             A string or a number type which can be converted to a decimal.
         """
+        if val is None:
+            return None
+
+        if val == '':
+            return val
+
         if isinstance(val, float) and not config.allow_DS_float:
             raise TypeError(
                 "'DS' cannot be instantiated with a float value unless "
@@ -577,14 +616,7 @@ class DSdecimal(Decimal):
                 "or use 'Decimal.quantize()' and pass a 'Decimal' instance."
             )
 
-        if isinstance(val, str):
-            val = val.strip()
-            if val == '':
-                return None
-
-        val = super().__new__(cls, val)
-
-        return val
+        return super().__new__(cls, val)
 
     def __init__(
         self,
@@ -637,6 +669,32 @@ class DSdecimal(Decimal):
                     'of DS'
                 )
 
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
+
+    def __lt__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) < other
+
+        return super().__lt__(other)
+
+    def __le__(self, other: Any) -> bool:
+        return self == other or self < other
+
+    def __ge__(self, other: Any) -> bool:
+        return self == other or self > other
+
+    def __gt__(self, other: Any) -> bool:
+        return not (self == other or self < other)
+
     def __str__(self) -> str:
         has_str = hasattr(self, 'original_string')
         if has_str and len(self.original_string) <= 16:
@@ -646,8 +704,8 @@ class DSdecimal(Decimal):
 
     def __repr__(self) -> str:
         if self.auto_format and hasattr(self, 'original_string'):
-            return f'"{self.original_string}"'
-        return f'"{str(self)}"'
+            return f"'{self.original_string}'"
+        return f"'{str(self)}'"
 
 
 # CHOOSE TYPE OF DS
@@ -689,19 +747,19 @@ class IS(int):
 
     def __new__(
         cls: Type[_IS], val: Union[None, str, int, float, Decimal]
-    ) -> Optional[_IS]:
+    ) -> Optional[Union[str, _IS]]:
         """Create instance if new integer string"""
         if val is None:
             return val
 
-        if isinstance(val, str) and val.strip() == '':
-            return ''
+        if val == '':
+            return val
 
         try:
-            newval: _IS = super().__new__(cls, val)
+            newval = super().__new__(cls, val)
         except ValueError:
             # accept float strings when no integer loss, e.g. "1.0"
-            newval: _IS = super().__new__(cls, float(val))
+            newval = super().__new__(cls, float(val))
 
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
@@ -726,6 +784,32 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
+
+    def __lt__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) < other
+
+        return super().__lt__(other)
+
+    def __le__(self, other: Any) -> bool:
+        return self == other or self < other
+
+    def __ge__(self, other: Any) -> bool:
+        return self == other or self > other
+
+    def __gt__(self, other: Any) -> bool:
+        return not (self == other or self < other)
+
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
             return self.original_string
@@ -734,7 +818,7 @@ class IS(int):
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        return f'"{super().__repr__()}"'
+        return f"'{super().__repr__()}'"
 
 
 def _as_str(s: str):
