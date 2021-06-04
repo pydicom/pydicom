@@ -138,7 +138,7 @@ class TestCodeDict:
 
     def test_cid3111(self):
         assert codes.cid3111.Tc99mTetrofosmin == Code(
-            value="404707004",
+            value="424118002",
             scheme_designator="SCT",
             meaning="Tc-99m tetrofosmin",
         )

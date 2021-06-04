@@ -38,6 +38,7 @@ cid_concepts[4051] = \
          'ACRAccreditationPhantomMammography',
          'ACRAccreditationPhantomStereotacticBreastBiopsy',
          'ACRAccreditationPhantomECT',
+         '_10cmDosimetryPhantom',
          'ACRAccreditationPhantomPET',
          'ACRAccreditationPhantomECTPET',
          'ACRAccreditationPhantomPETFaceplate',
@@ -416,31 +417,45 @@ cid_concepts[3413] = \
 name_for_cid[7000] = 'DiagnosticImagingReportDocumentTitles'
 cid_concepts[7000] = \
 {'DCM': ['BreastImagingReport'],
- 'LN': ['MRIHeadReport',
-        'XRayReport',
-        'CTAbdomenReport',
+ 'LN': ['USCarotidArteriesReport',
         'EchocardiographyReport',
+        'XRayReport',
+        'USVeinReport',
+        'MRIHeadReport',
+        'CTAbdomenReport',
+        'NuclearMedicineReport',
         'ECGReport',
-        'CTChestReport',
-        'CTHeadReport',
+        'USDopplerAbdominalVesselsReport',
+        'USDopplerHeadVesselsReport',
         'CardiacCatheterizationReport',
-        'FluoroscopyStudyReport',
         'UltrasoundReport',
+        'FluoroscopyStudyReport',
         'DEXASkeletalSystemStudyReport',
-        'DiagnosticImagingReport',
         'CTReport',
-        'DiagnosticInterventionalRadiologyReport',
-        'MammographyScreeningReport',
-        'CardiacElectrophysiologyReport',
-        'UltrasoundObstetricAndGynReport',
+        'DiagnosticImagingReport',
         'NuclearMedicineThyroidScanReport',
+        'DiagnosticInterventionalRadiologyReport',
+        'USDopplerVesselsReport',
+        'CTChestReport',
+        'USArteryReport',
+        'MammographyScreeningReport',
+        'FetalCardiacUltrasoundReport',
+        'USDopplerUpperExtremityVesselsReport',
+        'AdultCongenitalCardiacUltrasoundReport',
+        'PediatricCardiacUltrasoundReport',
+        'CardiacElectrophysiologyReport',
+        'USDopplerExtremityVesselsReport',
+        'UltrasoundObstetricAndGynReport',
+        'CTHeadReport',
+        'MRIReport',
+        'PETScanReport',
+        'AdultEchocardiographyProcedureReport',
         'RadiologyReport',
         'HolterStudyReport',
         'ExerciseStressTestReport',
-        'PETScanReport',
-        'NuclearMedicineReport',
-        'MRISpineReport',
-        'MRIReport']}
+        'USDopplerLowerExtremityVesselsReport',
+        'MRISpineReport'],
+ 'SCT': ['PeripheralVascularUltrasoundReport']}
 
 name_for_cid[12282] = 'CardiacUltrasoundVenousReturnSystemicFindingSites'
 cid_concepts[12282] = \
@@ -847,7 +862,7 @@ cid_concepts[12304] = \
          'PeakTissueVelocity'],
  'LN': ['MeanGradientPressureByDoppler',
         'VelocityTimeIntegral',
-        'PeakBloodVelocity',
+        'PeakSystolicBloodVelocity',
         'VolumeFlowRate',
         'DpDtByUS',
         'Thickness',
@@ -1440,7 +1455,6 @@ name_for_cid[621] = 'TypeofMedicationforSmallAnimalAnesthesia'
 cid_concepts[621] = \
 {'DCM': ['CarrierGas'],
  'SCT': ['CaloricAgent',
-         'Vasoconstrictor',
          'CarbapenemAntibiotic',
          'BetaLactamAntibiotic',
          'AminoglycosideAntibiotic',
@@ -1467,6 +1481,7 @@ cid_concepts[621] = \
          'Antifungal',
          'Hypoglycemic',
          'Steroid',
+         'CephalosporinAntibiotic',
          'LowMolecularWeightHeparin',
          'RespiratoryStimulant',
          'Anticholinergic',
@@ -1488,7 +1503,6 @@ cid_concepts[621] = \
          'Vasodilator',
          'BenzodiazepineAntagonist',
          'CalciumChannelBlocker',
-         'CephalosporinAntibiotic',
          'CholinergicAgent',
          'GastrointestinalProkinetic',
          'PlasmaExpander',
@@ -1500,6 +1514,7 @@ cid_concepts[621] = \
          'NarcoticOpiateAntagonist',
          'LincomycinAntibiotic',
          'NeuromuscularBlockingNMBDepolarizing',
+         'Vasoconstrictor',
          'LinezolidAntibiotic',
          'Analgesic'],
  'UMLS': ['H2Antagonist', 'NarcoticAnalgesic', 'Antihypoglycemic']}
@@ -2223,17 +2238,23 @@ cid_concepts[3761] = \
 
 name_for_cid[10067] = 'RadiationAttenuatorMaterials'
 cid_concepts[10067] = \
-{'SCT': ['Copper',
-         'Niobium',
-         'CarbonFiber',
+{'SCT': ['CarbonFiber',
          'Tin',
-         'Molybdenum',
-         'Silver',
-         'Aluminum',
-         'Europium',
          'Tantalum',
          'Rhodium',
-         'Lead']}
+         'Lead',
+         'Copper',
+         'Niobium',
+         'Molybdenum',
+         'Beryllium',
+         'Silver',
+         'Aluminum',
+         'Europium'],
+ 'UMLS': ['KevlarAramidFiber']}
+
+name_for_cid[44] = 'NumericValueUnknownQualifier'
+cid_concepts[44] = \
+{'DCM': ['ValueUnknown', 'ValueIndeterminate', 'MeasurementNotAttempted']}
 
 name_for_cid[7165] = 'AbstractSegmentationTypes'
 cid_concepts[7165] = \
@@ -2384,6 +2405,7 @@ cid_concepts[4030] = \
          'HeadAndNeck',
          'Uterus',
          'TemporomandibularJoint',
+         'BiliaryTract',
          'ApexOfLung',
          'Ileum',
          'Testis',
@@ -3010,7 +3032,6 @@ cid_concepts[9300] = \
          'InjectionSiteThrombosis',
          'InjectionSiteAbscess',
          'DrugInducedDizziness',
-         'InjectionSiteReaction',
          'CardiorespiratoryArrest',
          'InjectionSiteCyst',
          'Hypertension',
@@ -3028,7 +3049,7 @@ cid_concepts[9300] = \
          'InjectionSiteInfection',
          'Hypotension',
          'DiffuseInflammatoryErythema',
-         'TasteAndSenseAltered',
+         'TasteSenseAltered',
          'InjectionSiteParesthesia',
          'NasalCongestion',
          'NoMotorResponseToCommand',
@@ -3371,6 +3392,7 @@ cid_concepts[4031] = \
          'Coccyx',
          'HeadAndNeck',
          'TemporomandibularJoint',
+         'BiliaryTract',
          'ApexOfLung',
          'Ileum',
          'PelvisAndLowerExtremities',
@@ -3530,6 +3552,7 @@ cid_concepts[12] = \
  'RXNORM': ['MangafodipirTrisodium'],
  'SCT': ['MeglumineIodipamide',
          'Iophendylate',
+         'GadopentetateDimeglumine',
          'Iodipamide',
          'Ioxilan',
          'Bunamiodyl',
@@ -3543,7 +3566,6 @@ cid_concepts[12] = \
          'SodiumTyropanoate',
          'Iohexol',
          'Water',
-         'GadopentetateDimeglumine',
          'SodiumAcetrizoate',
          'Propyliodone',
          'ContrastAgent',
@@ -3555,7 +3577,6 @@ cid_concepts[12] = \
          'MeglumineDiatrizoate',
          'IodamideMeglumine',
          'SodiumIodipamide',
-         'SodiumDiatrizoate',
          'Diatrizoate',
          'NonRadiopaqueMedium',
          'ChloriodizedOil',
@@ -4051,10 +4072,10 @@ cid_concepts[6124] = \
          'AnteriorSegmentOfRightUpperLobe',
          'UpperZoneOfLung',
          'LowerZoneOfLung',
+         'MiddleLobeOfRightLung',
          'Apical',
          'PosteriorSegmentOfRightUpperLobe',
          'MiddleZoneOfLung',
-         'MiddleLobeOfLung',
          'AnteriorSegmentOfLeftUpperLobe',
          'UpperLobeOfLung']}
 
@@ -5693,7 +5714,7 @@ cid_concepts[12119] = \
         'TimeAveragedMeanVelocity'],
  'SCT': ['VesselDepthFromSurface',
          'VesselOutsideDiameter',
-         'VesselIntimalCrossSectionalArea',
+         'VesselIntimalCrossSectionalDiameter',
          'LumenDiameterStenosis',
          'VesselLumenDiameter',
          'LengthOfSegment',
@@ -5705,8 +5726,8 @@ name_for_cid[42] = 'NumericValueQualifier'
 cid_concepts[42] = \
 {'DCM': ['ValueUnknown',
          'NegativeInfinity',
-         'NotANumber',
          'ValueIndeterminate',
+         'NotANumber',
          'DivideByZero',
          'PositiveInfinity',
          'Overflow',
@@ -7054,10 +7075,10 @@ cid_concepts[7180] = \
 
 name_for_cid[62] = 'ImagingAgentAdministrationPhaseType'
 cid_concepts[62] = \
-{'DCM': ['AutomaticAdministrationPhase',
-         'AutomaticProgrammedHoldPhase',
-         'AutomaticWithManualInjectPhase',
-         'AutomaticWithManualHoldPhase']}
+{'DCM': ['AutomaticProgrammedAdministrationPhase',
+         'AutomaticProgrammedDelayPhase',
+         'AutomatedManualInjectPhase',
+         'AutomaticProgrammedWaitPhase']}
 
 name_for_cid[7704] = 'LimbicSystemTracts'
 cid_concepts[7704] = \
@@ -7409,7 +7430,6 @@ cid_concepts[7600] = \
          'LymphNodeOfStomach',
          'LateralExternalIliacLymphNode',
          'EpigastricLymphNode',
-         'AbdominalLymphNode',
          'LymphNodeOfGreaterCurvatureOfStomach',
          'PoplitealLymphNode',
          'IntramammaryLymphNode',
@@ -7455,6 +7475,7 @@ cid_concepts[7600] = \
          'LymphNodeOfLimb',
          'RetrocecalLymphNode',
          'AnteriorMediastinalLymphNode',
+         'AbdominalLymphNode',
          'PromontoryCommonIliacLymphNode',
          'CysticLymphNode',
          'SubmentalLymphNode',
@@ -7818,7 +7839,8 @@ cid_concepts[3642] = \
 
 name_for_cid[7601] = 'HeadandNeckCancerAnatomicSites'
 cid_concepts[7601] = \
-{'SCT': ['PharyngealTonsil',
+{'FMA': ['TorusOfPharyngotympanicTube'],
+ 'SCT': ['PharyngealTonsil',
          'ParanasalSinus',
          'Oropharynx',
          'FloorOfMouth',
@@ -7827,6 +7849,7 @@ cid_concepts[7601] = \
          'BaseOfTongue',
          'Lip',
          'Tongue',
+         'PharyngealRecess',
          'TonsilAndAdenoid',
          'Hypopharynx',
          'OropharyngealTonsil',
@@ -7838,6 +7861,7 @@ cid_concepts[7601] = \
          'Larynx',
          'Uvula',
          'OralCavity',
+         'PharyngotympanicTube',
          'PalatineTonsil',
          'NasalCavity',
          'Nasopharynx',
@@ -8601,6 +8625,7 @@ cid_concepts[4040] = \
          'Shoulder',
          'AnusRectumAndSigmoidColon',
          'LumenOfBloodVessel',
+         'BiliaryTract',
          'TracheaAndBronchus',
          'Gallbladder',
          'Cervix',
@@ -8609,6 +8634,7 @@ cid_concepts[4040] = \
          'BileDuct',
          'Joint',
          'LargeIntestine',
+         'PancreaticDuctAndBileDuctSystems',
          'Larynx',
          'Spine',
          'Rectum',
@@ -8888,24 +8914,35 @@ cid_concepts[3814] = \
 
 name_for_cid[7154] = 'AbdominalSegmentationTypes'
 cid_concepts[7154] = \
-{'FMA': ['WallOfGallbladder', 'LumenOfGallbladder'],
+{'FMA': ['LumenOfGallbladder', 'WallOfGallbladder'],
  'SCT': ['Abdomen',
+         'SmallIntestine',
+         'PancreaticDuct',
+         'CouinaudHepaticSegmentV',
+         'InferiorVenaCava',
+         'CouinaudHepaticSegmentII',
+         'CouinaudHepaticSegmentIV',
+         'AbdominalAorta',
+         'CouinaudHepaticSegmentVII',
+         'Peritioneum',
+         'RetroperitonealSpace',
+         'CouinaudHepaticSegmentI',
+         'Omentum',
+         'BiliaryTract',
          'Gallbladder',
          'SkinOfAbdomen',
          'PeritonealCavity',
-         'SmallIntestine',
          'BileDuct',
-         'InferiorVenaCava',
+         'PancreaticDuctAndBileDuctSystems',
          'UrinarySystem',
-         'AbdominalAorta',
-         'Peritioneum',
-         'RetroperitonealSpace',
+         'CouinaudHepaticSegmentIII',
+         'CouinaudHepaticSegmentVI',
          'Pancreas',
          'Liver',
          'Spleen',
+         'CouinaudHepaticSegmentVIII',
          'Kidney',
          'AdrenalGland',
-         'Omentum',
          'AbdominopelvicCavity',
          'AbdominalWallMuscle']}
 
@@ -9187,7 +9224,7 @@ cid_concepts[12122] = \
          'VesselDepthFromSurface',
          'VesselOutsideDiameter',
          'VesselLumenDiameter',
-         'VesselIntimalCrossSectionalArea',
+         'VesselIntimalCrossSectionalDiameter',
          'LengthOfSegment',
          'VesselIntimalDiameter']}
 
@@ -9327,6 +9364,18 @@ cid_concepts[12118] = \
 name_for_cid[7230] = 'AutomationofMeasurement'
 cid_concepts[7230] = \
 {'SCT': ['Automated', 'Manual']}
+
+name_for_cid[43] = 'NumericValueFailureQualifier'
+cid_concepts[43] = \
+{'DCM': ['NegativeInfinity',
+         'NotANumber',
+         'DivideByZero',
+         'PositiveInfinity',
+         'Overflow',
+         'Underflow',
+         'MeasurementFailure',
+         'ValueOutOfRange',
+         'CalculationFailure']}
 
 name_for_cid[10060] = 'OrgansforRadiationDoseEstimates'
 cid_concepts[10060] = \
@@ -11508,7 +11557,6 @@ cid_concepts[60] = \
          'InjectionSiteThrombosis',
          'InjectionSiteAbscess',
          'DrugInducedDizziness',
-         'InjectionSiteReaction',
          'CardiorespiratoryArrest',
          'InjectionSiteCyst',
          'Hypertension',
@@ -11526,7 +11574,7 @@ cid_concepts[60] = \
          'InjectionSiteInfection',
          'Hypotension',
          'DiffuseInflammatoryErythema',
-         'TasteAndSenseAltered',
+         'TasteSenseAltered',
          'InjectionSiteParesthesia',
          'NasalCongestion',
          'NoMotorResponseToCommand',
@@ -11546,7 +11594,6 @@ cid_concepts[10043] = \
          'InjectionSitePigmentationChange',
          'InjectionSiteScar',
          'InjectionSiteIrritation',
-         'InjectionSiteReaction',
          'InjectionSiteAnesthesia',
          'InjectionSiteCyst',
          'InjectionSiteInduration',
@@ -12174,9 +12221,10 @@ name_for_cid[3552] = 'PacingActions'
 cid_concepts[3552] = \
 {'DCM': ['EndPacing', 'BeginPacing']}
 
-name_for_cid[6300] = 'ProstateSectorAnatomy'
+name_for_cid[6300] = 'ProstateAnatomy'
 cid_concepts[6300] = \
 {'SCT': ['LeftBasalPeripheralZoneOfProstate',
+         'TransitionZoneOfTheProstate',
          'LeftPosteromedialBasalPeripheralZoneOfProstate',
          'MaleExternalUrethralSphincter',
          'RightApicalAnteriorFibromuscularStromaOfProstate',
@@ -12199,6 +12247,7 @@ cid_concepts[6300] = \
          'RightPosteromedialApicalPeripheralZoneOfProstate',
          'BasalAnteriorFibromuscularStromaOfProstate',
          'LeftBasalPartTransitionZoneOfProstate',
+         'PeripheralZoneOfTheProstate',
          'RightApicalPeripheralZoneOfProstate',
          'LeftPosterolateralBasalPeripheralZoneOfProstate',
          'RightPosterolateralApicalPeripheralZoneOfProstate',
@@ -12207,6 +12256,7 @@ cid_concepts[6300] = \
          'LeftAnteriorMiddlePeripheralZoneOfProstate',
          'RightAnteriorMiddleTransitionZoneOfProstate',
          'RightLateralMiddlePeripheralZoneOfProstate',
+         'AnteriorFibromuscularStromaOfProstate',
          'CentralZoneOfLeftHalfProstate',
          'LeftLateralMiddlePeripheralZoneOfProstate',
          'LeftPosteromedialMiddlePeripheralZoneOfProstate',
@@ -12216,6 +12266,7 @@ cid_concepts[6300] = \
          'RightAnteriorBasalTransitionZoneOfProstate',
          'LeftPosteriorApicalTransitionZoneOfProstate',
          'LeftAnteriorMiddleTransitionZoneOfProstate',
+         'Prostate',
          'LeftPosteriorBasalTransitionZoneOfProstate',
          'RightAnteriorBasalPeripheralZoneOfProstate',
          'LeftMiddleAnteriorFibromuscularStromaOfProstate',
@@ -12226,12 +12277,14 @@ cid_concepts[6300] = \
          'LeftApicalTransitionZoneOfProstate',
          'ApicalAnteriorFibromuscularStromaOfProstate',
          'LeftSeminalVesicle',
+         'SeminalVesicle',
          'RightAnteriorApicalPeripheralZoneOfProstate',
          'LeftAnteriorBasalPeripheralZoneOfProstate',
          'RightMiddleAnteriorFibromuscularStromaOfProstate',
          'RightPosteriorMiddleTransitionZoneOfProstate',
          'RightPosteriorApicalTransitionZoneOfProstate',
-         'RightMiddleTransitionZoneOfProstate']}
+         'RightMiddleTransitionZoneOfProstate',
+         'ProstaticUrethra']}
 
 name_for_cid[3102] = 'RestStress'
 cid_concepts[3102] = \
@@ -12624,9 +12677,10 @@ name_for_cid[12005] = 'FetalBiometryMeasurements'
 cid_concepts[12005] = \
 {'LN': ['OccipitalFrontalDiameter',
         'BPDAreaCorrected',
+        'LeftFetalEarLength',
         'TransverseAbdominalDiameter',
         'APADTAD',
-        'CisternaMagna',
+        'CisternaMagnaLength',
         'AbdominalCircumference',
         'FemurLength',
         'ThoracicCircumference',
@@ -12634,6 +12688,7 @@ cid_concepts[12005] = \
         'FootLength',
         'BiparietalDiameter',
         'LeftKidneyThickness',
+        'RightFetalEarLength',
         'TransverseThoracicDiameter',
         'LeftKidneyLength',
         'LeftKidneyWidth',
@@ -12927,7 +12982,6 @@ name_for_cid[1200] = 'ContraindicationsForCTImaging'
 cid_concepts[1200] = \
 {'SCT': ['ContrastMediaAllergy',
          'PatientCurrentlyPregnant',
-         'XRayContrastMediaAllergy',
          'ImpairedRenalFunction']}
 
 name_for_cid[7100] = 'RCSRegistrationMethodType'
@@ -13220,7 +13274,6 @@ cid_concepts[12012] = \
         'AxtShinozuka1996',
         'FibulaJeanty1983',
         'RadiusMerz1987',
-        'HCACByGACampbell1977',
         'EFWByGAHansmann1986',
         'MaleSingletonBWPByGAArbuckle1993',
         'FLByGAChitty1994',
@@ -13260,6 +13313,7 @@ cid_concepts[12012] = \
         'TCDGoldstein1987',
         'ACHansmann1985',
         'APAbdominalDiameterLessoway1998',
+        'HCACByGACampbell1977',
         'CRLTokyo1986',
         'FWPByGAHadlock1985',
         'FWPByGAAlexander1996',
@@ -13358,6 +13412,15 @@ name_for_cid[3729] = 'AdmissionStatus'
 cid_concepts[3729] = \
 {'SCT': ['Elective', 'EmergencyDepartment', 'Transfer']}
 
+name_for_cid[1201] = 'ContraindicationsForXAImaging'
+cid_concepts[1201] = \
+{'SCT': ['ContrastMediaAllergy',
+         'BloodCoagulationDisorders',
+         'CardiacArrhythmia',
+         'PatientCurrentlyPregnant',
+         'Sepsis',
+         'ImpairedRenalFunction']}
+
 name_for_cid[9518] = 'RadiotherapyAccessoryNoSlotHolderDeviceTypes'
 cid_concepts[9518] = \
 {'DCM': ['AccessoryTray']}
@@ -13374,8 +13437,8 @@ name_for_cid[7156] = 'VascularSegmentationTypes'
 cid_concepts[7156] = \
 {'SCT': ['CardiovascularSystem',
          'VascularSclerosis',
-         'Intima',
          'Thrombus',
+         'Intima',
          'SystemicArtery',
          'Adventitia',
          'Media',
@@ -13486,6 +13549,7 @@ cid_concepts[7140] = \
          'CerebralWhiteMatter',
          'InferiorHornOfLateralVentricle',
          'LateralVentricle',
+         'CavumOfSeptumPellucidum',
          'CaudateNucleus',
          'NucleusAccumbens',
          'CerebellarCortex',
@@ -13493,7 +13557,6 @@ cid_concepts[7140] = \
          'BrainStem',
          'Putamen',
          'Hippocampus',
-         'FifthVentricle',
          'CerebellarWhiteMatter',
          'CranialCavity',
          'IntracranialStructure']}
@@ -13650,7 +13713,7 @@ cid_concepts[12287] = \
 
 name_for_cid[219] = 'GeometryGraphicalRepresentation'
 cid_concepts[219] = \
-{'DCM': ['Center', 'Outline'], 'SCT': ['BoundedBy']}
+{'DCM': ['Centerline', 'Center', 'Outline'], 'SCT': ['BoundedBy']}
 
 name_for_cid[7005] = 'ContributingEquipmentPurposesofReference'
 cid_concepts[7005] = \
@@ -13918,6 +13981,7 @@ cid_concepts[4042] = \
          'CoronarySinus',
          'AxillaryArtery',
          'LeftPulmonaryArtery',
+         'BiliaryTract',
          'ApexOfLung',
          'Ileum',
          'Knee',
@@ -17163,6 +17227,14 @@ name_for_cid[4234] = 'RefractiveSurgeryTypes'
 cid_concepts[4234] = \
 {'DCM': ['SMILE'], 'SCT': ['RK', 'LASIK', 'LASEK', 'PRK']}
 
+name_for_cid[10074] = 'RDSRFrameofReferenceOrigins'
+cid_concepts[10074] = \
+{'DCM': ['PatientCoordinateSystemOrigin',
+         'IsocenterOrigin',
+         'PatientSupportOrigin',
+         'EquipmentOrigin',
+         'RoomOrigin']}
+
 name_for_cid[3772] = 'HealthStatus'
 cid_concepts[3772] = \
 {'SCT': ['LostToFollowUp',
@@ -17331,6 +17403,7 @@ cid_concepts[9514] = \
          'BrainCerebrospinalFluidPathway',
          'WristJoint',
          'MidCircumflexCoronaryArtery',
+         'CouinaudHepaticSegmentII',
          'CentralRetinalVein',
          'IntermediateArteryRamus',
          'GenicularArtery',
@@ -17435,6 +17508,7 @@ cid_concepts[9514] = \
          'Forearm',
          'BronchialArtery',
          'NeckChestAndAbdomen',
+         'CouinaudHepaticSegmentIII',
          'ExternalCarotidArtery',
          'SuperiorMesentericArtery',
          'TemporalLobe',
@@ -17492,6 +17566,7 @@ cid_concepts[9514] = \
          'FascialLayer',
          'MiddleEar',
          'InternalAuditoryCanal',
+         'CouinaudHepaticSegmentV',
          'RightPulmonaryArtery',
          'RenalPelvis',
          'ProperHepaticArtery',
@@ -17523,6 +17598,7 @@ cid_concepts[9514] = \
          'Vein',
          'CommonIliacArteryBifurcation',
          'MiddleHepaticVein',
+         'CouinaudHepaticSegmentVI',
          'CerebrospinalFluid',
          'EsophagealArtery',
          'Thigh',
@@ -17541,6 +17617,7 @@ cid_concepts[9514] = \
          'MuscleOfHead',
          'SpinalCerebrospinalFluidPathway',
          'MiddleCerebralArteryM1Segment',
+         'CouinaudHepaticSegmentIV',
          'ExternalJugularVein',
          'SesamoidBonesOfFoot',
          'InternalIliacArtery',
@@ -17699,6 +17776,7 @@ cid_concepts[9514] = \
          'Hand',
          'PectoralisMajorMuscle',
          'CardiovascularSystem',
+         'CouinaudHepaticSegmentI',
          'OvarianArtery',
          'ElbowJoint',
          'Hippocampus',
@@ -17738,6 +17816,7 @@ cid_concepts[9514] = \
          'PiaMater',
          'TricuspidValve',
          'RightAtrium',
+         'CouinaudHepaticSegmentVII',
          'VascularSclerosis',
          'SuperiorPhrenicArtery',
          'CommonVentricle',
@@ -17811,6 +17890,7 @@ cid_concepts[9514] = \
          'LeftAtrium',
          'InterlobularArteryOfKidney',
          'CerebralArtery',
+         'CouinaudHepaticSegmentVIII',
          'InferiorMesentericArtery',
          'DigitalArteryOfHand',
          'SecondLumbarArtery',
@@ -17908,6 +17988,7 @@ cid_concepts[9514] = \
          'CoronarySinus',
          'HilarArtery',
          'TerminalInternalCarotidArtery',
+         'BiliaryTract',
          'ApexOfLung',
          'ThirdVentricle',
          'Atrium',
@@ -17940,6 +18021,7 @@ cid_concepts[9514] = \
          'PosteriorCerebralCommissure',
          'InferiorLeftPulmonaryVein',
          'UncinateFasciculus',
+         'Intima',
          'AnteriorCerebralArtery',
          'LowerLeg',
          'RenalVein',
@@ -17969,7 +18051,6 @@ cid_concepts[9514] = \
          'PericardiophrenicArtery',
          'Pleura',
          'Subcostal',
-         'Intima',
          'ExternalAuditoryCanal',
          'Patella',
          'SegmentOfLung',
@@ -18141,12 +18222,14 @@ cid_concepts[645] = \
          'PulmonaryMetastasis',
          'Breast',
          'AsciticFluid',
+         'Mesothelium',
          'PleuralEffusion',
          'Mouth',
          'Skin',
          'Bone',
          'LymphaticTissue',
          'Prostate',
+         'PeripheralNerveMyelinSheath',
          'LymphNode',
          'HeadAndNeck',
          'Colon',
@@ -18160,6 +18243,7 @@ cid_concepts[645] = \
          'Brain',
          'Larynx',
          'Lymph',
+         'Rectum',
          'Ovary',
          'Pancreas',
          'Anus',
@@ -18187,6 +18271,7 @@ name_for_cid[12008] = 'OBGYNAmnioticSac'
 cid_concepts[12008] = \
 {'LN': ['ThirdQuadrantDiameter',
         'SecondQuadrantDiameter',
+        'AmnioticFluidIndex',
         'FourthQuadrantDiameter',
         'FirstQuadrantDiameter'],
  'SCT': ['Diameter']}
@@ -19655,6 +19740,7 @@ cid_concepts[7192] = \
          'BrainCerebrospinalFluidPathway',
          'WristJoint',
          'MidCircumflexCoronaryArtery',
+         'CouinaudHepaticSegmentII',
          'CentralRetinalVein',
          'IntermediateArteryRamus',
          'GenicularArtery',
@@ -19758,6 +19844,7 @@ cid_concepts[7192] = \
          'EntorhinalCortex',
          'Forearm',
          'BronchialArtery',
+         'CouinaudHepaticSegmentIII',
          'NeckChestAndAbdomen',
          'ExternalCarotidArtery',
          'SuperiorMesentericArtery',
@@ -19815,6 +19902,7 @@ cid_concepts[7192] = \
          'UlnarVein',
          'FascialLayer',
          'MiddleEar',
+         'CouinaudHepaticSegmentV',
          'InternalAuditoryCanal',
          'RightPulmonaryArtery',
          'RenalPelvis',
@@ -19847,6 +19935,7 @@ cid_concepts[7192] = \
          'Vein',
          'CommonIliacArteryBifurcation',
          'MiddleHepaticVein',
+         'CouinaudHepaticSegmentVI',
          'CerebrospinalFluid',
          'EsophagealArtery',
          'Thigh',
@@ -19865,6 +19954,7 @@ cid_concepts[7192] = \
          'MuscleOfHead',
          'SpinalCerebrospinalFluidPathway',
          'MiddleCerebralArteryM1Segment',
+         'CouinaudHepaticSegmentIV',
          'ExternalJugularVein',
          'SesamoidBonesOfFoot',
          'InternalIliacArtery',
@@ -20023,6 +20113,7 @@ cid_concepts[7192] = \
          'Hand',
          'PectoralisMajorMuscle',
          'CardiovascularSystem',
+         'CouinaudHepaticSegmentI',
          'OvarianArtery',
          'ElbowJoint',
          'Hippocampus',
@@ -20062,6 +20153,7 @@ cid_concepts[7192] = \
          'PiaMater',
          'TricuspidValve',
          'RightAtrium',
+         'CouinaudHepaticSegmentVII',
          'VascularSclerosis',
          'SuperiorPhrenicArtery',
          'CommonVentricle',
@@ -20135,6 +20227,7 @@ cid_concepts[7192] = \
          'LeftAtrium',
          'InterlobularArteryOfKidney',
          'CerebralArtery',
+         'CouinaudHepaticSegmentVIII',
          'InferiorMesentericArtery',
          'DigitalArteryOfHand',
          'SecondLumbarArtery',
@@ -20232,6 +20325,7 @@ cid_concepts[7192] = \
          'CoronarySinus',
          'HilarArtery',
          'TerminalInternalCarotidArtery',
+         'BiliaryTract',
          'ApexOfLung',
          'ThirdVentricle',
          'Atrium',
@@ -20264,6 +20358,7 @@ cid_concepts[7192] = \
          'PosteriorCerebralCommissure',
          'InferiorLeftPulmonaryVein',
          'UncinateFasciculus',
+         'Intima',
          'AnteriorCerebralArtery',
          'LowerLeg',
          'RenalVein',
@@ -20293,7 +20388,6 @@ cid_concepts[7192] = \
          'PericardiophrenicArtery',
          'Pleura',
          'Subcostal',
-         'Intima',
          'ExternalAuditoryCanal',
          'Patella',
          'SegmentOfLung',
@@ -20907,6 +21001,7 @@ cid_concepts[3850] = \
  'RXNORM': ['MangafodipirTrisodium'],
  'SCT': ['MeglumineIodipamide',
          'Iophendylate',
+         'GadopentetateDimeglumine',
          'Iodipamide',
          'Ioxilan',
          'Bunamiodyl',
@@ -20920,7 +21015,6 @@ cid_concepts[3850] = \
          'SodiumTyropanoate',
          'Iohexol',
          'Water',
-         'GadopentetateDimeglumine',
          'SodiumAcetrizoate',
          'Saline',
          'Propyliodone',
@@ -20933,7 +21027,6 @@ cid_concepts[3850] = \
          'MeglumineDiatrizoate',
          'IodamideMeglumine',
          'SodiumIodipamide',
-         'SodiumDiatrizoate',
          'Diatrizoate',
          'NonRadiopaqueMedium',
          'ChloriodizedOil',
@@ -21153,14 +21246,18 @@ cid_concepts[3411] = \
          'TransluminalExtractionCatheterTEC',
          'DirectionalCoronaryAtherectomyDCADevice']}
 
+name_for_cid[3041] = 'NeurophysiologicStimulationModes'
+cid_concepts[3041] = \
+{'MDC': ['FlashStimulus']}
+
 name_for_cid[12003] = 'OBGYNDates'
 cid_concepts[12003] = \
 {'LN': ['ConceptionDate',
+        'LMP',
         'EstimatedLMPByEDD',
         'EDDFromAverageUltrasoundAge',
         'EDDFromOvulationDate',
         'EDD',
-        'LMP',
         'EDDFromLMP',
         'OvulationDate']}
 
@@ -21290,7 +21387,7 @@ cid_concepts[12279] = \
         'HCAC',
         'BPDAreaCorrected',
         'TransverseAbdominalDiameter',
-        'CisternaMagna',
+        'CisternaMagnaLength',
         'FemurLength',
         'ThoracicCircumference',
         'LeftVentricleRightVentricleDiameterRatio',
@@ -21468,6 +21565,7 @@ cid_concepts[7151] = \
          'MarginalCoronaryArtery',
          'InternalMammaryArtery',
          'BronchialArtery',
+         'CouinaudHepaticSegmentIII',
          'ExternalCarotidArtery',
          'BiteBlock',
          'Neoplasm',
@@ -21497,6 +21595,7 @@ cid_concepts[7151] = \
          'InternalCarotidArtery',
          'RightPosteriorAVCoronaryArtery',
          'FascialLayer',
+         'CouinaudHepaticSegmentV',
          'RenalPelvis',
          'Thrombus',
          'VenousNetwork',
@@ -21514,6 +21613,7 @@ cid_concepts[7151] = \
          'MastoidBone',
          'CommonIliacArteryBifurcation',
          'MiddleHepaticVein',
+         'CouinaudHepaticSegmentVI',
          'Thigh',
          'Trachea',
          'LeftPosterolateralCircumflexCoronaryArtery',
@@ -21651,6 +21751,7 @@ cid_concepts[7151] = \
          'LeftAtrium',
          'InterlobularArteryOfKidney',
          'CerebralArtery',
+         'CouinaudHepaticSegmentVIII',
          'InferiorMesentericArtery',
          'IliocostalisMuscle',
          'LeftVentricularAssistDevice',
@@ -21726,11 +21827,13 @@ cid_concepts[7151] = \
          'PosteriorCerebralArteryP1Segment',
          'LumbarSpine',
          'ThyrocervicalTrunk',
+         'Inflammation',
          'PrimitivePulmonaryArtery',
          'HilumOfLung',
          'SellaTurcica',
          'Scrotum',
          'InferiorLeftPulmonaryVein',
+         'Intima',
          'LowerLeg',
          'RenalVein',
          'InternalIliacVein',
@@ -21757,6 +21860,7 @@ cid_concepts[7151] = \
          'ParanasalSinus',
          'BrainCerebrospinalFluidPathway',
          'MidCircumflexCoronaryArtery',
+         'CouinaudHepaticSegmentII',
          'CentralRetinalVein',
          'Prosthesis',
          'GastricArtery',
@@ -21886,6 +21990,7 @@ cid_concepts[7151] = \
          'MesentericArtery',
          'MuscleOfHead',
          'MiddleCerebralArteryM1Segment',
+         'CouinaudHepaticSegmentIV',
          'ExternalJugularVein',
          'InternalIliacArtery',
          'SuperiorVenaCava',
@@ -21994,6 +22099,7 @@ cid_concepts[7151] = \
          'Lung',
          'HeartValveProsthesis',
          'CardiovascularSystem',
+         'CouinaudHepaticSegmentI',
          'ElbowJoint',
          'Sternum',
          'NeckAndChest',
@@ -22016,6 +22122,7 @@ cid_concepts[7151] = \
          'Finger',
          'InlayDentalRestoration',
          'InfraspinatusMuscle',
+         'CouinaudHepaticSegmentVII',
          'SuperiorPhrenicArtery',
          'CommonVentricle',
          'RightPulmonaryVein',
@@ -22037,7 +22144,6 @@ cid_concepts[7151] = \
          'PeripheralNervousSystem',
          'PinealGland',
          'UpperLobeOfLung',
-         'Inflammation',
          'ProximalCircumflexCoronaryArtery',
          'LowerLimb',
          'PosteriorCommunicationArtery',
@@ -22114,6 +22220,7 @@ cid_concepts[7151] = \
          'CoronarySinus',
          'Tendon',
          'TerminalInternalCarotidArtery',
+         'BiliaryTract',
          'Atrium',
          'CerebralWhiteMatter',
          'Knee',
@@ -22149,7 +22256,6 @@ cid_concepts[7151] = \
          'Pleura',
          'Subcostal',
          'SubcutaneousTissue',
-         'Intima',
          'SegmentOfLung',
          'DoddPerforatingVein']}
 
@@ -22186,7 +22292,6 @@ cid_concepts[12015] = \
 {'LN': ['CRLByGAShinozuka1996',
         'CRLByGARempen1991',
         'FLByGAHadlock1984',
-        'HCACByGACampbell1977',
         'FLByGAASUM2000',
         'FibulaByGAJeanty1983',
         'TCDByGAGoldstein1987',
@@ -22223,7 +22328,8 @@ cid_concepts[12015] = \
         'ACByGAShinozuka1996',
         'CRLByGAASUM2000',
         'HCByGAMerz1988',
-        'BPDOuterInnerByGAChitty1994']}
+        'BPDOuterInnerByGAChitty1994',
+        'HCACByGACampbell1977']}
 
 name_for_cid[8] = 'AngiographicInterventionalDevices'
 cid_concepts[8] = \
@@ -22538,6 +22644,17 @@ name_for_cid[3831] = 'StenosisLength'
 cid_concepts[3831] = \
 {'SCT': ['Long', 'Short']}
 
+name_for_cid[7171] = 'LiverSegmentationTypes'
+cid_concepts[7171] = \
+{'SCT': ['CouinaudHepaticSegmentIII',
+         'CouinaudHepaticSegmentVII',
+         'CouinaudHepaticSegmentVI',
+         'CouinaudHepaticSegmentI',
+         'CouinaudHepaticSegmentV',
+         'CouinaudHepaticSegmentVIII',
+         'CouinaudHepaticSegmentII',
+         'CouinaudHepaticSegmentIV']}
+
 name_for_cid[93] = 'JointPositioningMethod'
 cid_concepts[93] = \
 {'SCT': ['PassiveMovement', 'ManipulationOfJoint']}
@@ -22709,44 +22826,52 @@ cid_concepts[639] = \
           'SoftTissueSarcomaExcludingRhabdomyosarcoma'],
  'SCT': ['CarcinosarcomaOfUterus',
          'NonSmallCellCarcinoma',
-         'AdenocarcinomaOfLargeIntestine',
          'SquamousCellCarcinomaOfLung',
          'SquamousCellCarcinoma',
          'AmelanoticMelanoma',
-         'MerkelCellCarcinoma',
          'SpindleCellCarcinoma',
          'TransitionalCellCarcinoma',
          'Adenocarcinoma',
          'Carcinosarcoma',
-         'MixedSmallCellCarcinoma',
-         'AdenocarcinomaOfLung',
          'EwingSarcomaPeripheralNeuroectodermalTumor',
-         'SquamousCellCarcinomaOfSkin',
          'BladderCancer',
          'CancerOfColon',
-         'LargeCellCarcinoma',
          'Melanoma',
-         'PapillaryThyroidCarcinoma',
          'CancerOfCervix',
+         'NeuroendocrineTumor',
          'LungCancer',
          'RenalCellCarcinoma',
+         'AdenocarcinomaOfRectum',
          'Glioblastoma',
          'SquamousCellCarcinomaOfMouth',
          'SquamousCellCarcinomaOfAnus',
-         'SquamousCellCarcinomaOfLaryngealCartilage',
-         'Carcinoma',
          'CancerOfSalivaryGland',
-         'Leukemia',
-         'AdenocarcinomaOfPancreas',
+         'SquamousCellCarcinomaOfHeadAndNeck',
          'InfiltratingDuctalCarcinomaOfBreast',
-         'Mesothelioma',
+         'MalignantMesothelioma',
          'Cystadenocarcinoma',
          'SarcomaOfSoftTissue',
-         'Astrocytoma',
          'NonSmallCellLungCancer',
-         'Osteosarcoma',
          'Sarcoma',
-         'SmallCellCarcinoma']}
+         'SmallCellCarcinoma',
+         'AdenocarcinomaOfLargeIntestine',
+         'Fibrosarcoma',
+         'MerkelCellCarcinoma',
+         'MixedSmallCellCarcinoma',
+         'AdenocarcinomaOfLung',
+         'SquamousCellCarcinomaOfSkin',
+         'LargeCellCarcinoma',
+         'PapillaryThyroidCarcinoma',
+         'EwingSarcoma',
+         'MalignantPeripheralNerveSheathTumor',
+         'OvarianCancer',
+         'SquamousCellCarcinomaOfLaryngealCartilage',
+         'Carcinoma',
+         'AlveolarSoftPartSarcoma',
+         'Leukemia',
+         'AdenocarcinomaOfPancreas',
+         'Astrocytoma',
+         'Osteosarcoma']}
 
 name_for_cid[12218] = 'EchocardiographyCongenital'
 cid_concepts[12218] = \
@@ -22836,13 +22961,10 @@ cid_concepts[3718] = \
 {'SCT': ['MyocardiumOfPosterolateralRegion',
          'MyocardiumOfApexOfHeart',
          'MyocardiumOfInferolateralRegion',
-         'LeftVentricleBasalLateralSegment',
-         'LeftVentricularBasalSeptalSegment',
          'LeftVentricleBasalAnteriorSegment',
          'LeftVentricleApicalSeptalSegment',
          'MyocardiumOfDiaphragmaticRegion',
          'LeftVentricleBasalInferiorSegment',
-         'LeftVentricularPosterobasalSegment',
          'MyocardiumOfAnterolateralRegion']}
 
 name_for_cid[7022] = 'RadiotherapyPurposesofReference'
@@ -23731,6 +23853,7 @@ cid_concepts[4] = \
          'CoronarySinus',
          'AxillaryArtery',
          'LeftPulmonaryArtery',
+         'BiliaryTract',
          'ApexOfLung',
          'Ileum',
          'Atrium',
@@ -23882,6 +24005,13 @@ name_for_cid[50] = 'InstanceAvailabilityStatus'
 cid_concepts[50] = \
 {'DCM': ['Unavailable', 'Nearline', 'Offline', 'Online']}
 
+name_for_cid[10073] = 'ValueTimings'
+cid_concepts[10073] = \
+{'DCM': ['MiddleOfTimePeriod',
+         'EndOfTimePeriod',
+         'BeginningOfTimePeriod',
+         'DurationOfTimePeriod']}
+
 name_for_cid[3630] = 'CardiovascularAnatomicLocations'
 cid_concepts[3630] = \
 {'SCT': ['SubclavianVein',
@@ -23927,7 +24057,6 @@ cid_concepts[3630] = \
          'OphthalmicArtery',
          'MesentericArtery',
          'MedialPlantarArtery',
-         'VenaAnonyma',
          'PoplitealArtery',
          'PulmonaryVenousAtrium',
          'BrachialVein',
@@ -24129,9 +24258,13 @@ cid_concepts[6126] = \
  'SCT': ['LowerLobeOfLung',
          'UpperZoneOfLung',
          'LowerZoneOfLung',
+         'MiddleLobeOfRightLung',
          'UpperLobeOfLung',
-         'MiddleZoneOfLung',
-         'MiddleLobeOfLung']}
+         'MiddleZoneOfLung']}
+
+name_for_cid[10072] = 'ReportedValueTypes'
+cid_concepts[10072] = \
+{'SCT': ['Mode', 'Nominal', 'Minimum', 'Yes', 'Maximum', 'Mean', 'Median']}
 
 name_for_cid[7222] = 'ParametricMapDerivationImagePurposeofReference'
 cid_concepts[7222] = \
@@ -24392,6 +24525,7 @@ cid_concepts[4009] = \
          'Coccyx',
          'HeadAndNeck',
          'TemporomandibularJoint',
+         'BiliaryTract',
          'ApexOfLung',
          'Ileum',
          'PelvisAndLowerExtremities',
@@ -24941,16 +25075,19 @@ cid_concepts[638] = \
          'VascularEndothelialGrowthFactor',
          'Melanoma',
          'CancerOfCervix',
+         'NeuroendocrineTumor',
          'LungCancer',
          'InterferonGamma',
          'RenalCellCarcinoma',
+         'AdenocarcinomaOfRectum',
          'Glioblastoma',
          'SquamousCellCarcinomaOfMouth',
          'SquamousCellCarcinomaOfAnus',
          'CancerOfSalivaryGland',
+         'SquamousCellCarcinomaOfHeadAndNeck',
          'Lysophosphatidylcholine',
          'InfiltratingDuctalCarcinomaOfBreast',
-         'Mesothelioma',
+         'MalignantMesothelioma',
          'Cystadenocarcinoma',
          'SarcomaOfSoftTissue',
          'NonSmallCellLungCancer',
@@ -24958,14 +25095,19 @@ cid_concepts[638] = \
          'Sarcoma',
          'SmallCellCarcinoma',
          'AdenocarcinomaOfLargeIntestine',
+         'Fibrosarcoma',
          'MerkelCellCarcinoma',
          'MixedSmallCellCarcinoma',
          'AdenocarcinomaOfLung',
          'SquamousCellCarcinomaOfSkin',
          'LargeCellCarcinoma',
          'PapillaryThyroidCarcinoma',
+         'EwingSarcoma',
+         'MalignantPeripheralNerveSheathTumor',
+         'OvarianCancer',
          'SquamousCellCarcinomaOfLaryngealCartilage',
          'Carcinoma',
+         'AlveolarSoftPartSarcoma',
          'Leukemia',
          'AdenocarcinomaOfPancreas',
          'TheilerMurineEncephalomyelitisVirus',
@@ -25189,6 +25331,17 @@ cid_concepts[12258] = \
          'Diameter',
          'CardiovascularOrificeArea']}
 
+name_for_cid[7170] = 'CouinaudLiverSegments'
+cid_concepts[7170] = \
+{'SCT': ['CouinaudHepaticSegmentIII',
+         'CouinaudHepaticSegmentVII',
+         'CouinaudHepaticSegmentVI',
+         'CouinaudHepaticSegmentI',
+         'CouinaudHepaticSegmentV',
+         'CouinaudHepaticSegmentVIII',
+         'CouinaudHepaticSegmentII',
+         'CouinaudHepaticSegmentIV']}
+
 name_for_cid[6018] = 'ClockfaceLocationorRegion'
 cid_concepts[6018] = \
 {'SCT': ['_7OClockPosition',
@@ -25383,6 +25536,7 @@ cid_concepts[8134] = \
          'SkinOfDorsalPartOfThumb',
          'MucosaOfPosteriorWallOfOropharynx',
          'Nasion',
+         'TorusOfPharyngotympanicTube',
          'SkinOfLowerOuterQuadrantOfBreast',
          'SkinOfUpperInnerQuadrantOfBreast',
          'SkinOfLowerInnerQuadrantOfBreast',
@@ -25453,6 +25607,7 @@ cid_concepts[8134] = \
          'SuperficialPalmarArch',
          'UpperGastroIntestinalTract',
          'Prostate',
+         'PeripheralNerveMyelinSheath',
          'FacialBones',
          'Back',
          'SoftTissue',
@@ -25512,6 +25667,7 @@ cid_concepts[8134] = \
          'HilarLymphNode',
          'BronchialArtery',
          'AccessoryNerve',
+         'CouinaudHepaticSegmentIII',
          'ExternalCarotidArtery',
          'UterineParacervicalLymphNode',
          'InterlobarLymphNodeOfTheLung',
@@ -25555,6 +25711,7 @@ cid_concepts[8134] = \
          'OmentalBursa',
          'InternalCarotidArtery',
          'RightPosteriorAVCoronaryArtery',
+         'CouinaudHepaticSegmentV',
          'ProximalRadius',
          'RenalPelvis',
          'AbducensNerve',
@@ -25580,6 +25737,7 @@ cid_concepts[8134] = \
          'MastoidBone',
          'CommonIliacArteryBifurcation',
          'MiddleHepaticVein',
+         'CouinaudHepaticSegmentVI',
          'SkinOfHead',
          'Thigh',
          'SkinOfLowerExtremity',
@@ -25597,6 +25755,7 @@ cid_concepts[8134] = \
          'SpinalCerebrospinalFluidPathway',
          'SesamoidBonesOfFoot',
          'SkinOfButtock',
+         'PharyngealRecess',
          'SixthLumbarArtery',
          'LacrimalCaruncle',
          'Omentum',
@@ -25732,8 +25891,8 @@ cid_concepts[8134] = \
          'OpticChiasm',
          'OphthalmicArtery',
          'SymphysisPubis',
-         'Nose',
          'PancreaticDuct',
+         'Nose',
          'EpitrochlearLymphNode',
          'Hand',
          'AxillaryLymphNode',
@@ -25837,6 +25996,7 @@ cid_concepts[8134] = \
          'LeftAtrium',
          'InterlobularArteryOfKidney',
          'CerebralArtery',
+         'CouinaudHepaticSegmentVIII',
          'InferiorMesentericArtery',
          'IliocostalisMuscle',
          'TracheobronchialLymphNode',
@@ -25849,6 +26009,7 @@ cid_concepts[8134] = \
          'Oropharynx',
          'SkinOfCrusOfHelix',
          'SuperiorRightPulmonaryVein',
+         'Mesothelium',
          'InferiorVenaCava',
          'IntraArticular',
          'Axilla',
@@ -25882,6 +26043,7 @@ cid_concepts[8134] = \
          'Mediastinum',
          'Cerebellum',
          'FirstLumbarArtery',
+         'AbdominalLymphNode',
          'PoplitealArtery',
          'TibialPlateau',
          'UpperUrinaryTract',
@@ -25952,6 +26114,7 @@ cid_concepts[8134] = \
          'InferiorLeftPulmonaryVein',
          'MaxillaryDentalArch',
          'InnominateLymphNode',
+         'Intima',
          'Forefoot',
          'LowerLeg',
          'RenalVein',
@@ -25994,6 +26157,7 @@ cid_concepts[8134] = \
          'NasalSinus',
          'BrainCerebrospinalFluidPathway',
          'MidCircumflexCoronaryArtery',
+         'CouinaudHepaticSegmentII',
          'CentralRetinalVein',
          'PleuralEffusion',
          'CalcanealTubercle',
@@ -26096,7 +26260,6 @@ cid_concepts[8134] = \
          'PosteriorTibialArtery',
          'FemoralVein',
          'CiliaryBody',
-         'AbdominalLymphNode',
          'RightAuricularAppendage',
          'GreatSaphenousVeinOfThigh',
          'LeftHepaticVein',
@@ -26190,6 +26353,7 @@ cid_concepts[8134] = \
          'PromontoryCommonIliacLymphNode',
          'MuscleOfHead',
          'MiddleCerebralArteryM1Segment',
+         'CouinaudHepaticSegmentIV',
          'ExternalJugularVein',
          'PosteriorHornLateralVentricle',
          'InternalIliacArtery',
@@ -26347,6 +26511,7 @@ cid_concepts[8134] = \
          'NailUnitOfThumb',
          'SkinOfUpperAbdomen',
          'CardiovascularSystem',
+         'CouinaudHepaticSegmentI',
          'LumbarLymphNode',
          'UpperParatrachealLymphNode',
          'ElbowJoint',
@@ -26386,6 +26551,7 @@ cid_concepts[8134] = \
          'SkinOfBack',
          'Ischium',
          'InfraspinatusMuscle',
+         'CouinaudHepaticSegmentVII',
          'SkinOfPosteriorSurfaceOfUpperArm',
          'LymphaticTissue',
          'SuperiorPhrenicArtery',
@@ -26541,6 +26707,7 @@ cid_concepts[8134] = \
          'CoronarySinus',
          'TerminalInternalCarotidArtery',
          'FoveaCentralis',
+         'BiliaryTract',
          'MedialLongitudinalFasciculus',
          'Atrium',
          'SkinOfHypothenarRegionOfPalm',
@@ -26554,6 +26721,7 @@ cid_concepts[8134] = \
          'LymphNodeOfThorax',
          'BrainVentricle',
          'OralMucosa',
+         'PharyngotympanicTube',
          'GlossopharyngealNerve',
          'UmbilicalVein',
          'InguinalRegion',
@@ -26593,7 +26761,6 @@ cid_concepts[8134] = \
          'FrontalSinus',
          'PleuralStructure',
          'Subcostal',
-         'Intima',
          'Retina',
          'CisternaMagna',
          'DoddPerforatingVein'],
@@ -26624,6 +26791,7 @@ cid_concepts[4052] = \
          'ACRAccreditationPhantomMammography',
          'ACRAccreditationPhantomStereotacticBreastBiopsy',
          'ACRAccreditationPhantomECT',
+         '_10cmDosimetryPhantom',
          'ACRAccreditationPhantomPET',
          'ACRAccreditationPhantomECTPET',
          'ACRAccreditationPhantomPETFaceplate']}
@@ -27329,7 +27497,6 @@ cid_concepts[3607] = \
          'SubclavianVein',
          'PosteriorMedialTributary',
          'PortalVein',
-         'VenaAnonyma',
          'BrachialVein',
          'InferiorVenaCava',
          'RenalVein',
@@ -27570,15 +27737,19 @@ cid_concepts[6106] = \
 name_for_cid[71] = 'ImagingAgentAdministrationInjectorEventType'
 cid_concepts[71] = \
 {'DCM': ['TerminatedDueToUnspecifiedInjectorFailure',
+         'SyringeDetached',
+         'SyringeAttached',
+         'KeepVeinOpenEnded',
+         'KeepVeinOpenStarted',
+         'ManualHoldStarted',
+         'ProgrammedHoldStarted',
+         'TerminatedHoldDueToTimeout',
+         'ManualResumeFromHold',
          'FlowRateAboveAdjustmentLimit',
          'AirDetected',
-         'SyringeDetached',
          'FlowRateAboveWarningLimit',
-         'SyringeAttached',
          'PressureAboveAdjustmentLimit',
-         'KeepVeinOpenEnded',
          'PressureAboveWarningLimit',
-         'KeepVeinOpenStarted',
          'TerminatedDueToFlowRateAboveTerminationLimit',
          'TerminatedDueToConsumableRemoval',
          'TerminatedDueToPressureAboveTerminationLimit',
@@ -27609,7 +27780,6 @@ cid_concepts[1010] = \
 name_for_cid[622] = 'MedicationTypeCodeTypefromAnesthesiaQualityInitiative(AQI)'
 cid_concepts[622] = \
 {'SCT': ['CaloricAgent',
-         'Vasoconstrictor',
          'CarbapenemAntibiotic',
          'BetaLactamAntibiotic',
          'AminoglycosideAntibiotic',
@@ -27636,6 +27806,7 @@ cid_concepts[622] = \
          'Antifungal',
          'Hypoglycemic',
          'Steroid',
+         'CephalosporinAntibiotic',
          'LowMolecularWeightHeparin',
          'RespiratoryStimulant',
          'Anticholinergic',
@@ -27657,7 +27828,6 @@ cid_concepts[622] = \
          'Vasodilator',
          'BenzodiazepineAntagonist',
          'CalciumChannelBlocker',
-         'CephalosporinAntibiotic',
          'CholinergicAgent',
          'GastrointestinalProkinetic',
          'PlasmaExpander',
@@ -27669,6 +27839,7 @@ cid_concepts[622] = \
          'NarcoticOpiateAntagonist',
          'LincomycinAntibiotic',
          'NeuromuscularBlockingNMBDepolarizing',
+         'Vasoconstrictor',
          'LinezolidAntibiotic',
          'Analgesic'],
  'UMLS': ['H2Antagonist', 'NarcoticAnalgesic', 'Antihypoglycemic']}
