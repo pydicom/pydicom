@@ -98,7 +98,7 @@ class UID(str):
             The UID object.
         """
         if isinstance(val, str):
-            return super().__new__(cls, val.strip())  # type: ignore
+            return super().__new__(cls, val.strip())
 
         raise TypeError("A UID must be created from a string")
 

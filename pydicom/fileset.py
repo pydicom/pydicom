@@ -1,7 +1,6 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """DICOM File-set handling."""
 
-from collections import namedtuple
 import copy
 import os
 from os import PathLike
@@ -10,8 +9,7 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import (
-    Generator, Optional, Union, Any, List, cast, Iterable, TypeVar,
-    Dict, Callable
+    Generator, Optional, Union, Any, List, cast, Iterable, Dict, Callable
 )
 import warnings
 
@@ -740,8 +738,7 @@ class FileInstance:
             else:
                 self._flags.add = True
                 self._stage_path = (
-                    self.file_set._stage['path']
-                    / cast(UID, self.SOPInstanceUID)
+                    self.file_set._stage['path'] / self.SOPInstanceUID
                 )
 
         elif flag == '-':
@@ -807,7 +804,7 @@ class FileInstance:
             return False
 
         if self["ReferencedFileID"].VM == 1:
-            file_id = cast(str, self.FileID).split(os.path.sep)
+            file_id = self.FileID.split(os.path.sep)
             return [self.ReferencedFileID] != file_id
 
         return self.ReferencedFileID != self.FileID.split(os.path.sep)
@@ -1520,7 +1517,7 @@ class FileSet:
         instance: Union[Dataset, FileInstance]
         for instance in iter_instances:
             if load:
-                instance = cast(FileInstance, instance).load()
+                instance = instance.load()
 
             if element not in instance:
                 continue
@@ -1624,7 +1621,7 @@ class FileSet:
                 "not a 'Media Storage Directory' instance"
             )
 
-        tsyntax = cast(UID, ds.file_meta.TransferSyntaxUID)
+        tsyntax = ds.file_meta.TransferSyntaxUID
         if tsyntax != ExplicitVRLittleEndian:
             warnings.warn(
                 "The DICOMDIR dataset uses an invalid transfer syntax "
@@ -1768,7 +1765,7 @@ class FileSet:
 
         if raise_orphans:
             raise ValueError(
-                f"The DICOMDIR contains orphaned directory records"
+                "The DICOMDIR contains orphaned directory records"
             )
 
         # DICOMDIR contains orphaned records

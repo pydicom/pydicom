@@ -4,7 +4,7 @@
 import codecs
 import re
 from typing import (
-    List, Set, Dict, Optional, Union, TYPE_CHECKING, MutableSequence, cast
+    List, Set, Optional, Union, TYPE_CHECKING, MutableSequence, cast
 )
 import warnings
 
@@ -19,6 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
 default_encoding = "iso8859"
 
 # Map DICOM Specific Character Set to python equivalent
+# https://docs.python.org/3/library/codecs.html#standard-encodings
 python_encoding = {
 
     # default character set for DICOM

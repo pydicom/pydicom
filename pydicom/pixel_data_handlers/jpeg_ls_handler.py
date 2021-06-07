@@ -5,7 +5,7 @@ package to decode *Pixel Data*.
 """
 
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False

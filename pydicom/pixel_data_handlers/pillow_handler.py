@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING, cast
 import warnings
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -155,8 +155,9 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     NotImplementedError
         If the transfer syntax is not supported
     """
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
-    transfer_syntax = cast(UID, file_meta.TransferSyntaxUID)
+    file_meta = cast("FileDataset", ds).file_meta
+    file_meta = cast("FileMetaDataset", file_meta)
+    transfer_syntax = file_meta.TransferSyntaxUID
 
     if not HAVE_PIL:
         raise ImportError(

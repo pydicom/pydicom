@@ -1,12 +1,11 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
-import os
 from struct import pack
 import sys
 from typing import (
     Union, BinaryIO, Any, cast, Sequence, MutableSequence, Iterable, Optional,
-    List, Callable
+    List
 )
 import warnings
 import zlib
@@ -30,7 +29,7 @@ from pydicom.values import convert_numbers
 
 
 if have_numpy:
-    import numpy
+    import numpy  # type: ignore[import]
 
 
 def _correct_ambiguous_vr_element(
@@ -183,7 +182,7 @@ def correct_ambiguous_vr_element(
     """
     if 'or' in elem.VR:
         # convert raw data elements before handling them
-        if elem.is_raw:
+        if isinstance(elem, RawDataElement):
             elem = DataElement_from_raw(elem, dataset=ds)
             ds.__setitem__(elem.tag, elem)
 
@@ -259,7 +258,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     try:
         try:
             # works only if list, not if string or number
-            value.append  # type: ignore[attr-defined]
+            value.append
         except AttributeError:  # is a single value - the usual case
             fp.write(pack(format_string, value))
         else:
@@ -1001,7 +1000,7 @@ def dcmwrite(
     if None in (dataset.is_little_endian, dataset.is_implicit_VR):
         has_tsyntax = False
         try:
-            tsyntax = cast(UID, dataset.file_meta.TransferSyntaxUID)
+            tsyntax = dataset.file_meta.TransferSyntaxUID
             if not tsyntax.is_private:
                 dataset.is_little_endian = tsyntax.is_little_endian
                 dataset.is_implicit_VR = tsyntax.is_implicit_VR
@@ -1018,7 +1017,7 @@ def dcmwrite(
 
     # Try and ensure that `is_undefined_length` is set correctly
     try:
-        tsyntax = cast(UID, dataset.file_meta.TransferSyntaxUID)
+        tsyntax = dataset.file_meta.TransferSyntaxUID
         if not tsyntax.is_private:
             dataset['PixelData'].is_undefined_length = tsyntax.is_compressed
     except (AttributeError, KeyError):
@@ -1056,7 +1055,7 @@ def dcmwrite(
     # Check for decompression, give warnings if inconsistencies
     # If decompressed, then pixel_array is now used instead of PixelData
     if dataset.is_decompressed:
-        if cast(UID, dataset.file_meta.TransferSyntaxUID).is_compressed:
+        if dataset.file_meta.TransferSyntaxUID.is_compressed:
             raise ValueError(
                 f"The Transfer Syntax UID element in "
                 f"'{dataset.__class__.__name__}.file_meta' is compressed "

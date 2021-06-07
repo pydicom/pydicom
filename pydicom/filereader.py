@@ -8,8 +8,8 @@ import os
 from struct import (Struct, unpack)
 import sys
 from typing import (
-    BinaryIO, Union, Optional, List, Tuple, Any, Callable, cast,
-    MutableSequence, Type, Iterator, Dict
+    BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
+    Type, Iterator, Dict
 )
 import warnings
 import zlib
@@ -17,13 +17,13 @@ import zlib
 from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings
 from pydicom.config import logger
-from pydicom.datadict import dictionary_VR, tag_for_keyword
-from pydicom.dataelem import (DataElement, RawDataElement,
-                              DataElement_from_raw, empty_value_for_VR)
-from pydicom.dataset import (Dataset, FileDataset, FileMetaDataset)
+from pydicom.datadict import dictionary_VR
+from pydicom.dataelem import (
+    DataElement, RawDataElement, DataElement_from_raw, empty_value_for_VR
+)
+from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import DicomFile
 from pydicom.fileutil import (
     read_undefined_length_value, path_from_pathlike, PathType, _unpack_tag
 )
@@ -76,7 +76,8 @@ def data_element_generator(
     Yields
     -------
     RawDataElement or DataElement
-        Yields DataElement for SQ, RawDataElement otherwise.
+        Yields DataElement for undefined length UN or SQ, RawDataElement
+        otherwise.
     """
     # Summary of DICOM standard PS3.5-2008 chapter 7:
     # If Implicit VR, data element is:
@@ -322,7 +323,6 @@ def _is_implicit_vr(
     if len(raw_vr) < 2:
         return implicit_vr_is_assumed
 
-
     # it is sufficient to check if the VR is in valid ASCII range, as it is
     # extremely unlikely that the tag length accidentally has such a
     # representation - this would need the first tag to be longer than 16kB
@@ -438,9 +438,10 @@ def read_dataset(
 
     encoding: Union[str, MutableSequence[str]]
     if 0x00080005 in raw_data_elements:
+        elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
         char_set = cast(
             Optional[Union[str, MutableSequence[str]]],
-            DataElement_from_raw(raw_data_elements[BaseTag(0x00080005)]).value
+            DataElement_from_raw(elem).value
         )
         encoding = convert_encodings(char_set)  # -> List[str]
     else:
@@ -1085,7 +1086,7 @@ def read_deferred_data_element(
     filename_or_obj: Union[PathType, BinaryIO],
     timestamp: Optional[float],
     raw_data_elem: RawDataElement
-) -> Union[RawDataElement, DataElement]:
+) -> RawDataElement:
     """Read the previously deferred value from the file into memory
     and return a raw data element.
 
@@ -1153,13 +1154,16 @@ def read_deferred_data_element(
     is_implicit_VR = raw_data_elem.is_implicit_VR
     is_little_endian = raw_data_elem.is_little_endian
     offset = data_element_offset_to_value(is_implicit_VR, raw_data_elem.VR)
+    # Seek back to the start of the deferred element
     fp.seek(raw_data_elem.value_tell - offset)
     elem_gen = data_element_generator(
         fp, is_implicit_VR, is_little_endian, defer_size=None
     )
 
     # Read the data element and check matches what was stored before
-    elem = next(elem_gen)
+    # The first element out of the iterator should be the same type as the
+    #   the deferred element == RawDataElement
+    elem = cast(RawDataElement, next(elem_gen))
     fp.close()
     if elem.VR != raw_data_elem.VR:
         raise ValueError(

@@ -915,7 +915,9 @@ class TestPersonName:
     def test_formatting(self):
         """PN: Formatting works..."""
         pn = PersonName("Family^Given")
-        assert "Family, Given" == pn.family_comma_given()
+        assert pn.family_comma_given() == "Family, Given"
+        s = pn.formatted('%(family_name)s, %(given_name)s')
+        assert s == "Family, Given"
 
     def test_unicode_kr(self):
         """PN: 3component in unicode works (Korean)..."""
@@ -1074,9 +1076,28 @@ class TestPersonName:
     def test_contains(self):
         """Test that characters can be check if they are within the name"""
         pn1 = PersonName("John^Doe")
-        assert ("J" in pn1) == True
-        assert ("o" in pn1) == True
-        assert ("x" in pn1) == False
+        assert "J" in pn1
+        assert "o" in pn1
+        assert "x" not in pn1
+        assert "^" in pn1
+
+    def test_length(self):
+        """Test len(PN)"""
+        pn1 = PersonName("John^Doe")
+        assert len(pn1) == 8
+
+        # "Hong^Gildong=洪^吉洞=홍^길동"
+        pn = PersonName.from_named_components(
+            family_name='Hong',
+            given_name='Gildong',
+            family_name_ideographic=b'\033$)C\373\363',
+            given_name_ideographic=b'\033$)C\321\316\324\327',
+            family_name_phonetic=b'\033$)C\310\253',
+            given_name_phonetic=b'\033$)C\261\346\265\277',
+            encodings=[default_encoding, 'euc_kr'],
+        )
+        pn = pn.decode()
+        assert len(pn) == 12 + 1 + 4 + 1 + 4
 
     def test_from_named_components(self):
         # Example from DICOM standard, part 5, sect 6.2.1.1
@@ -1273,6 +1294,7 @@ def test_person_name_unicode_warns():
     """Test deprecation warning for PersonNameUnicode."""
     if sys.version_info[:2] < (3, 7):
         from pydicom.valuerep import PersonNameUnicode
+
     else:
         msg = (
             r"'PersonNameUnicode' is deprecated and will be removed in "
@@ -1281,4 +1303,4 @@ def test_person_name_unicode_warns():
         with pytest.warns(DeprecationWarning, match=msg):
             from pydicom.valuerep import PersonNameUnicode
 
-        assert PersonNameUnicode == PersonName
+    assert PersonNameUnicode == PersonName

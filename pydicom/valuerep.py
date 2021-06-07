@@ -8,8 +8,8 @@ import warnings
 from decimal import Decimal
 from math import floor, isfinite, log10
 from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Generator,
-    Callable, MutableSequence, Sequence, cast
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Callable,
+    MutableSequence, Sequence, cast, Iterator
 )
 
 # don't import datetime_conversion directly
@@ -55,6 +55,8 @@ PN_DELIMS = {0xe5}
 
 class _DateTimeBase:
     """Base class for DT, DA and TM element sub-classes."""
+    original_string: str
+
     # Add pickling support for the mutable additions
     def __getstate__(self) -> Dict[str, Any]:
         return self.__dict__.copy()
@@ -62,8 +64,11 @@ class _DateTimeBase:
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
 
-    def __reduce_ex__(self, protocol: int) -> Union[str, Tuple[Any, ...]]:
-        return super().__reduce_ex__(protocol) + (self.__getstate__(),)
+    def __reduce_ex__(self, protocol: int) -> Tuple[Any, ...]:
+        # datetime.time, and datetime.datetime return Tuple[Any, ...]
+        # datetime.date doesn't define __reduce_ex__
+        reduce_ex = cast(Tuple[Any, ...], super().__reduce_ex__(protocol))
+        return reduce_ex + (self.__getstate__(),)
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
@@ -80,7 +85,9 @@ class DA(_DateTimeBase, datetime.date):
 
     Note that the :class:`datetime.date` base class is immutable.
     """
-    def __new__(cls: Type[_DA], *args, **kwargs) -> Optional[_DA]:
+    def __new__(  # type: ignore[misc]
+        cls: Type[_DA], *args, **kwargs
+    ) -> Optional[_DA]:
         """Create an instance of DA object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -168,7 +175,9 @@ class DT(_DateTimeBase, datetime.datetime):
             name=value
         )
 
-    def __new__(cls: Type[_DT], *args, **kwargs) -> Optional[_DT]:
+    def __new__(  # type: ignore[misc]
+        cls: Type[_DT], *args, **kwargs
+    ) -> Optional[_DT]:
         """Create an instance of DT object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -197,32 +206,35 @@ class DT(_DateTimeBase, datetime.datetime):
                 )
 
             dt_match = match.group(2)
-            args = [
+            args = (
                 int(dt_match[0:4]),  # year
                 1 if len(dt_match) < 6 else int(dt_match[4:6]),  # month
                 1 if len(dt_match) < 8 else int(dt_match[6:8]),  # day
-                0 if len(dt_match) < 10 else int(dt_match[8:10]),  # hour
-                0 if len(dt_match) < 12 else int(dt_match[10:12]),  # minute
-                0 if len(dt_match) < 14 else int(dt_match[12:14]),  # second
-            ]
-            # microsecond
+            )
+            kwargs = {
+                'hour': 0 if len(dt_match) < 10 else int(dt_match[8:10]),
+                'minute': 0 if len(dt_match) < 12 else int(dt_match[10:12]),
+                'second': 0 if len(dt_match) < 14 else int(dt_match[12:14]),
+                'microsecond': 0
+            }
             if len(dt_match) >= 14 and match.group(4):
-                args.append(int(match.group(4).rstrip().ljust(6, '0')))
-            else:
-                args.append(0)
+                kwargs['microsecond'] = int(
+                    match.group(4).rstrip().ljust(6, '0')
+                )
 
             # Timezone offset
             tz_match = match.group(5)
-            args.append(cls._utc_offset(tz_match) if tz_match else None)
+            kwargs['tzinfo'] = cls._utc_offset(tz_match) if tz_match else None
 
-            if args[5] == 60:
+            # DT may include a leap second which isn't allowed by datetime
+            if kwargs['second'] == 60:
                 warnings.warn(
                     "'datetime.datetime' doesn't allow a value of '60' for "
                     "the seconds component, changing to '59'"
                 )
-                args[5] = 59
+                kwargs['second'] = 59
 
-            return super().__new__(cls, *args)
+            return super().__new__(cls, *args, **kwargs)
 
         if isinstance(val, datetime.datetime):
             return super().__new__(
@@ -251,14 +263,17 @@ class DT(_DateTimeBase, datetime.datetime):
             # milliseconds are seldom used, add them only if needed
             if val.microsecond > 0:
                 self.original_string += f".{val.microsecond:06}"
+
             if val.tzinfo is not None:
+                # offset: Optional[datetime.timedelta]
                 offset = val.tzinfo.utcoffset(val)
-                offset_min = offset.days * 24 * 60 + offset.seconds // 60
-                sign = "+" if offset_min >= 0 else "-"
-                offset_min = abs(offset_min)
-                self.original_string += (
-                    f"{sign}{offset_min // 60:02}{offset_min % 60:02}"
-                )
+                if offset is not None:
+                    offset_min = offset.days * 24 * 60 + offset.seconds // 60
+                    sign = "+" if offset_min >= 0 else "-"
+                    offset_min = abs(offset_min)
+                    self.original_string += (
+                        f"{sign}{offset_min // 60:02}{offset_min % 60:02}"
+                    )
 
 
 class TM(_DateTimeBase, datetime.time):
@@ -273,7 +288,9 @@ class TM(_DateTimeBase, datetime.time):
         r"(?(7)(\.(?P<ms>([0-9]{1,6})?))?))$"
     )
 
-    def __new__(cls: Type[_TM], *args, **kwargs) -> Optional[_TM]:
+    def __new__(  # type: ignore[misc]
+        cls: Type[_TM], *args, **kwargs
+    ) -> Optional[_TM]:
         """Create an instance of TM object from a string.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -316,15 +333,19 @@ class TM(_DateTimeBase, datetime.time):
             if match.group('ms'):
                 microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
-            return super().__new__(cls, hour, minute, second, microsecond)
+            return super().__new__(  # type: ignore[call-arg]
+                cls, hour, minute, second, microsecond
+            )
 
         if isinstance(val, datetime.time):
-            return super().__new__(
+            return super().__new__(  # type: ignore[call-arg]
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
         try:
-            return super().__new__(cls, *args, **kwargs)
+            return super().__new__(  # type: ignore[call-arg]
+                cls, *args, **kwargs
+            )
         except Exception as exc:
             raise ValueError(
                 f"Unable to convert '{val}' to 'TM' object"
@@ -420,7 +441,7 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
         return valstr
 
     # Decide whether to use scientific notation
-    logval = log10(abs(val))
+    logval = log10(cast(Union[float, Decimal], abs(val)))
 
     # Characters needed for '-' at start
     sign_chars = 1 if val < 0.0 else 0
@@ -469,11 +490,13 @@ class DSfloat(float):
         Note that this will lead to loss of precision for some numbers.
 
     """
+    auto_format: bool
+
     def __new__(
-            cls,
-            val: Union[str, int, float, Decimal],
-            auto_format: bool = False
-    ) -> [_DSfloat]:
+        cls: Type[_DSfloat],
+        val: Union[str, int, float, Decimal],
+        auto_format: bool = False
+    ) -> _DSfloat:
         return super().__new__(cls, val)
 
     def __init__(
@@ -556,7 +579,9 @@ class DSdecimal(Decimal):
     instance of this class.
 
     """
-    def __new__(
+    auto_format: bool
+
+    def __new__(  # type: ignore[misc]
         cls: Type[_DSdecimal],
         val: Union[str, int, float, Decimal],
         auto_format: bool = False
@@ -654,12 +679,11 @@ class DSdecimal(Decimal):
 if config.use_DS_decimal:
     DSclass = DSdecimal
 else:
-    DSclass = DSfloat
+    DSclass = DSfloat  # type: ignore[assignment, misc]
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal],
-    auto_format: bool = False
+    val: Union[None, str, int, float, Decimal], auto_format: bool = False
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -671,13 +695,18 @@ def DS(
     Similarly the string clean and check can be avoided and :class:`DSfloat`
     called directly if a string has already been processed.
     """
+    if val is None:
+        return None
+
     if isinstance(val, str):
         val = val.strip()
+        if val == '':
+            return ''
 
-    if val == '' or val is None:
-        return val
+    if config.use_DS_decimal:
+        return DSdecimal(val, auto_format=auto_format)
 
-    return DSclass(val, auto_format=auto_format)
+    return DSfloat(val, auto_format=auto_format)
 
 
 class IS(int):
@@ -687,7 +716,7 @@ class IS(int):
     originally read or stored.
     """
 
-    def __new__(
+    def __new__(  # type: ignore[misc]
         cls: Type[_IS], val: Union[None, str, int, float, Decimal]
     ) -> Optional[_IS]:
         """Create instance if new integer string"""
@@ -698,10 +727,10 @@ class IS(int):
             return None
 
         try:
-            newval: _IS = super().__new__(cls, val)
+            newval = super().__new__(cls, val)
         except ValueError:
             # accept float strings when no integer loss, e.g. "1.0"
-            newval: _IS = super().__new__(cls, float(val))
+            newval = super().__new__(cls, float(val))
 
         # check if a float or Decimal passed in, then could have lost info,
         # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
@@ -768,7 +797,7 @@ def MultiString(
     while val and val.endswith((' ', '\x00')):
         val = val[:-1]
 
-    splitup = val.split("\\")
+    splitup: List[str] = val.split("\\")
     if len(splitup) == 1:
         return valtype(splitup[0])
 
@@ -850,10 +879,9 @@ def _encode_personname(components, encodings):
 
 class PersonName:
     """Representation of the value for an element with VR **PN**."""
-    def __new__(
+    def __new__(  # type: ignore[misc]
         cls: Type[_PersonName], *args, **kwargs
     ) -> Optional[_PersonName]:
-        # Handle None value by returning None instead of a PersonName object
         if len(args) and args[0] is None:
             return None
 
@@ -862,8 +890,8 @@ class PersonName:
     def __init__(
         self,
         val: Union[bytes, str, "PersonName"],
-        encodings: Optional[List[str]] = None,
-        original_string: Optional[str] = None
+        encodings: Optional[Sequence[str]] = None,
+        original_string: Optional[bytes] = None
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -873,7 +901,7 @@ class PersonName:
             The value to use for the **PN** element.
         encodings: list of str, optional
             A list of the encodings used for the value.
-        original_string: str, optional
+        original_string: bytes, optional
             When creating a ``PersonName`` using a decoded string, this is the
             original encoded value.
 
@@ -881,11 +909,10 @@ class PersonName:
         -----
         A :class:`PersonName` may also be constructed by specifying individual
         components using the :meth:`from_named_components` and
-        :meth:`from_named_components_veterinary` classmethods.
-
+        :meth:`from_named_components_veterinary` class methods.
         """
-        self.original_string: Union[None, str, bytes] = None
-        self._components = None
+        self.original_string: bytes
+        self._components: Optional[Tuple[str, ...]] = None
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -896,12 +923,10 @@ class PersonName:
             self.original_string = val
             self._components = None
         else:
-            # handle None `val` as empty string
-            val = val or ''
-
-            # this is the decoded string - save the original string if
-            # available for easier writing back
-            self.original_string = original_string
+            # val: str
+            # `val` is the decoded person name value
+            # `original_string`  should be the original encoded value
+            self.original_string = cast(bytes, original_string)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:
@@ -910,7 +935,6 @@ class PersonName:
 
             # if the encoding is not given, leave it as undefined (None)
         self.encodings: List[str] = _verify_encodings(encodings)
-        self._dict = {}
 
     def _create_dict(self) -> Dict[str, str]:
         """Creates a dictionary of person name group and component names.
@@ -924,13 +948,17 @@ class PersonName:
         return {c: getattr(self, c, '') for c in parts}
 
     @property
-    def components(self) -> List[str]:
-        """Returns up to three decoded person name components.
+    def components(self) -> Tuple[str, ...]:
+        """Returns up to three decoded person name components as a
+        :class:`tuple` of :class:`str`.
 
         .. versionadded:: 1.2
 
-        The returned components represent the alphabetic, ideographic and
-        phonetic representations as a list of unicode strings.
+        Returns
+        -------
+        Tuple[str, ...]
+            The (alphabetic, ideographic, phonetic) components of the
+            decoded person name. Any of the components may be absent.
         """
         if self._components is None:
             groups = self.original_string.split(b'=')
@@ -939,7 +967,7 @@ class PersonName:
 
         return self._components
 
-    def _name_part(self, i) -> str:
+    def _name_part(self, i: int) -> str:
         """Return the `i`th part of the name."""
         try:
             return self.components[0].split('^')[i]
@@ -1015,11 +1043,11 @@ class PersonName:
         except IndexError:
             return ''
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Return ``True`` if `other` equals the current name."""
         return str(self) == other
 
-    def __ne__(self, other: object) -> bool:
+    def __ne__(self, other: Any) -> bool:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
@@ -1027,7 +1055,7 @@ class PersonName:
         """Return a string representation of the name."""
         return '='.join(self.components).__str__()
 
-    def __iter__(self) -> Generator[str, None, None]:
+    def __iter__(self) -> Iterator[str]:
         """Iterate through the name."""
         yield from self.__str__()
 
@@ -1035,7 +1063,7 @@ class PersonName:
         """Return the length of the person name."""
         return len(self.__str__())
 
-    def __contains__(self, x: str) -> bool:
+    def __contains__(self, x: Any) -> bool:
         """Return ``True`` if `x` is in the name."""
         return x in self.__str__()
 
@@ -1066,18 +1094,19 @@ class PersonName:
         # in the common case (encoding did not change) we decode on demand
         if encodings is None or encodings == self.encodings:
             return self
+
         # the encoding was unknown or incorrect - create a new
         # PersonName object with the changed encoding
         encodings = _verify_encodings(encodings)
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, self.encodings or [default_encoding])
+                self.components, self.encodings or [default_encoding]
+            )
+
         return PersonName(self.original_string, encodings)
 
-    def encode(
-        self, encodings: Optional[List[str]] = None
-    ) -> bytes:
+    def encode(self, encodings: Optional[List[str]] = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1100,15 +1129,18 @@ class PersonName:
         # a re-encoded string (without updating the original string)
         if encodings != self.encodings and self.encodings is not None:
             return _encode_personname(self.components, encodings)
+
         if self.original_string is None:
             # if the original encoding was not set, we set it now
             self.original_string = _encode_personname(
-                self.components, encodings or [default_encoding])
+                self.components, encodings or [default_encoding]
+            )
+
         return self.original_string
 
     def family_comma_given(self) -> str:
         """Return the name as "Family, Given"."""
-        return self.formatted('%(family_name)s, %(given_name)s')
+        return f"{self.family_name}, {self.given_name}"
 
     def formatted(self, format_str: str) -> str:
         """Return the name as a :class:`str` formatted using `format_str`."""
@@ -1116,19 +1148,19 @@ class PersonName:
 
     def __bool__(self) -> bool:
         """Return ``True`` if the name is not empty."""
-        if self.original_string is None:
+        if not self.original_string:
             return (
-                bool(self._components)
-                and (len(self._components) > 1 or bool(self._components[0]))
+                bool(self.components)
+                and (len(self.components) > 1 or bool(self.components[0]))
             )
 
         return bool(self.original_string)
 
     @staticmethod
     def _encode_component_groups(
-        alphabetic_group: MutableSequence[Union[str, bytes]],
-        ideographic_group: MutableSequence[Union[str, bytes]],
-        phonetic_group: MutableSequence[Union[str, bytes]],
+        alphabetic_group: Sequence[Union[str, bytes]],
+        ideographic_group: Sequence[Union[str, bytes]],
+        phonetic_group: Sequence[Union[str, bytes]],
         encodings: Optional[List[str]] = None,
     ) -> bytes:
         """Creates a byte string for a person name from lists of parts.
@@ -1138,11 +1170,11 @@ class PersonName:
 
         Parameters
         ----------
-        alphabetic_group: MutableSequence[Union[str, bytes]]
+        alphabetic_group: Sequence[Union[str, bytes]]
             List of components for the alphabetic group.
-        ideographic_group: MutableSequence[Union[str, bytes]]
+        ideographic_group: Sequence[Union[str, bytes]]
             List of components for the ideographic group.
-        phonetic_group: MutableSequence[Union[str, bytes]]
+        phonetic_group: Sequence[Union[str, bytes]]
             List of components for the phonetic group.
         encodings: Optional[List[str]]
             A list of encodings used for the other input parameters.
@@ -1164,7 +1196,7 @@ class PersonName:
             return encode_string(s, encodings or [default_encoding])
 
         def dec(s: bytes) -> str:
-            return decode_bytes(s, encodings or [default_encoding], [])
+            return decode_bytes(s, encodings or [default_encoding], set())
 
         encoded_component_sep = enc('^')
         encoded_group_sep = enc('=')
@@ -1192,17 +1224,19 @@ class PersonName:
             # Return the encoded string
             return val_enc
 
-        def make_component_group(components: List[Union[str, bytes]]):
+        def make_component_group(
+            components: Sequence[Union[str, bytes]]
+        ) -> bytes:
             encoded_components = [standardize_encoding(c) for c in components]
             joined_components = encoded_component_sep.join(encoded_components)
             return joined_components.rstrip(encoded_component_sep)
 
-        component_groups = [
+        component_groups: List[bytes] = [
             make_component_group(alphabetic_group),
             make_component_group(ideographic_group),
             make_component_group(phonetic_group)
         ]
-        joined_groups = encoded_group_sep.join(component_groups)
+        joined_groups: bytes = encoded_group_sep.join(component_groups)
         joined_groups = joined_groups.rstrip(encoded_group_sep)
         return joined_groups
 
@@ -1241,6 +1275,31 @@ class PersonName:
         - :dcm:`Value Representations <part05/sect_6.2.html>`
         - :dcm:`PN Examples <part05/sect_6.2.html#sect_6.2.1.1>`
         - :dcm:`PN Precise semantics <part05/sect_6.2.html#sect_6.2.1.2>`
+
+        Example
+        -------
+        A case with multiple given names and suffixes (DICOM standard,
+        part 5, sect 6.2.1.1):
+
+        >>> pn = PersonName.from_named_components(
+                family_name='Adams',
+                given_name='John Robert Quincy',
+                name_prefix='Rev.',
+                name_suffix='B.A. M.Div.'
+            )
+
+        A Korean case with phonetic and ideographic representations (PS3.5-2008
+        section I.2 p. 108):
+
+        >>> pn = PersonName.from_named_components(
+                family_name='Hong',
+                given_name='Gildong',
+                family_name_ideographic='洪',
+                given_name_ideographic='吉洞',
+                family_name_phonetic='홍',
+                given_name_phonetic='길동',
+                encodings=[default_encoding, 'euc_kr']
+            )
 
         Parameters
         ----------
@@ -1283,39 +1342,12 @@ class PersonName:
         PersonName:
             PersonName constructed from the supplied components.
 
-        Example
-        -------
-        A case with multiple given names and suffixes (DICOM standard,
-        part 5, sect 6.2.1.1):
-
-        >>> pn = PersonName.from_named_components(
-                family_name='Adams',
-                given_name='John Robert Quincy',
-                name_prefix='Rev.',
-                name_suffix='B.A. M.Div.'
-            )
-
-        A Korean case with phonetic and ideographic representations (PS3.5-2008
-        section I.2 p. 108):
-
-        >>> pn = PersonName.from_named_components(
-                family_name='Hong',
-                given_name='Gildong',
-                family_name_ideographic='洪',
-                given_name_ideographic='吉洞',
-                family_name_phonetic='홍',
-                given_name_phonetic='길동',
-                encodings=[default_encoding, 'euc_kr']
-            )
-
         Notes
         -----
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
-
-        """  # noqa: E501
-        # Alphatic component group
-        alphabetic_group = [
+        """
+        alphabetic_group: List[Union[str, bytes]] = [
             family_name,
             given_name,
             middle_name,
@@ -1324,7 +1356,7 @@ class PersonName:
         ]
 
         # Ideographic component group
-        ideographic_group = [
+        ideographic_group: List[Union[str, bytes]] = [
             family_name_ideographic,
             given_name_ideographic,
             middle_name_ideographic,
@@ -1333,7 +1365,7 @@ class PersonName:
         ]
 
         # Phonetic component group
-        phonetic_group = [
+        phonetic_group: List[Union[str, bytes]] = [
             family_name_phonetic,
             given_name_phonetic,
             middle_name_phonetic,
@@ -1341,14 +1373,14 @@ class PersonName:
             name_suffix_phonetic,
         ]
 
-        joined_string = cls._encode_component_groups(
+        encoded_value: bytes = cls._encode_component_groups(
             alphabetic_group,
             ideographic_group,
             phonetic_group,
             encodings,
         )
 
-        return cls(joined_string, encodings=encodings)
+        return cls(encoded_value, encodings=encodings)
 
     @classmethod
     def from_named_components_veterinary(
@@ -1374,9 +1406,20 @@ class PersonName:
         phonetic form in addition to (or instead of) alphabetic form.
 
         For more information see the following parts of the DICOM standard:
-        - `Value Representations <http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html>`_
-        - `PN Examples <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
-        - `PN Precise semantics <http://dicom.nema.org/dicom/2013/output/chtml/part05/sect_6.2.html#sect_6.2.1.1>`_
+        - :dcm:`Value Representations <part05/sect_6.2.html>`
+        - :dcm:`PN Examples <part05/sect_6.2.html#sect_6.2.1.1>`
+        - :dcm:`PN Precise semantics <part05/sect_6.2.html#sect_6.2.1.1>`
+
+        Example
+        -------
+
+        A horse whose responsible organization is named "ABC Farms", and whose
+        name is "Running On Water"
+
+        >>> pn = PersonName.from_named_components_veterinary(
+                responsible_party_name='ABC Farms',
+                patient_name='Running on Water'
+            )
 
         Parameters
         ----------
@@ -1402,49 +1445,34 @@ class PersonName:
         PersonName:
             PersonName constructed from the supplied components
 
-        Example
-        -------
-        Example from the DICOM standard, part 5, sect 6.2.1.1: A horse whose
-        responsible organization is named ABC Farms, and whose name
-        is "Running On Water"
-
-        >>> pn = PersonName.from_named_components_veterinary(
-                responsible_party_name='ABC Farms',
-                patient_name='Running on Water'
-            )
-
         Notes
         -----
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
-
-        """  # noqa: E501
-        # Alphatic component group
-        alphabetic_group = [
+        """
+        alphabetic_group: List[Union[str, bytes]] = [
             responsible_party_name,
             patient_name,
         ]
 
-        # Ideographic component group
-        ideographic_group = [
+        ideographic_group: List[Union[str, bytes]] = [
             responsible_party_name_ideographic,
             patient_name_ideographic,
         ]
 
-        # Phonetic component group
-        phonetic_group = [
+        phonetic_group: List[Union[str, bytes]] = [
             responsible_party_name_phonetic,
             patient_name_phonetic,
         ]
 
-        joined_string = cls._encode_component_groups(
+        encoded_value: bytes = cls._encode_component_groups(
             alphabetic_group,
             ideographic_group,
             phonetic_group,
             encodings
         )
 
-        return cls(joined_string, encodings=encodings)
+        return cls(encoded_value, encodings=encodings)
 
 
 # Alias old class names for backwards compat in user code
