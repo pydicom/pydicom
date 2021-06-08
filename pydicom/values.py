@@ -26,9 +26,8 @@ from pydicom.valuerep import (
     MultiString, DA, DT, TM, TEXT_VR_DELIMS, DSfloat, DSdecimal, IS, text_VRs
 )
 
-
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     have_numpy = True
 except ImportError:
     have_numpy = False
@@ -692,7 +691,7 @@ def convert_UR_string(
 def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
-    encodings: Optional[Union[str, List[str]]] = None
+    encodings: Optional[Union[str, MutableSequence[str]]] = None
 ) -> Union[Any, MutableSequence[Any]]:
     """Return the element value decoded using the appropriate decoder.
 

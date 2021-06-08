@@ -24,7 +24,7 @@ import json
 import os
 import os.path
 import re
-from types import ModuleType, TracebackType
+from types import TracebackType
 from typing import (
     TYPE_CHECKING, Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
     Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
@@ -35,7 +35,7 @@ import weakref
 
 if TYPE_CHECKING:  # pragma: no cover
     try:
-        import numpy
+        import numpy  # type: ignore[import]
         import numpy as np
     except ImportError:
         pass
@@ -423,7 +423,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     ) -> Optional[bool]:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
-        return
+        return None
 
     def add(self, data_element: DataElement) -> None:
         """Add an element to the :class:`Dataset`.
@@ -919,33 +919,39 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             except Exception as exc:
                 raise KeyError(f"'{key}'") from exc
 
-        data_elem = self._dict[tag]
-        if isinstance(data_elem, DataElement):
-            if data_elem.VR == 'SQ' and data_elem.value:
+        elem = self._dict[tag]
+        if isinstance(elem, DataElement):
+            if elem.VR == 'SQ' and elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
-                data_elem.value.parent = self
-            return data_elem
-        elif isinstance(data_elem, RawDataElement):
+                elem.value.parent = self
+            return elem
+
+        if isinstance(elem, RawDataElement):
             # If a deferred read, then go get the value now
-            if data_elem.value is None and data_elem.length != 0:
+            if elem.value is None and elem.length != 0:
                 from pydicom.filereader import read_deferred_data_element
-                data_elem = read_deferred_data_element(
-                    self.fileobj_type, self.filename, self.timestamp,
-                    data_elem)
+
+                elem = read_deferred_data_element(
+                    self.fileobj_type,
+                    self.filename,
+                    self.timestamp,
+                    elem
+                )
 
             if tag != BaseTag(0x00080005):
                 character_set = self.read_encoding or self._character_set
             else:
                 character_set = default_encoding
             # Not converted from raw form read from file yet; do so now
-            self[tag] = DataElement_from_raw(data_elem, character_set, self)
+            self[tag] = DataElement_from_raw(elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
             if 'or' in self[tag].VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
-                    self[tag], self, data_elem[6])
+                    self[tag], self, elem[6]
+                )
 
         return cast(DataElement, self._dict.get(tag))
 
@@ -1462,8 +1468,9 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         handler = getattr(pydicom.config, handler_name)
 
-        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
-        tsyntax = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", self).file_meta
+        file_meta = cast("FileMetaDataset", file_meta)
+        tsyntax = file_meta.TransferSyntaxUID
         if not handler.supports_transfer_syntax(tsyntax):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID"
@@ -1485,8 +1492,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
         # Find all possible handlers that support the transfer syntax
-        file_meta: "FileMetaDataset" = self.file_meta  # type: ignore[has-type]
-        ts = cast(UID, file_meta.TransferSyntaxUID)
+        file_meta = cast("FileDataset", self).file_meta
+        ts = cast("FileMetaDataset", file_meta).TransferSyntaxUID
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
@@ -2775,7 +2782,7 @@ def validate_file_meta(
             file_meta.FileMetaInformationVersion = b'\x00\x01'
 
         if 'ImplementationClassUID' not in file_meta:
-            file_meta.ImplementationClassUID = PYDICOM_IMPLEMENTATION_UID
+            file_meta.ImplementationClassUID = UID(PYDICOM_IMPLEMENTATION_UID)
 
         if 'ImplementationVersionName' not in file_meta:
             file_meta.ImplementationVersionName = (
@@ -2820,6 +2827,22 @@ class FileMetaDataset(Dataset):
         """
         super().__init__(*args, **kwargs)
         FileMetaDataset.validate(self._dict)
+
+        # Set type hints for the possible contents - VR, Type (1|1C|3)
+        self.FileMetaInformationGroupLength: int  # UL, 1
+        self.FileMetaInformationVersion: bytes  # OB, 1
+        self.MediaStorageSOPClassUID: UID  # UI, 1
+        self.MediaStorageSOPInstanceUID: UID  # UI, 1
+        self.TransferSyntaxUID: UID  # UI, 1
+        self.ImplementationClassUID: UID  # UI, 1
+        self.ImplementationVersionName: Optional[str]  # SH, 3
+        self.SourceApplicationEntityTitle: Optional[str]  # AE, 3
+        self.SendingApplicationEntityTitle: Optional[str]  # AE, 3
+        self.ReceivingApplicationEntityTitle: Optional[str]  # AE, 3
+        self.SourcePresentationAddress: Optional[str]  # UR, 3
+        self.ReceivingPresentationAddress: Optional[str]  # UR, 3
+        self.PrivateInformationCreatorUID: Optional[UID]  # UI, 3
+        self.PrivateInformation: bytes  # OB, 1C
 
     @staticmethod
     def validate(init_value: MutableMapping[BaseTag, _DatasetValue]) -> None:

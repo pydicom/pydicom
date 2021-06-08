@@ -51,7 +51,7 @@ from pydicom.encoders.native import _encode_frame
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
-    import numpy  # type: ignore[import]
+    import numpy
     from pydicom.dataset import Dataset, FileMetaDataset
 
 
