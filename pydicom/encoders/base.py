@@ -289,9 +289,7 @@ class Encoder:
         kwargs = {**self.kwargs_from_ds(ds), **kwargs}
         self._validate_encoding_profile(**kwargs)
 
-        file_meta = cast("FileDataset", ds).file_meta
-        file_meta = cast("FileMetaDataset", file_meta)
-        tsyntax = file_meta.TransferSyntaxUID
+        tsyntax = ds.file_meta.TransferSyntaxUID
         if not tsyntax.is_compressed:
             return self._encode_bytes(
                 ds.PixelData, idx, encoding_plugin, **kwargs
