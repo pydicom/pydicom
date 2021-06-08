@@ -701,10 +701,11 @@ class TestDSdecimal:
         # Not equal because float(1.2) != Decimal('1.2')
         assert DSdecimal('1.20') != 1.2
         assert DSdecimal('1.20') != 1.20
-        assert DSdecimal('1.20') == Decimal(1.2)
-        assert DSdecimal('1.20') == Decimal(1.20)
-        assert DSdecimal('1.20 ') == Decimal(1.2)
-        assert DSdecimal('1.20 ') == Decimal(1.20)
+        # Decimal(1.2) is different to Decimal('1.2')
+        assert DSdecimal('1.20') == Decimal('1.2')
+        assert DSdecimal('1.20') == Decimal('1.20')
+        assert DSdecimal('1.20 ') == Decimal('1.2')
+        assert DSdecimal('1.20 ') == Decimal('1.20')
         assert DSdecimal('1.20') != '1.2'
         assert DSdecimal('1.20') == '1.20'
         assert DSdecimal('1.20 ') == '1.20'
