@@ -1875,7 +1875,7 @@ class TestFileDataset:
         expected_diff = {'__class__', '__doc__', '__hash__', 'fromkeys'}
         if sys.version_info[:2] >= (3, 9):
             expected_diff = expected_diff.union({
-                '__ror__', '__ior__', '__or__','__reversed__',
+                '__ror__', '__ior__', '__or__', '__reversed__',
                 '__class_getitem__',
             })
 
