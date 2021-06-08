@@ -485,7 +485,8 @@ class TestDS:
     """Unit tests for DS values"""
     def test_empty_value(self):
         assert DS(None) is None
-        assert "" == DS("")
+        assert DS("") == ""
+        assert DS("   ") == "   "
 
     def test_float_values(self):
         val = DS(0.9)
@@ -642,13 +643,6 @@ class TestDSfloat:
             assert val > Decimal(1233)
             assert val >= Decimal(1233)
 
-            assert Decimal(1234.5) == val
-            assert Decimal(1235) != val
-            assert Decimal(1235) > val
-            assert Decimal(1235) >= val
-            assert Decimal(1233) < val
-            assert Decimal(1233) <= val
-
             assert val == 1234.5
             assert val != 1235.0
             assert val < 1235.0
@@ -656,26 +650,23 @@ class TestDSfloat:
             assert val > 1233.0
             assert val >= 1233.0
 
-            assert 1234.5 == val
-            assert 1235.0 != val
-            assert 1235.0 > val
-            assert 1235.0 >= val
-            assert 1233.0 < val
-            assert 1233.0 <= val
-
             assert val == "1234.5"
+            assert val != " 1234.5"
+            assert val != "1234.50"
+            assert val != "1234.5 "
             assert val != "1235"
-            assert val < "1235"
-            assert val <= "1235"
-            assert val > "1233"
-            assert val >= "1233"
 
-            assert "1234.5" == val
-            assert "1235" != val
-            assert "1235" > val
-            assert "1235" >= val
-            assert "1233" < val
-            assert "1233" <= val
+            with pytest.raises(TypeError, match="'<' not supported"):
+                val < "1235"
+
+            with pytest.raises(TypeError, match="'<=' not supported"):
+                val <= "1235"
+
+            with pytest.raises(TypeError, match="'>' not supported"):
+                val > "1233"
+
+            with pytest.raises(TypeError, match="'>=' not supported"):
+                val >= "1233"
 
 
 class TestDSdecimal:
@@ -693,17 +684,16 @@ class TestDSdecimal:
 
     def test_float_value(self):
         config.allow_DS_float = False
-        with pytest.raises(
-                TypeError, match="cannot be instantiated with a float value"
-        ):
+        msg = "cannot be instantiated with a float value"
+        with pytest.raises(TypeError, match=msg):
             DSdecimal(9.0)
         config.allow_DS_float = True
         assert 9 == DSdecimal(9.0)
 
     def test_new_empty(self):
         """Test passing an empty value."""
-        assert isinstance(DSdecimal(''), str)
         assert DSdecimal('') == ''
+        assert DSdecimal('  ') == '  '
         assert DSdecimal(None) is None
 
     def test_str_value(self):
@@ -776,9 +766,7 @@ class TestDSdecimal:
         ]
     )
     def test_enforce_valid_values_value(
-            self,
-            val: Union[Decimal, str],
-            enforce_valid_true_fixture
+        self, val: Union[Decimal, str], enforce_valid_true_fixture
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
@@ -816,13 +804,6 @@ class TestDSdecimal:
             assert val > Decimal(1233)
             assert val >= Decimal(1233)
 
-            assert Decimal(1234.5) == val
-            assert Decimal(1235) != val
-            assert Decimal(1235) > val
-            assert Decimal(1235) >= val
-            assert Decimal(1233) < val
-            assert Decimal(1233) <= val
-
             assert val == 1234.5
             assert val != 1235.0
             assert val < 1235.0
@@ -830,26 +811,23 @@ class TestDSdecimal:
             assert val > 1233.0
             assert val >= 1233.0
 
-            assert 1234.5 == val
-            assert 1235.0 != val
-            assert 1235.0 > val
-            assert 1235.0 >= val
-            assert 1233.0 < val
-            assert 1233.0 <= val
-
             assert val == "1234.5"
+            assert val != " 1234.5"
+            assert val != "1234.50"
+            assert val != "1234.5 "
             assert val != "1235"
-            assert val < "1235"
-            assert val <= "1235"
-            assert val > "1233"
-            assert val >= "1233"
 
-            assert "1234.5" == val
-            assert "1235" != val
-            assert "1235" > val
-            assert "1235" >= val
-            assert "1233" < val
-            assert "1233" <= val
+            with pytest.raises(TypeError, match="'<' not supported"):
+                val < "1235"
+
+            with pytest.raises(TypeError, match="'<=' not supported"):
+                val <= "1235"
+
+            with pytest.raises(TypeError, match="'>' not supported"):
+                val > "1233"
+
+            with pytest.raises(TypeError, match="'>=' not supported"):
+                val >= "1233"
 
 
 class TestIS:
@@ -857,6 +835,7 @@ class TestIS:
     def test_empty_value(self):
         assert IS(None) is None
         assert IS("") == ""
+        assert IS("  ") == "  "
 
     def test_str_value(self):
         """Test creating using str"""
@@ -938,13 +917,6 @@ class TestIS:
             assert val > 1233
             assert val >= 1233
 
-            assert 1234 == val
-            assert 1235 != val
-            assert 1235 > val
-            assert 1235 >= val
-            assert 1233 < val
-            assert 1233 <= val
-
             assert val == 1234.0
             assert val != 1235.0
             assert val < 1235.0
@@ -952,26 +924,23 @@ class TestIS:
             assert val > 1233.0
             assert val >= 1233.0
 
-            assert 1234.0 == val
-            assert 1235.0 != val
-            assert 1235.0 > val
-            assert 1235.0 >= val
-            assert 1233.0 < val
-            assert 1233.0 <= val
-
             assert val == "1234"
+            assert val != "1234.0"
             assert val != "1235"
-            assert val < "1235"
-            assert val <= "1235"
-            assert val > "1233"
-            assert val >= "1233"
+            assert val != "1234 "
+            assert val != " 1234"
 
-            assert "1234" == val
-            assert "1235" != val
-            assert "1235" > val
-            assert "1235" >= val
-            assert "1233" < val
-            assert "1233" <= val
+            with pytest.raises(TypeError, match="'<' not supported"):
+                val < "1235"
+
+            with pytest.raises(TypeError, match="'<=' not supported"):
+                val <= "1235"
+
+            with pytest.raises(TypeError, match="'>' not supported"):
+                val > "1233"
+
+            with pytest.raises(TypeError, match="'>=' not supported"):
+                val >= "1233"
 
 
 class TestBadValueRead:

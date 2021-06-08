@@ -477,10 +477,8 @@ class DSfloat(float):
         if val is None:
             return val
 
-        if isinstance(val, str):
-            val = val.strip()
-            if val == '':
-                return val
+        if isinstance(val, str) and val.strip() == '':
+            return val
 
         return super().__new__(cls, val)
 
@@ -544,22 +542,6 @@ class DSfloat(float):
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    def __lt__(self, other: Any) -> bool:
-        """Override to allow string equality comparisons."""
-        if isinstance(other, str):
-            return str(self) < other
-
-        return super().__lt__(other)
-
-    def __le__(self, other: Any) -> bool:
-        return self == other or self < other
-
-    def __ge__(self, other: Any) -> bool:
-        return self == other or self > other
-
-    def __gt__(self, other: Any) -> bool:
-        return not (self == other or self < other)
-
     def __str__(self) -> str:
         if hasattr(self, 'original_string') and not self.auto_format:
             return self.original_string
@@ -608,10 +590,8 @@ class DSdecimal(Decimal):
         if val is None:
             return val
 
-        if isinstance(val, str):
-            val = val.strip()
-            if val == '':
-                return val
+        if isinstance(val, str) and val.strip() == '':
+            return val
 
         if isinstance(val, float) and not config.allow_DS_float:
             raise TypeError(
@@ -684,22 +664,6 @@ class DSdecimal(Decimal):
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
-    def __lt__(self, other: Any) -> bool:
-        """Override to allow string equality comparisons."""
-        if isinstance(other, str):
-            return str(self) < other
-
-        return super().__lt__(other)
-
-    def __le__(self, other: Any) -> bool:
-        return self == other or self < other
-
-    def __ge__(self, other: Any) -> bool:
-        return self == other or self > other
-
-    def __gt__(self, other: Any) -> bool:
-        return not (self == other or self < other)
-
     def __str__(self) -> str:
         has_str = hasattr(self, 'original_string')
         if has_str and len(self.original_string) <= 16:
@@ -734,10 +698,10 @@ def DS(
     Similarly the string clean and check can be avoided and :class:`DSfloat`
     called directly if a string has already been processed.
     """
-    if isinstance(val, str):
-        val = val.strip()
+    if val is None:
+        return val
 
-    if val == '' or val is None:
+    if isinstance(val, str) and val.strip() == '':
         return val
 
     return DSclass(val, auto_format=auto_format)
@@ -757,10 +721,8 @@ class IS(int):
         if val is None:
             return val
 
-        if isinstance(val, str):
-            val = val.strip()
-            if val == '':
-                return val
+        if isinstance(val, str) and val.strip() == '':
+            return val
 
         try:
             newval = super().__new__(cls, val)
@@ -800,22 +762,6 @@ class IS(int):
 
     def __ne__(self, other: Any) -> bool:
         return not self == other
-
-    def __lt__(self, other: Any) -> bool:
-        """Override to allow string equality comparisons."""
-        if isinstance(other, str):
-            return str(self) < other
-
-        return super().__lt__(other)
-
-    def __le__(self, other: Any) -> bool:
-        return self == other or self < other
-
-    def __ge__(self, other: Any) -> bool:
-        return self == other or self > other
-
-    def __gt__(self, other: Any) -> bool:
-        return not (self == other or self < other)
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
