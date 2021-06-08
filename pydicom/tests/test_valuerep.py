@@ -517,7 +517,9 @@ class TestDSfloat:
     def test_str_value(self):
         """Test creating using str"""
         assert DSfloat('1.20') == 1.2
+        assert DSfloat('1.20') == 1.20
         assert DSfloat('1.20 ') == 1.2
+        assert DSfloat('1.20 ') == 1.20
         assert DSfloat('1.20') != '1.2'
         assert DSfloat('1.20') == '1.20'
         assert DSfloat('1.20 ') == '1.20'
@@ -624,9 +626,7 @@ class TestDSfloat:
         ]
     )
     def test_enforce_valid_values_value(
-            self,
-            val: Union[float, str],
-            enforce_valid_true_fixture
+        self, val: Union[float, str], enforce_valid_true_fixture
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
@@ -698,10 +698,16 @@ class TestDSdecimal:
 
     def test_str_value(self):
         """Test creating using str"""
+        # Not equal because float(1.2) != Decimal('1.2')
+        assert DSdecimal('1.20') != 1.2
+        assert DSdecimal('1.20') != 1.20
+        assert DSdecimal('1.20') == Decimal(1.2)
+        assert DSdecimal('1.20') == Decimal(1.20)
+        assert DSdecimal('1.20 ') == Decimal(1.2)
+        assert DSdecimal('1.20 ') == Decimal(1.20)
+        assert DSdecimal('1.20') != '1.2'
         assert DSdecimal('1.20') == '1.20'
         assert DSdecimal('1.20 ') == '1.20'
-        assert DSdecimal('1.20') != '1.2'
-        assert DSdecimal('1.20 ') == Decimal('1.2')
 
     def test_DSfloat(self):
         """Test creating a value using DSfloat."""
@@ -841,8 +847,7 @@ class TestIS:
         """Test creating using str"""
         assert IS('1') == 1
         assert IS('1 ') == 1
-        assert IS('1') == '1'
-        assert IS('1 ') == '1'
+        assert IS(' 1 ') == 1
 
     def test_valid_value(self):
         assert 42 == IS(42)
@@ -1489,41 +1494,39 @@ VALUE_REFERENCE = [
 ]
 
 
-class TestValueConsistency:
-    """Fundamental element value behaviour tests."""
-    @pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
-    def test_set_value(self, vr, pytype, vm0, vmN, keyword):
-        """Test that element values are set consistently"""
-        # Test VM = 0
-        ds = Dataset()
-        for value in vm0:
-            setattr(ds, keyword, value)
-            elem = ds[keyword]
-            assert elem.VR == vr
-            assert elem.value == value
-            assert value == elem.value
-
-        # Test VM = 1
-        ds = Dataset()
-        value = vmN[0]
-        if vr == 'SQ':
-            setattr(ds, keyword, [value])
-            elem = ds[keyword]
-            assert elem.value[0] == value
-            assert value == elem.value[0]
-        else:
-            setattr(ds, keyword, value)
-            elem = ds[keyword]
-            assert elem.value == value
-            assert value == elem.value
-
-        if vr[0] == 'O':
-            return
-
-        # Test VM > 1
-        ds = Dataset()
-        value = vmN[0]
-        setattr(ds, keyword, list(vmN))
+@pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
+def test_set_value(vr, pytype, vm0, vmN, keyword):
+    """Test that element values are set consistently"""
+    # Test VM = 0
+    ds = Dataset()
+    for value in vm0:
+        setattr(ds, keyword, value)
         elem = ds[keyword]
-        assert elem.value == list(vmN)
-        assert list(vmN) == elem.value
+        assert elem.VR == vr
+        assert elem.value == value
+        assert value == elem.value
+
+    # Test VM = 1
+    ds = Dataset()
+    value = vmN[0]
+    if vr == 'SQ':
+        setattr(ds, keyword, [value])
+        elem = ds[keyword]
+        assert elem.value[0] == value
+        assert value == elem.value[0]
+    else:
+        setattr(ds, keyword, value)
+        elem = ds[keyword]
+        assert elem.value == value
+        assert value == elem.value
+
+    if vr[0] == 'O':
+        return
+
+    # Test VM > 1
+    ds = Dataset()
+    value = vmN[0]
+    setattr(ds, keyword, list(vmN))
+    elem = ds[keyword]
+    assert elem.value == list(vmN)
+    assert list(vmN) == elem.value

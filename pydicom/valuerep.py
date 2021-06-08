@@ -629,7 +629,6 @@ class DSdecimal(Decimal):
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        has_str = hasattr(val, 'original_string')
         pre_checked = False
         if isinstance(val, str):
             self.original_string = val.strip()
@@ -637,7 +636,8 @@ class DSdecimal(Decimal):
             if val.auto_format:
                 auto_format = True  # override input parameter
                 pre_checked = True
-            if has_str:
+
+            if hasattr(val, 'original_string'):
                 self.original_string = val.original_string
 
         self.auto_format = auto_format

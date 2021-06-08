@@ -26,7 +26,7 @@ jobs:
         pip install mypy
     - name: Enable typing
       run: |
-        touch pydicom/pydicom/py.typed
+        touch pydicom/py.typed
     - name: Run typing check with mypy
       run: |
         mypy
