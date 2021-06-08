@@ -5,6 +5,7 @@ import copy
 import io
 import math
 import pickle
+import sys
 import weakref
 
 import pytest
@@ -1871,10 +1872,13 @@ class TestFileDataset:
         """Ensure that we don't use inherited dict functionality"""
         ds = Dataset()
         di = dict()
-        expected_diff = {
-            '__class__', '__class_getitem__', '__doc__', '__hash__',
-            '__ior__', '__or__', '__reversed__', '__ror__', 'fromkeys'
-        }
+        expected_diff = {'__class__', '__doc__', '__hash__', 'fromkeys'}
+        if sys.version_info[:2] >= (3, 9):
+            expected_diff = expected_diff.union({
+                '__ror__', '__ior__', '__or__','__reversed__',
+                '__class_getitem__',
+            })
+
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
     def test_copy_filedataset(self):
