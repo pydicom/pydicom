@@ -121,10 +121,12 @@ class Sequence(MultiValue[Dataset]):
                 item.parent = self._parent
 
     @overload  # type: ignore[override]
-    def __setitem__(self, idx: int, val: Dataset) -> None: pass
+    def __setitem__(self, idx: int, val: Dataset) -> None:
+        pass  # pragma: no cover
 
     @overload
-    def __setitem__(self, idx: slice, val: Iterable[Dataset]) -> None: pass
+    def __setitem__(self, idx: slice, val: Iterable[Dataset]) -> None:
+        pass  # pragma: no cover
 
     def __setitem__(
         self, idx: Union[slice, int], val: Union[Iterable[Dataset], Dataset]

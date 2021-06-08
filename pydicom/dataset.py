@@ -714,7 +714,7 @@ class Dataset:
 
     @overload
     def get(self, key: str, default: Optional[Any] = None) -> Any:
-        pass
+        pass  # pragma: no cover
 
     @overload
     def get(
@@ -722,7 +722,7 @@ class Dataset:
         key: Union[int, Tuple[int, int], BaseTag],
         default: Optional[Any] = None
     ) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def get(
         self,
@@ -845,11 +845,11 @@ class Dataset:
 
     @overload
     def __getitem__(self, key: slice) -> "Dataset":
-        pass
+        pass  # pragma: no cover
 
     @overload
     def __getitem__(self, key: TagType) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def __getitem__(
         self, key: Union[slice, TagType]
@@ -1106,11 +1106,11 @@ class Dataset:
 
     @overload
     def get_item(self, key: slice) -> "Dataset":
-        pass
+        pass  # pragma: no cover
 
     @overload
     def get_item(self, key: TagType) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def get_item(
         self, key: Union[slice, TagType]

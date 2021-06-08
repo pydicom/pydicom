@@ -1874,11 +1874,11 @@ class TestFileDataset:
         di = dict()
         expected_diff = {'__class__', '__doc__', '__hash__', 'fromkeys'}
         if sys.version_info[:2] >= (3, 8):
-            expected_diff = expected_diff.union({'__reversed__'})
+            expected_diff.add('__reversed__')
         if sys.version_info[:2] >= (3, 9):
-            expected_diff = expected_diff.union({
-                '__ror__', '__ior__', '__or__', '__class_getitem__',
-            })
+            expected_diff.update([
+                '__ror__', '__ior__', '__or__', '__class_getitem__'
+            ])
 
         assert expected_diff == set(dir(di)) - set(dir(ds))
 

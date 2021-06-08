@@ -83,10 +83,11 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list == other
 
     @overload
-    def __getitem__(self, index: int) -> _ItemType: pass
+    def __getitem__(self, index: int) -> _ItemType: pass  # pragma: no cover
 
     @overload
-    def __getitem__(self, index: slice) -> MutableSequence[_ItemType]: pass
+    def __getitem__(self, index: slice) -> MutableSequence[_ItemType]:
+        pass  # pragma: no cover
 
     def __getitem__(
         self, index: Union[slice, int]
@@ -106,10 +107,11 @@ class MultiValue(MutableSequence[_ItemType]):
         return self._list != other
 
     @overload
-    def __setitem__(self, idx: int, val: _T) -> None: pass
+    def __setitem__(self, idx: int, val: _T) -> None: pass  # pragma: no cover
 
     @overload
-    def __setitem__(self, idx: slice, val: Iterable[_T]) -> None: pass
+    def __setitem__(self, idx: slice, val: Iterable[_T]) -> None:
+        pass  # pragma: no cover
 
     def __setitem__(  # type: ignore[misc]
         self, idx: Union[int, slice], val: Union[_T, Iterable[_T]]
