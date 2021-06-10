@@ -85,7 +85,7 @@ class TestCodify:
         # DataElement(0x00080301, 'US', 1200)]
         out_str = ["ds.PatientName = # XXX Array of 7 bytes excluded",
                    "ds.CodingSchemeUID = '1.1'",
-                   'ds.SeriesNumber = "3"']
+                   "ds.SeriesNumber = '3'"]
         # Fails
         # "ds.PrivateGroupReference = 1200"]
         for elem, out in zip(input_elem, out_str):

@@ -16,15 +16,6 @@ from typing import (
 from pydicom import config
 from pydicom.multival import MultiValue
 
-# Types
-_T = TypeVar('_T')
-_DA = TypeVar("_DA", bound="DA")
-_DT = TypeVar("_DT", bound="DT")
-_TM = TypeVar("_TM", bound="TM")
-_IS = TypeVar("_IS", bound="IS")
-_DSfloat = TypeVar("_DSfloat", bound="DSfloat")
-_DSdecimal = TypeVar("_DSdecimal", bound="DSdecimal")
-_PersonName = TypeVar("_PersonName", bound="PersonName")
 
 # can't import from charset or get circular import
 default_encoding = "iso8859"
@@ -86,8 +77,8 @@ class DA(_DateTimeBase, datetime.date):
     Note that the :class:`datetime.date` base class is immutable.
     """
     def __new__(  # type: ignore[misc]
-        cls: Type[_DA], *args, **kwargs
-    ) -> Optional[_DA]:
+        cls: Type["DA"], *args, **kwargs
+    ) -> Optional["DA"]:
         """Create an instance of DA object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -176,8 +167,8 @@ class DT(_DateTimeBase, datetime.datetime):
         )
 
     def __new__(  # type: ignore[misc]
-        cls: Type[_DT], *args, **kwargs
-    ) -> Optional[_DT]:
+        cls: Type["DT"], *args, **kwargs
+    ) -> Optional["DT"]:
         """Create an instance of DT object.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -289,8 +280,8 @@ class TM(_DateTimeBase, datetime.time):
     )
 
     def __new__(  # type: ignore[misc]
-        cls: Type[_TM], *args, **kwargs
-    ) -> Optional[_TM]:
+        cls: Type["TM"], *args, **kwargs
+    ) -> Optional["TM"]:
         """Create an instance of TM object from a string.
 
         Raise an exception if the string cannot be parsed or the argument
@@ -492,11 +483,17 @@ class DSfloat(float):
     """
     auto_format: bool
 
-    def __new__(
-        cls: Type[_DSfloat],
+    def __new__(  # type: ignore[misc]
+        cls: Type["DSfloat"],
         val: Union[str, int, float, Decimal],
         auto_format: bool = False
-    ) -> _DSfloat:
+    ) -> Optional[Union[str, "DSfloat"]]:
+        if val is None:
+            return val
+
+        if isinstance(val, str) and val.strip() == '':
+            return val
+
         return super().__new__(cls, val)
 
     def __init__(
@@ -511,7 +508,7 @@ class DSfloat(float):
         has_attribute = hasattr(val, 'original_string')
         pre_checked = False
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, (DSfloat, DSdecimal)):
             if val.auto_format:
                 auto_format = True  # override input parameter
@@ -548,6 +545,16 @@ class DSfloat(float):
                     'of DS'
                 )
 
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
+
     def __str__(self) -> str:
         if hasattr(self, 'original_string') and not self.auto_format:
             return self.original_string
@@ -557,8 +564,9 @@ class DSfloat(float):
 
     def __repr__(self) -> str:
         if self.auto_format and hasattr(self, 'original_string'):
-            return f'"{self.original_string}"'
-        return f'"{super().__repr__()}"'
+            return f"'{self.original_string}'"
+
+        return f"'{super().__repr__()}'"
 
 
 class DSdecimal(Decimal):
@@ -582,10 +590,10 @@ class DSdecimal(Decimal):
     auto_format: bool
 
     def __new__(  # type: ignore[misc]
-        cls: Type[_DSdecimal],
+        cls: Type["DSdecimal"],
         val: Union[str, int, float, Decimal],
         auto_format: bool = False
-    ) -> Optional[_DSdecimal]:
+    ) -> Optional[Union[str, "DSdecimal"]]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
 
@@ -594,6 +602,12 @@ class DSdecimal(Decimal):
         val : str or numeric
             A string or a number type which can be converted to a decimal.
         """
+        if val is None:
+            return val
+
+        if isinstance(val, str) and val.strip() == '':
+            return val
+
         if isinstance(val, float) and not config.allow_DS_float:
             raise TypeError(
                 "'DS' cannot be instantiated with a float value unless "
@@ -602,14 +616,7 @@ class DSdecimal(Decimal):
                 "or use 'Decimal.quantize()' and pass a 'Decimal' instance."
             )
 
-        if isinstance(val, str):
-            val = val.strip()
-            if val == '':
-                return None
-
-        val = super().__new__(cls, val)
-
-        return val
+        return super().__new__(cls, val)
 
     def __init__(
         self,
@@ -622,15 +629,15 @@ class DSdecimal(Decimal):
         """
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
-        has_str = hasattr(val, 'original_string')
         pre_checked = False
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, (DSfloat, DSdecimal)):
             if val.auto_format:
                 auto_format = True  # override input parameter
                 pre_checked = True
-            if has_str:
+
+            if hasattr(val, 'original_string'):
                 self.original_string = val.original_string
 
         self.auto_format = auto_format
@@ -646,7 +653,7 @@ class DSdecimal(Decimal):
                 self.original_string = format_number_as_ds(self)
 
         if config.enforce_valid_values:
-            if len(repr(self).strip('"')) > 16:
+            if len(repr(self).strip("'")) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
@@ -655,12 +662,22 @@ class DSdecimal(Decimal):
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-            if not is_valid_ds(repr(self).strip('"')):
+            if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
                 raise ValueError(
                     f'Value "{str(self)}" is not valid for elements with a VR '
                     'of DS'
                 )
+
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
 
     def __str__(self) -> str:
         has_str = hasattr(self, 'original_string')
@@ -671,8 +688,8 @@ class DSdecimal(Decimal):
 
     def __repr__(self) -> str:
         if self.auto_format and hasattr(self, 'original_string'):
-            return f'"{self.original_string}"'
-        return f'"{str(self)}"'
+            return f"'{self.original_string}'"
+        return f"'{str(self)}'"
 
 
 # CHOOSE TYPE OF DS
@@ -696,12 +713,10 @@ def DS(
     called directly if a string has already been processed.
     """
     if val is None:
-        return None
+        return val
 
-    if isinstance(val, str):
-        val = val.strip()
-        if val == '':
-            return ''
+    if isinstance(val, str) and val.strip() == '':
+        return val
 
     if config.use_DS_decimal:
         return DSdecimal(val, auto_format=auto_format)
@@ -717,14 +732,14 @@ class IS(int):
     """
 
     def __new__(  # type: ignore[misc]
-        cls: Type[_IS], val: Union[None, str, int, float, Decimal]
-    ) -> Optional[_IS]:
+        cls: Type["IS"], val: Union[None, str, int, float, Decimal]
+    ) -> Optional[Union[str, "IS"]]:
         """Create instance if new integer string"""
         if val is None:
             return val
 
         if isinstance(val, str) and val.strip() == '':
-            return None
+            return val
 
         try:
             newval = super().__new__(cls, val)
@@ -751,9 +766,19 @@ class IS(int):
     def __init__(self, val: Union[str, int, float, Decimal]) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
-            self.original_string = val
+            self.original_string = val.strip()
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
+
+    def __eq__(self, other: Any) -> bool:
+        """Override to allow string equality comparisons."""
+        if isinstance(other, str):
+            return str(self) == other
+
+        return super().__eq__(other)
+
+    def __ne__(self, other: Any) -> bool:
+        return not self == other
 
     def __str__(self) -> str:
         if hasattr(self, 'original_string'):
@@ -763,7 +788,10 @@ class IS(int):
         return repr(self)[1:-1]
 
     def __repr__(self) -> str:
-        return f'"{super().__repr__()}"'
+        return f"'{super().__repr__()}'"
+
+
+_T = TypeVar('_T')
 
 
 def _as_str(s: str):
@@ -771,8 +799,7 @@ def _as_str(s: str):
 
 
 def MultiString(
-    val: str,
-    valtype: Optional[Callable[[str], _T]] = None
+    val: str, valtype: Optional[Callable[[str], _T]] = None
 ) -> Union[_T, MutableSequence[_T]]:
     """Split a string by delimiters if there are any
 
@@ -880,8 +907,8 @@ def _encode_personname(components, encodings):
 class PersonName:
     """Representation of the value for an element with VR **PN**."""
     def __new__(  # type: ignore[misc]
-        cls: Type[_PersonName], *args, **kwargs
-    ) -> Optional[_PersonName]:
+        cls: Type["PersonName"], *args, **kwargs
+    ) -> Optional["PersonName"]:
         if len(args) and args[0] is None:
             return None
 
