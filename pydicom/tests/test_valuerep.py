@@ -671,7 +671,7 @@ class TestDSfloat:
     def test_hash(self):
         """Test hash(DSfloat)"""
         value = 1.2345
-        hash(DSfloat(value)) == hash(value)
+        assert hash(DSfloat(value)) == hash(value)
 
 
 class TestDSdecimal:
@@ -844,7 +844,7 @@ class TestDSdecimal:
     def test_hash(self):
         """Test hash(DSdecimal)"""
         value = 1.2345
-        hash(DSdecimal(value)) == hash(value)
+        assert hash(DSdecimal(value)) == hash(value)
 
 
 class TestIS:
@@ -961,7 +961,7 @@ class TestIS:
     def test_hash(self):
         """Test hash(IS)"""
         value = 1
-        hash(IS(value)) == hash(value)
+        assert hash(IS(value)) == hash(value)
 
 
 class TestBadValueRead:
