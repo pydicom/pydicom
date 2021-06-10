@@ -959,7 +959,7 @@ class TestIS:
                 val >= "1233"
 
     def test_hash(self):
-        """Test hash(DSdecimal)"""
+        """Test hash(IS)"""
         value = 1
         hash(IS(value)) == hash(value)
 
