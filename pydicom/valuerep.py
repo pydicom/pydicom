@@ -552,6 +552,9 @@ class DSfloat(float):
 
         return super().__eq__(other)
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
@@ -676,6 +679,9 @@ class DSdecimal(Decimal):
 
         return super().__eq__(other)
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
     def __ne__(self, other: Any) -> bool:
         return not self == other
 
@@ -776,6 +782,9 @@ class IS(int):
             return str(self) == other
 
         return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
     def __ne__(self, other: Any) -> bool:
         return not self == other

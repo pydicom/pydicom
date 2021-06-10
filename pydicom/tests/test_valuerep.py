@@ -668,6 +668,11 @@ class TestDSfloat:
             with pytest.raises(TypeError, match="'>=' not supported"):
                 val >= "1233"
 
+    def test_hash(self):
+        """Test hash(DSfloat)"""
+        assert hash(DSfloat(1.2345)) == hash(1.2345)
+        assert hash(DSfloat('1.2345')) == hash(1.2345)
+
 
 class TestDSdecimal:
     """Unit tests for pickling DSdecimal"""
@@ -836,6 +841,11 @@ class TestDSdecimal:
             with pytest.raises(TypeError, match="'>=' not supported"):
                 val >= "1233"
 
+    def test_hash(self):
+        """Test hash(DSdecimal)"""
+        assert hash(DSdecimal(1.2345)) == hash(Decimal(1.2345))
+        assert hash(DSdecimal('1.2345')) == hash(Decimal('1.2345'))
+
 
 class TestIS:
     """Unit tests for IS"""
@@ -947,6 +957,11 @@ class TestIS:
 
             with pytest.raises(TypeError, match="'>=' not supported"):
                 val >= "1233"
+
+    def test_hash(self):
+        """Test hash(IS)"""
+        assert hash(IS(1)) == hash(1)
+        assert hash(IS('1')) == hash(1)
 
 
 class TestBadValueRead:
