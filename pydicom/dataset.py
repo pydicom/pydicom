@@ -2634,7 +2634,9 @@ class FileDataset(Dataset):
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
-        self.file_meta: "FileMetaDataset" = file_meta or FileMetaDataset()
+        self.file_meta: "FileMetaDataset" = (
+            file_meta if file_meta is not None else FileMetaDataset()
+        )
         self.is_implicit_VR: bool = is_implicit_VR
         self.is_little_endian: bool = is_little_endian
 
@@ -2826,9 +2828,7 @@ class FileMetaDataset(Dataset):
         self.PrivateInformation: bytes  # OB, 1C
 
     @staticmethod
-    def validate(
-        init_value: Union[Dataset, MutableMapping[BaseTag, _DatasetValue]]
-    ) -> None:
+    def validate(init_value: _DatasetType) -> None:
         """Raise errors if initialization value is not acceptable for file_meta
 
         Parameters
