@@ -1146,9 +1146,7 @@ def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
         raise ImportError("Numpy is required to determine the dtype.")
 
     if ds.is_little_endian is None:
-        file_meta = cast("FileDataset", ds).file_meta
-        file_meta = cast("FileMetaDataset", file_meta)
-        ds.is_little_endian = file_meta.TransferSyntaxUID.is_little_endian
+        ds.is_little_endian = ds.file_meta.TransferSyntaxUID.is_little_endian
 
     if not as_float:
         # (0028,0103) Pixel Representation, US, 1
@@ -1302,9 +1300,7 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
 
     # Valid values for Planar Configuration are dependent on transfer syntax
     if nr_samples > 1:
-        file_meta = cast("FileDataset", ds).file_meta
-        file_meta = cast("FileMetaDataset", file_meta)
-        transfer_syntax = file_meta.TransferSyntaxUID
+        transfer_syntax = ds.file_meta.TransferSyntaxUID
         if transfer_syntax in ['1.2.840.10008.1.2.4.50',
                                '1.2.840.10008.1.2.4.57',
                                '1.2.840.10008.1.2.4.70',

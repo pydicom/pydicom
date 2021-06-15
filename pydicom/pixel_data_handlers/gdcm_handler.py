@@ -66,9 +66,8 @@ def needs_to_convert_to_RGB(ds: "Dataset"):
 
     This affects JPEG transfer syntaxes.
     """
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
     should_convert = (
-        file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
     )
     should_convert &= ds.SamplesPerPixel == 3
     return False
@@ -80,9 +79,8 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
     This affects JPEG transfer syntaxes.
     """
-    file_meta: "FileMetaDataset" = ds.file_meta  # type: ignore[has-type]
     should_change = (
-        file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
+        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
     )
     should_change &= ds.SamplesPerPixel == 3
     return False
@@ -114,9 +112,7 @@ def create_data_element(ds: "Dataset") -> "DataElement":
     gdcm.DataElement
         The converted *Pixel Data* element.
     """
-    file_meta = cast("FileDataset", ds).file_meta
-    file_meta = cast("FileMetaDataset", file_meta)
-    tsyntax = file_meta.TransferSyntaxUID
+    tsyntax = ds.file_meta.TransferSyntaxUID
     data_element = gdcm.DataElement(gdcm.Tag(0x7fe0, 0x0010))
     if tsyntax.is_compressed:
         if getattr(ds, 'NumberOfFrames', 1) > 1:
@@ -168,9 +164,7 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
         gdcm.PhotometricInterpretation(pi_type)
     )
 
-    file_meta = cast("FileDataset", ds).file_meta
-    file_meta = cast("FileMetaDataset", file_meta)
-    tsyntax = file_meta.TransferSyntaxUID
+    tsyntax = ds.file_meta.TransferSyntaxUID
     ts_type = gdcm.TransferSyntax.GetTSType(str.__str__(tsyntax))
     image.SetTransferSyntax(gdcm.TransferSyntax(ts_type))
     pixel_format = gdcm.PixelFormat(
@@ -209,7 +203,7 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
         #   originate with
         new = ds.group_dataset(0x0028)
         new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
-        new.file_meta = ds.file_meta  # type: ignore[has-type]
+        new.file_meta = ds.file_meta
         tfile = NamedTemporaryFile('wb')
         new.save_as(tfile.name)
         fname = tfile.name
@@ -286,9 +280,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             f"expected data {expected_length_pixels}"
         )
 
-    file_meta = cast("FileDataset", ds).file_meta
-    file_meta = cast("FileMetaDataset", file_meta)
-    tsyntax = file_meta.TransferSyntaxUID
+    tsyntax = ds.file_meta.TransferSyntaxUID
     if (
         config.APPLY_J2K_CORRECTIONS
         and tsyntax in [JPEG2000, JPEG2000Lossless]

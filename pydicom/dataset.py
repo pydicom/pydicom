@@ -33,12 +33,10 @@ from typing import (
 import warnings
 import weakref
 
-if TYPE_CHECKING:  # pragma: no cover
-    try:
-        import numpy  # type: ignore[import]
-        import numpy as np
-    except ImportError:
-        pass
+try:
+    import numpy  # type: ignore[import]
+except ImportError:
+    pass
 
 import pydicom  # for dcmwrite
 import pydicom.charset
@@ -220,18 +218,11 @@ def _dict_equal(
 
 _Dataset = TypeVar("_Dataset", bound="Dataset")
 _DatasetValue = Union[DataElement, RawDataElement]
+_DatasetType = Union[_Dataset, MutableMapping[BaseTag, _DatasetValue]]
 
 
-class Dataset(Dict[BaseTag, _DatasetValue]):
-    """Contains a collection (dictionary) of DICOM Data Elements.
-
-    Behaves like a :class:`dict`.
-
-    .. note::
-
-        :class:`Dataset` is only derived from :class:`dict` to make it work in
-        a NumPy :class:`~numpy.ndarray`. The parent :class:`dict` class
-        is never called, as all :class:`dict` methods are overridden.
+class Dataset:
+    """A DICOM dataset as a mutable mapping of DICOM Data Elements.
 
     Examples
     --------
@@ -374,9 +365,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
     """
     indent_chars = "   "
 
-    def __init__(
-        self, *args: MutableMapping[BaseTag, _DatasetValue], **kwargs
-    ) -> None:
+    def __init__(self, *args: _DatasetType, **kwargs) -> None:
         """Create a new :class:`Dataset` instance."""
         self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
 
@@ -410,6 +399,8 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         self._pixel_array: Optional["numpy.ndarray"] = None
         self._pixel_id: Dict[str, int] = {}
+
+        self.file_meta: FileMetaDataset
 
     def __enter__(self) -> "Dataset":
         """Method invoked on entry to a with statement."""
@@ -463,6 +454,10 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
+    def __array__(self) -> "numpy.ndarray":
+        """Support accessing the dataset from a numpy array."""
+        return numpy.asarray(self._dict)
+
     def data_element(self, name: str) -> Optional[DataElement]:
         """Return the element corresponding to the element keyword `name`.
 
@@ -484,7 +479,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             return self[tag]
         return None
 
-    def __contains__(self, name: TagType) -> bool:  # type: ignore[override]
+    def __contains__(self, name: TagType) -> bool:
         """Simulate dict.__contains__() to handle DICOM keywords.
 
         Examples
@@ -719,7 +714,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     @overload
     def get(self, key: str, default: Optional[Any] = None) -> Any:
-        pass
+        pass  # pragma: no cover
 
     @overload
     def get(
@@ -727,7 +722,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         key: Union[int, Tuple[int, int], BaseTag],
         default: Optional[Any] = None
     ) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def get(
         self,
@@ -774,9 +769,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         except KeyError:
             return default
 
-    def items(  # type: ignore[override]
-        self
-    ) -> AbstractSet[Tuple[BaseTag, _DatasetValue]]:
+    def items(self) -> AbstractSet[Tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -788,7 +781,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return self._dict.items()
 
-    def keys(self) -> AbstractSet[BaseTag]:  # type: ignore[override]
+    def keys(self) -> AbstractSet[BaseTag]:
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
@@ -852,11 +845,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     @overload
     def __getitem__(self, key: slice) -> "Dataset":
-        pass
+        pass  # pragma: no cover
 
     @overload
     def __getitem__(self, key: TagType) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def __getitem__(
         self, key: Union[slice, TagType]
@@ -1113,11 +1106,11 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
     @overload
     def get_item(self, key: slice) -> "Dataset":
-        pass
+        pass  # pragma: no cover
 
     @overload
     def get_item(self, key: TagType) -> DataElement:
-        pass
+        pass  # pragma: no cover
 
     def get_item(
         self, key: Union[slice, TagType]
@@ -1218,7 +1211,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return self[(group, 0x0000):(group + 1, 0x0000)]  # type: ignore[misc]
 
-    def __iter__(self) -> Iterator[DataElement]:  # type: ignore[override]
+    def __iter__(self) -> Iterator[DataElement]:
         """Iterate through the top-level of the Dataset, yielding DataElements.
 
         Examples
@@ -1468,9 +1461,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
 
         handler = getattr(pydicom.config, handler_name)
 
-        file_meta = cast("FileDataset", self).file_meta
-        file_meta = cast("FileMetaDataset", file_meta)
-        tsyntax = file_meta.TransferSyntaxUID
+        tsyntax = self.file_meta.TransferSyntaxUID
         if not handler.supports_transfer_syntax(tsyntax):
             raise NotImplementedError(
                 "Unable to decode pixel data with a transfer syntax UID"
@@ -1492,8 +1483,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         See :meth:`~Dataset.convert_pixel_data` for more information.
         """
         # Find all possible handlers that support the transfer syntax
-        file_meta = cast("FileDataset", self).file_meta
-        ts = cast("FileMetaDataset", file_meta).TransferSyntaxUID
+        ts = self.file_meta.TransferSyntaxUID
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
@@ -1802,7 +1792,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
             # All is as expected, updated the Transfer Syntax
             self.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
 
-    def overlay_array(self, group: int) -> "np.ndarray":
+    def overlay_array(self, group: int) -> "numpy.ndarray":
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
 
         .. versionadded:: 1.4
@@ -1874,7 +1864,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         raise last_exception  # type: ignore[misc]
 
     @property
-    def pixel_array(self) -> "np.ndarray":
+    def pixel_array(self) -> "numpy.ndarray":
         """Return the pixel data as a :class:`numpy.ndarray`.
 
         .. versionchanged:: 1.4
@@ -1891,7 +1881,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         self.convert_pixel_data()
         return cast("numpy.ndarray", self._pixel_array)
 
-    def waveform_array(self, index: int) -> "np.ndarray":
+    def waveform_array(self, index: int) -> "numpy.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
         `index` in the (5400,0100) *Waveform Sequence*.
 
@@ -2318,14 +2308,7 @@ class Dataset(Dict[BaseTag, _DatasetValue]):
         """
         return dir(self)
 
-    def update(  # type: ignore[override]
-        self,
-        d: Union[
-            Dict[str, Any],
-            MutableMapping[BaseTag, _DatasetValue],
-            MutableMapping[TagType, _DatasetValue]
-        ]
-    ) -> None:
+    def update(self, d: _DatasetType) -> None:
         """Extend :meth:`dict.update` to handle DICOM tags and keywords.
 
         Parameters
@@ -2619,7 +2602,7 @@ class FileDataset(Dataset):
     def __init__(
         self,
         filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
-        dataset: Dataset,
+        dataset: _DatasetType,
         preamble: Optional[bytes] = None,
         file_meta: Optional["FileMetaDataset"] = None,
         is_implicit_VR: bool = True,
@@ -2651,7 +2634,9 @@ class FileDataset(Dataset):
         """
         Dataset.__init__(self, dataset)
         self.preamble = preamble
-        self.file_meta: Optional["FileMetaDataset"] = file_meta
+        self.file_meta: "FileMetaDataset" = (
+            file_meta if file_meta is not None else FileMetaDataset()
+        )
         self.is_implicit_VR: bool = is_implicit_VR
         self.is_little_endian: bool = is_little_endian
 
@@ -2810,9 +2795,7 @@ class FileMetaDataset(Dataset):
     Group 2 (File Meta Information) data elements
     """
 
-    def __init__(
-        self, *args: MutableMapping[BaseTag, _DatasetValue], **kwargs
-    ) -> None:
+    def __init__(self, *args: _DatasetType, **kwargs) -> None:
         """Initialize a FileMetaDataset
 
         Parameters are as per :class:`Dataset`; this overrides the super class
@@ -2845,7 +2828,7 @@ class FileMetaDataset(Dataset):
         self.PrivateInformation: bytes  # OB, 1C
 
     @staticmethod
-    def validate(init_value: MutableMapping[BaseTag, _DatasetValue]) -> None:
+    def validate(init_value: _DatasetType) -> None:
         """Raise errors if initialization value is not acceptable for file_meta
 
         Parameters

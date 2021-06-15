@@ -155,9 +155,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     NotImplementedError
         If the transfer syntax is not supported
     """
-    file_meta = cast("FileDataset", ds).file_meta
-    file_meta = cast("FileMetaDataset", file_meta)
-    transfer_syntax = file_meta.TransferSyntaxUID
+    transfer_syntax = ds.file_meta.TransferSyntaxUID
 
     if not HAVE_PIL:
         raise ImportError(

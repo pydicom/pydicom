@@ -5,9 +5,16 @@ import copy
 import io
 import math
 import pickle
+import sys
 import weakref
 
 import pytest
+
+try:
+    import numpy
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
 
 import pydicom
 from pydicom import config
@@ -1835,28 +1842,44 @@ class TestFileDataset:
         fds = FileDataset(Dummy(), ds)
         assert '/some/path/to/test' == fds.filename
 
-    def test_works_as_expected_within_numpy_array(self):
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_with_array(self):
         """Test Dataset within a numpy array"""
-        try:
-            import numpy as np
-        except ImportError:
-            np = None
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        arr = numpy.array([ds])
+        assert arr[0].PatientName == ds.PatientName
+        assert arr.dtype == object
+        assert arr.shape == (1, )
+        assert arr.flags.writeable
 
-        if np is None:
-            pytest.skip('No numpy installed')
+        arr[0].PatientName = "Citizen^Jan"
+        assert arr[0].PatientName == "Citizen^Jan"
+        assert "BeamSequence" not in arr[0]
+        arr[0].BeamSequence = []
+        assert arr[0].BeamSequence == []
 
-        # see PR #836
-        dataset = Dataset()
-        patient_name = 'MacDonald^George'
-        dataset.PatientName = patient_name
-        array_of_datasets = np.array([dataset])
-        assert patient_name == array_of_datasets[0].PatientName
+        elem = arr[0]["PatientID"]
+        assert isinstance(elem, DataElement)
+
+        b = DicomBytesIO()
+        arr[0].save_as(b)
+        b.seek(0)
+
+        out = dcmread(b)
+        assert out == arr[0]
 
     def test_dataset_overrides_all_dict_attributes(self):
         """Ensure that we don't use inherited dict functionality"""
         ds = Dataset()
         di = dict()
-        expected_diff = {'__class__', '__doc__', '__hash__'}
+        expected_diff = {'__class__', '__doc__', '__hash__', 'fromkeys'}
+        if sys.version_info[:2] >= (3, 8):
+            expected_diff.add('__reversed__')
+        if sys.version_info[:2] >= (3, 9):
+            expected_diff.update([
+                '__ror__', '__ior__', '__or__', '__class_getitem__'
+            ])
+
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
     def test_copy_filedataset(self):

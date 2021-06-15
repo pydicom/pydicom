@@ -223,8 +223,7 @@ def generate_frames(
     RuntimeError
         If the plugin required to decode the pixel data is not installed.
     """
-    file_meta: "FileMetaDataset" = ds.file_meta
-    tsyntax = file_meta.TransferSyntaxUID
+    tsyntax = ds.file_meta.TransferSyntaxUID
     # The check of transfer syntax must be first
     if tsyntax not in _DECODERS:
         if tsyntax in _OPENJPEG_SYNTAXES:
