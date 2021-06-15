@@ -29,7 +29,6 @@
       ~Dataset.fix_meta_info
       ~Dataset.formatted_lines
       ~Dataset.from_json
-      ~Dataset.fromkeys
       ~Dataset.get
       ~Dataset.get_item
       ~Dataset.get_private_item

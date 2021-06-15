@@ -29,7 +29,6 @@
       ~FileMetaDataset.fix_meta_info
       ~FileMetaDataset.formatted_lines
       ~FileMetaDataset.from_json
-      ~FileMetaDataset.fromkeys
       ~FileMetaDataset.get
       ~FileMetaDataset.get_item
       ~FileMetaDataset.get_private_item

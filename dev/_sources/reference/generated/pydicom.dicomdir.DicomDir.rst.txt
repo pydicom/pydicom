@@ -29,7 +29,6 @@
       ~DicomDir.fix_meta_info
       ~DicomDir.formatted_lines
       ~DicomDir.from_json
-      ~DicomDir.fromkeys
       ~DicomDir.get
       ~DicomDir.get_item
       ~DicomDir.get_private_item

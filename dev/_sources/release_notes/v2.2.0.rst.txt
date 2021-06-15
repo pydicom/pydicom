@@ -29,6 +29,7 @@ Changes
 * :func:`~pydicom.filewriter.write_file` is deprecated and will be removed in
   v3.0, use :func:`~pydicom.filewriter.dcmwrite` instead.
 * Data dictionaries updated to version 2021b of the DICOM Standard
+* :class:`~pydicom.dataset.Dataset` no longer inherits from :class:`dict`
 
 Enhancements
 ------------
