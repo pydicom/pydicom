@@ -106,4 +106,4 @@ Fixes
   rather than YBR with the Pillow pixel data handler (:pr:`878`)
 * Allow to deepcopy a `~pydicom.dataset.FileDataset` object (:issue:`1147`)
 * Fixed elements with a VR of **OL**, **OD** and **OV** not being set correctly
-  when an encoded backslash was part of the element value (:issue:`1421`)
+  when an encoded backslash was part of the element value (:issue:`1412`)
