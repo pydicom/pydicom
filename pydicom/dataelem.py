@@ -433,8 +433,9 @@ class DataElement:
     @value.setter
     def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
-        # Ignore backslash characters in these str or byte VRs
-        #   Based on Part 5, Section 6.2 and
+        # Ignore backslash characters in these VRs, based on:
+        # * Which str VRs can have backslashes in Part 5, Section 6.2
+        # * All byte VRs
         exclusions = [
             'LT', 'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'ST', 'UN', 'UT',
             'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB',
