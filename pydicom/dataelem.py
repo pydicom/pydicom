@@ -439,6 +439,8 @@ class DataElement:
         exclusions = [
             'LT', 'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'ST', 'UN', 'UT',
             'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB',
+            # Probably not needed
+            'AT', 'FD', 'FL', 'SQ', 'SS', 'SL', 'UL',
         ]
 
         # Check if is a string with multiple values separated by '\'
