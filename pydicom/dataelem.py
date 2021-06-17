@@ -433,13 +433,24 @@ class DataElement:
     @value.setter
     def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
+        # Ignore backslash characters in these VRs, based on:
+        # * Which str VRs can have backslashes in Part 5, Section 6.2
+        # * All byte VRs
+        exclusions = [
+            'LT', 'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'ST', 'UN', 'UT',
+            'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB',
+            # Probably not needed
+            'AT', 'FD', 'FL', 'SQ', 'SS', 'SL', 'UL',
+        ]
+
         # Check if is a string with multiple values separated by '\'
         # If so, turn them into a list of separate strings
         #  Last condition covers 'US or SS' etc
-        if isinstance(val, (str, bytes)) and self.VR not in \
-                ['UT', 'ST', 'LT', 'FL', 'FD', 'AT', 'OB', 'OW', 'OF', 'SL',
-                 'SQ', 'SS', 'UL', 'OB/OW', 'OW/OB', 'OB or OW',
-                 'OW or OB', 'UN'] and 'US' not in self.VR:
+        if (
+            isinstance(val, (str, bytes))
+            and self.VR not in exclusions
+            and 'US' not in self.VR
+        ):
             try:
                 if _backslash_str in val:
                     val = cast(str, val).split(_backslash_str)
