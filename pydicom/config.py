@@ -5,11 +5,11 @@
 
 import logging
 import os
-from typing import Optional, Callable, Dict, Any, TYPE_CHECKING
+from typing import Optional, Callable, Dict, Any, TYPE_CHECKING, List, Union
 
 have_numpy = True
 try:
-    import numpy
+    import numpy  # type: ignore[import]
 except ImportError:
     have_numpy = False
 
@@ -26,7 +26,10 @@ VR of **DS** are represented as :class:`~decimal.Decimal`.
 Default ``False``.
 """
 
-data_element_callback: Optional[Callable[["RawDataElement"], None]] = None
+# raw_data_element,
+# encoding=encoding,
+# **config.data_element_callback_kwargs
+data_element_callback: Optional[Any] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
 :class:`~pydicom.dataelem.RawDataElement` has been returned,
@@ -380,6 +383,7 @@ element tag as a 2-tuple or int, or an element keyword
 """
 
 debugging: bool
+
 
 def debug(debug_on: bool = True, default_handler: bool = True) -> None:
     """Turn on/off debugging of DICOM file reading and writing.

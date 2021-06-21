@@ -12,13 +12,13 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import PIL
+    import PIL  # type: ignore[import]
     from PIL import Image, features
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")

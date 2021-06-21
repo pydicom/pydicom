@@ -52,7 +52,7 @@ from typing import TYPE_CHECKING, cast
 import warnings
 
 try:
-    import numpy as np
+    import numpy as np  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False

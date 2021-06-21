@@ -13,12 +13,17 @@ _size_factors = {
 }
 
 
-def size_in_bytes(expr: Optional[str]) -> Union[None, float, int]:
+def size_in_bytes(
+    expr: Optional[Union[int, float, str]]
+) -> Union[None, float, int]:
     """Return the number of bytes for `defer_size` argument in
     :func:`~pydicom.filereader.dcmread`.
     """
     if expr is None or expr == float('inf'):
         return None
+
+    if isinstance(expr, (int, float)):
+        return expr
 
     try:
         return int(expr)

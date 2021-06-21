@@ -11,13 +11,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 try:
-    import numpy
+    import numpy  # type: ignore[import]
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import gdcm
+    import gdcm  # type: ignore[import]
     from gdcm import DataElement
     HAVE_GDCM = True
     HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, 'SetByteStringValue')
