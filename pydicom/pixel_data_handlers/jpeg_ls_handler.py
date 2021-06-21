@@ -103,20 +103,19 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             "imported"
         )
 
-    dtype = pixel_dtype(ds)
-    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
     pixel_bytes = bytearray()
 
+    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
     if nr_frames > 1:
-        for frame in decode_data_sequence(ds.PixelData):
-            im = jpeg_ls.decode(numpy.frombuffer(frame))
-            pixel_bytes.append(im.tobytes())
+        for src in decode_data_sequence(ds.PixelData):
+            frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+            pixel_bytes.extend(frame.tobytes())
     else:
-        frame = defragment_data(ds.PixelData)
-        im = jpeg_ls.decode(numpy.frombuffer(frame))
-        pixel_bytes.append(im.tobytes())
+        src = defragment_data(ds.PixelData)
+        frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+        pixel_bytes.extend(frame.tobytes())
 
-    arr = numpy.frombuffer(pixel_bytes, dtype)
+    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
