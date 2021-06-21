@@ -9,10 +9,10 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-def print_character(ordchr: int) -> str:
+def print_character(char: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
-    if 31 < ordchr < 126 and ordchr != 92:
-        return chr(ordchr)
+    if 31 < char < 126 and char != 92:
+        return f"{char:02X}"
 
     return '.'
 
@@ -21,7 +21,7 @@ def filedump(
     filename: Union[str, pathlib.Path],
     start_address: int = 0,
     stop_address: Optional[int] = None,
-) -> BytesIO:
+) -> str:
     """Dump out the contents of a file to a
        standard hex dump 16 bytes wide"""
 
@@ -36,48 +36,45 @@ def datadump(data: bytes) -> None:
 
 
 def hexdump(
-    file_in: BinaryIO,
+    f: BinaryIO,
     start_address: int = 0,
     stop_address: Optional[int] = None,
-    showAddress: bool = True,
-) -> BytesIO:
+    show_address: bool = True,
+) -> str:
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
 
     file_in -- a file-like object to get the bytes to show from"""
 
-    str_out = BytesIO()
+    s = []
     # space taken up if row has a full 16 bytes
     byteslen = 16 * 3 - 1
     blanks = ' ' * byteslen
 
-    file_in.seek(start_address)
-    data = True  # dummy to start the loop
-    while data:
-        if stop_address and file_in.tell() > stop_address:
+    f.seek(start_address)
+    while True:
+        if stop_address and f.tell() > stop_address:
             break
-        if showAddress:
+
+        if show_address:
             # address at start of line
-            str_out.write("%04x : " % (file_in.tell()))
-        data = file_in.read(16)
+            s.append(f"{f.tell():04X}")
+
+        data = f.read(16)
         if not data:
             break
-        row = [ord(x) for x in data]  # need ord twice below so convert once
 
         # string of two digit hex bytes
-        byte_string = ' '.join(["%02x" % x for x in row])
-        str_out.write(byte_string)
+        b = ' '.join([f"{x:02X}" for x in data])
+        s.append(f"{b:<16}")  # if not 16, pad
+        s.append('  ')
 
-        # if not 16, pad
-        str_out.write(blanks[:byteslen - len(byte_string)])
-        str_out.write('  ')
+        # character repr of bytes
+        s.append(''.join([print_character(x) for x in data]))
+        s.append("\n")
 
-        # character rep of bytes
-        str_out.write(''.join([print_character(x) for x in row]))
-        str_out.write("\n")
-
-    return str_out.getvalue()
+    return ''.join(s)
 
 
 def pretty_print(
