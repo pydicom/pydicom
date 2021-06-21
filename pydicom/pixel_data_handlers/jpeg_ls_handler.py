@@ -109,11 +109,11 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     if nr_frames > 1:
         for frame in decode_data_sequence(ds.PixelData):
-            im = jpeg_ls.decode(numpy.frombuffer(frame, dtype=dtype))
+            im = jpeg_ls.decode(numpy.frombuffer(frame))
             pixel_bytes.append(im.tobytes())
     else:
         frame = defragment_data(ds.PixelData)
-        im = jpeg_ls.decode(numpy.frombuffer(frame, dtype=dtype))
+        im = jpeg_ls.decode(numpy.frombuffer(frame))
         pixel_bytes.append(im.tobytes())
 
     arr = numpy.frombuffer(pixel_bytes, dtype)

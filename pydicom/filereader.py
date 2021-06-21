@@ -361,7 +361,7 @@ def read_dataset(
     is_little_endian: bool,
     bytelength: Optional[int] = None,
     stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, float]] = None,
+    defer_size: Optional[Union[str, int, float]] = None,
     parent_encoding: Union[str, MutableSequence[str]] = default_encoding,
     specific_tags: Optional[List[BaseTag]] = None,
     at_top_level: bool = True
@@ -383,7 +383,7 @@ def read_dataset(
     stop_when : None, optional
         Optional call_back function which can terminate reading. See help for
         :func:`data_element_generator` for details
-    defer_size : int, None, optional
+    defer_size : int, str or float, optional
         Size to avoid loading large elements in memory. See :func:`dcmread` for
         more parameter info.
     parent_encoding : str or List[str]
@@ -738,7 +738,7 @@ def _at_pixel_data(tag: BaseTag, VR: Optional[str], length: int) -> bool:
 def read_partial(
     fileobj: BinaryIO,
     stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, float]] = None,
+    defer_size: Optional[Union[int, str, float]] = None,
     force: bool = False,
     specific_tags: Optional[List[BaseTag]] = None
 ) -> Union[FileDataset, DicomDir]:
@@ -750,7 +750,7 @@ def read_partial(
         Note that the file will not close when the function returns.
     stop_when :
         Stop condition. See :func:`read_dataset` for more info.
-    defer_size : int, str, None, optional
+    defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
     force : bool
         See :func:`dcmread` for parameter info.
@@ -889,7 +889,7 @@ def read_partial(
 
 def dcmread(
     fp: Union[PathType, BinaryIO],
-    defer_size: Optional[Union[str, int]] = None,
+    defer_size: Optional[Union[str, int, float]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: Optional[TagListType] = None
@@ -933,7 +933,7 @@ def dcmread(
         path to the file. The file-like object must have ``seek()``,
         ``read()`` and ``tell()`` methods and the caller is responsible for
         closing it (if required).
-    defer_size : int or str, optional
+    defer_size : int, str or float, optional
         If not used then all elements are read into memory. If specified,
         then if a data element's stored value is larger than `defer_size`, the
         value is not read into memory until it is accessed in code. Should be

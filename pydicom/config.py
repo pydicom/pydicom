@@ -26,9 +26,7 @@ VR of **DS** are represented as :class:`~decimal.Decimal`.
 Default ``False``.
 """
 
-# raw_data_element,
-# encoding=encoding,
-# **config.data_element_callback_kwargs
+
 data_element_callback: Optional[Any] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a

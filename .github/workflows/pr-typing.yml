@@ -25,6 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install mypy
         pip install types-requests types-pkg_resources
-    - name: Run typing check without dependencies
+    - name: Run typing check with mypy
       run: |
         mypy
