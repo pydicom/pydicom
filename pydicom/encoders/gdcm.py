@@ -5,7 +5,7 @@ from typing import Any, cast
 from pydicom.uid import RLELossless, ImplicitVRLittleEndian
 
 try:
-    import gdcm  # type: ignore[import]
+    import gdcm
     HAVE_GDCM = True
 except ImportError:
     HAVE_GDCM = False

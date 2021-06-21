@@ -40,7 +40,7 @@ import sys
 from typing import List, TYPE_CHECKING, cast
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False

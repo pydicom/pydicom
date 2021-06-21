@@ -9,7 +9,7 @@ from typing import Optional, Callable, Dict, Any, TYPE_CHECKING, List, Union
 
 have_numpy = True
 try:
-    import numpy  # type: ignore[import]
+    import numpy
 except ImportError:
     have_numpy = False
 

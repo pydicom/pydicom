@@ -9,7 +9,7 @@ from typing import (
 import warnings
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False

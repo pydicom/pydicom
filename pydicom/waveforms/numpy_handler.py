@@ -31,7 +31,7 @@ given in the table below.
 from typing import TYPE_CHECKING, Generator, cast, List
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False

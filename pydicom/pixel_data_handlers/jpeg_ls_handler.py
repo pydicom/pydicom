@@ -6,13 +6,13 @@ package to decode *Pixel Data*.
 from typing import TYPE_CHECKING, cast
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import jpeg_ls  # type: ignore[import]
+    import jpeg_ls
     HAVE_JPEGLS = True
 except ImportError:
     HAVE_JPEGLS = False

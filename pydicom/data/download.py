@@ -21,7 +21,7 @@ except ImportError:
     HAVE_REQUESTS = False
 
 try:
-    import tqdm  # type: ignore[import]
+    import tqdm
 
     if HAVE_REQUESTS is False:
         class DownloadProgressBar(tqdm.tqdm):

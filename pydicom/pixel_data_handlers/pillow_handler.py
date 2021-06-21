@@ -8,17 +8,17 @@ import logging
 from typing import TYPE_CHECKING, cast
 import warnings
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import PIL  # type: ignore[import]
+    import PIL
     from PIL import Image, features
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
