@@ -5,7 +5,7 @@ from importlib import import_module
 import sys
 from typing import (
     Callable, Iterator, Tuple, List, Optional, Dict, Union, cast, Iterable,
-    TYPE_CHECKING
+    TYPE_CHECKING, Any
 )
 
 from pydicom.encaps import encapsulate
@@ -112,7 +112,7 @@ class Encoder:
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> bytes:
         """Return an encoded frame of the pixel data in `src` as
         :class:`bytes`.
@@ -206,7 +206,7 @@ class Encoder:
         arr: "numpy.ndarray",
         idx: Optional[int] = None,
         encoding_plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from `arr`."""
         self._check_kwargs(kwargs)
@@ -230,7 +230,7 @@ class Encoder:
         src: bytes,
         idx: Optional[int] = None,
         encoding_plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from `src`.
 
@@ -283,7 +283,7 @@ class Encoder:
         idx: Optional[int] = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> bytes:
         """Return a single encoded frame from the *Pixel Data* in `ds`."""
         kwargs = {**self.kwargs_from_ds(ds), **kwargs}
@@ -331,7 +331,7 @@ class Encoder:
         src: Union[bytes, "numpy.ndarray", "Dataset"],
         encoding_plugin: str = '',
         decoding_plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> Iterator[bytes]:
         """Yield encoded frames of the pixel data in  `src` as :class:`bytes`.
 
@@ -512,7 +512,7 @@ class Encoder:
         """Return the name of the encoder as :class:`str`."""
         return f"{self.UID.keyword}Encoder"
 
-    def _preprocess(self, arr: "numpy.ndarray", **kwargs) -> bytes:
+    def _preprocess(self, arr: "numpy.ndarray", **kwargs: Any) -> bytes:
         """Preprocess `arr` before encoding to ensure it meets requirements.
 
         `arr` will be checked against the required keys in `kwargs` before
@@ -647,7 +647,7 @@ class Encoder:
         self,
         src: bytes,
         plugin: str = '',
-        **kwargs
+        **kwargs: Any,
     ) -> bytes:
         """Return an encoded frame from `src` as :class:`bytes`.
 
@@ -711,7 +711,7 @@ class Encoder:
         if plugin:
             # Try specific encoder
             try:
-                return self._available[plugin](src, **kwargs)
+                return cast(bytes, self._available[plugin](src, **kwargs))
             except Exception as exc:
                 raise RuntimeError(
                     "Unable to encode as an exception was raised by the "
@@ -722,7 +722,7 @@ class Encoder:
         failure_messages: List[str] = []
         for name, func in self._available.items():
             try:
-                return func(src, **kwargs)
+                return cast(bytes, func(src, **kwargs))
             except Exception as exc:
                 failure_messages.append(f"{name}: {str(exc)}")
 
@@ -754,7 +754,7 @@ class Encoder:
         """
         return self._uid
 
-    def _validate_encoding_profile(self, **kwargs) -> None:
+    def _validate_encoding_profile(self, **kwargs: Any) -> None:
         """Perform  UID specific validation of encoding parameters based on
         Part 5, Section 8 of the DICOM Standard.
 

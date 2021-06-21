@@ -1,12 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Miscellaneous utility routines relating to hex and byte strings"""
 
-from binascii import (a2b_hex, b2a_hex)
+from binascii import a2b_hex, b2a_hex
+from typing import Union
 
 from pydicom.charset import default_encoding
 
 
-def hex2bytes(hexstring):
+def hex2bytes(hexstring: Union[str, bytes]) -> bytes:
     """Return bytestring for a string of hex bytes separated by whitespace
 
     This is useful for creating specific byte sequences for testing, using
@@ -32,12 +33,13 @@ def hex2bytes(hexstring):
     # true in 2.x so the difference in bytes constructor doesn't matter
     if isinstance(hexstring, bytes):
         return a2b_hex(hexstring.replace(b" ", b""))
-    elif isinstance(hexstring, str):
+
+    if isinstance(hexstring, str):
         return a2b_hex(bytes(hexstring.replace(" ", ""), default_encoding))
+
     raise TypeError('argument shall be bytes or string type')
 
 
-def bytes2hex(byte_string):
-    s = b2a_hex(byte_string)
-    s = s.decode()
+def bytes2hex(byte_string: bytes) -> str:
+    s = b2a_hex(byte_string).decode()
     return " ".join(s[i:i + 2] for i in range(0, len(s), 2))

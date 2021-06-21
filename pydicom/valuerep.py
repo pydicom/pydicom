@@ -77,7 +77,7 @@ class DA(_DateTimeBase, datetime.date):
     Note that the :class:`datetime.date` base class is immutable.
     """
     def __new__(  # type: ignore[misc]
-        cls: Type["DA"], *args, **kwargs
+        cls: Type["DA"], *args: Any, **kwargs: Any
     ) -> Optional["DA"]:
         """Create an instance of DA object.
 
@@ -123,7 +123,7 @@ class DA(_DateTimeBase, datetime.date):
                 f"Unable to convert '{val}' to 'DA' object"
             ) from exc
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new **DA** element value."""
         val = args[0]
         if isinstance(val, str):
@@ -167,7 +167,7 @@ class DT(_DateTimeBase, datetime.datetime):
         )
 
     def __new__(  # type: ignore[misc]
-        cls: Type["DT"], *args, **kwargs
+        cls: Type["DT"], *args: Any, **kwargs: Any
     ) -> Optional["DT"]:
         """Create an instance of DT object.
 
@@ -239,7 +239,7 @@ class DT(_DateTimeBase, datetime.datetime):
                 f"Unable to convert '{val}' to 'DT' object"
             ) from exc
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a new **DT** element value."""
         val = args[0]
         if isinstance(val, str):
@@ -280,7 +280,7 @@ class TM(_DateTimeBase, datetime.time):
     )
 
     def __new__(  # type: ignore[misc]
-        cls: Type["TM"], *args, **kwargs
+        cls: Type["TM"], *args: Any, **kwargs: Any
     ) -> Optional["TM"]:
         """Create an instance of TM object from a string.
 
@@ -324,17 +324,17 @@ class TM(_DateTimeBase, datetime.time):
             if match.group('ms'):
                 microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
-            return super().__new__(  # type: ignore[call-arg]
+            return super().__new__(  # type: ignore[call-arg, no-any-return]
                 cls, hour, minute, second, microsecond
             )
 
         if isinstance(val, datetime.time):
-            return super().__new__(  # type: ignore[call-arg]
+            return super().__new__(  # type: ignore[call-arg, no-any-return]
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
         try:
-            return super().__new__(  # type: ignore[call-arg]
+            return super().__new__(  # type: ignore[call-arg, no-any-return]
                 cls, *args, **kwargs
             )
         except Exception as exc:
@@ -342,7 +342,7 @@ class TM(_DateTimeBase, datetime.time):
                 f"Unable to convert '{val}' to 'TM' object"
             ) from exc
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__()
         val = args[0]
         if isinstance(val, str):
@@ -485,7 +485,7 @@ class DSfloat(float):
 
     def __new__(  # type: ignore[misc]
         cls: Type["DSfloat"],
-        val: Union[str, int, float, Decimal],
+        val: Union[None, str, int, float, Decimal],
         auto_format: bool = False
     ) -> Optional[Union[str, "DSfloat"]]:
         if val is None:
@@ -545,7 +545,7 @@ class DSfloat(float):
                     'of DS'
                 )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -555,7 +555,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -594,7 +594,7 @@ class DSdecimal(Decimal):
 
     def __new__(  # type: ignore[misc]
         cls: Type["DSdecimal"],
-        val: Union[str, int, float, Decimal],
+        val: Union[None, str, int, float, Decimal],
         auto_format: bool = False
     ) -> Optional[Union[str, "DSdecimal"]]:
         """Create an instance of DS object, or return a blank string if one is
@@ -672,7 +672,7 @@ class DSdecimal(Decimal):
                     'of DS'
                 )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -682,7 +682,7 @@ class DSdecimal(Decimal):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -776,7 +776,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -786,7 +786,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         return not self == other
 
     def __str__(self) -> str:
@@ -803,6 +803,7 @@ class IS(int):
 _T = TypeVar('_T')
 
 
+# FIXME: ARGH!
 def _as_str(s: str):
     return str(s)
 
@@ -840,21 +841,24 @@ def MultiString(
     return MultiValue(valtype, splitup)
 
 
-def _verify_encodings(encodings):
+def _verify_encodings(
+    encodings: Optional[Union[str, Sequence[str], Tuple[str, ...]]]
+) -> Optional[Tuple[str, ...]]:
     """Checks the encoding to ensure proper format"""
-    if encodings is not None:
-        if not isinstance(encodings, (list, tuple)):
-            return encodings,
-        return tuple(encodings)
-    return encodings
+    if encodings is None:
+        return None
+
+    return tuple(encodings)
 
 
-def _decode_personname(components, encodings):
+def _decode_personname(
+    components: Sequence[Union[str, bytes]], encodings: Sequence[str]
+) -> Tuple[str, ...]:
     """Return a list of decoded person name components.
 
     Parameters
     ----------
-    components : list of byte string
+    components : list of bytes
         The list of the up to three encoded person name components
     encodings : list of str
         The Python encodings uses to decode `components`.
@@ -869,24 +873,28 @@ def _decode_personname(components, encodings):
     """
     from pydicom.charset import decode_bytes
 
-    if isinstance(components[0], str):
-        comps = components
-    else:
-        comps = [
-            decode_bytes(comp, encodings, PN_DELIMS) for comp in components
-        ]
+    comps: List[str] = []
+    for c in components:
+        if isinstance(c, str):
+            comps.append(c)
+        else:
+            comps.append(decode_bytes(c, encodings, PN_DELIMS))
+
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:
         comps.pop()
+
     return tuple(comps)
 
 
-def _encode_personname(components, encodings):
+def _encode_personname(
+    components: Sequence[str], encodings: Sequence[str]
+) -> bytes:
     """Encode a list of text string person name components.
 
     Parameters
     ----------
-    components : list of text type
+    components : list of str
         The list of the up to three unicode person name components
     encodings : list of str
         The Python encodings uses to encode `components`.
@@ -903,8 +911,9 @@ def _encode_personname(components, encodings):
 
     encoded_comps = []
     for comp in components:
-        groups = [encode_string(group, encodings)
-                  for group in comp.split('^')]
+        groups = [
+            encode_string(group, encodings) for group in comp.split('^')
+        ]
         encoded_comps.append(b'^'.join(groups))
 
     # Remove empty elements from the end
@@ -916,7 +925,7 @@ def _encode_personname(components, encodings):
 class PersonName:
     """Representation of the value for an element with VR **PN**."""
     def __new__(  # type: ignore[misc]
-        cls: Type["PersonName"], *args, **kwargs
+        cls: Type["PersonName"], *args: Any, **kwargs: Any
     ) -> Optional["PersonName"]:
         if len(args) and args[0] is None:
             return None
@@ -949,6 +958,7 @@ class PersonName:
         """
         self.original_string: bytes
         self._components: Optional[Tuple[str, ...]] = None
+        self.encodings: Optional[Tuple[str, ...]]
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -970,7 +980,7 @@ class PersonName:
             self._components = tuple(components)
 
             # if the encoding is not given, leave it as undefined (None)
-        self.encodings: List[str] = _verify_encodings(encodings)
+        self.encodings = _verify_encodings(encodings)
 
     def _create_dict(self) -> Dict[str, str]:
         """Creates a dictionary of person name group and component names.
@@ -1079,11 +1089,11 @@ class PersonName:
         except IndexError:
             return ''
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         """Return ``True`` if `other` equals the current name."""
         return str(self) == other
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
@@ -1111,7 +1121,7 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Optional[List[str]] = None) -> "PersonName":
+    def decode(self, encodings: Optional[Sequence[str]] = None) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1142,7 +1152,7 @@ class PersonName:
 
         return PersonName(self.original_string, encodings)
 
-    def encode(self, encodings: Optional[List[str]] = None) -> bytes:
+    def encode(self, encodings: Optional[Sequence[str]] = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1164,7 +1174,9 @@ class PersonName:
         # if the encoding is not the original encoding, we have to return
         # a re-encoded string (without updating the original string)
         if encodings != self.encodings and self.encodings is not None:
-            return _encode_personname(self.components, encodings)
+            return _encode_personname(
+                self.components, cast(Sequence[str], encodings)
+            )
 
         if self.original_string is None:
             # if the original encoding was not set, we set it now
@@ -1512,7 +1524,7 @@ class PersonName:
 
 
 # Alias old class names for backwards compat in user code
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     if name == "PersonNameUnicode":
         warnings.warn(
             "'PersonNameUnicode' is deprecated and will be removed in "

@@ -410,19 +410,23 @@ def length_of_undefined_length(
     return None
 
 
-def read_delimiter_item(fp, delimiter):
+def read_delimiter_item(fp, delimiter) -> None:
     """Read and ignore an expected delimiter.
 
     If the delimiter is not found or correctly formed, a warning is logged.
     """
     found = fp.read(4)
     if found != delimiter:
-        logger.warn("Expected delimitor %s, got %s at file position 0x%x",
-                    Tag(delimiter), Tag(found), fp.tell() - 4)
+        logger.warn(
+            f"Expected delimitor {Tag(delimiter)}, got "
+            f"{Tag(found)} at file position 0x{fp.tell() - 4:X}"
+        )
     length = fp.read_UL()
     if length != 0:
-        logger.warn("Expected delimiter item to have length 0, "
-                    "got %d at file position 0x%x", length, fp.tell() - 4)
+        logger.warn(
+            "Expected delimiter item to have length 0, "
+            f"got {length}at file position 0x{fp.tell() - 4:X}"
+        )
 
 
 def path_from_pathlike(

@@ -154,7 +154,7 @@ def online_test_file_dummy_paths() -> Dict[str, str]:
     return dummy_path_map
 
 
-def fetch_data_files():
+def fetch_data_files() -> None:
     """Download missing test files to the local cache."""
     cache = get_data_dir()
     paths = {cache / fname: fname for fname in list(get_url_map().keys())}

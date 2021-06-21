@@ -8,7 +8,7 @@ import hashlib
 import json
 import os
 import pathlib
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 import urllib.request
 import urllib.error
 import warnings
@@ -25,7 +25,9 @@ try:
 
     if HAVE_REQUESTS is False:
         class DownloadProgressBar(tqdm.tqdm):
-            def update_to(self, b=1, bsize=1, tsize=None):
+            def update_to(
+                self, b: int = 1, bsize: int = 1, tsize: Optional[int] = None
+            ) -> None:
                 if tsize is not None:
                     self.total = tsize
                 self.update(b * bsize - self.n)
@@ -41,12 +43,12 @@ HERE = pathlib.Path(__file__).resolve().parent
 _SIMULATE_NETWORK_OUTAGE = False  # For testing network outages
 
 
-def calculate_file_hash(fpath: os.PathLike) -> str:
+def calculate_file_hash(fpath: pathlib.Path) -> str:
     """Return the SHA256 checksum for the file at `fpath`.
 
     Parameters
     ----------
-    fpath : os.PathLike
+    fpath : pathlib.Path
         The absolute path to the file that is to be checksummed.
 
     Returns
@@ -79,17 +81,16 @@ def get_config_dir() -> pathlib.Path:
 
 @retry.retry(
     (urllib.error.HTTPError, urllib.error.URLError),
-    exception_msg=("Installing the `requests` package "
-                   "could be a possible solution to this problem.")
+    exc_msg=("Installing the `requests` package may help")
 )
-def download_with_progress(url: str, fpath: os.PathLike) -> None:
+def download_with_progress(url: str, fpath: pathlib.Path) -> None:
     """Download the file at `url` to `fpath` with a progress bar.
 
     Parameters
     ----------
     url : str
         The URL to download the file from.
-    fpath : os.PathLike
+    fpath : pathlib.Path
         The absolute path where the file will be written to.
     """
     filename = os.fspath(fpath)
@@ -134,7 +135,7 @@ def get_data_dir() -> pathlib.Path:
 def get_url_map() -> Dict[str, str]:
     """Return a dict containing the URL mappings from ``urls.json```."""
     with open(HERE / "urls.json", "r") as url_file:
-        return json.load(url_file)
+        return cast(Dict[str, str], json.load(url_file))
 
 
 def get_url(filename: str) -> str:
@@ -174,7 +175,7 @@ def data_path_with_download(
     redownload_on_hash_mismatch: bool = True,
     url: Optional[str] = None,
     quiet: bool = True
-) -> os.PathLike:
+) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
 
     If the file isn't available in the cache then it will be downloaded.
@@ -193,7 +194,7 @@ def data_path_with_download(
 
     Returns
     -------
-    os.PathLike
+    pathlib.Path
         The absolute path to the file.
     """
     if _SIMULATE_NETWORK_OUTAGE:
@@ -251,7 +252,7 @@ def get_cached_filehash(filename: str) -> str:
         The SHA256 checksum of the cached file.
     """
     with open(HERE / "hashes.json", "r") as hash_file:
-        hashes = json.load(hash_file)
+        hashes = cast(Dict[str, str], json.load(hash_file))
         # Convert filenames to lowercase because windows filenames are
         #   case-insensitive
         hashes = {k.lower(): v for k, v in hashes.items()}

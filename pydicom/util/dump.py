@@ -2,31 +2,45 @@
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
+import pathlib.Path
+from typing import Union, Optional, BinaryIO, TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 
-def print_character(ordchr):
+def print_character(ordchr: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
     if 31 < ordchr < 126 and ordchr != 92:
         return chr(ordchr)
-    else:
-        return '.'
+
+    return '.'
 
 
-def filedump(filename, start_address=0, stop_address=None):
+def filedump(
+    filename: Union[str, pathlib.Path],
+    start_address: int = 0,
+    stop_address: Optional[int] = None,
+) -> BytesIO:
     """Dump out the contents of a file to a
        standard hex dump 16 bytes wide"""
 
-    fp = open(filename, 'rb')
-    return hexdump(fp, start_address, stop_address)
+    with open(filename, 'rb') as f:
+        return hexdump(f, start_address, stop_address)
 
 
-def datadump(data):
+def datadump(data: bytes) -> None:
     stop_address = len(data) + 1
     fp = BytesIO(data)
     print(hexdump(fp, 0, stop_address))
 
 
-def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
+def hexdump(
+    file_in: BinaryIO,
+    start_address: int = 0,
+    stop_address: Optional[int] = None,
+    showAddress: bool = True,
+) -> BytesIO:
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
@@ -66,7 +80,9 @@ def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
     return str_out.getvalue()
 
 
-def pretty_print(ds, indent=0, indent_chars="   "):
+def pretty_print(
+    ds: "Dataset", indent: int = 0, indent_chars: str = "   "
+) -> None:
     """Print a dataset directly, with indented levels.
 
     This is just like Dataset._pretty_str, but more useful for debugging as it
@@ -77,18 +93,17 @@ def pretty_print(ds, indent=0, indent_chars="   "):
 
     indentStr = indent_chars * indent
     nextIndentStr = indent_chars * (indent + 1)
-    for data_element in ds:
-        if data_element.VR == "SQ":  # a sequence
-            fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
-            new_str = fmt_str.format(indentStr,
-                                     str(data_element.tag), data_element.name,
-                                     len(data_element.value))
-            print(new_str)
-            for dataset in data_element.value:
+    for elem in ds:
+        if elem.VR == "SQ":  # a sequence
+            print(
+                f"{indentStr}{elem.tag} {elem.name}  {elem.value:d} "
+                "item(s) ---"
+            )
+            for dataset in elem.value:
                 pretty_print(dataset, indent + 1)
                 print(nextIndentStr + "---------")
         else:
-            print(indentStr + repr(data_element))
+            print(indentStr + repr(elem))
 
 
 if __name__ == "__main__":

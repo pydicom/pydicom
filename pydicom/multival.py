@@ -79,7 +79,7 @@ class MultiValue(MutableSequence[_ItemType]):
         self._list += [self.type_constructor(x) for x in other]
         return self
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         return self._list == other
 
     @overload
@@ -103,7 +103,7 @@ class MultiValue(MutableSequence[_ItemType]):
     def __len__(self) -> int:
         return len(self._list)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         return self._list != other
 
     @overload
