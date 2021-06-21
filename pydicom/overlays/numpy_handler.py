@@ -28,11 +28,11 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, Dict, Any
 import warnings
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -55,7 +55,7 @@ def is_available() -> bool:
     return HAVE_NP
 
 
-def get_expected_length(elem: dict, unit: str = 'bytes') -> int:
+def get_expected_length(elem: Dict[str, Any], unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -91,7 +91,7 @@ def get_expected_length(elem: dict, unit: str = 'bytes') -> int:
         The expected length of the *Overlay Data* in either whole bytes or
         pixels, excluding the NULL trailing padding byte for odd length data.
     """
-    length = elem['OverlayRows'] * elem['OverlayColumns']
+    length: int = elem['OverlayRows'] * elem['OverlayColumns']
     length *= elem['NumberOfFramesInOverlay']
 
     if unit == 'pixels':
@@ -103,7 +103,9 @@ def get_expected_length(elem: dict, unit: str = 'bytes') -> int:
     return length // 8 + (length % 8 > 0)
 
 
-def reshape_overlay_array(elem: dict, arr: "np.ndarray") -> "np.ndarray":
+def reshape_overlay_array(
+    elem: Dict[str, Any], arr: "np.ndarray"
+) -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 
     .. versionadded:: 1.4

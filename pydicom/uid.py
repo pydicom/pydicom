@@ -7,7 +7,7 @@ import random
 import hashlib
 import re
 import sys
-from typing import List, Optional, TypeVar, Type, Union
+from typing import List, Optional, TypeVar, Type, Union, Any
 import warnings
 
 from pydicom._uid_dict import UID_dictionary
@@ -23,7 +23,7 @@ _deprecations = {
 }
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     if name in _deprecations:
         replacement = _deprecations[name]
         if name == "JPEGLossless":

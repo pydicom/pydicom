@@ -4,7 +4,7 @@
 from itertools import groupby, islice
 from struct import pack
 import sys
-from typing import List
+from typing import List, Any
 
 from pydicom.uid import RLELossless
 
@@ -19,7 +19,7 @@ def is_available(uid: str) -> bool:
     return True
 
 
-def _encode_frame(src: bytes, **kwargs) -> bytes:
+def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     """Wrapper for use with the encoder interface.
 
     Parameters
@@ -82,7 +82,7 @@ def _encode_frame(src: bytes, **kwargs) -> bytes:
     return bytes(rle_header + rle_data)
 
 
-def _encode_segment(src: bytes, **kwargs) -> bytearray:
+def _encode_segment(src: bytes, **kwargs: Any) -> bytearray:
     """Return `src` as an RLE encoded bytearray.
 
     Each row of the image is encoded separately as required by the DICOM

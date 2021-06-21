@@ -1,10 +1,12 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
+from typing import Any, cast
+
 from pydicom.uid import RLELossless
 
 try:
-    from pylibjpeg.utils import get_pixel_data_encoders  # type: ignore[import]
+    from pylibjpeg.utils import get_pixel_data_encoders
     HAVE_PYLJ = True
 except ImportError:
     HAVE_PYLJ = False
@@ -15,7 +17,7 @@ ENCODER_DEPENDENCIES = {
 }
 
 
-def encode_pixel_data(src: bytes, **kwargs) -> bytes:
+def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     """Return the encoded image data in `src`.
 
     Parameters
@@ -32,7 +34,7 @@ def encode_pixel_data(src: bytes, **kwargs) -> bytes:
     """
     encoder = get_pixel_data_encoders()[kwargs['transfer_syntax_uid']]
 
-    return encoder(src, **kwargs)
+    return cast(bytes, encoder(src, **kwargs))
 
 
 def is_available(uid: str) -> bool:

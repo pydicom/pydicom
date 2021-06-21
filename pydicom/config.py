@@ -5,12 +5,16 @@
 
 import logging
 import os
+from typing import Optional, Callable, Dict, Any, TYPE_CHECKING
 
 have_numpy = True
 try:
-    import numpy  # type: ignore[import]
+    import numpy
 except ImportError:
     have_numpy = False
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataelem import RawDataElement
 
 
 # Set the type used to hold DS values
@@ -22,7 +26,7 @@ VR of **DS** are represented as :class:`~decimal.Decimal`.
 Default ``False``.
 """
 
-data_element_callback = None
+data_element_callback: Optional[Callable[["RawDataElement"], None]] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
 :class:`~pydicom.dataelem.RawDataElement` has been returned,
@@ -31,14 +35,14 @@ before it is added to the :class:`~pydicom.dataset.Dataset`.
 Default ``None``.
 """
 
-data_element_callback_kwargs = {}
+data_element_callback_kwargs: Dict[str, Any] = {}
 """Set the keyword arguments passed to :func:`data_element_callback`.
 
 Default ``{}``.
 """
 
 
-def reset_data_element_callback():
+def reset_data_element_callback() -> None:
     """Reset the :func:`data_element_callback` function to the default."""
     global data_element_callback
     global data_element_callback_kwargs
@@ -46,7 +50,7 @@ def reset_data_element_callback():
     data_element_callback_kwargs = {}
 
 
-def DS_numpy(use_numpy=True):
+def DS_numpy(use_numpy: bool = True) -> None:
     """Set whether multi-valued elements with VR of **DS** will be numpy arrays
 
     .. versionadded:: 2.0
@@ -78,7 +82,7 @@ def DS_numpy(use_numpy=True):
     use_DS_numpy = use_numpy
 
 
-def DS_decimal(use_Decimal_boolean=True):
+def DS_decimal(use_Decimal_boolean: bool = True) -> None:
     """Set DS class to be derived from :class:`decimal.Decimal` or
     :class:`float`.
 
@@ -111,7 +115,7 @@ def DS_decimal(use_Decimal_boolean=True):
     if use_DS_decimal:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
     else:
-        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
+        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat  # type: ignore
 
 
 # Configuration flags
@@ -377,7 +381,7 @@ element tag as a 2-tuple or int, or an element keyword
 
 debugging: bool
 
-def debug(debug_on=True, default_handler=True):
+def debug(debug_on: bool = True, default_handler: bool = True) -> None:
     """Turn on/off debugging of DICOM file reading and writing.
 
     When debugging is on, file location and details about the elements read at

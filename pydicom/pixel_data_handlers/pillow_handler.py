@@ -12,13 +12,13 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import PIL  # type: ignore[import]
+    import PIL
     from PIL import Image, features
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
@@ -187,9 +187,10 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     columns = cast(int, ds.Columns)
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
+    nr_frames = getattr(ds, 'NumberOfFrames', 1) or 1
 
     pixel_bytes = bytearray()
-    if getattr(ds, 'NumberOfFrames', 1) > 1:
+    if nr_frames > 1:
         j2k_precision, j2k_sign = None, None
         # multiple compressed frames
         for frame in decode_data_sequence(ds.PixelData):
@@ -265,4 +266,4 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return arr
+    return cast("numpy.ndarray", arr)

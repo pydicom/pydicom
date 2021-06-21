@@ -48,16 +48,20 @@ table below.
 
 """
 
+from typing import TYPE_CHECKING, cast
+import warnings
+
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
-import warnings
-
 from pydicom.pixel_data_handlers.util import pixel_dtype, get_expected_length
 import pydicom.uid
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 HANDLER_NAME = 'Numpy'
 
@@ -73,12 +77,12 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 ]
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP
 
 
-def supports_transfer_syntax(transfer_syntax):
+def supports_transfer_syntax(transfer_syntax: pydicom.uid.UID) -> bool:
     """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
@@ -90,7 +94,7 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def needs_to_convert_to_RGB(ds):
+def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
@@ -99,7 +103,7 @@ def needs_to_convert_to_RGB(ds):
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(ds):
+def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
@@ -179,7 +183,7 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     return packed
 
 
-def unpack_bits(bytestream):
+def unpack_bits(bytestream: bytes) -> "np.ndarray":
     """Unpack bit packed *Pixel Data* or *Overlay Data* into a
     :class:`numpy.ndarray`.
 
@@ -216,10 +220,10 @@ def unpack_bits(bytestream):
     # -> [0 0 0 0 0 0 1 1 1 0 0 1 0 0 0 0]
     arr = np.ravel(arr)
 
-    return arr
+    return cast("np.ndarray", arr)
 
 
-def get_pixeldata(ds, read_only=False):
+def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the pixel data.
 
     .. versionchanged:: 1.4
@@ -363,6 +367,6 @@ def get_pixeldata(ds, read_only=False):
         ds.PhotometricInterpretation = "RGB"
 
     if not read_only and ds.BitsAllocated > 1:
-        return arr.copy()
+        return cast("np.ndarray", arr.copy())
 
-    return arr
+    return cast("np.ndarray", arr)

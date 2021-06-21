@@ -11,13 +11,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import gdcm  # type: ignore[import]
+    import gdcm
     from gdcm import DataElement
     HAVE_GDCM = True
     HAVE_GDCM_IN_MEMORY_SUPPORT = hasattr(DataElement, 'SetByteStringValue')
@@ -60,16 +60,12 @@ def is_available() -> bool:
     return HAVE_NP and HAVE_GDCM
 
 
-def needs_to_convert_to_RGB(ds: "Dataset"):
+def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
     This affects JPEG transfer syntaxes.
     """
-    should_convert = (
-        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
-    )
-    should_convert &= ds.SamplesPerPixel == 3
     return False
 
 
@@ -79,10 +75,6 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = (
-        ds.file_meta.TransferSyntaxUID in should_convert_these_syntaxes_to_RGB
-    )
-    should_change &= ds.SamplesPerPixel == 3
     return False
 
 
@@ -305,4 +297,4 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return arr.copy()
+    return cast("numpy.ndarray", arr.copy())
