@@ -1,13 +1,15 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Miscellaneous helper functions"""
 
+from itertools import groupby
 from pathlib import Path
+import re
 from typing import Optional, Union
 
 
 _size_factors = {
-    "KB": 1000, "MiB": 1000 * 1000, "GiB": 1000 * 1000 * 1000,
-    "KiB": 1024, "MiB": 1024 * 1024, "GiB": 1024 * 1024 * 1024,
+    "kb": 1000, "mb": 1000 * 1000, "gb": 1000 * 1000 * 1000,
+    "kib": 1024, "mib": 1024 * 1024, "gib": 1024 * 1024 * 1024,
 }
 
 
@@ -23,9 +25,9 @@ def size_in_bytes(expr: Optional[str]) -> Union[None, float, int]:
     except ValueError:
         pass
 
-    unit = expr[-2:].upper()
-    if unit in _size_factors.keys():
-        return float(expr[:-2]) * _size_factors[unit]
+    value, unit = ("".join(g) for k, g in groupby(expr, str.isalpha))
+    if unit.lower() in _size_factors:
+        return float(value) * _size_factors[unit.lower()]
 
     raise ValueError(f"Unable to parse length with unit '{unit}'")
 

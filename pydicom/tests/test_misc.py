@@ -40,12 +40,19 @@ class TestMisc:
 
         # string shall be parsed
         assert size_in_bytes('1234') == 1234
-        assert size_in_bytes('4 kb') == 4096
-        assert size_in_bytes('16 KB') == 0x4000
-        assert size_in_bytes('3  MB') == 0x300000
-        assert size_in_bytes('2gB') == 0x80000000
+        assert size_in_bytes('4 kb') == 4000
+        assert size_in_bytes('4 kib') == 4096
+        assert size_in_bytes('0.8 kb') == 800
+        assert size_in_bytes('16 KB') == 16e3
+        assert size_in_bytes('16 KiB') == 0x4000
+        assert size_in_bytes('3  MB') == 3e6
+        assert size_in_bytes('3  MiB') == 0x300000
+        assert size_in_bytes('2gB') == 2e9
+        assert size_in_bytes('2giB') == 0x80000000
 
         with pytest.raises(ValueError):
             size_in_bytes('2 TB')
         with pytest.raises(ValueError):
             size_in_bytes('KB 2')
+        with pytest.raises(ValueError):
+            size_in_bytes('4 KB asdf')
