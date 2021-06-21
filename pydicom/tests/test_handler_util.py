@@ -1252,6 +1252,11 @@ class TestNumpy_ExpandSegmentedLUT:
         out = _expand_segmented_lut(data, 'H')
         assert [-400, -320, -240, -160, -80, 0] == out
 
+        # Positive slope, floating point steps
+        data = (0, 1, 163, 1, 48, 255)
+        out = _expand_segmented_lut(data, 'H')
+        assert (1 + 48) == len(out)
+
         # No slope
         data = (0, 2, 0, 28672, 1, 5, 28672)
         out = _expand_segmented_lut(data, 'H')
