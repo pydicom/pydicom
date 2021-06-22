@@ -803,11 +803,6 @@ class IS(int):
 _T = TypeVar('_T')
 
 
-# FIXME: ARGH!
-def _as_str(s: str):
-    return str(s)
-
-
 def MultiString(
     val: str, valtype: Optional[Callable[[str], _T]] = None
 ) -> Union[_T, MutableSequence[_T]]:
@@ -826,7 +821,8 @@ def MultiString(
     valtype or MultiValue of valtype
         The split value as `valtype` or a :class:`list` of `valtype`.
     """
-    valtype = _as_str if valtype is None else valtype
+    if valtype is None:
+        valtype = cast(Callable[[str], _T], str)
 
     # Remove trailing blank used to pad to even length
     # 2005.05.25: also check for trailing 0, error made
@@ -842,11 +838,14 @@ def MultiString(
 
 
 def _verify_encodings(
-    encodings: Optional[Union[str, Sequence[str], Tuple[str, ...]]]
+    encodings: Optional[Union[str, Sequence[str]]]
 ) -> Optional[Tuple[str, ...]]:
     """Checks the encoding to ensure proper format"""
     if encodings is None:
         return None
+
+    if isinstance(encodings, str):
+        return (encodings,)
 
     return tuple(encodings)
 
@@ -930,7 +929,7 @@ class PersonName:
         if len(args) and args[0] is None:
             return None
 
-        return super().__new__(cls)
+        return cast("PersonName", super().__new__(cls))
 
     def __init__(
         self,
@@ -1121,7 +1120,9 @@ class PersonName:
         """Return a hash of the name."""
         return hash(self.components)
 
-    def decode(self, encodings: Optional[Sequence[str]] = None) -> "PersonName":
+    def decode(
+        self, encodings: Optional[Sequence[str]] = None
+    ) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
         Parameters

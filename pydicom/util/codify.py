@@ -22,7 +22,7 @@ import pydicom
 from pydicom.datadict import dictionary_keyword
 from pydicom.dataelem import DataElement, BINARY_VR_VALUES
 from pydicom.dataset import Dataset
-from pydicom.tag import Tag
+from pydicom.tag import BaseTag
 from pydicom import cli
 
 import re
@@ -42,7 +42,7 @@ def camel_to_underscore(name: str) -> str:
     return all_cap_re.sub(r"\1_\2", s1).lower()
 
 
-def tag_repr(tag: Tag) -> str:
+def tag_repr(tag: BaseTag) -> str:
     """String of tag value as (0xgggg, 0xeeee)"""
     return f"(0x{tag.group:04x}, 0x{tag.element:04x})"
 

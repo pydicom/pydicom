@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
 
 from io import BytesIO
@@ -149,30 +149,120 @@ class TestDump:
     """Test the utils.dump module"""
     def test_print_character(self):
         """Test utils.dump.print_character"""
-        # assert print_character(0x30) == '0'  # Missing!
-        assert '1' == print_character(0x31)
-        assert '9' == print_character(0x39)
-        assert 'A' == print_character(0x41)
-        assert 'Z' == print_character(0x5A)
-        assert 'a' == print_character(0x61)
-        assert 'z' == print_character(0x7A)
-        assert '.' == print_character(0x00)
+        assert print_character(0x30) == '0'
+        assert print_character(0x31) == '1'
+        assert print_character(0x39) == '9'
+        assert print_character(0x41) == 'A'
+        assert print_character(0x5A) == 'Z'
+        assert print_character(0x61) == 'a'
+        assert print_character(0x7A) == 'z'
+        assert print_character(0x00) == '.'
 
     def test_filedump(self):
         """Test utils.dump.filedump"""
-        pass
+        p = get_testdata_file("CT_small.dcm")
+        s = filedump(p, start_address=500, stop_address=1000)
+
+        assert (
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
+        assert (
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
 
     def test_datadump(self):
         """Test utils.dump.datadump"""
-        pass
+        p = get_testdata_file("CT_small.dcm")
+        with open(p, 'rb') as f:
+            s = datadump(f.read(), 500, 1000)
+
+        assert (
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
 
     def test_hexdump(self):
         """Test utils.dump.hexdump"""
-        pass
+        # Default
+        p = get_testdata_file("CT_small.dcm")
+        with open(p, 'rb') as f:
+            s = hexdump(f)
 
-    def test_pretty_print(self):
+        assert (
+            "0000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
+        assert (
+            "0170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
+            "AL.PRIMARY.AXIAL"
+        ) in s
+        assert (
+            "9920  08 00 00 00 00 00                                ......"
+        ) in s
+
+        # `stop_address` parameter
+        with open(p, 'rb') as f:
+            s = hexdump(f, stop_address=1000)
+
+        assert (
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
+        assert (
+            "170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
+            "AL.PRIMARY.AXIAL"
+        ) in s
+        assert (
+            "9920  08 00 00 00 00 00                                ......"
+        ) not in s
+
+        # `show_address` parameter
+        with open(p, 'rb') as f:
+            s = hexdump(f, show_address=False, stop_address=1000)
+
+        assert (
+            "49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
+        assert (
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
+
+        # `start_address` parameter
+        with open(p, 'rb') as f:
+            s = hexdump(f, start_address=500, stop_address=1000)
+
+        assert (
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
+        assert (
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
+
+    def test_pretty_print(self, capsys):
         """Test utils.dump.pretty_print"""
-        pass
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        pretty_print(ds)
+
+        s = capsys.readouterr().out
+        assert (
+            "(0008, 0005) Specific Character Set              CS: 'ISO_IR 100'"
+        ) in s
+        assert (
+            "(0010, 1002) Other Patient IDs Sequence -- 2 item(s)"
+        ) in s
+        assert (
+            "  (0010, 0022) Type of Patient ID                  CS: 'TEXT'"
+        ) in s
+        assert (
+            "(fffc, fffc) Data Set Trailing Padding           OB: Array of "
+            "126 elements"
+        ) in s
 
 
 class TestFixer:
@@ -199,19 +289,25 @@ class TestHexUtil:
     def test_hex_to_bytes(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09' \
-                     b'\x0A\x0B\x0C\x0D\x0E\x0F'
-        assert bytestring == hex2bytes(hexstring)
-
-        hexstring = b"00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
-        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09' \
-                     b'\x0A\x0B\x0C\x0D\x0E\x0F'
-        assert bytestring == hex2bytes(hexstring)
+        bytestring = (
+            b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09'
+            b'\x0A\x0B\x0C\x0D\x0E\x0F'
+        )
+        assert hex2bytes(hexstring) == bytestring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 A0 B0 C0 D0 E0 F0"
-        bytestring = b'\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90' \
-                     b'\xA0\xB0\xC0\xD0\xE0\xF0'
-        assert bytestring == hex2bytes(hexstring)
+        bytestring = (
+            b'\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90'
+            b'\xA0\xB0\xC0\xD0\xE0\xF0'
+        )
+        assert hex2bytes(hexstring) == bytestring
+
+        hexstring = b"00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
+        bytestring = (
+            b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09'
+            b'\x0A\x0B\x0C\x0D\x0E\x0F'
+        )
+        assert hex2bytes(hexstring) == bytestring
 
         with pytest.raises(TypeError):
             hex2bytes(0x1234)
@@ -219,14 +315,18 @@ class TestHexUtil:
     def test_bytes_to_hex(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f"
-        bytestring = b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09' \
-                     b'\x0A\x0B\x0C\x0D\x0E\x0F'
-        assert hexstring == bytes2hex(bytestring)
+        bytestring = (
+            b'\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09'
+            b'\x0A\x0B\x0C\x0D\x0E\x0F'
+        )
+        assert bytes2hex(bytestring) == hexstring
 
         hexstring = "00 10 20 30 40 50 60 70 80 90 a0 b0 c0 d0 e0 f0"
-        bytestring = b'\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90' \
-                     b'\xA0\xB0\xC0\xD0\xE0\xF0'
-        assert hexstring == bytes2hex(bytestring)
+        bytestring = (
+            b'\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90'
+            b'\xA0\xB0\xC0\xD0\xE0\xF0'
+        )
+        assert bytes2hex(bytestring) == hexstring
 
 
 class TestDataElementCallbackTests:

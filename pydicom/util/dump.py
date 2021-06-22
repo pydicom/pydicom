@@ -1,8 +1,9 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
-import pathlib.Path
+import pathlib
+import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -12,9 +13,9 @@ if TYPE_CHECKING:  # pragma: no cover
 def print_character(char: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
     if 31 < char < 126 and char != 92:
-        return f"{char:02X}"
+        return chr(char)
 
-    return '.'
+    return "."
 
 
 def filedump(
@@ -22,17 +23,17 @@ def filedump(
     start_address: int = 0,
     stop_address: Optional[int] = None,
 ) -> str:
-    """Dump out the contents of a file to a
-       standard hex dump 16 bytes wide"""
+    """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
 
-    with open(filename, 'rb') as f:
+    with open(filename, "rb") as f:
         return hexdump(f, start_address, stop_address)
 
 
-def datadump(data: bytes) -> None:
-    stop_address = len(data) + 1
-    fp = BytesIO(data)
-    print(hexdump(fp, 0, stop_address))
+def datadump(
+    data: bytes, start_address: int = 0, stop_address: Optional[int] = None
+) -> str:
+    """Return a hex string representation of `data`."""
+    return hexdump(BytesIO(data), start_address, stop_address)
 
 
 def hexdump(
@@ -45,40 +46,60 @@ def hexdump(
 
     This is a utility function for debugging file writing.
 
-    file_in -- a file-like object to get the bytes to show from"""
+    Parameters
+    ----------
+    f : BinaryIO
+        The file-like to dump.
+    start_address : int, optional
+        The offset where the dump should start (default ``0``)
+    stop_address : int, optional
+        The offset where the dump should end, by default the entire file will
+        be dumped.
+    show_address : bool, optional
+        If ``True`` (default) then include the offset of each line of output.
+
+    Returns
+    -------
+    str
+    """
 
     s = []
-    # space taken up if row has a full 16 bytes
-    byteslen = 16 * 3 - 1
-    blanks = ' ' * byteslen
+
+    # Determine the maximum number of characters for the offset
+    max_offset = len(f"{f.seek(0, 2):X}")
+    if stop_address:
+        max_offset = len(f"{stop_address:X}")
 
     f.seek(start_address)
     while True:
         if stop_address and f.tell() > stop_address:
             break
 
-        if show_address:
-            # address at start of line
-            s.append(f"{f.tell():04X}")
-
+        offset = f.tell()
         data = f.read(16)
         if not data:
             break
 
-        # string of two digit hex bytes
-        b = ' '.join([f"{x:02X}" for x in data])
-        s.append(f"{b:<16}")  # if not 16, pad
-        s.append('  ')
+        current = []
 
-        # character repr of bytes
-        s.append(''.join([print_character(x) for x in data]))
-        s.append("\n")
+        if show_address:
+            # Offset at the start of the current line
+            current.append(f"{offset:0{max_offset}X}  ")
 
-    return ''.join(s)
+        # Add hex version of the current line
+        b = " ".join([f"{x:02X}" for x in data])
+        current.append(f"{b:<49}")  # if not 16, pad
+
+        # Add an ASCII version of the current line (or . if not ASCII)
+        current.append("".join([print_character(x) for x in data]))
+
+        s.append("".join(current))
+
+    return "\n".join(s)
 
 
 def pretty_print(
-    ds: "Dataset", indent: int = 0, indent_chars: str = "   "
+    ds: "Dataset", indent_level: int = 0, indent_chars: str = "  "
 ) -> None:
     """Print a dataset directly, with indented levels.
 
@@ -88,23 +109,21 @@ def pretty_print(
 
     """
 
-    indentStr = indent_chars * indent
-    nextIndentStr = indent_chars * (indent + 1)
+    indent = indent_chars * indent_level
+    next_indent = indent_chars * (indent_level + 1)
     for elem in ds:
         if elem.VR == "SQ":  # a sequence
             print(
-                f"{indentStr}{elem.tag} {elem.name}  {elem.value:d} "
-                "item(s) ---"
+                f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)"
             )
             for dataset in elem.value:
-                pretty_print(dataset, indent + 1)
-                print(nextIndentStr + "---------")
+                pretty_print(dataset, indent_level + 1)
+                print(next_indent + "---------")
         else:
-            print(indentStr + repr(elem))
+            print(indent + repr(elem))
 
 
-if __name__ == "__main__":
-    import sys
+if __name__ == "__main__":  # pragma: no cover
     filename = sys.argv[1]
     start_address = 0
     stop_address = None

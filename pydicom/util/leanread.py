@@ -21,7 +21,9 @@ ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
 
 ItemTag = 0xFFFEE000  # start of Sequence Item
 
-_ElementType = Tuple[Tuple[int, int], Optional[bytes], int, Optional[bytes], int]
+_ElementType = Tuple[
+    Tuple[int, int], Optional[bytes], int, Optional[bytes], int
+]
 
 
 class dicomfile:
@@ -138,10 +140,6 @@ def data_element_generator(
     fp_tell = fp.tell
     element_struct_unpack = element_struct.unpack
     defer_size = size_in_bytes(defer_size)
-
-    group: int
-    elem: int
-    length: int
 
     while True:
         # Read tag, VR, length, get ready to read value
