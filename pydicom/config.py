@@ -5,7 +5,10 @@
 
 import logging
 import os
-from typing import Optional, Callable, Dict, Any, TYPE_CHECKING, List, Union
+from typing import (
+    Optional, Callable, Dict, Any, TYPE_CHECKING, List, Union, MutableSequence,
+    Union
+)
 
 have_numpy = True
 try:
@@ -15,6 +18,15 @@ except ImportError:
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import RawDataElement
+    from typing import Protocol
+
+    class ElementCallback(Protocol):
+        def __call__(
+            self,
+            elem: "RawDataElement",
+            encoding: Optional[Union[str, MutableSequence[str]]] = None,
+            **kwargs: Any
+        ) -> "RawDataElement": ...
 
 
 # Set the type used to hold DS values
@@ -27,7 +39,7 @@ Default ``False``.
 """
 
 
-data_element_callback: Optional[Any] = None
+data_element_callback: Optional["ElementCallback"] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
 :class:`~pydicom.dataelem.RawDataElement` has been returned,
@@ -116,7 +128,7 @@ def DS_decimal(use_Decimal_boolean: bool = True) -> None:
     if use_DS_decimal:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
     else:
-        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat  # type: ignore
+        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
 
 # Configuration flags
