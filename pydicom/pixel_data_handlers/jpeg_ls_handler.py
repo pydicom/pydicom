@@ -3,22 +3,26 @@
 Use the `jpeg_ls (CharPyLS) <https://github.com/Who8MyLunch/CharPyLS>`_ Python
 package to decode *Pixel Data*.
 """
+from typing import TYPE_CHECKING, cast
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
-    import jpeg_ls  # type: ignore[import]
+    import jpeg_ls
     HAVE_JPEGLS = True
 except ImportError:
     HAVE_JPEGLS = False
 
-import pydicom.encaps
-from pydicom.pixel_data_handlers.util import dtype_corrected_for_endianness
+from pydicom.encaps import decode_data_sequence, defragment_data
+from pydicom.pixel_data_handlers.util import pixel_dtype
 import pydicom.uid
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'JPEG-LS'
@@ -34,12 +38,12 @@ SUPPORTED_TRANSFER_SYNTAXES = [
 ]
 
 
-def is_available():
+def is_available() -> bool:
     """Return ``True`` if the handler has its dependencies met."""
     return HAVE_NP and HAVE_JPEGLS
 
 
-def needs_to_convert_to_RGB(dicom_dataset):
+def needs_to_convert_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Pixel Data* should to be converted from YCbCr to
     RGB.
 
@@ -48,17 +52,16 @@ def needs_to_convert_to_RGB(dicom_dataset):
     return False
 
 
-def should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
+def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     """Return ``True`` if the *Photometric Interpretation* should be changed
     to RGB.
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = dicom_dataset.SamplesPerPixel == 3
     return False
 
 
-def supports_transfer_syntax(transfer_syntax):
+def supports_transfer_syntax(transfer_syntax: pydicom.uid.UID) -> bool:
     """Return ``True`` if the handler supports the `transfer_syntax`.
 
     Parameters
@@ -70,7 +73,7 @@ def supports_transfer_syntax(transfer_syntax):
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def get_pixeldata(dicom_dataset):
+def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     """Return the *Pixel Data* as a :class:`numpy.ndarray`.
 
     Returns
@@ -87,65 +90,34 @@ def get_pixeldata(dicom_dataset):
     TypeError
         If the pixel data type is unsupported.
     """
-    if (dicom_dataset.file_meta.TransferSyntaxUID
-            not in SUPPORTED_TRANSFER_SYNTAXES):
-        msg = ("The jpeg_ls does not support "
-               "this transfer syntax {0}.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
-        raise NotImplementedError(msg)
+    tsyntax = ds.file_meta.TransferSyntaxUID
+    if tsyntax not in SUPPORTED_TRANSFER_SYNTAXES:
+        raise NotImplementedError(
+            f"The jpeg_ls does not support this transfer syntax {tsyntax.name}"
+        )
 
     if not HAVE_JPEGLS:
-        msg = ("The jpeg_ls package is required to use pixel_array "
-               "for this transfer syntax {0}, and jpeg_ls could not "
-               "be imported.".format(
-                   dicom_dataset.file_meta.TransferSyntaxUID.name))
-        raise ImportError(msg)
-    # Make NumPy format code, e.g. "uint16", "int32" etc
-    # from two pieces of info:
-    # dicom_dataset.PixelRepresentation -- 0 for unsigned, 1 for signed;
-    # dicom_dataset.BitsAllocated -- 8, 16, or 32
-    if dicom_dataset.PixelRepresentation == 0:
-        format_str = 'uint{}'.format(dicom_dataset.BitsAllocated)
-    elif dicom_dataset.PixelRepresentation == 1:
-        format_str = 'int{}'.format(dicom_dataset.BitsAllocated)
+        raise ImportError(
+            "The jpeg_ls package is required to use pixel_array for this "
+            f"transfer syntax {tsyntax.name}, and jpeg_ls could not be "
+            "imported"
+        )
+
+    pixel_bytes = bytearray()
+
+    nr_frames = getattr(ds, "NumberOfFrames", 1) or 1
+    if nr_frames > 1:
+        for src in decode_data_sequence(ds.PixelData):
+            frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+            pixel_bytes.extend(frame.tobytes())
     else:
-        format_str = 'bad_pixel_representation'
-    try:
-        numpy_format = numpy.dtype(format_str)
-    except TypeError:
-        msg = ("Data type not understood by NumPy: "
-               "format='{}', PixelRepresentation={}, "
-               "BitsAllocated={}".format(
-                   format_str,
-                   dicom_dataset.PixelRepresentation,
-                   dicom_dataset.BitsAllocated))
-        raise TypeError(msg)
+        src = defragment_data(ds.PixelData)
+        frame = jpeg_ls.decode(numpy.frombuffer(src, dtype='u1'))
+        pixel_bytes.extend(frame.tobytes())
 
-    numpy_format = dtype_corrected_for_endianness(
-        dicom_dataset.is_little_endian, numpy_format)
+    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
 
-    # decompress here
-    UncompressedPixelData = bytearray()
-    if ('NumberOfFrames' in dicom_dataset and
-            dicom_dataset.NumberOfFrames > 1):
-        # multiple compressed frames
-        CompressedPixelDataSeq = pydicom.encaps.decode_data_sequence(
-            dicom_dataset.PixelData)
-        # print len(CompressedPixelDataSeq)
-        for frame in CompressedPixelDataSeq:
-            decompressed_image = jpeg_ls.decode(
-                numpy.frombuffer(frame, dtype=numpy.uint8))
-            UncompressedPixelData.extend(decompressed_image.tobytes())
-    else:
-        # single compressed frame
-        CompressedPixelData = pydicom.encaps.defragment_data(
-            dicom_dataset.PixelData)
-        decompressed_image = jpeg_ls.decode(
-            numpy.frombuffer(CompressedPixelData, dtype=numpy.uint8))
-        UncompressedPixelData.extend(decompressed_image.tobytes())
+    if should_change_PhotometricInterpretation_to_RGB(ds):
+        ds.PhotometricInterpretation = "RGB"
 
-    pixel_array = numpy.frombuffer(UncompressedPixelData, numpy_format)
-    if should_change_PhotometricInterpretation_to_RGB(dicom_dataset):
-        dicom_dataset.PhotometricInterpretation = "RGB"
-
-    return pixel_array
+    return cast("numpy.ndarray", arr)

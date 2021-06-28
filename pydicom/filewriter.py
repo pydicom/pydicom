@@ -29,7 +29,7 @@ from pydicom.values import convert_numbers
 
 
 if have_numpy:
-    import numpy  # type: ignore[import]
+    import numpy
 
 
 def _correct_ambiguous_vr_element(

@@ -34,7 +34,7 @@ import warnings
 import weakref
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
 except ImportError:
     pass
 

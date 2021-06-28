@@ -40,7 +40,7 @@ import sys
 from typing import List, TYPE_CHECKING, cast
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
@@ -175,7 +175,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return arr
+    return cast("np.ndarray", arr)
 
 
 def _parse_rle_header(header: bytes) -> List[int]:

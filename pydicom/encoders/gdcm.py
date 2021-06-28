@@ -1,9 +1,11 @@
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
+from typing import Any, cast
+
 from pydicom.uid import RLELossless, ImplicitVRLittleEndian
 
 try:
-    import gdcm  # type: ignore[import]
+    import gdcm
     HAVE_GDCM = True
 except ImportError:
     HAVE_GDCM = False
@@ -24,7 +26,7 @@ def is_available(uid: str) -> bool:
     return uid in ENCODER_DEPENDENCIES
 
 
-def encode_pixel_data(src: bytes, **kwargs) -> bytes:
+def encode_pixel_data(src: bytes, **kwargs: Any) -> bytes:
     """Return the encoded image data in `src`.
 
     Parameters
@@ -58,7 +60,7 @@ def encode_pixel_data(src: bytes, **kwargs) -> bytes:
     return _ENCODERS[kwargs['transfer_syntax_uid']](src, **kwargs)
 
 
-def _rle_encode(src, **kwargs):
+def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     """Return RLE encoded image data from `src`.
 
     Parameters
@@ -135,13 +137,11 @@ def _rle_encode(src, **kwargs):
             "fragments found in the 'Pixel Data'"
         )
 
-    fragment = seq.GetFragment(0)
-    return (
-        fragment.GetByteValue().GetBuffer().encode("utf-8", "surrogateescape")
-    )
+    fragment: str = seq.GetFragment(0).GetByteValue().GetBuffer()
+    return fragment.encode("utf-8", "surrogateescape")
 
 
-def _create_gdcm_image(src: bytes, **kwargs) -> bytes:
+def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
     """Return a gdcm.Image from the `src`.
 
     Parameters
@@ -213,7 +213,7 @@ def _create_gdcm_image(src: bytes, **kwargs) -> bytes:
     elem.SetByteStringValue(src)
     image.SetDataElement(elem)
 
-    return image
+    return cast("gdcm.Image", image)
 
 
 _ENCODERS = {

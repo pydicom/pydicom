@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     import numpy as np
 except ImportError:
     pass

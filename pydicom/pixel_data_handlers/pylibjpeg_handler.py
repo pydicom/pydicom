@@ -1,5 +1,4 @@
 # Copyright 2020 pydicom authors. See LICENSE file for details.
-# type: ignore[import]
 """Use the `pylibjpeg <https://github.com/pydicom/pylibjpeg/>`_ package
 to convert supported pixel data to a :class:`numpy.ndarray`.
 
@@ -250,7 +249,6 @@ def generate_frames(
             "elements are missing from the dataset: " + ", ".join(missing)
         )
 
-    tsyntax = cast(UID, tsyntax)
     decoder = _DECODERS[tsyntax]
     LOGGER.debug(f"Decoding {tsyntax.name} encoded Pixel Data using {decoder}")
 

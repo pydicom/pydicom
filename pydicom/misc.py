@@ -1,29 +1,43 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Miscellaneous helper functions"""
 
+from itertools import groupby
+from pathlib import Path
+import re
+from typing import Optional, Union
 
-_size_factors = dict(KB=1024, MB=1024 * 1024, GB=1024 * 1024 * 1024)
+
+_size_factors = {
+    "kb": 1000, "mb": 1000 * 1000, "gb": 1000 * 1000 * 1000,
+    "kib": 1024, "mib": 1024 * 1024, "gib": 1024 * 1024 * 1024,
+}
 
 
-def size_in_bytes(expr):
+def size_in_bytes(
+    expr: Optional[Union[int, float, str]]
+) -> Union[None, float, int]:
     """Return the number of bytes for `defer_size` argument in
     :func:`~pydicom.filereader.dcmread`.
     """
     if expr is None or expr == float('inf'):
         return None
+
+    if isinstance(expr, (int, float)):
+        return expr
+
     try:
         return int(expr)
     except ValueError:
-        unit = expr[-2:].upper()
-        if unit in _size_factors.keys():
-            val = float(expr[:-2]) * _size_factors[unit]
-            return val
-        else:
-            raise ValueError(
-                "Unable to parse length with unit '{0:s}'".format(unit))
+        pass
+
+    value, unit = ("".join(g) for k, g in groupby(expr, str.isalpha))
+    if unit.lower() in _size_factors:
+        return float(value) * _size_factors[unit.lower()]
+
+    raise ValueError(f"Unable to parse length with unit '{unit}'")
 
 
-def is_dicom(file_path):
+def is_dicom(file_path: Union[str, Path]) -> bool:
     """Return ``True`` if the file at `file_path` is a DICOM file.
 
     This function is a pared down version of
@@ -42,6 +56,5 @@ def is_dicom(file_path):
     filereader.read_partial
     """
     with open(file_path, 'rb') as fp:
-        fp.read(0x80)  # preamble
-        magic = fp.read(4)
-    return magic == b"DICM"
+        fp.read(128)  # preamble
+        return fp.read(4) == b"DICM"

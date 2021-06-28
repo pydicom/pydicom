@@ -9,7 +9,7 @@ from typing import (
 import warnings
 
 try:
-    import numpy as np  # type: ignore[import]
+    import numpy as np
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -272,7 +272,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # IVs > number of entries get set to last entry
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
-        return lut_data[clipped_iv]
+        return cast("np.ndarray", lut_data[clipped_iv])
     elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
         arr = arr.astype(np.float64) * cast(float, ds.RescaleSlope)
         arr += cast(float, ds.RescaleIntercept)
@@ -454,7 +454,7 @@ def apply_voi(
     # IVs > number of entries get set to last entry
     np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
-    return lut_data[clipped_iv]
+    return cast("np.ndarray", lut_data[clipped_iv])
 
 
 def apply_windowing(
@@ -644,7 +644,7 @@ def convert_color_space(
       <https://www.ijg.org/files/T-REC-T.871-201105-I!!PDF-E.pdf>`_),
       Section 7
     """
-    def _no_change(arr):
+    def _no_change(arr: "np.ndarray") -> "np.ndarray":
         return arr
 
     _converters = {

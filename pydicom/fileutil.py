@@ -107,7 +107,7 @@ def read_undefined_length_value(
     fp: BinaryIO,
     is_little_endian: bool,
     delimiter_tag: BaseTag,
-    defer_size: Optional[int] = None,
+    defer_size: Optional[Union[int, float]] = None,
     read_size: int = 1024 * 8
 ) -> Optional[bytes]:
     """Read until `delimiter_tag` and return the value up to that point.
@@ -156,9 +156,8 @@ def read_undefined_length_value(
     # sequence delimiter, as was done historically.
     if delimiter_tag == SequenceDelimiterTag:
         was_value_found, value = _try_read_encapsulated_pixel_data(
-                                    fp,
-                                    is_little_endian,
-                                    defer_size)
+            fp, is_little_endian, defer_size
+        )
         if was_value_found:
             return value
 
@@ -217,7 +216,9 @@ def read_undefined_length_value(
 
 
 def _try_read_encapsulated_pixel_data(
-    fp: BinaryIO, is_little_endian: bool, defer_size: Optional[int] = None
+    fp: BinaryIO,
+    is_little_endian: bool,
+    defer_size: Optional[Union[float, int]] = None,
 ) -> Tuple[bool, Optional[bytes]]:
     """Attempt to read an undefined length value item as if it were
     encapsulated pixel data as defined in PS3.5 section A.4.

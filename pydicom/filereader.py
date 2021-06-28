@@ -42,7 +42,7 @@ def data_element_generator(
     is_implicit_VR: bool,
     is_little_endian: bool,
     stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, str]] = None,
+    defer_size: Optional[Union[int, str, float]] = None,
     encoding: Union[str, MutableSequence[str]] = default_encoding,
     specific_tags: Optional[List[BaseTag]] = None
 ) -> Iterator[Union[RawDataElement, DataElement]]:
@@ -66,7 +66,7 @@ def data_element_generator(
         If ``None`` (default), then the whole file is read. A callable which
         takes tag, VR, length, and returns ``True`` or ``False``. If it
         returns ``True``, ``read_data_element`` will just return.
-    defer_size : int or str, optional
+    defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
     encoding : Union[str, MutableSequence[str]]
         Encoding scheme
@@ -121,7 +121,7 @@ def data_element_generator(
     logger_debug = logger.debug
     debugging = config.debugging
     element_struct_unpack = element_struct.unpack
-    defer_size = cast(int, size_in_bytes(defer_size))
+    defer_size = size_in_bytes(defer_size)
 
     tag_set = {Tag(tag) for tag in specific_tags} if specific_tags else set()
     has_tag_set = bool(tag_set)
@@ -272,8 +272,9 @@ def data_element_generator(
                 delimiter = SequenceDelimiterTag
                 if debugging:
                     logger_debug("Reading undefined length data element")
-                value = read_undefined_length_value(fp, is_little_endian,
-                                                    delimiter, defer_size)
+                value = read_undefined_length_value(
+                    fp, is_little_endian, delimiter, defer_size
+                )
 
                 # tags with undefined length are skipped after read
                 if has_tag_set and tag not in tag_set:
@@ -360,7 +361,7 @@ def read_dataset(
     is_little_endian: bool,
     bytelength: Optional[int] = None,
     stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, str]] = None,
+    defer_size: Optional[Union[str, int, float]] = None,
     parent_encoding: Union[str, MutableSequence[str]] = default_encoding,
     specific_tags: Optional[List[BaseTag]] = None,
     at_top_level: bool = True
@@ -382,7 +383,7 @@ def read_dataset(
     stop_when : None, optional
         Optional call_back function which can terminate reading. See help for
         :func:`data_element_generator` for details
-    defer_size : int, None, optional
+    defer_size : int, str or float, optional
         Size to avoid loading large elements in memory. See :func:`dcmread` for
         more parameter info.
     parent_encoding : str or List[str]
@@ -412,9 +413,15 @@ def read_dataset(
         is_sequence=not at_top_level
     )
     fp.seek(fp_start)
-    de_gen = data_element_generator(fp, is_implicit_VR, is_little_endian,
-                                    stop_when, defer_size, parent_encoding,
-                                    specific_tags)
+    de_gen = data_element_generator(
+        fp,
+        is_implicit_VR,
+        is_little_endian,
+        stop_when,
+        defer_size,
+        parent_encoding,
+        specific_tags,
+    )
     try:
         while (bytelength is None) or (fp.tell() - fp_start < bytelength):
             raw_data_element = next(de_gen)
@@ -731,7 +738,7 @@ def _at_pixel_data(tag: BaseTag, VR: Optional[str], length: int) -> bool:
 def read_partial(
     fileobj: BinaryIO,
     stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, str]] = None,
+    defer_size: Optional[Union[int, str, float]] = None,
     force: bool = False,
     specific_tags: Optional[List[BaseTag]] = None
 ) -> Union[FileDataset, DicomDir]:
@@ -743,7 +750,7 @@ def read_partial(
         Note that the file will not close when the function returns.
     stop_when :
         Stop condition. See :func:`read_dataset` for more info.
-    defer_size : int, str, None, optional
+    defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
     force : bool
         See :func:`dcmread` for parameter info.
@@ -842,9 +849,14 @@ def read_partial(
     #   By this point we should be at the start of the dataset and have
     #   the transfer syntax (whether read from the file meta or guessed at)
     try:
-        dataset = read_dataset(fileobj, is_implicit_VR, is_little_endian,
-                               stop_when=stop_when, defer_size=defer_size,
-                               specific_tags=specific_tags)
+        dataset = read_dataset(
+            fileobj,
+            is_implicit_VR,
+            is_little_endian,
+            stop_when=stop_when,
+            defer_size=defer_size,
+            specific_tags=specific_tags,
+        )
     except EOFError:
         if config.enforce_valid_values:
             raise
@@ -877,7 +889,7 @@ def read_partial(
 
 def dcmread(
     fp: Union[PathType, BinaryIO],
-    defer_size: Optional[Union[str, int]] = None,
+    defer_size: Optional[Union[str, int, float]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,
     specific_tags: Optional[TagListType] = None
@@ -921,7 +933,7 @@ def dcmread(
         path to the file. The file-like object must have ``seek()``,
         ``read()`` and ``tell()`` methods and the caller is responsible for
         closing it (if required).
-    defer_size : int or str, optional
+    defer_size : int, str or float, optional
         If not used then all elements are read into memory. If specified,
         then if a data element's stored value is larger than `defer_size`, the
         value is not read into memory until it is accessed in code. Should be
@@ -989,9 +1001,6 @@ def dcmread(
             logger.debug("Caller passed file name")
         logger.debug("-" * 80)
 
-    # Convert size to defer reading into bytes
-    defer_size = size_in_bytes(defer_size)
-
     if specific_tags:
         specific_tags = [Tag(t) for t in specific_tags]
 
@@ -1002,8 +1011,13 @@ def dcmread(
     if stop_before_pixels:
         stop_when = _at_pixel_data
     try:
-        dataset = read_partial(fp, stop_when, defer_size=defer_size,
-                               force=force, specific_tags=specific_tags)
+        dataset = read_partial(
+            fp,
+            stop_when,
+            defer_size=size_in_bytes(defer_size),
+            force=force,
+            specific_tags=specific_tags,
+        )
     finally:
         if not caller_owns_file:
             fp.close()

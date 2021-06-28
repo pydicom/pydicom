@@ -1,6 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Module for pydicom exception classes"""
 
+from typing import Any
+
 
 class InvalidDicomError(Exception):
     """Exception that is raised when the the file does not appear to be DICOM.
@@ -12,7 +14,7 @@ class InvalidDicomError(Exception):
     a header), use ``dcmread(..., force=True)``.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args: Any) -> None:
         if not args:
             args = ('The specified file is not a valid DICOM file.', )
         Exception.__init__(self, *args)

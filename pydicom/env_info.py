@@ -10,16 +10,21 @@ GitHub bug report.
 This file is intended to be run as an executable module.
 """
 
+import importlib
 import platform
 import sys
-import importlib
+from types import ModuleType
+from typing import Optional, Tuple, List, cast
 
 
-def main():
+def main() -> None:
     version_rows = [("platform", platform.platform()), ("Python", sys.version)]
 
-    for module in ("pydicom", "gdcm", "jpeg_ls", "numpy", "PIL",
-                   "pylibjpeg", "openjpeg", "libjpeg"):
+    modules = (
+        "pydicom", "gdcm", "jpeg_ls", "numpy", "PIL", "pylibjpeg",
+        "openjpeg", "libjpeg",
+    )
+    for module in modules:
         try:
             m = importlib.import_module(module)
         except ImportError:
@@ -32,7 +37,7 @@ def main():
     print_table(version_rows)
 
 
-def print_table(version_rows):
+def print_table(version_rows: List[Tuple[str, str]]) -> None:
     row_format = "{:12} | {}"
     print(row_format.format("module", "version"))
     print(row_format.format("------", "-------"))
@@ -41,10 +46,11 @@ def print_table(version_rows):
         print(row_format.format(module, version.replace("\n", " ")))
 
 
-def extract_version(module):
+def extract_version(module: ModuleType) -> Optional[str]:
     if module.__name__ == "gdcm":
-        return getattr(module, "GDCM_VERSION", None)
-    return getattr(module, "__version__", None)
+        return cast(Optional[str], getattr(module, "GDCM_VERSION", None))
+
+    return cast(Optional[str], getattr(module, "__version__", None))
 
 
 if __name__ == "__main__":

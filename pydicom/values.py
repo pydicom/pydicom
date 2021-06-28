@@ -27,7 +27,7 @@ from pydicom.valuerep import (
 )
 
 try:
-    import numpy  # type: ignore[import]
+    import numpy
     have_numpy = True
 except ImportError:
     have_numpy = False
