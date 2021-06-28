@@ -234,13 +234,13 @@
   <div class="section" id="module-pydicom.pixel_data_handlers.pylibjpeg_handler">
 <span id="pydicom-pixel-data-handlers-pylibjpeg-handler"></span><h1>pydicom.pixel_data_handlers.pylibjpeg_handler<a class="headerlink" href="#module-pydicom.pixel_data_handlers.pylibjpeg_handler" title="Permalink to this headline">¶</a></h1>
 <p>Use the <a class="reference external" href="https://github.com/pydicom/pylibjpeg/">pylibjpeg</a> package
-to convert supported pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+to convert supported pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
 </div>
 <p><strong>Supported data</strong></p>
 <p>The pylibjpeg handler supports the conversion of data in the (7FE0,0010)
-<em>Pixel Data</em> elements to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> provided the
+<em>Pixel Data</em> elements to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> provided the
 related <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements have
 values given in the table below.</p>
 <table class="docutils align-default">
@@ -336,13 +336,13 @@ YBR_RCT</p></td>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.as_array" title="pydicom.pixel_data_handlers.pylibjpeg_handler.as_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_array</span></code></a>(ds)</p></td>
-<td><p>Return the entire <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
+<td><p>Return the entire <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames" title="pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_frames</span></code></a>(ds[, reshape])</p></td>
-<td><p>Yield a <em>Pixel Data</em> frame from <cite>ds</cite> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
+<td><p>Yield a <em>Pixel Data</em> frame from <cite>ds</cite> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.get_pixeldata" title="pydicom.pixel_data_handlers.pylibjpeg_handler.get_pixeldata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pixeldata</span></code></a>(ds)</p></td>
-<td><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p></td>
+<td><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.is_available" title="pydicom.pixel_data_handlers.pylibjpeg_handler.is_available"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_available</span></code></a>()</p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p></td>
@@ -360,8 +360,8 @@ YBR_RCT</p></td>
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.as_array">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">as_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">np.ndarray</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.as_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the entire <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">as_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">np.ndarray</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L171"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.as_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the entire <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
 </div>
@@ -371,21 +371,21 @@ YBR_RCT</p></td>
 converted.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The contents of (7FE0,0010) <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
+<dd class="field-even"><p>The contents of (7FE0,0010) <em>Pixel Data</em> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>
 with shape (rows, columns), (rows, columns, components), (frames,
 rows, columns), or (frames, rows, columns, components) depending on
 the dataset.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">generate_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames" title="Permalink to this definition">¶</a></dt>
-<dd><p>Yield a <em>Pixel Data</em> frame from <cite>ds</cite> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">generate_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reshape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L194"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.generate_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield a <em>Pixel Data</em> frame from <cite>ds</cite> as an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
 </div>
@@ -394,14 +394,14 @@ the dataset.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>pydicom.dataset.Dataset</em></a>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> containing an <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module and the <em>Pixel Data</em> to be
 converted.</p></li>
-<li><p><strong>reshape</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), then the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will
+<li><p><strong>reshape</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), then the returned <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> will
 be reshaped to the correct dimensions. If <code class="docutils literal notranslate"><span class="pre">False</span></code> then no reshaping
 will be performed.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Yields</dt>
 <dd class="field-even"><p><em>numpy.ndarray</em> – A single frame of (7FE0,0010) <em>Pixel Data</em> as an
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with an appropriate dtype for the data.</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with an appropriate dtype for the data.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
@@ -414,8 +414,8 @@ will be performed.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.get_pixeldata">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">get_pixeldata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">np.ndarray</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L306"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">get_pixeldata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">np.ndarray</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L304"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.get_pixeldata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the pixel data.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
 </div>
@@ -428,20 +428,20 @@ converted.</p>
 <dd class="field-even"><p>The contents of (7FE0,0010) <em>Pixel Data</em> as a 1D array.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.is_available">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">is_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L137"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.is_available" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">is_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L136"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.is_available" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler has its dependencies met.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.needs_to_convert_to_RGB">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">needs_to_convert_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L154"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">needs_to_convert_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L153"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.needs_to_convert_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Pixel Data</em> should to be converted from YCbCr to
 RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -449,7 +449,7 @@ RGB.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.should_change_PhotometricInterpretation_to_RGB">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L163"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">should_change_PhotometricInterpretation_to_RGB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.should_change_PhotometricInterpretation_to_RGB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the <em>Photometric Interpretation</em> should be changed
 to RGB.</p>
 <p>This affects JPEG transfer syntaxes.</p>
@@ -457,7 +457,7 @@ to RGB.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.pylibjpeg_handler.supports_transfer_syntax">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">supports_transfer_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tsyntax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">pydicom.uid.UID</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/819f984e8/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.pylibjpeg_handler.</span></span><span class="sig-name descname"><span class="pre">supports_transfer_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tsyntax</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">pydicom.uid.UID</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/f9ee9126f/pydicom/pixel_data_handlers/pylibjpeg_handler.py#L141"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.pylibjpeg_handler.supports_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler supports the <cite>tsyntax</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

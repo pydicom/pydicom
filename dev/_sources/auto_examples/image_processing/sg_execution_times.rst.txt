@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:00.310** total execution time for **auto_examples_image_processing** files:
+**00:00.306** total execution time for **auto_examples_image_processing** files:
 
 +----------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``plot_waveforms.py``)           | 00:00.304 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py` (``plot_waveforms.py``)           | 00:00.301 | 0.0 MB |
 +----------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py` (``plot_downsize_image.py``) | 00:00.006 | 0.0 MB |
 +----------------------------------------------------------------------------------------------------+-----------+--------+
