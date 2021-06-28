@@ -873,7 +873,7 @@ def _expand_segmented_lut(
                 lut.extend([y1] * length)
             else:
                 step = (y1 - y0) / length
-                vals = np.around(np.arange(y0 + step, y1 + step, step))
+                vals = np.around(np.linspace(y0 + step, y1, length))
                 lut.extend([int(vv) for vv in vals])
         elif opcode == 2:
             # C.7.9.2.3: Indirect segment
