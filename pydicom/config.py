@@ -24,8 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
         def __call__(
             self,
             elem: "RawDataElement",
-            encoding: Optional[Union[str, MutableSequence[str]]] = None,
-            **kwargs: Any
+            **kwargs: Any,
         ) -> "RawDataElement": ...
 
 

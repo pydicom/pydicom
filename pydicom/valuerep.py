@@ -852,7 +852,7 @@ def _verify_encodings(
 
 
 def _decode_personname(
-    components: Sequence[Union[str, bytes]], encodings: Sequence[str]
+    components: Sequence[bytes], encodings: Sequence[str]
 ) -> Tuple[str, ...]:
     """Return a list of decoded person name components.
 
@@ -873,12 +873,7 @@ def _decode_personname(
     """
     from pydicom.charset import decode_bytes
 
-    comps: List[str] = []
-    for c in components:
-        if isinstance(c, str):
-            comps.append(c)
-        else:
-            comps.append(decode_bytes(c, encodings, PN_DELIMS))
+    comps = [decode_bytes(c, encodings, PN_DELIMS) for c in components]
 
     # Remove empty elements from the end to avoid trailing '='
     while len(comps) and not comps[-1]:

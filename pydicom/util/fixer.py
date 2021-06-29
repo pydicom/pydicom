@@ -13,33 +13,33 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def fix_separator_callback(
-    raw_elem: "RawDataElement", **kwargs: Any
+    elem: "RawDataElement", **kwargs: Any
 ) -> "RawDataElement":
     """Used by fix_separator as the callback function from read_dataset
     """
-    return_val = raw_elem
+    return_val = elem
     try_replace = False
 
     # If elements are implicit VR, attempt to determine the VR
-    if raw_elem.VR is None:
+    if elem.VR is None:
         try:
-            VR = datadict.dictionary_VR(raw_elem.tag)
+            VR = datadict.dictionary_VR(elem.tag)
         # Not in the dictionary, process if flag says to do so
         except KeyError:
             try_replace = kwargs['process_unkown_VR']
         else:
             try_replace = VR in kwargs['for_VRs']
     else:
-        try_replace = raw_elem.VR in kwargs['for_VRs']
+        try_replace = elem.VR in kwargs['for_VRs']
 
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
-        if raw_elem.value is not None:
-            new_value = raw_elem.value.replace(
+        if elem.value is not None:
+            new_value = elem.value.replace(
                 kwargs['invalid_separator'], b"\\"
             )
-        return_val = raw_elem._replace(value=new_value)
+        return_val = elem._replace(value=new_value)
 
     return return_val
 
@@ -77,22 +77,22 @@ def fix_separator(
 
 
 def fix_mismatch_callback(
-    raw_elem: "RawDataElement", **kwargs: Any
+    elem: "RawDataElement", **kwargs: Any
 ) -> "RawDataElement":
-    if raw_elem.VR is None:
-        return raw_elem
+    if elem.VR is None:
+        return elem
 
     try:
-        values.convert_value(raw_elem.VR, raw_elem)
+        values.convert_value(elem.VR, elem)
     except ValueError:
         for vr in kwargs['with_VRs']:
             try:
-                values.convert_value(vr, raw_elem)
+                values.convert_value(vr, elem)
             except ValueError:
                 pass
             else:
-                raw_elem = raw_elem._replace(VR=vr)
-    return raw_elem
+                elem = elem._replace(VR=vr)
+    return elem
 
 
 def fix_mismatch(with_VRs: Tuple[str, ...] = ('PN', 'DS', 'IS')) -> None:
