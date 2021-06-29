@@ -128,7 +128,7 @@ def DS_decimal(use_Decimal_boolean: bool = True) -> None:
     if use_DS_decimal:
         pydicom.valuerep.DSclass = pydicom.valuerep.DSdecimal
     else:
-        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat  # type: ignore
+        pydicom.valuerep.DSclass = pydicom.valuerep.DSfloat
 
 
 # Configuration flags

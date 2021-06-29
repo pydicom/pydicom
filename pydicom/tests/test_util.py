@@ -6,20 +6,30 @@ import os
 
 import pytest
 
-from pydicom import config
+from pydicom import config, dcmread
 from pydicom import filereader
 from pydicom import valuerep
+from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import Tag
+from pydicom.uid import (
+    ImplicitVRLittleEndian, ExplicitVRBigEndian, ExplicitVRLittleEndian
+)
 from pydicom.util import fixer
 from pydicom.util import hexutil
-from pydicom.util.codify import (camel_to_underscore, tag_repr,
-                                 default_name_filter, code_imports,
-                                 code_dataelem, main as codify_main)
+from pydicom.util.codify import (
+    camel_to_underscore,
+    tag_repr,
+    default_name_filter,
+    code_imports,
+    code_dataelem,
+    main as codify_main,
+)
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
-from pydicom.data import get_testdata_file
+from pydicom.util.leanread import dicomfile
+
 
 have_numpy = True
 try:
@@ -364,3 +374,63 @@ class TestDataElementCallbackTests:
             assert numpy.allclose(expected, got)
         else:
             assert expected == got
+
+
+class TestLeanRead:
+    def test_explicit_little(self):
+        p = get_testdata_file("CT_small.dcm")
+        ds = dcmread(p)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
+        with dicomfile(p) as ds:
+            assert ds.preamble is not None
+            for elem in ds:
+                if elem[0] == (0x7fe0, 0x0010):
+                    assert elem[2] == 32768
+
+    def test_implicit_little(self):
+        p = get_testdata_file("MR_small_implicit.dcm")
+        ds = dcmread(p)
+        assert ds.file_meta.TransferSyntaxUID == ImplicitVRLittleEndian
+        with dicomfile(p) as ds:
+            assert ds.preamble is not None
+            for elem in ds:
+                if elem[0] == (0x7fe0, 0x0010):
+                    assert elem[2] == 8192
+
+    def test_explicit_big(self):
+        p = get_testdata_file("MR_small_bigendian.dcm")
+        ds = dcmread(p)
+        assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
+        with dicomfile(p) as ds:
+            assert ds.preamble is not None
+            for elem in ds:
+                if elem[0] == (0x7fe0, 0x0010):
+                    assert elem[2] == 8192
+
+    def test_no_tsyntax(self):
+        p = get_testdata_file("meta_missing_tsyntax.dcm")
+        ds = dcmread(p)
+        assert "TransferSyntaxUID" not in ds.file_meta
+        msg = "No transfer syntax in file meta info"
+        with dicomfile(p) as ds:
+            assert ds.preamble is not None
+            with pytest.raises(NotImplementedError, match=msg):
+                for elem in ds:
+                    pass
+
+    def test_no_meta(self):
+        p = get_testdata_file("no_meta.dcm")
+        msg = "No transfer syntax in file meta info"
+        with dicomfile(p) as ds:
+            assert ds.preamble is None
+            with pytest.raises(NotImplementedError, match=msg):
+                for elem in ds:
+                    pass
+
+    def test_UN_sequence(self):
+        p = get_testdata_file("UN_sequence.dcm")
+        msg = "This reader does not handle undefined length except for SQ"
+        with dicomfile(p) as ds:
+            with pytest.raises(NotImplementedError, match=msg):
+                for elem in ds:
+                    pass
