@@ -412,9 +412,9 @@ def length_of_undefined_length(
 
 def read_delimiter_item(fp, delimiter):
     """Read and ignore an expected delimiter.
+
     If the delimiter is not found or correctly formed, a warning is logged.
     """
-
     found = fp.read(4)
     if found != delimiter:
         logger.warn("Expected delimitor %s, got %s at file position 0x%x",
