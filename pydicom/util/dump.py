@@ -10,10 +10,10 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-def print_character(ordchar: int) -> str:
+def print_character(ordchr: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
-    if 31 < ordchar < 126 and ordchar != 92:
-        return chr(ordchar)
+    if 31 < ordchr < 126 and ordchr != 92:
+        return chr(ordchr)
 
     return "."
 
