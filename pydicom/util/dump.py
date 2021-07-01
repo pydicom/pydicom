@@ -10,10 +10,10 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
-def print_character(char: int) -> str:
+def print_character(ordchar: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
-    if 31 < char < 126 and char != 92:
-        return chr(char)
+    if 31 < ordchar < 126 and ordchar != 92:
+        return chr(ordchar)
 
     return "."
 
@@ -66,16 +66,16 @@ def hexdump(
     s = []
 
     # Determine the maximum number of characters for the offset
-    max_offset = len(f"{f.seek(0, 2):X}")
+    max_offset_len = len(f"{f.seek(0, 2):X}")
     if stop_address:
-        max_offset = len(f"{stop_address:X}")
+        max_offset_len = len(f"{stop_address:X}")
 
     f.seek(start_address)
     while True:
-        if stop_address and f.tell() > stop_address:
+        offset = f.tell()
+        if stop_address and offset > stop_address:
             break
 
-        offset = f.tell()
         data = f.read(16)
         if not data:
             break
@@ -84,13 +84,13 @@ def hexdump(
 
         if show_address:
             # Offset at the start of the current line
-            current.append(f"{offset:0{max_offset}X}  ")
+            current.append(f"{offset:0{max_offset_len}X}  ")
 
         # Add hex version of the current line
         b = " ".join([f"{x:02X}" for x in data])
-        current.append(f"{b:<49}")  # if not 16, pad
+        current.append(f"{b:<49}")  # if fewer than 16 bytes, pad out to length
 
-        # Add an ASCII version of the current line (or . if not ASCII)
+        # Append the ASCII version of the current line (or . if not ASCII)
         current.append("".join([print_character(x) for x in data]))
 
         s.append("".join(current))

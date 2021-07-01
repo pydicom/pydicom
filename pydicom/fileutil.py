@@ -4,11 +4,11 @@ import os
 from struct import pack, unpack
 from typing import Union, BinaryIO, Optional, Tuple, cast
 
-from pydicom.config import logger
-from pydicom.datadict import dictionary_description
-from pydicom.filebase import DicomIO
 from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag
+from pydicom.datadict import dictionary_description
+
+from pydicom.config import logger
 
 
 PathType = Union[str, bytes, os.PathLike]
@@ -408,6 +408,20 @@ def length_of_undefined_length(
         return delimiter_pos - data_start
 
     return None
+
+
+def read_delimiter_item(fp, delimiter):
+    """Read and ignore an expected delimiter.
+    If the delimiter is not found or correctly formed, a warning is logged.
+    """
+    found = fp.read(4)
+    if found != delimiter:
+        logger.warn("Expected delimitor %s, got %s at file position 0x%x",
+                    Tag(delimiter), Tag(found), fp.tell() - 4)
+    length = fp.read_UL()
+    if length != 0:
+        logger.warn("Expected delimiter item to have length 0, "
+                    "got %d at file position 0x%x", length, fp.tell() - 4)
 
 
 def path_from_pathlike(

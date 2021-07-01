@@ -19,10 +19,10 @@ def retry(
 
     Parameters
     ----------
-    exc : Exception or Tuple[Exception]
+    exc : Exception or Tuple[Exception, ...]
         The exception to check. may be a tuple of exceptions to check.
     exc_msg : str, optional
-        The exception message something FIXME
+        The message to be shown if an exception occurs.
     tries : int, optional
         The number of times to try (not retry) before giving up, default ``4``.
     delay : int, optional
@@ -42,7 +42,7 @@ def retry(
                 try:
                     return f(*args, **kwargs)
                 except exc as e:
-                    msg = f"{str(e)}, Retrying in {mdelay} seconds..."
+                    msg = f"{str(e)}: retrying in {mdelay} seconds..."
                     if exc_msg:
                         msg += f"  {exc_msg}"
 
