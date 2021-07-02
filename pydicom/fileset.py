@@ -9,7 +9,7 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import (
-    Generator, Optional, Union, Any, List, cast, Iterable, Dict, Callable
+    Iterator, Optional, Union, Any, List, cast, Iterable, Dict, Callable
 )
 import warnings
 
@@ -75,7 +75,7 @@ _LAST_OFFSET = "OffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity"
 
 def generate_filename(
     prefix: str = "", start: int = 0, alphanumeric: bool = False
-) -> Generator[str, None, None]:
+) -> Iterator[str]:
     """Yield File IDs for a File-set.
 
     Maximum number of File IDs is:
@@ -382,6 +382,11 @@ class RecordNode(Iterable["RecordNode"]):
         raise KeyError(key)
 
     @property
+    def has_instance(self) -> bool:
+        """Return ``True`` if the current node corresponds to an instance."""
+        return self.instance is not None
+
+    @property
     def index(self) -> int:
         """Return the index of the current node amongst its siblings."""
         if not self.parent:
@@ -390,16 +395,11 @@ class RecordNode(Iterable["RecordNode"]):
         return self.parent.children.index(self)
 
     @property
-    def has_instance(self) -> bool:
-        """Return ``True`` if the current node corresponds to an instance."""
-        return self.instance is not None
-
-    @property
     def is_root(self) -> bool:
         """Return ``True`` if the current node is the tree's root node."""
         return False
 
-    def __iter__(self) -> Generator["RecordNode", None, None]:
+    def __iter__(self) -> Iterator["RecordNode"]:
         """Yield this node (unless it's the root node) and all nodes below it.
         """
         if not self.is_root:
@@ -467,7 +467,7 @@ class RecordNode(Iterable["RecordNode"]):
         indent_char : str, optional
             The characters to use to indent each level of the tree.
         """
-        def leaf_summary(node, indent_char):
+        def leaf_summary(node: "RecordNode", indent_char: str) -> List[str]:
             """Summarize the leaves at the current level."""
             # Examples:
             #   IMAGE: 15 SOP Instances (10 initial, 9 additions, 4 removals)
@@ -481,11 +481,21 @@ class RecordNode(Iterable["RecordNode"]):
                 for record_type in sorted(rtypes):
                     # nr = initial + additions
                     nr = [ii for ii in sibs if ii.record_type == record_type]
-                    add = len([ii for ii in nr if ii.instance.for_addition])
-                    rm = len([ii for ii in nr if ii.instance.for_removal])
-                    nr = len(nr)
-                    initial = nr - add
-                    result = nr - rm
+                    # All leaves should have a corresponding FileInstance
+                    add = len(
+                        [
+                            ii for ii in nr
+                            if cast(FileInstance, ii.instance).for_addition
+                        ]
+                    )
+                    rm = len(
+                        [
+                            ii for ii in nr
+                            if cast(FileInstance, ii.instance).for_removal
+                        ]
+                    )
+                    initial = len(nr) - add
+                    result = len(nr) - rm
 
                     changes = []
                     if (add or rm) and initial > 0:
@@ -807,7 +817,9 @@ class FileInstance:
             file_id = self.FileID.split(os.path.sep)
             return [self.ReferencedFileID] != file_id
 
-        return self.ReferencedFileID != self.FileID.split(os.path.sep)
+        return cast(
+            bool, self.ReferencedFileID != self.FileID.split(os.path.sep)
+        )
 
     @property
     def for_removal(self) -> bool:
@@ -924,17 +936,17 @@ class FileInstance:
     @property
     def SOPClassUID(self) -> UID:
         """Return the *SOP Class UID* of the referenced instance."""
-        return self.ReferencedSOPClassUIDInFile
+        return cast(UID, self.ReferencedSOPClassUIDInFile)
 
     @property
     def SOPInstanceUID(self) -> UID:
         """Return the *SOP Instance UID* of the referenced instance."""
-        return self.ReferencedSOPInstanceUIDInFile
+        return cast(UID, self.ReferencedSOPInstanceUIDInFile)
 
     @property
     def TransferSyntaxUID(self) -> UID:
         """Return the *Transfer Syntax UID* of the referenced instance."""
-        return self.ReferencedTransferSyntaxUIDInFile
+        return cast(UID, self.ReferencedTransferSyntaxUIDInFile)
 
 
 class FileSet:
@@ -1029,7 +1041,7 @@ class FileSet:
             self._instances.append(instance)
             instance._apply_stage('+')
 
-            return instance
+            return cast(FileInstance, instance)
 
         # The instance is already in the File-set (and not staged for removal)
         #   May or may not be staged for addition/movement
@@ -1059,7 +1071,7 @@ class FileSet:
         instance._apply_stage('+')
         ds.save_as(instance.path, write_like_original=False)
 
-        return instance
+        return cast(FileInstance, instance)
 
     def add_custom(
         self, ds_or_path: Union[Dataset, str, PathLike], leaf: RecordNode
@@ -1168,7 +1180,7 @@ class FileSet:
             self._instances.append(instance)
             instance._apply_stage('+')
 
-            return instance
+            return cast(FileInstance, instance)
 
         if have_instance:
             return have_instance[0]
@@ -1191,7 +1203,7 @@ class FileSet:
         instance._apply_stage('+')
         ds.save_as(instance.path, write_like_original=False)
 
-        return instance
+        return cast(FileInstance, instance)
 
     def clear(self) -> None:
         """Clear the File-set."""
@@ -1213,7 +1225,9 @@ class FileSet:
         self._stage['t'] = TemporaryDirectory()
         self._stage['path'] = Path(self._stage['t'].name)
 
-    def copy(self, path, force_implicit: bool = False) -> "FileSet":
+    def copy(
+        self, path: Union[str, Path], force_implicit: bool = False
+    ) -> "FileSet":
         """Copy the File-set to a new root directory and return the copied
         File-set.
 
@@ -1419,7 +1433,7 @@ class FileSet:
             self._ds.FileSetDescriptorFileID = self._descriptor
         self._stage['^'] = True
 
-    def find(self, load: bool = False, **kwargs) -> List[FileInstance]:
+    def find(self, load: bool = False, **kwargs: Any) -> List[FileInstance]:
         """Return matching instances in the File-set
 
         **Limitations**
@@ -1453,7 +1467,7 @@ class FileSet:
         # Flag whether or not the query elements are in the DICOMDIR records
         has_elements = False
 
-        def match(ds, **kwargs):
+        def match(ds: Union[Dataset, FileInstance], **kwargs: Any) -> bool:
             nonlocal has_elements
             if load:
                 ds = ds.load()
@@ -1574,7 +1588,7 @@ class FileSet:
         """Return ``True`` if the File-set is new or has changes staged."""
         return any(self._stage[c] for c in '+-^~')
 
-    def __iter__(self) -> Generator[FileInstance, None, None]:
+    def __iter__(self) -> Iterator[FileInstance]:
         """Yield :class:`~pydicom.fileset.FileInstance` from the File-set."""
         yield from self._instances[:]
 
@@ -1734,7 +1748,7 @@ class FileSet:
         # Second pass: build the record hierarchy
         #   Records not in the hierarchy will be ignored
         #   Branches without a valid leaf node File ID will be removed
-        def recurse_node(node):
+        def recurse_node(node: RecordNode) -> None:
             child_offset = getattr(node._record, _LOWER_OFFSET, None)
             if child_offset:
                 child = records[child_offset]
@@ -1809,7 +1823,7 @@ class FileSet:
 
         return self._path
 
-    def _recordify(self, ds: Dataset) -> Generator[Dataset, None, None]:
+    def _recordify(self, ds: Dataset) -> Iterator[Dataset]:
         """Yield directory records for a SOP Instance.
 
         Parameters

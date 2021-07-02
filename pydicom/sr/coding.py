@@ -18,7 +18,7 @@ class Code(NamedTuple):
     meaning: str
     scheme_version: Optional[str]
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         if self.scheme_designator == "SRT":
             self_mapped = Code(
                 value=snomed_mapping["SRT"][self.value],
@@ -55,7 +55,7 @@ class Code(NamedTuple):
             and self_mapped.scheme_version == other_mapped.scheme_version
         )
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         return not (self == other)
 
 

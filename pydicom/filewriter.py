@@ -473,7 +473,7 @@ def _format_TM(val: Optional[TM]) -> str:
     return val.strftime("%H%M%S")
 
 
-def write_TM(fp: DicomIO, elem: DataElement):
+def write_TM(fp: DicomIO, elem: DataElement) -> None:
     val = elem.value
     if isinstance(val, str):
         write_string(fp, elem)
@@ -1119,7 +1119,7 @@ def dcmwrite(
             fp.close()
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     if name == 'write_file':
         warnings.warn(
             "'write_file' is deprecated and will be removed in v3.0, use "

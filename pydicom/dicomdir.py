@@ -1,10 +1,13 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Module for DicomDir class."""
+
+import os
+from typing import Optional, List, Dict, Union, BinaryIO, AnyStr
 import warnings
 
 from pydicom import config
 from pydicom.errors import InvalidDicomError
-from pydicom.dataset import FileDataset
+from pydicom.dataset import FileDataset, FileMetaDataset, Dataset
 
 
 class DicomDir(FileDataset):
@@ -19,13 +22,15 @@ class DicomDir(FileDataset):
         use :class:`~pydicom.fileset.FileSet` instead.
     """
 
-    def __init__(self,
-                 filename_or_obj,
-                 dataset,
-                 preamble=None,
-                 file_meta=None,
-                 is_implicit_VR=True,
-                 is_little_endian=True):
+    def __init__(
+        self,
+        filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        dataset: Dataset,
+        preamble: Optional[bytes] = None,
+        file_meta: Optional[FileMetaDataset] = None,
+        is_implicit_VR: bool = True,
+        is_little_endian: bool = True,
+    ) -> None:
         """Initialize a DICOMDIR dataset read from a DICOM file.
 
         Carries forward all the initialization from
@@ -87,10 +92,10 @@ class DicomDir(FileDataset):
             is_little_endian=is_little_endian
         )
 
-        self.patient_records = []
+        self.patient_records: List[Dataset] = []
         self.parse_records()
 
-    def parse_records(self):
+    def parse_records(self) -> None:
         """Build the hierarchy of given directory records, and structure
         into Patient, Studies, Series, Images hierarchy.
 
@@ -99,18 +104,23 @@ class DicomDir(FileDataset):
         """
 
         # Define a helper function for organizing the records
-        def get_siblings(record, map_offset_to_record):
+        def get_siblings(
+            record: Dataset, map_offset_to_record: Dict[int, Dataset]
+        ) -> List[Dataset]:
             """Return a list of all siblings of the given directory record,
             including itself.
             """
             sibling_list = [record]
             current_record = record
-            while ('OffsetOfTheNextDirectoryRecord' in current_record and
-                   current_record.OffsetOfTheNextDirectoryRecord):
+            while (
+                'OffsetOfTheNextDirectoryRecord' in current_record
+                and current_record.OffsetOfTheNextDirectoryRecord
+            ):
                 offset_of_next = current_record.OffsetOfTheNextDirectoryRecord
                 sibling = map_offset_to_record[offset_of_next]
                 sibling_list.append(sibling)
                 current_record = sibling
+
             return sibling_list
 
         # Build the mapping from file offsets to records
@@ -128,8 +138,9 @@ class DicomDir(FileDataset):
         for record in records:
             record.children = []
             if 'OffsetOfReferencedLowerLevelDirectoryEntity' in record:
-                child_offset = (record.
-                                OffsetOfReferencedLowerLevelDirectoryEntity)
+                child_offset = (
+                    record.OffsetOfReferencedLowerLevelDirectoryEntity
+                )
                 if child_offset:
                     child = map_offset_to_record[child_offset]
                     record.children = get_siblings(child, map_offset_to_record)
