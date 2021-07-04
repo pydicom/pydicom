@@ -2,7 +2,7 @@
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
-import pathlib
+import os
 import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
 
@@ -19,7 +19,7 @@ def print_character(ordchr: int) -> str:
 
 
 def filedump(
-    filename: Union[str, pathlib.Path],
+    filename: Union[str, os.PathLike],
     start_address: int = 0,
     stop_address: Optional[int] = None,
 ) -> str:
