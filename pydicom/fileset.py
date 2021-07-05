@@ -1514,17 +1514,15 @@ class FileSet:
             If list of elements was queried: A dict of element value pairs with
                 lists of value(s) for the elements available in the instances.
         """
-        single_element = not isinstance(elements, list)
-        if single_element:
-            elements = [elements]
-        has_element = {element: False for element in elements}
-        results = {element: [] for element in elements}
+        element_list = elements if isinstance(elements, list) else [elements]
+        has_element = {element: False for element in element_list}
+        results: Dict = {element: [] for element in element_list}
         iter_instances = instances or iter(self)
         instance: Union[Dataset, FileInstance]
         for instance in iter_instances:
             if load:
                 instance = instance.load()
-            for element in elements:
+            for element in element_list:
                 if element not in instance:
                     continue
 
@@ -1540,8 +1538,8 @@ class FileSet:
                     f"{element}, consider using the 'load' parameter "
                     "to expand the search to the corresponding SOP instances"
                 )
-        if single_element:
-            return results[elements[0]]
+        if not isinstance(elements, list):
+            return results[element_list[0]]
         else:
             return results
 
