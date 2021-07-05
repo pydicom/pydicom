@@ -1,7 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-import pathlib
+import os
 from struct import Struct, unpack
 from types import TracebackType
 from typing import (
@@ -30,7 +30,7 @@ _ElementType = Tuple[
 class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
-    def __init__(self, filename: Union[str, pathlib.Path]) -> None:
+    def __init__(self, filename: Union[str, os.PathLike]) -> None:
         self.fobj = fobj = open(filename, "rb")
 
         # Read the DICOM preamble, if present
