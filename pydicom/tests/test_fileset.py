@@ -1945,20 +1945,20 @@ class TestFileSet_Load:
     def test_find_values(self, private):
         """Test searching the FileSet for element values."""
         fs = FileSet(private)
-        ptid_v = ['77654033', '98890234']
-        desc_v = [
-            'XR C Spine Comp Min 4 Views',
-            'CT, HEAD/BRAIN WO CONTRAST',
-            '',
-            'Carotids',
-            'Brain',
-            'Brain-MRA',
-        ]
-        assert ptid_v == fs.find_values("PatientID")
-        assert desc_v == fs.find_values("StudyDescription")
-        assert (
-            {"PatientID": ptid_v, "StudyDescription": desc_v}
-        ) == fs.find_values(["PatientID", "StudyDescription"])
+        expected = {
+            "PatientID": ['77654033', '98890234'],
+            "StudyDescription": [
+                'XR C Spine Comp Min 4 Views',
+                'CT, HEAD/BRAIN WO CONTRAST',
+                '',
+                'Carotids',
+                'Brain',
+                'Brain-MRA',
+            ],
+        }
+        for k, v in expected.items():
+            assert v == fs.find_values(k)
+        assert expected == fs.find_values(list(expected.keys()))
 
     def test_find_values_load(self, private):
         """Test FileSet.find_values(load=True)."""
