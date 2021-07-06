@@ -1957,8 +1957,8 @@ class TestFileSet_Load:
             ],
         }
         for k, v in expected.items():
-            assert v == fs.find_values(k)
-        assert expected == fs.find_values(list(expected.keys()))
+            assert fs.find_values(k) == v
+        assert fs.find_values(list(expected.keys())) == expected
 
     def test_find_values_load(self, private):
         """Test FileSet.find_values(load=True)."""
@@ -1973,17 +1973,17 @@ class TestFileSet_Load:
             results = fs.find_values(search_element, load=False)
             assert not results
 
-        assert ['MONOCHROME1', 'MONOCHROME2'] == fs.find_values(
-            search_element, load=True
-        )
+        assert fs.find_values(search_element, load=True) == [
+            'MONOCHROME1', 'MONOCHROME2'
+        ]
 
         with pytest.warns(UserWarning, match=msg):
             results = fs.find_values([search_element], load=False)
             assert not results[search_element]
 
         assert (
-            {search_element: ['MONOCHROME1', 'MONOCHROME2']}
-        ) == fs.find_values([search_element], load=True)
+            fs.find_values([search_element], load=True)
+        ) == {search_element: ['MONOCHROME1', 'MONOCHROME2']}
 
     def test_empty_file_id(self, dicomdir):
         """Test loading a record with an empty File ID."""
