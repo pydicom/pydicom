@@ -19,6 +19,7 @@ from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.filebase import DicomBytesIO, DicomFileLike
 from pydicom.filereader import dcmread
+from pydicom.fileutil import PathType
 from pydicom.filewriter import (
     write_dataset, write_data_element, write_file_meta_info
 )
@@ -952,7 +953,7 @@ class FileInstance:
 class FileSet:
     """Representation of a DICOM File-set."""
     def __init__(
-        self, ds: Optional[Union[Dataset, str, PathLike]] = None
+        self, ds: Optional[Union[Dataset, PathType]] = None
     ) -> None:
         """Create or load a File-set.
 
@@ -1002,7 +1003,7 @@ class FileSet:
             # New File-set
             self.UID = generate_uid()
 
-    def add(self, ds_or_path: Union[Dataset, str, PathLike]) -> FileInstance:
+    def add(self, ds_or_path: Union[Dataset, PathType]) -> FileInstance:
         """Stage an instance for addition to the File-set.
 
         If the instance has been staged for removal then calling
@@ -1074,7 +1075,7 @@ class FileSet:
         return cast(FileInstance, instance)
 
     def add_custom(
-        self, ds_or_path: Union[Dataset, str, PathLike], leaf: RecordNode
+        self, ds_or_path: Union[Dataset, PathType], leaf: RecordNode
     ) -> FileInstance:
         """Stage an instance for addition to the File-set using custom records.
 
@@ -1598,7 +1599,7 @@ class FileSet:
 
     def load(
         self,
-        ds_or_path: Union[Dataset, str, PathLike],
+        ds_or_path: Union[Dataset, PathType],
         include_orphans: bool = True,
         raise_orphans: bool = False,
     ) -> None:

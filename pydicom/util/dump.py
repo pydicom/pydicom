@@ -2,9 +2,12 @@
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
-import pathlib
+import os
 import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
+
+from pydicom.fileutil import PathType
+
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -19,7 +22,7 @@ def print_character(ordchr: int) -> str:
 
 
 def filedump(
-    filename: Union[str, pathlib.Path],
+    filename: PathType,
     start_address: int = 0,
     stop_address: Optional[int] = None,
 ) -> str:
