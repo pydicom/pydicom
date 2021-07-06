@@ -28,7 +28,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast, Dict, Any
+from typing import TYPE_CHECKING, cast, Dict, Any, Optional
 import warnings
 
 try:
@@ -41,6 +41,7 @@ from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
+    from pydicom.dataelem import DataElement
 
 
 HANDLER_NAME = 'Numpy Overlay'
@@ -215,7 +216,7 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
     elem_values = {kk: vv.value for kk, vv in elem.items()}
 
     # Add in if not present
-    nr_frames = ds.get((group, 0x0015), None)
+    nr_frames: Optional["DataElement"] = ds.get((group, 0x0015), None)
     if nr_frames is None:
         elem_values['NumberOfFramesInOverlay'] = 1
     else:

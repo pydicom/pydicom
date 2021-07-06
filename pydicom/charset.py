@@ -4,7 +4,8 @@
 import codecs
 import re
 from typing import (
-    List, Set, Optional, Union, TYPE_CHECKING, MutableSequence, cast
+    List, Set, Optional, Union, TYPE_CHECKING, MutableSequence, cast,
+    Sequence,
 )
 import warnings
 
@@ -291,7 +292,7 @@ custom_encoders = {
 
 
 def decode_bytes(
-    value: bytes, encodings: List[str], delimiters: Set[int]
+    value: bytes, encodings: Sequence[str], delimiters: Set[int]
 ) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
@@ -371,7 +372,7 @@ decode_string = decode_bytes
 
 
 def _decode_fragment(
-    byte_str: bytes, encodings: List[str], delimiters: Set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: Set[int]
 ) -> str:
     """Decode a byte string encoded with a single encoding.
 
@@ -431,7 +432,7 @@ def _decode_fragment(
 
 
 def _decode_escaped_fragment(
-    byte_str: bytes, encodings: List[str], delimiters: Set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: Set[int]
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
 
@@ -475,7 +476,7 @@ def _decode_escaped_fragment(
     return byte_str.decode(encodings[0], errors='replace')
 
 
-def encode_string(value: str, encodings: List[str]) -> bytes:
+def encode_string(value: str, encodings: Sequence[str]) -> bytes:
     """Encode a unicode string `value` into :class:`bytes` using `encodings`.
 
     .. versionadded:: 1.2
@@ -538,7 +539,7 @@ def encode_string(value: str, encodings: List[str]) -> bytes:
         return _encode_string_impl(value, encodings[0], errors='replace')
 
 
-def _encode_string_parts(value: str, encodings: List[str]) -> bytes:
+def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:
     """Convert a unicode string into a byte string using the given
     list of encodings.
     This is invoked if `encode_string` failed to encode `value` with a single

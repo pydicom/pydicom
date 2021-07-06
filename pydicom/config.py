@@ -23,9 +23,8 @@ if TYPE_CHECKING:  # pragma: no cover
     class ElementCallback(Protocol):
         def __call__(
             self,
-            elem: "RawDataElement",
-            encoding: Optional[Union[str, MutableSequence[str]]] = None,
-            **kwargs: Any
+            raw_elem: "RawDataElement",
+            **kwargs: Any,
         ) -> "RawDataElement": ...
 
 

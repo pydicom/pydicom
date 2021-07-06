@@ -1,72 +1,106 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Utility functions used in debugging writing and reading"""
 
 from io import BytesIO
+import os
+import sys
+from typing import Union, Optional, BinaryIO, TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataset import Dataset
 
 
-def print_character(ordchr):
+def print_character(ordchr: int) -> str:
     """Return a printable character, or '.' for non-printable ones."""
     if 31 < ordchr < 126 and ordchr != 92:
         return chr(ordchr)
-    else:
-        return '.'
+
+    return "."
 
 
-def filedump(filename, start_address=0, stop_address=None):
-    """Dump out the contents of a file to a
-       standard hex dump 16 bytes wide"""
+def filedump(
+    filename: Union[str, bytes, os.PathLike],
+    start_address: int = 0,
+    stop_address: Optional[int] = None,
+) -> str:
+    """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
 
-    fp = open(filename, 'rb')
-    return hexdump(fp, start_address, stop_address)
-
-
-def datadump(data):
-    stop_address = len(data) + 1
-    fp = BytesIO(data)
-    print(hexdump(fp, 0, stop_address))
+    with open(filename, "rb") as f:
+        return hexdump(f, start_address, stop_address)
 
 
-def hexdump(file_in, start_address=0, stop_address=None, showAddress=True):
+def datadump(
+    data: bytes, start_address: int = 0, stop_address: Optional[int] = None
+) -> str:
+    """Return a hex string representation of `data`."""
+    return hexdump(BytesIO(data), start_address, stop_address)
+
+
+def hexdump(
+    f: BinaryIO,
+    start_address: int = 0,
+    stop_address: Optional[int] = None,
+    show_address: bool = True,
+) -> str:
     """Return a formatted string of hex bytes and characters in data.
 
     This is a utility function for debugging file writing.
 
-    file_in -- a file-like object to get the bytes to show from"""
+    Parameters
+    ----------
+    f : BinaryIO
+        The file-like to dump.
+    start_address : int, optional
+        The offset where the dump should start (default ``0``)
+    stop_address : int, optional
+        The offset where the dump should end, by default the entire file will
+        be dumped.
+    show_address : bool, optional
+        If ``True`` (default) then include the offset of each line of output.
 
-    str_out = BytesIO()
-    # space taken up if row has a full 16 bytes
-    byteslen = 16 * 3 - 1
-    blanks = ' ' * byteslen
+    Returns
+    -------
+    str
+    """
 
-    file_in.seek(start_address)
-    data = True  # dummy to start the loop
-    while data:
-        if stop_address and file_in.tell() > stop_address:
+    s = []
+
+    # Determine the maximum number of characters for the offset
+    max_offset_len = len(f"{f.seek(0, 2):X}")
+    if stop_address:
+        max_offset_len = len(f"{stop_address:X}")
+
+    f.seek(start_address)
+    while True:
+        offset = f.tell()
+        if stop_address and offset > stop_address:
             break
-        if showAddress:
-            # address at start of line
-            str_out.write("%04x : " % (file_in.tell()))
-        data = file_in.read(16)
+
+        data = f.read(16)
         if not data:
             break
-        row = [ord(x) for x in data]  # need ord twice below so convert once
 
-        # string of two digit hex bytes
-        byte_string = ' '.join(["%02x" % x for x in row])
-        str_out.write(byte_string)
+        current = []
 
-        # if not 16, pad
-        str_out.write(blanks[:byteslen - len(byte_string)])
-        str_out.write('  ')
+        if show_address:
+            # Offset at the start of the current line
+            current.append(f"{offset:0{max_offset_len}X}  ")
 
-        # character rep of bytes
-        str_out.write(''.join([print_character(x) for x in row]))
-        str_out.write("\n")
+        # Add hex version of the current line
+        b = " ".join([f"{x:02X}" for x in data])
+        current.append(f"{b:<49}")  # if fewer than 16 bytes, pad out to length
 
-    return str_out.getvalue()
+        # Append the ASCII version of the current line (or . if not ASCII)
+        current.append("".join([print_character(x) for x in data]))
+
+        s.append("".join(current))
+
+    return "\n".join(s)
 
 
-def pretty_print(ds, indent=0, indent_chars="   "):
+def pretty_print(
+    ds: "Dataset", indent_level: int = 0, indent_chars: str = "  "
+) -> None:
     """Print a dataset directly, with indented levels.
 
     This is just like Dataset._pretty_str, but more useful for debugging as it
@@ -75,24 +109,21 @@ def pretty_print(ds, indent=0, indent_chars="   "):
 
     """
 
-    indentStr = indent_chars * indent
-    nextIndentStr = indent_chars * (indent + 1)
-    for data_element in ds:
-        if data_element.VR == "SQ":  # a sequence
-            fmt_str = "{0:s}{1:s} {2:s}  {3:d} item(s) ---"
-            new_str = fmt_str.format(indentStr,
-                                     str(data_element.tag), data_element.name,
-                                     len(data_element.value))
-            print(new_str)
-            for dataset in data_element.value:
-                pretty_print(dataset, indent + 1)
-                print(nextIndentStr + "---------")
+    indent = indent_chars * indent_level
+    next_indent = indent_chars * (indent_level + 1)
+    for elem in ds:
+        if elem.VR == "SQ":  # a sequence
+            print(
+                f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)"
+            )
+            for dataset in elem.value:
+                pretty_print(dataset, indent_level + 1)
+                print(next_indent + "---------")
         else:
-            print(indentStr + repr(data_element))
+            print(indent + repr(elem))
 
 
-if __name__ == "__main__":
-    import sys
+if __name__ == "__main__":  # pragma: no cover
     filename = sys.argv[1]
     start_address = 0
     stop_address = None

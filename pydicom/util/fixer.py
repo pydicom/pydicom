@@ -2,12 +2,19 @@
 """Code to fix non-standard dicom issues in files
 """
 
+from typing import TYPE_CHECKING, Any, Tuple
+
 from pydicom import config
 from pydicom import datadict
 from pydicom import values
 
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.dataelem import RawDataElement
 
-def fix_separator_callback(raw_elem, **kwargs):
+
+def fix_separator_callback(
+    raw_elem: "RawDataElement", **kwargs: Any
+) -> "RawDataElement":
     """Used by fix_separator as the callback function from read_dataset
     """
     return_val = raw_elem
@@ -28,15 +35,20 @@ def fix_separator_callback(raw_elem, **kwargs):
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
-        new_value = raw_elem.value.replace(kwargs['invalid_separator'], b"\\")
+        if raw_elem.value is not None:
+            new_value = raw_elem.value.replace(
+                kwargs['invalid_separator'], b"\\"
+            )
         return_val = raw_elem._replace(value=new_value)
 
     return return_val
 
 
-def fix_separator(invalid_separator,
-                  for_VRs=["DS", "IS"],
-                  process_unknown_VRs=True):
+def fix_separator(
+    invalid_separator: bytes,
+    for_VRs: Tuple[str, ...] = ("DS", "IS"),
+    process_unknown_VRs: bool = True,
+) -> None:
     """A callback function to fix RawDataElement values using
     some other separator than the dicom standard backslash character
 
@@ -64,7 +76,12 @@ def fix_separator(invalid_separator,
     }
 
 
-def fix_mismatch_callback(raw_elem, **kwargs):
+def fix_mismatch_callback(
+    raw_elem: "RawDataElement", **kwargs: Any
+) -> "RawDataElement":
+    if raw_elem.VR is None:
+        return raw_elem
+
     try:
         values.convert_value(raw_elem.VR, raw_elem)
     except ValueError:
@@ -78,7 +95,7 @@ def fix_mismatch_callback(raw_elem, **kwargs):
     return raw_elem
 
 
-def fix_mismatch(with_VRs=['PN', 'DS', 'IS']):
+def fix_mismatch(with_VRs: Tuple[str, ...] = ('PN', 'DS', 'IS')) -> None:
     """A callback function to check that RawDataElements are translatable
     with their provided VRs.  If not, re-attempt translation using
     some other translators.

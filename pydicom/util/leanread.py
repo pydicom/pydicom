@@ -1,109 +1,100 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
+import os
+from struct import Struct, unpack
+from types import TracebackType
+from typing import (
+    Iterator, Tuple, Optional, Union, Type, cast, BinaryIO, Callable
+)
+
 from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
-from pydicom.tag import TupleTag
-from struct import Struct, unpack
+from pydicom.tag import TupleTag, ItemTag
+from pydicom.uid import UID
+from pydicom.valuerep import extra_length_VRs
 
-extra_length_VRs_b = (b'OB', b'OW', b'OF', b'SQ', b'UN', b'UT')
+
+extra_length_VRs_b = tuple(vr.encode('ascii') for vr in extra_length_VRs)
 ExplicitVRLittleEndian = b'1.2.840.10008.1.2.1'
 ImplicitVRLittleEndian = b'1.2.840.10008.1.2'
 DeflatedExplicitVRLittleEndian = b'1.2.840.10008.1.2.1.99'
 ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
 
-ItemTag = 0xFFFEE000  # start of Sequence Item
+
+_ElementType = Tuple[
+    Tuple[int, int], Optional[bytes], int, Optional[bytes], int
+]
 
 
 class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
-    def __init__(self, filename):
+    def __init__(self, filename: Union[str, bytes, os.PathLike]) -> None:
         self.fobj = fobj = open(filename, "rb")
 
         # Read the DICOM preamble, if present
-        self.preamble = fobj.read(0x80)
+        self.preamble: Optional[bytes] = fobj.read(0x80)
         dicom_prefix = fobj.read(4)
         if dicom_prefix != b"DICM":
             self.preamble = None
             fobj.seek(0)
 
-    def __enter__(self):
+    def __enter__(self) -> "dicomfile":
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType]
+    ) -> Optional[bool]:
         self.fobj.close()
 
-    def __iter__(self):
+        return None
+
+    def __iter__(self) -> Iterator[_ElementType]:
         # Need the transfer_syntax later
-        transfer_syntax_uid = None
+        tsyntax: Optional[UID] = None
 
         # Yield the file meta info elements
-        file_meta_gen = data_element_generator(
+        file_meta = data_element_generator(
             self.fobj,
             is_implicit_VR=False,
             is_little_endian=True,
-            stop_when=lambda gp, elem: gp != 2)
-        for data_elem in file_meta_gen:
-            if data_elem[0] == (0x0002, 0x0010):
-                transfer_syntax_uid = data_elem[3]
-            yield data_elem
+            stop_when=lambda group, elem: group != 2
+        )
+
+        for elem in file_meta:
+            if elem[0] == (0x0002, 0x0010):
+                value = cast(bytes, elem[3])
+                tsyntax = UID(value.strip(b" \0").decode('ascii'))
+
+            yield elem
 
         # Continue to yield elements from the main data
-        if transfer_syntax_uid:
-            if transfer_syntax_uid.endswith(b' ') or \
-                    transfer_syntax_uid.endswith(b'\0'):
-                transfer_syntax_uid = transfer_syntax_uid[:-1]
-            is_implicit_VR, is_little_endian = transfer_syntax(
-                transfer_syntax_uid)
-            # print is_implicit_VR
-        else:
+        if not tsyntax:
             raise NotImplementedError("No transfer syntax in file meta info")
 
-        ds_gen = data_element_generator(self.fobj, is_implicit_VR,
-                                        is_little_endian)
-        for data_elem in ds_gen:
-            yield data_elem
-
-        raise StopIteration
-
-
-def transfer_syntax(uid):
-    """Parse the transfer syntax
-    :return: is_implicit_VR, is_little_endian
-    """
-    # Assume a transfer syntax, correct it as necessary
-    is_implicit_VR = True
-    is_little_endian = True
-    if uid == ImplicitVRLittleEndian:
-        pass
-    elif uid == ExplicitVRLittleEndian:
-        is_implicit_VR = False
-    elif uid == ExplicitVRBigEndian:
-        is_implicit_VR = False
-        is_little_endian = False
-    elif uid == DeflatedExplicitVRLittleEndian:
-        raise NotImplementedError("This reader does not handle deflate files")
-    else:
-        # PS 3.5-2008 A.4 (p63): other syntax (e.g all compressed)
-        #    should be Explicit VR Little Endian,
-        is_implicit_VR = False
-    return is_implicit_VR, is_little_endian
+        ds_gen = data_element_generator(
+            self.fobj, tsyntax.is_implicit_VR, tsyntax.is_little_endian
+        )
+        for elem in ds_gen:
+            yield elem
 
 
-####
-def data_element_generator(fp,
-                           is_implicit_VR,
-                           is_little_endian,
-                           stop_when=None,
-                           defer_size=None):
+def data_element_generator(
+    fp: BinaryIO,
+    is_implicit_VR: bool,
+    is_little_endian: bool,
+    stop_when: Optional[Callable[[int, int], bool]] = None,
+    defer_size: Optional[Union[str, int, float]] = None,
+) -> Iterator[_ElementType]:
     """:return: (tag, VR, length, value, value_tell,
                                  is_implicit_VR, is_little_endian)
     """
-    if is_little_endian:
-        endian_chr = "<"
-    else:
-        endian_chr = ">"
+    endian_chr = "<" if is_little_endian else ">"
+
     if is_implicit_VR:
         element_struct = Struct(endian_chr + "HHL")
     else:  # Explicit VR
@@ -122,7 +113,7 @@ def data_element_generator(fp,
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
-            raise StopIteration  # at end of file
+            return  # at end of file
 
         if is_implicit_VR:
             # must reset VR each time; could have set last iteration (e.g. SQ)
@@ -131,8 +122,7 @@ def data_element_generator(fp,
         else:  # explicit VR
             group, elem, VR, length = element_struct_unpack(bytes_read)
             if VR in extra_length_VRs_b:
-                bytes_read = fp_read(4)
-                length = extra_length_unpack(bytes_read)[0]
+                length = extra_length_unpack(fp_read(4))[0]
 
         # Positioned to read the value, but may not want to -- check stop_when
         value_tell = fp_tell()
@@ -142,7 +132,8 @@ def data_element_generator(fp,
                 if not is_implicit_VR and VR in extra_length_VRs_b:
                     rewind_length += 4
                 fp.seek(value_tell - rewind_length)
-                raise StopIteration
+
+                return
 
         # Reading the value
         # First case (most common): reading a value with a defined length
@@ -167,11 +158,16 @@ def data_element_generator(fp,
             #   identified as a Sequence
             if VR is None:
                 try:
-                    VR = dictionary_VR((group, elem))
+                    VR = dictionary_VR((group, elem)).encode('ascii')
                 except KeyError:
                     # Look ahead to see if it consists of items and
                     # is thus a SQ
-                    next_tag = TupleTag(unpack(endian_chr + "HH", fp_read(4)))
+                    next_tag = TupleTag(
+                        cast(
+                            Tuple[int, int],
+                            unpack(endian_chr + "HH", fp_read(4)),
+                        )
+                    )
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
                     if next_tag == ItemTag:
@@ -180,5 +176,7 @@ def data_element_generator(fp,
             if VR == b'SQ':
                 yield ((group, elem), VR, length, None, value_tell)
             else:
-                raise NotImplementedError("This reader does not handle "
-                                          "undefined length except for SQ")
+                raise NotImplementedError(
+                    "This reader does not handle undefined length except for "
+                    "SQ"
+                )
