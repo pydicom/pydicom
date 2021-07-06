@@ -1511,9 +1511,9 @@ class FileSet:
         list of object(s), or dict of lists of object(s)
 
             * If single element was queried: A list of value(s) for the element
-            available in the instances.
+              available in the instances.
             * If list of elements was queried: A dict of element value pairs
-            with lists of value(s) for the elements available in the instances.
+              with lists of value(s) for the elements available in the instances.
         """
         element_list = elements if isinstance(elements, list) else [elements]
         has_element = {element: False for element in element_list}
@@ -1538,8 +1538,9 @@ class FileSet:
         if not load and missing_elements:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain "
-                f"{missing_elements}, consider using the 'load' parameter "
-                "to expand the search to the corresponding SOP instances"
+                f"{', '.join(missing_elements)}, consider using the 'load' "
+                "parameter to expand the search to the corresponding SOP "
+                "instances"
             )
         if not isinstance(elements, list):
             return results[element_list[0]]
