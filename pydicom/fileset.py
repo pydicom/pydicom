@@ -1501,16 +1501,16 @@ class FileSet:
 
     def find_values(
         self,
-        element: Union[str, int],
+        elements: Union[str, int, List[Union[str, int]]],
         instances: Optional[List[FileInstance]] = None,
         load: bool = False
-    ) -> List[Any]:
-        """Return a list of unique values for a given element.
+    ) -> Union[List[Any], Dict[Union[str, int], List]]:
+        """Return a list of unique values for given element(s).
 
         Parameters
         ----------
-        element : str, int or pydicom.tag.BaseTag
-            The keyword or tag of the element to search for.
+        elements : str, int or pydicom.tag.BaseTag, or list of these
+            The keyword or tag of the element(s) to search for.
         instances : list of pydicom.fileset.FileInstance, optional
             Search within the given instances. If not used then all available
             instances will be searched.
@@ -1523,32 +1523,41 @@ class FileSet:
 
         Returns
         -------
-        list of object
-            A list of value(s) for the element available in the instances.
+        list of object(s), or dict of lists of object(s)
+
+            * If single element was queried: A list of value(s) for the element
+              available in the instances.
+            * If list of elements was queried: A dict of element value pairs
+              with lists of value(s) for the elements available in the instances.
         """
-        has_element = False
-        results = []
+        element_list = elements if isinstance(elements, list) else [elements]
+        has_element = {element: False for element in element_list}
+        results: Dict = {element: [] for element in element_list}
         iter_instances = instances or iter(self)
         instance: Union[Dataset, FileInstance]
         for instance in iter_instances:
             if load:
                 instance = instance.load()
+            for element in element_list:
+                if element not in instance:
+                    continue
 
-            if element not in instance:
-                continue
-
-            has_element = True
-            val = instance[element].value
-            # Not very efficient, but we can't use set
-            if val not in results:
-                results.append(val)
-
-        if not load and not has_element:
+                has_element[element] = True
+                val = instance[element].value
+                # Not very efficient, but we can't use set
+                if val not in results[element]:
+                    results[element].append(val)
+        missing_elements = [
+            element for element, v in has_element.items() if not v
+        ]
+        if not load and missing_elements:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain "
-                "the query element, consider using the 'load' parameter "
+                f"{missing_elements}, consider using the 'load' parameter "
                 "to expand the search to the corresponding SOP instances"
             )
+        if not isinstance(elements, list):
+            return results[element_list[0]]
 
         return results
 
