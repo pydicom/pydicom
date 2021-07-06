@@ -19,7 +19,7 @@ def print_character(ordchr: int) -> str:
 
 
 def filedump(
-    filename: Union[str, os.PathLike],
+    filename: Union[str, bytes, os.PathLike],
     start_address: int = 0,
     stop_address: Optional[int] = None,
 ) -> str:

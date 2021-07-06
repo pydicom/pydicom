@@ -30,7 +30,7 @@ _ElementType = Tuple[
 class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
-    def __init__(self, filename: Union[str, os.PathLike]) -> None:
+    def __init__(self, filename: Union[str, bytes, os.PathLike]) -> None:
         self.fobj = fobj = open(filename, "rb")
 
         # Read the DICOM preamble, if present
