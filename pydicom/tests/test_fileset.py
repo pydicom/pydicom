@@ -1966,7 +1966,7 @@ class TestFileSet_Load:
         search_element = "PhotometricInterpretation"
         msg = (
             r"None of the records in the DICOMDIR dataset contain "
-            fr"\['{search_element}'\], consider using the 'load' parameter "
+            r"PhotometricInterpretation, consider using the 'load' parameter "
             r"to expand the search to the corresponding SOP instances"
         )
         with pytest.warns(UserWarning, match=msg):
