@@ -1538,9 +1538,8 @@ class FileSet:
         if not load and missing_elements:
             warnings.warn(
                 "None of the records in the DICOMDIR dataset contain "
-                f"{', '.join(missing_elements)}, consider using the 'load' "
-                "parameter to expand the search to the corresponding SOP "
-                "instances"
+                f"{missing_elements}, consider using the 'load' parameter "
+                "to expand the search to the corresponding SOP instances"
             )
         if not isinstance(elements, list):
             return results[element_list[0]]
