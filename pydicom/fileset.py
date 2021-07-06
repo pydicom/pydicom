@@ -1509,10 +1509,11 @@ class FileSet:
         Returns
         -------
         list of object(s), or dict of lists of object(s)
-            If single element was queried: A list of value(s) for the element
-                available in the instances.
-            If list of elements was queried: A dict of element value pairs with
-                lists of value(s) for the elements available in the instances.
+
+            * If single element was queried: A list of value(s) for the element
+            available in the instances.
+            * If list of elements was queried: A dict of element value pairs
+            with lists of value(s) for the elements available in the instances.
         """
         element_list = elements if isinstance(elements, list) else [elements]
         has_element = {element: False for element in element_list}
@@ -1531,17 +1532,19 @@ class FileSet:
                 # Not very efficient, but we can't use set
                 if val not in results[element]:
                     results[element].append(val)
-        for element, v in has_element.items():
-            if not load and not v:
-                warnings.warn(
-                    "None of the records in the DICOMDIR dataset contain "
-                    f"{element}, consider using the 'load' parameter "
-                    "to expand the search to the corresponding SOP instances"
-                )
+        missing_elements = [
+            element for element, v in has_element.items() if not v
+        ]
+        if not load and missing_elements:
+            warnings.warn(
+                "None of the records in the DICOMDIR dataset contain "
+                f"{missing_elements}, consider using the 'load' parameter "
+                "to expand the search to the corresponding SOP instances"
+            )
         if not isinstance(elements, list):
             return results[element_list[0]]
-        else:
-            return results
+
+        return results
 
     @property
     def ID(self) -> Union[str, None]:
