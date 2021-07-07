@@ -1,7 +1,4 @@
-import pytest
-
 from pydicom.sr.coding import Code
-from pydicom.uid import UID
 
 
 class TestCode:
@@ -20,6 +17,15 @@ class TestCode:
         assert c.scheme_designator == self._scheme_designator
         assert c.meaning == self._meaning
         assert c.scheme_version is None
+
+    def test_use_as_dictionary_key(self):
+        c = Code(
+            value=self._value,
+            scheme_designator=self._scheme_designator,
+            meaning=self._meaning,
+        )
+        d = {c: 1}
+        assert c in d.keys()
 
     def test_construction_kwargs_optional(self):
         version = "v1.0"
