@@ -1,5 +1,4 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-# type: ignore
 """
 Produce runnable python code which can recreate DICOM objects or files.
 
@@ -26,7 +25,7 @@ from pydicom.datadict import dictionary_keyword
 from pydicom.dataelem import DataElement, BINARY_VR_VALUES
 from pydicom.dataset import Dataset
 from pydicom.tag import BaseTag
-from pydicom import cli
+from pydicom.cli.main import filespec_help, filespec_parser
 
 
 line_term = "\n"
@@ -102,7 +101,6 @@ def code_dataelem(
     str
         A string containing code to recreate the data element
         If the data element is a sequence, calls code_sequence
-
     """
 
     if dataelem.VR == "SQ":
@@ -143,34 +141,33 @@ def code_sequence(
     dataset_name: str = "ds",
     exclude_size: Optional[int] = None,
     include_private: bool = False,
-    name_filter: Callable = default_name_filter,
+    name_filter: Callable[[str], str] = default_name_filter,
 ) -> str:
     """Code lines for recreating a Sequence data element
 
     Parameters
     ----------
-    dataelem: DataElement
+    dataelem : DataElement
         The DataElement instance whose value is the Sequence
-    dataset_name: str
+    dataset_name : str
         Variable name of the dataset containing the Sequence
-    exclude_size: Union[int,None]
-        If not None, values longer than this (in bytes)
-        will only have a commented string for a value,
-        causing a syntax error when the code is run,
-        and thus prompting the user to remove or fix that line.
+    exclude_size : int, optional
+        If not ``None``, values longer than this (in bytes) will only have a
+        commented string for a value, causing a syntax error when the code is
+        run, and thus prompting the user to remove or fix that line.
     include_private: bool
-        If ``False`` (default), private elements are skipped
-        If ``True``, private data elements will be coded.
-    name_filter: Callable
-        A callable taking a sequence name or sequence item name,
-        and returning a shorter name for easier code reading
+        If ``False`` (default) private elements are skipped, otherwise private
+        data elements will be coded.
+    name_filter: Callable[[str], str]
+        A callable taking a sequence name or sequence item name, and returning
+        a shorter name for easier code reading
 
     Returns
     -------
     str
         A string containing code lines to recreate a DICOM sequence
-
     """
+
     lines = []
     seq = dataelem.value
     seq_name = dataelem.name
@@ -229,26 +226,31 @@ def code_dataset(
     exclude_size: Optional[int] = None,
     include_private: bool = False,
     is_file_meta: bool = False,
-) -> List[str]:
-    """Return python code lines for import statements needed by other code
+) -> str:
+    """Return Python code for creating `ds`.
 
     Parameters
     ----------
-    exclude_size: Union[int,None]
-        If not None, values longer than this (in bytes)
-        will only have a commented string for a value,
-        causing a syntax error when the code is run,
-        and thus prompting the user to remove or fix that line.
-    include_private: bool
-        If ``False`` (default), private elements are skipped
-        If ``True``, private data elements will be coded.
+    ds : pydicom.dataset.Dataset
+        The dataset to codify.
+    dataset_name : str, optional
+        The Python variable name to use for the dataset, default ``'ds'``.
+    exclude_size : int, optional
+        If not ``None``, values longer than this (in bytes) will only have a
+        commented string for a value, causing a syntax error when the code is
+        run, and thus prompting the user to remove or fix that line.
+    include_private : bool, optional
+        If ``False`` (default) private elements are skipped, otherwise private
+        data elements will be coded.
+    is_file_meta : bool, optional
+        ``True`` if `ds` contains file meta information elements.
 
     Returns
     -------
-    List[str]
-        A list of code lines containing import statements
-
+    str
+        The codified dataset.
     """
+
     lines = []
     ds_class = " = FileMetaDataset()" if is_file_meta else " = Dataset()"
     lines.append(dataset_name + ds_class)
@@ -376,27 +378,28 @@ def set_parser_arguments(
 ) -> None:
     parser.add_argument(
         "filespec",
-        help=cli.main.filespec_help,
-        type=cli.main.filespec_parser
+        help=filespec_help,
+        type=filespec_parser,
     )
     parser.add_argument(
         "outfile",
         nargs="?",
         type=argparse.FileType("w"),
         help=(
-            "Filename to write python code to. "
-            "If not specified, code is written to stdout"
+            "Filename to write Python code to, if not specified then code is "
+            "written to stdout"
         ),
         default=sys.stdout,
     )
-    help_exclude_size = "Exclude binary data larger than specified (bytes). "
-    help_exclude_size += f"Default is {default_exclude_size} bytes"
     parser.add_argument(
         "-e",
         "--exclude-size",
         type=int,
         default=default_exclude_size,
-        help=help_exclude_size,
+        help=(
+            "Exclude binary data larger than specified (default: "
+            f"{default_exclude_size} bytes)"
+        ),
     )
     parser.add_argument(
         "-p",
@@ -414,7 +417,7 @@ def set_parser_arguments(
     )
 
 
-def do_codify(args):
+def do_codify(args: argparse.Namespace) -> None:
     # Convert the requested dataset to python/pydicom code lines
     if len(args.filespec) != 1:
         raise NotImplementedError(
@@ -455,14 +458,15 @@ def do_codify(args):
 
 
 def main(default_exclude_size: int, args: Optional[List[str]] = None) -> None:
-    """Create python code according to user options
+    """Create Python code according to user options
 
     Parameters:
     -----------
     default_exclude_size : int
         Values longer than this will be coded as a commented syntax error
     args : List[str], optional
-        Command-line arguments to parse.  If None, then sys.argv is used
+        Command-line arguments to parse.  If ``None`` then :attr:`sys.argv` is
+        used.
     """
     parser = argparse.ArgumentParser(
         description="Produce python/pydicom code from a DICOM file",
@@ -474,8 +478,7 @@ def main(default_exclude_size: int, args: Optional[List[str]] = None) -> None:
         ),
     )
     set_parser_arguments(parser, default_exclude_size)
-    args = parser.parse_args(args)
-    do_codify(args)
+    do_codify(parser.parse_args(args))
 
 
 if __name__ == "__main__":  # pragma: no cover

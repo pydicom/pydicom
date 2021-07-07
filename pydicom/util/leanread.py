@@ -11,7 +11,6 @@ from typing import (
 from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
 from pydicom.tag import TupleTag, ItemTag
-from pydicom.fileutil import PathType
 from pydicom.uid import UID
 from pydicom.valuerep import extra_length_VRs
 
@@ -31,7 +30,7 @@ _ElementType = Tuple[
 class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
-    def __init__(self, filename: PathType) -> None:
+    def __init__(self, filename: Union[str, bytes, os.PathLike]) -> None:
         self.fobj = fobj = open(filename, "rb")
 
         # Read the DICOM preamble, if present

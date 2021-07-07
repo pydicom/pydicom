@@ -8,7 +8,6 @@ from typing import Optional, List, Union, Callable, Any
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
-
 from pydicom.cli.main import filespec_help, filespec_parser
 
 
@@ -38,7 +37,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     subparser.set_defaults(func=do_command)
 
 
-def do_command(args) -> None:
+def do_command(args: argparse.Namespace) -> None:
     if len(args.filespec) != 1:
         raise NotImplementedError(
             "Show can only work on a single DICOM file input"

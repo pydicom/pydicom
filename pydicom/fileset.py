@@ -1504,7 +1504,7 @@ class FileSet:
         elements: Union[str, int, List[Union[str, int]]],
         instances: Optional[List[FileInstance]] = None,
         load: bool = False
-    ) -> Union[List[Any], Dict[Union[str, int], List]]:
+    ) -> Union[List[Any], Dict[Union[str, int], List[Any]]]:
         """Return a list of unique values for given element(s).
 
         Parameters
@@ -1532,12 +1532,15 @@ class FileSet:
         """
         element_list = elements if isinstance(elements, list) else [elements]
         has_element = {element: False for element in element_list}
-        results: Dict = {element: [] for element in element_list}
+        results: Dict[Union[str, int], List[Any]] = {
+            element: [] for element in element_list
+        }
         iter_instances = instances or iter(self)
         instance: Union[Dataset, FileInstance]
         for instance in iter_instances:
             if load:
                 instance = instance.load()
+
             for element in element_list:
                 if element not in instance:
                     continue
@@ -1547,6 +1550,7 @@ class FileSet:
                 # Not very efficient, but we can't use set
                 if val not in results[element]:
                     results[element].append(val)
+
         missing_elements = [
             element for element, v in has_element.items() if not v
         ]
@@ -1556,6 +1560,7 @@ class FileSet:
                 f"{missing_elements}, consider using the 'load' parameter "
                 "to expand the search to the corresponding SOP instances"
             )
+
         if not isinstance(elements, list):
             return results[element_list[0]]
 

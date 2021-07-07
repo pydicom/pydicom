@@ -48,7 +48,7 @@ filespec_help = (
 
 def eval_element(ds: Dataset, element: str) -> Any:
     try:
-        data_elem_val = eval("ds." + element, {"ds": ds})
+        return eval("ds." + element, {"ds": ds})
     except AttributeError:
         raise argparse.ArgumentTypeError(
             f"Data element '{element}' is not in the dataset"
@@ -57,8 +57,6 @@ def eval_element(ds: Dataset, element: str) -> Any:
         raise argparse.ArgumentTypeError(
             f"'{element}' has an index error: {str(e)}"
         )
-
-    return data_elem_val
 
 
 def filespec_parts(filespec: str) -> Tuple[str, str, str]:
@@ -169,7 +167,7 @@ def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
     return [(ds, data_elem_val)]
 
 
-def help_command(args: Any) -> None:
+def help_command(args: argparse.Namespace) -> None:
     if subparsers is None:
         print("No subcommands are available")
         return
@@ -210,7 +208,6 @@ def main(args: Optional[List[str]] = None) -> None:
     )
     subparsers = parser.add_subparsers(help="subcommand help")
 
-    #
     help_parser = subparsers.add_parser(
         "help", help="display help for subcommands"
     )
@@ -224,7 +221,7 @@ def main(args: Optional[List[str]] = None) -> None:
     for subcommand in subcommands.values():
         subcommand(subparsers)
 
-    ns: argparse.Namespace = parser.parse_args(args)
+    ns = parser.parse_args(args)
     if not vars(ns):
         parser.print_help()
     else:
