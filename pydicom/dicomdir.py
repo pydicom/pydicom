@@ -6,8 +6,9 @@ from typing import Optional, List, Dict, Union, BinaryIO, AnyStr
 import warnings
 
 from pydicom import config
-from pydicom.errors import InvalidDicomError
 from pydicom.dataset import FileDataset, FileMetaDataset, Dataset
+from pydicom.errors import InvalidDicomError
+from pydicom.fileutil import PathType
 
 
 class DicomDir(FileDataset):
@@ -24,7 +25,7 @@ class DicomDir(FileDataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename_or_obj: Union[str, os.PathLike, BinaryIO],
         dataset: Dataset,
         preamble: Optional[bytes] = None,
         file_meta: Optional[FileMetaDataset] = None,

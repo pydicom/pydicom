@@ -11,7 +11,7 @@ from pydicom.datadict import dictionary_description
 from pydicom.config import logger
 
 
-PathType = Union[str, os.PathLike]
+PathType = Union[str, bytes, os.PathLike]
 
 
 def absorb_delimiter_item(
