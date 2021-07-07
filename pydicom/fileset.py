@@ -1226,7 +1226,7 @@ class FileSet:
         self._stage['path'] = Path(self._stage['t'].name)
 
     def copy(
-        self, path: Union[str, Path], force_implicit: bool = False
+        self, path: Union[str, os.PathLike], force_implicit: bool = False
     ) -> "FileSet":
         """Copy the File-set to a new root directory and return the copied
         File-set.
