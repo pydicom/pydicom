@@ -499,7 +499,7 @@ class TestDS:
 
 class TestDSfloat:
     """Unit tests for pickling DSfloat"""
-    def test_pickling(self):
+    def test_pickling(self, enforce_valid_both_fixture):
         # Check that a pickled DSFloat is read back properly
         x = DSfloat(9.0)
         x.original_string = "hello"
@@ -508,13 +508,13 @@ class TestDSfloat:
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
-    def test_new_empty(self):
+    def test_new_empty(self, enforce_valid_both_fixture):
         """Test passing an empty value."""
         assert isinstance(DSfloat(''), str)
         assert DSfloat('') == ''
         assert DSfloat(None) is None
 
-    def test_str_value(self):
+    def test_str_value(self, enforce_valid_both_fixture):
         """Test creating using str"""
         assert DSfloat('1.20') == 1.2
         assert DSfloat('1.20') == 1.20
@@ -524,7 +524,7 @@ class TestDSfloat:
         assert DSfloat('1.20') == '1.20'
         assert DSfloat('1.20 ') == '1.20'
 
-    def test_str(self):
+    def test_str(self, enforce_valid_both_fixture):
         """Test DSfloat.__str__()."""
         val = DSfloat(1.1)
         assert str(val) == '1.1'
@@ -532,7 +532,7 @@ class TestDSfloat:
         val = DSfloat("1.1")
         assert str(val) == '1.1'
 
-    def test_repr(self):
+    def test_repr(self, enforce_valid_both_fixture):
         """Test DSfloat.__repr__()."""
         val = DSfloat(1.1)
         assert repr(val) == "'1.1'"
@@ -542,7 +542,7 @@ class TestDSfloat:
         assert repr(val) == repr("1.1")
         assert repr(val) == repr('1.1')
 
-    def test_DSfloat(self):
+    def test_DSfloat(self, enforce_valid_both_fixture):
         """Test creating a value using DSfloat."""
         x = DSfloat('1.2345')
         y = DSfloat(x)
@@ -551,7 +551,7 @@ class TestDSfloat:
         assert 1.2345 == y
         assert "1.2345" == y.original_string
 
-    def test_DSdecimal(self):
+    def test_DSdecimal(self, enforce_valid_both_fixture):
         """Test creating a value using DSdecimal."""
         x = DSdecimal('1.2345')
         y = DSfloat(x)
