@@ -6,7 +6,6 @@ import os
 import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
 
-
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 

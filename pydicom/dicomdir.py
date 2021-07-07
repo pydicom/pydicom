@@ -8,7 +8,6 @@ import warnings
 from pydicom import config
 from pydicom.dataset import FileDataset, FileMetaDataset, Dataset
 from pydicom.errors import InvalidDicomError
-from pydicom.fileutil import PathType
 
 
 class DicomDir(FileDataset):

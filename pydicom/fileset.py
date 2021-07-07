@@ -3,7 +3,6 @@
 
 import copy
 import os
-from os import PathLike
 from pathlib import Path
 import re
 import shutil
@@ -949,7 +948,7 @@ class FileInstance:
         return cast(UID, self.ReferencedTransferSyntaxUIDInFile)
 
 
-DSPathType = Union[Dataset, Union[str, os.PathLike]]
+DSPathType = Union[Dataset, str, os.PathLike]
 
 
 class FileSet:
@@ -1026,7 +1025,7 @@ class FileSet:
         :meth:`~pydicom.fileset.FileSet.add_custom`
         """
         ds: Union[Dataset, FileDataset]
-        if isinstance(ds_or_path, (str, PathLike)):
+        if isinstance(ds_or_path, (str, os.PathLike)):
             ds = dcmread(ds_or_path)
         else:
             ds = ds_or_path
@@ -1158,7 +1157,7 @@ class FileSet:
         :meth:`~pydicom.fileset.FileSet.add`
         """
         ds: Union[Dataset, FileDataset]
-        if isinstance(ds_or_path, (str, PathLike)):
+        if isinstance(ds_or_path, (str, os.PathLike)):
             ds = dcmread(ds_or_path)
         else:
             ds = ds_or_path
@@ -2032,7 +2031,7 @@ class FileSet:
 
     def write(
         self,
-        path: Optional[Union[str, PathLike]] = None,
+        path: Optional[Union[str, os.PathLike]] = None,
         use_existing: bool = False,
         force_implicit: bool = False
     ) -> None:
