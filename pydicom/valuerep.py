@@ -529,7 +529,7 @@ class DSfloat(float):
                 self.original_string = format_number_as_ds(self)
 
         if config.enforce_valid_values and not self.auto_format:
-            if len(repr(self).strip('"')) > 16:
+            if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
                     "characters long, but the float provided requires > 16 "
@@ -538,7 +538,7 @@ class DSfloat(float):
                     "override the length check, or explicitly construct a DS "
                     "object with 'auto_format' set to True"
                 )
-            if not is_valid_ds(repr(self).strip('"')):
+            if not is_valid_ds(repr(self)[1:-1]):
                 # This will catch nan and inf
                 raise ValueError(
                     f'Value "{str(self)}" is not valid for elements with a VR '

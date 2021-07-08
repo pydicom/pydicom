@@ -2,7 +2,6 @@
 
 from typing import NamedTuple, Any, Optional
 
-from pydicom.dataset import Dataset
 from pydicom.sr._snomed_dict import mapping as snomed_mapping
 
 
@@ -13,10 +12,13 @@ class Code(NamedTuple):
 
     ..versionadded: 1.4
     """
-    value: Any
+    value: str
     scheme_designator: str
     meaning: str
     scheme_version: Optional[str]
+
+    def __hash__(self) -> int:
+        return hash(self.scheme_designator + self.value)
 
     def __eq__(self, other: Any) -> Any:
         if self.scheme_designator == "SRT":
