@@ -138,7 +138,7 @@ class TestCodeDict:
 
     def test_cid3111(self):
         assert codes.cid3111.Tc99mTetrofosmin == Code(
-            value="404707004",
+            value="424118002",
             scheme_designator="SCT",
             meaning="Tc-99m tetrofosmin",
         )
@@ -160,6 +160,22 @@ class TestCodeDict:
             value="10:320",
             scheme_designator="MDC",
             meaning="P' wave (second deflection in P wave)",
+        )
+
+    def test_cid3716(self):
+        invalid_attribute_name = "None"
+        try:
+            getattr(codes.cid3716, invalid_attribute_name)
+            raise LookupError(
+                f'Invalid keyword attribute "{invalid_attribute_name}"'
+            )
+        except AttributeError:
+            pass
+
+        assert codes.cid3716.None__ == Code(
+            value="260413007",
+            scheme_designator="SCT",
+            meaning=invalid_attribute_name,
         )
 
     def test_contained(self):
