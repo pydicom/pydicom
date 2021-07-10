@@ -578,9 +578,9 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
         command set elements are present.
     """
 
-    def _not_group_0000(tag, VR, length):
+    def _not_group_0000(tag: BaseTag, VR: Optional[str], length: int) -> bool:
         """Return True if the tag is not in group 0x0000, False otherwise."""
-        return (tag.group != 0)
+        return tag.group != 0
 
     return read_dataset(
         fp,
@@ -611,7 +611,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
         File Meta are present.
     """
 
-    def _not_group_0002(tag, VR, length):
+    def _not_group_0002(tag: BaseTag, VR: Optional[str], length: int) -> bool:
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return tag.group != 2
 
@@ -732,7 +732,7 @@ def read_preamble(fp: BinaryIO, force: bool) -> Optional[bytes]:
 
 
 def _at_pixel_data(tag: BaseTag, VR: Optional[str], length: int) -> bool:
-    return tag == (0x7fe0, 0x0010)
+    return cast(bool, tag == 0x7fe00010)
 
 
 def read_partial(
@@ -865,10 +865,10 @@ def read_partial(
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set)
 
-    dataset_class: Union[Type[DicomDir], Type[FileDataset]]
     class_uid = cast(
         pydicom.uid.UID, file_meta_dataset.get("MediaStorageSOPClassUID", None)
     )
+    ds: Union[DicomDir, FileDataset]
     if class_uid and class_uid.name == "Media Storage Directory Storage":
         warnings.warn(
             "The 'DicomDir' class is deprecated and will be removed in v3.0, "
@@ -876,15 +876,28 @@ def read_partial(
             "instance for 'Media Storage Directory' SOP Instances.",
             DeprecationWarning
         )
-        dataset_class = DicomDir
+        ds = DicomDir(
+            fileobj,
+            dataset,
+            preamble,
+            file_meta_dataset,
+            is_implicit_VR,
+            is_little_endian,
+        )
     else:
-        dataset_class = FileDataset
-    new_dataset = dataset_class(fileobj, dataset, preamble, file_meta_dataset,
-                                is_implicit_VR, is_little_endian)
+        ds = FileDataset(
+            fileobj,
+            dataset,
+            preamble,
+            file_meta_dataset,
+            is_implicit_VR,
+            is_little_endian,
+        )
     # save the originally read transfer syntax properties in the dataset
-    new_dataset.set_original_encoding(is_implicit_VR, is_little_endian,
-                                      dataset._character_set)
-    return new_dataset
+    ds.set_original_encoding(
+        is_implicit_VR, is_little_endian, dataset._character_set
+    )
+    return ds
 
 
 def dcmread(
@@ -1025,7 +1038,7 @@ def dcmread(
     return dataset
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     if name == 'read_file':
         warnings.warn(
             "'read_file' is deprecated and will be removed in v3.0, use "

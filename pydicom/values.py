@@ -338,8 +338,9 @@ def convert_IS_string(
             )
         value = numpy.fromstring(num_string, dtype='i8', sep=chr(92))  # 92:'\'
         if len(value) == 1:  # Don't use array for one number
-            value = value[0]
-        return value
+            return cast("numpy.int64", value[0])
+
+        return cast("numpy.ndarray", value)
 
     return MultiString(num_string, valtype=pydicom.valuerep.IS)
 

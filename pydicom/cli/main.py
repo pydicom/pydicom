@@ -11,7 +11,7 @@ import argparse
 import sys
 import pkg_resources
 import re
-from typing import Tuple, cast
+from typing import Tuple, cast, List, Any, Dict, Optional, Callable
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
@@ -19,7 +19,7 @@ from pydicom.dataset import Dataset
 from pydicom.dataelem import DataElement
 
 
-subparsers = None
+subparsers: Optional[argparse._SubParsersAction] = None
 
 
 # Restrict the allowed syntax tightly, since use Python `eval`
@@ -46,9 +46,9 @@ filespec_help = (
 )
 
 
-def eval_element(ds: Dataset, element: str) -> DataElement:
+def eval_element(ds: Dataset, element: str) -> Any:
     try:
-        data_elem_val = eval("ds." + element, {"ds": ds})
+        return eval("ds." + element, {"ds": ds})
     except AttributeError:
         raise argparse.ArgumentTypeError(
             f"Data element '{element}' is not in the dataset"
@@ -57,8 +57,6 @@ def eval_element(ds: Dataset, element: str) -> DataElement:
         raise argparse.ArgumentTypeError(
             f"'{element}' has an index error: {str(e)}"
         )
-
-    return data_elem_val
 
 
 def filespec_parts(filespec: str) -> Tuple[str, str, str]:
@@ -85,7 +83,7 @@ def filespec_parts(filespec: str) -> Tuple[str, str, str]:
     return prefix, "".join(prefix_file), last
 
 
-def filespec_parser(filespec: str):
+def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
     """Utility to return a dataset and an optional data element value within it
 
     Note: this is used as an argparse 'type' for adding parsing arguments.
@@ -169,8 +167,12 @@ def filespec_parser(filespec: str):
     return [(ds, data_elem_val)]
 
 
-def help_command(args):
-    subcommands = list(subparsers.choices.keys())
+def help_command(args: argparse.Namespace) -> None:
+    if subparsers is None:
+        print("No subcommands are available")
+        return
+
+    subcommands: List[str] = list(subparsers.choices.keys())
     if args.subcommand and args.subcommand in subcommands:
         subparsers.choices[args.subcommand].print_help()
     else:
@@ -179,18 +181,25 @@ def help_command(args):
         print(f"Available subcommands: {', '.join(subcommands)}")
 
 
-def get_subcommand_entry_points():
+SubCommandType = Dict[str, Callable[[argparse._SubParsersAction], None]]
+
+
+def get_subcommand_entry_points() -> SubCommandType:
     subcommands = {}
     for entry_point in pkg_resources.iter_entry_points("pydicom_subcommands"):
         subcommands[entry_point.name] = entry_point.load()
+
     return subcommands
 
 
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> None:
     """Entry point for 'pydicom' command line interface
 
-    args: list
-        Command-line arguments to parse.  If None, then sys.argv is used
+    Parameters
+    ----------
+    args : List[str], optional
+        Command-line arguments to parse.  If ``None``, then :attr:`sys.argv`
+        is used.
     """
     global subparsers
 
@@ -212,8 +221,8 @@ def main(args=None):
     for subcommand in subcommands.values():
         subcommand(subparsers)
 
-    args = parser.parse_args(args)
-    if not len(args.__dict__):
+    ns = parser.parse_args(args)
+    if not vars(ns):
         parser.print_help()
     else:
-        args.func(args)
+        ns.func(ns)

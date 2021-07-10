@@ -365,9 +365,11 @@ class Dataset:
     """
     indent_chars = "   "
 
-    def __init__(self, *args: _DatasetType, **kwargs) -> None:
+    def __init__(self, *args: _DatasetType, **kwargs: Any) -> None:
         """Create a new :class:`Dataset` instance."""
-        self._parent_encoding = kwargs.get('parent_encoding', default_encoding)
+        self._parent_encoding: List[str] = kwargs.get(
+            'parent_encoding', default_encoding
+        )
 
         self._dict: MutableMapping[BaseTag, _DatasetValue]
         if not args:
@@ -1578,7 +1580,7 @@ class Dataset:
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         encapsulate_ext: bool = False,
-        **kwargs
+        **kwargs: Any,
     ) -> None:
         """Compress and update an uncompressed dataset in-place with the
         resulting :dcm:`encapsulated<part05/sect_A.4.html>` pixel data.
@@ -1846,7 +1848,7 @@ class Dataset:
             try:
                 # Use the handler to get an ndarray of the pixel data
                 func = handler.get_overlay_array  # type: ignore[attr-defined]
-                return func(self, group)
+                return cast("numpy.ndarray", func(self, group))
             except Exception as exc:
                 logger.debug(
                     "Exception raised by overlay data handler", exc_info=exc
@@ -2538,7 +2540,7 @@ class Dataset:
         >>> ds.to_json(dump_handler=my_json_dumps)
         """
         if dump_handler is None:
-            def json_dump(d):
+            def json_dump(d: Any) -> str:
                 return json.dumps(d, sort_keys=True)
 
             dump_handler = json_dump
@@ -2707,7 +2709,7 @@ class FileDataset(Dataset):
         """
         return self._copy_implementation(copy.copy)
 
-    def __deepcopy__(self, _) -> "FileDataset":
+    def __deepcopy__(self, _: Optional[Dict[int, Any]]) -> "FileDataset":
         """Return a deep copy of the file dataset.
         Make sure that the filename is not copied in case it is a file-like
         object.
@@ -2795,7 +2797,7 @@ class FileMetaDataset(Dataset):
     Group 2 (File Meta Information) data elements
     """
 
-    def __init__(self, *args: _DatasetType, **kwargs) -> None:
+    def __init__(self, *args: _DatasetType, **kwargs: Any) -> None:
         """Initialize a FileMetaDataset
 
         Parameters are as per :class:`Dataset`; this overrides the super class

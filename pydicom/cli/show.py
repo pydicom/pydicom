@@ -1,15 +1,17 @@
 # Copyright 2019 pydicom authors. See LICENSE file for details.
 """Pydicom command line interface program for `pydicom show`"""
 
+import argparse
+import sys
+from typing import Optional, List, Union, Callable, Any
+
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
-import sys
-
 from pydicom.cli.main import filespec_help, filespec_parser
 
 
-def add_subparser(subparsers):
+def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     subparser = subparsers.add_parser(
         "show", description="Display all or part of a DICOM file"
     )
@@ -35,7 +37,7 @@ def add_subparser(subparsers):
     subparser.set_defaults(func=do_command)
 
 
-def do_command(args):
+def do_command(args: argparse.Namespace) -> None:
     if len(args.filespec) != 1:
         raise NotImplementedError(
             "Show can only work on a single DICOM file input"
@@ -56,14 +58,14 @@ def do_command(args):
         print(str(element_val))
 
 
-def SOPClassname(ds):
+def SOPClassname(ds: Dataset) -> Optional[str]:
     class_uid = ds.get("SOPClassUID")
     if class_uid is None:
         return None
     return f"SOPClassUID: {class_uid.name}"
 
 
-def quiet_rtplan(ds):
+def quiet_rtplan(ds: Dataset) -> Optional[str]:
     if "BeamSequence" not in ds:
         return None
 
@@ -133,9 +135,10 @@ def quiet_rtplan(ds):
     return "\n".join(lines)
 
 
-def quiet_image(ds):
+def quiet_image(ds: Dataset) -> Optional[str]:
     if "SOPClassUID" not in ds or "Image Storage" not in ds.SOPClassUID.name:
         return None
+
     results = [
         f"{name}: {ds.get(name, 'N/A')}"
         for name in [
@@ -151,7 +154,7 @@ def quiet_image(ds):
 
 # Items to show in quiet mode
 # Item can be a callable or a DICOM keyword
-quiet_items = [
+quiet_items: List[Union[Callable[[Dataset], Optional[str]], str]] = [
     SOPClassname,
     "PatientName",
     "PatientID",
@@ -165,7 +168,7 @@ quiet_items = [
 ]
 
 
-def show_quiet(ds):
+def show_quiet(ds: Dataset) -> None:
     for item in quiet_items:
         if callable(item):
             result = item(ds)
