@@ -1,5 +1,82 @@
-from pydicom.sr.codedict import codes
+
 from pydicom.sr.coding import Code
+from pydicom.sr.codedict import codes, _CID_Dict
+from pydicom.uid import UID
+
+
+class TestCode:
+    def setup(self):
+        self._value = "373098007"
+        self._meaning = "Mean Value of population"
+        self._scheme_designator = "SCT"
+
+    def test_construction_kwargs(self):
+        c = Code(
+            value=self._value,
+            scheme_designator=self._scheme_designator,
+            meaning=self._meaning,
+        )
+        assert c.value == self._value
+        assert c.scheme_designator == self._scheme_designator
+        assert c.meaning == self._meaning
+        assert c.scheme_version is None
+
+    def test_use_as_dictionary_key(self):
+        c = Code(
+            value=self._value,
+            scheme_designator=self._scheme_designator,
+            meaning=self._meaning,
+        )
+        d = {c: 1}
+        assert c in d.keys()
+
+    def test_construction_kwargs_optional(self):
+        version = "v1.0"
+        c = Code(
+            value=self._value,
+            scheme_designator=self._scheme_designator,
+            meaning=self._meaning,
+            scheme_version=version,
+        )
+        assert c.value == self._value
+        assert c.scheme_designator == self._scheme_designator
+        assert c.meaning == self._meaning
+        assert c.scheme_version == version
+
+    def test_construction_args(self):
+        c = Code(self._value, self._scheme_designator, self._meaning)
+        assert c.value == self._value
+        assert c.scheme_designator == self._scheme_designator
+        assert c.meaning == self._meaning
+        assert c.scheme_version is None
+
+    def test_construction_args_optional(self):
+        version = "v1.0"
+        c = Code(self._value, self._scheme_designator, self._meaning, version)
+        assert c.value == self._value
+        assert c.scheme_designator == self._scheme_designator
+        assert c.meaning == self._meaning
+        assert c.scheme_version == version
+
+    def test_equal(self):
+        c1 = Code(self._value, self._scheme_designator, self._meaning)
+        c2 = Code(self._value, self._scheme_designator, self._meaning)
+        assert c1 == c2
+
+    def test_not_equal(self):
+        c1 = Code(self._value, self._scheme_designator, self._meaning)
+        c2 = Code("373099004", "SCT", "Median Value of population")
+        assert c1 != c2
+
+    def test_equal_ignore_meaning(self):
+        c1 = Code(self._value, self._scheme_designator, self._meaning)
+        c2 = Code(self._value, self._scheme_designator, "bla bla bla")
+        assert c1 == c2
+
+    def test_equal_equivalent_coding(self):
+        c1 = Code(self._value, self._scheme_designator, self._meaning)
+        c2 = Code("R-00317", "SRT", self._meaning)
+        assert c1 == c2
 
 
 class TestCodeDict:
@@ -169,3 +246,79 @@ class TestCodeDict:
     def test_not_contained(self):
         c = Code("130290", "DCM", "Median")
         assert c not in codes.cid244
+
+
+class TestCIDDict:
+    def test_concepts(self):
+        d = _CID_Dict(2)
+        assert "Afferent" in d.concepts
+        code = d.concepts["Afferent"]
+        assert isinstance(code, Code)
+        assert code.value == "49530007"
+
+    def test_dunder_dir(self):
+        d = _CID_Dict(2)
+        assert "Afferent" in dir(d)
+        assert "Vertical" in dir(d)
+        assert "__contains__" in dir(d)
+        assert "trait_names" in dir(d)
+        assert isinstance(dir(d), list)
+
+    def test_dir(self):
+        d = _CID_Dict(2)
+        assert isinstance(d.dir(), list)
+        assert "Afferent" in d.dir()
+        assert "Vertical" in d.dir()
+
+        assert d.dir("xyz") == []
+        assert "Axial" in d.dir("ia")
+        assert "Superficial" in d.dir("ia")
+        assert "Axial" in d.dir("IA")
+        assert "Superficial" in d.dir("IA")
+
+    def test_trait_names(self):
+        d = _CID_Dict(2)
+        assert isinstance(d.trait_names(), list)
+        assert "Afferent" in d.trait_names()
+        assert "Vertical" in d.trait_names()
+
+    def test_str(self):
+        d = _CID_Dict(2)
+        s = str(d)
+        assert "CID 2 (AnatomicModifier)" in s
+        assert "Afferent             49530007     SCT      Afferent" in s
+        assert "Vertical             33096000     SCT      Vertical" in s
+
+    def test_repr(self):
+        d = _CID_Dict(2)
+        r = repr(d)
+        assert "CID 2" in r
+        assert "Afferent = Code(value='49530007'" in r
+        assert "Vertical = Code(value='33096000'" in r
+
+    def test_getattr_match(self):
+        d = _CID_Dict(2)
+        code = d.Afferent
+        assert isinstance(code, Code)
+        assert code.value == "49530007"
+
+    def test_getattr_no_match_raises(self):
+        d = _CID_Dict(2)
+        msg = r"'XYZ' not found in CID 2"
+        with pytest.raises(AttributeError, match=msg):
+            d.XYZ
+
+    def test_getattr_match_multiple_codes_raises(self):
+        # Same attribute for multiple codes
+        d = _CID_Dict(12300)
+        msg = (
+            r"'LeftVentricularInternalDiastolicDimensionBSA' "
+            r"has multiple code matches in CID 12300: '80009-4', '80010-2'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            d.LeftVentricularInternalDiastolicDimensionBSA
+
+    def test_getattr_match_multiple_schemes_raises(self):
+        # Same attribute for different schemes - none currently exist
+        d = _CID_Dict(7151)
+        d.HipJoint
