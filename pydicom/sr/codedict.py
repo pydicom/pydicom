@@ -286,12 +286,12 @@ class _CodesDict:
         -------
         pydicom.sr._CodesDict, pydicom.sr._CID_Dict or pydicom.sr.Code
 
-            * If `name` is a concept ID then a ``_CID_Dict`` for the
+            * If `name` is a concept ID then the ``_CID_Dict`` for the
               corresponding CID.
-            * If `name` is a coding scheme designator then a ``_CodesDict``
+            * If `name` is a coding scheme designator then the ``_CodesDict``
               instance for the corresponding scheme.
-            * If ``_CodesDict.scheme`` is not ``None`` then a ``Code``
-              corresponding `name`.
+            * If ``_CodesDict.scheme`` is not ``None`` then the ``Code``
+              corresponding to `name`.
         """
         # for codes.X, X must be a CID or a scheme designator
         if name.startswith("cid"):

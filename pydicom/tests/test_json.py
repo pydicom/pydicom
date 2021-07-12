@@ -142,8 +142,8 @@ class TestAT:
     def test_invalid_value_in_json(self):
         ds_json = ('{"00091001": {"vr": "AT", "Value": ["000910AG"]}, '
                    '"00091002": {"vr": "AT", "Value": ["00100010"]}}')
-        with pytest.warns(UserWarning, match='Invalid value "000910AG" for '
-                                             'AT element - ignoring it'):
+        with pytest.warns(UserWarning, match="Invalid value '000910AG' for "
+                                             "AT element - ignoring it"):
             ds = Dataset.from_json(ds_json)
             assert ds[0x00091001].value is None
             assert 0x00100010 == ds[0x00091002].value
@@ -289,7 +289,7 @@ class TestSequence:
         test1_json = get_testdata_file("test1.json")
         with open(test1_json) as f:
             with pytest.warns(UserWarning,
-                              match='no bulk data URI handler provided '):
+                              match='No bulk data URI handler provided '):
                 ds = Dataset.from_json(f.read())
             del ds.PixelData
         ds2 = Dataset.from_json(ds.to_json())
@@ -311,8 +311,10 @@ class TestBinary:
         assert ds == ds1
 
     def test_invalid_inline_binary(self):
-        msg = ('"InlineBinary" of data element "00091002" '
-               'must be a bytes-like object.')
+        msg = (
+            "'InlineBinary' of data element '00091002' must be a "
+            "bytes-like object"
+        )
         ds_json = '{"00091002": {"vr": "OB", "InlineBinary": 42}}'
         with pytest.raises(TypeError, match=msg):
             Dataset.from_json(ds_json)
@@ -324,7 +326,7 @@ class TestBinary:
     def test_valid_bulkdata_uri(self):
         ds_json = ('{"00091002": {"vr": "OB", "BulkDataURI": '
                    '"http://example.com/bulkdatahandler"}}')
-        msg = r"no bulk data URI handler provided"
+        msg = r"No bulk data URI handler provided"
         with pytest.warns(UserWarning, match=msg):
             ds = Dataset.from_json(ds_json)
         assert 0x00091002 in ds
@@ -336,8 +338,7 @@ class TestBinary:
         assert 0x00091002 in ds
 
     def test_invalid_bulkdata_uri(self):
-        msg = ('"BulkDataURI" of data element "00091002" '
-               'must be a string.')
+        msg = "'BulkDataURI' of data element '00091002' must be a string"
         ds_json = '{"00091002": {"vr": "OB", "BulkDataURI": 42}}'
         with pytest.raises(TypeError, match=msg):
             Dataset.from_json(ds_json)

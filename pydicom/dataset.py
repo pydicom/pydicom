@@ -2394,7 +2394,7 @@ class Dataset:
         json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], Any],
+                Callable[[TagType, str, str], Any],
                 Callable[[str], Any]
             ]
         ] = None

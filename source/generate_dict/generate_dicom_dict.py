@@ -45,12 +45,14 @@ Based on Rickard Holmberg's docbook_to_dict2013.py.
 """
 
 import argparse
+import itertools
 import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import urllib.request as urllib2
 
 from pydicom import _version
+from pydicom.values import converters
 
 
 _DIRECTORY = os.path.dirname(__file__)
@@ -354,4 +356,16 @@ if __name__ == "__main__":
         write_dict(f, MASK_DICT_NAME, mask_attributes, tag_is_string=True)
 
     nr_tags = len(main_attributes) + len(mask_attributes)
-    print(f"Finished, wrote {nr_tags} tags")
+    print(f"Processing completed, wrote {nr_tags} tags")
+
+    print("Checking that all VRs are supported...")
+    for attr in itertools.chain(main_attributes, mask_attributes):
+        vr = attr['VR']
+        tag = attr['Tag']
+        try:
+            # (fffe,e000), (fffe,e00d) and (fffe,e0dd) have no VR
+            assert vr in converters or vr == 'NONE'
+        except AssertionError:
+            print(f"Warning: the VR '{vr}' for tag {tag} is not implemented")
+
+    print("VR checks complete")

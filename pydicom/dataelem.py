@@ -10,7 +10,7 @@ A DataElement has a tag,
 import base64
 import json
 from typing import (
-    Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, TypeVar, Type,
+    Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
     List, NamedTuple, MutableSequence, cast
 )
 import warnings
@@ -24,7 +24,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, BaseTag
+from pydicom.tag import Tag, BaseTag, TagType
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -102,10 +102,6 @@ def _is_bytes(val: object) -> bool:
 # double '\' because it is used as escape chr in Python
 _backslash_str = "\\"
 _backslash_byte = b"\\"
-
-
-_DataElement = TypeVar("_DataElement", bound="DataElement")
-_Dataset = TypeVar("_Dataset", bound="Dataset")
 
 
 class DataElement:
@@ -235,19 +231,19 @@ class DataElement:
 
     @classmethod
     def from_json(
-        cls: Type[_DataElement],
-        dataset_class: Type[_Dataset],
-        tag: Union[BaseTag, int, str],
+        cls: Type["DataElement"],
+        dataset_class: Type["Dataset"],
+        tag: TagType,
         vr: str,
-        value: object,
-        value_key: Union[str, None],
+        value: Any,
+        value_key: Optional[str],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[BaseTag, str, str], Any],
+                Callable[[TagType, str, str], Any],
                 Callable[[str], Any]
             ]
         ] = None
-    ) -> _DataElement:
+    ) -> "DataElement":
         """Return a :class:`DataElement` from JSON.
 
         .. versionadded:: 1.3
@@ -260,7 +256,7 @@ class DataElement:
             The data element tag.
         vr : str
             The data element value representation.
-        value : list
+        value : Any
             The data element's value(s).
         value_key : str or None
             Key of the data element that contains the value
@@ -301,19 +297,20 @@ class DataElement:
 
         Parameters
         ----------
-        bulk_data_element_handler: callable or None
-            Callable that accepts a bulk data element and returns the
-            "BulkDataURI" for retrieving the value of the data element
-            via DICOMweb WADO-RS
-        bulk_data_threshold: int
+        bulk_data_element_handler : callable or None
+            Callable that accepts a bulk :class`data element
+            <pydicom.dataelem.DataElement>` and returns the
+            "BulkDataURI" as a :class:`str` for retrieving the value of the
+            data element via DICOMweb WADO-RS.
+        bulk_data_threshold : int
             Size of base64 encoded data element above which a value will be
             provided in form of a "BulkDataURI" rather than "InlineBinary".
-            Ignored if no bulk data handler is given.
+            Ignored if no `bulk_data_element_handler` is given.
 
         Returns
         -------
         dict
-            Mapping representing a JSON encoded data element
+            Mapping representing a JSON encoded data element as ``{str: Any}``.
         """
         json_element: Dict[str, Any] = {'vr': self.VR}
         if self.VR in jsonrep.BINARY_VR_VALUES:
@@ -332,6 +329,7 @@ class DataElement:
                         f"encode bulk data element '{self.name}' inline"
                     )
                     json_element['InlineBinary'] = encoded_value
+
         elif self.VR == 'SQ':
             # recursive call to get sequence item JSON dicts
             value = [
@@ -343,6 +341,7 @@ class DataElement:
                 for ds in self.value
             ]
             json_element['Value'] = value
+
         elif self.VR == 'PN':
             if not self.is_empty:
                 elem_value = []
@@ -350,6 +349,7 @@ class DataElement:
                     value = self.value
                 else:
                     value = [self.value]
+
                 for v in value:
                     comps = {'Alphabetic': v.components[0]}
                     if len(v.components) > 1:
@@ -358,12 +358,14 @@ class DataElement:
                         comps['Phonetic'] = v.components[2]
                     elem_value.append(comps)
                 json_element['Value'] = elem_value
+
         elif self.VR == 'AT':
             if not self.is_empty:
                 value = self.value
                 if self.VM == 1:
                     value = [value]
                 json_element['Value'] = [format(v, '08X') for v in value]
+
         else:
             if not self.is_empty:
                 if self.VM > 1:
@@ -371,10 +373,12 @@ class DataElement:
                 else:
                     value = [self.value]
                 json_element['Value'] = [v for v in value]
+
         if 'Value' in json_element:
             json_element['Value'] = jsonrep.convert_to_python_number(
                 json_element['Value'], self.VR
             )
+
         return json_element
 
     def to_json(
@@ -384,42 +388,42 @@ class DataElement:
             Callable[["DataElement"], str]
         ] = None,
         dump_handler: Optional[
-            Callable[[Dict[Any, Any]], Dict[str, Any]]
+            Callable[[Dict[str, Any]], str]
         ] = None
-    ) -> Dict[str, Any]:
+    ) -> str:
         """Return a JSON representation of the :class:`DataElement`.
 
         .. versionadded:: 1.3
 
         Parameters
         ----------
-        bulk_data_element_handler: callable, optional
-            Callable that accepts a bulk data element and returns the
-            "BulkDataURI" for retrieving the value of the data element
-            via DICOMweb WADO-RS
-        bulk_data_threshold: int, optional
+        bulk_data_threshold : int, optional
             Size of base64 encoded data element above which a value will be
             provided in form of a "BulkDataURI" rather than "InlineBinary".
-            Ignored if no bulk data handler is given.
+            Ignored if no `bulk_data_element_handler` is given.
+        bulk_data_element_handler : callable, optional
+            Callable that accepts a bulk :class`data element
+            <pydicom.dataelem.DataElement>` and returns the
+            "BulkDataURI" as a :class:`str` for retrieving the value of the
+            data element via DICOMweb WADO-RS.
         dump_handler : callable, optional
-            Callable function that accepts a :class:`dict` and returns the
-            serialized (dumped) JSON string (by default uses
-            :func:`json.dumps`).
+            Callable function that accepts a :class:`dict` of ``{str: Any}``
+            and returns the serialized (dumped) JSON :class:`str` (by default
+            uses :func:`json.dumps`).
 
         Returns
         -------
-        dict
+        str
             Mapping representing a JSON encoded data element
 
         See also
         --------
         Dataset.to_json
         """
-        if dump_handler is None:
-            def json_dump(d):
-                return json.dumps(d, sort_keys=True)
+        def json_dump(d: Dict[str, Any]) -> str:
+            return json.dumps(d, sort_keys=True)
 
-            dump_handler = json_dump
+        dump_handler = json_dump if dump_handler is None else dump_handler
 
         return dump_handler(
             self.to_json_dict(bulk_data_element_handler, bulk_data_threshold)
@@ -563,7 +567,7 @@ class DataElement:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
             # % (repr(val), self.VR, self.tag)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -585,14 +589,16 @@ class DataElement:
 
             # tag and VR match, now check the value
             if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return (len(self.value) == len(other.value)
-                        and numpy.allclose(self.value, other.value))
-            else:
-                return self.value == other.value
+                return (
+                    len(self.value) == len(other.value)
+                    and numpy.allclose(self.value, other.value)
+                )
+
+            return self.value == other.value
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: Any) -> Any:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 

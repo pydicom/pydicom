@@ -1,4 +1,6 @@
 
+import pytest
+
 from pydicom.sr.coding import Code
 from pydicom.sr.codedict import codes, _CID_Dict
 from pydicom.uid import UID
@@ -317,8 +319,3 @@ class TestCIDDict:
         )
         with pytest.raises(AttributeError, match=msg):
             d.LeftVentricularInternalDiastolicDimensionBSA
-
-    def test_getattr_match_multiple_schemes_raises(self):
-        # Same attribute for different schemes - none currently exist
-        d = _CID_Dict(7151)
-        d.HipJoint
