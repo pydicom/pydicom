@@ -64,22 +64,15 @@ class _CID_Dict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list
-        meths = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
-                0
-            ]
-        )
-        props = set(
-            list(
-                zip(
-                    *inspect.getmembers(
-                        self.__class__, inspect.isdatadescriptor
-                    )
-                )
-            )[0]
-        )
+        meths = {
+            v[0] for v in inspect.getmembers(type(self), inspect.isroutine)
+        }
+        props = {
+            v[0]
+            for v in inspect.getmembers(type(self), inspect.isdatadescriptor)
+        }
         sr_names = set(self.dir())
+
         return sorted(props | meths | sr_names)
 
     def __getattr__(self, name: str) -> Code:
@@ -248,24 +241,16 @@ class _CodesDict:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list
-        meths = set(
-            list(zip(*inspect.getmembers(self.__class__, inspect.isroutine)))[
-                0
-            ]
-        )
-        props = set(
-            list(
-                zip(
-                    *inspect.getmembers(
-                        self.__class__, inspect.isdatadescriptor
-                    )
-                )
-            )[0]
-        )
+        meths = {
+            v[0] for v in inspect.getmembers(type(self), inspect.isroutine)
+        }
+        props = {
+            v[0]
+            for v in inspect.getmembers(type(self), inspect.isdatadescriptor)
+        }
         sr_names = set(self.dir())
-        alldir = sorted(props | meths | sr_names)
-        return alldir
+
+        return sorted(props | meths | sr_names)
 
     def __getattr__(self, name: str) -> Union["_CodesDict", _CID_Dict, Code]:
         """Return either a ``_CodesDict``, ``_CID_Dict`` or ``Code`` depending
