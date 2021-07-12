@@ -1,9 +1,21 @@
 
 import pytest
 
+from pydicom.sr._cid_dict import cid_concepts as CID_CONCEPTS
 from pydicom.sr.coding import Code
-from pydicom.sr.codedict import codes, _CID_Dict
+from pydicom.sr.codedict import codes, _CID_Dict, _CodesDict
 from pydicom.uid import UID
+
+
+@pytest.fixture()
+def ambiguous_scheme():
+    """Add a scheme to the CID concepts dict that contains a duplicate attr"""
+    cid = 6129
+    attr = CID_CONCEPTS[cid]['SCT'][0]
+    assert 'FOO' not in CID_CONCEPTS[cid]
+    CID_CONCEPTS[cid]['FOO'] = [attr]
+    yield attr, cid
+    del CID_CONCEPTS[cid]['FOO']
 
 
 class TestCode:
@@ -79,9 +91,10 @@ class TestCode:
         c1 = Code(self._value, self._scheme_designator, self._meaning)
         c2 = Code("R-00317", "SRT", self._meaning)
         assert c1 == c2
+        assert c2 == c1
 
 
-class TestCodeDict:
+class TestCodesDict:
     def test_dcm_1(self):
         assert codes.DCM.Modality == Code(
             value="121139", scheme_designator="DCM", meaning="Modality"
@@ -249,6 +262,53 @@ class TestCodeDict:
         c = Code("130290", "DCM", "Median")
         assert c not in codes.cid244
 
+    def test_dunder_dir(self):
+        d = _CodesDict('UCUM')
+        assert "ArbitraryUnit" in dir(d)
+        assert "Year" in dir(d)
+        assert "__delattr__" in dir(d)
+        assert "trait_names" in dir(d)
+        assert isinstance(dir(d), list)
+
+    def test_dir(self):
+        d = _CodesDict('UCUM')
+        assert isinstance(d.dir(), list)
+        assert "ArbitraryUnit" in d.dir()
+        assert "Year" in d.dir()
+        assert d.dir("xyz") == []
+        assert "Radian" in d.dir("ia")
+
+    def test_schemes(self):
+        d = _CodesDict('UCUM')
+        assert 'UCUM' in list(d.schemes())
+        schemes = list(codes.schemes())
+        assert 'UCUM' in schemes
+        assert 'DCM' in schemes
+        assert 'SCT' in schemes
+
+    def test_trait_names(self):
+        d = _CodesDict('UCUM')
+        assert "ArbitraryUnit" in d.trait_names()
+        assert "Year" in d.trait_names()
+        assert "__delattr__" in d.trait_names()
+        assert "trait_names" in d.trait_names()
+
+    def test_getattr_CID_with_scheme_raises(self):
+        msg = "Cannot use a CID with a scheme dictionary"
+        with pytest.raises(AttributeError, match=msg):
+            _CodesDict('UCUM').cid2
+
+    def test_getattr_unknown_attr_raises(self):
+        msg = "Unknown code name 'bar' for scheme 'UCUM'"
+        with pytest.raises(AttributeError, match=msg):
+            _CodesDict('UCUM').bar
+
+    def test_getattr_nonunique_attr_raises(self):
+        attr = "LeftVentricularInternalDiastolicDimensionBSA"
+        msg = f"Multiple code values for '{attr}' found: 80009-4, 80010-2"
+        with pytest.raises(RuntimeError, match=msg):
+            _CodesDict('LN').LeftVentricularInternalDiastolicDimensionBSA
+
 
 class TestCIDDict:
     def test_concepts(self):
@@ -319,3 +379,9 @@ class TestCIDDict:
         )
         with pytest.raises(AttributeError, match=msg):
             d.LeftVentricularInternalDiastolicDimensionBSA
+
+    def test_getattr_ambiguous_attr_raises(self, ambiguous_scheme):
+        attr, cid = ambiguous_scheme
+        msg = f"Multiple schemes found for '{attr}' in CID 6129: SCT, FOO"
+        with pytest.raises(AttributeError, match=msg):
+            getattr(_CID_Dict(cid), attr)

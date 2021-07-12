@@ -80,8 +80,7 @@ class _CID_Dict:
             )[0]
         )
         sr_names = set(self.dir())
-        alldir = sorted(props | meths | sr_names)
-        return alldir
+        return sorted(props | meths | sr_names)
 
     def __getattr__(self, name: str) -> Code:
         """Return the ``Code`` for class attribute `name`."""
@@ -96,6 +95,7 @@ class _CID_Dict:
                 f"'{name}' not found in CID {self.cid}"
             )
 
+        # FIXME: needs coverage
         if len(matches) > 1:
             # Should never happen, but just in case
             raise AttributeError(
@@ -297,6 +297,7 @@ class _CodesDict:
         if name.startswith("cid"):
             if not self.scheme:
                 return _CID_Dict(int(name[3:]))
+
             raise AttributeError("Cannot use a CID with a scheme dictionary")
 
         if name in self._dict.keys():
