@@ -88,7 +88,6 @@ class _CID_Dict:
                 f"'{name}' not found in CID {self.cid}"
             )
 
-        # FIXME: needs coverage
         if len(matches) > 1:
             # Should never happen, but just in case
             raise AttributeError(

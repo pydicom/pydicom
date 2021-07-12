@@ -410,7 +410,7 @@ def length_of_undefined_length(
     return None
 
 
-def read_delimiter_item(fp: BinaryIO, delimiter) -> None:
+def read_delimiter_item(fp, delimiter):
     """Read and ignore an expected delimiter.
 
     If the delimiter is not found or correctly formed, a warning is logged.

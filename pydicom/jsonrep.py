@@ -26,7 +26,7 @@ VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'SV', 'UL', 'US', 'UV', 'US or SS']
 
 
 def convert_to_python_number(value: Any, vr: str) -> Any:
-    """Makes sure that values are either ints or floats
+    """When possible convert numeric-like values to either ints or floats
     based on their value representation.
 
     .. versionadded:: 1.4
@@ -34,9 +34,9 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     Parameters
     ----------
     value : Any
-        Value of data element
+        Value of the data element.
     vr : str
-        Value representation of data element
+        Value representation of the data element.
 
     Returns
     -------
@@ -83,8 +83,8 @@ class JsonDataElementConverter:
         value_key: Optional[str],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[TagType, str, str], object],
-                Callable[[str], object]
+                Callable[[TagType, str, str], Any],
+                Callable[[str], Any]
             ]
         ] = None
     ) -> None:
@@ -114,7 +114,9 @@ class JsonDataElementConverter:
         self.vr = vr
         self.value = value
         self.value_key = value_key
-        self.bulk_data_element_handler: Callable[[TagType, str, str], Any]
+
+        HandlerType = Optional[Callable[[TagType, str, str], Any]]
+        self.bulk_data_element_handler: HandlerType
 
         handler = bulk_data_uri_handler
 
@@ -123,18 +125,17 @@ class JsonDataElementConverter:
             return x(value)
 
         if handler and len(signature(handler).parameters) == 1:
+            # handler is Callable[[str], Any]
             self.bulk_data_element_handler = wrapper
         else:
-            handler = cast(Callable[[TagType, str, str], Any], handler)
-            self.bulk_data_element_handler = handler
+            self.bulk_data_element_handler = cast(HandlerType, handler)
 
     def get_element_values(self) -> Any:
         """Return a the data element value or list of values.
 
         Returns
         -------
-        str or bytes or int or float or dataset_class
-        or PersonName or list of any of these types
+        Any
             The value or value list of the newly created data element.
         """
         from pydicom.dataelem import empty_value_for_VR
@@ -147,6 +148,7 @@ class JsonDataElementConverter:
                 )
 
             if not self.value:
+                # None, "", b"", [], PersonName("")
                 return empty_value_for_VR(self.vr)
 
             element_value = [
@@ -156,6 +158,7 @@ class JsonDataElementConverter:
             if len(element_value) == 1 and self.vr != 'SQ':
                 element_value = element_value[0]
 
+            # Any
             return convert_to_python_number(element_value, self.vr)
 
         # The value for "InlineBinary" shall be encoded as a base64 encoded
@@ -174,6 +177,7 @@ class JsonDataElementConverter:
                     "be a bytes-like object"
                 )
 
+            # bytes
             return base64.b64decode(value)
 
         if self.value_key == 'BulkDataURI':
@@ -190,6 +194,7 @@ class JsonDataElementConverter:
                 )
                 return empty_value_for_VR(self.vr, raw=True)
 
+            # Any
             return self.bulk_data_element_handler(self.tag, self.vr, value)
 
         return empty_value_for_VR(self.vr)
@@ -199,22 +204,24 @@ class JsonDataElementConverter:
 
         Parameters
         ----------
-        value : str or int or float or dict
+        value : Any
             The data element's value from the json entry.
 
         Returns
         -------
-        dataset_class or PersonName
-        or str or int or float
+        Any
             A single value of the corresponding :class:`DataElement`.
         """
         if self.vr == 'SQ':
+            # Dataset
             return self.get_sequence_item(value)
 
         if self.vr == 'PN':
+
             return self.get_pn_element_value(value)
 
         if self.vr == 'AT':
+            # Optional[int]
             try:
                 return int(value, 16)
             except ValueError:
@@ -290,12 +297,12 @@ class JsonDataElementConverter:
 
         Parameters
         ----------
-        value : dict
+        value : dict[str, str]
             The person name components in the JSON entry.
 
         Returns
         -------
-        PersonName or str
+        str
             The decoded PersonName object or an empty string.
         """
         if not isinstance(value, dict):
