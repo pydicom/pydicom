@@ -881,11 +881,10 @@ class TestNumpy_RLEDecodeFrame:
                 header, rows=1, columns=1, nr_samples=samples, nr_bits=bits
             )
 
-    def test_invalid_frame_data_raises(self):
-        """Test that invalid segment data raises exception."""
+    def test_invalid_segment_data_raises(self):
+        """Test invalid segment data raises exception"""
         ds = dcmread(RLE_16_1_1F)
         pixel_data = defragment_data(ds.PixelData)
-        # Missing byte
         msg = r"amount \(4095 vs. 4096 bytes\)"
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(
@@ -896,10 +895,16 @@ class TestNumpy_RLEDecodeFrame:
                 ds.BitsAllocated
             )
 
-        # Extra byte
-        msg = r'amount \(4097 vs. 4096 bytes\)'
-        with pytest.raises(ValueError, match=msg):
-            _rle_decode_frame(
+    def test_nonconf_segment_padding_warns(self):
+        """Test non-conformant segment padding warns"""
+        ds = dcmread(RLE_16_1_1F)
+        pixel_data = defragment_data(ds.PixelData)
+        msg = (
+            r"The decoded RLE segment contains non-conformant padding - 4097 "
+            r"vs. 4096 bytes expected"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            frame = _rle_decode_frame(
                 pixel_data + b'\x00\x01',
                 ds.Rows,
                 ds.Columns,

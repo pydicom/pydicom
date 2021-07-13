@@ -38,6 +38,7 @@ in the table below.
 from struct import unpack
 import sys
 from typing import List, TYPE_CHECKING, cast
+import warnings
 
 try:
     import numpy as np
@@ -323,6 +324,8 @@ def _rle_decode_frame(
 
     # `stride` is the total number of bytes of each sample plane
     stride = bytes_per_sample * rows * columns
+    # Expected number of bytes in each segment
+    expected_length = rows * columns
     for sample_number in range(nr_samples):
         le_gen = range(bytes_per_sample)
         byte_offsets = le_gen if segment_order == '<' else reversed(le_gen)
@@ -333,11 +336,19 @@ def _rle_decode_frame(
             # This is where the segment order correction occurs
             segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
             # Check that the number of decoded pixels is correct
-            if len(segment) != rows * columns:
+            segment_length = len(segment)
+
+            if segment_length < expected_length:
                 raise ValueError(
                     "The amount of decoded RLE segment data doesn't match the "
-                    f"expected amount ({len(segment)} vs. "
-                    f"{rows * columns} bytes)"
+                    f"expected amount ({segment_length} vs. "
+                    f"{expected_length} bytes)"
+                )
+            elif segment_length != expected_length and segment_length % 2:
+                # Odd length segments are padded to an even number of bytes
+                warnings.warn(
+                    "The decoded RLE segment contains non-conformant padding - "
+                    f"{segment_length} vs. {expected_length} bytes expected"
                 )
 
             if segment_order == '>':
@@ -346,7 +357,9 @@ def _rle_decode_frame(
             # For 100 pixel/plane, 32-bit, 3 sample data, `start` will be
             #   0, 1, 2, 3, 400, 401, 402, 403, 800, 801, 802, 803
             start = byte_offset + (sample_number * stride)
-            decoded[start:start + stride:bytes_per_sample] = segment
+            decoded[start:start + stride:bytes_per_sample] = (
+                segment[:expected_length]
+            )
 
     return decoded
 

@@ -109,3 +109,4 @@ Fixes
   when an encoded backslash was part of the element value (:issue:`1412`)
 * Fixed expansion of linear segments with floating point steps in
   segmented LUTs (:issue:`1415`)
+* Fixed decoding RLE segments with padding (:issue:`1438`)
