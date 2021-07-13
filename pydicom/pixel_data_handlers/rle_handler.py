@@ -324,8 +324,9 @@ def _rle_decode_frame(
 
     # `stride` is the total number of bytes of each sample plane
     stride = bytes_per_sample * rows * columns
-    # Expected number of bytes in each segment
-    expected_length = rows * columns
+    # Expected number of bytes in each segment (including odd-length padding)
+    expected_length = rows * columns + (rows * columns) % 2
+
     for sample_number in range(nr_samples):
         le_gen = range(bytes_per_sample)
         byte_offsets = le_gen if segment_order == '<' else reversed(le_gen)
@@ -335,20 +336,21 @@ def _rle_decode_frame(
             # ii is 1, 0, 3, 2, 5, 4 for the example above
             # This is where the segment order correction occurs
             segment = _rle_decode_segment(data[offsets[ii]:offsets[ii + 1]])
-            # Check that the number of decoded pixels is correct
-            segment_length = len(segment)
 
-            if segment_length < expected_length:
+            # Check that the number of decoded bytes is correct
+            actual_length = len(segment)
+            if actual_length < rows * columns:
                 raise ValueError(
                     "The amount of decoded RLE segment data doesn't match the "
-                    f"expected amount ({segment_length} vs. "
+                    f"expected amount ({actual_length} vs. "
                     f"{expected_length} bytes)"
                 )
-            elif segment_length != expected_length and segment_length % 2:
+            elif actual_length != expected_length:
                 # Odd length segments are padded to an even number of bytes
+                #   so warn if segment padded unexpectedly
                 warnings.warn(
-                    "The decoded RLE segment contains non-conformant padding - "
-                    f"{segment_length} vs. {expected_length} bytes expected"
+                    "The decoded RLE segment contains non-conformant padding "
+                    f"- {actual_length} vs. {expected_length} bytes expected"
                 )
 
             if segment_order == '>':
@@ -358,7 +360,7 @@ def _rle_decode_frame(
             #   0, 1, 2, 3, 400, 401, 402, 403, 800, 801, 802, 803
             start = byte_offset + (sample_number * stride)
             decoded[start:start + stride:bytes_per_sample] = (
-                segment[:expected_length]
+                segment[:rows * columns]
             )
 
     return decoded
