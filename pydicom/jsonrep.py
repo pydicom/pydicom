@@ -68,10 +68,25 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     return number_type(value)
 
 
+OtherValueType = Union[None, str, int, float]
+PNValueType = Union[None, str, Dict[str, str]]
+SQValueType = Optional[Dict[str, Any]]  # Recursive
+ValueType = List[
+    Union[JSONPNValueType, JSONSQValueType, JSONOtherValueType]
+]
+# JSONInlineBinaryType: bytes
+# JSONBulkDataURIType: str
+
+
 class JsonDataElementConverter:
     """Handles conversion between JSON struct and :class:`DataElement`.
 
     .. versionadded:: 1.4
+
+    References
+    ----------
+
+    * :dcm:`Annex F of Part 18 of the DICOM Standard<part18/chapter_F.html>`
     """
 
     def __init__(
@@ -139,7 +154,12 @@ class JsonDataElementConverter:
         """
         from pydicom.dataelem import empty_value_for_VR
 
+        # An attribute with an empty value shall have no "Value", "BulkDataURI"
+        #   or "InlineBinary"
         if self.value_key == 'Value':
+            # May be a single item or a list of items
+            # A multi-valued value uses `null` for empty items
+            # An empty sequence is `{}`
             if not isinstance(self.value, list):
                 raise TypeError(
                     f"'{self.value_key}' of data element '{self.tag}' must "
@@ -168,15 +188,17 @@ class JsonDataElementConverter:
             value = value[0]
 
         if self.value_key == 'InlineBinary':
+            # The `value` should be a base64 encoded str
             if not isinstance(value, (str, bytes)):
                 raise TypeError(
                     f"'{self.value_key}' of data element '{self.tag}' must "
                     "be a bytes-like object"
                 )
 
-            return base64.b64decode(value)
+            return base64.b64decode(value)  # bytes
 
         if self.value_key == 'BulkDataURI':
+            # The `value` should be a str
             if not isinstance(value, str):
                 raise TypeError(
                     f"'{self.value_key}' of data element '{self.tag}' must "
@@ -207,13 +229,19 @@ class JsonDataElementConverter:
         Any
             A single value of the corresponding :class:`DataElement`.
         """
-        if self.vr == 'SQ':
+        # Table F.2.3-1 has JSON type mappings
+        if self.vr == 'SQ':  # Dataset
+            # May be an empty dict
+            value = cast(Dict[str, Any], value)
             return self.get_sequence_item(value)
 
-        if self.vr == 'PN':
+        if self.vr == 'PN':  # str
+            value = cast(Dict[str, str], value)
             return self.get_pn_element_value(value)
 
-        if self.vr == 'AT':
+        if self.vr == 'AT':  # Optional[int]
+            # May be an empty str
+            value = cast(str, value)
             try:
                 return int(value, 16)
             except ValueError:
@@ -225,7 +253,7 @@ class JsonDataElementConverter:
 
         return value
 
-    def get_sequence_item(self, value: Optional[Dict[str, Any]]) -> "Dataset":
+    def get_sequence_item(self, value: SQValueType) -> "Dataset":
         """Return a sequence item for the JSON dict `value`.
 
         Parameters
@@ -281,7 +309,7 @@ class JsonDataElementConverter:
 
         return ds
 
-    def get_pn_element_value(self, value: Union[str, Dict[str, str]]) -> str:
+    def get_pn_element_value(self, value: PNValueType) -> str:
         """Return PersonName value from JSON value.
 
         Values with VR PN have a special JSON encoding, see the DICOM Standard,
