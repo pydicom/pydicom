@@ -42,11 +42,11 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     -------
     Any
 
-        * If `value` is ``None`` then returns ``None``
-        * If `vr` is a integer-like VR type then returns ``int``, ``List[int]``
-          or ``""`` if empty
-        * If `vr` is a float-like VR type then returns ``float``,
-          ``List[float]`` or ``""`` if empty
+        * If `value` is empty then returns the `value` unchanged.
+        * If `vr` is an integer-like VR type then returns ``int`` or
+          ``List[int]``
+        * If `vr` is a float-like VR type then returns ``float`` or
+          ``List[float]``
         * Otherwise returns `value` unchanged
 
     """
@@ -119,13 +119,12 @@ class JsonDataElementConverter:
         self.bulk_data_element_handler: HandlerType
 
         handler = bulk_data_uri_handler
-
-        def wrapper(tag: TagType, vr: str, value: str) -> Any:
-            x = cast(Callable[[str], Any], handler)
-            return x(value)
-
         if handler and len(signature(handler).parameters) == 1:
             # handler is Callable[[str], Any]
+            def wrapper(tag: TagType, vr: str, value: str) -> Any:
+                x = cast(Callable[[str], Any], handler)
+                return x(value)
+
             self.bulk_data_element_handler = wrapper
         else:
             self.bulk_data_element_handler = cast(HandlerType, handler)
@@ -148,7 +147,6 @@ class JsonDataElementConverter:
                 )
 
             if not self.value:
-                # None, "", b"", [], PersonName("")
                 return empty_value_for_VR(self.vr)
 
             element_value = [
@@ -158,7 +156,6 @@ class JsonDataElementConverter:
             if len(element_value) == 1 and self.vr != 'SQ':
                 element_value = element_value[0]
 
-            # Any
             return convert_to_python_number(element_value, self.vr)
 
         # The value for "InlineBinary" shall be encoded as a base64 encoded
@@ -177,7 +174,6 @@ class JsonDataElementConverter:
                     "be a bytes-like object"
                 )
 
-            # bytes
             return base64.b64decode(value)
 
         if self.value_key == 'BulkDataURI':
@@ -194,7 +190,6 @@ class JsonDataElementConverter:
                 )
                 return empty_value_for_VR(self.vr, raw=True)
 
-            # Any
             return self.bulk_data_element_handler(self.tag, self.vr, value)
 
         return empty_value_for_VR(self.vr)
@@ -213,15 +208,12 @@ class JsonDataElementConverter:
             A single value of the corresponding :class:`DataElement`.
         """
         if self.vr == 'SQ':
-            # Dataset
             return self.get_sequence_item(value)
 
         if self.vr == 'PN':
-
             return self.get_pn_element_value(value)
 
         if self.vr == 'AT':
-            # Optional[int]
             try:
                 return int(value, 16)
             except ValueError:
@@ -289,7 +281,7 @@ class JsonDataElementConverter:
 
         return ds
 
-    def get_pn_element_value(self, value: Any) -> Any:
+    def get_pn_element_value(self, value: Union[str, Dict[str, str]]) -> str:
         """Return PersonName value from JSON value.
 
         Values with VR PN have a special JSON encoding, see the DICOM Standard,
