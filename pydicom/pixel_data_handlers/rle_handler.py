@@ -324,9 +324,6 @@ def _rle_decode_frame(
 
     # `stride` is the total number of bytes of each sample plane
     stride = bytes_per_sample * rows * columns
-    # Expected number of bytes in each segment (including odd-length padding)
-    expected_length = rows * columns + (rows * columns) % 2
-
     for sample_number in range(nr_samples):
         le_gen = range(bytes_per_sample)
         byte_offsets = le_gen if segment_order == '<' else reversed(le_gen)
@@ -343,14 +340,12 @@ def _rle_decode_frame(
                 raise ValueError(
                     "The amount of decoded RLE segment data doesn't match the "
                     f"expected amount ({actual_length} vs. "
-                    f"{expected_length} bytes)"
+                    f"{rows * columns} bytes)"
                 )
-            elif actual_length != expected_length:
-                # Odd length segments are padded to an even number of bytes
-                #   so warn if segment padded unexpectedly
+            elif actual_length != rows * columns:
                 warnings.warn(
                     "The decoded RLE segment contains non-conformant padding "
-                    f"- {actual_length} vs. {expected_length} bytes expected"
+                    f"- {actual_length} vs. {rows * columns} bytes expected"
                 )
 
             if segment_order == '>':

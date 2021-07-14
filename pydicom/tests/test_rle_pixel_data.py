@@ -899,7 +899,6 @@ class TestNumpy_RLEDecodeFrame:
         """Test non-conformant segment padding warns"""
         ds = dcmread(RLE_16_1_1F)
         pixel_data = defragment_data(ds.PixelData)
-        # Even length padded to odd length
         msg = (
             r"The decoded RLE segment contains non-conformant padding - 4097 "
             r"vs. 4096 bytes expected"
@@ -908,20 +907,6 @@ class TestNumpy_RLEDecodeFrame:
             frame = _rle_decode_frame(
                 pixel_data + b'\x00\x01',
                 4096,
-                1,
-                ds.SamplesPerPixel,
-                ds.BitsAllocated
-            )
-
-        # Odd length with excess padding
-        msg = (
-            r"The decoded RLE segment contains non-conformant padding - 4098 "
-            r"vs. 4096 bytes expected"
-        )
-        with pytest.warns(UserWarning, match=msg):
-            frame = _rle_decode_frame(
-                pixel_data + b'\x00\x01\x00\x01',
-                4095,
                 1,
                 ds.SamplesPerPixel,
                 ds.BitsAllocated
