@@ -2393,8 +2393,8 @@ class Dataset:
         json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[str, str, str], bytes],
-                Callable[[str], bytes]
+                Callable[[str, str, str], Union[None, str, int, float, bytes]],
+                Callable[[str], Union[None, str, int, float, bytes]]
             ]
         ] = None
     ) -> "Dataset":
@@ -2411,14 +2411,14 @@ class Dataset:
             representing a DICOM Data Set formatted based on the :dcm:`DICOM
             JSON Model<part18/chapter_F.html>`.
         bulk_data_uri_handler : callable, optional
-            Callable function that accepts either a *tag*, *vr* and
-            "BulkDataURI" *value* (as str, str, str) or just the "BulkDataURI"
-            *value* of the JSON representation of a data element and returns
-            the actual value of that data element (retrieved via DICOMweb
-            WADO-RS) as :class:`bytes`. If no `bulk_data_uri_handler` is
-            specified (default) then the corresponding element will have an
-            "empty" value such as ``""``, ``b""`` or ``None`` depending on the
-            VR (i.e. the Value Multiplicity will be 0).
+            Callable function that accepts either the `tag`, `vr` and
+            "BulkDataURI" `value` or just the "BulkDataURI" `value` of the JSON
+            representation of a data element and returns the actual value of
+            that data element (retrieved via DICOMweb WADO-RS). If no
+            `bulk_data_uri_handler` is specified (default) then the
+            corresponding element will have an "empty" value such as
+            ``""``, ``b""`` or ``None`` depending on the `vr` (i.e. the
+            Value Multiplicity will be 0).
 
         Returns
         -------

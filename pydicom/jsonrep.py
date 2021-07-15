@@ -83,7 +83,8 @@ BulkDataURIType = Union[str, List[str]]
 
 JSONValueType = Union[List[ValueType], InlineBinaryType, BulkDataURIType]
 
-BulkDataHandlerType = Optional[Callable[[str, str, str], bytes]]
+BulkDataType = Union[None, str, int, float, bytes]
+BulkDataHandlerType = Optional[Callable[[str, str, str], BulkDataType]]
 
 
 class JsonDataElementConverter:
@@ -107,7 +108,7 @@ class JsonDataElementConverter:
         value: JSONValueType,
         value_key: Optional[str],
         bulk_data_uri_handler: Optional[
-            Union[BulkDataHandlerType, Callable[[str], bytes]]
+            Union[BulkDataHandlerType, Callable[[str], BulkDataType]]
         ] = None
     ) -> None:
         """Create a new converter instance.
@@ -132,10 +133,10 @@ class JsonDataElementConverter:
             Callable function that accepts either the `tag`, `vr` and the
             "BulkDataURI" `value`, or just the "BulkDataURI" `value` of the
             JSON representation of a data element and returns the actual
-            value of that data element (retrieved via DICOMweb WADO-RS) as
-            :class:`bytes`. If no `bulk_data_uri_handler` is
-            specified (default) then the corresponding element will have an
-            "empty" value such as ``""``, ``b""`` or ``None`` depending on the
+            value of that data element (retrieved via DICOMweb WADO-RS). If
+            no `bulk_data_uri_handler` is specified (default) then the
+            corresponding element will have an "empty" value such as
+            ``""``, ``b""`` or ``None`` depending on the
             `vr` (i.e. the Value Multiplicity will be 0).
         """
         self.dataset_class = dataset_class
@@ -147,8 +148,8 @@ class JsonDataElementConverter:
 
         handler = bulk_data_uri_handler
         if handler and len(signature(handler).parameters) == 1:
-            # `handler` is Callable[[str], bytes]
-            def wrapper(tag: str, vr: str, value: str) -> bytes:
+            # `handler` is Callable[[str], Any]
+            def wrapper(tag: str, vr: str, value: str) -> BulkDataType:
                 x = cast(Callable[[str], bytes], handler)
                 return x(value)
 

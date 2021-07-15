@@ -22,7 +22,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               private_dictionary_description, dictionary_VR,
                               repeater_has_tag, private_dictionary_VR)
 from pydicom.errors import BytesLengthException
-from pydicom.jsonrep import JsonDataElementConverter
+from pydicom.jsonrep import JsonDataElementConverter, BulkDataType
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
@@ -239,8 +239,8 @@ class DataElement:
         value_key: Optional[str],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[str, str, str], bytes],
-                Callable[[str], bytes]
+                Callable[[str, str, str], BulkDataType],
+                Callable[[str], BulkDataType]
             ]
         ] = None
     ) -> "DataElement":
@@ -260,17 +260,18 @@ class DataElement:
         value : str or List[Union[None, str, int, float, dict]]
             The data element's value(s).
         value_key : str or None
-            Key of the data element that contains the value
-            (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
+            The attribute name for `value`, should be one of:
+            ``{"Value", "InlineBinary", "BulkDataURI"}``. If the element's VM
+            is ``0`` and none of the keys are used then will be ``None``.
         bulk_data_uri_handler: callable or None
             Callable function that accepts either the `tag`, `vr` and
             "BulkDataURI" `value` or just the "BulkDataURI" `value` of the JSON
             representation of a data element and returns the actual value of
-            that data element (retrieved via DICOMweb WADO-RS) as
-            :class:`bytes`. If no `bulk_data_uri_handler` is specified
-            (default) then the corresponding element will have an "empty"
-            value such as ``""``, ``b""`` or ``None`` depending on the
-            `vr` (i.e. the Value Multiplicity will be 0).
+            that data element (retrieved via DICOMweb WADO-RS). If no
+            `bulk_data_uri_handler` is specified (default) then the
+            corresponding element will have an "empty" value such as
+            ``""``, ``b""`` or ``None`` depending on the `vr` (i.e. the
+            Value Multiplicity will be 0).
 
         Returns
         -------
