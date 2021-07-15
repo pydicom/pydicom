@@ -252,12 +252,12 @@ class DataElement:
         Parameters
         ----------
         dataset_class : dataset.Dataset derived class
-            Class used to create sequence items.
+            The class object to use for **SQ** element items.
         tag : str
             The data element's tag as uppercase hex.
         vr : str
             The data element's value representation (VR).
-        value : str or List[Union[None, str, int, float, dict]]
+        value : str or List[Union[None, str, int, float, bytes, dict]]
             The data element's value(s).
         value_key : str or None
             The attribute name for `value`, should be one of:
