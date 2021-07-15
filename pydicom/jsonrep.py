@@ -162,7 +162,7 @@ class JsonDataElementConverter:
 
         Returns
         -------
-        Any
+        None, str, float, int, bytes, dataset_class or a list of these
             The value or value list of the newly created data element.
         """
         from pydicom.dataelem import empty_value_for_VR
@@ -241,7 +241,7 @@ class JsonDataElementConverter:
 
         Returns
         -------
-        Any
+        None, str, int, float or Dataset
             A single value of the corresponding :class:`DataElement`.
         """
         from pydicom.dataelem import empty_value_for_VR
@@ -330,14 +330,14 @@ class JsonDataElementConverter:
         return ds
 
     def get_pn_element_value(self, value: Union[str, Dict[str, str]]) -> str:
-        """Return PersonName value from JSON value.
+        """Return a person name from JSON **PN** value as str.
 
         Values with VR PN have a special JSON encoding, see the DICOM Standard,
         Part 18, :dcm:`Annex F.2.2<part18/sect_F.2.2.html>`.
 
         Parameters
         ----------
-        value : dict[str, str]
+        value : Dict[str, str]
             The person name components in the JSON entry.
 
         Returns
