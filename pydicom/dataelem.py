@@ -263,8 +263,8 @@ class DataElement:
             Key of the data element that contains the value
             (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
         bulk_data_uri_handler: callable or None
-            Callable function that accepts either the `tag`, `vr` and "BulkDataURI"
-            `value` or just the "BulkDataURI" `value` of the JSON
+            Callable function that accepts either the `tag`, `vr` and
+            "BulkDataURI" `value` or just the "BulkDataURI" `value` of the JSON
             representation of a data element and returns the actual value of
             that data element (retrieved via DICOMweb WADO-RS) as
             :class:`bytes`. If no `bulk_data_uri_handler` is specified
