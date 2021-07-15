@@ -24,7 +24,7 @@ from pydicom.datadict import (dictionary_has_tag, dictionary_description,
 from pydicom.errors import BytesLengthException
 from pydicom.jsonrep import JsonDataElementConverter
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, BaseTag, TagType
+from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
@@ -334,7 +334,6 @@ class DataElement:
                         f"encode bulk data element '{self.name}' inline"
                     )
                     json_element['InlineBinary'] = encoded_value
-
         elif self.VR == 'SQ':
             # recursive call to get sequence item JSON dicts
             value = [
@@ -346,7 +345,6 @@ class DataElement:
                 for ds in self.value
             ]
             json_element['Value'] = value
-
         elif self.VR == 'PN':
             if not self.is_empty:
                 elem_value = []
@@ -354,7 +352,6 @@ class DataElement:
                     value = self.value
                 else:
                     value = [self.value]
-
                 for v in value:
                     comps = {'Alphabetic': v.components[0]}
                     if len(v.components) > 1:
@@ -363,14 +360,12 @@ class DataElement:
                         comps['Phonetic'] = v.components[2]
                     elem_value.append(comps)
                 json_element['Value'] = elem_value
-
         elif self.VR == 'AT':
             if not self.is_empty:
                 value = self.value
                 if self.VM == 1:
                     value = [value]
                 json_element['Value'] = [format(v, '08X') for v in value]
-
         else:
             if not self.is_empty:
                 if self.VM > 1:
@@ -378,12 +373,10 @@ class DataElement:
                 else:
                     value = [self.value]
                 json_element['Value'] = [v for v in value]
-
         if 'Value' in json_element:
             json_element['Value'] = jsonrep.convert_to_python_number(
                 json_element['Value'], self.VR
             )
-
         return json_element
 
     def to_json(

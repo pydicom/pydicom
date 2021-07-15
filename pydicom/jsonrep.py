@@ -147,7 +147,7 @@ class JsonDataElementConverter:
 
         handler = bulk_data_uri_handler
         if handler and len(signature(handler).parameters) == 1:
-            # handler is Callable[[str], Any]
+            # `handler` is Callable[[str], bytes]
             def wrapper(tag: str, vr: str, value: str) -> bytes:
                 x = cast(Callable[[str], bytes], handler)
                 return x(value)
@@ -166,15 +166,12 @@ class JsonDataElementConverter:
         """
         from pydicom.dataelem import empty_value_for_VR
 
+        # An attribute with an empty value should have no "Value", "BulkDataURI"
+        #   or "InlineBinary"
         if self.value_key is None:
             return empty_value_for_VR(self.vr)
 
-        # An attribute with an empty value shall have no "Value", "BulkDataURI"
-        #   or "InlineBinary"
         if self.value_key == 'Value':
-            # May be a single item or a list of items
-            # A multi-valued value uses `null` for empty items
-            # An empty sequence is `{}`
             if not isinstance(self.value, list):
                 raise TypeError(
                     f"'{self.value_key}' of data element '{self.tag}' must "
@@ -237,7 +234,7 @@ class JsonDataElementConverter:
 
         Parameters
         ----------
-        value : List[Union[None, str, int, float, dict]]
+        value : None, str, int, float or dict
             The data element's value from the json entry.
 
         Returns
@@ -272,7 +269,6 @@ class JsonDataElementConverter:
 
             return None
 
-        # List[Union[None, str, int, float]]
         return value
 
     def get_sequence_item(self, value: SQValueType) -> "Dataset":
