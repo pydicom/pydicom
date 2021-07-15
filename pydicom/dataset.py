@@ -2411,8 +2411,8 @@ class Dataset:
             representing a DICOM Data Set formatted based on the :dcm:`DICOM
             JSON Model<part18/chapter_F.html>`.
         bulk_data_uri_handler : callable, optional
-            Callable function that accepts either the `tag`, `vr` and
-            "BulkDataURI" `value` or just the "BulkDataURI" `value` of the JSON
+            Callable function that accepts either the tag, vr and
+            "BulkDataURI" value or just the "BulkDataURI" value of the JSON
             representation of a data element and returns the actual value of
             that data element (retrieved via DICOMweb WADO-RS). If no
             `bulk_data_uri_handler` is specified (default) then the

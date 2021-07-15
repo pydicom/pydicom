@@ -148,7 +148,7 @@ class JsonDataElementConverter:
 
         handler = bulk_data_uri_handler
         if handler and len(signature(handler).parameters) == 1:
-            # `handler` is Callable[[str], Any]
+            # `handler` is Callable[[str], BulkDataType]
             def wrapper(tag: str, vr: str, value: str) -> BulkDataType:
                 x = cast(Callable[[str], bytes], handler)
                 return x(value)
@@ -213,8 +213,9 @@ class JsonDataElementConverter:
             # The `value` should be a URI as a str
             if not isinstance(value, str):
                 raise TypeError(
-                    f"'{self.value_key}' of data element '{self.tag}' must "
-                    "be a string"
+                    f"Invalid attribute value for data element '{self.tag}' - "
+                    "the value for 'BulkDataURI' must be str, not "
+                    f"{type(value).__name__}"
                 )
 
             if self.bulk_data_element_handler is None:

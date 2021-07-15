@@ -340,7 +340,10 @@ class TestBinary:
         assert 0x00091002 in ds
 
     def test_invalid_bulkdata_uri(self):
-        msg = "'BulkDataURI' of data element '00091002' must be a string"
+        msg = (
+            "Invalid attribute value for data element '00091002' - the value "
+            "for 'BulkDataURI' must be str, not int"
+        )
         ds_json = '{"00091002": {"vr": "OB", "BulkDataURI": 42}}'
         with pytest.raises(TypeError, match=msg):
             Dataset.from_json(ds_json)
