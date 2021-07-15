@@ -5,11 +5,10 @@ import base64
 from inspect import signature
 import inspect
 from typing import (
-    Callable, Optional, Union, Any, cast, Type, TypeVar, Dict, TYPE_CHECKING
+    Callable, Optional, Union, Any, cast, Type, TypeVar, Dict, TYPE_CHECKING,
+    List
 )
 import warnings
-
-from pydicom.tag import BaseTag, TagType
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -50,6 +49,8 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
         * Otherwise returns `value` unchanged
 
     """
+    from pydicom.dataelem import empty_value_for_VR
+
     if value is None or "":
         return value
 
@@ -62,8 +63,12 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     if number_type is None:
         return value
 
-    if isinstance(value, (list, tuple,)):
-        return [number_type(e) for e in value]
+    if isinstance(value, (list, tuple)):
+        return [
+            number_type(v) if v is not None
+            else empty_value_for_VR(vr)
+            for v in value
+        ]
 
     return number_type(value)
 
@@ -71,15 +76,18 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
 OtherValueType = Union[None, str, int, float]
 PNValueType = Union[None, str, Dict[str, str]]
 SQValueType = Optional[Dict[str, Any]]  # Recursive
-ValueType = List[
-    Union[JSONPNValueType, JSONSQValueType, JSONOtherValueType]
-]
-# JSONInlineBinaryType: bytes
-# JSONBulkDataURIType: str
+
+ValueType = Union[PNValueType, SQValueType, OtherValueType]
+InlineBinaryType = Union[str, List[str]]
+BulkDataURIType = Union[str, List[str]]
+
+JSONValueType = Union[List[ValueType], InlineBinaryType, BulkDataURIType]
+
+BulkDataHandlerType = Optional[Callable[[str, str, str], bytes]]
 
 
 class JsonDataElementConverter:
-    """Handles conversion between JSON struct and :class:`DataElement`.
+    """Convert from a JSON struct to a :class:`DataElement`.
 
     .. versionadded:: 1.4
 
@@ -87,20 +95,19 @@ class JsonDataElementConverter:
     ----------
 
     * :dcm:`Annex F of Part 18 of the DICOM Standard<part18/chapter_F.html>`
+    * `JSON to Python object conversion table
+      <https://docs.python.org/3/library/json.html#json-to-py-table>`_
     """
 
     def __init__(
         self,
         dataset_class: Type["Dataset"],
-        tag: TagType,
+        tag: str,
         vr: str,
-        value: Any,
+        value: JSONValueType,
         value_key: Optional[str],
         bulk_data_uri_handler: Optional[
-            Union[
-                Callable[[TagType, str, str], Any],
-                Callable[[str], Any]
-            ]
+            Union[BulkDataHandlerType, Callable[[str], bytes]]
         ] = None
     ) -> None:
         """Create a new converter instance.
@@ -108,41 +115,46 @@ class JsonDataElementConverter:
         Parameters
         ----------
         dataset_class : dataset.Dataset derived class
-            Class used to create sequence items.
-        tag : BaseTag
-            The data element tag or int.
+            The class object to use for **SQ** element items.
+        tag : str
+            The data element's tag in uppercase hex format like ``"7FE00010"``.
         vr : str
             The data element value representation.
-        value : Any
-            The data element's value(s).
+        value : str or List[Union[None, str, int, float, dict]]
+            The attribute value for the JSON object's "Value", "InlineBinary"
+            or "BulkDataURI" field. If there's no such attribute then `value`
+            will be ``[""]``.
         value_key : str or None
-            Key of the data element that contains the value
-            (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
-        bulk_data_uri_handler: callable or None
-            Callable function that accepts either the tag, vr and "BulkDataURI"
-            or just the "BulkDataURI" of the JSON
-            representation of a data element and returns the actual value of
-            that data element (retrieved via DICOMweb WADO-RS)
+            The attribute name for `value`, should be one of:
+            ``{"Value", "InlineBinary", "BulkDataURI"}``. If the element's VM
+            is ``0`` and none of the keys are used then will be ``None``.
+        bulk_data_uri_handler: callable, optional
+            Callable function that accepts either the `tag`, `vr` and the
+            "BulkDataURI" `value`, or just the "BulkDataURI" `value` of the
+            JSON representation of a data element and returns the actual
+            value of that data element (retrieved via DICOMweb WADO-RS) as
+            :class:`bytes`. If no `bulk_data_uri_handler` is
+            specified (default) then the corresponding element will have an
+            "empty" value such as ``""``, ``b""`` or ``None`` depending on the
+            `vr` (i.e. the Value Multiplicity will be 0).
         """
         self.dataset_class = dataset_class
         self.tag = tag
         self.vr = vr
         self.value = value
         self.value_key = value_key
-
-        HandlerType = Optional[Callable[[TagType, str, str], Any]]
-        self.bulk_data_element_handler: HandlerType
+        self.bulk_data_element_handler: BulkDataHandlerType
 
         handler = bulk_data_uri_handler
         if handler and len(signature(handler).parameters) == 1:
             # handler is Callable[[str], Any]
-            def wrapper(tag: TagType, vr: str, value: str) -> Any:
-                x = cast(Callable[[str], Any], handler)
+            def wrapper(tag: str, vr: str, value: str) -> bytes:
+                x = cast(Callable[[str], bytes], handler)
                 return x(value)
 
             self.bulk_data_element_handler = wrapper
         else:
-            self.bulk_data_element_handler = cast(HandlerType, handler)
+            self.bulk_data_element_handler = cast(BulkDataHandlerType, handler)
 
     def get_element_values(self) -> Any:
         """Return a the data element value or list of values.
@@ -153,6 +165,9 @@ class JsonDataElementConverter:
             The value or value list of the newly created data element.
         """
         from pydicom.dataelem import empty_value_for_VR
+
+        if self.value_key is None:
+            return empty_value_for_VR(self.vr)
 
         # An attribute with an empty value shall have no "Value", "BulkDataURI"
         #   or "InlineBinary"
@@ -169,10 +184,8 @@ class JsonDataElementConverter:
             if not self.value:
                 return empty_value_for_VR(self.vr)
 
-            element_value = [
-                self.get_regular_element_value(v) for v in self.value
-            ]
-
+            val = cast(List[ValueType], self.value)
+            element_value = [self.get_regular_element_value(v) for v in val]
             if len(element_value) == 1 and self.vr != 'SQ':
                 element_value = element_value[0]
 
@@ -183,22 +196,23 @@ class JsonDataElementConverter:
         # PS3.18, Annex F.4 shows the string enclosed in a list.
         # We support both variants, as the standard is ambiguous here,
         # and do the same for "BulkDataURI".
-        value = self.value
+        value = cast(Union[str, List[str]], self.value)
         if isinstance(value, list):
             value = value[0]
 
         if self.value_key == 'InlineBinary':
             # The `value` should be a base64 encoded str
-            if not isinstance(value, (str, bytes)):
+            if not isinstance(value, str):
                 raise TypeError(
-                    f"'{self.value_key}' of data element '{self.tag}' must "
-                    "be a bytes-like object"
+                    f"Invalid attribute value for data element '{self.tag}' - "
+                    "the value for 'InlineBinary' must be str, not "
+                    f"{type(value).__name__}"
                 )
 
             return base64.b64decode(value)  # bytes
 
         if self.value_key == 'BulkDataURI':
-            # The `value` should be a str
+            # The `value` should be a URI as a str
             if not isinstance(value, str):
                 raise TypeError(
                     f"'{self.value_key}' of data element '{self.tag}' must "
@@ -210,18 +224,20 @@ class JsonDataElementConverter:
                     'No bulk data URI handler provided for retrieval '
                     f'of value of data element "{self.tag}"'
                 )
-                return empty_value_for_VR(self.vr, raw=True)
+                return empty_value_for_VR(self.vr)
 
             return self.bulk_data_element_handler(self.tag, self.vr, value)
 
-        return empty_value_for_VR(self.vr)
+        raise ValueError(
+            f"Unknown attribute name '{self.value_key}' for tag {self.tag}"
+        )
 
-    def get_regular_element_value(self, value: Any) -> Any:
+    def get_regular_element_value(self, value: ValueType) -> Any:
         """Return a the data element value created from a json "Value" entry.
 
         Parameters
         ----------
-        value : Any
+        value : List[Union[None, str, int, float, dict]]
             The data element's value from the json entry.
 
         Returns
@@ -229,11 +245,16 @@ class JsonDataElementConverter:
         Any
             A single value of the corresponding :class:`DataElement`.
         """
+        from pydicom.dataelem import empty_value_for_VR
+
         # Table F.2.3-1 has JSON type mappings
         if self.vr == 'SQ':  # Dataset
             # May be an empty dict
             value = cast(Dict[str, Any], value)
             return self.get_sequence_item(value)
+
+        if value is None:
+            return empty_value_for_VR(self.vr)
 
         if self.vr == 'PN':  # str
             value = cast(Dict[str, str], value)
@@ -251,6 +272,7 @@ class JsonDataElementConverter:
 
             return None
 
+        # List[Union[None, str, int, float]]
         return value
 
     def get_sequence_item(self, value: SQValueType) -> "Dataset":
@@ -309,7 +331,7 @@ class JsonDataElementConverter:
 
         return ds
 
-    def get_pn_element_value(self, value: PNValueType) -> str:
+    def get_pn_element_value(self, value: Union[str, Dict[str, str]]) -> str:
         """Return PersonName value from JSON value.
 
         Values with VR PN have a special JSON encoding, see the DICOM Standard,

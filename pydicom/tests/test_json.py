@@ -292,6 +292,8 @@ class TestSequence:
                               match='No bulk data URI handler provided '):
                 ds = Dataset.from_json(f.read())
             del ds.PixelData
+            assert ds.AcquisitionMatrix == [128, 0, 0, 32, None]
+
         ds2 = Dataset.from_json(ds.to_json())
         assert ds == ds2
 
@@ -312,8 +314,8 @@ class TestBinary:
 
     def test_invalid_inline_binary(self):
         msg = (
-            "'InlineBinary' of data element '00091002' must be a "
-            "bytes-like object"
+            "Invalid attribute value for data element '00091002' - the value "
+            "for 'InlineBinary' must be str, not int"
         )
         ds_json = '{"00091002": {"vr": "OB", "InlineBinary": 42}}'
         with pytest.raises(TypeError, match=msg):

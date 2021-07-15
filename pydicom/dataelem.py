@@ -233,18 +233,19 @@ class DataElement:
     def from_json(
         cls: Type["DataElement"],
         dataset_class: Type["Dataset"],
-        tag: TagType,
+        tag: str,
         vr: str,
         value: Any,
         value_key: Optional[str],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[TagType, str, str], Any],
-                Callable[[str], Any]
+                Callable[[str, str, str], bytes],
+                Callable[[str], bytes]
             ]
         ] = None
     ) -> "DataElement":
-        """Return a :class:`DataElement` from JSON.
+        """Return a :class:`DataElement` from a DICOM JSON Model attribute
+        object.
 
         .. versionadded:: 1.3
 
@@ -252,20 +253,24 @@ class DataElement:
         ----------
         dataset_class : dataset.Dataset derived class
             Class used to create sequence items.
-        tag : pydicom.tag.BaseTag, int or str
-            The data element tag.
+        tag : str
+            The data element's tag as uppercase hex.
         vr : str
-            The data element value representation.
-        value : Any
+            The data element's value representation (VR).
+        value : str or List[Union[None, str, int, float, dict]]
             The data element's value(s).
         value_key : str or None
             Key of the data element that contains the value
             (options: ``{"Value", "InlineBinary", "BulkDataURI"}``)
         bulk_data_uri_handler: callable or None
-            Callable function that accepts either the tag, vr and "BulkDataURI"
-            or just the "BulkDataURI" of the JSON
+            Callable function that accepts either the `tag`, `vr` and "BulkDataURI"
+            `value` or just the "BulkDataURI" `value` of the JSON
             representation of a data element and returns the actual value of
-            that data element (retrieved via DICOMweb WADO-RS)
+            that data element (retrieved via DICOMweb WADO-RS) as
+            :class:`bytes`. If no `bulk_data_uri_handler` is specified
+            (default) then the corresponding element will have an "empty"
+            value such as ``""``, ``b""`` or ``None`` depending on the
+            `vr` (i.e. the Value Multiplicity will be 0).
 
         Returns
         -------

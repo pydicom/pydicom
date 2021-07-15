@@ -216,9 +216,8 @@ def _dict_equal(
             )
 
 
-_Dataset = TypeVar("_Dataset", bound="Dataset")
 _DatasetValue = Union[DataElement, RawDataElement]
-_DatasetType = Union[_Dataset, MutableMapping[BaseTag, _DatasetValue]]
+_DatasetType = Union["Dataset", MutableMapping[BaseTag, _DatasetValue]]
 
 
 class Dataset:
@@ -2390,16 +2389,16 @@ class Dataset:
 
     @classmethod
     def from_json(
-        cls: Type[_Dataset],
+        cls: Type["Dataset"],
         json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
         bulk_data_uri_handler: Optional[
             Union[
-                Callable[[TagType, str, str], Any],
-                Callable[[str], Any]
+                Callable[[str, str, str], bytes],
+                Callable[[str], bytes]
             ]
         ] = None
-    ) -> _Dataset:
-        """Add elements to the :class:`Dataset` from DICOM JSON format.
+    ) -> "Dataset":
+        """Return a :class:`Dataset` from a DICOM JSON Model object.
 
         .. versionadded:: 1.3
 
@@ -2409,13 +2408,17 @@ class Dataset:
         ----------
         json_dataset : dict, str, bytes or bytearray
             :class:`dict`, :class:`str`, :class:`bytes` or :class:`bytearray`
-            representing a DICOM Data Set formatted based on the DICOM JSON
-            Model.
+            representing a DICOM Data Set formatted based on the :dcm:`DICOM
+            JSON Model<part18/chapter_F.html>`.
         bulk_data_uri_handler : callable, optional
-            Callable function that accepts either the tag, vr and "BulkDataURI"
-            or just the "BulkDataURI" of the JSON
-            representation of a data element and returns the actual value of
-            data element (retrieved via DICOMweb WADO-RS).
+            Callable function that accepts either a *tag*, *vr* and
+            "BulkDataURI" *value* (as str, str, str) or just the "BulkDataURI"
+            *value* of the JSON representation of a data element and returns
+            the actual value of that data element (retrieved via DICOMweb
+            WADO-RS) as :class:`bytes`. If no `bulk_data_uri_handler` is
+            specified (default) then the corresponding element will have an
+            "empty" value such as ``""``, ``b""`` or ``None`` depending on the
+            VR (i.e. the Value Multiplicity will be 0).
 
         Returns
         -------
@@ -2426,6 +2429,10 @@ class Dataset:
 
         dataset = cls()
         for tag, mapping in json_dataset.items():
+            # `tag` is an element tag in uppercase hex format as a str
+            # `mapping` is Dict[str, Any] and should have keys 'vr' and at most
+            #   one of ('Value', 'BulkDataURI', 'InlineBinary') but may have
+            #   none of those if the element's VM is 0
             vr = mapping['vr']
             unique_value_keys = tuple(
                 set(mapping.keys()) & set(jsonrep.JSON_VALUE_KEYS)
