@@ -167,8 +167,8 @@ class JsonDataElementConverter:
         """
         from pydicom.dataelem import empty_value_for_VR
 
-        # An attribute with an empty value should have no "Value", "BulkDataURI"
-        #   or "InlineBinary"
+        # An attribute with an empty value should have no "Value",
+        #   "BulkDataURI" or "InlineBinary"
         if self.value_key is None:
             return empty_value_for_VR(self.vr)
 
