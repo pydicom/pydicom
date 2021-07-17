@@ -122,15 +122,16 @@ def _decompress_single_frame(
     # decompression.
     if (transfer_syntax in PillowJPEGTransferSyntaxes and
             photometric_interpretation == 'RGB'):
-        color_mode = 'YCbCr'
-        image.tile = [(
-            'jpeg',
-            image.tile[0][1],
-            image.tile[0][2],
-            (color_mode, ''),
-        )]
-        image.mode = color_mode
-        image.rawmode = color_mode
+        if 'adobe_transform' not in image.info:
+            color_mode = 'YCbCr'
+            image.tile = [(
+                'jpeg',
+                image.tile[0][1],
+                image.tile[0][2],
+                (color_mode, ''),
+            )]
+            image.mode = color_mode
+            image.rawmode = color_mode
     return image
 
 
