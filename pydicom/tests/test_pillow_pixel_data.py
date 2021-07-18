@@ -64,7 +64,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")
 JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_jpeg_no_color_transform.dcm")
-JPGB_08_08_3_0_1F_RGB_APP14 = get_testdata_file("SC_jpeg_no_color_transform_2.dcm")
+JPGB_08_08_3_0_1F_RGB_APP14 = get_testdata_file("SC_jpeg_no_color_transform_2.dcm")  # noqa
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
 
