@@ -441,7 +441,7 @@ class DataElement:
         # * All byte VRs
         exclusions = [
             'LT', 'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'ST', 'UN', 'UT',
-            'OB/OW', 'OW/OB', 'OB or OW', 'OW or OB',
+            'OB or OW',
             # Probably not needed
             'AT', 'FD', 'FL', 'SQ', 'SS', 'SL', 'UL',
         ]

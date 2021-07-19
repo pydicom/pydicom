@@ -150,7 +150,7 @@ class JsonDataElementConverter:
         if handler and len(signature(handler).parameters) == 1:
             # `handler` is Callable[[str], BulkDataType]
             def wrapper(tag: str, vr: str, value: str) -> BulkDataType:
-                x = cast(Callable[[str], bytes], handler)
+                x = cast(Callable[[str], BulkDataType], handler)
                 return x(value)
 
             self.bulk_data_element_handler = wrapper
