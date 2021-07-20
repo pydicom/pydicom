@@ -1176,8 +1176,5 @@ writers = {
     'US or SS': (write_OWvalue, None),
     'US or OW': (write_OWvalue, None),
     'US or SS or OW': (write_OWvalue, None),
-    'OW/OB': (write_OBvalue, None),
-    'OB/OW': (write_OBvalue, None),
     'OB or OW': (write_OBvalue, None),
-    'OW or OB': (write_OBvalue, None),
-}  # note OW/OB depends on other items, which we don't know at write time
+}

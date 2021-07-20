@@ -824,12 +824,8 @@ converters = {
     'US': (convert_numbers, 'H'),
     'UT': convert_single_string,
     'UV': (convert_numbers, 'Q'),
-    'OW/OB': convert_OBvalue,  # note OW/OB depends on other items,
-    'OB/OW': convert_OBvalue,  # which we don't know at read time
-    'OW or OB': convert_OBvalue,
     'OB or OW': convert_OBvalue,
     'US or SS': convert_OWvalue,
     'US or OW': convert_OWvalue,
     'US or SS or OW': convert_OWvalue,
-    'US\\US or SS\\US': convert_OWvalue,
 }

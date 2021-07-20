@@ -15,7 +15,7 @@ class Code(NamedTuple):
     value: str
     scheme_designator: str
     meaning: str
-    scheme_version: Optional[str]
+    scheme_version: Optional[str] = None
 
     def __hash__(self) -> int:
         return hash(self.scheme_designator + self.value)
