@@ -13,9 +13,8 @@ import warnings
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
-# Order of keys is significant!
-JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary',)
 
+JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary')
 BINARY_VR_VALUES = [
     'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'UN',
     'OB or OW', 'US or OW', 'US or SS or OW'
