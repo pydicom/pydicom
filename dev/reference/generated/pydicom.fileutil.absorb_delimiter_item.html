@@ -104,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -138,7 +138,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.find_bytes.html">pydicom.fileutil.find_bytes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.find_delimiter.html">pydicom.fileutil.find_delimiter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.length_of_undefined_length.html">pydicom.fileutil.length_of_undefined_length</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.read_delimiter_item.html">pydicom.fileutil.read_delimiter_item</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.fileutil.read_undefined_length_value.html">pydicom.fileutil.read_undefined_length_value</a></li>
 </ul>
 </li>
@@ -149,14 +148,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -236,7 +235,7 @@
 <h1>pydicom.fileutil.absorb_delimiter_item<a class="headerlink" href="#pydicom-fileutil-absorb-delimiter-item" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.fileutil.absorb_delimiter_item">
-<span class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></span><span class="sig-name descname"><span class="pre">absorb_delimiter_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">BinaryIO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/506ecea8f/pydicom/fileutil.py#L17"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.absorb_delimiter_item" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.fileutil.</span></span><span class="sig-name descname"><span class="pre">absorb_delimiter_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">BinaryIO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/154670084/pydicom/fileutil.py#L17"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileutil.absorb_delimiter_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read (and ignore) undefined length sequence or item terminators.</p>
 </dd></dl>
 

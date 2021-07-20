@@ -63,5 +63,6 @@
       ~DT.second
       ~DT.tzinfo
       ~DT.year
+      ~DT.original_string
    
    

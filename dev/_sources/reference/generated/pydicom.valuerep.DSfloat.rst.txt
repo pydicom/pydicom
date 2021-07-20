@@ -30,5 +30,6 @@
    
       ~DSfloat.imag
       ~DSfloat.real
+      ~DSfloat.auto_format
    
    

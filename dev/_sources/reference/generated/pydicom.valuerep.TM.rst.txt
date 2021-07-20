@@ -39,5 +39,6 @@
       ~TM.resolution
       ~TM.second
       ~TM.tzinfo
+      ~TM.original_string
    
    
