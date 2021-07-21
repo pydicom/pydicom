@@ -4,7 +4,6 @@ import pytest
 from pydicom.sr._cid_dict import cid_concepts as CID_CONCEPTS
 from pydicom.sr.coding import Code
 from pydicom.sr.codedict import codes, _CID_Dict, _CodesDict
-from pydicom.uid import UID
 
 
 @pytest.fixture()
