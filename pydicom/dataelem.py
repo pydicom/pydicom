@@ -533,38 +533,40 @@ class DataElement:
         # If the value is a byte string and has a VR that can only be encoded
         # using the default character repertoire, we convert it to a string
         # here to allow for byte string input in these cases
-        if _is_bytes(val) and self.VR in (
-                'AE', 'AS', 'CS', 'DA', 'DS', 'DT', 'IS', 'TM', 'UI', 'UR'):
+        if (
+            isinstance(val, bytes)
+            and self.VR in (
+                'AE', 'AS', 'CS', 'DA', 'DS', 'DT', 'IS', 'TM', 'UI', 'UR'
+            )
+        ):
             val = val.decode()
 
         if self.VR == 'IS':
             return pydicom.valuerep.IS(val)
-        elif self.VR == 'DA' and config.datetime_conversion:
+
+        if self.VR == 'DA' and config.datetime_conversion:
             return pydicom.valuerep.DA(val)
-        elif self.VR == 'DS':
+
+        if self.VR == 'DS':
             return pydicom.valuerep.DS(val)
-        elif self.VR == 'DT' and config.datetime_conversion:
+
+        if self.VR == 'DT' and config.datetime_conversion:
             return pydicom.valuerep.DT(val)
-        elif self.VR == 'TM' and config.datetime_conversion:
+
+        if self.VR == 'TM' and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
-        elif self.VR == "UI":
+
+        if self.VR == "UI":
             return UID(val) if val is not None else None
-        elif self.VR == "PN":
+
+        if self.VR == "PN":
             return PersonName(val)
-        elif self.VR == "AT" and (val == 0 or val):
+
+        if self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
-        # Later may need this for PersonName as for UI,
-        #    but needs more thought
-        # elif self.VR == "PN":
-        #    return PersonName(val)
-        else:  # is either a string or a type 2 optionally blank string
-            return val  # this means a "numeric" value could be empty string ""
-        # except TypeError:
-            # print "Could not convert value '%s' to VR '%s' in tag %s" \
-            # % (repr(val), self.VR, self.tag)
-        # except ValueError:
-            # print "Could not convert value '%s' to VR '%s' in tag %s" \
-            # % (repr(val), self.VR, self.tag)
+
+        return val  # this means a "numeric" value could be empty string ""
+
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
@@ -624,14 +626,15 @@ class DataElement:
                 pass
             else:
                 if length > self.maxBytesToDisplay:
-                    return "Array of %d elements" % length
+                    return f"Array of {length} elements"
+
         if self.VM > self.maxBytesToDisplay:
-            repVal = "Array of %d elements" % self.VM
-        elif isinstance(self.value, UID):
-            repVal = self.value.name
-        else:
-            repVal = repr(self.value)  # will tolerate unicode too
-        return repVal
+            return f"Array of {self.VM} elements"
+
+        if isinstance(self.value, UID):
+            return self.value.name
+
+        return repr(self.value)
 
     def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
@@ -665,7 +668,7 @@ class DataElement:
                     #   and clear that cannot access it by name
                     name = private_dictionary_description(
                         self.tag, self.private_creator)
-                    name = "[%s]" % (name)
+                    name = f"[{name}]"
                 except KeyError:
                     pass
             elif self.tag.element >> 8 == 0:
