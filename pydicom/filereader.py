@@ -1241,8 +1241,8 @@ def _get_bot(fp: DicomFile, number_of_frames: int) -> List[int]:
     Returns
     -------
     List[int]
-        Offset of each Frame item in bytes from the first byte of the Pixel Data
-        element following the BOT item
+        Offset of each Frame item in bytes from the first byte of the Pixel
+        Data element following the BOT item
 
     Note
     ----
@@ -1285,8 +1285,8 @@ def _read_bot(fp: DicomFile) -> List[int]:
     Returns
     -------
     List[int]
-        Offset of each Frame item in bytes from the first byte of the Pixel Data
-        element following the BOT item
+        Offset of each Frame item in bytes from the first byte of the Pixel
+        Data element following the BOT item
 
     Note
     ----
@@ -1328,8 +1328,8 @@ def _build_bot(fp: DicomFile, number_of_frames: int) -> List[int]:
     Returns
     -------
     List[int]
-        Offset of each Frame item in bytes from the first byte of the Pixel Data
-        element following the BOT item
+        Offset of each Frame item in bytes from the first byte of the Pixel
+        Data element following the BOT item
 
     Note
     ----
@@ -1358,8 +1358,8 @@ def _build_bot(fp: DicomFile, number_of_frames: int) -> List[int]:
         if int(tag) != ItemTag:
             fp.seek(initial_position, 0)
             raise IOError(
-                'Building Basic Offset Table (BOT) failed. '
-                f'Expected tag of Frame item #{i} at position {frame_position}.'
+                'Building Basic Offset Table (BOT) failed. Expected tag of '
+                f'Frame item #{i} at position {frame_position}.'
             )
         length = fp.read_UL()
         if length % 2:
