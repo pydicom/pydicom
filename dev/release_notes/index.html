@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Release notes &mdash; pydicom 2.2.0.dev0 documentation</title>
+  <title>Release notes &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
@@ -78,7 +78,7 @@
             
             
               <div class="version">
-                2.2.0.dev0
+                2.2.0-rc.1
               </div>
             
           
@@ -452,6 +452,9 @@ and ‘gdcm’ plugins</p></li>
 <li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
 to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
 <li><p>Handle decoded RLE segments with padding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1438">#1438</a>)</p></li>
+<li><p>Add option to JSON functions to suppress exception and continue (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1332">#1332</a>)</p></li>
+<li><p>Allow searching <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> s for a list of elements (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1428">#1428</a>)</p></li>
+<li><p>Added hash function to SR <code class="xref py py-class docutils literal notranslate"><span class="pre">Code</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1434">#1434</a>)</p></li>
 </ul>
 </div>
 <div class="section" id="fixes">
@@ -475,6 +478,7 @@ when an encoded backslash was part of the element value (<a class="reference ext
 segmented LUTs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1415">#1415</a>)</p></li>
 <li><p>Fixed handling of code extensions with person name component delimiter
 (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1449">#1449</a>)</p></li>
+<li><p>Fixed bug decoding RBG jpg with APP14 marker due to change in Pillow (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1444">#1444</a>)</p></li>
 </ul>
 </div>
 </div>
