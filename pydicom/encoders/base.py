@@ -132,10 +132,7 @@ class Encoder:
                 multi-sample data.
 
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
-              the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a :doc:`suitable pixel data
-              handler </old/image_data_handlers>` must be available to
-              decompress it.
+              the uncompressed *Pixel Data* to be encoded.
             * :class:`bytes`: the uncompressed little-endian ordered pixel
               data. Using ``bytes`` as the `src` will bypass some of the
               validation checks and is only recommended for advanced users.
@@ -350,10 +347,7 @@ class Encoder:
                 multi-sample data.
 
             * :class:`~pydicom.dataset.Dataset`: the dataset containing
-              the compressed or uncompressed *Pixel Data* to be encoded. If the
-              *Pixel Data* is compressed then a :doc:`suitable pixel data
-              handler </old/image_data_handlers>` must be available to
-              decompress it.
+              the uncompressed *Pixel Data* to be encoded.
             * :class:`bytes`: the uncompressed little-endian ordered pixel
               data. Using ``bytes`` as the `src` will bypass some of the
               validation checks and is only recommended for advanced users.

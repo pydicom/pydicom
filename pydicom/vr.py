@@ -147,11 +147,6 @@ class VR(str):
         return self in _BACKSLASH_ALLOWED
 
     @property
-    def is_ambiguous(self) -> bool:
-        """Return ``True`` if the VR is ambiguous, ``False`` otherwise."""
-        return len(self) > 2
-
-    @property
     def character_repertoire(self) -> Optional[str]:
         """
 
@@ -161,6 +156,15 @@ class VR(str):
                 return k
 
         return None
+
+    @classmethod
+    def decode(vr: str, value: Any, *args: Any, **kwargs: Any) -> Any:
+        pass
+
+    @property
+    def is_ambiguous(self) -> bool:
+        """Return ``True`` if the VR is ambiguous, ``False`` otherwise."""
+        return len(self) > 2
 
     def is_like(self, t: Union[Type[_T], Tuple[Type[_T], ...]]) -> bool:
         pass
