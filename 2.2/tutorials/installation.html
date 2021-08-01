@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>How to install pydicom &mdash; pydicom 2.1.0 documentation</title>
+  <title>How to install pydicom &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,7 +104,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">How to install pydicom</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-the-official-release">Install the official release</a><ul>
@@ -119,7 +125,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -143,6 +149,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="virtualenvs.html">Creating and managing virtual environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dataset_basics.html">Dataset basics: read, access, modify, write</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pixel_data/compressing.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="waveforms.html">Waveforms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="filesets.html">DICOM File-sets and DICOMDIR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sr_basics.html">Structured Reporting</a></li>
@@ -154,14 +161,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -206,6 +213,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -217,7 +226,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -259,7 +268,7 @@ from PyPi is using <a class="reference external" href="https://pip.pypa.io/">pip
 <p>You can also perform an offline installation by
 <a class="reference external" href="https://github.com/pydicom/pydicom/releases">downloading</a> and installing
 one of the release <code class="docutils literal notranslate"><span class="pre">*.whl</span></code> files. For example, with the v2.0 release:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pydicom</span><span class="o">-</span><span class="mf">2.0</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">py3</span><span class="o">-</span><span class="n">none</span><span class="o">-</span><span class="nb">any</span><span class="o">.</span><span class="n">whl</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pydicom</span><span class="o">-</span><span class="mf">2.0.0</span><span class="o">-</span><span class="n">py3</span><span class="o">-</span><span class="n">none</span><span class="o">-</span><span class="nb">any</span><span class="o">.</span><span class="n">whl</span>
 </pre></div>
 </div>
 </div>
@@ -288,7 +297,7 @@ install the <em>pydicom-data</em> repository:</p>
 </div>
 </div>
 <div class="section" id="install-the-optional-libraries">
-<span id="tut-install-libs"></span><h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this headline">¶</a></h2>
+<span id="tut-install-np"></span><span id="tut-install-libs"></span><h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this headline">¶</a></h2>
 <p>If you’re going to be manipulating pixel data then
 <a class="reference external" href="https://numpy.org/">NumPy</a> is required.</p>
 <p>Using pip:</p>
@@ -304,7 +313,7 @@ need to be installed. See <a class="reference internal" href="../old/image_data_
 which library is needed to handle a given JPEG format, as specified by
 the dataset’s (0002,0010) <em>Transfer Syntax UID</em> value.</p>
 <div class="section" id="installing-pillow">
-<h3>Installing Pillow<a class="headerlink" href="#installing-pillow" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-pil"></span><h3>Installing Pillow<a class="headerlink" href="#installing-pillow" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://pillow.readthedocs.io/">Pillow</a> is a popular Python imaging library
 that can handle the decompression of some JPEG and JPEG 2000 images.</p>
 <p>Using pip; you may need to make sure that the
@@ -337,25 +346,25 @@ decompress JPEG-LS images.</p>
 </div>
 </div>
 <div class="section" id="installing-gdcm">
-<h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-gdcm"></span><h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
-<p>Unfortunately there’s no easy way to install the Python GDCM bindings
-using pip. <a class="reference external" href="https://github.com/pydicom/pydicom/wiki/Installing-the-Python-GDCM-bindings-without-Conda">This page</a>
-has instructions for installing in a virtual environment in Ubuntu
-19.04+ or Debian Buster+ using the <code class="docutils literal notranslate"><span class="pre">python3-gdcm</span></code> package.</p>
+<p>Using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">gdcm</span>
+</pre></div>
+</div>
 <p>Through conda:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">gdcm</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="installing-pylibjpeg">
-<h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-pylj"></span><h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> is a Python framework for
-decompressing JPEG, JPEG-LS and JPEG 2000 images provided a suitable plugin
-is installed.</p>
+decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
+RLE images provided a suitable plugin is installed.</p>
 <p>Using pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pylibjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">libjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">openjpeg</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pylibjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">libjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">openjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">rle</span>
 </pre></div>
 </div>
 </div>
@@ -389,37 +398,29 @@ within the <code class="docutils literal notranslate"><span class="pre">pydicom<
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../old/getting_started.html" class="btn btn-neutral float-right" title="Introduction to pydicom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../index.html" class="btn btn-neutral float-left" title="pydicom documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../old/getting_started.html" class="btn btn-neutral float-right" title="Introduction to pydicom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="pydicom documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -1,0 +1,36 @@
+﻿pydicom.encoders.base.Encoder
+=============================
+
+.. currentmodule:: pydicom.encoders.base
+
+.. autoclass:: Encoder
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Encoder.__init__
+      ~Encoder.add_plugin
+      ~Encoder.encode
+      ~Encoder.iter_encode
+      ~Encoder.kwargs_from_ds
+      ~Encoder.remove_plugin
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Encoder.UID
+      ~Encoder.is_available
+      ~Encoder.missing_dependencies
+      ~Encoder.name
+   
+   

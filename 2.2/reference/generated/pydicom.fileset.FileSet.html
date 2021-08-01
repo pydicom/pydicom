@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pydicom.fileset.FileSet &mdash; pydicom 2.1.0 documentation</title>
+  <title>pydicom.fileset.FileSet &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -118,6 +124,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.RecordNode.html">pydicom.fileset.RecordNode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.FileInstance.html">pydicom.fileset.FileInstance</a></li>
@@ -136,14 +143,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -188,6 +195,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -203,7 +212,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -218,12 +227,12 @@
   <div class="section" id="pydicom-fileset-fileset">
 <h1>pydicom.fileset.FileSet<a class="headerlink" href="#pydicom-fileset-fileset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.fileset.FileSet">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.fileset.</code><code class="sig-name descname">FileSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L934"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">FileSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L954"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of a DICOM File-set.</p>
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L936"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L956"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create or load a File-set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -258,8 +267,8 @@ to the DICOMDIR file.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.fileset.FileSet.find" title="pydicom.fileset.FileSet.find"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find</span></code></a>([load])</p></td>
 <td><p>Return matching instances in the File-set</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.fileset.FileSet.find_values" title="pydicom.fileset.FileSet.find_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_values</span></code></a>(element[, instances, load])</p></td>
-<td><p>Return a list of unique values for a given element.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.fileset.FileSet.find_values" title="pydicom.fileset.FileSet.find_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_values</span></code></a>(elements[, instances, load])</p></td>
+<td><p>Return a list of unique values for given element(s).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.fileset.FileSet.load" title="pydicom.fileset.FileSet.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(ds_or_path[, include_orphans, …])</p></td>
 <td><p>Load an existing File-set.</p></td>
@@ -299,21 +308,21 @@ to the DICOMDIR file.</p>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.ID">
-<em class="property">property </em><code class="sig-name descname">ID</code><a class="headerlink" href="#pydicom.fileset.FileSet.ID" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.ID">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ID</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[str]</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.ID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>File-set ID</em> (if available) or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.UID">
-<em class="property">property </em><code class="sig-name descname">UID</code><a class="headerlink" href="#pydicom.fileset.FileSet.UID" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.UID">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">UID</span></span><em class="property"><span class="pre">:</span> <span class="pre">pydicom.uid.UID</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.UID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the File-set’s UID.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds_or_path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L987"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.add" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_or_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1005"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stage an instance for addition to the File-set.</p>
 <p>If the instance has been staged for removal then calling
 <a class="reference internal" href="#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> will cancel the staging
@@ -337,8 +346,8 @@ and the instance will not be removed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.add_custom">
-<code class="sig-name descname">add_custom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds_or_path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">leaf</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode">pydicom.fileset.RecordNode</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1057"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.add_custom" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.add_custom">
+<span class="sig-name descname"><span class="pre">add_custom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_or_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leaf</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1076"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.add_custom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stage an instance for addition to the File-set using custom records.</p>
 <p>This method allows you to add a SOP instance and customize the
 directory records that will be used when writing the DICOMDIR file. It
@@ -417,14 +426,14 @@ structure.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.clear">
-<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1188"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.clear" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1208"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.clear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the File-set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">force_implicit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet">pydicom.fileset.FileSet</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1208"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.copy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_implicit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><span class="pre">pydicom.fileset.FileSet</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1228"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Copy the File-set to a new root directory and return the copied
 File-set.</p>
 <p>Changes staged to the original <a class="reference internal" href="#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> will
@@ -448,22 +457,22 @@ VR Little Endian</em> which is non-conformant to the DICOM Standard
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.descriptor_character_set">
-<em class="property">property </em><code class="sig-name descname">descriptor_character_set</code><a class="headerlink" href="#pydicom.fileset.FileSet.descriptor_character_set" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.descriptor_character_set">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">descriptor_character_set</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[str]</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.descriptor_character_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>Specific Character Set of File-set Descriptor File</em>
 (if available) or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.descriptor_file_id">
-<em class="property">property </em><code class="sig-name descname">descriptor_file_id</code><a class="headerlink" href="#pydicom.fileset.FileSet.descriptor_file_id" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.descriptor_file_id">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">descriptor_file_id</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[str]</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.descriptor_file_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>File-set Descriptor File ID</em> (if available) or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.find">
-<code class="sig-name descname">find</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">load</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">pydicom.fileset.FileInstance</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1414"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.find" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1436"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.find" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return matching instances in the File-set</p>
 <p><strong>Limitations</strong></p>
 <ul class="simple">
@@ -495,13 +504,13 @@ number of elements are available).</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.find_values">
-<code class="sig-name descname">find_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">instances</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">pydicom.fileset.FileInstance</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">load</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Any<span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1479"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.find_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of unique values for a given element.</p>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.find_values">
+<span class="sig-name descname"><span class="pre">find_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elements</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instances</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1501"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.find_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of unique values for given element(s).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>element</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><em>pydicom.tag.BaseTag</em></a>) – The keyword or tag of the element to search for.</p></li>
+<li><p><strong>elements</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><em>pydicom.tag.BaseTag</em></a><em>, or </em><em>list of these</em>) – The keyword or tag of the element(s) to search for.</p></li>
 <li><p><strong>instances</strong> (<em>list of pydicom.fileset.FileInstance</em><em>, </em><em>optional</em>) – Search within the given instances. If not used then all available
 instances will be searched.</p></li>
 <li><p><strong>load</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, then load the SOP Instances belonging to the
@@ -512,23 +521,29 @@ number of elements are available).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of value(s) for the element available in the instances.</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If single element was queried: A list of value(s) for the element
+available in the instances.</p></li>
+<li><p>If list of elements was queried: A dict of element value pairs
+with lists of value(s) for the elements available in the instances.</p></li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of object</p>
+<dd class="field-odd"><p>list of object(s), or dict of lists of object(s)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.is_staged">
-<em class="property">property </em><code class="sig-name descname">is_staged</code><a class="headerlink" href="#pydicom.fileset.FileSet.is_staged" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.is_staged">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_staged</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.is_staged" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the File-set is new or has changes staged.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.load">
-<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ds_or_path</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">include_orphans</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">raise_orphans</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1576"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.load" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_or_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_orphans</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_orphans</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1613"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an existing File-set.</p>
 <p>Existing File-sets that do not use the same directory structure as
 <em>pydicom</em> will be staged to be moved to a new structure. This is
@@ -550,16 +565,16 @@ are found in the File-set (default <code class="docutils literal notranslate"><s
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.fileset.FileSet.path">
-<em class="property">property </em><code class="sig-name descname">path</code><a class="headerlink" href="#pydicom.fileset.FileSet.path" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.path">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[str]</span></em><a class="headerlink" href="#pydicom.fileset.FileSet.path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the absolute path to the File-set root directory as
 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (if set) or <code class="docutils literal notranslate"><span class="pre">None</span></code> otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.remove">
-<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">pydicom.fileset.FileInstance</a><span class="p">, </span>List<span class="p">[</span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance">pydicom.fileset.FileInstance</a><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1879"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.remove" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><span class="pre">pydicom.fileset.FileInstance</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L1923"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stage instance(s) for removal from the File-set.</p>
 <p>If the instance has been staged for addition to the File-set, calling
 <a class="reference internal" href="#pydicom.fileset.FileSet.remove" title="pydicom.fileset.FileSet.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove()</span></code></a> will cancel the staging and
@@ -572,8 +587,8 @@ the instance will not be added.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.fileset.FileSet.write">
-<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_existing</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">force_implicit</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/fileset.py#L1988"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.fileset.FileSet.write" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.FileSet.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_existing</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_implicit</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/fileset.py#L2032"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileSet.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the File-set, or changes to the File-set, to the file system.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -634,37 +649,29 @@ VR Little Endian</em> which is non-conformant to the DICOM Standard
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="pydicom.fileset.generate_filename.html" class="btn btn-neutral float-right" title="pydicom.fileset.generate_filename" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="pydicom.fileset.FileInstance.html" class="btn btn-neutral float-left" title="pydicom.fileset.FileInstance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="pydicom.fileset.generate_filename.html" class="btn btn-neutral float-right" title="pydicom.fileset.generate_filename" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.fileset.FileInstance.html" class="btn btn-neutral float-left" title="pydicom.fileset.FileInstance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

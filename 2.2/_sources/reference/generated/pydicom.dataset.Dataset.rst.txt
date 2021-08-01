@@ -17,6 +17,7 @@
       ~Dataset.add
       ~Dataset.add_new
       ~Dataset.clear
+      ~Dataset.compress
       ~Dataset.convert_pixel_data
       ~Dataset.copy
       ~Dataset.data_element
@@ -28,7 +29,6 @@
       ~Dataset.fix_meta_info
       ~Dataset.formatted_lines
       ~Dataset.from_json
-      ~Dataset.fromkeys
       ~Dataset.get
       ~Dataset.get_item
       ~Dataset.get_private_item

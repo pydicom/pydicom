@@ -78,5 +78,6 @@
    
       ~DSdecimal.imag
       ~DSdecimal.real
+      ~DSdecimal.auto_format
    
    

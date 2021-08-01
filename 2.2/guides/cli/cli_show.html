@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pydicom show command &mdash; pydicom 2.2.0-rc.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span></code> command</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-show-command">
+<h1><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span></code> command<a class="headerlink" href="#pydicom-show-command" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>pydicom show</cite> command displays representation of DICOM files or parts of them
+from a command-line terminal.</p>
+<p>Some examples were already given in the <a class="reference internal" href="cli_guide.html#cli-intro"><span class="std std-ref">Introduction</span></a>, but here we will
+show some additional options.</p>
+<p>To see the available options, in a command-line terminal, type <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span> <span class="pre">show</span></code>
+or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span> <span class="pre">-h</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span> show
+<span class="go">usage: pydicom show [-h] [-x] [-t] [-q] filespec</span>
+
+<span class="go">Display all or part of a DICOM file</span>
+
+<span class="go">positional arguments:</span>
+<span class="go">filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`</span>
+<span class="go">                        prefix is present, then use the pydicom test file with that name. If `element`</span>
+<span class="go">                        is given, use only that data element within the file. Examples:</span>
+<span class="go">                        path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
+<span class="go">                        pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">-h, --help            show this help message and exit</span>
+<span class="go">-x, --exclude-private</span>
+<span class="go">                        Don&#39;t show private data elements</span>
+<span class="go">-t, --top             Only show top level</span>
+<span class="go">-q, --quiet           Only show basic information</span>
+</pre></div>
+</div>
+<p>The basic command with no options shows all data elements and nested sequences:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="gp gp-VirtualEnv">(0002, 0000)</span> <span class="go">File Meta Information Group Length  UL: 192</span>
+<span class="gp gp-VirtualEnv">(0002, 0001)</span> <span class="go">File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="gp gp-VirtualEnv">(0002, 0002)</span> <span class="go">Media Storage SOP Class UID         UI: CT Image Storage</span>
+<span class="gp gp-VirtualEnv">(0002, 0003)</span> <span class="go">Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="gp gp-VirtualEnv">(0002, 0010)</span> <span class="go">Transfer Syntax UID                 UI: Explicit VR Little Endian</span>
+<span class="gp gp-VirtualEnv">(0002, 0012)</span> <span class="go">Implementation Class UID            UI: 1.3.6.1.4.1.5962.2</span>
+<span class="gp gp-VirtualEnv">(0002, 0013)</span> <span class="go">Implementation Version Name         SH: &#39;DCTOOL100&#39;</span>
+<span class="gp gp-VirtualEnv">(0002, 0016)</span> <span class="go">Source Application Entity Title     AE: &#39;CLUNIE1&#39;</span>
+<span class="go">-------------------------------------------------</span>
+<span class="gp gp-VirtualEnv">(0008, 0005)</span> <span class="go">Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
+<span class="gp gp-VirtualEnv">(0008, 0008)</span> <span class="go">Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AXIAL&#39;]</span>
+<span class="gp gp-VirtualEnv">(0008, 0012)</span> <span class="go">Instance Creation Date              DA: &#39;20040119&#39;</span>
+<span class="gp gp-VirtualEnv">(0008, 0013)</span> <span class="go">Instance Creation Time              TM: &#39;072731&#39;</span>
+<span class="gp gp-VirtualEnv">(0008, 0014)</span> <span class="go">Instance Creator UID                UI: 1.3.6.1.4.1.5962.3</span>
+<span class="gp gp-VirtualEnv">(0008, 0016)</span> <span class="go">SOP Class UID                       UI: CT Image Storage</span>
+<span class="gp gp-VirtualEnv">(0008, 0018)</span> <span class="go">SOP Instance UID                    UI: 1.3.6.1.4.1.5962.1.1.1.1.1.20040119072730.12322</span>
+<span class="gp gp-VirtualEnv">(0008, 0020)</span> <span class="go">Study Date                          DA: &#39;20040119&#39;</span>
+<span class="go">.</span>
+<span class="go">.</span>
+<span class="go">.</span>
+<span class="gp gp-VirtualEnv">(0043, 104b)</span> <span class="go">[DAS xm pattern]                    SL: 0</span>
+<span class="gp gp-VirtualEnv">(0043, 104c)</span> <span class="go">[TGGC trigger mode]                 SS: 0</span>
+<span class="gp gp-VirtualEnv">(0043, 104d)</span> <span class="go">[Start scan to X-ray on delay]      FL: 0.0</span>
+<span class="gp gp-VirtualEnv">(0043, 104e)</span> <span class="go">[Duration of X-ray on]              FL: 10.60060977935791</span>
+<span class="gp gp-VirtualEnv">(7fe0, 0010)</span> <span class="go">Pixel Data                          OW: Array of 32768 elements</span>
+<span class="gp gp-VirtualEnv">(fffc, fffc)</span> <span class="go">Data Set Trailing Padding           OB: Array of 126 elements</span>
+</pre></div>
+</div>
+<p>Note that prefixing the file specification with <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> will read the file
+from the <em>pydicom</em> test data files rather than from the file system.</p>
+<p>You can also show just parts of the DICOM file by specifying a data element
+using the usual pydicom keyword notation:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm::PatientName
+<span class="go">CompressedSamples^CT1</span>
+
+<span class="gp">$ </span>pydicom show pydicom::rtplan.dcm::FractionGroupSequence
+<span class="go">[(300a, 0071) Fraction Group Number               IS: &quot;1&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0078)</span> <span class="go">Number of Fractions Planned         IS: &quot;30&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0080)</span> <span class="go">Number of Beams                     IS: &quot;1&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 00a0)</span> <span class="go">Number of Brachy Application Setups IS: &quot;0&quot;</span>
+<span class="gp gp-VirtualEnv">(300c, 0004)</span>  <span class="go">Referenced Beam Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300a, 0082)</span> <span class="go">Beam Dose Specification Point       DS: [239.531250000000, 239.531250000000, -751.87000000000]</span>
+<span class="gp gp-VirtualEnv">(300a, 0084)</span> <span class="go">Beam Dose                           DS: &quot;1.0275401&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0086)</span> <span class="go">Beam Meterset                       DS: &quot;116.0036697&quot;</span>
+<span class="gp gp-VirtualEnv">(300c, 0006)</span> <span class="go">Referenced Beam Number              IS: &quot;1&quot;</span>
+<span class="go">---------]</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">-q</span></code> quiet argument shows a minimal version of some of the information in the
+file, using just the DICOM keyword and value (not showing the tag numbers
+and VR). The example below shows the quiet mode with an image slice:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">show</span> <span class="o">-</span><span class="n">q</span> <span class="n">pydicom</span><span class="p">::</span><span class="n">ct_small</span><span class="o">.</span><span class="n">dcm</span>
+
+<span class="n">SOPClassUID</span><span class="p">:</span> <span class="n">CT</span> <span class="n">Image</span> <span class="n">Storage</span>
+<span class="n">PatientName</span><span class="p">:</span> <span class="n">CompressedSamples</span><span class="o">^</span><span class="n">CT1</span>
+<span class="n">PatientID</span><span class="p">:</span> <span class="mi">1</span><span class="n">CT1</span>
+<span class="n">StudyID</span><span class="p">:</span> <span class="mi">1</span><span class="n">CT1</span>
+<span class="n">StudyDate</span><span class="p">:</span> <span class="mi">20040119</span>
+<span class="n">StudyTime</span><span class="p">:</span> <span class="mi">072730</span>
+<span class="n">StudyDescription</span><span class="p">:</span> <span class="n">e</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">BitsStored</span><span class="p">:</span> <span class="mi">16</span>
+<span class="n">Modality</span><span class="p">:</span> <span class="n">CT</span>
+<span class="n">Rows</span><span class="p">:</span> <span class="mi">128</span>
+<span class="n">Columns</span><span class="p">:</span> <span class="mi">128</span>
+<span class="n">SliceLocation</span><span class="p">:</span> <span class="o">-</span><span class="mf">77.2040634155</span>
+</pre></div>
+</div>
+<p>And the following example shows an RT Plan in quiet mode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">show</span> <span class="o">-</span><span class="n">q</span> <span class="n">pydicom</span><span class="p">::</span><span class="n">rtplan</span><span class="o">.</span><span class="n">dcm</span>
+
+<span class="n">SOPClassUID</span><span class="p">:</span> <span class="n">RT</span> <span class="n">Plan</span> <span class="n">Storage</span>
+<span class="n">PatientName</span><span class="p">:</span> <span class="n">Last</span><span class="o">^</span><span class="n">First</span><span class="o">^</span><span class="n">mid</span><span class="o">^</span><span class="n">pre</span>
+<span class="n">PatientID</span><span class="p">:</span> <span class="n">id00001</span>
+<span class="n">StudyID</span><span class="p">:</span> <span class="n">study1</span>
+<span class="n">StudyDate</span><span class="p">:</span> <span class="mi">20030716</span>
+<span class="n">StudyTime</span><span class="p">:</span> <span class="mi">153557</span>
+<span class="n">StudyDescription</span><span class="p">:</span> <span class="n">N</span><span class="o">/</span><span class="n">A</span>
+<span class="n">Plan</span> <span class="n">Label</span><span class="p">:</span> <span class="n">Plan1</span>  <span class="n">Plan</span> <span class="n">Name</span><span class="p">:</span> <span class="n">Plan1</span>
+<span class="n">Fraction</span> <span class="n">Group</span> <span class="mi">1</span>  <span class="mi">30</span> <span class="n">fraction</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">planned</span>
+<span class="n">Brachy</span> <span class="n">Application</span> <span class="n">Setups</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Beam</span> <span class="mi">1</span> <span class="n">Dose</span> <span class="mf">1.02754010000000</span> <span class="n">Meterset</span> <span class="mf">116.003669700000</span>
+<span class="n">Beam</span> <span class="mi">1</span> <span class="s1">&#39;Field 1&#39;</span> <span class="n">TREATMENT</span> <span class="n">STATIC</span> <span class="n">PHOTON</span> <span class="n">energy</span> <span class="mf">6.00000000000000</span> <span class="n">gantry</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">coll</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">couch</span> <span class="mf">0.0</span> <span class="p">(</span><span class="mi">0</span> <span class="n">wedges</span><span class="p">,</span> <span class="mi">0</span> <span class="n">comps</span><span class="p">,</span> <span class="mi">0</span> <span class="n">boli</span><span class="p">,</span> <span class="mi">0</span> <span class="n">blocks</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Quiet modes always show the SOP Class UID, patient and study information as
+shown in the above two examples. After those elements, custom values for
+different SOP classes are shown. Currently “Image Storage” and “RT Plan Storage”
+classes have custom extra information.  Please submit an issue on the <em>pydicom</em>
+issues list or a pull request to help us expand the list of custom
+‘quiet’ mode SOP Classes.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

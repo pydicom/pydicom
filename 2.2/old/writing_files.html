@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Writing DICOM Files &mdash; pydicom 2.1.0 documentation</title>
+  <title>Writing DICOM Files &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,18 +104,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="pydicom_user_guide.html">pydicom User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="base_element.html">Core elements in pydicom</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Writing DICOM Files</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#using-the-codify-script">Using the Codify Script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-codify">Using Codify</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#writing-a-file-from-scratch">Writing a file from Scratch</a></li>
 </ul>
 </li>
@@ -117,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="working_with_overlays.html">Working with Overlay Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="working_with_waveforms.html">Working with Waveform Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="image_data_handlers.html">Handling of compressed pixel data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="image_data_compression.html">Compressing <em>Pixel Data</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="viewing_images.html">Viewing Images</a></li>
 <li class="toctree-l2"><a class="reference internal" href="private_data_elements.html">Private Data Elements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="best_practices.html">Best Practices</a></li>
@@ -128,14 +135,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -180,6 +187,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -193,7 +202,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -223,14 +232,14 @@ file meta information, and in the main dataset. Also, you should create your
 own UIDs, implementation name, and so on.</p>
 </div>
 </div>
-<div class="section" id="using-the-codify-script">
-<h2>Using the Codify Script<a class="headerlink" href="#using-the-codify-script" title="Permalink to this headline">¶</a></h2>
-<p>In the pydicom ‘util’ folder, there is a script called <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/util/codify.py">codify.py</a>.
-It takes an existing DICOM file, and produces python code. The python code
+<div class="section" id="using-codify">
+<span id="writing-files-using-codify"></span><h2>Using Codify<a class="headerlink" href="#using-codify" title="Permalink to this headline">¶</a></h2>
+<p>pydicom has a command-line utility called <code class="docutils literal notranslate"><span class="pre">codify</span></code> that
+takes an existing DICOM file, and produces Python code. The Python code
 uses pydicom to produce a copy of the original file again, when the code is
 run.</p>
 <p>In other words: pydicom has a tool that can automatically generate
-well-designed python code for you - code that creates DICOM files. The only
+well-designed Python code for you - code that creates DICOM files. The only
 requirement is that you have an existing DICOM file that looks approximately
 like the one you need. You can then use the code as a model to work from. The
 tool is especially useful with Sequences, which can be tricky to code
@@ -244,7 +253,7 @@ that information. You may want to consider using de-identified dicom files
 with codify, or handling the output files according to your requirements for
 sensitive information.</p>
 </div>
-<p>One issue to be aware of is that codify will not create code for large items
+<p>One issue to be aware of is that <code class="docutils literal notranslate"><span class="pre">codify</span></code> will not create code for large items
 like pixel data. Instead it creates a line like:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="c1"># XXX Array of 524288 bytes excluded</span>
 </pre></div>
@@ -257,28 +266,17 @@ to edit the code to supply a valid value.</p>
 element value that is coded. Data elements bigger than that will have the
 syntax error line as shown above.</p>
 </div>
-<p>One potential disadvantage of codify, depending on your use case, is that it
-does not create loops. If you have, say, 30 items in a Sequence, codify will
+<p>One potential disadvantage of <code class="docutils literal notranslate"><span class="pre">codify</span></code>, depending on your use case, is that it
+does not create loops. If you have, say, 30 items in a Sequence, <code class="docutils literal notranslate"><span class="pre">codify</span></code> will
 produce code that makes them one at a time. Code you wrote by hand would
 likely create them in a loop, because most of the code needed is quite
 repetitive. If you want to switch to a loop, you could use the first item’s
 code as a starting point, and modify as needed, deleting the code for the
 other individual items.</p>
-<p>Codify could also be called from code, rather than as a script; you can look
-at the codify.py source and the <code class="docutils literal notranslate"><span class="pre">code_file</span></code> function for a starting point
-for that.</p>
-<p>To call codify as a script, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">&lt;</span><span class="n">path</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">pydicom</span><span class="o">-</span><span class="n">util</span> <span class="n">folder</span><span class="o">&gt;/</span><span class="n">codify</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">s</span> <span class="n">savename</span> <span class="n">dicom</span><span class="o">-</span><span class="n">file</span> <span class="n">createdicomfile</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>The -s parameter is optional, but if present, is followed by a save filename
-(the DICOM filename that would be created when the code is run). If not
-specified, then a modified version of the input dicom filename is used. The
-output file (createdicomfile.py in the example above) is optional.  If nothing
-is specified, the code is written to standard output.</p>
-<p>There is also a parameter <code class="docutils literal notranslate"><span class="pre">--exclude-private</span></code> if you don’t want private data
-elements to be included in the generated code.</p>
-<p>You can also call codify with <code class="docutils literal notranslate"><span class="pre">--help</span></code> to see details of all the parameters.</p>
+<p>For details on calling the codify command, see the <a class="reference internal" href="../guides/cli/cli_guide.html#cli-codify"><span class="std std-ref">pydicom codify command</span></a> section.</p>
+<p><code class="docutils literal notranslate"><span class="pre">codify</span></code> could also be called from code, rather than from a command line; you
+can look at the codify.py source and the <code class="docutils literal notranslate"><span class="pre">code_file</span></code> function for a
+starting point for that.</p>
 </div>
 <div class="section" id="writing-a-file-from-scratch">
 <h2>Writing a file from Scratch<a class="headerlink" href="#writing-a-file-from-scratch" title="Permalink to this headline">¶</a></h2>
@@ -299,37 +297,29 @@ to create all the required DICOM data elements.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="working_with_pixel_data.html" class="btn btn-neutral float-right" title="Working with Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="base_element.html" class="btn btn-neutral float-left" title="Core elements in pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="working_with_pixel_data.html" class="btn btn-neutral float-right" title="Working with Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="base_element.html" class="btn btn-neutral float-left" title="Core elements in pydicom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

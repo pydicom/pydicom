@@ -17,6 +17,7 @@
       ~DicomDir.add
       ~DicomDir.add_new
       ~DicomDir.clear
+      ~DicomDir.compress
       ~DicomDir.convert_pixel_data
       ~DicomDir.copy
       ~DicomDir.data_element
@@ -28,7 +29,6 @@
       ~DicomDir.fix_meta_info
       ~DicomDir.formatted_lines
       ~DicomDir.from_json
-      ~DicomDir.fromkeys
       ~DicomDir.get
       ~DicomDir.get_item
       ~DicomDir.get_private_item

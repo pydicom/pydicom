@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Introduction &mdash; pydicom 2.2.0-rc.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Starting in v2.2, <em>pydicom</em> offers a useful command-line interface (CLI) for
+exploring DICOM files, and access to the <cite>codify</cite> option for creating pydicom
+Python code. Additional subcommands may be added over time.</p>
+<p>Example at the command line in a terminal window:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm
+<span class="go">Dataset.file_meta -------------------------------</span>
+<span class="gp gp-VirtualEnv">(0002, 0000)</span> <span class="go">File Meta Information Group Length  UL: 156</span>
+<span class="gp gp-VirtualEnv">(0002, 0001)</span> <span class="go">File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
+<span class="gp gp-VirtualEnv">(0002, 0002)</span> <span class="go">Media Storage SOP Class UID         UI: RT Plan Storage</span>
+<span class="gp gp-VirtualEnv">(0002, 0003)</span> <span class="go">Media Storage SOP Instance UID      UI: 1.2.999.999.99.9.9999.9999.20030903150023</span>
+<span class="gp gp-VirtualEnv">(0002, 0010)</span> <span class="go">Transfer Syntax UID                 UI: Implicit VR Little Endian</span>
+<span class="gp gp-VirtualEnv">(0002, 0012)</span> <span class="go">Implementation Class UID            UI: 1.2.888.888.88.8.8.8</span>
+<span class="go">-------------------------------------------------</span>
+<span class="gp gp-VirtualEnv">(0008, 0012)</span> <span class="go">Instance Creation Date              DA: &#39;20030903&#39;</span>
+<span class="gp gp-VirtualEnv">(0008, 0013)</span> <span class="go">Instance Creation Time              TM: &#39;150031&#39;</span>
+<span class="gp gp-VirtualEnv">(0008, 0016)</span> <span class="go">SOP Class UID                       UI: RT Plan Storage</span>
+<span class="gp gp-VirtualEnv">(0008, 0018)</span> <span class="go">SOP Instance UID                    UI: 1.2.777.777.77.7.7777.7777.20030903150023</span>
+<span class="gp gp-VirtualEnv">(0008, 0020)</span> <span class="go">Study Date                          DA: &#39;20030716&#39;</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>Note that prefixing the file specification with <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> will read the file
+from the <em>pydicom</em> test data files rather than from the normal file system.
+The following examples will use that so that you can replicate these
+examples exactly.  In normal use, you would leave the <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> prefix
+off when working with your files.</p>
+<p>You can also show just parts of the DICOM file by specifying a data element
+using the usual <em>pydicom</em> keyword notation:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm::FractionGroupSequence<span class="o">[</span><span class="m">0</span><span class="o">]</span>
+<span class="gp gp-VirtualEnv">(300a, 0071)</span> <span class="go">Fraction Group Number               IS: &quot;1&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0078)</span> <span class="go">Number of Fractions Planned         IS: &quot;30&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0080)</span> <span class="go">Number of Beams                     IS: &quot;1&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 00a0)</span> <span class="go">Number of Brachy Application Setups IS: &quot;0&quot;</span>
+<span class="gp gp-VirtualEnv">(300c, 0004)</span>  <span class="go">Referenced Beam Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300a, 0082)</span> <span class="go">Beam Dose Specification Point       DS: [239.531250000000, 239.531250000000, -751.87000000000]</span>
+<span class="gp gp-VirtualEnv">(300a, 0084)</span> <span class="go">Beam Dose                           DS: &quot;1.0275401&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0086)</span> <span class="go">Beam Meterset                       DS: &quot;116.0036697&quot;</span>
+<span class="gp gp-VirtualEnv">(300c, 0006)</span> <span class="go">Referenced Beam Number              IS: &quot;1&quot;</span>
+<span class="go">---------</span>
+</pre></div>
+</div>
+<p>You can see the available subcommands by simply typing <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> with no
+arguments, or with <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span>
+<span class="go">Use pydicom help [subcommand] to show help for a subcommand</span>
+<span class="go">Available subcommands: codify, show</span>
+</pre></div>
+</div>
+<p>And, as noted in the block above, you get help for a particular subcommand
+by typing <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span> <span class="pre">[subcommand]</span></code>.  For example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span> show
+<span class="go">usage: pydicom show [-h] [-x] [-t] [-q] filespec</span>
+
+<span class="go">Display all or part of a DICOM file</span>
+
+<span class="go">positional arguments:</span>
+<span class="go">filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`</span>
+<span class="go">                        prefix is used, then show the pydicom test file with that name. If `element`</span>
+<span class="go">                        is given, use only that data element within the file. Examples:</span>
+<span class="go">                        path/to/your_file.dcm, your_file.dcm::StudyDate,</span>
+<span class="go">                        pydicom::rtplan.dcm::BeamSequence[0], yourplan.dcm::BeamSequence[0].BeamNumber</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">-h, --help            show this help message and exit</span>
+<span class="go">-x, --exclude-private</span>
+<span class="go">                        Don&#39;t show private data elements</span>
+<span class="go">-t, --top             Only show top level</span>
+<span class="go">-q, --quiet           Only show basic information</span>
+</pre></div>
+</div>
+<div class="section" id="installing-the-pydicom-cli">
+<h2>Installing the pydicom CLI<a class="headerlink" href="#installing-the-pydicom-cli" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> command should automatically be available after you
+<cite>pip install pydicom</cite>.  It should not require any updates to the system
+path or environment variables.</p>
+<p>If you are helping develop <em>pydicom</em> code, and are using git clones,
+you will have to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">develop</span></code> from
+the <cite>pydicom</cite> repository root. This has to be repeated for any changes to
+<cite>setup.py</cite> (e.g. to add a new subcommand).</p>
+<p>If you are developing subcommands within your own package, you will need to
+reinstall your package similar to the above as you add entry points.</p>
+</div>
+<div class="section" id="combining-with-other-clis">
+<h2>Combining with other CLIs<a class="headerlink" href="#combining-with-other-clis" title="Permalink to this headline">¶</a></h2>
+<p>CLIs are useful for general exploration while programming, but also can be
+combined with other command-line filters for additional functionality. The
+following is an example of piping the output of the pydicom
+‘show’ subcommand into ‘grep’, filtering for lines with
+either “Dose” or “Sequence” in them:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::rtplan.dcm <span class="p">|</span> grep <span class="s2">&quot;Dose\|Sequence&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0010)</span>  <span class="go">Dose Reference Sequence  2 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300a, 0012)</span> <span class="go">Dose Reference Number               IS: &quot;1&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0014)</span> <span class="go">Dose Reference Structure Type       CS: &#39;COORDINATES&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0016)</span> <span class="go">Dose Reference Description          LO: &#39;iso&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0018)</span> <span class="go">Dose Reference Point Coordinates    DS: [239.531250000000, 239.531250000000, -741.87000000000]</span>
+<span class="gp gp-VirtualEnv">(300a, 0020)</span> <span class="go">Dose Reference Type                 CS: &#39;ORGAN_AT_RISK&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0023)</span> <span class="go">Delivery Maximum Dose               DS: &quot;75.0&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 002c)</span> <span class="go">Organ at Risk Maximum Dose          DS: &quot;75.0&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0012)</span> <span class="go">Dose Reference Number               IS: &quot;2&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0014)</span> <span class="go">Dose Reference Structure Type       CS: &#39;COORDINATES&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0016)</span> <span class="go">Dose Reference Description          LO: &#39;PTV&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0018)</span> <span class="go">Dose Reference Point Coordinates    DS: [239.531250000000, 239.531250000000, -751.87000000000]</span>
+<span class="gp gp-VirtualEnv">(300a, 0020)</span> <span class="go">Dose Reference Type                 CS: &#39;TARGET&#39;</span>
+<span class="gp gp-VirtualEnv">(300a, 0026)</span> <span class="go">Target Prescription Dose            DS: &quot;30.826203&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0070)</span>  <span class="go">Fraction Group Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300c, 0004)</span>  <span class="go">Referenced Beam Sequence  1 item(s) ----</span>
+<span class="go">    (300a, 0082) Beam Dose Specification Point       DS: [239.531250000000, 239.531250000000, -751.87000000000]</span>
+<span class="go">    (300a, 0084) Beam Dose                           DS: &quot;1.0275401&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 00b0)</span>  <span class="go">Beam Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300a, 00b6)</span>  <span class="go">Beam Limiting Device Sequence  2 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300a, 0111)</span>  <span class="go">Control Point Sequence  2 item(s) ----</span>
+<span class="go">    (300a, 0115) Dose Rate Set                       DS: &quot;650.0&quot;</span>
+<span class="go">    (300a, 011a)  Beam Limiting Device Position Sequence  2 item(s) ----</span>
+<span class="go">    (300c, 0050)  Referenced Dose Reference Sequence  2 item(s) ----</span>
+<span class="go">        (300a, 010c) Cumulative Dose Reference Coefficie DS: &quot;0.0&quot;</span>
+<span class="go">        (300c, 0051) Referenced Dose Reference Number    IS: &quot;1&quot;</span>
+<span class="go">        (300a, 010c) Cumulative Dose Reference Coefficie DS: &quot;0.0&quot;</span>
+<span class="go">        (300c, 0051) Referenced Dose Reference Number    IS: &quot;2&quot;</span>
+<span class="go">    (300c, 0050)  Referenced Dose Reference Sequence  2 item(s) ----</span>
+<span class="go">        (300a, 010c) Cumulative Dose Reference Coefficie DS: &quot;0.9990268&quot;</span>
+<span class="go">        (300c, 0051) Referenced Dose Reference Number    IS: &quot;1&quot;</span>
+<span class="go">        (300a, 010c) Cumulative Dose Reference Coefficie DS: &quot;1.0&quot;</span>
+<span class="go">        (300c, 0051) Referenced Dose Reference Number    IS: &quot;2&quot;</span>
+<span class="gp gp-VirtualEnv">(300a, 0180)</span>  <span class="go">Patient Setup Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300c, 0002)</span>  <span class="go">Referenced RT Plan Sequence  1 item(s) ----</span>
+<span class="gp gp-VirtualEnv">(300c, 0060)</span>  <span class="go">Referenced Structure Set Sequence  1 item(s) ----</span>
+</pre></div>
+</div>
+<p>Using the “or Sequence” (<code class="docutils literal notranslate"><span class="pre">`\|Sequence`</span></code>) regular expression as above allows you
+to see any filtered results in relation to their parent Sequences.</p>
+<p>See the <a class="reference internal" href="cli_guide.html#cli-show"><span class="std std-ref">pydicom show command</span></a> section for more examples of the <cite>show</cite>
+command, its options, and the ability to show only data elements or sequences
+within the file.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

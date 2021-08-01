@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Analyse differences between DICOM files &mdash; pydicom 2.1.0 documentation</title>
+  <title>Analyse differences between DICOM files &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -111,7 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">General examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Analyse differences between DICOM files</a></li>
@@ -124,7 +130,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -169,6 +175,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -182,7 +190,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -196,7 +204,8 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-dicom-difference-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-dicom-difference-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="analyse-differences-between-dicom-files">
 <span id="sphx-glr-auto-examples-plot-dicom-difference-py"></span><h1>Analyse differences between DICOM files<a class="headerlink" href="#analyse-differences-between-dicom-files" title="Permalink to this headline">¶</a></h1>
@@ -366,9 +375,9 @@
 
 + (0010, 1010) Patient&#39;s Age                       AS: &#39;000Y&#39;
 
-- (0010, 1030) Patient&#39;s Weight                    DS: &quot;80.0&quot;
+- (0010, 1030) Patient&#39;s Weight                    DS: &#39;80.0&#39;
 
-+ (0010, 1030) Patient&#39;s Weight                    DS: &quot;0.0&quot;
++ (0010, 1030) Patient&#39;s Weight                    DS: &#39;0.0&#39;
 
 + (0010, 21b0) Additional Patient History          LT: &#39;&#39;
 
@@ -390,27 +399,27 @@
 
 - (0018, 0023) MR Acquisition Type                 CS: &#39;3D&#39;
 
-- (0018, 0050) Slice Thickness                     DS: &quot;0.8&quot;
+- (0018, 0050) Slice Thickness                     DS: &#39;0.8&#39;
 
-+ (0018, 0050) Slice Thickness                     DS: &quot;5.0&quot;
++ (0018, 0050) Slice Thickness                     DS: &#39;5.0&#39;
 
-- (0018, 0080) Repetition Time                     DS: &quot;4000.0&quot;
+- (0018, 0080) Repetition Time                     DS: &#39;4000.0&#39;
 
-- (0018, 0081) Echo Time                           DS: &quot;240.0&quot;
+- (0018, 0081) Echo Time                           DS: &#39;240.0&#39;
 
-+ (0018, 0060) KVP                                 DS: &quot;120.0&quot;
++ (0018, 0060) KVP                                 DS: &#39;120.0&#39;
 
-+ (0018, 0088) Spacing Between Slices              DS: &quot;5.0&quot;
++ (0018, 0088) Spacing Between Slices              DS: &#39;5.0&#39;
 
-+ (0018, 0090) Data Collection Diameter            DS: &quot;480.0&quot;
++ (0018, 0090) Data Collection Diameter            DS: &#39;480.0&#39;
 
-- (0018, 0083) Number of Averages                  DS: &quot;1.0&quot;
+- (0018, 0083) Number of Averages                  DS: &#39;1.0&#39;
 
-- (0018, 0084) Imaging Frequency                   DS: &quot;63.924339&quot;
+- (0018, 0084) Imaging Frequency                   DS: &#39;63.924339&#39;
 
 - (0018, 0085) Imaged Nucleus                      SH: &#39;H&#39;
 
-- (0018, 0086) Echo Number(s)                      IS: &quot;1&quot;
+- (0018, 0086) Echo Number(s)                      IS: &#39;1&#39;
 
 - (0018, 0091) Echo Train Length                   IS: None
 
@@ -422,27 +431,27 @@
 
 + (0018, 1040) Contrast/Bolus Route                LO: &#39;IV&#39;
 
-+ (0018, 1100) Reconstruction Diameter             DS: &quot;338.6716&quot;
++ (0018, 1100) Reconstruction Diameter             DS: &#39;338.6716&#39;
 
-+ (0018, 1110) Distance Source to Detector         DS: &quot;1099.3100585938&quot;
++ (0018, 1110) Distance Source to Detector         DS: &#39;1099.3100585938&#39;
 
-+ (0018, 1111) Distance Source to Patient          DS: &quot;630.0&quot;
++ (0018, 1111) Distance Source to Patient          DS: &#39;630.0&#39;
 
-+ (0018, 1120) Gantry/Detector Tilt                DS: &quot;0.0&quot;
++ (0018, 1120) Gantry/Detector Tilt                DS: &#39;0.0&#39;
 
-+ (0018, 1130) Table Height                        DS: &quot;133.699997&quot;
++ (0018, 1130) Table Height                        DS: &#39;133.699997&#39;
 
-+ (0018, 1150) Exposure Time                       IS: &quot;1601&quot;
++ (0018, 1150) Exposure Time                       IS: &#39;1601&#39;
 
-+ (0018, 1151) X-Ray Tube Current                  IS: &quot;170&quot;
++ (0018, 1151) X-Ray Tube Current                  IS: &#39;170&#39;
 
-- (0018, 1314) Flip Angle                          DS: &quot;90.0&quot;
+- (0018, 1314) Flip Angle                          DS: &#39;90.0&#39;
 
-+ (0018, 1152) Exposure                            IS: &quot;170&quot;
++ (0018, 1152) Exposure                            IS: &#39;170&#39;
 
 + (0018, 1160) Filter Type                         SH: &#39;LARGE BOWTIE FIL&#39;
 
-+ (0018, 1190) Focal Spot(s)                       DS: &quot;0.7&quot;
++ (0018, 1190) Focal Spot(s)                       DS: &#39;0.7&#39;
 
 + (0018, 1210) Convolution Kernel                  SH: &#39;STANDARD&#39;
 
@@ -454,11 +463,11 @@
 
 + (0019, 1002) [Detector Channel]                  SL: 912
 
-+ (0019, 1003) [Cell number at Theta]              DS: &quot;373.75&quot;
++ (0019, 1003) [Cell number at Theta]              DS: &#39;373.75&#39;
 
-+ (0019, 1004) [Cell spacing]                      DS: &quot;1.0166&quot;
++ (0019, 1004) [Cell spacing]                      DS: &#39;1.0166&#39;
 
-+ (0019, 100f) [Horiz. Frame of ref.]              DS: &quot;955.799988&quot;
++ (0019, 100f) [Horiz. Frame of ref.]              DS: &#39;955.799988&#39;
 
 + (0019, 1011) [Series contrast]                   SS: 2
 
@@ -474,33 +483,33 @@
 
 + (0019, 1018) [First scan ras]                    LO: &#39;S&#39;
 
-+ (0019, 1019) [First scan location]               DS: &quot;7.79187&quot;
++ (0019, 1019) [First scan location]               DS: &#39;7.79187&#39;
 
 + (0019, 101a) [Last scan ras]                     LO: &#39;I&#39;
 
-+ (0019, 101b) [Last scan loc]                     DS: &quot;-320.197968&quot;
++ (0019, 101b) [Last scan loc]                     DS: &#39;-320.197968&#39;
 
-+ (0019, 101e) [Display field of view]             DS: &quot;0.0&quot;
++ (0019, 101e) [Display field of view]             DS: &#39;0.0&#39;
 
-+ (0019, 1023) [Table Speed [mm/rotation]]         DS: &quot;5.0&quot;
++ (0019, 1023) [Table Speed [mm/rotation]]         DS: &#39;5.0&#39;
 
-+ (0019, 1024) [Mid Scan Time [sec]]               DS: &quot;17.784578&quot;
++ (0019, 1024) [Mid Scan Time [sec]]               DS: &#39;17.784578&#39;
 
 + (0019, 1025) [Mid scan flag]                     SS: 1
 
 + (0019, 1026) [Tube Azimuth [degree]]             SL: 0
 
-+ (0019, 1027) [Rotation Speed [msec]]             DS: &quot;1.0&quot;
++ (0019, 1027) [Rotation Speed [msec]]             DS: &#39;1.0&#39;
 
-+ (0019, 102a) [x-ray On position]                 DS: &quot;178.079926&quot;
++ (0019, 102a) [x-ray On position]                 DS: &#39;178.079926&#39;
 
-+ (0019, 102b) [x-ray Off position]                DS: &quot;3994.299316&quot;
++ (0019, 102b) [x-ray Off position]                DS: &#39;3994.299316&#39;
 
 + (0019, 102c) [Number of triggers]                SL: 10431
 
-+ (0019, 102e) [Angle of first view]               DS: &quot;-718.079956&quot;
++ (0019, 102e) [Angle of first view]               DS: &#39;-718.079956&#39;
 
-+ (0019, 102f) [Trigger frequency]                 DS: &quot;984.0&quot;
++ (0019, 102f) [Trigger frequency]                 DS: &#39;984.0&#39;
 
 + (0019, 1039) [SFOV Type]                         SS: 16
 
@@ -512,7 +521,7 @@
 
 + (0019, 1043) [Total Segments Required]           SS: 0
 
-+ (0019, 1044) [Interscan delay]                   DS: &quot;1.0&quot;
++ (0019, 1044) [Interscan delay]                   DS: &#39;1.0&#39;
 
 + (0019, 1047) [View compression factor]           SS: 1
 
@@ -544,25 +553,25 @@
 
 + (0019, 1071) [Set if fatq estimates were used]   SS: 0
 
-+ (0019, 1072) [Z chan avg over views]             DS: &quot;0.0&quot;
++ (0019, 1072) [Z chan avg over views]             DS: &#39;0.0&#39;
 
-+ (0019, 1073) [Avg of left ref chans over views]  DS: &quot;0.0&quot;
++ (0019, 1073) [Avg of left ref chans over views]  DS: &#39;0.0&#39;
 
-+ (0019, 1074) [Max left chan over views]          DS: &quot;0.0&quot;
++ (0019, 1074) [Max left chan over views]          DS: &#39;0.0&#39;
 
-+ (0019, 1075) [Avg of right ref chans over views] DS: &quot;0.0&quot;
++ (0019, 1075) [Avg of right ref chans over views] DS: &#39;0.0&#39;
 
-+ (0019, 1076) [Max right chan over views]         DS: &quot;0.0&quot;
++ (0019, 1076) [Max right chan over views]         DS: &#39;0.0&#39;
 
 + (0019, 10da) [Reference channel used]            SS: 0
 
-+ (0019, 10db) [Back projector coefficient]        DS: &quot;0.0&quot;
++ (0019, 10db) [Back projector coefficient]        DS: &#39;0.0&#39;
 
 + (0019, 10dc) [Primary speed correction used]     SS: 1
 
 + (0019, 10dd) [Overrange correction used]         SS: 1
 
-+ (0019, 10de) [Dynamic Z alpha value]             DS: &quot;0.0&quot;
++ (0019, 10de) [Dynamic Z alpha value]             DS: &#39;0.0&#39;
 
 - (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.1.2.4.20040826185059.5457
 
@@ -576,13 +585,13 @@
 
 + (0020, 0010) Study ID                            SH: &#39;1CT1&#39;
 
-  (0020, 0011) Series Number                       IS: &quot;1&quot;
+  (0020, 0011) Series Number                       IS: &#39;1&#39;
 
-- (0020, 0012) Acquisition Number                  IS: &quot;0&quot;
+- (0020, 0012) Acquisition Number                  IS: &#39;0&#39;
 
-+ (0020, 0012) Acquisition Number                  IS: &quot;2&quot;
++ (0020, 0012) Acquisition Number                  IS: &#39;2&#39;
 
-  (0020, 0013) Instance Number                     IS: &quot;1&quot;
+  (0020, 0013) Instance Number                     IS: &#39;1&#39;
 
 - (0020, 0032) Image Position (Patient)            DS: [-83.9063, -91.2000, 6.6406]
 
@@ -602,9 +611,9 @@
 
 + (0020, 1040) Position Reference Indicator        LO: &#39;SN&#39;
 
-- (0020, 1041) Slice Location                      DS: &quot;0.0&quot;
+- (0020, 1041) Slice Location                      DS: &#39;0.0&#39;
 
-+ (0020, 1041) Slice Location                      DS: &quot;-77.2040634155&quot;
++ (0020, 1041) Slice Location                      DS: &#39;-77.2040634155&#39;
 
   (0020, 4000) Image Comments                      LT: &#39;Uncompressed&#39;
 
@@ -752,17 +761,17 @@
 
 + (0028, 0120) Pixel Padding Value                 SS: -2000
 
-+ (0028, 1052) Rescale Intercept                   DS: &quot;-1024.0&quot;
++ (0028, 1052) Rescale Intercept                   DS: &#39;-1024.0&#39;
 
-+ (0028, 1053) Rescale Slope                       DS: &quot;1.0&quot;
++ (0028, 1053) Rescale Slope                       DS: &#39;1.0&#39;
 
 + (0029, 0010) Private Creator                     LO: &#39;GEMS_IMPS_01&#39;
 
 + (0029, 1004) [Lower range of Pixels1]            SL: 0
 
-+ (0029, 1005) [Lower range of Pixels1]            DS: &quot;0.0&quot;
++ (0029, 1005) [Lower range of Pixels1]            DS: &#39;0.0&#39;
 
-+ (0029, 1006) [Lower range of Pixels1]            DS: &quot;0.0&quot;
++ (0029, 1006) [Lower range of Pixels1]            DS: &#39;0.0&#39;
 
 + (0029, 1007) [Lower range of Pixels1]            SL: 87
 
@@ -780,11 +789,11 @@
 
 + (0043, 0010) Private Creator                     LO: &#39;GEMS_PARM_01&#39;
 
-- (0028, 1050) Window Center                       DS: &quot;600.0&quot;
+- (0028, 1050) Window Center                       DS: &#39;600.0&#39;
 
 + (0043, 1010) [Window value]                      US: 400
 
-- (0028, 1051) Window Width                        DS: &quot;1600.0&quot;
+- (0028, 1051) Window Width                        DS: &#39;1600.0&#39;
 
 + (0043, 1011) [Total input views]                 US: 10431
 
@@ -798,7 +807,7 @@
 
 + (0043, 1016) [Number of overranges]              SS: 0
 
-+ (0043, 1017) [IBH image scale factors]           DS: &quot;0.095&quot;
++ (0043, 1017) [IBH image scale factors]           DS: &#39;0.095&#39;
 
 + (0043, 1018) [BBH coefficients]                  DS: [0.085000, 1.102000, 0.095000]
 
@@ -812,11 +821,11 @@
 
 + (0043, 101d) [Level value]                       SS: 40
 
-+ (0043, 101e) [Delta Start Time [msec]]           DS: &quot;2.0&quot;
++ (0043, 101e) [Delta Start Time [msec]]           DS: &#39;2.0&#39;
 
 + (0043, 101f) [Max overranges in a view]          SL: 0
 
-+ (0043, 1020) [Avg overranges all views]          DS: &quot;0.0&quot;
++ (0043, 1020) [Avg overranges all views]          DS: &#39;0.0&#39;
 
 + (0043, 1021) [Corrected after glow terms]        SS: 0
 
@@ -908,7 +917,7 @@
         <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">line</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.123 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.110 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-dicom-difference-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a3b4852d291f27302d2926716393406e/plot_dicom_difference.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_dicom_difference.py</span></code></a></p>
@@ -925,37 +934,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="show_charset_name.html" class="btn btn-neutral float-right" title="Display unicode person names" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="General examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="show_charset_name.html" class="btn btn-neutral float-right" title="Display unicode person names" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="General examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

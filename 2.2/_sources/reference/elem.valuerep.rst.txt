@@ -12,6 +12,8 @@ or TM and utilities.
    :toctree: generated/
 
    DA
+   is_valid_ds
+   format_number_as_ds
    DS
    DSdecimal
    DSfloat

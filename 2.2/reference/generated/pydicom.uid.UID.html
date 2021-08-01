@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pydicom.uid.UID &mdash; pydicom 2.1.0 documentation</title>
+  <title>pydicom.uid.UID &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -118,6 +124,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -141,14 +148,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -193,6 +200,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -208,7 +217,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -223,8 +232,8 @@
   <div class="section" id="pydicom-uid-uid">
 <h1>pydicom.uid.UID<a class="headerlink" href="#pydicom-uid-uid" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.uid.UID">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.uid.</code><code class="sig-name descname">UID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/uid.py#L68"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.uid.UID">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicom.uid.</span></span><span class="sig-name descname"><span class="pre">UID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/uid.py#L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.uid.UID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Human friendly UIDs as a Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> subclass.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">UID</span>
@@ -242,10 +251,9 @@
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="pydicom.uid.UID.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="pydicom.uid.UID.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pydicom.uid.UID.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="longtable docutils align-default">
@@ -255,7 +263,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.uid.UID.__init__" title="pydicom.uid.UID.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
-<td><p>Initialize self.</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">capitalize</span></code>()</p></td>
 <td><p>Return a capitalized version of the string.</p></td>
@@ -442,83 +450,83 @@
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt id="pydicom.uid.UID.info">
-<em class="property">property </em><code class="sig-name descname">info</code><a class="headerlink" href="#pydicom.uid.UID.info" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.info">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.uid.UID.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the UID info from the UID dictionary.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_compressed">
-<em class="property">property </em><code class="sig-name descname">is_compressed</code><a class="headerlink" href="#pydicom.uid.UID.is_compressed" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_compressed">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_compressed</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_compressed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a compressed transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_deflated">
-<em class="property">property </em><code class="sig-name descname">is_deflated</code><a class="headerlink" href="#pydicom.uid.UID.is_deflated" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_deflated">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_deflated</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_deflated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a deflated transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_encapsulated">
-<em class="property">property </em><code class="sig-name descname">is_encapsulated</code><a class="headerlink" href="#pydicom.uid.UID.is_encapsulated" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_encapsulated">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_encapsulated</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_encapsulated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an encasulated transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_implicit_VR">
-<em class="property">property </em><code class="sig-name descname">is_implicit_VR</code><a class="headerlink" href="#pydicom.uid.UID.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_implicit_VR">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_implicit_VR</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if an implicit VR transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_little_endian">
-<em class="property">property </em><code class="sig-name descname">is_little_endian</code><a class="headerlink" href="#pydicom.uid.UID.is_little_endian" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_little_endian">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_little_endian</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_little_endian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a little endian transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_private">
-<em class="property">property </em><code class="sig-name descname">is_private</code><a class="headerlink" href="#pydicom.uid.UID.is_private" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_private">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_private</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID isn’t an officially registered DICOM
 UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_retired">
-<em class="property">property </em><code class="sig-name descname">is_retired</code><a class="headerlink" href="#pydicom.uid.UID.is_retired" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_retired">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_retired</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_retired" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the UID is retired, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise or if
 private.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_transfer_syntax">
-<em class="property">property </em><code class="sig-name descname">is_transfer_syntax</code><a class="headerlink" href="#pydicom.uid.UID.is_transfer_syntax" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_transfer_syntax">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_transfer_syntax</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_transfer_syntax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if a transfer syntax UID.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.is_valid">
-<em class="property">property </em><code class="sig-name descname">is_valid</code><a class="headerlink" href="#pydicom.uid.UID.is_valid" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.is_valid">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_valid</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.uid.UID.is_valid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>self</cite> is a valid UID, <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.keyword">
-<em class="property">property </em><code class="sig-name descname">keyword</code><a class="headerlink" href="#pydicom.uid.UID.keyword" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.keyword">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">keyword</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.uid.UID.keyword" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the UID keyword from the UID dictionary.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.name">
-<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#pydicom.uid.UID.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.uid.UID.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the UID name from the UID dictionary.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.uid.UID.type">
-<em class="property">property </em><code class="sig-name descname">type</code><a class="headerlink" href="#pydicom.uid.UID.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.uid.UID.type">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#pydicom.uid.UID.type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the UID type from the UID dictionary.</p>
 </dd></dl>
 
@@ -531,37 +539,29 @@ private.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../../auto_examples/index.html" class="btn btn-neutral float-right" title="General examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="pydicom.uid.RE_VALID_UID_PREFIX.html" class="btn btn-neutral float-left" title="pydicom.uid.RE_VALID_UID_PREFIX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../../auto_examples/index.html" class="btn btn-neutral float-right" title="General examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.uid.RE_VALID_UID_PREFIX.html" class="btn btn-neutral float-left" title="pydicom.uid.RE_VALID_UID_PREFIX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

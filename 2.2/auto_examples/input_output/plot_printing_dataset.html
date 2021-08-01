@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Format the output of the data set printing &mdash; pydicom 2.1.0 documentation</title>
+  <title>Format the output of the data set printing &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -111,7 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/index.html">Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
@@ -126,7 +132,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -171,6 +177,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -184,7 +192,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -198,7 +206,8 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="format-the-output-of-the-data-set-printing">
 <span id="sphx-glr-auto-examples-input-output-plot-printing-dataset-py"></span><h1>Format the output of the data set printing<a class="headerlink" href="#format-the-output-of-the-data-set-printing" title="Permalink to this headline">¶</a></h1>
@@ -231,36 +240,36 @@
  Patient&#39;s Birth Date = &#39;&#39;
  Patient&#39;s Sex = &#39;F&#39;
  Patient&#39;s Size = None
- Patient&#39;s Weight = &quot;80.0&quot;
+ Patient&#39;s Weight = &#39;80.0&#39;
  Contrast/Bolus Agent = &#39;&#39;
  Scanning Sequence = &#39;SE&#39;
  Sequence Variant = &#39;NONE&#39;
  Scan Options = &#39;&#39;
  MR Acquisition Type = &#39;3D&#39;
- Slice Thickness = &quot;0.8&quot;
- Repetition Time = &quot;4000.0&quot;
- Echo Time = &quot;240.0&quot;
- Number of Averages = &quot;1.0&quot;
- Imaging Frequency = &quot;63.924339&quot;
+ Slice Thickness = &#39;0.8&#39;
+ Repetition Time = &#39;4000.0&#39;
+ Echo Time = &#39;240.0&#39;
+ Number of Averages = &#39;1.0&#39;
+ Imaging Frequency = &#39;63.924339&#39;
  Imaged Nucleus = &#39;H&#39;
- Echo Number(s) = &quot;1&quot;
+ Echo Number(s) = &#39;1&#39;
  Echo Train Length = None
  Device Serial Number = &#39;-0000200&#39;
  Software Versions = &#39;V3.51*P25&#39;
- Flip Angle = &quot;90.0&quot;
+ Flip Angle = &#39;90.0&#39;
  Patient Position = &#39;HFS&#39;
  Study Instance UID = &#39;1.3.6.1.4.1.5962.1.2.4.20040826185059.5457&#39;
  Series Instance UID = &#39;1.3.6.1.4.1.5962.1.3.4.1.20040826185059.5457&#39;
  Study ID = &#39;4MR1&#39;
- Series Number = &quot;1&quot;
- Acquisition Number = &quot;0&quot;
- Instance Number = &quot;1&quot;
+ Series Number = &#39;1&#39;
+ Acquisition Number = &#39;0&#39;
+ Instance Number = &#39;1&#39;
  Image Position (Patient) = [-83.9063, -91.2000, 6.6406]
  Image Orientation (Patient) = [1.0000, 0.0000, 0.0000, 0.0000, 1.0000, 0.0000]
  Frame of Reference UID = &#39;1.3.6.1.4.1.5962.1.4.4.1.20040826185059.5457&#39;
  Laterality = &#39;&#39;
  Position Reference Indicator = &#39;&#39;
- Slice Location = &quot;0.0&quot;
+ Slice Location = &#39;0.0&#39;
  Image Comments = &#39;Uncompressed&#39;
  Samples per Pixel = 1
  Photometric Interpretation = &#39;MONOCHROME2&#39;
@@ -273,8 +282,8 @@
  Pixel Representation = 1
  Smallest Image Pixel Value = 0
  Largest Image Pixel Value = 4000
- Window Center = &quot;600.0&quot;
- Window Width = &quot;1600.0&quot;
+ Window Center = &#39;600.0&#39;
+ Window Width = &#39;1600.0&#39;
 &lt;item not printed -- in the &quot;don&#39;t print&quot; list&gt;
  Data Set Trailing Padding = b&#39;\n\x00\xfe\x00\x04\x00\x01\x00\x00\x00\x00\x00\x...
 </pre></div>
@@ -325,7 +334,7 @@
 <span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.010 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.009 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7d5fde14cbfb9e9d3e3df4c27eff8500/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></p>
@@ -342,37 +351,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="plot_write_dicom.html" class="btn btn-neutral float-right" title="Write DICOM data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="plot_read_dicom.html" class="btn btn-neutral float-left" title="Read a Dataset and plot Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="plot_write_dicom.html" class="btn btn-neutral float-right" title="Write DICOM data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="plot_read_dicom.html" class="btn btn-neutral float-left" title="Read a Dataset and plot Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

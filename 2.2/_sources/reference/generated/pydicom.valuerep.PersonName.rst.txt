@@ -18,6 +18,8 @@
       ~PersonName.encode
       ~PersonName.family_comma_given
       ~PersonName.formatted
+      ~PersonName.from_named_components
+      ~PersonName.from_named_components_veterinary
    
    
 

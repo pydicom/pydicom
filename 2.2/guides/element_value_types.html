@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Element VRs and Python types &mdash; pydicom 2.1.0 documentation</title>
+  <title>Element VRs and Python types &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     
@@ -45,7 +51,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Writing documentation" href="writing_documentation.html" />
+    <link rel="next" title="Pixel Data Encoding" href="encoding/index.html" />
     <link rel="prev" title="Guides" href="index.html" /> 
 </head>
 
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,31 +104,34 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Guides</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Element VRs and Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encoding/index.html">Pixel Data Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli/cli_guide.html">Command-line Interface Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="glossary.html">Glossary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="writing_documentation.html">Writing documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
@@ -167,6 +176,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -180,7 +191,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -222,22 +233,21 @@ never have a VM greater than 1.</p></li>
 </li>
 <li><p><strong>SQ</strong> element values should be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of zero or more
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances.</p></li>
-<li><p>To ensure <strong>AT</strong> elements are encoded correctly, their values should be set
-using the 8-byte integer form of the tag - such as <code class="docutils literal notranslate"><span class="pre">0x00100020</span></code> for the tag
-(0010,0020) - and not as a 2-tuple or 2-list.</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 5%" />
-<col style="width: 24%" />
-<col style="width: 23%" />
-<col style="width: 47%" />
+<col style="width: 4%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 34%" />
+<col style="width: 28%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>VR</p></th>
 <th class="head"><p>Name</p></th>
 <th class="head"><p>Set using</p></th>
-<th class="head"><p>Stored as</p></th>
+<th class="head"><p>Stored as (T)</p></th>
+<th class="head"><p>Type hint for element value</p></th>
 </tr>
 </thead>
 <tbody>
@@ -246,6 +256,8 @@ using the 8-byte integer form of the tag - such as <code class="docutils literal
 Entity</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td rowspan="11"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>AS</p></td>
 <td><p>Age String</p></td>
@@ -254,8 +266,9 @@ Entity</p></td>
 </tr>
 <tr class="row-even"><td><p>AT</p></td>
 <td><p>Attribute Tag</p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Tag
+<sup>1</sup></p></td>
+<td><p><a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>CS</p></td>
 <td><p>Code String</p></td>
@@ -266,7 +279,7 @@ Entity</p></td>
 <td><p>Date</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-class docutils literal notranslate"><span class="pre">DA</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DA.html#pydicom.valuerep.DA" title="pydicom.valuerep.DA"><code class="xref py py-class docutils literal notranslate"><span class="pre">DA</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p>DS</p></td>
 <td><p>Decimal String</p></td>
@@ -274,13 +287,13 @@ Entity</p></td>
 <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>
 or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a><sup>2</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a><sup>3</sup></p></td>
 </tr>
 <tr class="row-even"><td><p>DT</p></td>
 <td><p>Date Time</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-class docutils literal notranslate"><span class="pre">DT</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DT.html#pydicom.valuerep.DT" title="pydicom.valuerep.DT"><code class="xref py py-class docutils literal notranslate"><span class="pre">DT</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p>FL</p></td>
 <td><p>Floating Point
@@ -309,6 +322,7 @@ or <a class="reference external" href="https://docs.python.org/3/library/functio
 <td><p>Long Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td rowspan="7"><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>OB</p></td>
 <td><p>Other Byte</p></td>
@@ -345,6 +359,8 @@ Very Long</p></td>
 <td><p>Person Name</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a></p></td>
+<td rowspan="3"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>SH</p></td>
 <td><p>Short String</p></td>
@@ -361,28 +377,35 @@ Very Long</p></td>
 Items</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p></td>
 <td><p><a class="reference internal" href="../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></p></td>
+<td><p>MutableSequence[
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>]</p></td>
 </tr>
 <tr class="row-even"><td><p>SS</p></td>
 <td><p>Signed Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>ST</p></td>
 <td><p>Short Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>SV</p></td>
 <td><p>Signed 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td rowspan="5"><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-odd"><td><p>TM</p></td>
 <td><p>Time</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> or
-<a class="reference internal" href="../reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM" title="pydicom.valuerep.TM"><code class="xref py py-class docutils literal notranslate"><span class="pre">TM</span></code></a><sup>1</sup></p></td>
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.TM.html#pydicom.valuerep.TM" title="pydicom.valuerep.TM"><code class="xref py py-class docutils literal notranslate"><span class="pre">TM</span></code></a><sup>2</sup></p></td>
 </tr>
 <tr class="row-even"><td><p>UC</p></td>
 <td><p>Unlimited
@@ -405,6 +428,7 @@ Identifier (UID)</p></td>
 <td><p>Unknown</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
+<td rowspan="2"><p>Optional[T]</p></td>
 </tr>
 <tr class="row-even"><td><p>UR</p></td>
 <td><p>URI/URL</p></td>
@@ -415,24 +439,30 @@ Identifier (UID)</p></td>
 <td><p>Unsigned Short</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 <tr class="row-even"><td><p>UT</p></td>
 <td><p>Unlimited Text</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p>Optional[T]</p></td>
 </tr>
 <tr class="row-odd"><td><p>UV</p></td>
 <td><p>Unsigned 64-bit
 Very Long</p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p>Union[None, T,
+MutableSequence[T]]</p></td>
 </tr>
 </tbody>
 </table>
 <div class="line-block">
-<div class="line"><sup>1</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.datetime_conversion.html#pydicom.config.datetime_conversion" title="pydicom.config.datetime_conversion"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.datetime_conversion</span></code></a>
+<div class="line"><sup>1</sup> Any type accepted by <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a> can be used</div>
+<div class="line"><sup>2</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.datetime_conversion.html#pydicom.config.datetime_conversion" title="pydicom.config.datetime_conversion"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.datetime_conversion</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
-<div class="line"><sup>2</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
+<div class="line"><sup>3</sup> If <a class="reference internal" href="../reference/generated/pydicom.config.use_DS_decimal.html#pydicom.config.use_DS_decimal" title="pydicom.config.use_DS_decimal"><code class="xref py py-attr docutils literal notranslate"><span class="pre">config.use_DS_decimal</span></code></a>
 = <code class="docutils literal notranslate"><span class="pre">True</span></code> (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</div>
 </div>
 </div>
@@ -442,37 +472,29 @@ Very Long</p></td>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="writing_documentation.html" class="btn btn-neutral float-right" title="Writing documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="encoding/index.html" class="btn btn-neutral float-right" title="Pixel Data Encoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -1,0 +1,6 @@
+﻿pydicom.config.convert\_wrong\_length\_to\_UN
+=============================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: convert_wrong_length_to_UN

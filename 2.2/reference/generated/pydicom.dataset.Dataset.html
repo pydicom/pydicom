@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pydicom.dataset.Dataset &mdash; pydicom 2.1.0 documentation</title>
+  <title>pydicom.dataset.Dataset &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -125,6 +131,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dicomdir.html">DICOMDIR (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dicomdir</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../encaps.html">Bulk Data Encapsulation Utilities (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encaps</span></code>)</a></li>
@@ -135,14 +142,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -187,6 +194,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -202,7 +211,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -217,16 +226,9 @@
   <div class="section" id="pydicom-dataset-dataset">
 <h1>pydicom.dataset.Dataset<a class="headerlink" href="#pydicom-dataset-dataset" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="pydicom.dataset.Dataset">
-<em class="property">class </em><code class="sig-prename descclassname">pydicom.dataset.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">, </span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L221"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Contains a collection (dictionary) of DICOM Data Elements.</p>
-<p>Behaves like a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> is only derived from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> to make it work in
-a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>. The parent <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> class
-is never called, as all <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> methods are overridden.</p>
-</div>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pydicom.dataset.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">MutableMapping</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L223"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A DICOM dataset as a mutable mapping of DICOM Data Elements.</p>
 <p class="rubric">Examples</p>
 <p>Add an element to the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> (for elements in the DICOM
 dictionary):</p>
@@ -346,8 +348,8 @@ Sequences):</p>
 </pre></div>
 </div>
 <dl class="py attribute">
-<dt id="pydicom.dataset.Dataset.default_element_format">
-<code class="sig-name descname">default_element_format</code><a class="headerlink" href="#pydicom.dataset.Dataset.default_element_format" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.default_element_format">
+<span class="sig-name descname"><span class="pre">default_element_format</span></span><a class="headerlink" href="#pydicom.dataset.Dataset.default_element_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default formatting for string display.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -357,8 +359,8 @@ Sequences):</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pydicom.dataset.Dataset.default_sequence_element_format">
-<code class="sig-name descname">default_sequence_element_format</code><a class="headerlink" href="#pydicom.dataset.Dataset.default_sequence_element_format" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.default_sequence_element_format">
+<span class="sig-name descname"><span class="pre">default_sequence_element_format</span></span><a class="headerlink" href="#pydicom.dataset.Dataset.default_sequence_element_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default formatting for string display of sequences.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -368,8 +370,8 @@ Sequences):</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pydicom.dataset.Dataset.indent_chars">
-<code class="sig-name descname">indent_chars</code><a class="headerlink" href="#pydicom.dataset.Dataset.indent_chars" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.indent_chars">
+<span class="sig-name descname"><span class="pre">indent_chars</span></span><a class="headerlink" href="#pydicom.dataset.Dataset.indent_chars" title="Permalink to this definition">¶</a></dt>
 <dd><p>For string display, the characters used to indent nested Sequences.
 Default is <code class="docutils literal notranslate"><span class="pre">&quot;</span>&#160;&#160; <span class="pre">&quot;</span></code>.</p>
 <dl class="field-list simple">
@@ -380,8 +382,8 @@ Default is <code class="docutils literal notranslate"><span class="pre">&quot;</
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pydicom.dataset.Dataset.is_little_endian">
-<code class="sig-name descname">is_little_endian</code><a class="headerlink" href="#pydicom.dataset.Dataset.is_little_endian" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.is_little_endian">
+<span class="sig-name descname"><span class="pre">is_little_endian</span></span><a class="headerlink" href="#pydicom.dataset.Dataset.is_little_endian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shall be set before writing with <code class="docutils literal notranslate"><span class="pre">write_like_original=False</span></code>.
 The <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> (excluding the pixel data) will be written using
 the given endianess.</p>
@@ -393,8 +395,8 @@ the given endianess.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pydicom.dataset.Dataset.is_implicit_VR">
-<code class="sig-name descname">is_implicit_VR</code><a class="headerlink" href="#pydicom.dataset.Dataset.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.is_implicit_VR">
+<span class="sig-name descname"><span class="pre">is_implicit_VR</span></span><a class="headerlink" href="#pydicom.dataset.Dataset.is_implicit_VR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shall be set before writing with <code class="docutils literal notranslate"><span class="pre">write_like_original=False</span></code>.
 The <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> will be written using the transfer syntax with
 the given VR handling, e.g <em>Little Endian Implicit VR</em> if <code class="docutils literal notranslate"><span class="pre">True</span></code>,
@@ -408,8 +410,8 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">, </span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L373"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">MutableMapping</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L367"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance.</p>
 </dd></dl>
 
@@ -432,41 +434,41 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.clear" title="pydicom.dataset.Dataset.clear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code></a>()</p></td>
 <td><p>Delete all the elements from the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.convert_pixel_data" title="pydicom.dataset.Dataset.convert_pixel_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_pixel_data</span></code></a>([handler_name])</p></td>
-<td><p>Convert pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compress</span></code></a>(transfer_syntax_uid[, arr, …])</p></td>
+<td><p>Compress and update an uncompressed dataset in-place with the resulting <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> pixel data.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.convert_pixel_data" title="pydicom.dataset.Dataset.convert_pixel_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_pixel_data</span></code></a>([handler_name])</p></td>
+<td><p>Convert pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a shallow copy of the dataset.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_element</span></code></a>(name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.data_element" title="pydicom.dataset.Dataset.data_element"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_element</span></code></a>(name)</p></td>
 <td><p>Return the element corresponding to the element keyword <cite>name</cite>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.decode" title="pydicom.dataset.Dataset.decode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.decode" title="pydicom.dataset.Dataset.decode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code></a>()</p></td>
 <td><p>Apply character set decoding to the elements in the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>([handler_name])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.decompress" title="pydicom.dataset.Dataset.decompress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress</span></code></a>([handler_name])</p></td>
 <td><p>Decompresses <em>Pixel Data</em> and modifies the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> in-place.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dir</span></code></a>(*filters)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.dir" title="pydicom.dataset.Dataset.dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dir</span></code></a>(*filters)</p></td>
 <td><p>Return an alphabetical list of element keywords in the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.elements" title="pydicom.dataset.Dataset.elements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elements</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.elements" title="pydicom.dataset.Dataset.elements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">elements</span></code></a>()</p></td>
 <td><p>Yield the top-level elements of the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.ensure_file_meta" title="pydicom.dataset.Dataset.ensure_file_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_file_meta</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.ensure_file_meta" title="pydicom.dataset.Dataset.ensure_file_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_file_meta</span></code></a>()</p></td>
 <td><p>Create an empty <code class="docutils literal notranslate"><span class="pre">Dataset.file_meta</span></code> if none exists.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.fix_meta_info" title="pydicom.dataset.Dataset.fix_meta_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fix_meta_info</span></code></a>([enforce_standard])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.fix_meta_info" title="pydicom.dataset.Dataset.fix_meta_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fix_meta_info</span></code></a>([enforce_standard])</p></td>
 <td><p>Ensure the file meta info exists and has the correct values for transfer syntax and media storage UIDs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.formatted_lines" title="pydicom.dataset.Dataset.formatted_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formatted_lines</span></code></a>([element_format, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.formatted_lines" title="pydicom.dataset.Dataset.formatted_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">formatted_lines</span></code></a>([element_format, …])</p></td>
 <td><p>Iterate through the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> for each element.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.from_json" title="pydicom.dataset.Dataset.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a>(json_dataset[, bulk_data_uri_handler])</p></td>
-<td><p>Add elements to the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from DICOM JSON format.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromkeys</span></code>([value])</p></td>
-<td><p>Create a new dictionary with keys from iterable and values set to value.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.from_json" title="pydicom.dataset.Dataset.from_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json</span></code></a>(json_dataset[, bulk_data_uri_handler])</p></td>
+<td><p>Return a <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from a DICOM JSON Model object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.get" title="pydicom.dataset.Dataset.get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get</span></code></a>()</p></td>
 <td><p>Simulate <code class="docutils literal notranslate"><span class="pre">dict.get()</span></code> to handle element tags and keywords.</p></td>
@@ -490,7 +492,7 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 <td><p>Return the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlay_array</span></code></a>(group)</p></td>
-<td><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
+<td><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.pop" title="pydicom.dataset.Dataset.pop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code></a>(key, *args)</p></td>
 <td><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.pop" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.pop()</span></code></a> with support for tags and keywords.</p></td>
@@ -528,7 +530,7 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.trait_names" title="pydicom.dataset.Dataset.trait_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trait_names</span></code></a>()</p></td>
 <td><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of valid names for auto-completion code.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(dictionary)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(d)</p></td>
 <td><p>Extend <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> to handle DICOM tags and keywords.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.values" title="pydicom.dataset.Dataset.values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></a>()</p></td>
@@ -538,7 +540,7 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 <td><p>Iterate through the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset's</span></code></a> elements and run <cite>callback</cite> on each.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">waveform_array</span></code></a>(index)</p></td>
-<td><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at <cite>index</cite> in the (5400,0100) <em>Waveform Sequence</em>.</p></td>
+<td><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at <cite>index</cite> in the (5400,0100) <em>Waveform Sequence</em>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -562,13 +564,13 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the encoding to be used for writing is set and is the same as that used to originally encode the  <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_array</span></code></a></p></td>
-<td><p>Return the pixel data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
+<td><p>Return the pixel data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_element</span><span class="p">:</span> <span class="n"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L421"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_element</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an element to the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">ds[data_element.tag]</span> <span class="pre">=</span> <span class="pre">data_element</span></code></p>
 <dl class="field-list simple">
@@ -579,8 +581,8 @@ on <code class="docutils literal notranslate"><span class="pre">Dataset.is_littl
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.add_new">
-<code class="sig-name descname">add_new</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tag</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">VR</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L433"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.add_new">
+<span class="sig-name descname"><span class="pre">add_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VR</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L432"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.add_new" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new element and add it to the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -605,15 +607,113 @@ Part 5, <a class="reference external" href="http://dicom.nema.org/medical/dicom/
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.clear">
-<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1268"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.clear" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1276"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.clear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all the elements from the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.convert_pixel_data">
-<code class="sig-name descname">convert_pixel_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler_name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1387"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally.</p>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.compress">
+<span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transfer_syntax_uid</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><span class="pre">numpy.ndarray</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding_plugin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoding_plugin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encapsulate_ext</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1575"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.compress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compress and update an uncompressed dataset in-place with the
+resulting <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_A.4.html">encapsulated</a> pixel data.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.2.</span></p>
+</div>
+<p>The dataset must already have the following
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel</a> module elements present
+with correct values that correspond to the resulting compressed
+pixel data:</p>
+<ul class="simple">
+<li><p>(0028,0002) <em>Samples per Pixel</em></p></li>
+<li><p>(0028,0004) <em>Photometric Interpretation</em></p></li>
+<li><p>(0028,0008) <em>Number of Frames</em> (if more than 1 frame will be present)</p></li>
+<li><p>(0028,0010) <em>Rows</em></p></li>
+<li><p>(0028,0011) <em>Columns</em></p></li>
+<li><p>(0028,0100) <em>Bits Allocated</em></p></li>
+<li><p>(0028,0101) <em>Bits Stored</em></p></li>
+<li><p>(0028,0103) <em>Pixel Representation</em></p></li>
+</ul>
+<p>This method will add the file meta dataset if none is present and add
+or modify the following elements:</p>
+<ul class="simple">
+<li><p>(0002,0010) <em>Transfer Syntax UID</em></p></li>
+<li><p>(7FE0,0010) <em>Pixel Data</em></p></li>
+</ul>
+<p>If <em>Samples per Pixel</em> is greater than 1 then the following element
+will also be added:</p>
+<ul class="simple">
+<li><p>(0028,0006) <em>Planar Configuration</em></p></li>
+</ul>
+<p>If the compressed pixel data is too large for encapsulation using a
+basic offset table then an <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">extended offset table</a> will also be used, in which case the
+following elements will also be added:</p>
+<ul class="simple">
+<li><p>(7FE0,0001) <em>Extended Offset Table</em></p></li>
+<li><p>(7FE0,0002) <em>Extended Offset Table Lengths</em></p></li>
+</ul>
+<p><strong>Supported Transfer Syntax UIDs</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 15%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>UID</p></th>
+<th class="head"><p>Plugins</p></th>
+<th class="head"><p>Encoding Guide</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><em>RLE Lossless</em> -
+1.2.840.10008.1.2.5</p></td>
+<td><p>pydicom,
+pylibjpeg,
+gdcm</p></td>
+<td><p><a class="reference internal" href="../../guides/encoding/rle_lossless.html"><span class="doc">RLE Lossless</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Compress the existing uncompressed <em>Pixel Data</em> in place:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.uid</span> <span class="kn">import</span> <span class="n">RLELossless</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_rle.dcm&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transfer_syntax_uid</strong> (<a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><em>pydicom.uid.UID</em></a>) – The UID of the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_10.html">transfer syntax</a> to
+use when compressing the pixel data.</p></li>
+<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – Compress the uncompressed pixel data in <cite>arr</cite> and use it
+to set the <em>Pixel Data</em>. If <cite>arr</cite> is not used then the
+existing <em>Pixel Data</em> in the dataset will be compressed instead.
+The <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.21)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and
+contents of the array should match the dataset.</p></li>
+<li><p><strong>encoding_plugin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Use the <cite>encoding_plugin</cite> to compress the pixel data. See the
+<a class="reference internal" href="../../old/image_data_compression.html"><span class="doc">user guide</span></a> for a list of
+plugins available for each UID and their dependencies. If not
+specified then all available plugins will be tried (default).</p></li>
+<li><p><strong>decoding_plugin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Placeholder for future functionality.</p></li>
+<li><p><strong>encapsulate_ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then force the addition of an extended offset table.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default) then an extended offset table
+will be added if needed for large amounts of compressed <em>Pixel
+Data</em>, otherwise just the basic offset table will be used.</p></li>
+<li><p><strong>**kwargs</strong> – Optional keyword parameters for the encoding plugin may also be
+present. See the <a class="reference internal" href="../../guides/encoding/encoder_plugin_options.html"><span class="doc">encoding plugins options</span></a> for more information.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.convert_pixel_data">
+<span class="sig-name descname"><span class="pre">convert_pixel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1396"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.convert_pixel_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert pixel data to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>handler_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the pixel handler that shall be used to
@@ -645,14 +745,14 @@ decompressed and any related data elements are changed accordingly.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L549"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.copy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L552"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a shallow copy of the dataset.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.data_element">
-<code class="sig-name descname">data_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> &#x2192; Optional<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L459"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.data_element">
+<span class="sig-name descname"><span class="pre">data_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L462"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.data_element" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the element corresponding to the element keyword <cite>name</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -670,8 +770,8 @@ otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.decode">
-<code class="sig-name descname">decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L522"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L525"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply character set decoding to the elements in the
 <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <p>See DICOM Standard, Part 5,
@@ -679,15 +779,15 @@ otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.decompress">
-<code class="sig-name descname">decompress</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler_name</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1566"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.decompress">
+<span class="sig-name descname"><span class="pre">decompress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handler_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1729"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.decompress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decompresses <em>Pixel Data</em> and modifies the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
 in-place.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4: </span>The <cite>handler_name</cite> keyword argument was added</p>
 </div>
 <p>If not a compressed transfer syntax, then pixel data is converted
-to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally, but not returned.</p>
+to a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> internally, but not returned.</p>
 <p>If compressed pixel data, then is decompressed using an image handler,
 and internal state is updated appropriately:</p>
 <ul class="simple">
@@ -703,7 +803,8 @@ is <code class="docutils literal notranslate"><span class="pre">False</span></co
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>handler_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the pixel handler that shall be used to
 decode the data. Supported names are: <code class="docutils literal notranslate"><span class="pre">'gdcm'</span></code>,
-<code class="docutils literal notranslate"><span class="pre">'pillow'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jpeg_ls'</span></code>, <code class="docutils literal notranslate"><span class="pre">'rle'</span></code> and <code class="docutils literal notranslate"><span class="pre">'numpy'</span></code>.
+<code class="docutils literal notranslate"><span class="pre">'pillow'</span></code>, <code class="docutils literal notranslate"><span class="pre">'jpeg_ls'</span></code>, <code class="docutils literal notranslate"><span class="pre">'rle'</span></code>, <code class="docutils literal notranslate"><span class="pre">'numpy'</span></code> and
+<code class="docutils literal notranslate"><span class="pre">'pylibjpeg'</span></code>.
 If not used (the default), a matching handler is used from the
 handlers configured in <a class="reference internal" href="pydicom.config.pixel_data_handlers.html#pydicom.config.pixel_data_handlers" title="pydicom.config.pixel_data_handlers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pixel_data_handlers</span></code></a>.</p>
 </dd>
@@ -721,8 +822,8 @@ handlers configured in <a class="reference internal" href="pydicom.config.pixel_
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.dir">
-<code class="sig-name descname">dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">filters</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L659"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.dir">
+<span class="sig-name descname"><span class="pre">dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L660"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an alphabetical list of element keywords in the
 <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <p>Intended mainly for use in interactive Python sessions. Only lists the
@@ -744,8 +845,8 @@ filters are used then all element keywords are returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.elements">
-<code class="sig-name descname">elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterator<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1236"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.elements" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.elements">
+<span class="sig-name descname"><span class="pre">elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1244"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.elements" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yield the top-level elements of the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.1.</span></p>
@@ -766,8 +867,8 @@ filters are used then all element keywords are returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.ensure_file_meta">
-<code class="sig-name descname">ensure_file_meta</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1889"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.ensure_file_meta" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.ensure_file_meta">
+<span class="sig-name descname"><span class="pre">ensure_file_meta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2055"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.ensure_file_meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an empty <code class="docutils literal notranslate"><span class="pre">Dataset.file_meta</span></code> if none exists.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -775,8 +876,8 @@ filters are used then all element keywords are returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.fix_meta_info">
-<code class="sig-name descname">fix_meta_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">enforce_standard</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1898"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.fix_meta_info" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.fix_meta_info">
+<span class="sig-name descname"><span class="pre">fix_meta_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enforce_standard</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2064"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.fix_meta_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure the file meta info exists and has the correct values
 for transfer syntax and media storage UIDs.</p>
 <div class="versionadded">
@@ -797,8 +898,8 @@ performed (see <a class="reference internal" href="pydicom.dataset.validate_file
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.formatted_lines">
-<code class="sig-name descname">formatted_lines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element_format</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</span></em>, <em class="sig-param"><span class="n">sequence_element_format</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'%(tag)s %(name)-35.35s %(VR)s: %(repval)s'</span></em>, <em class="sig-param"><span class="n">indent_format</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterator<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1754"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.formatted_lines">
+<span class="sig-name descname"><span class="pre">formatted_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'%(tag)s</span> <span class="pre">%(name)-35.35s</span> <span class="pre">%(VR)s:</span> <span class="pre">%(repval)s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_element_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'%(tag)s</span> <span class="pre">%(name)-35.35s</span> <span class="pre">%(VR)s:</span> <span class="pre">%(repval)s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent_format</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1920"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.formatted_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> yielding formatted <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>
 for each element.</p>
 <dl class="field-list simple">
@@ -822,9 +923,9 @@ the attributes of
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">json_dataset</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">bulk_data_uri_handler</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">, </span>Callable<span class="p">[</span><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; _Dataset<a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2224"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.from_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add elements to the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from DICOM JSON format.</p>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.from_json">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><span class="pre">bytearray</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_data_uri_handler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><span class="pre">bytes</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2390"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> from a DICOM JSON Model object.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
 </div>
@@ -832,12 +933,17 @@ the attributes of
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>json_dataset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> representing a DICOM Data Set
-formatted based on the DICOM JSON Model.</p></li>
-<li><p><strong>bulk_data_uri_handler</strong> (<em>callable</em><em>, </em><em>optional</em>) – Callable function that accepts either the tag, vr and “BulkDataURI”
-or just the “BulkDataURI” of the JSON
+<li><p><strong>json_dataset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><em>bytearray</em></a>) – <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytearray" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a>
+representing a DICOM Data Set formatted based on the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">DICOM
+JSON Model</a>.</p></li>
+<li><p><strong>bulk_data_uri_handler</strong> (<em>callable</em><em>, </em><em>optional</em>) – Callable function that accepts either the tag, vr and
+“BulkDataURI” value or just the “BulkDataURI” value of the JSON
 representation of a data element and returns the actual value of
-data element (retrieved via DICOMweb WADO-RS).</p></li>
+that data element (retrieved via DICOMweb WADO-RS). If no
+<cite>bulk_data_uri_handler</cite> is specified (default) then the
+corresponding element will have an “empty” value such as
+<code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">b&quot;&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> depending on the <cite>vr</cite> (i.e. the
+Value Multiplicity will be 0).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -850,10 +956,10 @@ data element (retrieved via DICOMweb WADO-RS).</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.get">
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">default</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'None'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L727"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">default</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">'None'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L728"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a></span></span></dt>
 <dd><p>Simulate <code class="docutils literal notranslate"><span class="pre">dict.get()</span></code> to handle element tags and keywords.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -878,10 +984,10 @@ instance.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.get_item">
-<code class="sig-name descname">get_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.9)">slice</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">Dataset</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1108"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
-<dt>
-<code class="sig-name descname">get_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.get_item">
+<span class="sig-name descname"><span class="pre">get_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.9)"><span class="pre">slice</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1116"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_item" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">BaseTag</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a></span></span></dt>
 <dd><p>Return the raw data element if possible.</p>
 <p>It will be raw if the user has never accessed the value, or set their
 own value. Note if the data element is a deferred-read element,
@@ -903,8 +1009,8 @@ made up of DICOM tags.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.get_private_item">
-<code class="sig-name descname">get_private_item</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">element_offset</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">private_creator</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1061"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_private_item" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.get_private_item">
+<span class="sig-name descname"><span class="pre">get_private_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_offset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_creator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1069"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.get_private_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the data element for the given private tag <cite>group</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -940,8 +1046,8 @@ for the tag to be returned.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.group_dataset">
-<code class="sig-name descname">group_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">pydicom.dataset.Dataset</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1191"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.group_dataset">
+<span class="sig-name descname"><span class="pre">group_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1199"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.group_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> containing only elements of a certain
 group.</p>
 <dl class="field-list simple">
@@ -957,9 +1063,9 @@ group.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.dataset.Dataset.is_original_encoding">
-<em class="property">property </em><code class="sig-name descname">is_original_encoding</code><a class="headerlink" href="#pydicom.dataset.Dataset.is_original_encoding" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.is_original_encoding">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">is_original_encoding</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#pydicom.dataset.Dataset.is_original_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the encoding to be used for writing is set and
 is the same as that used to originally encode the  <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <div class="versionadded">
@@ -970,8 +1076,8 @@ is the same as that used to originally encode the  <a class="reference internal"
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.items">
-<code class="sig-name descname">items</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; ItemsView<span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">, </span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L772"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.items" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L773"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> items to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -986,8 +1092,8 @@ is the same as that used to originally encode the  <a class="reference internal"
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.iterall">
-<code class="sig-name descname">iterall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterator<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2161"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.iterall">
+<span class="sig-name descname"><span class="pre">iterall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2327"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.iterall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, yielding all the elements.</p>
 <p>Unlike <code class="docutils literal notranslate"><span class="pre">iter(Dataset)</span></code>, this <em>does</em> recurse into sequences,
 and so yields all elements as if dataset were “flattened”.</p>
@@ -999,8 +1105,8 @@ and so yields all elements as if dataset were “flattened”.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.keys">
-<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; KeysView<span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L784"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.keys" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AbstractSet</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L785"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> keys to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.keys" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.keys()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1014,9 +1120,9 @@ the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.overlay_array">
-<code class="sig-name descname">overlay_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1632"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.overlay_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.overlay_array">
+<span class="sig-name descname"><span class="pre">overlay_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1796"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.overlay_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <em>Overlay Data</em> in <cite>group</cite> as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
 </div>
@@ -1026,18 +1132,18 @@ the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The (<cite>group</cite>,3000) <em>Overlay Data</em> converted to a
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="pydicom.dataset.Dataset.pixel_array">
-<em class="property">property </em><code class="sig-name descname">pixel_array</code><a class="headerlink" href="#pydicom.dataset.Dataset.pixel_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the pixel data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.pixel_array">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pixel_array</span></span><em class="property"><span class="pre">:</span> <span class="pre">numpy.ndarray</span></em><a class="headerlink" href="#pydicom.dataset.Dataset.pixel_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the pixel data as a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 1.4: </span>Added support for <em>Float Pixel Data</em> and <em>Double Float Pixel Data</em></p>
 </div>
@@ -1045,17 +1151,17 @@ the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>The (7FE0,0008) <em>Float Pixel Data</em>, (7FE0,0009) <em>Double Float
 Pixel Data</em> or (7FE0,0010) <em>Pixel Data</em> converted to a
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.pop">
-<code class="sig-name descname">pop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1272"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.pop" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.pop">
+<span class="sig-name descname"><span class="pre">pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1280"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.pop" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.pop()</span></code></a> with support for tags and keywords.</p>
 <p>Removes the element for <cite>key</cite> if it exists and returns it,
 otherwise returns a default value if given or raises <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeyError</span></code></a>.</p>
@@ -1074,10 +1180,10 @@ raised</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p>The element for <cite>key</cite> if it exists, or the default value if given.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>The element for <cite>key</cite> if it exists, or the default value if given.</p>
+<dd class="field-odd"><p><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">RawDataElement</a> or <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">DataElement</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.9)"><strong>KeyError</strong></a> – If the <cite>key</cite> is not a valid tag or keyword.
@@ -1087,8 +1193,8 @@ raised</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.popitem">
-<code class="sig-name descname">popitem</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag">pydicom.tag.BaseTag</a><span class="p">, </span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1308"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.popitem" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.popitem">
+<span class="sig-name descname"><span class="pre">popitem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1317"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.popitem" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.popitem" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.popitem()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1101,8 +1207,8 @@ raised</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.private_block">
-<code class="sig-name descname">private_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em>, <em class="sig-param"><span class="n">private_creator</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">create</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock">pydicom.dataset.PrivateBlock</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L945"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.private_block" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.private_block">
+<span class="sig-name descname"><span class="pre">private_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_creator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">create</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.PrivateBlock.html#pydicom.dataset.PrivateBlock" title="pydicom.dataset.PrivateBlock"><span class="pre">pydicom.dataset.PrivateBlock</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L952"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.private_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the block for the given tag <cite>group</cite> and <cite>private_creator</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -1141,8 +1247,8 @@ creator tag is added at the next free block. If <code class="docutils literal no
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.private_creators">
-<code class="sig-name descname">private_creators</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1027"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.private_creators" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.private_creators">
+<span class="sig-name descname"><span class="pre">private_creators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1034"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.private_creators" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of private creator names in the given group.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -1172,14 +1278,14 @@ the group of the dataset:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.remove_private_tags">
-<code class="sig-name descname">remove_private_tags</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1861"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.remove_private_tags">
+<span class="sig-name descname"><span class="pre">remove_private_tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2027"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.remove_private_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove all private elements from the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.save_as">
-<code class="sig-name descname">save_as</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)">os.PathLike</a><span class="p">[</span>AnyStr<span class="p">]</span><span class="p">, </span>BinaryIO<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">write_like_original</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1872"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.save_as">
+<span class="sig-name descname"><span class="pre">save_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.9)"><span class="pre">os.PathLike</span></a><span class="p"><span class="pre">[</span></span><span class="pre">AnyStr</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">BinaryIO</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_like_original</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2038"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.save_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> to <cite>filename</cite>.</p>
 <p>Wrapper for pydicom.filewriter.dcmwrite, passing this dataset to it.
 See documentation for that function for details.</p>
@@ -1193,8 +1299,8 @@ See documentation for that function for details.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.set_original_encoding">
-<code class="sig-name descname">set_original_encoding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">is_implicit_vr</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">is_little_endian</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">character_encoding</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1174"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.set_original_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.set_original_encoding">
+<span class="sig-name descname"><span class="pre">set_original_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_implicit_vr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_little_endian</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_encoding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">MutableSequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1182"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.set_original_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the values for the original transfer syntax and encoding.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.2.</span></p>
@@ -1204,8 +1310,8 @@ optimized writing (e.g. without decoding the data elements).</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.setdefault">
-<code class="sig-name descname">setdefault</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">default</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1317"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.setdefault" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.setdefault">
+<span class="sig-name descname"><span class="pre">setdefault</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1326"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.setdefault" title="Permalink to this definition">¶</a></dt>
 <dd><p>Emulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.setdefault()</span></code></a> with support for tags and keywords.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
@@ -1252,8 +1358,8 @@ the value of the <a class="reference internal" href="pydicom.dataelem.DataElemen
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.to_json">
-<code class="sig-name descname">to_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bulk_data_threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1024</span></em>, <em class="sig-param"><span class="n">bulk_data_element_handler</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dump_handler</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">Dataset</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2314"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.to_json" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk_data_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_data_element_handler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dump_handler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_invalid_tags</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2500"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.to_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a JSON representation of the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
@@ -1273,6 +1379,8 @@ JSON representation of the data element (dictionary including the
 serialized (dumped) JSON string (by default uses
 <a class="reference external" href="https://docs.python.org/3/library/json.html#json.dumps" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">json.dumps()</span></code></a>).</p>
 </p></li>
+<li><p><strong>suppress_invalid_tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag to specify if errors while serializing tags should be logged
+and the tag dropped or if the error should be bubbled up.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1292,8 +1400,8 @@ Model.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.to_json_dict">
-<code class="sig-name descname">to_json_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bulk_data_threshold</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1024</span></em>, <em class="sig-param"><span class="n">bulk_data_element_handler</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; _Dataset<a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2276"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.to_json_dict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.to_json_dict">
+<span class="sig-name descname"><span class="pre">to_json_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk_data_threshold</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk_data_element_handler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_invalid_tags</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2452"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.to_json_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary representation of the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
 conforming to the DICOM JSON Model as described in the DICOM
 Standard, Part 18, <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">Annex F</a>.</p>
@@ -1310,6 +1418,8 @@ value provided as a URI rather than included inline (default:
 <li><p><strong>bulk_data_element_handler</strong> (<em>callable</em><em>, </em><em>optional</em>) – Callable function that accepts a bulk data element and returns a
 JSON representation of the data element (dictionary including the
 “vr” key and either the “InlineBinary” or the “BulkDataURI” key).</p></li>
+<li><p><strong>suppress_invalid_tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Flag to specify if errors while serializing tags should be logged
+and the tag dropped or if the error should be bubbled up.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1322,22 +1432,22 @@ JSON representation of the data element (dictionary including the
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.top">
-<code class="sig-name descname">top</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2132"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.top">
+<span class="sig-name descname"><span class="pre">top</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2300"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.top" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> representation of the top level elements.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.trait_names">
-<code class="sig-name descname">trait_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2136"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.trait_names">
+<span class="sig-name descname"><span class="pre">trait_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2304"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.trait_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of valid names for auto-completion code.</p>
 <p>Used in IPython, so that data element names can be found and offered
 for autocompletion on the IPython command line.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dictionary</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a><span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>Union<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span><span class="p">, </span>BaseTag<span class="p">]</span><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2144"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">MutableMapping</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2312"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extend <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> to handle DICOM tags and keywords.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1348,8 +1458,8 @@ current object.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.values">
-<code class="sig-name descname">values</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; ValuesView<span class="p">[</span>Union<span class="p">[</span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement">pydicom.dataelem.RawDataElement</a><span class="p">]</span><span class="p">]</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L795"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.values" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ValuesView</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><span class="pre">pydicom.dataelem.RawDataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L796"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> values to simulate <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1363,8 +1473,8 @@ up the values of the <a class="reference internal" href="#pydicom.dataset.Datase
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.walk">
-<code class="sig-name descname">walk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">callback</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset">Dataset</a><span class="p">, </span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement">pydicom.dataelem.DataElement</a><span class="p">]</span><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">recursive</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a><a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L2177"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.walk">
+<span class="sig-name descname"><span class="pre">walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><span class="pre">pydicom.dataelem.DataElement</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L2343"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.walk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate through the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset's</span></code></a> elements and run
 <cite>callback</cite> on each.</p>
 <p>Visit all elements in the <a class="reference internal" href="#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>, possibly recursing into
@@ -1395,9 +1505,9 @@ to that <a class="reference internal" href="#pydicom.dataset.Dataset" title="pyd
 </dd></dl>
 
 <dl class="py method">
-<dt id="pydicom.dataset.Dataset.waveform_array">
-<code class="sig-name descname">waveform_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span></em><span class="sig-paren">)</span> &#x2192; np.ndarray<a class="reference external" href="https://github.com/pydicom/pydicom/blob/59be4993/pydicom/dataset.py#L1719"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydicom.dataset.Dataset.waveform_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at
+<dt class="sig sig-object py" id="pydicom.dataset.Dataset.waveform_array">
+<span class="sig-name descname"><span class="pre">waveform_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><span class="pre">numpy.ndarray</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8da0b9b21/pydicom/dataset.py#L1885"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.dataset.Dataset.waveform_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at
 <cite>index</cite> in the (5400,0100) <em>Waveform Sequence</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
@@ -1408,13 +1518,13 @@ to that <a class="reference internal" href="#pydicom.dataset.Dataset" title="pyd
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The <em>Waveform Data</em> for the multiplex group as an
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with shape (samples, channels). If
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> with shape (samples, channels). If
 (003A,0210) <em>Channel Sensitivity</em> is present
 then the values will be in the units specified by the (003A,0211)
 <em>Channel Sensitivity Units Sequence</em>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1432,37 +1542,29 @@ then the values will be in the units specified by the (003A,0211)
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="pydicom.dataset.FileDataset.html" class="btn btn-neutral float-right" title="pydicom.dataset.FileDataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../dataset.html" class="btn btn-neutral float-left" title="Representation of Datasets (pydicom.dataset)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="pydicom.dataset.FileDataset.html" class="btn btn-neutral float-right" title="pydicom.dataset.FileDataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../dataset.html" class="btn btn-neutral float-left" title="Representation of Datasets (pydicom.dataset)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

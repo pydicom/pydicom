@@ -17,6 +17,7 @@
       ~FileMetaDataset.add
       ~FileMetaDataset.add_new
       ~FileMetaDataset.clear
+      ~FileMetaDataset.compress
       ~FileMetaDataset.convert_pixel_data
       ~FileMetaDataset.copy
       ~FileMetaDataset.data_element
@@ -28,7 +29,6 @@
       ~FileMetaDataset.fix_meta_info
       ~FileMetaDataset.formatted_lines
       ~FileMetaDataset.from_json
-      ~FileMetaDataset.fromkeys
       ~FileMetaDataset.get
       ~FileMetaDataset.get_item
       ~FileMetaDataset.get_private_item

@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pydicom codify command &mdash; pydicom 2.2.0-rc.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydicom-codify-command">
+<h1><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command<a class="headerlink" href="#pydicom-codify-command" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command takes a DICOM file and produces Python code to
+recreate that file, or, optionally a subset within that file.</p>
+<p>See <a class="reference internal" href="../../old/writing_files.html#writing-files-using-codify"><span class="std std-ref">Using Codify</span></a> for full details of writing a complete
+file.  Here we will review the command-line options in more detail than
+in that section, and show how to export a dataset within a DICOM file that has
+sequences.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The code produced by <code class="docutils literal notranslate"><span class="pre">codify</span></code> will contain all the information in the original
+file, which may include private health information or other sensitive
+information.</p>
+</div>
+<div class="section" id="a-simple-example">
+<h2>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h2>
+<p>A simple example of using the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pydicom codify pydicom::rtplan.dcm
+
+# Coded version of DICOM file &#39;C:\git\pydicom\pydicom\data\test_files\rtplan.dcm&#39;
+# Produced by pydicom codify utility script
+import pydicom
+from pydicom.dataset import Dataset, FileMetaDataset
+from pydicom.sequence import Sequence
+
+# Main data elements
+ds = Dataset()
+ds.InstanceCreationDate = &#39;20030903&#39;
+ds.InstanceCreationTime = &#39;150031&#39;
+ds.SOPClassUID = &#39;1.2.840.10008.5.1.4.1.1.481.5&#39;
+ds.SOPInstanceUID = &#39;1.2.777.777.77.7.7777.7777.20030903150023&#39;
+ds.StudyDate = &#39;20030716&#39;
+ds.StudyTime = &#39;153557&#39;
+.
+.
+.
+</pre></div>
+</div>
+<p>Note that prefixing the file specification with <code class="docutils literal notranslate"><span class="pre">pydicom::</span></code> will read the file
+from the <em>pydicom</em> test data files rather than from the file system.</p>
+</div>
+<div class="section" id="command-options">
+<h2>Command options<a class="headerlink" href="#command-options" title="Permalink to this headline">¶</a></h2>
+<p>In the above example, the output was directed to screen, because no output file
+was specified. To see the available command options, use the <code class="docutils literal notranslate"><span class="pre">help</span></code> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pydicom help codify
+
+usage: pydicom codify [-h] [-e EXCLUDE_SIZE] [-p] [-s SAVE_AS] filespec [outfile]
+
+Read a DICOM file and produce the *pydicom* (Python) code which can create that file
+
+positional arguments:
+filespec              File specification, in format [pydicom::]filename[::element]. If `pydicom::`
+                        prefix is used, then use the pydicom test file with that name. If `element`
+                        is given, use only that data element within the file. Examples:
+                        path/to/your_file.dcm, your_file.dcm::StudyDate,
+                        pydicom::rtplan.dcm::BeamSequence[0],
+                        yourplan.dcm::BeamSequence[0].BeamNumber
+outfile               Filename to write python code to. If not specified, code is written to
+                        stdout
+
+optional arguments:
+-h, --help            show this help message and exit
+-e EXCLUDE_SIZE, --exclude-size EXCLUDE_SIZE
+                        Exclude binary data larger than specified (bytes). Default is 100 bytes
+-p, --include-private
+                        Include private data elements (default is to exclude them)
+-s SAVE_AS, --save-as SAVE_AS
+                        Specify the filename for ds.save_as(save_filename); otherwise the input name
+                        + &#39;_from_codify&#39; will be used
+
+Binary data (e.g. pixels) larger than --exclude-size (default 100 bytes) is not included. A dummy
+line with a syntax error is produced. Private data elements are not included by default.
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">codify</span> <span class="o">-</span><span class="n">s</span> <span class="n">savename</span><span class="o">.</span><span class="n">dcm</span> <span class="n">dicomfile</span><span class="o">.</span><span class="n">dcm</span> <span class="n">pythoncode</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>would read the DICOM file “dicomfile.dcm” and write the Python code
+to file “pythoncode.py”.  In that code, near the end of the file
+would be a <code class="docutils literal notranslate"><span class="pre">ds.save_as(&quot;savename.dcm&quot;,</span> <span class="pre">...)</span></code> line.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, any private data elements within the file are not translated
+to code.  If you want to include them, use the <code class="docutils literal notranslate"><span class="pre">-p</span></code> parameter.</p>
+</div>
+</div>
+<div class="section" id="codifying-a-part-of-a-dicom-file">
+<h2>Codifying a part of a DICOM file<a class="headerlink" href="#codifying-a-part-of-a-dicom-file" title="Permalink to this headline">¶</a></h2>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">filespec</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, as for
+<a class="reference internal" href="cli_guide.html#cli-show"><span class="std std-ref">the show command</span></a>, allows you to specify a data element within the file,
+rather than the whole file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pydicom</span> <span class="n">codify</span> <span class="n">pydicom</span><span class="p">::</span><span class="n">rtplan</span><span class="o">.</span><span class="n">dcm</span><span class="p">::</span><span class="n">FractionGroupSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Coded version of non-file dataset</span>
+<span class="o">...</span>
+
+<span class="c1"># Main data elements</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">FractionGroupNumber</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">NumberOfFractionsPlanned</span> <span class="o">=</span> <span class="s2">&quot;30&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">NumberOfBeams</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">NumberOfBrachyApplicationSetups</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+
+<span class="c1"># Referenced Beam Sequence</span>
+<span class="n">refd_beam_sequence</span> <span class="o">=</span> <span class="n">Sequence</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">ReferencedBeamSequence</span> <span class="o">=</span> <span class="n">refd_beam_sequence</span>
+
+<span class="c1"># Referenced Beam Sequence: Referenced Beam 1</span>
+<span class="n">refd_beam1</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">()</span>
+<span class="n">refd_beam1</span><span class="o">.</span><span class="n">BeamDoseSpecificationPoint</span> <span class="o">=</span> <span class="p">[</span><span class="mf">239.531250000000</span><span class="p">,</span> <span class="mf">239.531250000000</span><span class="p">,</span> <span class="o">-</span><span class="mf">751.87000000000</span><span class="p">]</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Currently, only a data element which is a <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>
+(an item within a <a class="reference internal" href="../../reference/generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>) is accepted.
+The resulting code would not on its own produce a correct DICOM file,
+but could be useful as a model when creating
+more complete code.  For example, issuing code for one item in a
+<code class="docutils literal notranslate"><span class="pre">Sequence</span></code> could be the starting point towards a loop
+producing a number of sequence items.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

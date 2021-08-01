@@ -3,27 +3,33 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pydicom.fileset.DIRECTORY_RECORDERS &mdash; pydicom 2.1.0 documentation</title>
+  <title>pydicom.fileset.DIRECTORY_RECORDERS &mdash; pydicom 2.2.0-rc.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -33,10 +39,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     
@@ -60,7 +66,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pydicom
+            <a href="../../index.html" class="icon icon-home"> pydicom
           
 
           
@@ -73,7 +79,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.2.0-rc.1
               </div>
             
           
@@ -98,12 +104,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">How to install pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/getting_started.html">Introduction to pydicom</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../old/pydicom_user_guide.html">pydicom User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../old/ref_guide.html">Reading and writing DICOM files</a></li>
@@ -118,6 +124,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dataset.html">Representation of Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.dataset</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../fileset.html">DICOM File-sets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.fileset</span></code>)</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.RecordNode.html">pydicom.fileset.RecordNode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.FileInstance.html">pydicom.fileset.FileInstance</a></li>
@@ -136,14 +143,14 @@
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#image-processing">Image processing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#input-output">Input-output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Additional Information</span></p>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/contributing.html">Contributing to pydicom</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq/index.html">Frequently asked questions</a></li>
@@ -188,6 +195,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -203,7 +212,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -218,8 +227,8 @@
   <div class="section" id="pydicom-fileset-directory-recorders">
 <h1>pydicom.fileset.DIRECTORY_RECORDERS<a class="headerlink" href="#pydicom-fileset-directory-recorders" title="Permalink to this headline">¶</a></h1>
 <dl class="py data">
-<dt id="pydicom.fileset.DIRECTORY_RECORDERS">
-<code class="sig-prename descclassname">pydicom.fileset.</code><code class="sig-name descname">DIRECTORY_RECORDERS</code><em class="property"> = {'ASSESSMENT': &lt;function _define_assessment&gt;, 'ENCAP DOC': &lt;function _define_encap_doc&gt;, 'FIDUCIAL': &lt;function _define_generic_content_id&gt;, 'HANGING PROTOCOL': &lt;function _define_hanging_protocol&gt;, 'IMAGE': &lt;function _define_image&gt;, 'IMPLANT': &lt;function _define_implant&gt;, 'IMPLANT ASSY': &lt;function _define_implant_assy&gt;, 'IMPLANT GROUP': &lt;function _define_implant_group&gt;, 'KEY OBJECT DOC': &lt;function _define_key_object_doc&gt;, 'MEASUREMENT': &lt;function _define_generic_content_id&gt;, 'PALETTE': &lt;function _define_palette&gt;, 'PATIENT': &lt;function _define_patient&gt;, 'PLAN': &lt;function _define_empty&gt;, 'PRESENTATION': &lt;function _define_presentation&gt;, 'RADIOTHERAPY': &lt;function _define_radiotherapy&gt;, 'RAW DATA': &lt;function _define_generic_content&gt;, 'REGISTRATION': &lt;function _define_generic_content_id&gt;, 'RT DOSE': &lt;function _define_rt_dose&gt;, 'RT PLAN': &lt;function _define_rt_plan&gt;, 'RT STRUCTURE SET': &lt;function _define_rt_structure_set&gt;, 'RT TREAT RECORD': &lt;function _define_rt_treatment_record&gt;, 'SERIES': &lt;function _define_series&gt;, 'SPECTROSCOPY': &lt;function _define_spectroscopy&gt;, 'SR DOCUMENT': &lt;function _define_sr_document&gt;, 'STEREOMETRIC': &lt;function _define_empty&gt;, 'STUDY': &lt;function _define_study&gt;, 'SURFACE': &lt;function _define_generic_content_id&gt;, 'SURFACE SCAN': &lt;function _define_surface_scan&gt;, 'TRACT': &lt;function _define_generic_content_id&gt;, 'VALUE MAP': &lt;function _define_generic_content_id&gt;, 'WAVEFORM': &lt;function _define_generic_content&gt;}</em><a class="headerlink" href="#pydicom.fileset.DIRECTORY_RECORDERS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pydicom.fileset.DIRECTORY_RECORDERS">
+<span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">DIRECTORY_RECORDERS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'ASSESSMENT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_assessment&gt;,</span> <span class="pre">'ENCAP</span> <span class="pre">DOC':</span> <span class="pre">&lt;function</span> <span class="pre">_define_encap_doc&gt;,</span> <span class="pre">'FIDUCIAL':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'HANGING</span> <span class="pre">PROTOCOL':</span> <span class="pre">&lt;function</span> <span class="pre">_define_hanging_protocol&gt;,</span> <span class="pre">'IMAGE':</span> <span class="pre">&lt;function</span> <span class="pre">_define_image&gt;,</span> <span class="pre">'IMPLANT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_implant&gt;,</span> <span class="pre">'IMPLANT</span> <span class="pre">ASSY':</span> <span class="pre">&lt;function</span> <span class="pre">_define_implant_assy&gt;,</span> <span class="pre">'IMPLANT</span> <span class="pre">GROUP':</span> <span class="pre">&lt;function</span> <span class="pre">_define_implant_group&gt;,</span> <span class="pre">'KEY</span> <span class="pre">OBJECT</span> <span class="pre">DOC':</span> <span class="pre">&lt;function</span> <span class="pre">_define_key_object_doc&gt;,</span> <span class="pre">'MEASUREMENT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'PALETTE':</span> <span class="pre">&lt;function</span> <span class="pre">_define_palette&gt;,</span> <span class="pre">'PATIENT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_patient&gt;,</span> <span class="pre">'PLAN':</span> <span class="pre">&lt;function</span> <span class="pre">_define_empty&gt;,</span> <span class="pre">'PRESENTATION':</span> <span class="pre">&lt;function</span> <span class="pre">_define_presentation&gt;,</span> <span class="pre">'RADIOTHERAPY':</span> <span class="pre">&lt;function</span> <span class="pre">_define_radiotherapy&gt;,</span> <span class="pre">'RAW</span> <span class="pre">DATA':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content&gt;,</span> <span class="pre">'REGISTRATION':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'RT</span> <span class="pre">DOSE':</span> <span class="pre">&lt;function</span> <span class="pre">_define_rt_dose&gt;,</span> <span class="pre">'RT</span> <span class="pre">PLAN':</span> <span class="pre">&lt;function</span> <span class="pre">_define_rt_plan&gt;,</span> <span class="pre">'RT</span> <span class="pre">STRUCTURE</span> <span class="pre">SET':</span> <span class="pre">&lt;function</span> <span class="pre">_define_rt_structure_set&gt;,</span> <span class="pre">'RT</span> <span class="pre">TREAT</span> <span class="pre">RECORD':</span> <span class="pre">&lt;function</span> <span class="pre">_define_rt_treatment_record&gt;,</span> <span class="pre">'SERIES':</span> <span class="pre">&lt;function</span> <span class="pre">_define_series&gt;,</span> <span class="pre">'SPECTROSCOPY':</span> <span class="pre">&lt;function</span> <span class="pre">_define_spectroscopy&gt;,</span> <span class="pre">'SR</span> <span class="pre">DOCUMENT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_sr_document&gt;,</span> <span class="pre">'STEREOMETRIC':</span> <span class="pre">&lt;function</span> <span class="pre">_define_empty&gt;,</span> <span class="pre">'STUDY':</span> <span class="pre">&lt;function</span> <span class="pre">_define_study&gt;,</span> <span class="pre">'SURFACE':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'SURFACE</span> <span class="pre">SCAN':</span> <span class="pre">&lt;function</span> <span class="pre">_define_surface_scan&gt;,</span> <span class="pre">'TRACT':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'VALUE</span> <span class="pre">MAP':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content_id&gt;,</span> <span class="pre">'WAVEFORM':</span> <span class="pre">&lt;function</span> <span class="pre">_define_generic_content&gt;}</span></em><a class="headerlink" href="#pydicom.fileset.DIRECTORY_RECORDERS" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> containing the directory record creation functions.</p>
 <p>The functions are used to create non-PRIVATE records for a given SOP Instance
 as <code class="docutils literal notranslate"><span class="pre">{&quot;RECORD</span> <span class="pre">TYPE&quot;:</span> <span class="pre">callable}</span></code>, where <code class="docutils literal notranslate"><span class="pre">&quot;RECORD</span> <span class="pre">TYPE&quot;</span></code> should match one of
@@ -266,37 +275,29 @@ for possible record types.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../dicomdir.html" class="btn btn-neutral float-right" title="DICOMDIR (pydicom.dicomdir)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="pydicom.fileset.is_conformant_file_id.html" class="btn btn-neutral float-left" title="pydicom.fileset.is_conformant_file_id" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../dicomdir.html" class="btn btn-neutral float-right" title="DICOMDIR (pydicom.dicomdir)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pydicom.fileset.is_conformant_file_id.html" class="btn btn-neutral float-left" title="pydicom.fileset.is_conformant_file_id" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2008-2020, Darcy Mason and pydicom contributors
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
