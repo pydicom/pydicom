@@ -43,6 +43,10 @@ table below.
 | (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32, | Required |
 |             |                           |      | 64            |          |
 +-------------+---------------------------+------+---------------+----------+
+| (0028,0101) | BitsStored                | 1    | 1, 8, 12, 16  | Optional |
++-------------+---------------------------+------+---------------+----------+
+| (0028,0102) | HighBit                   | 1    | 0, 7, 11, 15  | Optional |
++-------------+---------------------------+------+---------------+----------+
 | (0028,0103) | PixelRepresentation       | 1C   | 0, 1          | Optional |
 +-------------+---------------------------+------+---------------+----------+
 
@@ -284,10 +288,21 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
             "the dataset"
         )
 
+    # Attributes required by both Floating Point Image Pixel Module Attributes
+    # and Image Pixel Description Macro Attributes
     required_elements = [
         'BitsAllocated', 'Rows', 'Columns',
         'SamplesPerPixel', 'PhotometricInterpretation'
     ]
+    if px_keyword == 'PixelData':
+        # Attributess required by Image Pixel Description Macro Attributes
+        required_elements.extend([
+            'PixelRepresentation',
+            'BitsStored',
+            'HighBit',
+        ])
+        if ds.SamplesPerPixel > 1:
+            required_elements.append('PlanarConfiguration')
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
