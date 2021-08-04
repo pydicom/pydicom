@@ -24,6 +24,7 @@ from pydicom.dataelem import (
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dicomdir import DicomDir
 from pydicom.errors import InvalidDicomError
+from pydicom.filebase import DicomFileLike
 from pydicom.fileutil import (
     read_undefined_length_value, path_from_pathlike, PathType, _unpack_tag
 )
@@ -901,7 +902,7 @@ def read_partial(
 
 
 def dcmread(
-    fp: Union[PathType, BinaryIO],
+    fp: Union[PathType, BinaryIO, DicomFileLike],
     defer_size: Optional[Union[str, int, float]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,
