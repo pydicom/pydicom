@@ -156,7 +156,7 @@ RLE images provided a suitable plugin is installed.
 
 Using pip::
 
-  pip install pylibjpeg pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
+  pip install "pylibjpeg>=1.1" pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
 
 
 .. _tut_install_dev:
