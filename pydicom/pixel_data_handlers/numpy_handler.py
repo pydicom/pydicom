@@ -43,7 +43,7 @@ table below.
 | (0028,0100) | BitsAllocated             | 1    | 1, 8, 16, 32, | Required |
 |             |                           |      | 64            |          |
 +-------------+---------------------------+------+---------------+----------+
-| (0028,0103) | PixelRepresentation       | 1    | 0, 1          | Required |
+| (0028,0103) | PixelRepresentation       | 1C   | 0, 1          | Optional |
 +-------------+---------------------------+------+---------------+----------+
 
 """
@@ -285,7 +285,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         )
 
     required_elements = [
-        'BitsAllocated', 'Rows', 'Columns', 'PixelRepresentation',
+        'BitsAllocated', 'Rows', 'Columns',
         'SamplesPerPixel', 'PhotometricInterpretation'
     ]
     missing = [elem for elem in required_elements if elem not in ds]
