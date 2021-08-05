@@ -45,8 +45,6 @@ table below.
 +-------------+---------------------------+------+---------------+----------+
 | (0028,0101) | BitsStored                | 1    | 1, 8, 12, 16  | Optional |
 +-------------+---------------------------+------+---------------+----------+
-| (0028,0102) | HighBit                   | 1    | 0, 7, 11, 15  | Optional |
-+-------------+---------------------------+------+---------------+----------+
 | (0028,0103) | PixelRepresentation       | 1C   | 0, 1          | Optional |
 +-------------+---------------------------+------+---------------+----------+
 
@@ -294,21 +292,22 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         'BitsAllocated', 'Rows', 'Columns',
         'SamplesPerPixel', 'PhotometricInterpretation'
     ]
-    if px_keyword == 'PixelData':
+    if px_keyword[0] == 'PixelData':
         # Attributess required by Image Pixel Description Macro Attributes
-        required_elements.extend([
-            'PixelRepresentation',
-            'BitsStored',
-            'HighBit',
-        ])
-        if ds.SamplesPerPixel > 1:
-            required_elements.append('PlanarConfiguration')
+        required_elements.extend(['PixelRepresentation', 'BitsStored'])
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:
         raise AttributeError(
             "Unable to convert the pixel data as the following required "
             "elements are missing from the dataset: " + ", ".join(missing)
         )
+    if ds.SamplesPerPixel > 1:
+        if not hasattr(ds, 'PlanarConfiguration'):
+            raise AttributeError(
+                "Unable to convert the pixel data as the following "
+                "conditionally required element is missing from the dataset: "
+                "PlanarConfiguration"
+            )
 
     # May be Pixel Data, Float Pixel Data or Double Float Pixel Data
     pixel_data = getattr(ds, px_keyword[0])

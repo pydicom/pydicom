@@ -26,6 +26,8 @@ There are the following possibilities:
 * PlanarConfiguration
 """
 
+from copy import deepcopy
+
 import pytest
 
 from pydicom import config
@@ -1068,6 +1070,7 @@ class TestNumpy_NumpyHandler:
         ds.Rows = 10
         ds.Columns = 10
         ds.BitsAllocated = 16
+        ds.BitsStored = 16
         ds.PixelRepresentation = 0
         ds.SamplesPerPixel = 1
         ds.PhotometricInterpretation = 'MONOCHROME2'
@@ -1105,16 +1108,60 @@ class TestNumpy_GetPixelData:
         with pytest.raises(AttributeError, match=msg):
             get_pixeldata(ds)
 
-    def test_missing_required_elem(self):
+    def test_missing_required_elem_pixel_data_monochrome(self):
         """Tet get_pixeldata raises if dataset missing required element."""
-        ds = dcmread(EXPL_16_1_1F)
-        del ds.BitsAllocated
+        required_attrs = (
+            'BitsAllocated',
+            'BitsStored',
+            'Rows',
+            'Columns',
+            'SamplesPerPixel',
+            'PhotometricInterpretation',
+            'PixelRepresentation',
+        )
+        for attr in required_attrs:
+            ds = dcmread(EXPL_16_1_1F)
+            delattr(ds, attr)
+            msg = (
+                r"Unable to convert the pixel data as the following required "
+                r"elements are missing from the dataset: {}".format(attr)
+            )
+            with pytest.raises(AttributeError, match=msg):
+                get_pixeldata(ds)
+
+    def test_missing_required_elem_pixel_data_color(self):
+        """Tet get_pixeldata raises if dataset missing required element."""
+        ds = dcmread(EXPL_8_3_1F)
         del ds.Rows
-        del ds.SamplesPerPixel
+        del ds.Columns
         msg = (
             r"Unable to convert the pixel data as the following required "
-            r"elements are missing from the dataset: BitsAllocated, Rows, "
-            r"SamplesPerPixel"
+            r"elements are missing from the dataset: Rows, Columns"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            get_pixeldata(ds)
+
+    def test_missing_conditionally_required_elem_pixel_data_color(self):
+        """Tet get_pixeldata raises if dataset missing required element."""
+        ds = dcmread(EXPL_8_3_1F)
+        del ds.PlanarConfiguration
+        msg = (
+            r"Unable to convert the pixel data as the following conditionally "
+            r"required element is missing from the dataset: "
+            r"PlanarConfiguration"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            get_pixeldata(ds)
+
+    def test_missing_required_elem_float_pixel_data_monochrome(self):
+        """Tet get_pixeldata raises if dataset missing required element."""
+        ds = dcmread(IMPL_32_1_1F)
+        ds.FloatPixelData = ds.PixelData
+        del ds.PixelData
+        del ds.Rows
+        msg = (
+            r"Unable to convert the pixel data as the following required "
+            r"elements are missing from the dataset: Rows"
         )
         with pytest.raises(AttributeError, match=msg):
             get_pixeldata(ds)
