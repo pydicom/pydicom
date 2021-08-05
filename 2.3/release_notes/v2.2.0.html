@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Version 2.2.0 &mdash; pydicom 2.2.0-rc.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Version 2.2.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="version-2-2-0">
+<h1>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Data elements with a VR of <strong>AT</strong> must now be set with values
+acceptable to <a class="reference internal" href="../reference/generated/pydicom.tag.Tag.html#pydicom.tag.Tag" title="pydicom.tag.Tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">Tag()</span></code></a>, and are always stored as a
+<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a>.  Previously, any Python type could be
+set.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseTag.__eq__()</span></code> returns <code class="docutils literal notranslate"><span class="pre">False</span></code> rather
+than raising an exception when the operand cannot be converted to
+<a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1327">#1327</a>)</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">DA.__str__()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">DT.__str__()</span></code> and
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">TM.__str__()</span></code> return valid DICOM
+strings instead of the formatted date and time representations
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1262">#1262</a>)</p></li>
+<li><p>If comparing <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instances, the file
+metadata is now ignored. This makes it possible to compare a
+<a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> object with a
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> object.</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.rle_handler.html#pydicom.pixel_data_handlers.rle_handler.rle_encode_frame" title="pydicom.pixel_data_handlers.rle_handler.rle_encode_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">rle_encode_frame()</span></code></a> is
+deprecated and will be removed in v3.0, use
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> or
+<a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> instead.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">read_file()</span></code> is deprecated and will be removed in
+v3.0, use <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> instead.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">write_file()</span></code> is deprecated and will be removed in
+v3.0, use <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> instead.</p></li>
+<li><p>Data dictionaries updated to version 2021b of the DICOM Standard</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> no longer inherits from <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></li>
+</ul>
+</div>
+<div class="section" id="enhancements">
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Added a command-line interface for pydicom.  Current subcommands are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">show</span></code>: display all or part of a DICOM file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">codify</span></code> to produce Python code for writing files or sequence items
+from scratch.</p></li>
+</ul>
+</div></blockquote>
+<p>Please see the <a class="reference internal" href="../guides/cli/cli_guide.html#cli-guide"><span class="std std-ref">Command-line Interface Guide</span></a> for examples and details
+of all the options for each command.</p>
+</li>
+<li><p>A field containing an invalid number of bytes will result in a warning
+instead of an exception when
+<a class="reference internal" href="../reference/generated/pydicom.config.convert_wrong_length_to_UN.html#pydicom.config.convert_wrong_length_to_UN" title="pydicom.config.convert_wrong_length_to_UN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">convert_wrong_length_to_UN</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p>Private tags known via the private dictionary will now get the configured
+VR if read from a dataset instead of <strong>UN</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1051">#1051</a>).</p></li>
+<li><p>While reading explicit VR, a switch to implicit VR will be silently attempted
+if the VR bytes are not valid VR characters, and config option
+<a class="reference internal" href="../reference/generated/pydicom.config.assume_implicit_vr_switch.html#pydicom.config.assume_implicit_vr_switch" title="pydicom.config.assume_implicit_vr_switch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assume_implicit_vr_switch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">True</span></code> (default)</p></li>
+<li><p>New functionality to help with correct formatting of decimal strings (<strong>DS</strong>)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.is_valid_ds.html#pydicom.valuerep.is_valid_ds" title="pydicom.valuerep.is_valid_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_valid_ds()</span></code></a> to check whether a string is
+valid as a DICOM decimal string and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_number_as_ds()</span></code></a> to format a given <code class="docutils literal notranslate"><span class="pre">float</span></code>
+or <code class="docutils literal notranslate"><span class="pre">Decimal</span></code> as a DS while retaining the highest possible level of
+precision</p></li>
+<li><p>If <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, all
+<strong>DS</strong> objects created will be checked for the validity of their string
+representations.</p></li>
+<li><p>Added optional <code class="docutils literal notranslate"><span class="pre">auto_format</span></code> parameter to the init methods of
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSfloat.html#pydicom.valuerep.DSfloat" title="pydicom.valuerep.DSfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSfloat</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.DSdecimal.html#pydicom.valuerep.DSdecimal" title="pydicom.valuerep.DSdecimal"><code class="xref py py-class docutils literal notranslate"><span class="pre">DSdecimal</span></code></a> and the <a class="reference internal" href="../reference/generated/pydicom.valuerep.DS.html#pydicom.valuerep.DS" title="pydicom.valuerep.DS"><code class="xref py py-func docutils literal notranslate"><span class="pre">DS()</span></code></a>
+factory function to allow explicitly requesting automatic formatting of
+the string representations of these objects when they are constructed.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Added methods to construct <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> objects
+from individual components of names (<code class="docutils literal notranslate"><span class="pre">family_name</span></code>, <code class="docutils literal notranslate"><span class="pre">given_name</span></code>, etc.).
+See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components_veterinary" title="pydicom.valuerep.PersonName.from_named_components_veterinary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components_veterinary()</span></code></a>.</p></li>
+<li><p>Added support for downloading the large test files with the <a class="reference external" href="https://docs.python-requests.org/en/master/">requests</a> package in addition to
+<a class="reference external" href="https://docs.python.org/3/library/urllib.request.html#module-urllib.request" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">urllib.request</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
+<li><p>Ensured <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.convert_color_space" title="pydicom.pixel_data_handlers.util.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> uses
+32-bit floats for calculation, added <cite>per_frame</cite> flag to allow frame-by-frame
+processing and improved the speed by ~20-60% (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
+<li><p>Optimisations for RLE encoding using <em>pydicom</em> (~40% faster).</p></li>
+<li><p>Added support for faster decoding (~4-5x) and encoding (~20x) of <em>RLE Lossless</em>
+<em>Pixel Data</em> via the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1361">#1361</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>).</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> function for
+compressing uncompressed pixel data using a given encoding format as specified
+by a UID. Only <em>RLE Lossless</em> is currently supported (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/encoders.html#module-pydicom.encoders" title="pydicom.encoders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">encoders</span></code></a> module and the following encoders:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.encoders.RLELosslessEncoder.html#pydicom.encoders.RLELosslessEncoder" title="pydicom.encoders.RLELosslessEncoder"><code class="xref py py-attr docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a> with ‘pydicom’, ‘pylibjpeg’
+and ‘gdcm’ plugins</p></li>
+</ul>
+</li>
+<li><p>Added <cite>read</cite> parameter to <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a>
+to allow reading and returning the corresponding dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
+<li><p>Handle decoded RLE segments with padding (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1438">#1438</a>)</p></li>
+<li><p>Add option to JSON functions to suppress exception and continue (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1332">#1332</a>)</p></li>
+<li><p>Allow searching <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> s for a list of elements (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1428">#1428</a>)</p></li>
+<li><p>Added hash function to SR <code class="xref py py-class docutils literal notranslate"><span class="pre">Code</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1434">#1434</a>)</p></li>
+</ul>
+</div>
+<div class="section" id="fixes">
+<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed pickling a <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance with sequences
+after the sequence had been read (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1278">#1278</a>)</p></li>
+<li><p>Fixed JSON export of numeric values</p></li>
+<li><p>Fixed handling of sequences of unknown length that switch to implicit
+encoding, and sequences with VR <strong>UN</strong> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
+<li><p>Do not load external data sources until needed - fixes problems with
+standard workflow if <cite>setuptools</cite> are not installed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1341">#1341</a>)</p></li>
+<li><p>Fixed empty <strong>PN</strong> elements read from file being <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> rather than
+<a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1338">#1338</a>)</p></li>
+<li><p>Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
+rather than YBR with the Pillow pixel data handler (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/878">#878</a>)</p></li>
+<li><p>Allow to deepcopy a <cite>~pydicom.dataset.FileDataset</cite> object (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1147">#1147</a>)</p></li>
+<li><p>Fixed elements with a VR of <strong>OL</strong>, <strong>OD</strong> and <strong>OV</strong> not being set correctly
+when an encoded backslash was part of the element value (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1412">#1412</a>)</p></li>
+<li><p>Fixed expansion of linear segments with floating point steps in
+segmented LUTs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1415">#1415</a>)</p></li>
+<li><p>Fixed handling of code extensions with person name component delimiter
+(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1449">#1449</a>)</p></li>
+<li><p>Fixed bug decoding RBG jpg with APP14 marker due to change in Pillow (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1444">#1444</a>)</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

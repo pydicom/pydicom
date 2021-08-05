@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Glossary &mdash; pydicom 2.2.0-rc.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing documentation" href="writing_documentation.html" />
+    <link rel="prev" title="Command-line Interface Guide" href="cli/cli_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pydicom
+          
+
+          
+            
+            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.2.0-rc.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Guides</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="element_value_types.html">Element VRs and Python types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encoding/index.html">Pixel Data Encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli/cli_guide.html">Command-line Interface Guide</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Glossary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#image-pixel-module">Image Pixel Module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="writing_documentation.html">Writing documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Guides</a> &raquo;</li>
+        
+      <li>Glossary</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="glossary">
+<h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="image-pixel-module">
+<span id="glossary-image-pixel"></span><h2><a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html">Image Pixel Module</a><a class="headerlink" href="#image-pixel-module" title="Permalink to this headline">¶</a></h2>
+<dl>
+<dt><strong>(0028,0002) Samples per Pixel</strong></dt><dd><p>The number of samples per pixel, otherwise known as the number of image
+channels, components or planes. An RGB image has 3 samples per pixel (red,
+green and blue), a grayscale image has 1 sample per pixel (intensity).
+The <em>Samples per Pixel</em> for all DICOM <em>Pixel Data</em> is either 1 or 3,
+however 4 was previously allowed.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>, but may be constrained by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+</dd>
+<dt><strong>(0028,0004) Photometric Interpretation</strong></dt><dd><p>The intended interpretation of the <em>Pixel Data</em> in its <em>current form</em> in
+the dataset. For example:</p>
+<ul class="simple">
+<li><p>If you have a dataset with RGB <em>Pixel Data</em> then the  <em>Photometric
+Interpretation</em> should be <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>.</p></li>
+<li><p>If you take your RGB data and convert it to <a class="reference external" href="https://en.wikipedia.org/wiki/YCbCr">YCbCr</a> then the <em>Photometric
+Interpretation</em> should be <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code> (or a related interpretation
+depending on the conversion method).</p></li>
+<li><p>If you then compress that data using <em>RLE Lossless</em> encoding then the
+<em>Photometric Interpretation</em> remains <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>.</p></li>
+<li><p>On the other hand, if you take your original RGB data and apply <em>JPEG
+2000 Lossless</em> encoding then the <em>Photometric Interpretation</em> will either
+be <code class="docutils literal notranslate"><span class="pre">'RGB'</span></code> or <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code> depending on whether or not the encoder
+performs multiple component transformation.</p></li>
+</ul>
+<p>When compressing pixel data using one of the JPEG encodings it’s important
+to know if the encoder is performing any color space transformation prior
+to compression, as this needs to be taken into account when setting
+the <em>Photometric Interpretation</em>. This is important when an encoder
+performs a transformation and the decoder doesn’t, since having a correct
+<em>Photometric Interpretation</em> makes it possible to determine which inverse
+transformation to use to return the pixel data to its original color space.</p>
+<p>For more detailed information on each of the defined photometric
+interpretations refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2">Annex C.7.6.3.1</a> of Part 3 of the DICOM
+Standard.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">'MONOCHROME1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'MONOCHROME2'</span></code>, <code class="docutils literal notranslate"><span class="pre">'PALETTE</span> <span class="pre">COLOR'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'RGB'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_FULL_422'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_PARTIAL_420'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'YBR_ICT'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YBR_RCT'</span></code>, however restrictions apply based on
+the <em>Transfer Syntax UID</em>, and further constraints may be required by the
+<a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+</dd>
+<dt><strong>(0028,0006) Planar Configuration</strong></dt><dd><p>Required when <em>Samples per Pixel</em> is greater than one, this indicates the
+order of the samples used by the pixel data, as either:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>, where sample values for the first pixel is followed by the sample
+value for the second pixel: R1, G1, B1, R2, G2, B2, …, Rn, Gn, Bn.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span></code>, where sample values for each color plane are contiguous: R1, R2,
+…, Rn, G1, G2, …, Gn, B1, B2, …, Bn.</p></li>
+</ul>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+<dt><strong>(0028,0100) Bits Allocated</strong></dt><dd><p>The number of bits used to actually <em>contain</em> each sample of each pixel.
+All DICOM <em>Pixel Data</em> is either 1 (for bit-packed <em>Pixel Data</em>) or more
+typically a multiple of 8 such as 8, 16 or 32, with 64 currently being the
+maximum used. Using the example of a <em>Bits Stored</em> of 12, this means that
+the actual number of bits used to contain the values must be at least 16.</p>
+<p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> or a multiple of 8, however many <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IODs</a> place further restrictions on what the value may be.</p>
+</dd>
+<dt><strong>(0028,0101) Bits Stored</strong></dt><dd><p>The number of bits actually <em>used</em> by each sample of each
+pixel. For example, with a <em>Bits Stored</em> value of <code class="docutils literal notranslate"><span class="pre">12</span></code>, an unsigned
+grayscale image will have pixel values in the range 0 to 4095 and an
+unsigned RGB image will have values in the range (R: 0 to 4095, G: 0 to
+4095, B: 0 to 4095). Must be equal to or less than <em>Bits Allocated</em>.</p>
+<p>For more detailed information refer to <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_8.html#sect_8.1.1">Chapter 8</a> and <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/chapter_D.html">Annex D</a> in Part 5 of the DICOM Standard.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">1</span></code> to <em>Bits Allocated</em> (inclusive)</p>
+</dd>
+<dt><strong>(0028,0102) High Bit</strong></dt><dd><p>The <a class="reference external" href="https://en.wikipedia.org/wiki/Bit_numbering#Most_significant_bit">most significant bit</a> of the
+pixel sample data and is equal to <em>Bits Stored</em> - 1, however other values
+have been allowed in past versions of the DICOM Standard.</p>
+<p>Allowed values: <em>Bits Stored</em> - 1</p>
+</dd>
+<dt><strong>(0028,0103) Pixel Representation</strong></dt><dd><p>Describes the type of pixel values, either signed (using
+<a class="reference external" href="https://en.wikipedia.org/wiki/Two%27s_complement">2’s complement</a>)
+or unsigned integers. A value of <code class="docutils literal notranslate"><span class="pre">0</span></code> indicates the <em>Pixel Data</em> contains
+unsigned integers while a value of <code class="docutils literal notranslate"><span class="pre">1</span></code> indicates it contains signed
+integers.</p>
+<p>Allowed values: <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code>, but may be constrained by the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/ps3.3.html">IOD</a>.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="writing_documentation.html" class="btn btn-neutral float-right" title="Writing documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cli/cli_guide.html" class="btn btn-neutral float-left" title="Command-line Interface Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

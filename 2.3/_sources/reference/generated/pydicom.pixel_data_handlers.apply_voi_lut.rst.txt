@@ -1,0 +1,6 @@
+﻿pydicom.pixel\_data\_handlers.apply\_voi\_lut
+=============================================
+
+.. currentmodule:: pydicom.pixel_data_handlers
+
+.. autofunction:: apply_voi_lut

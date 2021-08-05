@@ -1,0 +1,6 @@
+﻿pydicom.encoders.get\_encoder
+=============================
+
+.. currentmodule:: pydicom.encoders
+
+.. autofunction:: get_encoder
