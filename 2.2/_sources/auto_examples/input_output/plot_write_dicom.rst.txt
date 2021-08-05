@@ -39,32 +39,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpzlsbei45.dcm
+    Writing test file /tmp/tmplw74bzx7.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpgd4c60oo.dcm
-    Load file /tmp/tmpzlsbei45.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmpf0sos_up.dcm
+    Load file /tmp/tmplw74bzx7.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210801'
-    (0008, 0033) Content Time                        TM: '213217.220090'
+    (0008, 0023) Content Date                        DA: '20210805'
+    (0008, 0033) Content Time                        TM: '173619.294036'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpzlsbei45.dcm ...
-    Load file /tmp/tmpgd4c60oo.dcm ...
+    Remove file /tmp/tmplw74bzx7.dcm ...
+    Load file /tmp/tmpf0sos_up.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20210801'
-    (0008, 0033) Content Time                        TM: '213217.220090'
+    (0008, 0023) Content Date                        DA: '20210805'
+    (0008, 0033) Content Time                        TM: '173619.294036'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpgd4c60oo.dcm ...
+    Remove file /tmp/tmpf0sos_up.dcm ...
 
 
 
@@ -145,7 +145,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.011 seconds)
+   **Total running time of the script:** ( 0 minutes  0.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
