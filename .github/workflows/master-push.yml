@@ -127,7 +127,7 @@ jobs:
 
     - name: Install pymedphys
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
-      run: python -m pip install pymedphys[user,tests]>=0.31.0
+      run: python -m pip install --pre pymedphys[user,tests]
     - name: Get PyMedPhys cache directory
       if: ${{ matrix.pymedphys-dep == 'pymedphys' }}
       id: pymedphys-cache-location
