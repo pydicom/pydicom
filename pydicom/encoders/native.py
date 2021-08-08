@@ -130,7 +130,7 @@ def _encode_row(src: bytes) -> bytes:
     Notes
     -----
     * 2-byte repeat runs are always encoded as Replicate Runs rather than
-      only when not preceeded by a Literal Run as suggested by the Standard.
+      only when not preceded by a Literal Run as suggested by the Standard.
     """
     out: List[int] = []
     out_append = out.append
