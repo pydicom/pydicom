@@ -5,10 +5,7 @@
 
 import logging
 import os
-from typing import (
-    Optional, Callable, Dict, Any, TYPE_CHECKING, List, Union, MutableSequence,
-    Union
-)
+from typing import Optional, Dict, Any, TYPE_CHECKING
 
 have_numpy = True
 try:

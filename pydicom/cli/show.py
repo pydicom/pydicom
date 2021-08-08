@@ -2,11 +2,8 @@
 """Pydicom command line interface program for `pydicom show`"""
 
 import argparse
-import sys
-from typing import Optional, List, Union, Callable, Any
+from typing import Optional, List, Union, Callable
 
-from pydicom import dcmread
-from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom.cli.main import filespec_help, filespec_parser
 
