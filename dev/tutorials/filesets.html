@@ -506,7 +506,7 @@ use the <a class="reference internal" href="../reference/generated/pydicom.files
 <p>The <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method uses <em>pydicom’s</em> default
 directory record creation functions to create the necessary records based on
 the SOP instance’s attributes, such as <em>SOP Class UID</em> and <em>Modality</em>.
-Occassionally they may fail when an element required by these functions
+Occasionally they may fail when an element required by these functions
 is empty or missing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtdose.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
