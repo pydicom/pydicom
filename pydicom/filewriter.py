@@ -830,7 +830,7 @@ def _write_dataset(
     if any, has been written.
     """
 
-    # if we want to write with the same endianess and VR handling as
+    # if we want to write with the same endianness and VR handling as
     # the read dataset we want to preserve raw data elements for
     # performance reasons (which is done by get_item);
     # otherwise we use the default converting item getter

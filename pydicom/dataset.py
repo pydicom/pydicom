@@ -354,7 +354,7 @@ class Dataset:
     is_little_endian : bool
         Shall be set before writing with ``write_like_original=False``.
         The :class:`Dataset` (excluding the pixel data) will be written using
-        the given endianess.
+        the given endianness.
     is_implicit_VR : bool
         Shall be set before writing with ``write_like_original=False``.
         The :class:`Dataset` will be written using the transfer syntax with
@@ -382,7 +382,7 @@ class Dataset:
 
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
-        # set depending on the endianess of the read dataset
+        # set depending on the endianness of the read dataset
         self.read_little_endian: Optional[bool] = None
         # set depending on the VR handling of the read dataset
         self.read_implicit_vr: Optional[bool] = None
@@ -1148,7 +1148,7 @@ class Dataset:
     def _dataset_slice(self, slce: slice) -> "Dataset":
         """Return a slice that has the same properties as the original dataset.
 
-        That includes properties related to endianess and VR handling,
+        That includes properties related to endianness and VR handling,
         and the specific character set. No element conversion is done, e.g.
         elements of type ``RawDataElement`` are kept.
         """
@@ -1168,7 +1168,7 @@ class Dataset:
 
         .. versionadded:: 1.1
 
-        This includes properties related to endianess, VR handling and the
+        This includes properties related to endianness, VR handling and the
         (0008,0005) *Specific Character Set*.
         """
         return (
