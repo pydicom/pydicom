@@ -18,7 +18,6 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import PIL
     from PIL import Image, features
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")

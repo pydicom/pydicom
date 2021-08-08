@@ -1,6 +1,6 @@
 """Pure python package for DICOM medical file reading and writing."""
 import re
-from typing import Tuple, cast, Match
+from typing import cast, Match
 
 
 __version__: str = '2.3.0.dev0'

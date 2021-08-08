@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 
-from typing import Tuple, Optional, Dict, Union
+from typing import Tuple, Optional, Dict
 
 from pydicom.config import logger
 from pydicom.tag import Tag, BaseTag, TagType
