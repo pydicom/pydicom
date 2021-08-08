@@ -3,7 +3,6 @@
 
 from itertools import groupby
 from pathlib import Path
-import re
 from typing import Optional, Union
 
 

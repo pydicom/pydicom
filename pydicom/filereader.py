@@ -9,7 +9,7 @@ from struct import (Struct, unpack)
 import sys
 from typing import (
     BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
-    Type, Iterator, Dict
+    Iterator, Dict
 )
 import warnings
 import zlib

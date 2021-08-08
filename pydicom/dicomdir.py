@@ -2,7 +2,7 @@
 """Module for DicomDir class."""
 
 import os
-from typing import Optional, List, Dict, Union, BinaryIO, AnyStr
+from typing import Optional, List, Dict, Union, BinaryIO
 import warnings
 
 from pydicom import config

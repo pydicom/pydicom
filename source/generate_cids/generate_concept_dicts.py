@@ -17,7 +17,6 @@ import re
 import sys
 import tempfile
 from pprint import pprint
-import urllib.request as urllib2
 from xml.etree import ElementTree as ET
 
 if sys.version_info[0] < 3:
