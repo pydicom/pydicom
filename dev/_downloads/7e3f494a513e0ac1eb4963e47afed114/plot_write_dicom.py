@@ -17,7 +17,7 @@ import tempfile
 import datetime
 
 import pydicom
-from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
+from pydicom.dataset import FileDataset, FileMetaDataset
 
 # Create some temporary filenames
 suffix = '.dcm'

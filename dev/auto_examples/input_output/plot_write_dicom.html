@@ -217,21 +217,21 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmp5gc4xg2c.dcm
+Writing test file /tmp/tmp3h1hp0_o.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmp9wtrmyko.dcm
-Load file /tmp/tmp5gc4xg2c.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpxf2wzpit.dcm
+Load file /tmp/tmp3h1hp0_o.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
 (0008, 0023) Content Date                        DA: &#39;20210808&#39;
-(0008, 0033) Content Time                        TM: &#39;121013.864172&#39;
+(0008, 0033) Content Time                        TM: &#39;222653.728532&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp5gc4xg2c.dcm ...
-Load file /tmp/tmp9wtrmyko.dcm ...
+Remove file /tmp/tmp3h1hp0_o.dcm ...
+Load file /tmp/tmpxf2wzpit.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
@@ -239,10 +239,10 @@ Dataset.file_meta -------------------------------
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
 (0008, 0023) Content Date                        DA: &#39;20210808&#39;
-(0008, 0033) Content Time                        TM: &#39;121013.864172&#39;
+(0008, 0033) Content Time                        TM: &#39;222653.728532&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp9wtrmyko.dcm ...
+Remove file /tmp/tmpxf2wzpit.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -256,7 +256,7 @@ Remove file /tmp/tmp9wtrmyko.dcm ...
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span><span class="p">,</span> <a href="../../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class"><span class="n">FileMetaDataset</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">FileDataset</span><span class="p">,</span> <a href="../../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class"><span class="n">FileMetaDataset</span></a>
 
 <span class="c1"># Create some temporary filenames</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
@@ -315,7 +315,7 @@ Remove file /tmp/tmp9wtrmyko.dcm ...
     <a href="https://docs.python.org/3/library/os.html#os.remove" title="os.remove" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">remove</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.005 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-write-dicom-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7e3f494a513e0ac1eb4963e47afed114/plot_write_dicom.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_write_dicom.py</span></code></a></p>
