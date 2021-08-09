@@ -220,7 +220,7 @@ class TestCodesDict:
         assert codes.cid3001.NegativeLowRightScapulaLead == Code(
             value="2:124",
             scheme_designator="MDC",
-            meaning="negativ: low right scapula Lead",
+            meaning="negative: low right scapula Lead",
         )
 
     def test_cid3107(self):
