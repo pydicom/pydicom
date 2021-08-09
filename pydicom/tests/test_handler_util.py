@@ -1891,7 +1891,7 @@ class TestNumpy_ApplyVOI:
         assert 8 == ds.BitsStored
         assert 0 == ds.PixelRepresentation
         item0 = ds.VOILUTSequence[0]
-        # Add another view thats the inverse
+        # Add another view that's the inverse
         ds.VOILUTSequence.append(Dataset())
         item1 = ds.VOILUTSequence[1]
         item1.LUTDescriptor = [256, 0, 16]

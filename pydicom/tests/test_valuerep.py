@@ -1208,7 +1208,7 @@ class TestPersonName:
         assert next(pn3_itr) == "m"
         assert next(pn3_itr) == "e"
 
-        # Attempting to get next characeter should stop the iteration
+        # Attempting to get next character should stop the iteration
         # I.e. next can only start once
         with pytest.raises(StopIteration):
             next(pn3_itr)
@@ -1220,7 +1220,7 @@ class TestPersonName:
             next(pn4)
 
     def test_iterator(self):
-        """Test that iterators can be corretly constructed"""
+        """Test that iterators can be correctly constructed"""
         name_str = "John^Doe^^Dr"
         pn1 = PersonName(name_str)
 
