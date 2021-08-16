@@ -20,17 +20,6 @@ from pydicom.multival import MultiValue
 # can't import from charset or get circular import
 default_encoding = "iso8859"
 
-# For reading/writing data elements,
-# these ones have longer explicit VR format
-# Taken from PS3.5 Section 7.1.2
-extra_length_VRs = ('OB', 'OD', 'OF', 'OL', 'OW', 'SQ', 'UC', 'UN', 'UR', 'UT')
-
-# VRs that can be affected by character repertoire
-# in (0008,0005) Specific Character Set
-# See PS-3.5 (2011), section 6.1.2 Graphic Characters
-# and PN, but it is handled separately.
-text_VRs: Tuple[str, ...] = ('SH', 'LO', 'ST', 'LT', 'UC', 'UT')
-
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
 # Note: We use character codes for Python 3

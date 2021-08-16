@@ -12,10 +12,10 @@ from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
 from pydicom.tag import TupleTag, ItemTag
 from pydicom.uid import UID
-from pydicom.valuerep import extra_length_VRs
+from pydicom.vr import VR_LENGTH_32
 
 
-extra_length_VRs_b = tuple(vr.encode('ascii') for vr in extra_length_VRs)
+extra_length_VRs_b = tuple(vr.encode('ascii') for vr in VR_LENGTH_32)
 ExplicitVRLittleEndian = b'1.2.840.10008.1.2.1'
 ImplicitVRLittleEndian = b'1.2.840.10008.1.2'
 DeflatedExplicitVRLittleEndian = b'1.2.840.10008.1.2.1.99'

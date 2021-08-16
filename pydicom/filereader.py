@@ -34,7 +34,7 @@ from pydicom.tag import (
 )
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
-from pydicom.valuerep import extra_length_VRs
+from pydicom.vr import EXPLICIT_VR_LENGTH_16
 
 
 def data_element_generator(
@@ -154,7 +154,7 @@ def data_element_generator(
                 group, elem, length = implicit_VR_struct.unpack(bytes_read)
             else:
                 VR = VR.decode(default_encoding)
-                if VR in extra_length_VRs:
+                if VR not in EXPLICIT_VR_LENGTH_16:
                     bytes_read = fp_read(4)
                     length = extra_length_unpack(bytes_read)[0]
                     if debugging:
@@ -180,7 +180,7 @@ def data_element_generator(
                     logger_debug("Reading ended by stop_when callback. "
                                  "Rewinding to start of data element.")
                 rewind_length = 8
-                if not is_implicit_VR and VR in extra_length_VRs:
+                if not is_implicit_VR and VR not in EXPLICIT_VR_LENGTH_16:
                     rewind_length += 4
                 fp.seek(value_tell - rewind_length)
                 return
@@ -1102,7 +1102,7 @@ def data_element_offset_to_value(
         return 8  # tag of 4 plus 4-byte length
 
     VR = cast(str, VR)
-    if VR in extra_length_VRs:
+    if VR not in EXPLICIT_VR_LENGTH_16:
         return 12  # tag 4 + 2 VR + 2 reserved + 4 length
 
     return 8  # tag 4 + 2 VR + 2 length

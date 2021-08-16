@@ -10,9 +10,7 @@ from typing import (
 import warnings
 import zlib
 
-from pydicom.charset import (
-    default_encoding, text_VRs, convert_encodings, encode_string
-)
+from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
@@ -22,10 +20,9 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
-from pydicom.valuerep import (
-    extra_length_VRs, PersonName, IS, DSclass, DA, DT, TM
-)
+from pydicom.valuerep import PersonName, IS, DSclass, DA, DT, TM
 from pydicom.values import convert_numbers
+from pydicom.vr import EXPLICIT_VR_LENGTH_16, CHARSET_VR, VR, AMBIGUOUS_VR
 
 
 if have_numpy:
@@ -537,7 +534,7 @@ def write_data_element(
         fn, param = writers[VR]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if VR in text_VRs or VR in ('PN', 'SQ'):
+            if VR in CHARSET_VR["customizable"] or VR in ('PN', 'SQ'):
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
@@ -563,8 +560,12 @@ def write_data_element(
             )
 
     value_length = buffer.tell()
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
-            not is_undefined_length and value_length > 0xffff):
+    if (
+        not fp.is_implicit_VR and
+        VR in EXPLICIT_VR_LENGTH_16
+        and not is_undefined_length
+        and value_length > 0xffff
+    ):
         # see PS 3.5, section 6.2.2 for handling of this case
         msg = (
             f"The value for the data element {elem.tag} exceeds the "
@@ -580,11 +581,14 @@ def write_data_element(
         VR = cast(str, VR)
         fp.write(bytes(VR, default_encoding))
 
-        if VR in extra_length_VRs:
+        if VR not in EXPLICIT_VR_LENGTH_16:
             fp.write_US(0)  # reserved 2 bytes
 
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
-            not is_undefined_length):
+    if (
+        not fp.is_implicit_VR
+        and VR in EXPLICIT_VR_LENGTH_16
+        and not is_undefined_length
+    ):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
         # write the proper length of the data_element in the length slot,
@@ -1178,3 +1182,9 @@ writers = {
     'US or SS or OW': (write_OWvalue, None),
     'OB or OW': (write_OBvalue, None),
 }
+
+try:
+    assert VR | AMBIGUOUS_VR == set(writers)
+except AssertionError:
+    missing = ", ".join(list((VR | AMBIGUOUS_VR) - set(writers)))
+    raise RuntimeError(f"Missing encoder function for VR {missing}")

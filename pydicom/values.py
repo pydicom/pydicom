@@ -23,8 +23,9 @@ from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString, DA, DT, TM, TEXT_VR_DELIMS, DSfloat, DSdecimal, IS, text_VRs
+    MultiString, DA, DT, TM, TEXT_VR_DELIMS, DSfloat, DSdecimal, IS
 )
+from pydicom.vr import CHARSET_VR, VR, AMBIGUOUS_VR
 
 try:
     import numpy
@@ -744,8 +745,7 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if VR in text_VRs or VR == 'PN':
-            # SH, LO, ST, LT, UC, UT
+        if VR in CHARSET_VR["customizable"]:
             return converter(byte_string, encodings)
 
         if VR != "SQ":
@@ -829,3 +829,9 @@ converters = {
     'US or OW': convert_OWvalue,
     'US or SS or OW': convert_OWvalue,
 }
+
+try:
+    assert VR | AMBIGUOUS_VR == set(converters)
+except AssertionError:
+    missing = ", ".join(list((VR | AMBIGUOUS_VR) - set(converters)))
+    raise RuntimeError(f"Missing decoder function for VR {missing}")

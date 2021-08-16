@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Define the DataElement class.
 
 A DataElement has a tag,
@@ -29,18 +29,13 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import PersonName
+from pydicom.vr import BYTES_VR, AMBIGUOUS_VR, STR_VR, CHARSET_VR
 
 if config.have_numpy:
     import numpy
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
-
-
-BINARY_VR_VALUES = [
-    'US', 'SS', 'UL', 'SL', 'OW', 'OB', 'OL', 'UN',
-    'OB or OW', 'US or OW', 'US or SS or OW', 'FL', 'FD', 'OF', 'OD'
-]
 
 
 def empty_value_for_VR(
@@ -85,16 +80,13 @@ def empty_value_for_VR(
     if VR == 'PN':
         return b'' if raw else PersonName('')
 
-    if VR in (
-        'AE', 'AS', 'CS', 'DA', 'DT', 'LO', 'LT', 'SH', 'ST', 'TM',
-        'UC', 'UI', 'UR', 'UT'
-    ):
+    if VR in STR_VR:
         return b'' if raw else ''
 
     return None
 
 
-def _is_bytes(val: object) -> bool:
+def _is_bytes(val: Any) -> bool:
     """Return True only if `val` is of type `bytes`."""
     return isinstance(val, bytes)
 
@@ -319,7 +311,7 @@ class DataElement:
             Mapping representing a JSON encoded data element as ``{str: Any}``.
         """
         json_element: Dict[str, Any] = {'vr': self.VR}
-        if self.VR in jsonrep.BINARY_VR_VALUES:
+        if self.VR in BYTES_VR | AMBIGUOUS_VR:
             if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
@@ -436,30 +428,20 @@ class DataElement:
     @value.setter
     def value(self, val: Any) -> None:
         """Convert (if necessary) and set the value of the element."""
-        # Ignore backslash characters in these VRs, based on:
-        # * Which str VRs can have backslashes in Part 5, Section 6.2
+        # Check if is multiple values separated by backslash
+        #   If so, turn them into a list of separate values
+        # Exclude splitting values with backslash characters based on:
+        # * Which str-like VRs can have backslashes in Part 5, Section 6.2
         # * All byte VRs
-        exclusions = [
-            'LT', 'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'ST', 'UN', 'UT',
-            'OB or OW',
-            # Probably not needed
-            'AT', 'FD', 'FL', 'SQ', 'SS', 'SL', 'UL',
-        ]
-
-        # Check if is a string with multiple values separated by '\'
-        # If so, turn them into a list of separate strings
-        #  Last condition covers 'US or SS' etc
-        if (
-            isinstance(val, (str, bytes))
-            and self.VR not in exclusions
-            and 'US' not in self.VR
-        ):
+        exclusions = CHARSET_VR["backslash_allowed"]
+        if isinstance(val, (str, bytes)) and self.VR not in exclusions:
             try:
                 if _backslash_str in val:
                     val = cast(str, val).split(_backslash_str)
             except TypeError:
                 if _backslash_byte in val:
                     val = val.split(_backslash_byte)
+
         self._value = self._convert_value(val)
 
     @property
@@ -517,8 +499,8 @@ class DataElement:
             from pydicom.sequence import Sequence
             if isinstance(val, Sequence):
                 return val
-            else:
-                return Sequence(val)
+
+            return Sequence(val)
 
         # if the value is a list, convert each element
         try:
@@ -530,15 +512,9 @@ class DataElement:
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
-        # If the value is a byte string and has a VR that can only be encoded
-        # using the default character repertoire, we convert it to a string
-        # here to allow for byte string input in these cases
-        if (
-            isinstance(val, bytes)
-            and self.VR in (
-                'AE', 'AS', 'CS', 'DA', 'DS', 'DT', 'IS', 'TM', 'UI', 'UR'
-            )
-        ):
+        # If the value is bytes and has a VR that can only be encoded
+        # using the default character repertoire, convert it to a string
+        if isinstance(val, bytes) and self.VR in CHARSET_VR["default"]:
             val = val.decode()
 
         if self.VR == 'IS':
@@ -566,7 +542,6 @@ class DataElement:
             return val if isinstance(val, BaseTag) else Tag(val)
 
         return val  # this means a "numeric" value could be empty string ""
-
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
@@ -605,20 +580,19 @@ class DataElement:
 
     def __str__(self) -> str:
         """Return :class:`str` representation of the element."""
-        repVal = self.repval or ''
-        if self.showVR:
-            s = "%s %-*s %s: %s" % (str(self.tag), self.descripWidth,
-                                    self.description()[:self.descripWidth],
-                                    self.VR, repVal)
-        else:
-            s = "%s %-*s %s" % (str(self.tag), self.descripWidth,
-                                self.description()[:self.descripWidth], repVal)
-        return s
+        value = self.repval or ''
+        name = f"{self.name[:self.descripWidth]:<{self.descripWidth}}"
 
+        if self.showVR:
+            return f"{self.tag} {name} {self.VR}: {value}"
+
+        return f"{self.tag} {name} {value}"
+
+    # TODO: VR
     @property
     def repval(self) -> str:
         """Return a :class:`str` representation of the element's value."""
-        long_VRs = {"OB", "OD", "OF", "OW", "UN", "UT"}
+        long_VRs = BYTES_VR | {"UT"}
         if set(self.VR.split(" or ")) & long_VRs:
             try:
                 length = len(self.value)
@@ -636,6 +610,7 @@ class DataElement:
 
         return repr(self.value)
 
+    # TODO: add deprecation warning
     def __getitem__(self, key: int) -> Any:
         """Return the item at `key` if the element's value is indexable."""
         try:
@@ -648,40 +623,53 @@ class DataElement:
     def name(self) -> str:
         """Return the DICOM dictionary name for the element as :class:`str`.
 
-        For officially registered DICOM Data Elements this will be the *Name*
-        as given in :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
-        For private elements known to *pydicom*
-        this will be the *Name* in the format ``'[name]'``. For unknown
-        private elements this will be ``'Private Creator'``. For unknown
-        elements this will return an empty string ``''``.
+        Returns
+        -------
+        str
+            * For officially registered DICOM Data Elements this will be the
+              *Name* as given in
+              :dcm:`Table 6-1<part06/chapter_6.html#table_6-1>`.
+            * For private elements known to *pydicom* this will be the *Name*
+              in the format ``'[name]'``.
+            * For unknown private elements this will be ``'Private tag data'``.
+            * Otherwise returns an empty string ``''``.
         """
-        return self.description()
-
-    def description(self) -> str:
-        """Return the DICOM dictionary name for the element as :class:`str`."""
         if self.tag.is_private:
-            name = "Private tag data"  # default
             if self.private_creator:
                 try:
                     # If have name from private dictionary, use it, but
                     #   but put in square brackets so is differentiated,
                     #   and clear that cannot access it by name
                     name = private_dictionary_description(
-                        self.tag, self.private_creator)
-                    name = f"[{name}]"
+                        self.tag, self.private_creator
+                    )
+                    return f"[{name}]"
                 except KeyError:
                     pass
             elif self.tag.element >> 8 == 0:
-                name = "Private Creator"
-        elif dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
-            name = dictionary_description(self.tag)
+                return "Private Creator"
+
+            return "Private tag data"  # default
+
+        if dictionary_has_tag(self.tag) or repeater_has_tag(self.tag):
+            return dictionary_description(self.tag)
 
         # implied Group Length dicom versions < 3
-        elif self.tag.element == 0:
-            name = "Group Length"
-        else:
-            name = ""
-        return name
+        if self.tag.element == 0:
+            return "Group Length"
+
+        return ""
+
+    # TODO: add deprecation warning
+    def description(self) -> str:
+        """Return the DICOM dictionary name for the element as :class:`str`.
+
+        .. deprecated:: 2.2
+
+            ``DataElement.description()`` will be removed in v3.0, use
+            :meth:`~pydicom.dataelem.DataElement.name` instead
+        """
+        return self.name
 
     @property
     def is_private(self) -> bool:

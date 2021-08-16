@@ -10,7 +10,8 @@ from typing import (
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
+from pydicom.valuerep import TEXT_VR_DELIMS, PersonName
+from pydicom.vr import CHARSET_VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
@@ -832,7 +833,7 @@ def decode_element(
             elem.value = [
                 cast(PersonName, vv).decode(encodings) for vv in elem.value
             ]
-    elif elem.VR in text_VRs:
+    elif elem.VR in CHARSET_VR["customizable"]:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
             if isinstance(elem.value, str):

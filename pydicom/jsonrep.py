@@ -1,4 +1,4 @@
-# Copyright 2008-2019 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Methods for converting Datasets and DataElements to/from json"""
 
 import base64
@@ -10,17 +10,13 @@ from typing import (
 )
 import warnings
 
+from pydicom.vr import FLOAT_VR, INT_VR
+
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary')
-BINARY_VR_VALUES = [
-    'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'UN',
-    'OB or OW', 'US or OW', 'US or SS or OW'
-]
-VRs_TO_BE_FLOATS = ['DS', 'FD', 'FL']
-VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'SV', 'UL', 'US', 'UV', 'US or SS']
 
 
 def convert_to_python_number(value: Any, vr: str) -> Any:
@@ -54,9 +50,9 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
         return value
 
     number_type: Optional[Union[Type[int], Type[float]]] = None
-    if vr in VRs_TO_BE_INTS:
+    if vr in INT_VR:
         number_type = int
-    if vr in VRs_TO_BE_FLOATS:
+    if vr in FLOAT_VR:
         number_type = float
 
     if number_type is None:
