@@ -80,15 +80,10 @@ def empty_value_for_VR(
     if VR == 'PN':
         return b'' if raw else PersonName('')
 
-    if VR in STR_VR:
+    if VR in STR_VR - {"DS", "IS"}:
         return b'' if raw else ''
 
     return None
-
-
-def _is_bytes(val: Any) -> bool:
-    """Return True only if `val` is of type `bytes`."""
-    return isinstance(val, bytes)
 
 
 # double '\' because it is used as escape chr in Python
@@ -432,15 +427,13 @@ class DataElement:
         #   If so, turn them into a list of separate values
         # Exclude splitting values with backslash characters based on:
         # * Which str-like VRs can have backslashes in Part 5, Section 6.2
-        # * All byte VRs
-        exclusions = CHARSET_VR["backslash_allowed"]
-        if isinstance(val, (str, bytes)) and self.VR not in exclusions:
-            try:
-                if _backslash_str in val:
-                    val = cast(str, val).split(_backslash_str)
-            except TypeError:
-                if _backslash_byte in val:
-                    val = val.split(_backslash_byte)
+        # * All byte-like VRs
+        # * All ambiguous VRs
+        if self.VR not in CHARSET_VR["backslash_allowed"]:
+            if isinstance(val, str) and '\\' in val:
+                val = val.split('\\')
+            elif isinstance(val, bytes) and b'\\' in val:
+                val = val.split(b'\\')
 
         self._value = self._convert_value(val)
 
@@ -514,7 +507,7 @@ class DataElement:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is bytes and has a VR that can only be encoded
         # using the default character repertoire, convert it to a string
-        if isinstance(val, bytes) and self.VR in CHARSET_VR["default"]:
+        if self.VR in CHARSET_VR["default"] and isinstance(val, bytes):
             val = val.decode()
 
         if self.VR == 'IS':
@@ -541,7 +534,7 @@ class DataElement:
         if self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
 
-        return val  # this means a "numeric" value could be empty string ""
+        return val
 
     def __eq__(self, other: Any) -> Any:
         """Compare `self` and `other` for equality.
@@ -664,7 +657,7 @@ class DataElement:
     def description(self) -> str:
         """Return the DICOM dictionary name for the element as :class:`str`.
 
-        .. deprecated:: 2.2
+        .. deprecated:: 2.3
 
             ``DataElement.description()`` will be removed in v3.0, use
             :meth:`~pydicom.dataelem.DataElement.name` instead

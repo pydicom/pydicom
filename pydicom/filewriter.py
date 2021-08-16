@@ -22,7 +22,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import PersonName, IS, DSclass, DA, DT, TM
 from pydicom.values import convert_numbers
-from pydicom.vr import EXPLICIT_VR_LENGTH_16, CHARSET_VR, VR, AMBIGUOUS_VR
+from pydicom.vr import EXPLICIT_VR_LENGTH_32, CHARSET_VR, VR, AMBIGUOUS_VR
 
 
 if have_numpy:
@@ -534,7 +534,7 @@ def write_data_element(
         fn, param = writers[VR]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if VR in CHARSET_VR["customizable"] or VR in ('PN', 'SQ'):
+            if VR in CHARSET_VR["customizable"] or VR == 'SQ':
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
@@ -562,7 +562,7 @@ def write_data_element(
     value_length = buffer.tell()
     if (
         not fp.is_implicit_VR and
-        VR in EXPLICIT_VR_LENGTH_16
+        VR not in EXPLICIT_VR_LENGTH_32
         and not is_undefined_length
         and value_length > 0xffff
     ):
@@ -581,12 +581,12 @@ def write_data_element(
         VR = cast(str, VR)
         fp.write(bytes(VR, default_encoding))
 
-        if VR not in EXPLICIT_VR_LENGTH_16:
+        if VR in EXPLICIT_VR_LENGTH_32:
             fp.write_US(0)  # reserved 2 bytes
 
     if (
         not fp.is_implicit_VR
-        and VR in EXPLICIT_VR_LENGTH_16
+        and VR not in EXPLICIT_VR_LENGTH_32
         and not is_undefined_length
     ):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes

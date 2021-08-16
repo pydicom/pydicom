@@ -41,11 +41,6 @@ except AssertionError:
     raise RuntimeError(f"Missing VR configuration for {missing}")
 
 
-# TODO: not necessary?
-# All possible VRs that may be used in a pydicom DataElement
-_DATA_ELEMENT_VR = VR | AMBIGUOUS_VR
-
-
 # Corresponding Python built-in for each VR
 #  This is more a "fallback" class-like behavioural definition than actual
 BYTES_VR = {"OB", "OD", "OF", "OL", "OW", "OV", "UN"}
@@ -57,7 +52,7 @@ STR_VR = {
     "SH", "ST", "TM", "UC", "UI", "UR", "UT",
 }
 
-assert BYTES_VR | INT_VR | FLOAT_VR | STR_VR | LIST_VR == VR
+assert BYTES_VR | FLOAT_VR | INT_VR | LIST_VR | STR_VR == VR
 
 
 # Character Repertoire
@@ -83,7 +78,7 @@ EXPLICIT_VR_LENGTH_16 = {
     "AE", "AS", "AT", "CS", "DA", "DS", "DT", "FL", "FD", "IS", "LO", "LT",
     "PN", "SH", "SL", "SS", "ST", "TM", "UI", "UL", "US",
 }
-VR_LENGTH_32 = VR - EXPLICIT_VR_LENGTH_16
+EXPLICIT_VR_LENGTH_32 = VR - EXPLICIT_VR_LENGTH_16
 
 # These VRs require byte swapping if converting little <-> big endian
 #   Note that "OB or OW" needs to be handled separately

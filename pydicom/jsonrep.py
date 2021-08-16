@@ -50,7 +50,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
         return value
 
     number_type: Optional[Union[Type[int], Type[float]]] = None
-    if vr in INT_VR:
+    if vr in INT_VR - {'AT'}:
         number_type = int
     if vr in FLOAT_VR:
         number_type = float
