@@ -520,24 +520,24 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
             return encoded
         except UnicodeError:
             continue
-    else:
-        # if we have more than one encoding, we retry encoding by splitting
-        # `value` into chunks that can be encoded with one of the encodings
-        if len(encodings) > 1:
-            try:
-                return _encode_string_parts(value, encodings)
-            except ValueError:
-                pass
-        # all attempts failed - raise or warn and encode with replacement
-        # characters
-        if config.enforce_valid_values:
-            # force raising a valid UnicodeEncodeError
-            value.encode(encodings[0])
 
-        warnings.warn("Failed to encode value with encodings: {} - using "
-                      "replacement characters in encoded string"
-                      .format(', '.join(encodings)))
-        return _encode_string_impl(value, encodings[0], errors='replace')
+    # if we have more than one encoding, we retry encoding by splitting
+    # `value` into chunks that can be encoded with one of the encodings
+    if len(encodings) > 1:
+        try:
+            return _encode_string_parts(value, encodings)
+        except ValueError:
+            pass
+    # all attempts failed - raise or warn and encode with replacement
+    # characters
+    if config.enforce_valid_values:
+        # force raising a valid UnicodeEncodeError
+        value.encode(encodings[0])
+
+    warnings.warn("Failed to encode value with encodings: {} - using "
+                  "replacement characters in encoded string"
+                  .format(', '.join(encodings)))
+    return _encode_string_impl(value, encodings[0], errors='replace')
 
 
 def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:

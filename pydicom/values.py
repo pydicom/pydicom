@@ -7,7 +7,7 @@ import re
 from io import BytesIO
 from struct import (unpack, calcsize)
 from typing import (
-    Optional, Union, List, Tuple, Dict, Callable, cast, MutableSequence, Any
+    Optional, Union, List, Tuple, cast, MutableSequence, Any
 )
 
 # don't import datetime_conversion directly
@@ -22,9 +22,7 @@ from pydicom.sequence import Sequence
 from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import (
-    MultiString, DA, DT, TM, TEXT_VR_DELIMS, DSfloat, DSdecimal, IS
-)
+from pydicom.valuerep import MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS
 from pydicom.vr import CHARSET_VR, VR, AMBIGUOUS_VR
 
 try:

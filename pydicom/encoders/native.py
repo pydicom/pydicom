@@ -1,9 +1,8 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Interface for *Pixel Data* encoding, not intended to be used directly."""
 
-from itertools import groupby, islice
+from itertools import groupby
 from struct import pack
-import sys
 from typing import List, Any
 
 from pydicom.uid import RLELossless
@@ -130,7 +129,7 @@ def _encode_row(src: bytes) -> bytes:
     Notes
     -----
     * 2-byte repeat runs are always encoded as Replicate Runs rather than
-      only when not preceeded by a Literal Run as suggested by the Standard.
+      only when not preceded by a Literal Run as suggested by the Standard.
     """
     out: List[int] = []
     out_append = out.append

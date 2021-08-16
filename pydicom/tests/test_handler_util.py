@@ -159,7 +159,7 @@ class TestNumpy_PixelDtype:
         assert ref_dtype == pixel_dtype(self.ds, as_float=as_float)
 
     def test_byte_swapping(self):
-        """Test that the endianess of the system is taken into account."""
+        """Test that the endianness of the system is taken into account."""
         # The main problem is that our testing environments are probably
         #   all little endian, but we'll try our best
         self.ds.BitsAllocated = 16
@@ -670,7 +670,7 @@ class TestNumpy_ConvertColourSpace:
 class TestNumpy_DtypeCorrectedForEndianness:
     """Tests for util.dtype_corrected_for_endianness."""
     def test_byte_swapping(self):
-        """Test that the endianess of the system is taken into account."""
+        """Test that the endianness of the system is taken into account."""
         # The main problem is that our testing environments are probably
         #   all little endian, but we'll try our best
         dtype = np.dtype('uint16')
@@ -1891,7 +1891,7 @@ class TestNumpy_ApplyVOI:
         assert 8 == ds.BitsStored
         assert 0 == ds.PixelRepresentation
         item0 = ds.VOILUTSequence[0]
-        # Add another view thats the inverse
+        # Add another view that's the inverse
         ds.VOILUTSequence.append(Dataset())
         item1 = ds.VOILUTSequence[1]
         item1.LUTDescriptor = [256, 0, 16]

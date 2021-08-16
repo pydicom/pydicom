@@ -37,9 +37,9 @@ FILE_PATIENT_NAMES = [
 # Mostly taken from the same example files.
 ENCODED_NAMES = [
     ('ISO 2022 IR 13', 'ﾔﾏﾀﾞ^ﾀﾛｳ',
-     b'\x1b\x29\x49\xd4\xcf\xc0\xde\x5e\xc0\xdb\xb3'),
+     b'\x1b\x29\x49\xd4\xcf\xc0\xde\x5e\x1b\x29\x49\xc0\xdb\xb3'),
     ('ISO 2022 IR 100', 'Buc^Jérôme',
-     b'\x1b\x2d\x41\x42\x75\x63\x5e\x4a\xe9\x72\xf4\x6d\x65'),
+     b'\x1b\x2d\x41\x42\x75\x63\x5e\x1b\x2d\x41\x4a\xe9\x72\xf4\x6d\x65'),
     ('ISO 2022 IR 101', 'Wałęsa',
      b'\x1b\x2d\x42\x57\x61\xb3\xea\x73\x61'),
     ('ISO 2022 IR 109', 'antaŭnomo',
@@ -47,11 +47,11 @@ ENCODED_NAMES = [
     ('ISO 2022 IR 110', 'vārds',
      b'\x1b\x2d\x44\x76\xe0\x72\x64\x73'),
     ('ISO 2022 IR 127', 'قباني^لنزار',
-     b'\x1b\x2d\x47\xe2\xc8\xc7\xe6\xea\x5e\xe4\xe6\xd2\xc7\xd1'),
+     b'\x1b\x2d\x47\xe2\xc8\xc7\xe6\xea\x5e\x1b\x2d\x47\xe4\xe6\xd2\xc7\xd1'),
     ('ISO 2022 IR 126', 'Διονυσιος',
      b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2'),
     ('ISO 2022 IR 138', 'שרון^דבורה',
-     b'\x1b\x2d\x48\xf9\xf8\xe5\xef\x5e\xe3\xe1\xe5\xf8\xe4'),
+     b'\x1b\x2d\x48\xf9\xf8\xe5\xef\x5e\x1b\x2d\x48\xe3\xe1\xe5\xf8\xe4'),
     ('ISO 2022 IR 144', 'Люкceмбypг',
      b'\x1b\x2d\x4c\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'),
     ('ISO 2022 IR 148', 'Çavuşoğlu',
@@ -380,9 +380,17 @@ class TestCharset:
     @pytest.mark.parametrize('encoding, decoded, raw_data', ENCODED_NAMES)
     def test_single_byte_code_extensions(self, encoding, decoded, raw_data):
         # single-byte encoding as code extension
-        elem = DataElement(0x00081039, 'LO', b'ASCII+' + raw_data)
+        elem = DataElement(0x00100010, 'PN', b'ASCII+' + raw_data)
         pydicom.charset.decode_element(elem, ['', encoding])
         assert 'ASCII+' + decoded == elem.value
+
+    def test_missing_escape_for_single_byte_code_extensions(self):
+        # missing escape sequence after component delimiter
+        raw_data = b'\x1b\x29\x49\xd4\xcf\xc0\xde\x5e\xc0\xdb\xb3'
+        elem = DataElement(0x00100010, 'PN', b'ASCII+' + raw_data)
+        pydicom.charset.decode_element(elem, ['', 'ISO 2022 IR 13'])
+        # the last part is decoded as Latin1
+        assert 'ASCII+ﾔﾏﾀﾞ^ÀÛ³' == elem.value
 
     @pytest.mark.parametrize('filename, patient_name', FILE_PATIENT_NAMES)
     def test_charset_patient_names(self, filename, patient_name):

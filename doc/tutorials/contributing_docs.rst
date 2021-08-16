@@ -46,7 +46,7 @@ Install required libraries
 
 ::
 
-  $ pip install sphinx sphinx-rtd-theme sphinx-gallery
+  $ pip install sphinx sphinx-rtd-theme sphinx-gallery sphinx-issues sphinx-copybutton
 
 
 Build and preview the documentation
