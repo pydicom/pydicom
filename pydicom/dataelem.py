@@ -71,24 +71,20 @@ def empty_value_for_VR(
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
-    if VR == 'SQ':
-        return b'' if raw else []
+    if VR == "SQ":
+        return b"" if raw else []
 
     if config.use_none_as_empty_text_VR_value:
         return None
 
-    if VR == 'PN':
-        return b'' if raw else PersonName('')
+    if VR == "PN":
+        return b"" if raw else PersonName("")
 
+    # DS and IS are treated more like int/float than str
     if VR in STR_VR - {"DS", "IS"}:
-        return b'' if raw else ''
+        return b"" if raw else ""
 
     return None
-
-
-# double '\' because it is used as escape chr in Python
-_backslash_str = "\\"
-_backslash_byte = b"\\"
 
 
 class DataElement:
@@ -439,7 +435,19 @@ class DataElement:
 
     @property
     def VM(self) -> int:
-        """Return the value multiplicity of the element as :class:`int`."""
+        """Return the value multiplicity of the element as :class:`int`.
+
+        Returns
+        -------
+        int
+            The :dcm:`value multiplicity<part05/sect_6.4.html>` of the element.
+            **SQ** elements always return a VM of ``1`` even if the sequence
+            itself contains zero or more items.
+        """
+        if self.VR == "SQ":
+            # See Part 5, Section 7.5
+            return 1
+
         if self.value is None:
             return 0
         if isinstance(self.value, (str, bytes, PersonName)):
@@ -455,7 +463,19 @@ class DataElement:
         """Return ``True`` if the element has no value.
 
         .. versionadded:: 1.4
+
+        Returns
+        -------
+        bool
+            For non-**SQ** elements returns ``True`` if the element's
+            :attr:`value multiplicity<pydicom.dataelem.DataElement.VM>` (VM)
+            is greater than 0, otherwise returns ``False``. For **SQ** elements
+            returns ``True`` if the sequence contains one or more items,
+            otherwise returns ``False``.
         """
+        if self.VR == "SQ":
+            return bool(len(self.value))
+
         return self.VM == 0
 
     @property
