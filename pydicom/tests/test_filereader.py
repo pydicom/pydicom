@@ -20,6 +20,7 @@ from pydicom import config
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
+from pydicom.filebase import DicomFile
 from pydicom.filereader import (
     dcmread, read_dataset, read_dicomdir, data_element_generator,
     ImageFileReader
@@ -1662,27 +1663,46 @@ class TestImageFileReader:
             'test_files'
         )
 
-    def test_construct_image_file_reader(self):
-        filename = '/tmp/foo.dcm'
+    def test_construct_image_file_reader_from_string(self):
+        filename = str(get_testdata_file('CT_small.dcm'))
         reader = ImageFileReader(filename)
-        assert reader.filename == filename
+        assert reader._filename == Path(filename)
+        assert reader._fp is None
+
+    def test_construct_image_file_reader_from_path(self):
+        filepath = Path(get_testdata_file('CT_small.dcm'))
+        reader = ImageFileReader(filepath)
+        assert reader._filename == filepath
+        assert reader._fp is None
+
+    def test_construct_image_file_reader_from_file_object(self):
+        filename = str(get_testdata_file('CT_small.dcm'))
+        fp = DicomFile(filename, mode='rb')
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+        reader = ImageFileReader(fp)
+        assert reader._filename is None
+        assert reader._fp == fp
 
     @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
     def test_read_single_frame_ct_image_native(self):
         filename = str(get_testdata_file('CT_small.dcm'))
+        fp = DicomFile(filename, 'rb')
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
         dataset = dcmread(filename)
         pixel_array = dataset.pixel_array
-        with ImageFileReader(filename) as reader:
-            assert reader.number_of_frames == 1
-            frame = reader.read_frame(0)
-            assert isinstance(frame, numpy.ndarray)
-            assert frame.ndim == 2
-            assert frame.dtype == numpy.int16
-            assert frame.shape == (
-                reader.metadata.Rows,
-                reader.metadata.Columns,
-            )
-            numpy.testing.assert_array_equal(frame, pixel_array)
+        reader = ImageFileReader(fp)
+        assert reader.number_of_frames == 1
+        frame = reader.read_frame(0)
+        assert isinstance(frame, numpy.ndarray)
+        assert frame.ndim == 2
+        assert frame.dtype == numpy.int16
+        assert frame.shape == (
+            reader.metadata.Rows,
+            reader.metadata.Columns,
+        )
+        numpy.testing.assert_array_equal(frame, pixel_array)
 
     @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
     def test_read_multi_frame_ct_image_native(self):

@@ -8,9 +8,10 @@ import math
 import os
 from struct import (Struct, unpack)
 import sys
+from pathlib import Path
 from typing import (
     BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
-    Iterator, Dict
+    Iterator, Dict, Tuple
 )
 import traceback
 import warnings
@@ -28,7 +29,7 @@ from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.dicomdir import DicomDir
 from pydicom.encaps import get_frame_offsets
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import DicomFile
+from pydicom.filebase import DicomFile, DicomFileLike
 from pydicom.fileutil import (
     read_undefined_length_value, path_from_pathlike, PathType, _unpack_tag
 )
@@ -1424,16 +1425,49 @@ class ImageFileReader:
 
     """
 
-    def __init__(self, filename: str):
+    def __init__(self, fp: Union[str, Path, DicomFileLike]):
         """
         Parameters
         ----------
-        filename: str
-            Path to a DICOM Part10 file containing a dataset of an image
-            SOP Instance
+        fp: Union[str, pathlib.Path, pydicom.filebase.DicomfileLike]
+            DICOM Part10 file containing a dataset of an image SOP Instance
 
         """
-        self.filename = filename
+        if isinstance(fp, DicomFileLike):
+            is_little_endian, is_implicit_VR = self._check_file_format(fp)
+            try:
+                if fp.is_little_endian != is_little_endian:
+                    raise ValueError(
+                        'Transfer syntax of file object has incorrect value '
+                        'for attribute "is_little_endian".'
+                    )
+            except AttributeError:
+                raise AttributeError(
+                    'Transfer syntax of file object does not have '
+                    'attribute "is_little_endian".'
+                )
+            try:
+                if fp.is_implicit_VR != is_implicit_VR:
+                    raise ValueError(
+                        'Transfer syntax of file object has incorrect value '
+                        'for attribute "is_implicit_VR".'
+                    )
+            except AttributeError:
+                raise AttributeError(
+                    'Transfer syntax of file object does not have '
+                    'attribute "is_implicit_VR".'
+                )
+            self._fp = fp
+            self._filename = None
+        elif isinstance(fp, (str, Path)):
+            self._filename = Path(fp)
+            self._fp = None
+        else:
+            raise TypeError(
+                'Argument "filename" must either an open DICOM file object or '
+                'the path to a DICOM file stored on disk.'
+            )
+        self._metadata = None
 
     def __enter__(self) -> 'ImageFileReader':
         self.open()
@@ -1444,7 +1478,7 @@ class ImageFileReader:
         if except_value:
             sys.stdout.write(
                 'Error while accessing file "{}":\n{}'.format(
-                    self.filename, str(except_value)
+                    self._filename, str(except_value)
                 )
             )
             for tb in traceback.format_tb(except_trace):
@@ -1452,7 +1486,7 @@ class ImageFileReader:
             raise
 
     def open(self) -> None:
-        """Open file and read metadata from it.
+        """Open file for reading.
 
         Raises
         ------
@@ -1471,26 +1505,68 @@ class ImageFileReader:
 
         """
         logger.debug('read File Meta Information')
-        file_meta = read_file_meta_info(self.filename)
+        if self._fp is None:
+            try:
+                self._fp = DicomFile(str(self._filename), mode='rb')
+            except FileNotFoundError:
+                raise FileNotFoundError(f'File not found: "{self._filename}"')
+            except Exception:
+                raise OSError(
+                    f'Could not open file for reading: "{self._filename}"'
+                )
+        is_little_endian, is_implicit_VR = self._check_file_format(self._fp)
+        self._fp.is_little_endian = is_little_endian
+        self._fp.is_implicit_VR = is_implicit_VR
+
+    def _check_file_format(self, fp) -> Tuple[bool, bool]:
+        """Check whether file object represents a DICOM Part 10 file.
+
+        Parameters
+        ----------
+        fp: pydicom.filebase.DicomFileLike
+            DICOM file object
+
+        Returns
+        -------
+        is_little_endian: bool
+            Whether the data set is encoded in little endian transfer syntax
+        is_implicit_VR: bool
+            Whether value representations of data elements in the data set
+            are implicit
+
+        Raises
+        ------
+        InvalidDicomError
+            If the file object does not represent a DICOM Part 10 file
+
+        """
+        pos = fp.tell()
+        read_preamble(fp, False)
+        file_meta = _read_file_meta_info(fp)
+        fp.seek(pos)
         transfer_syntax_uid = pydicom.uid.UID(file_meta.TransferSyntaxUID)
-        try:
-            self._fp = DicomFile(str(self.filename), mode='rb')
-            self._fp.is_little_endian = transfer_syntax_uid.is_little_endian
-            self._fp.is_implicit_VR = transfer_syntax_uid.is_implicit_VR
-        except FileNotFoundError:
-            raise FileNotFoundError(f'File not found: "{self.filename}"')
-        except Exception:
-            raise OSError(
-                f'Could not open file for reading: "{self.filename}"'
-            )
+        return (
+            transfer_syntax_uid.is_little_endian,
+            transfer_syntax_uid.is_implicit_VR,
+        )
+
+    def _read_metadata(self) -> None:
+        """Read metadata from file.
+
+        Caches the metadata and additional information such as the offset of
+        the Pixel Data element and the Basic Offset Table to speed up
+        subsequent access to individual frame items.
+
+        """
         logger.debug('read metadata elements')
+        if self._fp is None:
+            raise IOError('File has not been opened for reading.')
+
         try:
             self._metadata = dcmread(self._fp, stop_before_pixels=True)
         except Exception as err:
-            raise IOError(
-                f'DICOM metadata cannot be read from file "{self.filename}": '
-                f'"{err}"'
-            )
+            raise IOError(f'DICOM metadata cannot be read from file: "{err}"')
+
         self._pixel_data_offset = self._fp.tell()
         # Determine whether dataset contains a Pixel Data element
         try:
@@ -1513,19 +1589,19 @@ class ImageFileReader:
         # Build the ICC Transformation object. This takes some time and should
         # be done only once to speedup subsequent color corrections.
 
-        if self.metadata.SamplesPerPixel == 1:
+        if self._metadata.SamplesPerPixel == 1:
             self._color_manager = None
         else:
             try:
-                icc_profile = self.metadata.ICCProfile
+                icc_profile = self._metadata.ICCProfile
             except AttributeError:
                 try:
-                    if len(self.metadata.OpticalPathSequence) > 1:
+                    if len(self._metadata.OpticalPathSequence) > 1:
                         # This should not happen in case of a color image.
                         logger.warning(
                             'color image contains more than one optical path'
                         )
-                    optical_path_item = self.metadata.OpticalPathSequence[0]
+                    optical_path_item = self._metadata.OpticalPathSequence[0]
                     icc_profile = optical_path_item.ICCProfile
                 except (IndexError, AttributeError):
                     raise AttributeError(
@@ -1539,12 +1615,16 @@ class ImageFileReader:
                 self._color_manager = None
 
         logger.debug('build Basic Offset Table')
-        transfer_syntax_uid = self.metadata.file_meta.TransferSyntaxUID
+        transfer_syntax_uid = self._metadata.file_meta.TransferSyntaxUID
+        try:
+            number_of_frames = int(self._metadata.NumberOfFrames)
+        except AttributeError:
+            number_of_frames = 1
         if transfer_syntax_uid.is_encapsulated:
             try:
                 self._basic_offset_table = _get_bot(
                     self._fp,
-                    number_of_frames=self.number_of_frames
+                    number_of_frames=number_of_frames
                 )
             except Exception as err:
                 raise IOError(f'Failed to build Basic Offset Table: "{err}"')
@@ -1556,19 +1636,19 @@ class ImageFileReader:
                 header_offset = 4 + 2 + 2 + 4  # tag, VR, reserved and length
             self._first_frame_offset = self._pixel_data_offset + header_offset
             n_pixels = self._pixels_per_frame
-            bits_allocated = self.metadata.BitsAllocated
+            bits_allocated = self._metadata.BitsAllocated
             if bits_allocated == 1:
                 self._basic_offset_table = [
                     int(math.floor(i * n_pixels / 8))
-                    for i in range(self.number_of_frames)
+                    for i in range(number_of_frames)
                 ]
             else:
                 self._basic_offset_table = [
                     i * self._bytes_per_frame_uncompressed
-                    for i in range(self.number_of_frames)
+                    for i in range(number_of_frames)
                 ]
 
-        if len(self._basic_offset_table) != self.number_of_frames:
+        if len(self._basic_offset_table) != number_of_frames:
             raise ValueError(
                 'Length of Basic Offset Table does not match Number of Frames.'
             )
@@ -1576,10 +1656,9 @@ class ImageFileReader:
     @property
     def metadata(self) -> Dataset:
         """pydicom.dataset.Dataset: Metadata"""
-        try:
-            return self._metadata
-        except AttributeError:
-            raise IOError('File has not been opened for reading.')
+        if self._metadata is None:
+            self._read_metadata()
+        return self._metadata
 
     def _decode_frame(self, value: bytes):
         """Decode pixel data of an individual frame.
@@ -1670,7 +1749,11 @@ class ImageFileReader:
         """
         if index > self.number_of_frames:
             raise ValueError('Frame index exceeds number of frames in image.')
+
         logger.debug(f'read frame #{index}')
+
+        if self._metadata is None:
+            self._read_metadata()
 
         frame_offset = self._basic_offset_table[index]
         self._fp.seek(self._first_frame_offset + frame_offset, 0)
