@@ -1401,7 +1401,7 @@ def _build_bot(fp: DicomFile, number_of_frames: int) -> List[int]:
     return basic_offset_table
 
 
-class ImageFileReader(object):
+class ImageFileReader:
 
     """Reader for DICOM datasets representing Image Information Entities.
 
