@@ -317,12 +317,10 @@ class TestReader:
         # Just check the tags, and a couple of values
         pm_float_partial = dcmread(pm_float32_pixel, stop_before_pixels=True)
         pm_float_partial_tags = sorted(pm_float_partial.keys())
-        
-        
         pm_float_full = dcmread(pm_float32_pixel)
         pm_float_full_tags = sorted(pm_float_full.keys())
         missing = [Tag(0x7FE0, 0x08)]
-        assert pm_float_full_tags == pm_float_partial_tags + missing        
+        assert pm_float_full_tags == pm_float_partial_tags + missing
 
     def test_specific_tags(self):
         """Returns only tags specified by user."""
