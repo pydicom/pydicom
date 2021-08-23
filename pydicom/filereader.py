@@ -1415,7 +1415,7 @@ class ImageFileReader:
 
     Examples
     --------
-    >>> from highdicom.io import ImageFileReader
+    >>> from pydicom.filereader import ImageFileReader
     >>> with ImageFileReader('/path/to/file.dcm') as image:
     ...     print(image.metadata)
     ...     for i in range(image.number_of_frames):
