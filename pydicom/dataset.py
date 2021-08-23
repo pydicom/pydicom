@@ -329,7 +329,7 @@ class Dataset:
     >>> def recurse(ds):
     ...     for elem in ds:
     ...         if elem.VR == 'SQ':
-    ...             [recurse(item) for item in elem]
+    ...             [recurse(item) for item in elem.value]
     ...         else:
     ...             # Do something useful with each DataElement
 
