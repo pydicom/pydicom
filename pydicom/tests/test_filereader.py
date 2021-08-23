@@ -94,6 +94,7 @@ emri_jpeg_2k_lossless_too_short = get_testdata_file(
     "emri_small_jpeg_2k_lossless_too_short.dcm"
 )
 color_3d_jpeg_baseline = get_testdata_file("color3d_jpeg_baseline.dcm")
+pm_float32_pixel = get_testdata_file("PM_float32_pixel.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -308,6 +309,20 @@ class TestReader:
         ctfull_tags = sorted(ctfull.keys())
         missing = [Tag(0x7FE0, 0x10), Tag(0xFFFC, 0xFFFC)]
         assert ctfull_tags == ctpartial_tags + missing
+
+    def test_no_float_pixels_read(self):
+        """Returns all data elements before pixels using
+        stop_before_pixels=True.
+        """
+        # Just check the tags, and a couple of values
+        pm_float_partial = dcmread(pm_float32_pixel, stop_before_pixels=True)
+        pm_float_partial_tags = sorted(pm_float_partial.keys())
+        
+        
+        pm_float_full = dcmread(pm_float32_pixel)
+        pm_float_full_tags = sorted(pm_float_full.keys())
+        missing = [Tag(0x7FE0, 0x08)]
+        assert pm_float_full_tags == pm_float_partial_tags + missing        
 
     def test_specific_tags(self):
         """Returns only tags specified by user."""
