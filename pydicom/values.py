@@ -829,7 +829,7 @@ converters = {
 }
 
 try:
-    assert VR | AMBIGUOUS_VR == set(converters)
+    assert VR.all == set(converters)
 except AssertionError:
-    missing = ", ".join(list((VR | AMBIGUOUS_VR) - set(converters)))
+    missing = ", ".join(list(VR.all - set(converters)))
     raise RuntimeError(f"Missing decoder function for VR {missing}")

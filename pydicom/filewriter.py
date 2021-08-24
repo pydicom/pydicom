@@ -29,6 +29,32 @@ if have_numpy:
     import numpy
 
 
+# (0018,9810) Zero Velocity Pixel Value
+# (0022,1452) Mapped Pixel Value
+# (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
+# (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
+# (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
+# (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
+# (0028,0120) Pixel Padding Value
+# (0028,0121) Pixel Padding Range Limit
+# (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
+# (0028,3002) LUT Descriptor
+# (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
+# (0060,3004)/(0060,3006) Histogram First/Last Bin Value
+_us_ss_tags = {
+    0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
+    0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
+    0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
+    0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006,
+}
+
+# (5400, 0110) Channel Minimum Value
+# (5400, 0112) Channel Maximum Value
+# (5400, 100A) Waveform Padding Data
+# (5400, 1010) Waveform Data
+_ob_ow_tags = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
+
+
 def _correct_ambiguous_vr_element(
     elem: DataElement, ds: Dataset, is_little_endian: bool
 ) -> DataElement:
@@ -41,11 +67,11 @@ def _correct_ambiguous_vr_element(
         # PS3.5 Annex A.4
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
-            elem.VR = 'OB'
+            elem.VR = VR.OB
         elif ds.is_implicit_VR:
             # Non-compressed Pixel Data - Implicit Little Endian
             # PS3.5 Annex A1: VR is always OW
-            elem.VR = 'OW'
+            elem.VR = VR.OW
         else:
             # Non-compressed Pixel Data - Explicit VR
             # PS3.5 Annex A.2:
@@ -54,27 +80,10 @@ def _correct_ambiguous_vr_element(
             # If we get here, the data has not been written before
             # or has been converted from Implicit Little Endian,
             # so we default to OB for BitsAllocated 1 or 8
-            elem.VR = 'OW' if cast(int, ds.BitsAllocated) > 8 else 'OB'
+            elem.VR = VR.OW if cast(int, ds.BitsAllocated) > 8 else VR.OB
 
     # 'US or SS' and dependent on PixelRepresentation
-    # (0018,9810) Zero Velocity Pixel Value
-    # (0022,1452) Mapped Pixel Value
-    # (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
-    # (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
-    # (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
-    # (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
-    # (0028,0120) Pixel Padding Value
-    # (0028,0121) Pixel Padding Range Limit
-    # (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
-    # (0028,3002) LUT Descriptor
-    # (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
-    # (0060,3004)/(0060,3006) Histogram First/Last Bin Value
-    elif elem.tag in [
-            0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
-            0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
-            0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
-            0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006
-    ]:
+    elif elem.tag in _us_ss_tags:
         # US if PixelRepresentation value is 0x0000, else SS
         #   For references, see the list at
         #   https://github.com/darcymason/pydicom/pull/298
@@ -88,10 +97,10 @@ def _correct_ambiguous_vr_element(
             and 'PixelData' not in ds
             or ds.PixelRepresentation == 0
         ):
-            elem.VR = 'US'
+            elem.VR = VR.US
             byte_type = 'H'
         else:
-            elem.VR = 'SS'
+            elem.VR = VR.SS
             byte_type = 'h'
 
         if elem.VM == 0:
@@ -107,18 +116,16 @@ def _correct_ambiguous_vr_element(
             )
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
-    # (5400, 0110) Channel Minimum Value
-    # (5400, 0112) Channel Maximum Value
-    # (5400, 100A) Waveform Padding Data
-    # (5400, 1010) Waveform Data
-    elif elem.tag in [0x54000110, 0x54000112, 0x5400100A, 0x54001010]:
+    elif elem.tag in _ob_ow_tags:
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
         if ds.is_implicit_VR:
-            elem.VR = 'OW'
+            elem.VR = VR.OW
         else:
-            elem.VR = 'OW' if cast(int, ds.WaveformBitsAllocated) > 8 else 'OB'
+            elem.VR = (
+                VR.OW if cast(int, ds.WaveformBitsAllocated) > 8 else VR.OB
+            )
 
     # 'US or OW': 0028,3006 LUTData
     elif elem.tag == 0x00283006:
@@ -126,7 +133,7 @@ def _correct_ambiguous_vr_element(
         #   LUTData, if there's only one value then must be US
         # As per PS3.3 C.11.1.1.1
         if cast(Sequence[int], ds.LUTDescriptor)[0] == 1:
-            elem.VR = 'US'
+            elem.VR = VR.US
             if elem.VM == 0:
                 return elem
 
@@ -139,14 +146,16 @@ def _correct_ambiguous_vr_element(
                     cast(bytes, elem.value), is_little_endian, 'H'
                 )
         else:
-            elem.VR = 'OW'
+            elem.VR = VR.OW
 
     # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-    elif (elem.tag.group in range(0x6000, 0x601F, 2)
-          and elem.tag.elem == 0x3000):
+    elif (
+        elem.tag.group in range(0x6000, 0x601F, 2)
+        and elem.tag.elem == 0x3000
+    ):
         # Implicit VR must be OW, explicit VR may be OB or OW
         #   as per PS3.5 Section 8.1.2 and Annex A
-        elem.VR = 'OW'
+        elem.VR = VR.OW
 
     return elem
 
@@ -177,7 +186,7 @@ def correct_ambiguous_vr_element(
     dataelem.DataElement
         The corrected element
     """
-    if 'or' in elem.VR:
+    if elem.VR in VR.ambiguous:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
             elem = DataElement_from_raw(elem, dataset=ds)
@@ -224,10 +233,10 @@ def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
     for elem in ds:
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
-        if elem.VR == 'SQ':
+        if elem.VR == VR.SQ:
             for item in cast(MutableSequence[Dataset], elem.value):
                 correct_ambiguous_vr(item, is_little_endian)
-        elif 'or' in elem.VR:
+        elif elem.VR in VR.ambiguous:
             correct_ambiguous_vr_element(elem, ds, is_little_endian)
     return ds
 
@@ -508,10 +517,10 @@ def write_data_element(
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
 
-    VR: Optional[str] = elem.VR
-    if not fp.is_implicit_VR and VR and len(VR) != 2:
+    vr: Optional[str] = elem.VR
+    if not fp.is_implicit_VR and vr and len(vr) != 2:
         msg = (
-            f"Cannot write ambiguous VR of '{VR}' for data element with "
+            f"Cannot write ambiguous VR of '{vr}' for data element with "
             f"tag {repr(elem.tag)}.\nSet the correct VR before "
             f"writing, or use an implicit VR transfer syntax"
         )
@@ -524,17 +533,17 @@ def write_data_element(
         is_undefined_length = elem.length == 0xFFFFFFFF
     else:
         elem = cast(DataElement, elem)
-        if VR not in writers:
+        if vr not in writers:
             raise NotImplementedError(
-                f"write_data_element: unknown Value Representation '{VR}'"
+                f"write_data_element: unknown Value Representation '{vr}'"
             )
 
         encodings = encodings or [default_encoding]
         encodings = convert_encodings(encodings)
-        fn, param = writers[VR]
+        fn, param = writers[vr]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if VR in CHARSET_VR["customizable"] or VR == 'SQ':
+            if vr in CHARSET_VR["customizable"] or vr == VR.SQ:
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
@@ -562,7 +571,7 @@ def write_data_element(
     value_length = buffer.tell()
     if (
         not fp.is_implicit_VR and
-        VR not in EXPLICIT_VR_LENGTH_32
+        vr not in EXPLICIT_VR_LENGTH_32
         and not is_undefined_length
         and value_length > 0xffff
     ):
@@ -570,23 +579,23 @@ def write_data_element(
         msg = (
             f"The value for the data element {elem.tag} exceeds the "
             f"size of 64 kByte and cannot be written in an explicit transfer "
-            f"syntax. The data element VR is changed from '{VR}' to 'UN' "
+            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
             f"to allow saving the data."
         )
         warnings.warn(msg)
-        VR = 'UN'
+        vr = VR.UN
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
-        VR = cast(str, VR)
-        fp.write(bytes(VR, default_encoding))
+        vr = cast(str, vr)
+        fp.write(bytes(vr, default_encoding))
 
-        if VR in EXPLICIT_VR_LENGTH_32:
+        if vr in EXPLICIT_VR_LENGTH_32:
             fp.write_US(0)  # reserved 2 bytes
 
     if (
         not fp.is_implicit_VR
-        and VR not in EXPLICIT_VR_LENGTH_32
+        and vr not in EXPLICIT_VR_LENGTH_32
         and not is_undefined_length
     ):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes
@@ -1184,7 +1193,7 @@ writers = {
 }
 
 try:
-    assert VR | AMBIGUOUS_VR == set(writers)
+    assert VR.all == set(writers)
 except AssertionError:
-    missing = ", ".join(list((VR | AMBIGUOUS_VR) - set(writers)))
+    missing = ", ".join(list(VR.all - set(writers)))
     raise RuntimeError(f"Missing encoder function for VR {missing}")

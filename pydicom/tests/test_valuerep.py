@@ -10,18 +10,16 @@ import math
 import sys
 from typing import Union
 
-from pydicom.tag import Tag
-from pydicom.values import convert_value
-
-import pydicom
-from pydicom import config
-from pydicom import valuerep
-from pydicom.data import get_testdata_file
-from pydicom.dataset import Dataset
-from pydicom.valuerep import DS, IS, DSfloat, DSdecimal
 import pytest
 
-from pydicom.valuerep import PersonName
+import pydicom
+from pydicom import config, valuerep
+from pydicom.data import get_testdata_file
+from pydicom.dataset import Dataset
+from pydicom.tag import Tag
+from pydicom.valuerep import DS, IS, DSfloat, DSdecimal, PersonName
+from pydicom.values import convert_value
+from pydicom.vr import VR
 
 
 badvr_name = get_testdata_file("badVR.dcm")
@@ -1559,3 +1557,10 @@ def test_assigning_bytes(vr, pytype, vm0, vmN, keyword):
         assert elem.VR == vr
         assert elem.value == value
         assert elem.VM == 1
+
+
+class TestVR:
+    def test_init(self):
+        print(VR)
+        print(VR.AE)
+        print(VR.__dict__)
