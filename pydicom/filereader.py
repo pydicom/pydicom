@@ -1586,34 +1586,6 @@ class ImageFileReader:
         # Reset the file pointer to the beginning of the Pixel Data element
         self._fp.seek(self._pixel_data_offset, 0)
 
-        # Build the ICC Transformation object. This takes some time and should
-        # be done only once to speedup subsequent color corrections.
-
-        if self._metadata.SamplesPerPixel == 1:
-            self._color_manager = None
-        else:
-            try:
-                icc_profile = self._metadata.ICCProfile
-            except AttributeError:
-                try:
-                    if len(self._metadata.OpticalPathSequence) > 1:
-                        # This should not happen in case of a color image.
-                        logger.warning(
-                            'color image contains more than one optical path'
-                        )
-                    optical_path_item = self._metadata.OpticalPathSequence[0]
-                    icc_profile = optical_path_item.ICCProfile
-                except (IndexError, AttributeError):
-                    raise AttributeError(
-                        'No ICC Profile found in image metadata.'
-                    )
-            try:
-                from pydicom.color import ColorManager
-                self._color_manager = ColorManager(icc_profile)
-            except (ImportError, ValueError):
-                logger.warning('could not read ICC Profile')
-                self._color_manager = None
-
         logger.debug('build Basic Offset Table')
         transfer_syntax_uid = self._metadata.file_meta.TransferSyntaxUID
         try:
@@ -1784,17 +1756,13 @@ class ImageFileReader:
 
         return frame_data
 
-    def read_frame(self, index: int, correct_color: bool = True):
+    def read_frame(self, index: int):
         """Read and decode the pixel data of an individual frame item.
 
         Parameters
         ----------
         index: int
             Zero-based frame index
-        correct_color: bool, optional
-            Whether colors should be corrected by applying an ICC
-            transformation. Will only be performed if metadata contain an
-            ICC Profile.
 
         Returns
         -------
@@ -1822,12 +1790,6 @@ class ImageFileReader:
             return pixel_array.reshape(rows, columns)
 
         frame_array = self._decode_frame(frame_data)
-
-        # We don't use the color_correct_frame() function here, since we cache
-        # the ICC transform on the reader instance for improved performance.
-        if correct_color and self._color_manager is not None:
-            logger.debug(f'correct color of frame #{index}')
-            return self._color_manager.transform_frame(frame_array)
 
         return frame_array
 

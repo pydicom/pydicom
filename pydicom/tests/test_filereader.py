@@ -1732,7 +1732,7 @@ class TestImageFileReader:
             indices = list(range(reader.number_of_frames))
             shuffle(indices)
             for i in indices:
-                frame = reader.read_frame(i, correct_color=False)
+                frame = reader.read_frame(i)
                 assert isinstance(frame, numpy.ndarray)
                 assert frame.ndim == 3
                 assert frame.dtype == numpy.uint8
