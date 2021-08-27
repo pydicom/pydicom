@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Write DICOM data &mdash; pydicom 2.2.0 documentation</title>
+  <title>Write DICOM data &mdash; pydicom 2.2.1 documentation</title>
   
 
   
@@ -79,7 +79,7 @@
             
             
               <div class="version">
-                2.2.0
+                2.2.1
               </div>
             
           
@@ -217,32 +217,32 @@ have to change UIDs to valid values and add all required DICOM data elements.</p
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpxzg05tzi.dcm
+Writing test file /tmp/tmpkeoflm2b.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmps_lnyeot.dcm
-Load file /tmp/tmpxzg05tzi.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmp2o2d9l71.dcm
+Load file /tmp/tmpkeoflm2b.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210805&#39;
-(0008, 0033) Content Time                        TM: &#39;180541.678690&#39;
+(0008, 0023) Content Date                        DA: &#39;20210827&#39;
+(0008, 0033) Content Time                        TM: &#39;172131.813699&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpxzg05tzi.dcm ...
-Load file /tmp/tmps_lnyeot.dcm ...
+Remove file /tmp/tmpkeoflm2b.dcm ...
+Load file /tmp/tmp2o2d9l71.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20210805&#39;
-(0008, 0033) Content Time                        TM: &#39;180541.678690&#39;
+(0008, 0023) Content Date                        DA: &#39;20210827&#39;
+(0008, 0033) Content Time                        TM: &#39;172131.813699&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmps_lnyeot.dcm ...
+Remove file /tmp/tmp2o2d9l71.dcm ...
 </pre></div>
 </div>
 <div class="line-block">
@@ -256,7 +256,7 @@ Remove file /tmp/tmps_lnyeot.dcm ...
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">import</span> <span class="nn">pydicom</span>
-<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">FileDataset</span><span class="p">,</span> <a href="../../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class"><span class="n">FileMetaDataset</span></a>
+<span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">FileDataset</span><span class="p">,</span> <a href="../../reference/generated/pydicom.dataset.FileMetaDataset.html#pydicom.dataset.FileMetaDataset" title="pydicom.dataset.FileMetaDataset" class="sphx-glr-backref-module-pydicom-dataset sphx-glr-backref-type-py-class"><span class="n">FileMetaDataset</span></a>
 
 <span class="c1"># Create some temporary filenames</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">suffix</span></a> <span class="o">=</span> <span class="s1">&#39;.dcm&#39;</span>
