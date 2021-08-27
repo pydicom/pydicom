@@ -3,7 +3,7 @@
 # This script is meant to be called in the "deploy" step defined
 # in .circleci/config.yml. See https://circleci.com/docs/2.0 for more details.
 
-# We have three possibily workflows:
+# We have three possible workflows:
 #   If the git branch is 'master' then we want to commit and merge the dev/
 #       docs on gh-pages
 #   If the git branch is [0-9].[0.9].X (i.e. 0.9.X, 1.0.X, 1.2.X, 41.21.X) then

@@ -1,9 +1,9 @@
 """Pure python package for DICOM medical file reading and writing."""
 import re
-from typing import Tuple, cast, Match
+from typing import cast, Match
 
 
-__version__: str = '2.2.0'
+__version__: str = '2.2.1'
 
 result = cast(Match[str], re.match(r'(\d+\.\d+\.\d+).*', __version__))
 __version_info__ = tuple(result.group(1).split('.'))

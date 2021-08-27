@@ -116,3 +116,5 @@ Fixes
 * Fixed handling of code extensions with person name component delimiter
   (:pr:`1449`)
 * Fixed bug decoding RBG jpg with APP14 marker due to change in Pillow (:pr:`1444`)
+* Fixed decoding for `FloatPixelData` and `DoubleFloatPixelData` via
+  `pydicom.pixel_data_handlers.numpy_handler` (:issue:`1457`)

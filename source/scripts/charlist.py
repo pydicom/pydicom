@@ -1,7 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """List summary info for the test files in the charset directory"""
 
-from glob import glob
 import logging
 import os
 

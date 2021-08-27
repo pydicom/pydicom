@@ -4,8 +4,8 @@ or any list of items that must all be the same type.
 """
 
 from typing import (
-    Iterable, Union, List, overload, Optional, Callable, Any, cast,
-    TypeVar, MutableSequence, Generator, Iterator
+    Iterable, Union, List, overload, Callable, Any, cast,
+    TypeVar, MutableSequence, Iterator
 )
 from typing import Sequence as SequenceType
 

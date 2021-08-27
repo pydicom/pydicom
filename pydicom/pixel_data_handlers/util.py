@@ -774,10 +774,10 @@ def dtype_corrected_for_endianness(
     Parameters
     ----------
     is_little_endian : bool
-        The endianess of the affected :class:`~pydicom.dataset.Dataset`.
+        The endianness of the affected :class:`~pydicom.dataset.Dataset`.
     numpy_dtype : numpy.dtype
         The numpy data type used for the *Pixel Data* without considering
-        endianess.
+        endianness.
 
     Raises
     ------
@@ -788,7 +788,7 @@ def dtype_corrected_for_endianness(
     -------
     numpy.dtype
         The numpy data type used for the *Pixel Data* without considering
-        endianess.
+        endianness.
     """
     if is_little_endian is None:
         raise ValueError("Dataset attribute 'is_little_endian' "
