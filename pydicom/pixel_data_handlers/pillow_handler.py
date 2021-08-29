@@ -18,7 +18,8 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    from PIL import Image, features
+    from PIL import Image, features, ImageFile
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
     HAVE_JPEG2K = features.check_codec("jpg_2000")
