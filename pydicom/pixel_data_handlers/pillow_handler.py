@@ -19,7 +19,6 @@ except ImportError:
 
 try:
     from PIL import Image, features, ImageFile
-    ImageFile.LOAD_TRUNCATED_IMAGES = True
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
     HAVE_JPEG2K = features.check_codec("jpg_2000")
@@ -221,7 +220,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         )
         if 'YBR' in photometric_interpretation:
             im.draft('YCbCr', (rows, columns))
-        pixel_bytes.extend(im.tobytes())
+
+        try:
+            pixel_bytes.extend(im.tobytes())
+        except OSError:
+            warnings.warn('Input image is truncated, but reading anyways!')
+            ImageFile.LOAD_TRUNCATED_IMAGE = True
+            pixel_bytes.extend(im.tobytes())
+
 
         params = get_j2k_parameters(pixel_data)
         j2k_precision = cast(int, params.setdefault("precision", bits_stored))
