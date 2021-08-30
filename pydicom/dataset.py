@@ -1541,19 +1541,22 @@ class Dataset:
                 )
                 last_exception = exc
 
-        # The only way to get to this point is if we failed to get the pixel
-        #   array because all suitable handlers raised exceptions
-        self._pixel_array = None
-        self._pixel_id = {}
+        if last_exception is None:
+            pass  # FIXME: raise some exception?
+        else:
+            # The only way to get to this point is if we failed to get the
+            # pixel array because all suitable handlers raised exceptions
+            self._pixel_array = None
+            self._pixel_id = {}
 
-        logger.info(
-            "Unable to decode the pixel data using the following handlers: {}."
-            "Please see the list of supported Transfer Syntaxes in the "
-            "pydicom documentation for alternative packages that might "
-            "be able to decode the data"
-            .format(", ".join([str(hh) for hh in available_handlers]))
-        )
-        raise last_exception  # type: ignore[misc]
+            logger.info(
+                "Unable to decode the pixel data using the following "
+                "handlers: {}. Please see the list of supported Transfer "
+                "Syntaxes in the pydicom documentation for alternative "
+                "packages that might be able to decode the data"
+                .format(", ".join([str(hh) for hh in available_handlers]))
+            )
+            raise last_exception
 
     def _do_pixel_data_conversion(self, handler: Any) -> None:
         """Do the actual data conversion using the given handler."""
@@ -1854,15 +1857,19 @@ class Dataset:
                 )
                 last_exception = exc
 
-        logger.info(
-            "Unable to decode the overlay data using the following handlers: "
-            "{}. Please see the list of supported Transfer Syntaxes in the "
-            "pydicom documentation for alternative packages that might "
-            "be able to decode the data"
-            .format(", ".join([str(hh) for hh in available_handlers]))
-        )
-
-        raise last_exception  # type: ignore[misc]
+        if last_exception is None:
+            pass  # FIXME: raise some exception?
+        else:
+            # The only way to get to this point is if we failed to get the
+            # pixel array because all suitable handlers raised exceptions
+            logger.info(
+                "Unable to decode the overlay data using the following "
+                "handlers: {}. Please see the list of supported Transfer "
+                "Syntaxes in the pydicom documentation for alternative "
+                "packages that might be able to decode the data"
+                .format(", ".join([str(hh) for hh in available_handlers]))
+            )
+            raise last_exception
 
     @property
     def pixel_array(self) -> "numpy.ndarray":
