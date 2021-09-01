@@ -1,0 +1,3 @@
+# https://lgtm.com/rules/1510014536001/
+queries:
+  - exclude: py/clear-text-logging-sensitive-data
