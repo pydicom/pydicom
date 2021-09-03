@@ -225,7 +225,7 @@ class TestNumpy_GetOverlayArray:
         """Test bad pixel data length raises exception."""
         ds = dcmread(EXPL_1_1_1F)
         # Too short
-        ds[0x6000, 0x3000].value = ds[0x6000, 0x3000][:-1]
+        ds[0x6000, 0x3000].value = ds[0x6000, 0x3000].value[:-1]
         msg = (
             r"The length of the overlay data in the dataset \(29281 bytes\) "
             r"doesn't match the expected length \(29282 bytes\). "

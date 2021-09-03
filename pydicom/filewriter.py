@@ -50,10 +50,10 @@ _us_ss_tags = {
     0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006,
 }
 
-# (5400, 0110) Channel Minimum Value
-# (5400, 0112) Channel Maximum Value
-# (5400, 100A) Waveform Padding Data
-# (5400, 1010) Waveform Data
+# (5400,0110) Channel Minimum Value
+# (5400,0112) Channel Maximum Value
+# (5400,100A) Waveform Padding Data
+# (5400,1010) Waveform Data
 _ob_ow_tags = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
 
 # (60xx,3000) Overlay Data
@@ -572,8 +572,8 @@ def write_data_element(
 
     value_length = buffer.tell()
     if (
-        not fp.is_implicit_VR and
-        vr not in EXPLICIT_VR_LENGTH_32
+        not fp.is_implicit_VR
+        and vr not in EXPLICIT_VR_LENGTH_32
         and not is_undefined_length
         and value_length > 0xffff
     ):

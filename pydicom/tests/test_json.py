@@ -19,7 +19,7 @@ class TestPersonName:
         assert isinstance(ds[0x00080090].value, PersonName)
         assert isinstance(ds[0x00100010].value, PersonName)
         inner_seq = ds[0x04000561].value[0][0x04000550]
-        dataelem = inner_seq[0][0x00100010]
+        dataelem = inner_seq.value[0][0x00100010]
         assert isinstance(dataelem.value, PersonName)
 
     def test_pn_components_to_json(self):

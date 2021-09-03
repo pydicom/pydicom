@@ -91,8 +91,6 @@ if _missing:
     raise RuntimeError(f"Corresponding Python built-in missing for {_missing}")
 
 
-# VRs that may have long values (more than 1024 characters)
-LONG_VR = BYTES_VR | {VR.LT, VR.UC, VR.UT}
 # These VRs may have backslash characters or encoded backslashes in the
 #   value based off of the information in Table 6.2-1 in Part 5
 # DataElements with ambiguous VRs may use `bytes` values and so are allowed

@@ -1947,7 +1947,9 @@ class Dataset:
         str
             A string representation of an element.
         """
-        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear')
+        exclusion = (
+            'from_json', 'to_json', 'to_json_dict', 'clear', 'description'
+        )
         for elem in self.iterall():
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
@@ -2014,7 +2016,7 @@ class Dataset:
             with tag_in_exception(elem.tag):
                 if elem.VR == VR.SQ:  # a sequence
                     strings.append(
-                        f"{indent_str}{str(elem.tag)}  {elem.description()}  "
+                        f"{indent_str}{str(elem.tag)}  {elem.name}  "
                         f"{len(elem.value)} item(s) ---- "
                     )
                     if not top_level_only:

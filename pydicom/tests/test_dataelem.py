@@ -134,25 +134,25 @@ class TestDataElement:
         assert self.data_elementRetired.is_retired is True
         assert self.data_elementPrivate.is_retired is False
 
-    def test_description_group_length(self):
-        """Test DataElement.description for Group Length element"""
+    def test_name_group_length(self):
+        """Test DataElement.name for Group Length element"""
         elem = DataElement(0x00100000, 'LO', 12345)
-        assert 'Group Length' == elem.description()
+        assert 'Group Length' == elem.name
 
-    def test_description_unknown_private(self):
-        """Test DataElement.description with an unknown private element"""
+    def test_name_unknown_private(self):
+        """Test DataElement.name with an unknown private element"""
         elem = DataElement(0x00110010, 'LO', 12345)
         elem.private_creator = 'TEST'
-        assert 'Private tag data' == elem.description()
+        assert 'Private tag data' == elem.name
         elem = DataElement(0x00110F00, 'LO', 12345)
         assert elem.tag.is_private
         assert elem.private_creator is None
-        assert 'Private tag data' == elem.description()
+        assert 'Private tag data' == elem.name
 
-    def test_description_unknown(self):
-        """Test DataElement.description with an unknown element"""
+    def test_name_unknown(self):
+        """Test DataElement.name with an unknown element"""
         elem = DataElement(0x00000004, 'LO', 12345)
-        assert '' == elem.description()
+        assert '' == elem.name
 
     def test_equality_standard_element(self):
         """DataElement: equality returns correct value for simple elements"""
@@ -292,10 +292,10 @@ class TestDataElement:
 
         # Check value
         dd.value = [Dataset()]
-        dd[0].PatientName = 'ANON'
-        ee[0].PatientName = 'ANON'
+        dd.value[0].PatientName = 'ANON'
+        ee.value[0].PatientName = 'ANON'
         assert not ee != dd
-        ee[0].PatientName = 'ANONA'
+        ee.value[0].PatientName = 'ANONA'
         assert ee != dd
 
     def test_hash(self):
@@ -320,14 +320,14 @@ class TestDataElement:
     def test_repr_seq(self):
         """Test DataElement.__repr__ with a sequence"""
         elem = DataElement(0x300A00B0, 'SQ', [Dataset()])
-        elem[0].PatientID = '1234'
+        elem.value[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
         elem = DataElement(0x00100010, 'LO', 12345)
         with pytest.raises(TypeError):
-            elem[0]
+            elem.value[0]
 
     def test_repval_large_elem(self):
         """Test DataElement.repval doesn't return a huge string for a large

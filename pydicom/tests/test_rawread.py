@@ -532,8 +532,8 @@ class TestRawSequence:
 
         # The sequence is parsed, but only into raw data elements.
         # They will be converted when asked for. Check some:
-        assert 1 == seq[0].BeamNumber
-        assert 'Beam 2' == seq[1].BeamName
+        assert 1 == seq.value[0].BeamNumber
+        assert 'Beam 2' == seq.value[1].BeamName
 
     def test_explVR_switch_implVR_in_SQ_item(self):
         """Raw read: Tolerate missing VR in Sequence item"""
@@ -555,4 +555,4 @@ class TestRawSequence:
                                         is_implicit_VR=False,
                                         is_little_endian=False)
         seq = next(de_gen)
-        assert seq[0].PatientID == "4444444444"
+        assert seq.value[0].PatientID == "4444444444"

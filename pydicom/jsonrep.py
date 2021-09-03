@@ -49,7 +49,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
         return value
 
     number_type: Optional[Union[Type[int], Type[float]]] = None
-    if vr in INT_VR | VR.US_SS - {VR.AT}:
+    if vr in (INT_VR - {VR.AT}) | {VR.US_SS}:
         number_type = int
     if vr in FLOAT_VR:
         number_type = float
@@ -307,7 +307,7 @@ class JsonDataElementConverter:
                 elem = DataElement(
                     tag=int(key, 16),
                     value=empty_value_for_VR(vr),
-                    VR=vr
+                    vr=vr
                 )
             else:
                 value_key = unique_value_keys[0]

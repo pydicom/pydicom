@@ -267,7 +267,7 @@ class DataElement:
         )
         elem_value = converter.get_element_values()
         try:
-            return cls(tag=tag, value=elem_value, VR=vr)
+            return cls(tag=tag, value=elem_value, vr=vr)
         except Exception as exc:
             raise ValueError(
                 f"Data element '{tag}' could not be loaded from JSON: "
@@ -303,7 +303,7 @@ class DataElement:
             Mapping representing a JSON encoded data element as ``{str: Any}``.
         """
         json_element: Dict[str, Any] = {'vr': self.VR}
-        if self.VR in BYTES_VR | AMBIGUOUS_VR:
+        if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
                 encoded_value = base64.b64encode(binary_value).decode('utf-8')
@@ -847,10 +847,10 @@ def DataElement_from_raw(
     except BytesLengthException as e:
         message = (
             f"{e} This occurred while trying to parse {raw.tag} according "
-            f"to VR '{vr}'"
+            f"to VR '{vr}'."
         )
         if config.convert_wrong_length_to_UN:
-            warnings.warn(f"{message} Setting VR to 'UN'")
+            warnings.warn(f"{message} Setting VR to 'UN'.")
             vr = VR.UN
             value = raw.value
         else:

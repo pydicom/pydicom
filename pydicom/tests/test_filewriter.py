@@ -990,14 +990,14 @@ class TestCorrectAmbiguousVR:
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
-        assert 'US' == ds[0x00283000][0][0x00283002].VR
+        assert 'US' == ds[0x00283000].value[0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
         ds.is_implicit_VR = False
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
-        assert 'SS' == ds[0x00283000][0][0x00283002].VR
+        assert 'SS' == ds[0x00283000].value[0][0x00283002].VR
 
     def test_ambiguous_element_in_sequence_implicit_using_attribute(self):
         """Test that reading a sequence with an ambiguous element
@@ -1027,14 +1027,14 @@ class TestCorrectAmbiguousVR:
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
-        assert 'US' == ds[0x00283000][0][0x00283002].VR
+        assert 'US' == ds[0x00283000].value[0][0x00283002].VR
 
         ds = self.dataset_with_modality_lut_sequence(pixel_repr=1)
         ds.is_implicit_VR = True
         fp = BytesIO()
         ds.save_as(fp, write_like_original=True)
         ds = dcmread(fp, force=True)
-        assert 'SS' == ds[0x00283000][0][0x00283002].VR
+        assert 'SS' == ds[0x00283000].value[0][0x00283002].VR
 
 
 class TestCorrectAmbiguousVRElement:

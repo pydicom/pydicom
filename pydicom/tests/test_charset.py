@@ -77,7 +77,7 @@ class TestCharset:
         # Instead, we make sure that it is decoded using the
         # (0008,0005) tag of the dataset
 
-        sequence = ds[0x32, 0x1064][0]
+        sequence = ds[0x32, 0x1064].value[0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
         assert 'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
@@ -88,7 +88,7 @@ class TestCharset:
 
         # These datasets inside of the SQ shall be decoded with the parent
         # dataset's encoding
-        sequence = ds[0x32, 0x1064][0]
+        sequence = ds[0x32, 0x1064].value[0]
         assert ['shift_jis', 'iso2022_jp'] == sequence._character_set
         assert 'ﾔﾏﾀﾞ^ﾀﾛｳ=山田^太郎=やまだ^たろう' == sequence.PatientName
 
