@@ -542,7 +542,7 @@ def write_data_element(
 
         encodings = encodings or [default_encoding]
         encodings = convert_encodings(encodings)
-        fn, param = writers[vr]
+        fn, param = writers[cast(VR, vr)]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
             if vr in CUSTOMIZABLE_CHARSET or vr == VR.SQ:

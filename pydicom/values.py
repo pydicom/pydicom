@@ -712,7 +712,6 @@ def convert_value(
     type or MultiValue of type
         The element value decoded using the appropriate decoder.
     """
-
     if vr not in converters:
         # `VR` characters are in the ascii alphabet ranges 65 - 90, 97 - 122
         char_range = list(range(65, 91)) + list(range(97, 123))
@@ -727,6 +726,7 @@ def convert_value(
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string
+    vr = cast(VR, vr)
     if isinstance(converters[vr], tuple):
         converter, num_format = cast(tuple, converters[vr])
     else:

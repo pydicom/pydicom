@@ -1373,6 +1373,7 @@ class Dataset:
         if tag in self:
             return self[tag]
 
+        vr: Union[str, VR]
         if not isinstance(default, DataElement):
             if tag.is_private:
                 vr = VR.UN
