@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Code to fix non-standard dicom issues in files
 """
 
@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Tuple
 from pydicom import config
 from pydicom import datadict
 from pydicom import values
+from pydicom.vr import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import RawDataElement
@@ -23,12 +24,12 @@ def fix_separator_callback(
     # If elements are implicit VR, attempt to determine the VR
     if raw_elem.VR is None:
         try:
-            VR = datadict.dictionary_VR(raw_elem.tag)
+            vr = datadict.dictionary_VR(raw_elem.tag)
         # Not in the dictionary, process if flag says to do so
         except KeyError:
             try_replace = kwargs['process_unkown_VR']
         else:
-            try_replace = VR in kwargs['for_VRs']
+            try_replace = vr in kwargs['for_VRs']
     else:
         try_replace = raw_elem.VR in kwargs['for_VRs']
 
@@ -95,16 +96,17 @@ def fix_mismatch_callback(
     return raw_elem
 
 
-def fix_mismatch(with_VRs: Tuple[str, ...] = ('PN', 'DS', 'IS')) -> None:
+def fix_mismatch(with_VRs: Tuple[str, ...] = (VR.PN, VR.DS, VR.IS)) -> None:
     """A callback function to check that RawDataElements are translatable
     with their provided VRs.  If not, re-attempt translation using
     some other translators.
 
     Parameters
     ----------
-    with_VRs : list, [['PN', 'DS', 'IS']]
-        A list of VR strings to attempt if the raw data element value cannot
-        be translated with the raw data element's VR.
+    with_VRs : Tuple[str]
+        A tuple of VR strings to attempt if the raw data element value cannot
+        be translated with the raw data element's VR. Default
+        ``('PN', 'DS', 'IS')``.
 
     Returns
     -------
@@ -112,6 +114,4 @@ def fix_mismatch(with_VRs: Tuple[str, ...] = ('PN', 'DS', 'IS')) -> None:
     the original RawDataElement instance, or one with a fixed VR.
     """
     config.data_element_callback = fix_mismatch_callback
-    config.data_element_callback_kwargs = {
-        'with_VRs': with_VRs,
-    }
+    config.data_element_callback_kwargs = {'with_VRs': with_VRs}

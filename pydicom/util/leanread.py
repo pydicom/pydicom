@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
 import os
@@ -117,11 +117,11 @@ def data_element_generator(
 
         if is_implicit_VR:
             # must reset VR each time; could have set last iteration (e.g. SQ)
-            VR = None
+            vr = None
             group, elem, length = element_struct_unpack(bytes_read)
         else:  # explicit VR
-            group, elem, VR, length = element_struct_unpack(bytes_read)
-            if VR in extra_length_VRs_b:
+            group, elem, vr, length = element_struct_unpack(bytes_read)
+            if vr in extra_length_VRs_b:
                 length = extra_length_unpack(fp_read(4))[0]
 
         # Positioned to read the value, but may not want to -- check stop_when
@@ -129,7 +129,7 @@ def data_element_generator(
         if stop_when is not None:
             if stop_when(group, elem):
                 rewind_length = 8
-                if not is_implicit_VR and VR in extra_length_VRs_b:
+                if not is_implicit_VR and vr in extra_length_VRs_b:
                     rewind_length += 4
                 fp.seek(value_tell - rewind_length)
 
@@ -145,7 +145,7 @@ def data_element_generator(
             else:
                 value = fp_read(length)
             # import pdb;pdb.set_trace()
-            yield ((group, elem), VR, length, value, value_tell)
+            yield ((group, elem), vr, length, value, value_tell)
 
         # Second case: undefined length - must seek to delimiter,
         # unless is SQ type, in which case is easier to parse it, because
@@ -156,9 +156,9 @@ def data_element_generator(
             # if private tag, won't be able to look it up in dictionary,
             #   in which case just ignore it and read the bytes unless it is
             #   identified as a Sequence
-            if VR is None:
+            if vr is None:
                 try:
-                    VR = dictionary_VR((group, elem)).encode('ascii')
+                    vr = dictionary_VR((group, elem)).encode('ascii')
                 except KeyError:
                     # Look ahead to see if it consists of items and
                     # is thus a SQ
@@ -171,12 +171,12 @@ def data_element_generator(
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
                     if next_tag == ItemTag:
-                        VR = b'SQ'
+                        vr = b'SQ'
 
-            if VR == b'SQ':
-                yield ((group, elem), VR, length, None, value_tell)
+            if vr == b'SQ':
+                yield ((group, elem), vr, length, None, value_tell)
             else:
                 raise NotImplementedError(
-                    "This reader does not handle undefined length except for "
-                    "SQ"
+                    "This reader does not handle undefined length except "
+                    "for SQ"
                 )

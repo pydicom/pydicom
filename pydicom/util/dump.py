@@ -6,6 +6,8 @@ import os
 import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
 
+from pydicom.vr import VR
+
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
@@ -112,7 +114,7 @@ def pretty_print(
     indent = indent_chars * indent_level
     next_indent = indent_chars * (indent_level + 1)
     for elem in ds:
-        if elem.VR == "SQ":  # a sequence
+        if elem.VR == VR.SQ:  # a sequence
             print(
                 f"{indent}{elem.tag} {elem.name} -- {len(elem.value)} item(s)"
             )

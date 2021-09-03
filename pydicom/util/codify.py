@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """
 Produce runnable python code which can recreate DICOM objects or files.
 
@@ -104,7 +104,7 @@ def code_dataelem(
         If the data element is a sequence, calls code_sequence
     """
 
-    if dataelem.VR == "SQ":
+    if dataelem.VR == VR.SQ:
         return code_sequence(
             dataelem, dataset_name, exclude_size, include_private
         )
@@ -121,7 +121,7 @@ def code_dataelem(
 
     if exclude_size:
         if (
-            dataelem.VR in BYTES_VR | AMBIGUOUS_VR - {VR.US_SS}
+            dataelem.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR.US_SS}
             and not isinstance(dataelem.value, (int, float))
             and len(dataelem.value) > exclude_size
         ):
@@ -131,8 +131,8 @@ def code_dataelem(
         line = f"{dataset_name}.{keyword} = {valuerep}"
     else:
         tag = tag_repr(dataelem.tag)
-        VR = dataelem.VR
-        line = f"{dataset_name}.add_new({tag}, '{VR}', {valuerep})"
+        vr = dataelem.VR
+        line = f"{dataset_name}.add_new({tag}, '{vr}', {valuerep})"
 
     return line
 
@@ -265,7 +265,7 @@ def code_dataset(
         )
         lines.append(code_line)
         # Add blank line if just coded a sequence
-        if dataelem.VR == "SQ":
+        if dataelem.VR == VR.SQ:
             lines.append("")
     # If sequence was end of this dataset, remove the extra blank line
     if len(lines) and lines[-1] == "":
