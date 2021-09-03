@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
 from struct import pack
@@ -10,7 +10,9 @@ from typing import (
 import warnings
 import zlib
 
-from pydicom.charset import default_encoding, convert_encodings, encode_string
+from pydicom.charset import (
+    default_encoding, convert_encodings, encode_string, CUSTOMIZABLE_CHARSET
+)
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
@@ -22,7 +24,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import PersonName, IS, DSclass, DA, DT, TM
 from pydicom.values import convert_numbers
-from pydicom.vr import EXPLICIT_VR_LENGTH_32, CHARSET_VR, VR, AMBIGUOUS_VR
+from pydicom.vr import EXPLICIT_VR_LENGTH_32, VR, AMBIGUOUS_VR
 
 
 if have_numpy:
@@ -186,7 +188,7 @@ def correct_ambiguous_vr_element(
     dataelem.DataElement
         The corrected element
     """
-    if elem.VR in VR.ambiguous:
+    if elem.VR in AMBIGUOUS_VR:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
             elem = DataElement_from_raw(elem, dataset=ds)
@@ -236,7 +238,7 @@ def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
         if elem.VR == VR.SQ:
             for item in cast(MutableSequence[Dataset], elem.value):
                 correct_ambiguous_vr(item, is_little_endian)
-        elif elem.VR in VR.ambiguous:
+        elif elem.VR in AMBIGUOUS_VR:
             correct_ambiguous_vr_element(elem, ds, is_little_endian)
     return ds
 
@@ -543,7 +545,7 @@ def write_data_element(
         fn, param = writers[vr]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if vr in CHARSET_VR["customizable"] or vr == VR.SQ:
+            if vr in CUSTOMIZABLE_CHARSET or vr == VR.SQ:
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
@@ -1152,48 +1154,48 @@ if sys.version_info[:2] < (3, 7):
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #   (struct_format is python's struct module format)
 writers = {
-    'AE': (write_string, None),
-    'AS': (write_string, None),
-    'AT': (write_ATvalue, None),
-    'CS': (write_string, None),
-    'DA': (write_DA, None),
-    'DS': (write_number_string, None),
-    'DT': (write_DT, None),
-    'FD': (write_numbers, 'd'),
-    'FL': (write_numbers, 'f'),
-    'IS': (write_number_string, None),
-    'LO': (write_text, None),
-    'LT': (write_text, None),
-    'OB': (write_OBvalue, None),
-    'OD': (write_OWvalue, None),
-    'OF': (write_OWvalue, None),
-    'OL': (write_OWvalue, None),
-    'OW': (write_OWvalue, None),
-    'OV': (write_OWvalue, None),
-    'PN': (write_PN, None),
-    'SH': (write_text, None),
-    'SL': (write_numbers, 'l'),
-    'SQ': (write_sequence, None),
-    'SS': (write_numbers, 'h'),
-    'ST': (write_text, None),
-    'SV': (write_numbers, 'q'),
-    'TM': (write_TM, None),
-    'UC': (write_text, None),
-    'UI': (write_UI, None),
-    'UL': (write_numbers, 'L'),
-    'UN': (write_UN, None),
-    'UR': (write_string, None),
-    'US': (write_numbers, 'H'),
-    'UT': (write_text, None),
-    'UV': (write_numbers, 'Q'),
-    'US or SS': (write_OWvalue, None),
-    'US or OW': (write_OWvalue, None),
-    'US or SS or OW': (write_OWvalue, None),
-    'OB or OW': (write_OBvalue, None),
+    VR.AE: (write_string, None),
+    VR.AS: (write_string, None),
+    VR.AT: (write_ATvalue, None),
+    VR.CS: (write_string, None),
+    VR.DA: (write_DA, None),
+    VR.DS: (write_number_string, None),
+    VR.DT: (write_DT, None),
+    VR.FD: (write_numbers, 'd'),
+    VR.FL: (write_numbers, 'f'),
+    VR.IS: (write_number_string, None),
+    VR.LO: (write_text, None),
+    VR.LT: (write_text, None),
+    VR.OB: (write_OBvalue, None),
+    VR.OD: (write_OWvalue, None),
+    VR.OF: (write_OWvalue, None),
+    VR.OL: (write_OWvalue, None),
+    VR.OW: (write_OWvalue, None),
+    VR.OV: (write_OWvalue, None),
+    VR.PN: (write_PN, None),
+    VR.SH: (write_text, None),
+    VR.SL: (write_numbers, 'l'),
+    VR.SQ: (write_sequence, None),
+    VR.SS: (write_numbers, 'h'),
+    VR.ST: (write_text, None),
+    VR.SV: (write_numbers, 'q'),
+    VR.TM: (write_TM, None),
+    VR.UC: (write_text, None),
+    VR.UI: (write_UI, None),
+    VR.UL: (write_numbers, 'L'),
+    VR.UN: (write_UN, None),
+    VR.UR: (write_string, None),
+    VR.US: (write_numbers, 'H'),
+    VR.UT: (write_text, None),
+    VR.UV: (write_numbers, 'Q'),
+    VR.US_SS: (write_OWvalue, None),
+    VR.US_OW: (write_OWvalue, None),
+    VR.US_SS_OW: (write_OWvalue, None),
+    VR.OB_OW: (write_OBvalue, None),
 }
 
 try:
-    assert VR.all == set(writers)
+    assert set(VR) == set(writers)
 except AssertionError:
-    missing = ", ".join(list(VR.all - set(writers)))
+    missing = ", ".join(list(set(VR) - set(writers)))
     raise RuntimeError(f"Missing encoder function for VR {missing}")

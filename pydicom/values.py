@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions for converting values of DICOM
    data elements to proper python types
 """
@@ -12,7 +12,9 @@ from typing import (
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.charset import default_encoding, decode_bytes
+from pydicom.charset import (
+    default_encoding, decode_bytes, CUSTOMIZABLE_CHARSET
+)
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
@@ -23,7 +25,7 @@ from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS
-from pydicom.vr import CHARSET_VR, VR, AMBIGUOUS_VR
+from pydicom.vr import VR
 
 try:
     import numpy
@@ -689,7 +691,7 @@ def convert_UR_string(
 
 
 def convert_value(
-    VR: str,
+    vr: str,
     raw_data_element: RawDataElement,
     encodings: Optional[Union[str, MutableSequence[str]]] = None
 ) -> Union[Any, MutableSequence[Any]]:
@@ -697,7 +699,7 @@ def convert_value(
 
     Parameters
     ----------
-    VR : str
+    vr : str
         The element's VR.
     raw_data_element : pydicom.dataelem.RawDataElement
         The encoded element value.
@@ -711,24 +713,24 @@ def convert_value(
         The element value decoded using the appropriate decoder.
     """
 
-    if VR not in converters:
+    if vr not in converters:
         # `VR` characters are in the ascii alphabet ranges 65 - 90, 97 - 122
         char_range = list(range(65, 91)) + list(range(97, 123))
         # If the VR characters are outside that range then print hex values
-        if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
-            VR = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in VR])
-        raise NotImplementedError(f"Unknown Value Representation '{VR}'")
+        if ord(vr[0]) not in char_range or ord(vr[1]) not in char_range:
+            vr = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in vr])
+        raise NotImplementedError(f"Unknown Value Representation '{vr}'")
 
     if raw_data_element.length == 0:
-        return empty_value_for_VR(VR)
+        return empty_value_for_VR(vr)
 
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string
-    if isinstance(converters[VR], tuple):
-        converter, num_format = cast(tuple, converters[VR])
+    if isinstance(converters[vr], tuple):
+        converter, num_format = cast(tuple, converters[vr])
     else:
-        converter = converters[VR]
+        converter = converters[vr]
         num_format = None
 
     # Ensure that encodings is a list
@@ -743,10 +745,10 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if VR in CHARSET_VR["customizable"]:
+        if vr in CUSTOMIZABLE_CHARSET:
             return converter(byte_string, encodings)
 
-        if VR != "SQ":
+        if vr != VR.SQ:
             return converter(byte_string, is_little_endian, num_format)
 
         # SQ
@@ -763,10 +765,10 @@ def convert_value(
             raise
 
     logger.debug(
-        f"Unable to convert tag {raw_data_element.tag} with VR {VR} using "
+        f"Unable to convert tag {raw_data_element.tag} with VR {vr} using "
         "the standard value converter"
     )
-    for vr in [val for val in convert_retry_VR_order if val != VR]:
+    for vr in [val for val in convert_retry_VR_order if val != vr]:
         try:
             return convert_value(vr, raw_data_element, encodings)
         except Exception:
@@ -780,56 +782,58 @@ def convert_value(
 
 
 convert_retry_VR_order = [
-    'SH', 'UL', 'SL', 'US', 'SS', 'FL', 'FD', 'OF', 'OB', 'UI', 'DA', 'TM',
-    'PN', 'IS', 'DS', 'LT', 'SQ', 'UN', 'AT', 'OW', 'DT', 'UT', ]
+    VR.SH, VR.UL, VR.SL, VR.US, VR.SS, VR.FL, VR.FD, VR.OF, VR.OB, VR.UI,
+    VR.DA, VR.TM, VR.PN, VR.IS, VR.DS, VR.LT, VR.SQ, VR.UN, VR.AT, VR.OW,
+    VR.DT, VR.UT,
+]
 # converters map a VR to the function
 # to read the value(s). for convert_numbers,
 # the converter maps to a tuple
 # (function, struct_format)
 # (struct_format in python struct module style)
 converters = {
-    'AE': convert_AE_string,
-    'AS': convert_string,
-    'AT': convert_ATvalue,
-    'CS': convert_string,
-    'DA': convert_DA_string,
-    'DS': convert_DS_string,
-    'DT': convert_DT_string,
-    'FD': (convert_numbers, 'd'),
-    'FL': (convert_numbers, 'f'),
-    'IS': convert_IS_string,
-    'LO': convert_text,
-    'LT': convert_single_string,
-    'OB': convert_OBvalue,
-    'OD': convert_OBvalue,
-    'OF': convert_OWvalue,
-    'OL': convert_OBvalue,
-    'OW': convert_OWvalue,
-    'OV': convert_OVvalue,
-    'PN': convert_PN,
-    'SH': convert_text,
-    'SL': (convert_numbers, 'l'),
-    'SQ': convert_SQ,
-    'SS': (convert_numbers, 'h'),
-    'ST': convert_single_string,
-    'SV': (convert_numbers, 'q'),
-    'TM': convert_TM_string,
-    'UC': convert_text,
-    'UI': convert_UI,
-    'UL': (convert_numbers, 'L'),
-    'UN': convert_UN,
-    'UR': convert_UR_string,
-    'US': (convert_numbers, 'H'),
-    'UT': convert_single_string,
-    'UV': (convert_numbers, 'Q'),
-    'OB or OW': convert_OBvalue,
-    'US or SS': convert_OWvalue,
-    'US or OW': convert_OWvalue,
-    'US or SS or OW': convert_OWvalue,
+    VR.AE: convert_AE_string,
+    VR.AS: convert_string,
+    VR.AT: convert_ATvalue,
+    VR.CS: convert_string,
+    VR.DA: convert_DA_string,
+    VR.DS: convert_DS_string,
+    VR.DT: convert_DT_string,
+    VR.FD: (convert_numbers, 'd'),
+    VR.FL: (convert_numbers, 'f'),
+    VR.IS: convert_IS_string,
+    VR.LO: convert_text,
+    VR.LT: convert_single_string,
+    VR.OB: convert_OBvalue,
+    VR.OD: convert_OBvalue,
+    VR.OF: convert_OWvalue,
+    VR.OL: convert_OBvalue,
+    VR.OW: convert_OWvalue,
+    VR.OV: convert_OVvalue,
+    VR.PN: convert_PN,
+    VR.SH: convert_text,
+    VR.SL: (convert_numbers, 'l'),
+    VR.SQ: convert_SQ,
+    VR.SS: (convert_numbers, 'h'),
+    VR.ST: convert_single_string,
+    VR.SV: (convert_numbers, 'q'),
+    VR.TM: convert_TM_string,
+    VR.UC: convert_text,
+    VR.UI: convert_UI,
+    VR.UL: (convert_numbers, 'L'),
+    VR.UN: convert_UN,
+    VR.UR: convert_UR_string,
+    VR.US: (convert_numbers, 'H'),
+    VR.UT: convert_single_string,
+    VR.UV: (convert_numbers, 'Q'),
+    VR.OB_OW: convert_OBvalue,
+    VR.US_SS: convert_OWvalue,
+    VR.US_OW: convert_OWvalue,
+    VR.US_SS_OW: convert_OWvalue,
 }
 
 try:
-    assert VR.all == set(converters)
+    assert set(VR) == set(converters)
 except AssertionError:
-    missing = ", ".join(list(VR.all - set(converters)))
+    missing = ", ".join(list(set(VR) - set(converters)))
     raise RuntimeError(f"Missing decoder function for VR {missing}")

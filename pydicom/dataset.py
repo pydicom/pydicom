@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -59,6 +59,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
     RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
 )
+from pydicom.vr import VR, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
@@ -177,7 +178,7 @@ class PrivateBlock:
         """
         del self.dataset[self.get_tag(element_offset)]
 
-    def add_new(self, element_offset: int, VR: str, value: object) -> None:
+    def add_new(self, element_offset: int, vr: str, value: object) -> None:
         """Add a private element to the parent :class:`Dataset`.
 
         Adds the private tag with the given `VR` and `value` to the parent
@@ -189,14 +190,14 @@ class PrivateBlock:
         element_offset : int
             The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be added.
-        VR : str
+        vr : str
             The 2 character DICOM value representation.
         value
             The value of the data element. See :meth:`Dataset.add_new()`
             for a description.
         """
         tag = self.get_tag(element_offset)
-        self.dataset.add_new(tag, VR, value)
+        self.dataset.add_new(tag, vr, value)
         self.dataset[tag].private_creator = self.private_creator
 
 
@@ -429,7 +430,7 @@ class Dataset:
         """
         self[data_element.tag] = data_element
 
-    def add_new(self, tag: TagType, VR: str, value: Any) -> None:
+    def add_new(self, tag: TagType, vr: str, value: Any) -> None:
         """Create a new element and add it to the :class:`Dataset`.
 
         Parameters
@@ -438,7 +439,7 @@ class Dataset:
             The DICOM (group, element) tag in any form accepted by
             :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
-        VR : str
+        vr : str
             The 2 character DICOM value representation (see DICOM Standard,
             Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
         value
@@ -451,7 +452,7 @@ class Dataset:
               :class:`Dataset`
         """
 
-        data_element = DataElement(tag, VR, value)
+        data_element = DataElement(tag, vr, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
@@ -540,7 +541,7 @@ class Dataset:
         # This simply calls the pydicom.charset.decode_element function
         def decode_callback(ds: "Dataset", data_element: DataElement) -> None:
             """Callback to decode `data_element`."""
-            if data_element.VR == 'SQ':
+            if data_element.VR == VR.SQ:
                 for dset in data_element.value:
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
@@ -915,7 +916,7 @@ class Dataset:
 
         elem = self._dict[tag]
         if isinstance(elem, DataElement):
-            if elem.VR == 'SQ' and elem.value:
+            if elem.VR == VR.SQ and elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
                 elem.value.parent = self
@@ -941,7 +942,7 @@ class Dataset:
             self[tag] = DataElement_from_raw(elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
-            if 'or' in self[tag].VR:
+            if self[tag].VR in AMBIGUOUS_VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, elem[6]
@@ -1374,7 +1375,7 @@ class Dataset:
 
         if not isinstance(default, DataElement):
             if tag.is_private:
-                vr = 'UN'
+                vr = VR.UN
             else:
                 try:
                     vr = dictionary_VR(tag)
@@ -1382,7 +1383,7 @@ class Dataset:
                     if config.enforce_valid_values:
                         raise KeyError(f"Unknown DICOM tag {tag}")
                     else:
-                        vr = 'UN'
+                        vr = VR.UN
                         warnings.warn(
                             f"Unknown DICOM tag {tag} - setting VR to 'UN'"
                         )
@@ -1960,7 +1961,7 @@ class Dataset:
                 for attr in dir(elem) if not attr.startswith("_")
                 and attr not in exclusion
             }
-            if elem.VR == "SQ":
+            if elem.VR == VR.SQ:
                 yield sequence_element_format % elem_dict
             else:
                 yield element_format % elem_dict
@@ -2011,7 +2012,7 @@ class Dataset:
 
         for elem in self:
             with tag_in_exception(elem.tag):
-                if elem.VR == "SQ":  # a sequence
+                if elem.VR == VR.SQ:  # a sequence
                     strings.append(
                         f"{indent_str}{str(elem.tag)}  {elem.description()}  "
                         f"{len(elem.value)} item(s) ---- "
@@ -2115,9 +2116,9 @@ class Dataset:
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
-                VR = dictionary_VR(tag)
-                data_element = DataElement(tag, VR, value)
-                if VR == 'SQ':
+                vr = dictionary_VR(tag)
+                data_element = DataElement(tag, vr, value)
+                if vr == VR.SQ:
                     # let a sequence know its parent dataset to pass it
                     # to its items, who may need parent dataset tags
                     # to resolve ambiguous tags
@@ -2336,7 +2337,7 @@ class Dataset:
         """
         for elem in self:
             yield elem
-            if elem.VR == "SQ":
+            if elem.VR == VR.SQ:
                 for ds in elem.value:
                     yield from ds.iterall()
 
@@ -2382,7 +2383,7 @@ class Dataset:
                 callback(self, data_element)  # self = this Dataset
                 # 'tag in self' below needed in case callback deleted
                 # data_element
-                if recursive and tag in self and data_element.VR == "SQ":
+                if recursive and tag in self and data_element.VR == VR.SQ:
                     sequence = data_element.value
                     for dataset in sequence:
                         dataset.walk(callback)

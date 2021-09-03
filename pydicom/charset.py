@@ -11,10 +11,26 @@ import warnings
 
 from pydicom import config
 from pydicom.valuerep import TEXT_VR_DELIMS, PersonName
-from pydicom.vr import CHARSET_VR
+from pydicom.vr import VR, STR_VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
+
+
+# Character Repertoire for VRs
+# Allowed character repertoire for str-like VRs, based off of the information
+#   in Section 6.1.2 and Table 6.2-1 in Part 5
+# Basic G0 set of ISO 646 (ISO-IR 6) only
+DEFAULT_CHARSET = {
+    VR.AE, VR.AS, VR.CS, VR.DA, VR.DS, VR.DT, VR.IS, VR.TM, VR.UI, VR.UR
+}
+# Basic G0 set of ISO 646 or extensible/replaceable by
+#   (0008,0005) *Specific Character Set*
+CUSTOMIZABLE_CHARSET = {VR.LO, VR.LT, VR.PN, VR.SH, VR.ST, VR.UC, VR.UT}
+
+_missing = ", ".join(list(STR_VR - (DEFAULT_CHARSET | CUSTOMIZABLE_CHARSET)))
+if _missing:
+    raise RuntimeError(f"Character set configuration missing for {_missing}")
 
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
@@ -824,7 +840,7 @@ def decode_element(
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with different chr sets
-    if elem.VR == "PN":
+    if elem.VR == VR.PN:
         if elem.VM == 1:
             # elem.value: Union[PersonName, bytes]
             elem.value = cast(PersonName, elem.value).decode(encodings)
@@ -833,7 +849,7 @@ def decode_element(
             elem.value = [
                 cast(PersonName, vv).decode(encodings) for vv in elem.value
             ]
-    elif elem.VR in CHARSET_VR["customizable"]:
+    elif elem.VR in CUSTOMIZABLE_CHARSET:
         # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
             if isinstance(elem.value, str):

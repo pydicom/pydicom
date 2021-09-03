@@ -16,6 +16,7 @@ from typing import (
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
+from pydicom.charset import DEFAULT_CHARSET
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
@@ -29,7 +30,7 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import PersonName
-from pydicom.vr import BYTES_VR, AMBIGUOUS_VR, STR_VR, CHARSET_VR
+from pydicom.vr import VR, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH
 
 if config.have_numpy:
     import numpy
@@ -39,7 +40,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def empty_value_for_VR(
-    VR: Optional[str], raw: bool = False
+    vr: Optional[str], raw: bool = False
 ) -> Union[bytes, List[str], str, None, PersonName]:
     """Return the value for an empty element for `VR`.
 
@@ -59,7 +60,7 @@ def empty_value_for_VR(
 
     Parameters
     ----------
-    VR : str or None
+    vr : str or None
         The VR of the corresponding element.
     raw : bool, optional
         If ``True``, returns the value for a :class:`RawDataElement`,
@@ -71,17 +72,17 @@ def empty_value_for_VR(
         The value a data element with `VR` is assigned on decoding
         if it is empty.
     """
-    if VR == "SQ":
+    if vr == VR.SQ:
         return b"" if raw else []
 
     if config.use_none_as_empty_text_VR_value:
         return None
 
-    if VR == "PN":
+    if vr == VR.PN:
         return b"" if raw else PersonName("")
 
     # DS and IS are treated more like int/float than str
-    if VR in STR_VR - {"DS", "IS"}:
+    if vr in STR_VR - {VR.DS, VR.IS}:
         return b"" if raw else ""
 
     return None
@@ -151,7 +152,7 @@ class DataElement:
     def __init__(
         self,
         tag: Union[int, str, Tuple[int, int]],
-        VR: str,
+        vr: str,
         value: Any,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
@@ -165,7 +166,7 @@ class DataElement:
             The DICOM (group, element) tag in any form accepted by
             :func:`~pydicom.tag.Tag` such as ``'PatientName'``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
-        VR : str
+        vr : str
             The 2 character DICOM value representation (see DICOM Standard,
             Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
         value
@@ -192,17 +193,17 @@ class DataElement:
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
         if (
-            VR == 'UN'
+            vr == VR.UN
             and not tag.is_private
             and config.replace_un_with_known_vr
             and (is_undefined_length or value is None or len(value) < 0xffff)
         ):
             try:
-                VR = dictionary_VR(tag)
+                vr = dictionary_VR(tag)
             except KeyError:
                 pass
 
-        self.VR = VR  # Note: you must set VR before setting value
+        self.VR = vr  # Note: you must set VR before setting value
         if already_converted:
             self._value = value
         else:
@@ -318,7 +319,7 @@ class DataElement:
                         f"encode bulk data element '{self.name}' inline"
                     )
                     json_element['InlineBinary'] = encoded_value
-        elif self.VR == 'SQ':
+        elif self.VR == VR.SQ:
             # recursive call to get sequence item JSON dicts
             value = [
                 ds.to_json(
@@ -329,7 +330,7 @@ class DataElement:
                 for ds in self.value
             ]
             json_element['Value'] = value
-        elif self.VR == 'PN':
+        elif self.VR == VR.PN:
             if not self.is_empty:
                 elem_value = []
                 if self.VM > 1:
@@ -344,7 +345,7 @@ class DataElement:
                         comps['Phonetic'] = v.components[2]
                     elem_value.append(comps)
                 json_element['Value'] = elem_value
-        elif self.VR == 'AT':
+        elif self.VR == VR.AT:
             if not self.is_empty:
                 value = self.value
                 if self.VM == 1:
@@ -425,7 +426,7 @@ class DataElement:
         # * Which str-like VRs can have backslashes in Part 5, Section 6.2
         # * All byte-like VRs
         # * All ambiguous VRs
-        if self.VR not in CHARSET_VR["backslash_allowed"]:
+        if self.VR not in ALLOW_BACKSLASH:
             if isinstance(val, str) and '\\' in val:
                 val = val.split('\\')
             elif isinstance(val, bytes) and b'\\' in val:
@@ -435,19 +436,7 @@ class DataElement:
 
     @property
     def VM(self) -> int:
-        """Return the value multiplicity of the element as :class:`int`.
-
-        Returns
-        -------
-        int
-            The :dcm:`value multiplicity<part05/sect_6.4.html>` of the element.
-            **SQ** elements always return a VM of ``1`` even if the sequence
-            itself contains zero or more items.
-        """
-        if self.VR == "SQ":
-            # See Part 5, Section 7.5
-            return 1
-
+        """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
         if isinstance(self.value, (str, bytes, PersonName)):
@@ -463,19 +452,7 @@ class DataElement:
         """Return ``True`` if the element has no value.
 
         .. versionadded:: 1.4
-
-        Returns
-        -------
-        bool
-            For non-**SQ** elements returns ``True`` if the element's
-            :attr:`value multiplicity<pydicom.dataelem.DataElement.VM>` (VM)
-            is greater than 0, otherwise returns ``False``. For **SQ** elements
-            returns ``True`` if the sequence contains one or more items,
-            otherwise returns ``False``.
         """
-        if self.VR == "SQ":
-            return bool(len(self.value))
-
         return self.VM == 0
 
     @property
@@ -508,7 +485,7 @@ class DataElement:
         Uses the element's VR in order to determine the conversion method and
         resulting type.
         """
-        if self.VR == 'SQ':  # a sequence - leave it alone
+        if self.VR == VR.SQ:  # a sequence - leave it alone
             from pydicom.sequence import Sequence
             if isinstance(val, Sequence):
                 return val
@@ -527,31 +504,31 @@ class DataElement:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is bytes and has a VR that can only be encoded
         # using the default character repertoire, convert it to a string
-        if self.VR in CHARSET_VR["default"] and isinstance(val, bytes):
+        if self.VR in DEFAULT_CHARSET and isinstance(val, bytes):
             val = val.decode()
 
-        if self.VR == 'IS':
+        if self.VR == VR.IS:
             return pydicom.valuerep.IS(val)
 
-        if self.VR == 'DA' and config.datetime_conversion:
+        if self.VR == VR.DA and config.datetime_conversion:
             return pydicom.valuerep.DA(val)
 
-        if self.VR == 'DS':
+        if self.VR == VR.DS:
             return pydicom.valuerep.DS(val)
 
-        if self.VR == 'DT' and config.datetime_conversion:
+        if self.VR == VR.DT and config.datetime_conversion:
             return pydicom.valuerep.DT(val)
 
-        if self.VR == 'TM' and config.datetime_conversion:
+        if self.VR == VR.TM and config.datetime_conversion:
             return pydicom.valuerep.TM(val)
 
-        if self.VR == "UI":
+        if self.VR == VR.UI:
             return UID(val) if val is not None else None
 
-        if self.VR == "PN":
+        if self.VR == VR.PN:
             return PersonName(val)
 
-        if self.VR == "AT" and (val == 0 or val):
+        if self.VR == VR.AT and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
 
         return val
@@ -601,12 +578,10 @@ class DataElement:
 
         return f"{self.tag} {name} {value}"
 
-    # TODO: VR
     @property
     def repval(self) -> str:
         """Return a :class:`str` representation of the element's value."""
-        long_VRs = BYTES_VR | {"UT"}
-        if set(self.VR.split(" or ")) & long_VRs:
+        if set(self.VR.split(" or ")) | BYTES_VR | {VR.UT}:
             try:
                 length = len(self.value)
             except TypeError:
@@ -623,14 +598,23 @@ class DataElement:
 
         return repr(self.value)
 
-    # TODO: add deprecation warning
     def __getitem__(self, key: int) -> Any:
-        """Return the item at `key` if the element's value is indexable."""
+        """Return the item at `key` if the element's value is indexable.
+
+        .. deprecated:: 2.3
+        """
+        warnings.warn(
+            "'DataElement[index]' is deprecated and will be removed in v3.0, "
+            "use 'DataElement.value[index]' instead",
+            DeprecationWarning,
+        )
+
         try:
             return self.value[key]
         except TypeError:
-            raise TypeError("DataElement value is unscriptable "
-                            "(not a Sequence)")
+            raise TypeError(
+                "DataElement value is unscriptable (not a Sequence)"
+            )
 
     @property
     def name(self) -> str:
@@ -673,7 +657,6 @@ class DataElement:
 
         return ""
 
-    # TODO: add deprecation warning
     def description(self) -> str:
         """Return the DICOM dictionary name for the element as :class:`str`.
 
@@ -682,6 +665,12 @@ class DataElement:
             ``DataElement.description()`` will be removed in v3.0, use
             :meth:`~pydicom.dataelem.DataElement.name` instead
         """
+        warnings.warn(
+            "'DataElement.description()' will be removed in v3.0, use "
+            "'DataElement.name' instead",
+            DeprecationWarning,
+        )
+
         return self.name
 
     @property
@@ -722,10 +711,7 @@ class DataElement:
 
     def __repr__(self) -> str:
         """Return the representation of the element."""
-        if self.VR == "SQ":
-            return repr(self.value)
-
-        return str(self)
+        return repr(self.value) if self.VR == VR.SQ else str(self)
 
 
 class RawDataElement(NamedTuple):
@@ -766,7 +752,8 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
         found in the private dictionary, or "UN".
     """
     if tag.is_private_creator:
-        return "LO"
+        return VR.LO
+
     # invalid private tags are handled as UN
     if ds is not None and (tag.element & 0xff00):
         private_creator_tag = tag.group << 16 | (tag.element >> 8)
@@ -776,7 +763,8 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
                 return private_dictionary_VR(tag, private_creator.value)
             except KeyError:
                 pass
-    return "UN"
+
+    return VR.UN
 
 
 def DataElement_from_raw(
@@ -820,48 +808,49 @@ def DataElement_from_raw(
             **config.data_element_callback_kwargs
         )
 
-    VR = raw.VR
-    if VR is None:  # Can be if was implicit VR
+    vr = raw.VR
+    if vr is None:  # Can be if was implicit VR
         try:
-            VR = dictionary_VR(raw.tag)
+            vr = dictionary_VR(raw.tag)
         except KeyError:
             # just read the bytes, no way to know what they mean
             if raw.tag.is_private:
                 # for VR for private tags see PS3.5, 6.2.2
-                VR = _private_vr_for_tag(dataset, raw.tag)
+                vr = _private_vr_for_tag(dataset, raw.tag)
 
             # group length tag implied in versions < 3.0
             elif raw.tag.element == 0:
-                VR = 'UL'
+                vr = VR.UL
             else:
-                msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
+                msg = f"Unknown DICOM tag {str(raw.tag)}"
                 if config.enforce_valid_values:
-                    msg += " can't look up VR"
-                    raise KeyError(msg)
-                else:
-                    VR = 'UN'
-                    msg += " - setting VR to 'UN'"
-                    warnings.warn(msg)
-    elif VR == 'UN' and config.replace_un_with_known_vr:
+                    raise KeyError(msg + " can't look up VR")
+
+                vr = VR.UN
+                warnings.warn(msg + " - setting VR to 'UN'")
+
+    elif vr == VR.UN and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if raw.tag.is_private:
-            VR = _private_vr_for_tag(dataset, raw.tag)
+            vr = _private_vr_for_tag(dataset, raw.tag)
         elif raw.value is None or len(raw.value) < 0xffff:
             try:
-                VR = dictionary_VR(raw.tag)
+                vr = dictionary_VR(raw.tag)
             except KeyError:
                 pass
     try:
-        value = convert_value(VR, raw, encoding)
+        value = convert_value(vr, raw, encoding)
     except NotImplementedError as e:
-        raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
+        raise NotImplementedError(f"{str(e)} in tag {raw.tag!r}")
     except BytesLengthException as e:
-        message = (f"{e} This occurred while trying to parse "
-                   f"{raw.tag} according to VR '{VR}'.")
+        message = (
+            f"{e} This occurred while trying to parse {raw.tag} according "
+            f"to VR '{vr}'"
+        )
         if config.convert_wrong_length_to_UN:
-            warnings.warn(f"{message} Setting VR to 'UN'.")
-            VR = "UN"
+            warnings.warn(f"{message} Setting VR to 'UN'")
+            vr = VR.UN
             value = raw.value
         else:
             raise BytesLengthException(
@@ -877,5 +866,11 @@ def DataElement_from_raw(
         except TypeError:
             pass
 
-    return DataElement(raw.tag, VR, value, raw.value_tell,
-                       raw.length == 0xFFFFFFFF, already_converted=True)
+    return DataElement(
+        raw.tag,
+        vr,
+        value,
+        raw.value_tell,
+        raw.length == 0xFFFFFFFF,
+        already_converted=True,
+    )

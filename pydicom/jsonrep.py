@@ -9,7 +9,7 @@ from typing import (
 )
 import warnings
 
-from pydicom.vr import FLOAT_VR, INT_VR
+from pydicom.vr import FLOAT_VR, INT_VR, VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -178,7 +178,7 @@ class JsonDataElementConverter:
 
             val = cast(List[ValueType], self.value)
             element_value = [self.get_regular_element_value(v) for v in val]
-            if len(element_value) == 1 and self.vr != 'SQ':
+            if len(element_value) == 1 and self.vr != VR.SQ:
                 element_value = element_value[0]
 
             return convert_to_python_number(element_value, self.vr)
@@ -241,7 +241,7 @@ class JsonDataElementConverter:
         from pydicom.dataelem import empty_value_for_VR
 
         # Table F.2.3-1 has JSON type mappings
-        if self.vr == 'SQ':  # Dataset
+        if self.vr == VR.SQ:  # Dataset
             # May be an empty dict
             value = cast(Dict[str, Any], value)
             return self.get_sequence_item(value)
@@ -249,11 +249,11 @@ class JsonDataElementConverter:
         if value is None:
             return empty_value_for_VR(self.vr)
 
-        if self.vr == 'PN':  # str
+        if self.vr == VR.PN:  # str
             value = cast(Dict[str, str], value)
             return self.get_pn_element_value(value)
 
-        if self.vr == 'AT':  # Optional[int]
+        if self.vr == VR.AT:  # Optional[int]
             # May be an empty str
             value = cast(str, value)
             try:
