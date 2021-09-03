@@ -26,7 +26,7 @@ from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import BaseTag
 from pydicom.cli.main import filespec_help, filespec_parser
-from pydicom.vr import BYTES_VR, AMBIGUOUS_VR
+from pydicom.vr import BYTES_VR, AMBIGUOUS_VR, VR
 
 
 line_term = "\n"
@@ -121,8 +121,8 @@ def code_dataelem(
 
     if exclude_size:
         if (
-            dataelem.VR in BYTES_VR | AMBIGUOUS_VR
-            and isinstance(dataelem.value, bytes)
+            dataelem.VR in BYTES_VR | AMBIGUOUS_VR - {VR.US_SS}
+            and not isinstance(dataelem.value, (int, float))
             and len(dataelem.value) > exclude_size
         ):
             valuerep = f"# XXX Array of {len(dataelem.value)} bytes excluded"

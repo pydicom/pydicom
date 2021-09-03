@@ -425,12 +425,12 @@ class DataElement:
         # Exclude splitting values with backslash characters based on:
         # * Which str-like VRs can have backslashes in Part 5, Section 6.2
         # * All byte-like VRs
-        # * All ambiguous VRs
+        # * Ambiguous VRs that may be byte-like
         if self.VR not in ALLOW_BACKSLASH:
-            if isinstance(val, str) and '\\' in val:
-                val = val.split('\\')
-            elif isinstance(val, bytes) and b'\\' in val:
-                val = val.split(b'\\')
+            if isinstance(val, str):
+                val = val.split("\\") if "\\" in val else val
+            elif isinstance(val, bytes):
+                val = val.split(b"\\") if b"\\" in val else val
 
         self._value = self._convert_value(val)
 
@@ -581,7 +581,8 @@ class DataElement:
     @property
     def repval(self) -> str:
         """Return a :class:`str` representation of the element's value."""
-        if set(self.VR.split(" or ")) | BYTES_VR | {VR.UT}:
+        # If the VR is byte-like or long text (1024+), show a summary instead
+        if set(self.VR.split(" or ")) & (BYTES_VR | {VR.UC, VR.UT}):
             try:
                 length = len(self.value)
             except TypeError:

@@ -56,6 +56,9 @@ _us_ss_tags = {
 # (5400, 1010) Waveform Data
 _ob_ow_tags = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
 
+# (60xx,3000) Overlay Data
+_overlay_data_tags = {x << 16 | 0x3000 for x in range(0x6000, 0x601F, 2)}
+
 
 def _correct_ambiguous_vr_element(
     elem: DataElement, ds: Dataset, is_little_endian: bool
@@ -151,10 +154,7 @@ def _correct_ambiguous_vr_element(
             elem.VR = VR.OW
 
     # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-    elif (
-        elem.tag.group in range(0x6000, 0x601F, 2)
-        and elem.tag.elem == 0x3000
-    ):
+    elif elem.tag in _overlay_data_tags:
         # Implicit VR must be OW, explicit VR may be OB or OW
         #   as per PS3.5 Section 8.1.2 and Annex A
         elem.VR = VR.OW
