@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Tuple
 from pydicom import config
 from pydicom import datadict
 from pydicom import values
-from pydicom.vr import VR
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import RawDataElement

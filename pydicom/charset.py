@@ -10,8 +10,7 @@ from typing import (
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import TEXT_VR_DELIMS, PersonName
-from pydicom.vr import VR, STR_VR
+from pydicom.valuerep import TEXT_VR_DELIMS, PersonName, VR, STR_VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
@@ -27,10 +26,6 @@ DEFAULT_CHARSET = {
 # Basic G0 set of ISO 646 or extensible/replaceable by
 #   (0008,0005) *Specific Character Set*
 CUSTOMIZABLE_CHARSET = {VR.LO, VR.LT, VR.PN, VR.SH, VR.ST, VR.UC, VR.UT}
-
-_missing = ", ".join(list(STR_VR - (DEFAULT_CHARSET | CUSTOMIZABLE_CHARSET)))
-if _missing:
-    raise RuntimeError(f"Character set configuration missing for {_missing}")
 
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII

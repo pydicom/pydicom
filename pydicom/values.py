@@ -24,8 +24,7 @@ from pydicom.sequence import Sequence
 from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS
-from pydicom.vr import VR
+from pydicom.valuerep import MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, VR
 
 try:
     import numpy

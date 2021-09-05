@@ -25,8 +25,8 @@ from pydicom.datadict import dictionary_keyword
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
 from pydicom.tag import BaseTag
+from pydicom.valuerep import BYTES_VR, AMBIGUOUS_VR, VR
 from pydicom.cli.main import filespec_help, filespec_parser
-from pydicom.vr import BYTES_VR, AMBIGUOUS_VR, VR
 
 
 line_term = "\n"

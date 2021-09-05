@@ -59,7 +59,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
     RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
 )
-from pydicom.vr import VR, AMBIGUOUS_VR
+from pydicom.valuerep import VR, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 

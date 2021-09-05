@@ -29,8 +29,9 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import PersonName
-from pydicom.vr import VR, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH
+from pydicom.valuerep import (
+    PersonName, VR, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH
+)
 
 if config.have_numpy:
     import numpy

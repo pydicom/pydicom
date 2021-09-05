@@ -6,7 +6,7 @@ import os
 import sys
 from typing import Union, Optional, BinaryIO, TYPE_CHECKING
 
-from pydicom.vr import VR
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

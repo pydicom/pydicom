@@ -5,6 +5,7 @@
 import copy
 from datetime import datetime, date, time, timedelta, timezone
 from decimal import Decimal
+from itertools import chain
 import pickle
 import math
 import sys
@@ -16,10 +17,13 @@ import pydicom
 from pydicom import config, valuerep
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
+from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
 from pydicom.tag import Tag
-from pydicom.valuerep import DS, IS, DSfloat, DSdecimal, PersonName
+from pydicom.valuerep import (
+    DS, IS, DSfloat, DSdecimal, PersonName, VR, STANDARD_VR,
+    AMBIGUOUS_VR, STR_VR, BYTES_VR, FLOAT_VR, INT_VR, LIST_VR
+)
 from pydicom.values import convert_value
-from pydicom.vr import VR
 
 
 badvr_name = get_testdata_file("badVR.dcm")
@@ -1560,7 +1564,16 @@ def test_assigning_bytes(vr, pytype, vm0, vmN, keyword):
 
 
 class TestVR:
-    def test_init(self):
-        print(VR)
-        print(VR.AE)
-        print(VR.__dict__)
+    def test_behavior(self):
+        """Test that VR class behaves as expected"""
+        assert isinstance(VR.AE, str)
+        assert VR.AE == "AE"
+        assert VR.US_SS_OW == "US or SS or OW"
+
+    def test_all_present(self):
+        """Test all VRs are configured"""
+        elem = chain(DicomDictionary.values(), RepeatersDictionary.values())
+        ref = {v[0] for v in elem} - {"NONE"}
+        assert ref == STANDARD_VR | AMBIGUOUS_VR
+        # Test all have Python built-in
+        assert STANDARD_VR  == BYTES_VR | FLOAT_VR | INT_VR | LIST_VR | STR_VR

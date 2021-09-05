@@ -9,7 +9,7 @@ from typing import (
 )
 import warnings
 
-from pydicom.vr import FLOAT_VR, INT_VR, VR
+from pydicom.valuerep import FLOAT_VR, INT_VR, VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset

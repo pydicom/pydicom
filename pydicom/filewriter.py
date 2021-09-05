@@ -22,10 +22,11 @@ from pydicom.multival import MultiValue
 from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
-from pydicom.valuerep import PersonName, IS, DSclass, DA, DT, TM
+from pydicom.valuerep import (
+    PersonName, IS, DSclass, DA, DT, TM, EXPLICIT_VR_LENGTH_32, VR,
+    AMBIGUOUS_VR
+)
 from pydicom.values import convert_numbers
-from pydicom.vr import EXPLICIT_VR_LENGTH_32, VR, AMBIGUOUS_VR
-
 
 if have_numpy:
     import numpy

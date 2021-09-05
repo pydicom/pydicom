@@ -35,7 +35,7 @@ from pydicom.tag import (
 )
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
-from pydicom.vr import EXPLICIT_VR_LENGTH_32, VR
+from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR
 
 
 def data_element_generator(
