@@ -830,9 +830,3 @@ converters = {
     VR.US_OW: convert_OWvalue,
     VR.US_SS_OW: convert_OWvalue,
 }
-
-try:
-    assert set(VR) == set(converters)
-except AssertionError:
-    missing = ", ".join(list(set(VR) - set(converters)))
-    raise RuntimeError(f"Missing decoder function for VR {missing}")

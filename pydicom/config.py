@@ -27,7 +27,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
-use_DS_decimal = False
+use_DS_decimal: bool = False
 """Set using :func:`~pydicom.config.DS_decimal` to control if elements with a
 VR of **DS** are represented as :class:`~decimal.Decimal`.
 

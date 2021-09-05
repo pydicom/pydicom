@@ -9,6 +9,7 @@ from pydicom.values import (
     convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
     convert_text, convert_single_string, convert_AE_string
 )
+from pydicom.valuerep import VR
 
 
 class TestConvertTag:
@@ -201,3 +202,8 @@ class TestConvertOValues:
         """Test converting OF."""
         fp = b'\x00\x01\x02\x03'
         assert b'\x00\x01\x02\x03' == converters['OF'](fp, True)
+
+
+def test_all_converters():
+    """Test that the VR decoder functions are complete"""
+    assert set(VR) == set(converters)

@@ -1194,9 +1194,3 @@ writers = {
     VR.US_SS_OW: (write_OWvalue, None),
     VR.OB_OW: (write_OBvalue, None),
 }
-
-try:
-    assert set(VR) == set(writers)
-except AssertionError:
-    missing = ", ".join(list(set(VR) - set(writers)))
-    raise RuntimeError(f"Missing encoder function for VR {missing}")
