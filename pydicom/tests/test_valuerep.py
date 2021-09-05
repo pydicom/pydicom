@@ -1576,4 +1576,4 @@ class TestVR:
         ref = {v[0] for v in elem} - {"NONE"}
         assert ref == STANDARD_VR | AMBIGUOUS_VR
         # Test all have Python built-in
-        assert STANDARD_VR  == BYTES_VR | FLOAT_VR | INT_VR | LIST_VR | STR_VR
+        assert STANDARD_VR == BYTES_VR | FLOAT_VR | INT_VR | LIST_VR | STR_VR
