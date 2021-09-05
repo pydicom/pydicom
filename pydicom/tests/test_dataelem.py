@@ -327,7 +327,8 @@ class TestDataElement:
         """Test DataElement.__getitem__ raise if value not indexable"""
         elem = DataElement(0x00100010, 'LO', 12345)
         with pytest.raises(TypeError):
-            elem.value[0]
+            with pytest.warns(DeprecationWarning):
+                elem[0]
 
     def test_repval_large_elem(self):
         """Test DataElement.repval doesn't return a huge string for a large
@@ -716,3 +717,25 @@ class TestRawDataElement:
         assert elem.VR == "UN"
         assert elem.name == "[Another Number]"
         assert elem.value == b"12345678"
+
+
+def test_elem_getitem_deprecated():
+    """Test deprecation warning for DataElement[idx]"""
+    elem = DataElement("PatientID", "LO", "Citizen^Jan")
+    msg = (
+        r"'DataElement\[index\]' is deprecated and will be removed in v3.0, "
+        r"use 'DataElement.value\[index\]' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        elem[0]
+
+
+def test_elem_description_deprecated():
+    """Test deprecation warning for DataElement.description()"""
+    elem = DataElement("PatientName", "PN", "Citizen^Jan")
+    msg = (
+        r"'DataElement.description\(\)' is deprecated and will be removed in "
+        r"v3.0, use 'DataElement.name' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        assert elem.description() == "Patient's Name"

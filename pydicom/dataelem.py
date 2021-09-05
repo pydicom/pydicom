@@ -668,8 +668,8 @@ class DataElement:
             :meth:`~pydicom.dataelem.DataElement.name` instead
         """
         warnings.warn(
-            "'DataElement.description()' will be removed in v3.0, use "
-            "'DataElement.name' instead",
+            "'DataElement.description()' is deprecated and will be removed "
+            "in v3.0, use 'DataElement.name' instead",
             DeprecationWarning,
         )
 
