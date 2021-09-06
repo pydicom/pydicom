@@ -13,7 +13,7 @@ from typing import (
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import (
-    default_encoding, decode_bytes, CUSTOMIZABLE_CHARSET
+    default_encoding, decode_bytes, CUSTOMIZABLE_CHARSET_VR
 )
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
@@ -744,7 +744,7 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if vr in CUSTOMIZABLE_CHARSET:
+        if vr in CUSTOMIZABLE_CHARSET_VR:
             return converter(byte_string, encodings)
 
         if vr != VR.SQ:

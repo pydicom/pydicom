@@ -16,7 +16,7 @@ from typing import (
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
-from pydicom.charset import DEFAULT_CHARSET
+from pydicom.charset import DEFAULT_CHARSET_VR
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
@@ -505,7 +505,7 @@ class DataElement:
         """Convert `val` to an appropriate type for the element's VR."""
         # If the value is bytes and has a VR that can only be encoded
         # using the default character repertoire, convert it to a string
-        if self.VR in DEFAULT_CHARSET and isinstance(val, bytes):
+        if self.VR in DEFAULT_CHARSET_VR and isinstance(val, bytes):
             val = val.decode()
 
         if self.VR == VR.IS:

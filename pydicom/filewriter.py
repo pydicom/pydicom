@@ -11,7 +11,7 @@ import warnings
 import zlib
 
 from pydicom.charset import (
-    default_encoding, convert_encodings, encode_string, CUSTOMIZABLE_CHARSET
+    default_encoding, convert_encodings, encode_string, CUSTOMIZABLE_CHARSET_VR
 )
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
@@ -546,7 +546,7 @@ def write_data_element(
         fn, param = writers[cast(VR, vr)]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if vr in CUSTOMIZABLE_CHARSET or vr == VR.SQ:
+            if vr in CUSTOMIZABLE_CHARSET_VR or vr == VR.SQ:
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
