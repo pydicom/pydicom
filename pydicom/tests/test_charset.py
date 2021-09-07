@@ -4,8 +4,8 @@
 
 import pytest
 
-from pydicom import dcmread, config
 import pydicom.charset
+from pydicom import dcmread, config
 from pydicom.data import get_charset_files, get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO

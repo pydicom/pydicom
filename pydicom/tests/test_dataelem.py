@@ -327,8 +327,7 @@ class TestDataElement:
         """Test DataElement.__getitem__ raise if value not indexable"""
         elem = DataElement(0x00100010, 'LO', 12345)
         with pytest.raises(TypeError):
-            with pytest.warns(DeprecationWarning):
-                elem[0]
+            elem[0]
 
     def test_repval_large_elem(self):
         """Test DataElement.repval doesn't return a huge string for a large
