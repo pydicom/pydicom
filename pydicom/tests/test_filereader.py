@@ -445,12 +445,12 @@ class TestReader:
         assert "SQ" == seq0.VR
 
         # Now verify the presence of the nested private SQ
-        seq1 = seq0.value[0][tag]
+        seq1 = seq0[0][tag]
         assert "SQ" == seq1.VR
 
         # Now make sure the values that are parsed are correct
-        assert b"Double Nested SQ" == seq1.value[0][tag].value
-        assert b"Nested SQ" == seq0.value[0][0x01, 0x02].value
+        assert b"Double Nested SQ" == seq1[0][tag].value
+        assert b"Nested SQ" == seq0[0][0x01, 0x02].value
 
     def test_un_sequence(self, dont_replace_un_with_known_vr):
         ds = dcmread(get_testdata_file("UN_sequence.dcm"))

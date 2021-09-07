@@ -601,16 +601,7 @@ class DataElement:
         return repr(self.value)
 
     def __getitem__(self, key: int) -> Any:
-        """Return the item at `key` if the element's value is indexable.
-
-        .. deprecated:: 2.3
-        """
-        warnings.warn(
-            "'DataElement[index]' is deprecated and will be removed in v3.0, "
-            "use 'DataElement.value[index]' instead",
-            DeprecationWarning,
-        )
-
+        """Return the item at `key` if the element's value is indexable."""
         try:
             return self.value[key]
         except TypeError:

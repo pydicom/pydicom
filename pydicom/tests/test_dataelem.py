@@ -292,10 +292,10 @@ class TestDataElement:
 
         # Check value
         dd.value = [Dataset()]
-        dd.value[0].PatientName = 'ANON'
-        ee.value[0].PatientName = 'ANON'
+        dd[0].PatientName = 'ANON'
+        ee[0].PatientName = 'ANON'
         assert not ee != dd
-        ee.value[0].PatientName = 'ANONA'
+        ee[0].PatientName = 'ANONA'
         assert ee != dd
 
     def test_hash(self):
@@ -320,7 +320,7 @@ class TestDataElement:
     def test_repr_seq(self):
         """Test DataElement.__repr__ with a sequence"""
         elem = DataElement(0x300A00B0, 'SQ', [Dataset()])
-        elem.value[0].PatientID = '1234'
+        elem[0].PatientID = '1234'
         assert repr(elem) == repr(elem.value)
 
     def test_getitem_raises(self):
@@ -717,17 +717,6 @@ class TestRawDataElement:
         assert elem.VR == "UN"
         assert elem.name == "[Another Number]"
         assert elem.value == b"12345678"
-
-
-def test_elem_getitem_deprecated():
-    """Test deprecation warning for DataElement[idx]"""
-    elem = DataElement("PatientID", "LO", "Citizen^Jan")
-    msg = (
-        r"'DataElement\[index\]' is deprecated and will be removed in v3.0, "
-        r"use 'DataElement.value\[index\]' instead"
-    )
-    with pytest.warns(DeprecationWarning, match=msg):
-        elem[0]
 
 
 def test_elem_description_deprecated():
