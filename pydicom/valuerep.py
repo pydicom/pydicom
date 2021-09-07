@@ -88,6 +88,18 @@ STANDARD_VR = {
 }
 # Ambiguous VRs from Tables 6-1, 7-1 and 8-1 in Part 6
 AMBIGUOUS_VR = {VR.US_SS_OW, VR.US_SS, VR.US_OW, VR.OB_OW}
+
+# Character Repertoire for VRs
+# Allowed character repertoire for str-like VRs, based off of the information
+#   in Section 6.1.2 and Table 6.2-1 in Part 5
+# Basic G0 set of ISO 646 (ISO-IR 6) only
+DEFAULT_CHARSET_VR = {
+    VR.AE, VR.AS, VR.CS, VR.DA, VR.DS, VR.DT, VR.IS, VR.TM, VR.UI, VR.UR
+}
+# Basic G0 set of ISO 646 or extensible/replaceable by
+#   (0008,0005) *Specific Character Set*
+CUSTOMIZABLE_CHARSET_VR = {VR.LO, VR.LT, VR.PN, VR.SH, VR.ST, VR.UC, VR.UT}
+
 # Corresponding Python built-in for each VR
 #   For some VRs this is more a "fallback" class-like behavioural definition
 #   than actual, and note that some VRs such as IS and DS are present in
@@ -96,10 +108,8 @@ BYTES_VR = {VR.OB, VR.OD, VR.OF, VR.OL, VR.OV, VR.OW, VR.UN}
 FLOAT_VR = {VR.DS, VR.FD, VR.FL}
 INT_VR = {VR.AT, VR.IS, VR.SL, VR.SS, VR.SV, VR.UL, VR.US, VR.UV}
 LIST_VR = {VR.SQ}
-STR_VR = {
-    VR.AE, VR.AS, VR.CS, VR.DA, VR.DS, VR.DT, VR.IS, VR.LO, VR.LT, VR.PN,
-    VR.SH, VR.ST, VR.TM, VR.UC, VR.UI, VR.UR, VR.UT,
-}
+STR_VR = DEFAULT_CHARSET_VR | CUSTOMIZABLE_CHARSET_VR
+
 # These VRs may have backslash characters or encoded backslashes in the
 #   value based off of the information in Table 6.2-1 in Part 5
 # DataElements with ambiguous VRs may use `bytes` values and so are allowed
@@ -107,6 +117,7 @@ STR_VR = {
 ALLOW_BACKSLASH = (
     {VR.LT, VR.ST, VR.UT, VR.US_SS_OW, VR.US_OW, VR.OB_OW} | BYTES_VR
 )
+
 # VRs that use 2 byte length fields for Explicit VR from Table 7.1-2 in Part 5
 #   All other explicit VRs and all implicit VRs use 4 byte length fields
 EXPLICIT_VR_LENGTH_16 = {

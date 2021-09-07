@@ -6,11 +6,10 @@ import pytest
 
 from pydicom import dcmread, config
 import pydicom.charset
-from pydicom.charset import DEFAULT_CHARSET_VR, CUSTOMIZABLE_CHARSET_VR
 from pydicom.data import get_charset_files, get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.filebase import DicomBytesIO
-from pydicom.valuerep import PersonName, STR_VR
+from pydicom.valuerep import PersonName
 
 # The file names (without '.dcm' extension) of most of the character test
 # files, together with the respective decoded PatientName tag values.
@@ -499,8 +498,3 @@ class TestCharset:
                                 "s in encoded string"):
             encoded = pydicom.charset.encode_string('あaｱア', ['shift_jis'])
             assert b'?a??' == encoded
-
-
-def test_vr_configured():
-    """Test that all str-like VRs have their charsets configured"""
-    assert STR_VR == DEFAULT_CHARSET_VR | CUSTOMIZABLE_CHARSET_VR

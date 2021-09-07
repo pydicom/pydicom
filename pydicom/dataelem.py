@@ -16,7 +16,6 @@ from typing import (
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
-from pydicom.charset import DEFAULT_CHARSET_VR
 from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
@@ -30,7 +29,8 @@ from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    PersonName, VR, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH
+    PersonName, VR, BYTES_VR, AMBIGUOUS_VR, STR_VR, ALLOW_BACKSLASH,
+    DEFAULT_CHARSET_VR
 )
 
 if config.have_numpy:

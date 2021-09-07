@@ -10,9 +10,7 @@ from typing import (
 import warnings
 import zlib
 
-from pydicom.charset import (
-    default_encoding, convert_encodings, encode_string, CUSTOMIZABLE_CHARSET_VR
-)
+from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
@@ -24,7 +22,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import (
     PersonName, IS, DSclass, DA, DT, TM, EXPLICIT_VR_LENGTH_32, VR,
-    AMBIGUOUS_VR
+    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR
 )
 from pydicom.values import convert_numbers
 

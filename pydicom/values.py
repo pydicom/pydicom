@@ -12,9 +12,7 @@ from typing import (
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.charset import (
-    default_encoding, decode_bytes, CUSTOMIZABLE_CHARSET_VR
-)
+from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
@@ -24,7 +22,9 @@ from pydicom.sequence import Sequence
 from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, VR
+from pydicom.valuerep import (
+    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, VR, CUSTOMIZABLE_CHARSET_VR
+)
 
 try:
     import numpy

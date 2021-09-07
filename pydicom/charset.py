@@ -10,22 +10,12 @@ from typing import (
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import TEXT_VR_DELIMS, PersonName, VR, STR_VR
+from pydicom.valuerep import (
+    TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
-
-
-# Character Repertoire for VRs
-# Allowed character repertoire for str-like VRs, based off of the information
-#   in Section 6.1.2 and Table 6.2-1 in Part 5
-# Basic G0 set of ISO 646 (ISO-IR 6) only
-DEFAULT_CHARSET_VR = {
-    VR.AE, VR.AS, VR.CS, VR.DA, VR.DS, VR.DT, VR.IS, VR.TM, VR.UI, VR.UR
-}
-# Basic G0 set of ISO 646 or extensible/replaceable by
-#   (0008,0005) *Specific Character Set*
-CUSTOMIZABLE_CHARSET_VR = {VR.LO, VR.LT, VR.PN, VR.SH, VR.ST, VR.UC, VR.UT}
 
 
 # default encoding if no encoding defined - corresponds to ISO IR 6 / ASCII
