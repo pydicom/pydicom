@@ -7,6 +7,7 @@ dictionary key is a map of DICOM tag to (VR, VM, name, is_retired).
 """
 from typing import Dict, Tuple
 
+
 private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
     '1.2.840.113663.1': {
         '0029xx00': ('US', '1', 'Unknown', ''),  # noqa
@@ -333,7 +334,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '3103xxa0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
         '3103xxb0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
         '3103xxc0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
-        '3103xxd0': ('TM', '1', 'AMI Annotation Mofification Times (RET)', ''),  # noqa
+        '3103xxd0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
         '3103xxe0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
     },
     'AMI Sequence Annotations_02': {
@@ -1081,7 +1082,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0009xx00': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx01': ('LO', '1', 'Unknown', ''),  # noqa
     },
-    'Eclispe 60': {
+    'Eclipse 60': {
         '0029xx30': ('UL', '1', 'Private data', ''),  # noqa
         '0029xx31': ('UL', '1', 'Private data', ''),  # noqa
         '0029xx32': ('UL', '1', 'Private data', ''),  # noqa
@@ -1941,7 +1942,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xxdd': ('DS', '1-n', 'DRM Strength', ''),  # noqa
         '0019xxde': ('CS', '1', 'Acquisition Plane', ''),  # noqa
         '0019xxdf': ('FL', '1-n', 'LP off longitudinal position Z', ''),  # noqa
-        '0019xxe0': ('FL', '1', 'DAP of currect record', ''),  # noqa
+        '0019xxe0': ('FL', '1', 'DAP of current record', ''),  # noqa
         '0019xxe1': ('FL', '1', 'Pivot Lateral Angle', ''),  # noqa
         '0019xxe2': ('FL', '1', 'Carm Lateral Angle', ''),  # noqa
         '0019xxe3': ('FL', '1-n', 'Pivot Lateral Angle increment', ''),  # noqa
@@ -2054,7 +2055,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0015xx9d': ('IS', '1', 'Study record time lateral', ''),  # noqa
     },
     'GEMS_DRS_1': {
-        '0037xx10': ('LO', '1', 'Refering Department', ''),  # noqa
+        '0037xx10': ('LO', '1', 'Referring Department', ''),  # noqa
         '0037xx20': ('US', '1', 'Screen Number', ''),  # noqa
         '0037xx40': ('SH', '1', 'Left Orientation', ''),  # noqa
         '0037xx42': ('SH', '1', 'Right Orientation', ''),  # noqa
@@ -2425,7 +2426,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0045xx02': ('FL', '1', 'Macro width at ISO Center', ''),  # noqa
         '0045xx03': ('SS', '1', 'DAS type', ''),  # noqa
         '0045xx04': ('SS', '1', 'DAS gain', ''),  # noqa
-        '0045xx05': ('SS', '1', 'DAS Temprature', ''),  # noqa
+        '0045xx05': ('SS', '1', 'DAS Temperature', ''),  # noqa
         '0045xx06': ('CS', '1', 'Table Direction', ''),  # noqa
         '0045xx07': ('FL', '1', 'Z smoothing Factor', ''),  # noqa
         '0045xx08': ('SS', '1', 'View Weighting Mode', ''),  # noqa
@@ -3495,7 +3496,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0057xx02': ('UI', '1', 'SOPClassUID', ''),  # noqa
         '0057xx03': ('UI', '1', 'SOPInstanceUID', ''),  # noqa
         '0057xx10': ('IS', '1', 'ROINumber', ''),  # noqa
-        '0057xx11': ('UI', '1', 'Dimentions', ''),  # noqa
+        '0057xx11': ('UI', '1', 'Dimensions', ''),  # noqa
         '0057xx12': ('UI', '1', 'Points', ''),  # noqa
         '0057xx13': ('UI', '1', 'Type', ''),  # noqa
         '0057xx14': ('UI', '1', 'Description', ''),  # noqa
@@ -5001,7 +5002,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '2001xx3a': ('CS', '1', 'Pixel Shift', ''),  # noqa
         '2001xx3d': ('UL', '1', 'Unknown', ''),  # noqa
         '2001xx3f': ('CS', '1', 'Interpolation Method', ''),  # noqa
-        '2001xx42': ('CS', '1', 'Substraction Land Marking Active', ''),  # noqa
+        '2001xx42': ('CS', '1', 'Subtraction Land Marking Active', ''),  # noqa
         '2001xx46': ('CS', '1', 'Graphic Line Style', ''),  # noqa
         '2001xx47': ('FL', '1', 'Graphic Line Width', ''),  # noqa
         '2001xx48': ('SS', '1', 'Graphic Annotation ID', ''),  # noqa
@@ -5062,10 +5063,10 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '2001xx9a': ('SQ', '1', 'Graphic Number Sequence', ''),  # noqa
         '2001xx9b': ('UL', '1', 'Graphic Number', ''),  # noqa
         '2001xx9c': ('LO', '1', 'Unknown', ''),  # noqa
-        '2001xx9d': ('LO', '1', 'PIIM Substraction Type', ''),  # noqa
+        '2001xx9d': ('LO', '1', 'PIIM Subtraction Type', ''),  # noqa
         '2001xx9f': ('US', '2', 'Pixel Processing Kernel Size', ''),  # noqa
         '2001xxa1': ('CS', '1', 'Is Raw Image', ''),  # noqa
-        '2001xxa2': ('US', '1', 'LOG Substraction Curve Taste', ''),  # noqa
+        '2001xxa2': ('US', '1', 'LOG Subtraction Curve Taste', ''),  # noqa
         '2001xxa3': ('UL', '1', 'Text Color Foreground', ''),  # noqa
         '2001xxa4': ('UL', '1', 'Text Color Background', ''),  # noqa
         '2001xxa5': ('UL', '1', 'Text Color Shadow', ''),  # noqa
@@ -6255,7 +6256,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx42': ('US', '1-n', 'Processing Mask', ''),  # noqa
         '0019xx44': ('UL', '1-n', 'IRS Data Number', ''),  # noqa
         '0019xx45': ('UL', '1-n', 'IRS Data Length', ''),  # noqa
-        '0019xx62': ('IS', '1', 'Number of Virtuell Channels', ''),  # noqa
+        '0019xx62': ('IS', '1', 'Number of Virtual Channels', ''),  # noqa
         '0019xx70': ('IS', '1', 'Number of Reading', ''),  # noqa
         '0019xx71': ('CS', '1', 'Reading Code', ''),  # noqa
         '0019xx74': ('IS', '1', 'Number of Projections', ''),  # noqa
@@ -6384,9 +6385,9 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0017xx71': ('LO', '1', 'Landmark Current', ''),  # noqa
         '0017xx72': ('US', '1', 'Zoom Factor', ''),  # noqa
         '0017xx73': ('US', '1', 'Roam Horizontal', ''),  # noqa
-        '0017xx74': ('US', '1', 'Roam Vertikal', ''),  # noqa
+        '0017xx74': ('US', '1', 'Roam Vertical', ''),  # noqa
         '0017xx77': ('IS', '1', 'Pixel Shift Horizontal', ''),  # noqa
-        '0017xx78': ('IS', '1', 'Pixel Shift Vertikal', ''),  # noqa
+        '0017xx78': ('IS', '1', 'Pixel Shift Vertical', ''),  # noqa
         '0017xx79': ('US', '1', 'Image Flip', ''),  # noqa
         '0017xx7a': ('US', '1', 'Invers Current', ''),  # noqa
         '0017xx80': ('US', '1', 'Unknown', ''),  # noqa
@@ -7120,8 +7121,8 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0031xx17': ('SS', '1-n', 'Unknown', ''),  # noqa
         '0031xx20': ('ST', '1', 'Unknown', ''),  # noqa
         '0031xx21': ('SS', '1', 'Unknown', ''),  # noqa
-        '0033xx00': ('FL', '1-n', 'Flood correction Matrix Det 1 upto SR 2.0', ''),  # noqa
-        '0033xx01': ('FL', '1-n', 'Flood correction Matrix Det 2 upto SR 2.0', ''),  # noqa
+        '0033xx00': ('FL', '1-n', 'Flood correction Matrix Det 1 up to SR 2.0', ''),  # noqa
+        '0033xx01': ('FL', '1-n', 'Flood correction Matrix Det 2 up to SR 2.0', ''),  # noqa
         '0033xx10': ('FL', '1-n', 'COR Data for Detector 1', ''),  # noqa
         '0033xx11': ('FL', '1-n', 'COR Data for Detector 2', ''),  # noqa
         '0033xx14': ('FL', '1', 'MHR ( Y-Shift) data for detector 1', ''),  # noqa
@@ -8476,7 +8477,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx50': ('US', '1', 'Video Scan Mode', ''),  # noqa
         '0019xx51': ('US', '1', 'Video LineRate', ''),  # noqa
         '0019xx60': ('US', '1', 'Xray Technique', ''),  # noqa
-        '0019xx61': ('DS', '1', 'Image Identifier Fromat', ''),  # noqa
+        '0019xx61': ('DS', '1', 'Image Identifier Format', ''),  # noqa
         '0019xx62': ('US', '1', 'Iris Diaphragm', ''),  # noqa
         '0019xx63': ('CS', '1', 'Filter', ''),  # noqa
         '0019xx64': ('CS', '1', 'Cine Parallel', ''),  # noqa
@@ -9063,7 +9064,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0029xx01': ('IS', '1', 'Storage State', ''),  # noqa
         '0029xx02': ('IS', '1', 'Referenced Image SOP Class', ''),  # noqa
         '0029xx03': ('LO', '1', 'Ref. Image Instance UID', ''),  # noqa
-        '0029xx04': ('IS', '1', 'Rel. Pres. State Number', ''),  # noqa
+        '0029xx04': ('IS', '1', 'Rel. Presentation State Number', ''),  # noqa
         '0029xx05': ('LO', '1', 'Rel. Presentation State UID', ''),  # noqa
     },
     'Siemens Ultrasound Miscellaneous': {
