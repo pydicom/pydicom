@@ -36,10 +36,10 @@ def parse_private_docbook(doc_root):
 
         tag = entry.attrib['group'] + entry.attrib['element']
 
-        # Covert unknown element names to 'Unknown'
+        # Convert unknown element names to 'Unknown'
         if entry.attrib['name'] == '?':
             entry.attrib['name'] = 'Unknown'
-        # If backslash in element name escape it
+        # Escape backslash in element names
         if "\\" in entry.attrib['name']:
             entry.attrib['name'] = entry.attrib['name'].replace("\\", "\\\\")
 
