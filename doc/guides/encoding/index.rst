@@ -11,7 +11,7 @@ Pixel Data Encoding
    rle_lossless
 
 
-Encoding plugin information: 
+Encoding plugin information:
 
 .. toctree::
    :maxdepth: 1

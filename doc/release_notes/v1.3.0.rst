@@ -66,7 +66,7 @@ Fixes
 * Correctly handle elements with ambiguous VR in sequence items (:issue:`804`)
 * Fix bug where new DicomDir objects always have is_implicit_VR
 * Fix dataset equality for mixed raw vs converted data elements (:issue:`835`)
-* Remove excess padding in Pixel Data 
+* Remove excess padding in Pixel Data
 * Fix wrong date format in anonymize example
 * Fix unknown VR exception message when VR isn't ASCII (:issue:`791`)
 * Fix jis-x-0201 characters encoding (:issue:`856`)

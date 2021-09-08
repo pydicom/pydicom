@@ -76,8 +76,8 @@ other individual items.
 
 For details on calling the codify command, see the :ref:`cli_codify` section.
 
-``codify`` could also be called from code, rather than from a command line; you 
-can look at the codify.py source and the ``code_file`` function for a 
+``codify`` could also be called from code, rather than from a command line; you
+can look at the codify.py source and the ``code_file`` function for a
 starting point for that.
 
 
@@ -90,7 +90,7 @@ can certainly write code from scratch to make a complete DICOM file using
 pydicom.
 
 It's not particularly difficult, but to produce a valid DICOM file requires
-specific items to be created.  A basic example of that is available in the 
+specific items to be created.  A basic example of that is available in the
 example file :ref:`sphx_glr_auto_examples_input_output_plot_write_dicom.py`.
 
 Just don't forget the warnings in the Introduction section above, and be sure

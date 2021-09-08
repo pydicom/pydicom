@@ -7,12 +7,12 @@ filing issues. Please read it carefully to help make the code review
 process go as smoothly as possible and maximize the likelihood of your
 contribution being merged.
 
-_Note:_  
-If you want to contribute new functionality, you may first consider if this 
+_Note:_
+If you want to contribute new functionality, you may first consider if this
 functionality belongs to the pydicom core, or is better suited for
 [contrib-pydicom](https://github.com/pydicom/contrib-pydicom). contrib-pydicom
 collects some convenient functionality that uses pydicom, but doesn't
-belong to the pydicom core. If you're not sure where your contribution belongs, 
+belong to the pydicom core. If you're not sure where your contribution belongs,
 create an issue where you can discuss this before creating a pull request.
 
 
@@ -53,26 +53,26 @@ GitHub, clone, and develop on a branch. Steps:
 5. Add a meaningful commit message. Pull requests are "squash-merged", e.g.
    squashed into one commit with all commit messages combined. The commit
    messages can be edited during the merge, but it helps if they are clearly
-   and briefly showing what has been done in the commit. Check out the 
+   and briefly showing what has been done in the commit. Check out the
    [seven commonly accepted rules](https://www.theserverside.com/video/Follow-these-git-commit-message-guidelines)
    for commit messages. Here are some examples, taken from actual commits:
-   
+
    ```
    Add support for new VRs OV, SV, UV
-   
+
    -  closes #1016
    ```
    ```
-   Add warning when saving compressed without encapsulation  
-   ``` 
+   Add warning when saving compressed without encapsulation
+   ```
    ```
    Add optional handler argument to Dataset.decompress()
-   
+
    - also add it to Dataset.convert_pixel_data()
    - add separate error handling for given handle
    - see #537
    ```
-   
+
 6. To record your changes in Git, push the changes to your GitHub
    account with:
 
@@ -96,12 +96,12 @@ submit a pull request:
    follow [PEP-8 guidelines](https://www.python.org/dev/peps/pep-0008/) for
    the code, and the [Google style](https://github.com/google/styleguide/blob/gh-pages/pyguide.md#38-comments-and-docstrings)
    for documentation.
-   
+
 -  If your pull request addresses an issue, please use the pull request title to
    describe the issue and mention the issue number in the pull request
    description. This will make sure a link back to the original issue is
-   created. Use "closes #issue-number" or "fixes #issue-number" to let GitHub 
-   automatically close the related issue on commit. Use any other keyword 
+   created. Use "closes #issue-number" or "fixes #issue-number" to let GitHub
+   automatically close the related issue on commit. Use any other keyword
    (i.e. works on, related) to avoid GitHub to close the referenced issue.
 
 -  All public methods should have informative docstrings with sample
@@ -111,7 +111,7 @@ submit a pull request:
    if the contribution is complete and ready for a detailed review. Some of the
    core developers will review your code, make suggestions for changes, and
    approve it as soon as it is ready for merge. Pull requests are usually merged
-   after two approvals by core developers, or other developers asked to review the code. 
+   after two approvals by core developers, or other developers asked to review the code.
    An incomplete contribution -- where you expect to do more work before receiving a full
    review -- should be prefixed with `[WIP]` (to indicate a work in progress) and
    changed to `[MRG]` when it matures. WIPs may be useful to: indicate you are
@@ -128,10 +128,10 @@ submit a pull request:
    to other methods available in pydicom.
 
 -  Documentation and high-coverage tests are necessary for enhancements to be
-   accepted. Bug-fixes shall be provided with 
+   accepted. Bug-fixes shall be provided with
    [regression tests](https://en.wikipedia.org/wiki/regression_testing) that
    fail before the fix. For new features, the correct behavior shall be
-   verified by feature tests. A good practice to write sufficient tests is 
+   verified by feature tests. A good practice to write sufficient tests is
    [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development).
 
 You can also check for common programming errors and style issues with the
@@ -155,7 +155,7 @@ following tools:
 -  No PEP8 warnings, check with:
 
   ```bash
-  $ pip install pycodestyle  # formerly called pep8 
+  $ pip install pycodestyle  # formerly called pep8
   $ pycodestyle path/to/module.py
   ```
 

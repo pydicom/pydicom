@@ -1,12 +1,12 @@
 In this directory are different variant of a DICOMDIR file representing the 3 patient directories.
 
-DICOMDIR: 
+DICOMDIR:
 created using dcmmkdir from DCMTK
 
-DICOMDIR-bigEnd: 
+DICOMDIR-bigEnd:
 created from DICOMDIR using dcmodify by changing the transfer syntax to Explicit Big Endian
 
-DICOMDIR-implicit: 
+DICOMDIR-implicit:
 Created from DICOMDIR using pydicom's `FileSet.write(force_implicit=True)`
 
 DICOMDIR-nooffset:
