@@ -46,4 +46,3 @@ if use_alphanumeric:
     fs.write("tiny_alpha")
 else:
     fs.write("tiny")
-
