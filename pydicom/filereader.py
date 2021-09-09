@@ -751,7 +751,8 @@ def read_preamble(fp: BinaryIO, force: bool) -> Optional[bytes]:
 
 
 def _at_pixel_data(tag: BaseTag, VR: Optional[str], length: int) -> bool:
-    return cast(bool, tag == 0x7fe00010)
+    pixel_data_tags = {0x7fe00010, 0x7fe00009, 0x7fe00008}
+    return tag in pixel_data_tags
 
 
 def read_partial(
@@ -920,7 +921,7 @@ def read_partial(
 
 
 def dcmread(
-    fp: Union[PathType, BinaryIO],
+    fp: Union[PathType, BinaryIO, DicomFileLike],
     defer_size: Optional[Union[str, int, float]] = None,
     stop_before_pixels: bool = False,
     force: bool = False,

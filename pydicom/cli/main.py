@@ -8,7 +8,6 @@ attributes, and calls set_defaults(func=callback_function)
 """
 
 import argparse
-import sys
 import pkg_resources
 import re
 from typing import Tuple, cast, List, Any, Dict, Optional, Callable
@@ -16,7 +15,6 @@ from typing import Tuple, cast, List, Any, Dict, Optional, Callable
 from pydicom import dcmread
 from pydicom.data.data_manager import get_testdata_file
 from pydicom.dataset import Dataset
-from pydicom.dataelem import DataElement
 
 
 subparsers: Optional[argparse._SubParsersAction] = None

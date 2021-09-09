@@ -38,6 +38,6 @@ Other
 .....
 
 * switch to Distribute for packaging
-* preliminary work on Python 3 compatiblity
+* preliminary work on Python 3 compatibility
 * preliminary work on using sphinx for documentation
 * preliminary work on better writing of files from scratch

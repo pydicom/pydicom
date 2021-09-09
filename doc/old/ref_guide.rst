@@ -32,7 +32,7 @@ File Writing
 DICOM files can also be written using *pydicom*. There are two ways to do this.
 
 * The first is to use
-  :func:`~filewriter.dcmwrite` with a prexisting :class:`~dataset.FileDataset`
+  :func:`~filewriter.dcmwrite` with a preexisting :class:`~dataset.FileDataset`
   (derived from :class:`~dataset.Dataset`) instance.
 * The second is to use the :meth:`Dataset.save_as()<dataset.Dataset.save_as>`
   method on a ``FileDataset`` or ``Dataset`` instance.

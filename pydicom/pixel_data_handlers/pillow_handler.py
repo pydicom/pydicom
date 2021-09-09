@@ -18,7 +18,6 @@ except ImportError:
     HAVE_NP = False
 
 try:
-    import PIL
     from PIL import Image, features
     HAVE_PIL = True
     HAVE_JPEG = features.check_codec("jpg")
@@ -85,7 +84,7 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
     This affects JPEG transfer syntaxes.
     """
-    should_change = ds.SamplesPerPixel == 3
+    # return ds.SamplesPerPixel == 3
     return False
 
 
