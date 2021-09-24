@@ -27,7 +27,10 @@ import xml.etree.ElementTree as ET
 from pydicom import _version
 
 
-PYDICOM_DICT_FILENAME = '../../pydicom/_uid_dict.py'
+PYDICOM_DICT_FILENAME = os.path.join(
+    os.path.dirname(__file__),
+    '../../pydicom/_uid_dict.py'
+)
 DICT_NAME = 'UID_dictionary'
 
 
