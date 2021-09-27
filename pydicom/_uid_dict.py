@@ -424,5 +424,32 @@ UID_dictionary = {
     '1.2.840.10008.15.0.4.6': ('dicomNetworkConnection', 'LDAP OID', '', '', 'dicomNetworkConnection'),  # noqa
     '1.2.840.10008.15.0.4.7': ('dicomUniqueAETitle', 'LDAP OID', '', '', 'dicomUniqueAETitle'),  # noqa
     '1.2.840.10008.15.0.4.8': ('dicomTransferCapability', 'LDAP OID', '', '', 'dicomTransferCapability'),  # noqa
-    '1.2.840.10008.15.1.1': ('Universal Coordinated Time', 'Synchronization Frame of Reference', '', '', 'UTC')  # noqa
+    '1.2.840.10008.15.1.1': ('Universal Coordinated Time', 'Synchronization Frame of Reference', '', '', 'UTC'),  # noqa
+    '1.2.840.10008.1.4.1.1': ('Talairach Brain Atlas Frame of Reference', 'Well-known frame of reference', '', '', 'TalairachBrainAtlas'),  # noqa
+    '1.2.840.10008.1.4.1.2': ('SPM2 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T1'),  # noqa
+    '1.2.840.10008.1.4.1.3': ('SPM2 T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T2'),  # noqa
+    '1.2.840.10008.1.4.1.4': ('SPM2 PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PD'),  # noqa
+    '1.2.840.10008.1.4.1.5': ('SPM2 EPI Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2EPI'),  # noqa
+    '1.2.840.10008.1.4.1.6': ('SPM2 FIL T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2FILT1'),  # noqa
+    '1.2.840.10008.1.4.1.7': ('SPM2 PET Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PET'),  # noqa
+    '1.2.840.10008.1.4.1.8': ('SPM2 TRANSM Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2TRANSM'),  # noqa
+    '1.2.840.10008.1.4.1.9': ('SPM2 SPECT Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SPECT'),  # noqa
+    '1.2.840.10008.1.4.1.10': ('SPM2 GRAY Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2GRAY'),  # noqa
+    '1.2.840.10008.1.4.1.11': ('SPM2 WHITE Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2WHITE'),  # noqa
+    '1.2.840.10008.1.4.1.12': ('SPM2 CSF Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2CSF'),  # noqa
+    '1.2.840.10008.1.4.1.13': ('SPM2 BRAINMASK Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2BRAINMASK'),  # noqa
+    '1.2.840.10008.1.4.1.14': ('SPM2 AVG305T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG305T1'),  # noqa
+    '1.2.840.10008.1.4.1.15': ('SPM2 AVG152T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T1'),  # noqa
+    '1.2.840.10008.1.4.1.16': ('SPM2 AVG152T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T2'),  # noqa
+    '1.2.840.10008.1.4.1.17': ('SPM2 AVG152PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152PD'),  # noqa
+    '1.2.840.10008.1.4.1.18': ('SPM2 SINGLESUBJT1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SINGLESUBJT1'),  # noqa
+    '1.2.840.10008.1.4.2.1': ('ICBM 452 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'ICBM452T1'),  # noqa
+    '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', '', 'ICBMSingleSubjectMRI'),  # noqa
+    '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'IEC61217FixedCoordinateSystem'),  # noqa
+    '1.2.840.10008.1.4.3.2': ('Standard Robotic-Arm Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'StandardRoboticArmCoordinateSystem'),  # noqa
+    '1.2.840.10008.1.4.4.1': ('SRI24 Frame of Reference', 'Well-known frame of reference', '', '', 'SRI24'),  # noqa
+    '1.2.840.10008.1.4.5.1': ('Colin27 Frame of Reference', 'Well-known frame of reference', '', '', 'Colin27'),  # noqa
+    '1.2.840.10008.1.4.6.1': ('LPBA40/AIR Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40AIR'),  # noqa
+    '1.2.840.10008.1.4.6.2': ('LPBA40/FLIRT Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40FLIRT'),  # noqa
+    '1.2.840.10008.1.4.6.3': ('LPBA40/SPM5 Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40SPM5'),  # noqa
 }
