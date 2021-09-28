@@ -4,6 +4,7 @@ UID_dictionary = {
     '1.2.840.10008.1.1': ('Verification SOP Class', 'SOP Class', '', '', 'Verification'),  # noqa
     '1.2.840.10008.1.2': ('Implicit VR Little Endian', 'Transfer Syntax', 'Default Transfer Syntax for DICOM', '', 'ImplicitVRLittleEndian'),  # noqa
     '1.2.840.10008.1.2.1': ('Explicit VR Little Endian', 'Transfer Syntax', '', '', 'ExplicitVRLittleEndian'),  # noqa
+    '1.2.840.10008.1.2.1.98': ('Encapsulated Uncompressed Explicit VR Little Endian', 'Transfer Syntax', '', '', 'EncapsulatedUncompressedExplicitVRLittleEndian'),  # noqa
     '1.2.840.10008.1.2.1.99': ('Deflated Explicit VR Little Endian', 'Transfer Syntax', '', '', 'DeflatedExplicitVRLittleEndian'),  # noqa
     '1.2.840.10008.1.2.2': ('Explicit VR Big Endian', 'Transfer Syntax', '', 'Retired', 'ExplicitVRBigEndian'),  # noqa
     '1.2.840.10008.1.2.4.50': ('JPEG Baseline (Process 1)', 'Transfer Syntax', 'Default Transfer Syntax for Lossy JPEG 8 Bit Image Compression', '', 'JPEGBaseline8Bit'),  # noqa
@@ -48,33 +49,6 @@ UID_dictionary = {
     '1.2.840.10008.1.2.7.2': ('SMPTE ST 2110-20 Uncompressed Interlaced Active Video', 'Transfer Syntax', '', '', 'SMPTEST211020UncompressedInterlacedActiveVideo'),  # noqa
     '1.2.840.10008.1.2.7.3': ('SMPTE ST 2110-30 PCM Digital Audio', 'Transfer Syntax', '', '', 'SMPTEST211030PCMDigitalAudio'),  # noqa
     '1.2.840.10008.1.3.10': ('Media Storage Directory Storage', 'SOP Class', '', '', 'MediaStorageDirectoryStorage'),  # noqa
-    '1.2.840.10008.1.4.1.1': ('Talairach Brain Atlas Frame of Reference', 'Well-known frame of reference', '', '', 'TalairachBrainAtlas'),  # noqa
-    '1.2.840.10008.1.4.1.2': ('SPM2 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T1'),  # noqa
-    '1.2.840.10008.1.4.1.3': ('SPM2 T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T2'),  # noqa
-    '1.2.840.10008.1.4.1.4': ('SPM2 PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PD'),  # noqa
-    '1.2.840.10008.1.4.1.5': ('SPM2 EPI Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2EPI'),  # noqa
-    '1.2.840.10008.1.4.1.6': ('SPM2 FIL T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2FILT1'),  # noqa
-    '1.2.840.10008.1.4.1.7': ('SPM2 PET Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PET'),  # noqa
-    '1.2.840.10008.1.4.1.8': ('SPM2 TRANSM Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2TRANSM'),  # noqa
-    '1.2.840.10008.1.4.1.9': ('SPM2 SPECT Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SPECT'),  # noqa
-    '1.2.840.10008.1.4.1.10': ('SPM2 GRAY Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2GRAY'),  # noqa
-    '1.2.840.10008.1.4.1.11': ('SPM2 WHITE Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2WHITE'),  # noqa
-    '1.2.840.10008.1.4.1.12': ('SPM2 CSF Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2CSF'),  # noqa
-    '1.2.840.10008.1.4.1.13': ('SPM2 BRAINMASK Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2BRAINMASK'),  # noqa
-    '1.2.840.10008.1.4.1.14': ('SPM2 AVG305T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG305T1'),  # noqa
-    '1.2.840.10008.1.4.1.15': ('SPM2 AVG152T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T1'),  # noqa
-    '1.2.840.10008.1.4.1.16': ('SPM2 AVG152T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T2'),  # noqa
-    '1.2.840.10008.1.4.1.17': ('SPM2 AVG152PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152PD'),  # noqa
-    '1.2.840.10008.1.4.1.18': ('SPM2 SINGLESUBJT1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SINGLESUBJT1'),  # noqa
-    '1.2.840.10008.1.4.2.1': ('ICBM 452 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'ICBM452T1'),  # noqa
-    '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', '', 'ICBMSingleSubjectMRI'),  # noqa
-    '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'IEC61217FixedCoordinateSystem'),  # noqa
-    '1.2.840.10008.1.4.3.2': ('Standard Robotic-Arm Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'StandardRoboticArmCoordinateSystem'),  # noqa
-    '1.2.840.10008.1.4.4.1': ('SRI24 Frame of Reference', 'Well-known frame of reference', '', '', 'SRI24'),  # noqa
-    '1.2.840.10008.1.4.5.1': ('Colin27 Frame of Reference', 'Well-known frame of reference', '', '', 'Colin27'),  # noqa
-    '1.2.840.10008.1.4.6.1': ('LPBA40/AIR Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40AIR'),  # noqa
-    '1.2.840.10008.1.4.6.2': ('LPBA40/FLIRT Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40FLIRT'),  # noqa
-    '1.2.840.10008.1.4.6.3': ('LPBA40/SPM5 Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40SPM5'),  # noqa
     '1.2.840.10008.1.5.1': ('Hot Iron Color Palette SOP Instance', 'Well-known SOP Instance', '', '', 'HotIronPalette'),  # noqa
     '1.2.840.10008.1.5.2': ('PET Color Palette SOP Instance', 'Well-known SOP Instance', '', '', 'PETPalette'),  # noqa
     '1.2.840.10008.1.5.3': ('Hot Metal Blue Color Palette SOP Instance', 'Well-known SOP Instance', '', '', 'HotMetalBluePalette'),  # noqa
@@ -288,6 +262,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.88.75': ('Performed Imaging Agent Administration SR Storage', 'SOP Class', '', '', 'PerformedImagingAgentAdministrationSRStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.88.76': ('Enhanced X-Ray Radiation Dose SR Storage', 'SOP Class', '', '', 'EnhancedXRayRadiationDoseSRStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.90.1': ('Content Assessment Results Storage', 'SOP Class', '', '', 'ContentAssessmentResultsStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.91.1': ('Microscopy Bulk Simple Annotations Storage', 'SOP Class', '', '', 'MicroscopyBulkSimpleAnnotationsStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.1': ('Encapsulated PDF Storage', 'SOP Class', '', '', 'EncapsulatedPDFStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.2': ('Encapsulated CDA Storage', 'SOP Class', '', '', 'EncapsulatedCDAStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.104.3': ('Encapsulated STL Storage', 'SOP Class', '', '', 'EncapsulatedSTLStorage'),  # noqa
@@ -326,6 +301,8 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.481.18': ('Tomotherapeutic Radiation Record Storage', 'SOP Class', '', '', 'TomotherapeuticRadiationRecordStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.19': ('C-Arm Photon-Electron Radiation Record Storage', 'SOP Class', '', '', 'CArmPhotonElectronRadiationRecordStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.20': ('Robotic Radiation Record Storage', 'SOP Class', '', '', 'RoboticRadiationRecordStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.21': ('RT Radiation Set Delivery Instruction Storage', 'SOP Class', '', '', 'RTRadiationSetDeliveryInstructionStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.22': ('RT Treatment Preparation Storage', 'SOP Class', '', '', 'RTTreatmentPreparationStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.1': ('DICOS CT Image Storage', 'SOP Class', 'DICOS', '', 'DICOSCTImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.1': ('DICOS Digital X-Ray Image Storage - For Presentation', 'SOP Class', 'DICOS', '', 'DICOSDigitalXRayImageStorageForPresentation'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.2': ('DICOS Digital X-Ray Image Storage - For Processing', 'SOP Class', 'DICOS', '', 'DICOSDigitalXRayImageStorageForProcessing'),  # noqa
@@ -447,5 +424,32 @@ UID_dictionary = {
     '1.2.840.10008.15.0.4.6': ('dicomNetworkConnection', 'LDAP OID', '', '', 'dicomNetworkConnection'),  # noqa
     '1.2.840.10008.15.0.4.7': ('dicomUniqueAETitle', 'LDAP OID', '', '', 'dicomUniqueAETitle'),  # noqa
     '1.2.840.10008.15.0.4.8': ('dicomTransferCapability', 'LDAP OID', '', '', 'dicomTransferCapability'),  # noqa
-    '1.2.840.10008.15.1.1': ('Universal Coordinated Time', 'Synchronization Frame of Reference', '', '', 'UTC')  # noqa
+    '1.2.840.10008.15.1.1': ('Universal Coordinated Time', 'Synchronization Frame of Reference', '', '', 'UTC'),  # noqa
+    '1.2.840.10008.1.4.1.1': ('Talairach Brain Atlas Frame of Reference', 'Well-known frame of reference', '', '', 'TalairachBrainAtlas'),  # noqa
+    '1.2.840.10008.1.4.1.2': ('SPM2 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T1'),  # noqa
+    '1.2.840.10008.1.4.1.3': ('SPM2 T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2T2'),  # noqa
+    '1.2.840.10008.1.4.1.4': ('SPM2 PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PD'),  # noqa
+    '1.2.840.10008.1.4.1.5': ('SPM2 EPI Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2EPI'),  # noqa
+    '1.2.840.10008.1.4.1.6': ('SPM2 FIL T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2FILT1'),  # noqa
+    '1.2.840.10008.1.4.1.7': ('SPM2 PET Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2PET'),  # noqa
+    '1.2.840.10008.1.4.1.8': ('SPM2 TRANSM Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2TRANSM'),  # noqa
+    '1.2.840.10008.1.4.1.9': ('SPM2 SPECT Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SPECT'),  # noqa
+    '1.2.840.10008.1.4.1.10': ('SPM2 GRAY Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2GRAY'),  # noqa
+    '1.2.840.10008.1.4.1.11': ('SPM2 WHITE Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2WHITE'),  # noqa
+    '1.2.840.10008.1.4.1.12': ('SPM2 CSF Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2CSF'),  # noqa
+    '1.2.840.10008.1.4.1.13': ('SPM2 BRAINMASK Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2BRAINMASK'),  # noqa
+    '1.2.840.10008.1.4.1.14': ('SPM2 AVG305T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG305T1'),  # noqa
+    '1.2.840.10008.1.4.1.15': ('SPM2 AVG152T1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T1'),  # noqa
+    '1.2.840.10008.1.4.1.16': ('SPM2 AVG152T2 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152T2'),  # noqa
+    '1.2.840.10008.1.4.1.17': ('SPM2 AVG152PD Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2AVG152PD'),  # noqa
+    '1.2.840.10008.1.4.1.18': ('SPM2 SINGLESUBJT1 Frame of Reference', 'Well-known frame of reference', '', '', 'SPM2SINGLESUBJT1'),  # noqa
+    '1.2.840.10008.1.4.2.1': ('ICBM 452 T1 Frame of Reference', 'Well-known frame of reference', '', '', 'ICBM452T1'),  # noqa
+    '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', '', 'ICBMSingleSubjectMRI'),  # noqa
+    '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'IEC61217FixedCoordinateSystem'),  # noqa
+    '1.2.840.10008.1.4.3.2': ('Standard Robotic-Arm Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'StandardRoboticArmCoordinateSystem'),  # noqa
+    '1.2.840.10008.1.4.4.1': ('SRI24 Frame of Reference', 'Well-known frame of reference', '', '', 'SRI24'),  # noqa
+    '1.2.840.10008.1.4.5.1': ('Colin27 Frame of Reference', 'Well-known frame of reference', '', '', 'Colin27'),  # noqa
+    '1.2.840.10008.1.4.6.1': ('LPBA40/AIR Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40AIR'),  # noqa
+    '1.2.840.10008.1.4.6.2': ('LPBA40/FLIRT Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40FLIRT'),  # noqa
+    '1.2.840.10008.1.4.6.3': ('LPBA40/SPM5 Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40SPM5'),  # noqa
 }

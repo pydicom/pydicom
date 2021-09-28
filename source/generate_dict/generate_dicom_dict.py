@@ -55,10 +55,13 @@ from pydicom import _version
 from pydicom.values import converters
 
 
-_DIRECTORY = os.path.dirname(__file__)
-PYDICOM_DICT_FILENAME = os.path.join(
-    _DIRECTORY, '../../pydicom/_dicom_dict.py'
+_PKG_DIRECTORY = os.path.join(
+    os.path.dirname(__file__),
+    '..',
+    '..',
+    'pydicom'
 )
+PYDICOM_DICT_FILENAME = os.path.join(_PKG_DIRECTORY, '_dicom_dict.py')
 MAIN_DICT_NAME = 'DicomDictionary: Dict[int, Tuple[str, str, str, str, str]]'
 MASK_DICT_NAME = (
     'RepeatersDictionary: Dict[str, Tuple[str, str, str, str, str]]'
