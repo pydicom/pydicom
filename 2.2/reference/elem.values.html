@@ -1,90 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Element Value Decoding (pydicom.values) &mdash; pydicom 2.2.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
-
-  
-  
+  <title>Element Value Decoding (pydicom.values) &mdash; pydicom 2.2.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-
-  
-  
-
-  
-
-  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pydicom.values.convert_AE_string" href="generated/pydicom.values.convert_AE_string.html" />
     <link rel="prev" title="pydicom.tag.TupleTag" href="generated/pydicom.tag.TupleTag.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pydicom
-          
-
-          
-            
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.2.1
+                2.2.2
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -92,18 +49,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
@@ -179,74 +125,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pydicom</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">API Reference</a> &raquo;</li>
-        
           <li><a href="elem.html">Representation of Data Elements</a> &raquo;</li>
-        
       <li>Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="element-value-decoding-pydicom-values">
+             
+  <section id="element-value-decoding-pydicom-values">
 <span id="api-elem-values"></span><h1>Element Value Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.values</span></code>)<a class="headerlink" href="#element-value-decoding-pydicom-values" title="Permalink to this headline">¶</a></h1>
 <p>Element value decoding.</p>
 <table class="longtable docutils align-default">
@@ -256,115 +160,98 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_AE_string.html#pydicom.values.convert_AE_string" title="pydicom.values.convert_AE_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_AE_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘AE’ value.</p></td>
+<td><p>Return a decoded 'AE' value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_ATvalue.html#pydicom.values.convert_ATvalue" title="pydicom.values.convert_ATvalue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_ATvalue</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘AT’ value.</p></td>
+<td><p>Return a decoded 'AT' value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_DA_string.html#pydicom.values.convert_DA_string" title="pydicom.values.convert_DA_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_DA_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘DA’ value.</p></td>
+<td><p>Return a decoded 'DA' value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_DS_string.html#pydicom.values.convert_DS_string" title="pydicom.values.convert_DS_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_DS_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘DS’ value.</p></td>
+<td><p>Return a decoded 'DS' value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_DT_string.html#pydicom.values.convert_DT_string" title="pydicom.values.convert_DT_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_DT_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘DT’ value.</p></td>
+<td><p>Return a decoded 'DT' value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_IS_string.html#pydicom.values.convert_IS_string" title="pydicom.values.convert_IS_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_IS_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘IS’ value.</p></td>
+<td><p>Return a decoded 'IS' value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_numbers.html#pydicom.values.convert_numbers" title="pydicom.values.convert_numbers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_numbers</span></code></a>(byte_string, …)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_numbers.html#pydicom.values.convert_numbers" title="pydicom.values.convert_numbers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_numbers</span></code></a>(byte_string, ...)</p></td>
 <td><p>Return a decoded numerical VR value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_OBvalue.html#pydicom.values.convert_OBvalue" title="pydicom.values.convert_OBvalue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_OBvalue</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return encoded ‘OB’ value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
+<td><p>Return encoded 'OB' value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_OWvalue.html#pydicom.values.convert_OWvalue" title="pydicom.values.convert_OWvalue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_OWvalue</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return the encoded ‘OW’ value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
+<td><p>Return the encoded 'OW' value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN" title="pydicom.values.convert_PN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_PN</span></code></a>(byte_string[, encodings])</p></td>
-<td><p>Return a decoded ‘PN’ value.</p></td>
+<td><p>Return a decoded 'PN' value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string" title="pydicom.values.convert_single_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_single_string</span></code></a>(byte_string[, encodings])</p></td>
 <td><p>Return decoded text, ignoring backslashes and trailing spaces.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_SQ.html#pydicom.values.convert_SQ" title="pydicom.values.convert_SQ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_SQ</span></code></a>(byte_string, is_implicit_VR, …)</p></td>
-<td><p>Return a decoded ‘SQ’ value.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_SQ.html#pydicom.values.convert_SQ" title="pydicom.values.convert_SQ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_SQ</span></code></a>(byte_string, is_implicit_VR, ...)</p></td>
+<td><p>Return a decoded 'SQ' value.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_string.html#pydicom.values.convert_string" title="pydicom.values.convert_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_string</span></code></a>(byte_string, is_little_endian)</p></td>
 <td><p>Return a decoded string VR value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_tag.html#pydicom.values.convert_tag" title="pydicom.values.convert_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_tag</span></code></a>(byte_string, is_little_endian[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_tag.html#pydicom.values.convert_tag" title="pydicom.values.convert_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_tag</span></code></a>(byte_string, is_little_endian[, ...])</p></td>
 <td><p>Return a decoded <a class="reference internal" href="generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> from the encoded <cite>byte_string</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_text.html#pydicom.values.convert_text" title="pydicom.values.convert_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_text</span></code></a>(byte_string[, encodings])</p></td>
 <td><p>Return a decoded text VR value, ignoring backslashes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_TM_string.html#pydicom.values.convert_TM_string" title="pydicom.values.convert_TM_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_TM_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘TM’ value.</p></td>
+<td><p>Return a decoded 'TM' value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_UI.html#pydicom.values.convert_UI" title="pydicom.values.convert_UI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_UI</span></code></a>(byte_string, is_little_endian[, …])</p></td>
-<td><p>Return a decoded ‘UI’ value.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_UI.html#pydicom.values.convert_UI" title="pydicom.values.convert_UI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_UI</span></code></a>(byte_string, is_little_endian[, ...])</p></td>
+<td><p>Return a decoded 'UI' value.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_UN.html#pydicom.values.convert_UN" title="pydicom.values.convert_UN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_UN</span></code></a>(byte_string, is_little_endian[, …])</p></td>
-<td><p>Return the encoded ‘UN’ value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_UN.html#pydicom.values.convert_UN" title="pydicom.values.convert_UN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_UN</span></code></a>(byte_string, is_little_endian[, ...])</p></td>
+<td><p>Return the encoded 'UN' value as <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_UR_string.html#pydicom.values.convert_UR_string" title="pydicom.values.convert_UR_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_UR_string</span></code></a>(byte_string, is_little_endian)</p></td>
-<td><p>Return a decoded ‘UR’ value.</p></td>
+<td><p>Return a decoded 'UR' value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_value.html#pydicom.values.convert_value" title="pydicom.values.convert_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_value</span></code></a>(VR, raw_data_element[, encodings])</p></td>
 <td><p>Return the element value decoded using the appropriate decoder.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="generated/pydicom.values.convert_AE_string.html" class="btn btn-neutral float-right" title="pydicom.values.convert_AE_string" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="generated/pydicom.tag.TupleTag.html" class="btn btn-neutral float-left" title="pydicom.tag.TupleTag" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/pydicom.values.convert_AE_string.html" class="btn btn-neutral float-right" title="pydicom.values.convert_AE_string" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
-
-    </p>
+    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

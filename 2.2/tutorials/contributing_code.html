@@ -1,90 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Contributing a source code change &mdash; pydicom 2.2.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
-
-  
-  
+  <title>Contributing a source code change &mdash; pydicom 2.2.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-
-  
-  
-
-  
-
-  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Contributing a documentation change" href="contributing_docs.html" />
     <link rel="prev" title="Introduction to JSON support" href="dicom_json.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pydicom
-          
-
-          
-            
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.2.1
+                2.2.2
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -92,18 +49,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
@@ -154,72 +100,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pydicom</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Tutorials</a> &raquo;</li>
-        
       <li>Contributing a source code change</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="contributing-a-source-code-change">
+             
+  <section id="contributing-a-source-code-change">
 <h1>Contributing a source code change<a class="headerlink" href="#contributing-a-source-code-change" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial will take you through the process of:</p>
 <ul class="simple">
@@ -231,7 +136,7 @@
 <li><p>Previewing your changes</p></li>
 <li><p>Committing the changes and making a pull request</p></li>
 </ul>
-<div class="section" id="download-the-current-source-code">
+<section id="download-the-current-source-code">
 <h2>Download the current source code<a class="headerlink" href="#download-the-current-source-code" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and
@@ -263,8 +168,8 @@ corresponding Python executable:</p>
 </div>
 </li>
 </ol>
-</div>
-<div class="section" id="optional-install-required-libraries">
+</section>
+<section id="optional-install-required-libraries">
 <h2>(Optional) Install required libraries<a class="headerlink" href="#optional-install-required-libraries" title="Permalink to this headline">¶</a></h2>
 <p>If you’re making changes to one of the pixel data handlers you’ll need to
 install <a class="reference external" href="https://numpy.org/">NumPy</a> as well as the library the handler is
@@ -277,8 +182,8 @@ you’ll also need to install <a class="reference external" href="https://pillow
 </div>
 <p>See the <a class="reference internal" href="installation.html"><span class="doc">installation page</span></a> for details on installing
 the optional libraries.</p>
-</div>
-<div class="section" id="install-pytest-and-run-the-test-suite">
+</section>
+<section id="install-pytest-and-run-the-test-suite">
 <h2>Install pytest and run the test suite<a class="headerlink" href="#install-pytest-and-run-the-test-suite" title="Permalink to this headline">¶</a></h2>
 <p>When making changes to <em>pydicom</em> it’s important that your changes don’t
 accidentally introduce bugs into other areas of the code. In order to
@@ -300,8 +205,8 @@ At this stage the entire test suite <em>should</em> pass. If you get any failure
 or errors you should check the
 <a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
 relevant issues or create a new one if there are none.</p>
-</div>
-<div class="section" id="create-a-new-branch">
+</section>
+<section id="create-a-new-branch">
 <h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h2>
 <p>Create a new branch <code class="docutils literal notranslate"><span class="pre">new-uid</span></code> for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
@@ -309,8 +214,8 @@ it and won’t affect the main copy (the <code class="docutils literal notransla
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b new-uid
 </pre></div>
 </div>
-</div>
-<div class="section" id="write-tests-for-your-changes">
+</section>
+<section id="write-tests-for-your-changes">
 <h2>Write tests for your changes<a class="headerlink" href="#write-tests-for-your-changes" title="Permalink to this headline">¶</a></h2>
 <p>If a change is to be accepted into <em>pydicom</em> it usually has to include tests.
 For bug fixes you should write a regression test that reproduces the bug.
@@ -365,8 +270,8 @@ run the tests we should get a failure:</p>
 </div>
 <p>If all the tests passed then make sure you’ve added the test to the correct
 file and that the test itself is written correctly.</p>
-</div>
-<div class="section" id="make-a-code-change-and-document-it">
+</section>
+<section id="make-a-code-change-and-document-it">
 <h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Permalink to this headline">¶</a></h2>
 <p>Next we’ll make changes to the actual source code. Open
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in
@@ -405,8 +310,8 @@ should make sure the entire test suite passes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pytest
 </pre></div>
 </div>
-</div>
-<div class="section" id="preview-your-changes">
+</section>
+<section id="preview-your-changes">
 <h2>Preview your changes<a class="headerlink" href="#preview-your-changes" title="Permalink to this headline">¶</a></h2>
 <p>It’s a good idea to go through all the changes you’ve made by first staging
 and then displaying the difference between the current copy and the initial
@@ -418,8 +323,8 @@ $ git diff --cached
 <p>You can scroll through the output using the up and down keys and quit with
 <strong>q</strong>. Lines with a <strong>-</strong> in front will be removed and lines with a <strong>+</strong>
 added. If everything looks good then it’s time to commit the changes.</p>
-</div>
-<div class="section" id="commit-your-changes-and-make-a-pull-request">
+</section>
+<section id="commit-your-changes-and-make-a-pull-request">
 <h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this headline">¶</a></h2>
 <p>To commit the changes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit
@@ -449,8 +354,8 @@ the test coverage is good, that the documentation builds OK, etc.</p>
 the PR title prefix to <code class="docutils literal notranslate"><span class="pre">[MRG]</span></code>. This would indicate that you considered the
 PR ready to be reviewed and merged into the main branch. You could also ask
 for a review or help at any point after creating the PR.</p>
-</div>
-<div class="section" id="what-happens-next">
+</section>
+<section id="what-happens-next">
 <h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this headline">¶</a></h2>
 <p>One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
@@ -468,55 +373,38 @@ changes we’ve made. First we switch back to the <code class="docutils literal 
 <p>And lastly we delete the remote copy on GitHub. Go to
 <code class="docutils literal notranslate"><span class="pre">https://github.com/YourUsername/pydicom/branches</span></code>, find the <code class="docutils literal notranslate"><span class="pre">new-uid</span></code>
 branch and click the corresponding red bin icon. All done!</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="contributing_docs.html" class="btn btn-neutral float-right" title="Contributing a documentation change" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dicom_json.html" class="btn btn-neutral float-left" title="Introduction to JSON support" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing_docs.html" class="btn btn-neutral float-right" title="Contributing a documentation change" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
-
-    </p>
+    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
