@@ -482,6 +482,8 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00143077: ('TM', '1', "Time of Gain Calibration", '', 'TimeOfGainCalibration'),  # noqa
     0x00143080: ('OB', '1', "Bad Pixel Image", '', 'BadPixelImage'),  # noqa
     0x00143099: ('LT', '1', "Calibration Notes", '', 'CalibrationNotes'),  # noqa
+    0x00143100: ('LT', '1', "Linearity Correction Technique", '', 'LinearityCorrectionTechnique'),  # noqa
+    0x00143101: ('LT', '1', "Beam Hardening Correction Technique", '', 'BeamHardeningCorrectionTechnique'),  # noqa
     0x00144002: ('SQ', '1', "Pulser Equipment Sequence", '', 'PulserEquipmentSequence'),  # noqa
     0x00144004: ('CS', '1', "Pulser Type", '', 'PulserType'),  # noqa
     0x00144006: ('LT', '1', "Pulser Notes", '', 'PulserNotes'),  # noqa
@@ -562,9 +564,9 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0014409C: ('DS', '1', "Translation Rate X", '', 'TranslationRateX'),  # noqa
     0x0014409D: ('DS', '1', "Translation Rate Y", '', 'TranslationRateY'),  # noqa
     0x0014409F: ('DS', '1', "Channel Overlap", '', 'ChannelOverlap'),  # noqa
-    0x001440A0: ('LO', '1', "Image Quality Indicator Type", '', 'ImageQualityIndicatorType'),  # noqa
-    0x001440A1: ('LO', '1', "Image Quality Indicator Material", '', 'ImageQualityIndicatorMaterial'),  # noqa
-    0x001440A2: ('LO', '1', "Image Quality Indicator Size", '', 'ImageQualityIndicatorSize'),  # noqa
+    0x001440A0: ('LO', '1-n', "Image Quality Indicator Type", '', 'ImageQualityIndicatorType'),  # noqa
+    0x001440A1: ('LO', '1-n', "Image Quality Indicator Material", '', 'ImageQualityIndicatorMaterial'),  # noqa
+    0x001440A2: ('LO', '1-n', "Image Quality Indicator Size", '', 'ImageQualityIndicatorSize'),  # noqa
     0x00145002: ('IS', '1', "LINAC Energy", '', 'LINACEnergy'),  # noqa
     0x00145004: ('IS', '1', "LINAC Output", '', 'LINACOutput'),  # noqa
     0x00145100: ('US', '1', "Active Aperture", '', 'ActiveAperture'),  # noqa
@@ -1869,7 +1871,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00221628: ('SQ', '1', "Ophthalmic En Face Image Quality Rating Sequence", '', 'OphthalmicEnFaceImageQualityRatingSequence'),  # noqa
     0x00221630: ('DS', '1', "Quality Threshold", '', 'QualityThreshold'),  # noqa
     0x00221640: ('SQ', '1', "OCT B-scan Analysis Acquisition Parameters Sequence", '', 'OCTBscanAnalysisAcquisitionParametersSequence'),  # noqa
-    0x00221642: ('UL', '1', "Number of B-scans Per Frame", '', 'NumberofBscansPerFrame'),  # noqa
+    0x00221642: ('UL', '1', "Number of B-scans Per Frame", '', 'NumberOfBscansPerFrame'),  # noqa
     0x00221643: ('FL', '1', "B-scan Slab Thickness", '', 'BscanSlabThickness'),  # noqa
     0x00221644: ('FL', '1', "Distance Between B-scan Slabs", '', 'DistanceBetweenBscanSlabs'),  # noqa
     0x00221645: ('FL', '1', "B-scan Cycle Time", '', 'BscanCycleTime'),  # noqa
@@ -2803,9 +2805,9 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00480112: ('DS', '1', "Objective Lens Power", '', 'ObjectiveLensPower'),  # noqa
     0x00480113: ('DS', '1', "Objective Lens Numerical Aperture", '', 'ObjectiveLensNumericalAperture'),  # noqa
     0x00480120: ('SQ', '1', "Palette Color Lookup Table Sequence", '', 'PaletteColorLookupTableSequence'),  # noqa
-    0x00480200: ('SQ', '1', "Referenced Image Navigation Sequence", '', 'ReferencedImageNavigationSequence'),  # noqa
-    0x00480201: ('US', '2', "Top Left Hand Corner of Localizer Area", '', 'TopLeftHandCornerOfLocalizerArea'),  # noqa
-    0x00480202: ('US', '2', "Bottom Right Hand Corner of Localizer Area", '', 'BottomRightHandCornerOfLocalizerArea'),  # noqa
+    0x00480200: ('SQ', '1', "Referenced Image Navigation Sequence", 'Retired', 'ReferencedImageNavigationSequence'),  # noqa
+    0x00480201: ('US', '2', "Top Left Hand Corner of Localizer Area", 'Retired', 'TopLeftHandCornerOfLocalizerArea'),  # noqa
+    0x00480202: ('US', '2', "Bottom Right Hand Corner of Localizer Area", 'Retired', 'BottomRightHandCornerOfLocalizerArea'),  # noqa
     0x00480207: ('SQ', '1', "Optical Path Identification Sequence", '', 'OpticalPathIdentificationSequence'),  # noqa
     0x0048021A: ('SQ', '1', "Plane Position (Slide) Sequence", '', 'PlanePositionSlideSequence'),  # noqa
     0x0048021E: ('SL', '1', "Column Position In Total Image Pixel Matrix", '', 'ColumnPositionInTotalImagePixelMatrix'),  # noqa
@@ -2999,6 +3001,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0066001F: ('US', '1', "Vector Dimensionality", '', 'VectorDimensionality'),  # noqa
     0x00660020: ('FL', '1-n', "Vector Accuracy", '', 'VectorAccuracy'),  # noqa
     0x00660021: ('OF', '1', "Vector Coordinate Data", '', 'VectorCoordinateData'),  # noqa
+    0x00660022: ('OD', '1', "Double Point Coordinates Data", '', 'DoublePointCoordinatesData'),  # noqa
     0x00660023: ('OW', '1', "Triangle Point Index List", 'Retired', 'TrianglePointIndexList'),  # noqa
     0x00660024: ('OW', '1', "Edge Point Index List", 'Retired', 'EdgePointIndexList'),  # noqa
     0x00660025: ('OW', '1', "Vertex Point Index List", 'Retired', 'VertexPointIndexList'),  # noqa
@@ -3115,6 +3118,22 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00687003: ('SQ', '1', "Model Usage Code Sequence", '', 'ModelUsageCodeSequence'),  # noqa
     0x00687004: ('UI', '1', "Model Group UID", '', 'ModelGroupUID'),  # noqa
     0x00687005: ('UR', '1', "Relative URI Reference Within Encapsulated Document", '', 'RelativeURIReferenceWithinEncapsulatedDocument'),  # noqa
+    0x006A0001: ('CS', '1', "Annotation Coordinate Type", '', 'AnnotationCoordinateType'),  # noqa
+    0x006A0002: ('SQ', '1', "Annotation Group Sequence", '', 'AnnotationGroupSequence'),  # noqa
+    0x006A0003: ('UI', '1', "Annotation Group UID", '', 'AnnotationGroupUID'),  # noqa
+    0x006A0005: ('LO', '1', "Annotation Group Label", '', 'AnnotationGroupLabel'),  # noqa
+    0x006A0006: ('UT', '1', "Annotation Group Description", '', 'AnnotationGroupDescription'),  # noqa
+    0x006A0007: ('CS', '1', "Annotation Group Generation Type", '', 'AnnotationGroupGenerationType'),  # noqa
+    0x006A0008: ('SQ', '1', "Annotation Group Algorithm Identification Sequence", '', 'AnnotationGroupAlgorithmIdentificationSequence'),  # noqa
+    0x006A0009: ('SQ', '1', "Annotation Property Category Code Sequence", '', 'AnnotationPropertyCategoryCodeSequence'),  # noqa
+    0x006A000A: ('SQ', '1', "Annotation Property Type Code Sequence", '', 'AnnotationPropertyTypeCodeSequence'),  # noqa
+    0x006A000B: ('SQ', '1', "Annotation Property Type Modifier Code Sequence", '', 'AnnotationPropertyTypeModifierCodeSequence'),  # noqa
+    0x006A000C: ('UL', '1', "Number of Annotations", '', 'NumberOfAnnotations'),  # noqa
+    0x006A000D: ('CS', '1', "Annotation Applies to All Optical Paths", '', 'AnnotationAppliesToAllOpticalPaths'),  # noqa
+    0x006A000E: ('SH', '1-n', "Referenced Optical Path Identifier", '', 'ReferencedOpticalPathIdentifier'),  # noqa
+    0x006A000F: ('CS', '1', "Annotation Applies to All Z Planes", '', 'AnnotationAppliesToAllZPlanes'),  # noqa
+    0x006A0010: ('FD', '1-n', "Common Z Coordinate Value", '', 'CommonZCoordinateValue'),  # noqa
+    0x006A0011: ('OL', '1', "Annotation Index List", '', 'AnnotationIndexList'),  # noqa
     0x00700001: ('SQ', '1', "Graphic Annotation Sequence", '', 'GraphicAnnotationSequence'),  # noqa
     0x00700002: ('CS', '1', "Graphic Layer", '', 'GraphicLayer'),  # noqa
     0x00700003: ('CS', '1', "Bounding Box Annotation Units", '', 'BoundingBoxAnnotationUnits'),  # noqa
@@ -4208,6 +4227,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A029C: ('DS', '1', "Source Applicator Wall Nominal Thickness", '', 'SourceApplicatorWallNominalThickness'),  # noqa
     0x300A029E: ('DS', '1', "Source Applicator Wall Nominal Transmission", '', 'SourceApplicatorWallNominalTransmission'),  # noqa
     0x300A02A0: ('DS', '1', "Source Applicator Step Size", '', 'SourceApplicatorStepSize'),  # noqa
+    0x300A02A1: ('IS', '1', "Applicator Shape Referenced ROI Number", '', 'ApplicatorShapeReferencedROINumber'),  # noqa
     0x300A02A2: ('IS', '1', "Transfer Tube Number", '', 'TransferTubeNumber'),  # noqa
     0x300A02A4: ('DS', '1', "Transfer Tube Length", '', 'TransferTubeLength'),  # noqa
     0x300A02B0: ('SQ', '1', "Channel Shield Sequence", '', 'ChannelShieldSequence'),  # noqa
@@ -4386,7 +4406,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A062F: ('SQ', '1', "C-Arm Photon-Electron Control Point Sequence", '', 'CArmPhotonElectronControlPointSequence'),  # noqa
     0x300A0630: ('SQ', '1', "Referenced RT Radiation Sequence", '', 'ReferencedRTRadiationSequence'),  # noqa
     0x300A0631: ('SQ', '1', "Referenced RT Instance Sequence", '', 'ReferencedRTInstanceSequence'),  # noqa
-    0x300A0632: ('SQ', '1', "Referenced RT Patient Setup Sequence", '', 'ReferencedRTPatientSetupSequence'),  # noqa
+    0x300A0632: ('SQ', '1', "Referenced RT Patient Setup Sequence", 'Retired', 'ReferencedRTPatientSetupSequence'),  # noqa
     0x300A0634: ('FD', '1', "Source to Patient Surface Distance", '', 'SourceToPatientSurfaceDistance'),  # noqa
     0x300A0635: ('SQ', '1', "Treatment Machine Special Mode Code Sequence", '', 'TreatmentMachineSpecialModeCodeSequence'),  # noqa
     0x300A0636: ('US', '1', "Intended Number of Fractions", '', 'IntendedNumberOfFractions'),  # noqa
@@ -4415,7 +4435,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A064D: ('SQ', '1', "RT Beam Limiting Device Definition Sequence", '', 'RTBeamLimitingDeviceDefinitionSequence'),  # noqa
     0x300A064E: ('CS', '1', "Parallel RT Beam Delimiter Opening Mode", '', 'ParallelRTBeamDelimiterOpeningMode'),  # noqa
     0x300A064F: ('CS', '1-n', "Parallel RT Beam Delimiter Leaf Mounting Side", '', 'ParallelRTBeamDelimiterLeafMountingSide'),  # noqa
-    0x300A0650: ('UI', '1', "Patient Setup UID", '', 'PatientSetupUID'),  # noqa
+    0x300A0650: ('UI', '1', "Patient Setup UID", 'Retired', 'PatientSetupUID'),  # noqa
     0x300A0651: ('SQ', '1', "Wedge Definition Sequence", '', 'WedgeDefinitionSequence'),  # noqa
     0x300A0652: ('FD', '1', "Radiation Beam Wedge Angle", '', 'RadiationBeamWedgeAngle'),  # noqa
     0x300A0653: ('FD', '1', "Radiation Beam Wedge Thin Edge Distance", '', 'RadiationBeamWedgeThinEdgeDistance'),  # noqa
@@ -4516,6 +4536,33 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A0780: ('SQ', '1', "Additional Parameter Recording Instance Sequence", '', 'AdditionalParameterRecordingInstanceSequence'),  # noqa
     0x300A0782: ('US', '1', "", 'Retired', ''),  # noqa
     0x300A0783: ('ST', '1', "Interlock Origin Description", '', 'InterlockOriginDescription'),  # noqa
+    0x300A0784: ('SQ', '1', "RT Patient Position Scope Sequence", '', 'RTPatientPositionScopeSequence'),  # noqa
+    0x300A0785: ('UI', '1', "Referenced Treatment Position Group UID", '', 'ReferencedTreatmentPositionGroupUID'),  # noqa
+    0x300A0786: ('US', '1', "Radiation Order Index", '', 'RadiationOrderIndex'),  # noqa
+    0x300A0787: ('SQ', '1', "Omitted Radiation Sequence", '', 'OmittedRadiationSequence'),  # noqa
+    0x300A0788: ('SQ', '1', "Reason for Omission Code Sequence", '', 'ReasonforOmissionCodeSequence'),  # noqa
+    0x300A0789: ('SQ', '1', "RT Delivery Start Patient Position Sequence", '', 'RTDeliveryStartPatientPositionSequence'),  # noqa
+    0x300A078A: ('SQ', '1', "RT Treatment Preparation Patient Position Sequence", '', 'RTTreatmentPreparationPatientPositionSequence'),  # noqa
+    0x300A078B: ('SQ', '1', "Referenced RT Treatment Preparation Sequence", '', 'ReferencedRTTreatmentPreparationSequence'),  # noqa
+    0x300A078C: ('SQ', '1', "Referenced Patient Setup Photo Sequence", '', 'ReferencedPatientSetupPhotoSequence'),  # noqa
+    0x300A078D: ('SQ', '1', "Patient Treatment Preparation Method Code Sequence", '', 'PatientTreatmentPreparationMethodCodeSequence'),  # noqa
+    0x300A078E: ('LT', '1', "Patient Treatment Preparation Procedure Parameter Description", '', 'PatientTreatmentPreparationProcedureParameterDescription'),  # noqa
+    0x300A078F: ('SQ', '1', "Patient Treatment Preparation Device Sequence", '', 'PatientTreatmentPreparationDeviceSequence'),  # noqa
+    0x300A0790: ('SQ', '1', "Patient Treatment Preparation Procedure Sequence", '', 'PatientTreatmentPreparationProcedureSequence'),  # noqa
+    0x300A0791: ('SQ', '1', "Patient Treatment Preparation Procedure Code Sequence", '', 'PatientTreatmentPreparationProcedureCodeSequence'),  # noqa
+    0x300A0792: ('LT', '1', "Patient Treatment Preparation Method Description", '', 'PatientTreatmentPreparationMethodDescription'),  # noqa
+    0x300A0793: ('SQ', '1', "Patient Treatment Preparation Procedure Parameter Sequence", '', 'PatientTreatmentPreparationProcedureParameterSequence'),  # noqa
+    0x300A0794: ('LT', '1', "Patient Setup Photo Description", '', 'PatientSetupPhotoDescription'),  # noqa
+    0x300A0795: ('US', '1', "Patient Treatment Preparation Procedure Index", '', 'PatientTreatmentPreparationProcedureIndex'),  # noqa
+    0x300A0796: ('US', '1', "Referenced Patient Setup Procedure Index", '', 'ReferencedPatientSetupProcedureIndex'),  # noqa
+    0x300A0797: ('SQ', '1', "RT Radiation Task Sequence", '', 'RTRadiationTaskSequence'),  # noqa
+    0x300A0798: ('SQ', '1', "RT Patient Position Displacement Sequence", '', 'RTPatientPositionDisplacementSequence'),  # noqa
+    0x300A0799: ('SQ', '1', "RT Patient Position Sequence", '', 'RTPatientPositionSequence'),  # noqa
+    0x300A079A: ('LO', '1', "Displacement Reference Label", '', 'DisplacementReferenceLabel'),  # noqa
+    0x300A079B: ('FD', '16', "Displacement Matrix", '', 'DisplacementMatrix'),  # noqa
+    0x300A079C: ('SQ', '1', "Patient Support Displacement Sequence", '', 'PatientSupportDisplacementSequence'),  # noqa
+    0x300A079D: ('SQ', '1', "Displacement Reference Location Code Sequence", '', 'DisplacementReferenceLocationCodeSequence'),  # noqa
+    0x300A079E: ('CS', '1', "RT Radiation Set Delivery Usage", '', 'RTRadiationSetDeliveryUsage'),  # noqa
     0x300C0002: ('SQ', '1', "Referenced RT Plan Sequence", '', 'ReferencedRTPlanSequence'),  # noqa
     0x300C0004: ('SQ', '1', "Referenced Beam Sequence", '', 'ReferencedBeamSequence'),  # noqa
     0x300C0006: ('IS', '1', "Referenced Beam Number", '', 'ReferencedBeamNumber'),  # noqa

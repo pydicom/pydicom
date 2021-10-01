@@ -26,7 +26,7 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    TYPE_CHECKING, Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
+    Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
     Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
     MutableSequence, MutableMapping, AbstractSet
 )
@@ -2904,5 +2904,5 @@ _RE_CAMEL_CASE = re.compile(
     # Ensure mix of upper and lowercase and digits, no underscores
     # If first character is lowercase ensure at least one uppercase char
     "(?P<start>(^[A-Za-z])((?=.+?[A-Z])[A-Za-z0-9]+)|(^[A-Z])([A-Za-z0-9]+))"
-    "(?P<last>[A-za-z0-9][^_]$)"  # Last character is alphanumeric
+    "(?P<last>[A-Za-z0-9][^_]$)"  # Last character is alphanumeric
 )

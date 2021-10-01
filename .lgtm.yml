@@ -1,0 +1,6 @@
+---
+queries:
+  # https://lgtm.com/rules/1510014536001/
+  - exclude: py/clear-text-logging-sensitive-data
+  # https://lgtm.com/rules/1510006386081/
+  - exclude: py/clear-text-storage-sensitive-data
