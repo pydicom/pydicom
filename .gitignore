@@ -27,6 +27,7 @@ distribute*.tar.gz
 py3source
 .tox/*
 __pycache__
+.eggs/*
 
 # Docs build
 docs/_build/*
