@@ -30,6 +30,10 @@ jobs:
             ext-sources: pydicom-data
             pytest-args: --cov=pydicom --cov-append
             coverage: coverage
+        # XXX temporary exclude of macos-Python3.10 when 3.10 first out
+        exclude:
+          - os: macos-latest
+          - python-version: '3.10'
 
     steps:
     - uses: actions/checkout@v2
