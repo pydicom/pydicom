@@ -1563,9 +1563,19 @@ class ImageFileReader:
             raise IOError('File has not been opened for reading.')
 
         try:
-            self._metadata = dcmread(self._fp, stop_before_pixels=True)
+            metadata = dcmread(self._fp, stop_before_pixels=True)
         except Exception as err:
             raise IOError(f'DICOM metadata cannot be read from file: "{err}"')
+
+        # Cache Transfer Syntax UID, since we need it to decode frame items
+        self._transfer_syntax_uid = pydicom.uid.UID(
+            metadata.file_meta.TransferSyntaxUID
+        )
+
+        # Construct a new Dataset that is fully decoupled from the file, i.e.,
+        # that does not contain any File Meta Information
+        del metadata.file_meta
+        self._metadata = Dataset(metadata)
 
         self._pixel_data_offset = self._fp.tell()
         # Determine whether dataset contains a Pixel Data element
@@ -1587,12 +1597,11 @@ class ImageFileReader:
         self._fp.seek(self._pixel_data_offset, 0)
 
         logger.debug('build Basic Offset Table')
-        transfer_syntax_uid = self._metadata.file_meta.TransferSyntaxUID
         try:
             number_of_frames = int(self._metadata.NumberOfFrames)
         except AttributeError:
             number_of_frames = 1
-        if transfer_syntax_uid.is_encapsulated:
+        if self._transfer_syntax_uid.is_encapsulated:
             try:
                 self._basic_offset_table = _get_bot(
                     self._fp,
@@ -1656,7 +1665,8 @@ class ImageFileReader:
         # with only a single frame item, which can then be decoded using the
         # existing pydicom API.
         ds = Dataset()
-        ds.file_meta = self.metadata.file_meta
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = self._transfer_syntax_uid
         ds.Rows = self.metadata.Rows
         ds.Columns = self.metadata.Columns
         ds.SamplesPerPixel = self.metadata.SamplesPerPixel
@@ -1667,7 +1677,7 @@ class ImageFileReader:
         ds.BitsStored = self.metadata.BitsStored
         ds.HighBit = self.metadata.HighBit
 
-        if self.metadata.file_meta.TransferSyntaxUID.is_encapsulated:
+        if self._transfer_syntax_uid.is_encapsulated:
             ds.PixelData = encapsulate(frames=[value])
         else:
             ds.PixelData = value
@@ -1729,7 +1739,7 @@ class ImageFileReader:
 
         frame_offset = self._basic_offset_table[index]
         self._fp.seek(self._first_frame_offset + frame_offset, 0)
-        if self.metadata.file_meta.TransferSyntaxUID.is_encapsulated:
+        if self._transfer_syntax_uid.is_encapsulated:
             try:
                 stop_at = self._basic_offset_table[index + 1] - frame_offset
             except IndexError:
