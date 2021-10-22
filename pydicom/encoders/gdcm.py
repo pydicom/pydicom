@@ -2,7 +2,7 @@
 
 from typing import Any, cast
 
-from pydicom.uid import RLELossless, ImplicitVRLittleEndian
+from pydicom.uid import RLELossless
 
 try:
     import gdcm

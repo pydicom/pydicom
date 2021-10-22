@@ -311,6 +311,26 @@ class TestReader:
         missing = [Tag(0x7FE0, 0x10), Tag(0xFFFC, 0xFFFC)]
         assert ctfull_tags == ctpartial_tags + missing
 
+    @pytest.mark.skipif(not have_numpy, reason="Numpy not available")
+    def test_no_float_pixels_read(self):
+        """Returns all data elements before pixels using
+        stop_before_pixels=True.
+        """
+        ds = Dataset()
+        ds.InstanceNumber = 1
+        ds.FloatPixelData = numpy.random.random((3, 3)).tobytes()
+
+        fp = BytesIO()
+        file_ds = FileDataset(fp, ds)
+        file_ds.is_implicit_VR = True
+        file_ds.is_little_endian = True
+        file_ds.save_as(fp, write_like_original=True)
+
+        test_ds = dcmread(fp, force=True, stop_before_pixels=True)
+        ds_tags = sorted(ds.keys())
+        test_ds_tags = sorted(test_ds.keys())
+        assert ds_tags == test_ds_tags + [Tag(0x7FE0, 0x08)]
+
     def test_specific_tags(self):
         """Returns only tags specified by user."""
         ctspecific = dcmread(

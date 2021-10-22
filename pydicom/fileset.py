@@ -90,7 +90,7 @@ def generate_filename(
         The starting index to use for the suffixes, (default ``0``).
         i.e. if you want to start at ``'00010'`` then `start` should be ``10``.
     alphanumeric : bool, optional
-        If ``False`` (defalt) then only generate suffixes using the characters
+        If ``False`` (default) then only generate suffixes using the characters
         [0-9], otherwise use [0-9][A-Z].
 
     Yields

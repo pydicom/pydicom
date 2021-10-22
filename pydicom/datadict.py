@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 
-from typing import Tuple, Optional, Dict, Union
+from typing import Tuple, Optional, Dict
 
 from pydicom.config import logger
 from pydicom.tag import Tag, BaseTag, TagType
@@ -602,7 +602,7 @@ def private_dictionary_VM(tag: TagType, private_creator: str) -> str:
         The tag for the element whose value multiplicity (VM) is being
         retrieved.
     private_creator : str
-        The name of the private creater.
+        The name of the private creator.
 
     Returns
     -------

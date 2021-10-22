@@ -41,7 +41,7 @@ TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 
 # Character/Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
-PN_DELIMS = {0xe5}
+PN_DELIMS = {0x5e}
 
 
 class _DateTimeBase:

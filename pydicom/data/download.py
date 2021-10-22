@@ -185,7 +185,7 @@ def data_path_with_download(
     filename : str
         The filename of the file to return the path to.
     check_hash : bool, optional
-        ``True`` to perform a SHA256 checkum on the file, ``False`` otherwise.
+        ``True`` to perform a SHA256 checksum on the file, ``False`` otherwise.
     redownload_on_hash_mismatch : bool, optional
         ``True`` to redownload the file on checksum failure, ``False``
         otherwise.
