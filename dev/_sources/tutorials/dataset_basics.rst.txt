@@ -487,7 +487,7 @@ Notice how we can also use the element keyword with the Python
 the dataset? This also works with element tags, so private and repeating group
 elements are also covered::
 
-    >>> [0x0043, 0x104E] in ds:
+    >>> [0x0043, 0x104E] in ds
     True
 
 Sequences
