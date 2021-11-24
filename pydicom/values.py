@@ -23,7 +23,8 @@ from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, VR, CUSTOMIZABLE_CHARSET_VR
+    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, CUSTOMIZABLE_CHARSET_VR,
+    VR as VR_
 )
 
 try:
@@ -690,7 +691,7 @@ def convert_UR_string(
 
 
 def convert_value(
-    vr: str,
+    VR: str,
     raw_data_element: RawDataElement,
     encodings: Optional[Union[str, MutableSequence[str]]] = None
 ) -> Union[Any, MutableSequence[Any]]:
@@ -698,8 +699,8 @@ def convert_value(
 
     Parameters
     ----------
-    vr : str
-        The element's VR.
+    VR : str
+        The element's VR_.
     raw_data_element : pydicom.dataelem.RawDataElement
         The encoded element value.
     encodings : list of str, optional
@@ -711,25 +712,25 @@ def convert_value(
     type or MultiValue of type
         The element value decoded using the appropriate decoder.
     """
-    if vr not in converters:
+    if VR not in converters:
         # `VR` characters are in the ascii alphabet ranges 65 - 90, 97 - 122
         char_range = list(range(65, 91)) + list(range(97, 123))
         # If the VR characters are outside that range then print hex values
-        if ord(vr[0]) not in char_range or ord(vr[1]) not in char_range:
-            vr = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in vr])
-        raise NotImplementedError(f"Unknown Value Representation '{vr}'")
+        if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
+            VR = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in VR])
+        raise NotImplementedError(f"Unknown Value Representation '{VR}'")
 
     if raw_data_element.length == 0:
-        return empty_value_for_VR(vr)
+        return empty_value_for_VR(VR)
 
     # Look up the function to convert that VR
     # Dispatch two cases: a plain converter,
     # or a number one which needs a format string
-    vr = cast(VR, vr)
-    if isinstance(converters[vr], tuple):
-        converter, num_format = cast(tuple, converters[vr])
+    VR = cast(VR_, VR)
+    if isinstance(converters[VR], tuple):
+        converter, num_format = cast(tuple, converters[VR])
     else:
-        converter = converters[vr]
+        converter = converters[VR]
         num_format = None
 
     # Ensure that encodings is a list
@@ -744,10 +745,10 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if vr in CUSTOMIZABLE_CHARSET_VR:
+        if VR in CUSTOMIZABLE_CHARSET_VR:
             return converter(byte_string, encodings)
 
-        if vr != VR.SQ:
+        if VR != VR_.SQ:
             return converter(byte_string, is_little_endian, num_format)
 
         # SQ
@@ -764,12 +765,12 @@ def convert_value(
             raise
 
     logger.debug(
-        f"Unable to convert tag {raw_data_element.tag} with VR {vr} using "
+        f"Unable to convert tag {raw_data_element.tag} with VR {VR} using "
         "the standard value converter"
     )
-    for vr in [val for val in convert_retry_VR_order if val != vr]:
+    for VR in [val for val in convert_retry_VR_order if val != VR]:
         try:
-            return convert_value(vr, raw_data_element, encodings)
+            return convert_value(VR, raw_data_element, encodings)
         except Exception:
             pass
 
@@ -781,9 +782,9 @@ def convert_value(
 
 
 convert_retry_VR_order = [
-    VR.SH, VR.UL, VR.SL, VR.US, VR.SS, VR.FL, VR.FD, VR.OF, VR.OB, VR.UI,
-    VR.DA, VR.TM, VR.PN, VR.IS, VR.DS, VR.LT, VR.SQ, VR.UN, VR.AT, VR.OW,
-    VR.DT, VR.UT,
+    VR_.SH, VR_.UL, VR_.SL, VR_.US, VR_.SS, VR_.FL, VR_.FD, VR_.OF, VR_.OB,
+    VR_.UI, VR_.DA, VR_.TM, VR_.PN, VR_.IS, VR_.DS, VR_.LT, VR_.SQ, VR_.UN,
+    VR_.AT, VR_.OW, VR_.DT, VR_.UT,
 ]
 # converters map a VR to the function
 # to read the value(s). for convert_numbers,
@@ -791,42 +792,42 @@ convert_retry_VR_order = [
 # (function, struct_format)
 # (struct_format in python struct module style)
 converters = {
-    VR.AE: convert_AE_string,
-    VR.AS: convert_string,
-    VR.AT: convert_ATvalue,
-    VR.CS: convert_string,
-    VR.DA: convert_DA_string,
-    VR.DS: convert_DS_string,
-    VR.DT: convert_DT_string,
-    VR.FD: (convert_numbers, 'd'),
-    VR.FL: (convert_numbers, 'f'),
-    VR.IS: convert_IS_string,
-    VR.LO: convert_text,
-    VR.LT: convert_single_string,
-    VR.OB: convert_OBvalue,
-    VR.OD: convert_OBvalue,
-    VR.OF: convert_OWvalue,
-    VR.OL: convert_OBvalue,
-    VR.OW: convert_OWvalue,
-    VR.OV: convert_OVvalue,
-    VR.PN: convert_PN,
-    VR.SH: convert_text,
-    VR.SL: (convert_numbers, 'l'),
-    VR.SQ: convert_SQ,
-    VR.SS: (convert_numbers, 'h'),
-    VR.ST: convert_single_string,
-    VR.SV: (convert_numbers, 'q'),
-    VR.TM: convert_TM_string,
-    VR.UC: convert_text,
-    VR.UI: convert_UI,
-    VR.UL: (convert_numbers, 'L'),
-    VR.UN: convert_UN,
-    VR.UR: convert_UR_string,
-    VR.US: (convert_numbers, 'H'),
-    VR.UT: convert_single_string,
-    VR.UV: (convert_numbers, 'Q'),
-    VR.OB_OW: convert_OBvalue,
-    VR.US_SS: convert_OWvalue,
-    VR.US_OW: convert_OWvalue,
-    VR.US_SS_OW: convert_OWvalue,
+    VR_.AE: convert_AE_string,
+    VR_.AS: convert_string,
+    VR_.AT: convert_ATvalue,
+    VR_.CS: convert_string,
+    VR_.DA: convert_DA_string,
+    VR_.DS: convert_DS_string,
+    VR_.DT: convert_DT_string,
+    VR_.FD: (convert_numbers, 'd'),
+    VR_.FL: (convert_numbers, 'f'),
+    VR_.IS: convert_IS_string,
+    VR_.LO: convert_text,
+    VR_.LT: convert_single_string,
+    VR_.OB: convert_OBvalue,
+    VR_.OD: convert_OBvalue,
+    VR_.OF: convert_OWvalue,
+    VR_.OL: convert_OBvalue,
+    VR_.OW: convert_OWvalue,
+    VR_.OV: convert_OVvalue,
+    VR_.PN: convert_PN,
+    VR_.SH: convert_text,
+    VR_.SL: (convert_numbers, 'l'),
+    VR_.SQ: convert_SQ,
+    VR_.SS: (convert_numbers, 'h'),
+    VR_.ST: convert_single_string,
+    VR_.SV: (convert_numbers, 'q'),
+    VR_.TM: convert_TM_string,
+    VR_.UC: convert_text,
+    VR_.UI: convert_UI,
+    VR_.UL: (convert_numbers, 'L'),
+    VR_.UN: convert_UN,
+    VR_.UR: convert_UR_string,
+    VR_.US: (convert_numbers, 'H'),
+    VR_.UT: convert_single_string,
+    VR_.UV: (convert_numbers, 'Q'),
+    VR_.OB_OW: convert_OBvalue,
+    VR_.US_SS: convert_OWvalue,
+    VR_.US_OW: convert_OWvalue,
+    VR_.US_SS_OW: convert_OWvalue,
 }

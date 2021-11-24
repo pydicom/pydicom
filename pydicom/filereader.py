@@ -35,7 +35,7 @@ from pydicom.tag import (
 )
 import pydicom.uid
 from pydicom.util.hexutil import bytes2hex
-from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR
+from pydicom.valuerep import EXPLICIT_VR_LENGTH_32, VR as VR_
 
 
 def data_element_generator(
@@ -236,13 +236,13 @@ def data_element_generator(
         else:
             # VR UN with undefined length shall be handled as SQ
             # see PS 3.5, section 6.2.2
-            if vr == VR.UN:
-                vr = VR.SQ
+            if vr == VR_.UN:
+                vr = VR_.SQ
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,
             #   in which case just ignore it and read the bytes unless it is
             #   identified as a Sequence
-            if vr is None or vr == VR.UN and config.replace_un_with_known_vr:
+            if vr is None or vr == VR_.UN and config.replace_un_with_known_vr:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
@@ -252,9 +252,9 @@ def data_element_generator(
                     # Rewind the file
                     fp.seek(fp_tell() - 4)
                     if next_tag == ItemTag:
-                        vr = VR.SQ
+                        vr = VR_.SQ
 
-            if vr == VR.SQ:
+            if vr == VR_.SQ:
                 if debugging:
                     logger_debug(
                         f"{fp_tell():08X}: Reading/parsing undefined length "
@@ -374,7 +374,7 @@ def read_dataset(
     fp : file-like
         An opened file-like object.
     is_implicit_VR : bool
-        ``True`` if file transfer syntax is implicit VR.
+        ``True`` if file transfer syntax is implicit VR_.
     is_little_endian : bool
         ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional
@@ -1095,13 +1095,13 @@ def read_dicomdir(filename: PathType = "DICOMDIR") -> DicomDir:
 
 
 def data_element_offset_to_value(
-    is_implicit_VR: bool, vr: Optional[str]
+    is_implicit_VR: bool, VR: Optional[str]
 ) -> int:
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:
         return 8  # tag of 4 plus 4-byte length
 
-    if cast(str, vr) in EXPLICIT_VR_LENGTH_32:
+    if cast(str, VR) in EXPLICIT_VR_LENGTH_32:
         return 12  # tag 4 + 2 VR + 2 reserved + 4 length
 
     return 8  # tag 4 + 2 VR + 2 length

@@ -59,7 +59,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
     RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
 )
-from pydicom.valuerep import VR, AMBIGUOUS_VR
+from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
@@ -178,7 +178,7 @@ class PrivateBlock:
         """
         del self.dataset[self.get_tag(element_offset)]
 
-    def add_new(self, element_offset: int, vr: str, value: object) -> None:
+    def add_new(self, element_offset: int, VR: str, value: object) -> None:
         """Add a private element to the parent :class:`Dataset`.
 
         Adds the private tag with the given `VR` and `value` to the parent
@@ -190,14 +190,14 @@ class PrivateBlock:
         element_offset : int
             The lower 16 bits (e.g. 2 hex numbers) of the element tag
             to be added.
-        vr : str
+        VR : str
             The 2 character DICOM value representation.
         value
             The value of the data element. See :meth:`Dataset.add_new()`
             for a description.
         """
         tag = self.get_tag(element_offset)
-        self.dataset.add_new(tag, vr, value)
+        self.dataset.add_new(tag, VR, value)
         self.dataset[tag].private_creator = self.private_creator
 
 
@@ -430,7 +430,7 @@ class Dataset:
         """
         self[data_element.tag] = data_element
 
-    def add_new(self, tag: TagType, vr: str, value: Any) -> None:
+    def add_new(self, tag: TagType, VR: str, value: Any) -> None:
         """Create a new element and add it to the :class:`Dataset`.
 
         Parameters
@@ -439,7 +439,7 @@ class Dataset:
             The DICOM (group, element) tag in any form accepted by
             :func:`~pydicom.tag.Tag` such as ``[0x0010, 0x0010]``,
             ``(0x10, 0x10)``, ``0x00100010``, etc.
-        vr : str
+        VR : str
             The 2 character DICOM value representation (see DICOM Standard,
             Part 5, :dcm:`Section 6.2<part05/sect_6.2.html>`).
         value
@@ -452,7 +452,7 @@ class Dataset:
               :class:`Dataset`
         """
 
-        data_element = DataElement(tag, vr, value)
+        data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
@@ -541,7 +541,7 @@ class Dataset:
         # This simply calls the pydicom.charset.decode_element function
         def decode_callback(ds: "Dataset", data_element: DataElement) -> None:
             """Callback to decode `data_element`."""
-            if data_element.VR == VR.SQ:
+            if data_element.VR == VR_.SQ:
                 for dset in data_element.value:
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
@@ -916,7 +916,7 @@ class Dataset:
 
         elem = self._dict[tag]
         if isinstance(elem, DataElement):
-            if elem.VR == VR.SQ and elem.value:
+            if elem.VR == VR_.SQ and elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
                 elem.value.parent = self
@@ -1373,10 +1373,10 @@ class Dataset:
         if tag in self:
             return self[tag]
 
-        vr: Union[str, VR]
+        vr: Union[str, VR_]
         if not isinstance(default, DataElement):
             if tag.is_private:
-                vr = VR.UN
+                vr = VR_.UN
             else:
                 try:
                     vr = dictionary_VR(tag)
@@ -1384,7 +1384,7 @@ class Dataset:
                     if config.enforce_valid_values:
                         raise KeyError(f"Unknown DICOM tag {tag}")
                     else:
-                        vr = VR.UN
+                        vr = VR_.UN
                         warnings.warn(
                             f"Unknown DICOM tag {tag} - setting VR to 'UN'"
                         )
@@ -1964,7 +1964,7 @@ class Dataset:
                 for attr in dir(elem) if not attr.startswith("_")
                 and attr not in exclusion
             }
-            if elem.VR == VR.SQ:
+            if elem.VR == VR_.SQ:
                 yield sequence_element_format % elem_dict
             else:
                 yield element_format % elem_dict
@@ -2015,7 +2015,7 @@ class Dataset:
 
         for elem in self:
             with tag_in_exception(elem.tag):
-                if elem.VR == VR.SQ:  # a sequence
+                if elem.VR == VR_.SQ:  # a sequence
                     strings.append(
                         f"{indent_str}{str(elem.tag)}  {elem.name}  "
                         f"{len(elem.value)} item(s) ---- "
@@ -2121,7 +2121,7 @@ class Dataset:
                 # don't have this tag yet->create the data_element instance
                 vr = dictionary_VR(tag)
                 data_element = DataElement(tag, vr, value)
-                if vr == VR.SQ:
+                if vr == VR_.SQ:
                     # let a sequence know its parent dataset to pass it
                     # to its items, who may need parent dataset tags
                     # to resolve ambiguous tags
@@ -2340,7 +2340,7 @@ class Dataset:
         """
         for elem in self:
             yield elem
-            if elem.VR == VR.SQ:
+            if elem.VR == VR_.SQ:
                 for ds in elem.value:
                     yield from ds.iterall()
 
@@ -2386,7 +2386,7 @@ class Dataset:
                 callback(self, data_element)  # self = this Dataset
                 # 'tag in self' below needed in case callback deleted
                 # data_element
-                if recursive and tag in self and data_element.VR == VR.SQ:
+                if recursive and tag in self and data_element.VR == VR_.SQ:
                     sequence = data_element.value
                     for dataset in sequence:
                         dataset.walk(callback)
@@ -2640,7 +2640,7 @@ class FileDataset(Dataset):
             file.
         is_implicit_VR : bool, optional
             ``True`` (default) if implicit VR transfer syntax used; ``False``
-            if explicit VR.
+            if explicit VR_.
         is_little_endian : bool
             ``True`` (default) if little-endian transfer syntax used; ``False``
             if big-endian.

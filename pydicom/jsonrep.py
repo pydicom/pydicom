@@ -307,7 +307,7 @@ class JsonDataElementConverter:
                 elem = DataElement(
                     tag=int(key, 16),
                     value=empty_value_for_VR(vr),
-                    vr=vr
+                    VR=vr
                 )
             else:
                 value_key = unique_value_keys[0]

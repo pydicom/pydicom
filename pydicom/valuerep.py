@@ -118,6 +118,10 @@ ALLOW_BACKSLASH = (
     {VR.LT, VR.ST, VR.UT, VR.US_SS_OW, VR.US_OW, VR.OB_OW} | BYTES_VR
 )
 
+# VRs which may have a value more than 1024 bytes or characters long
+#   Used to flag which values may need shortening during printing
+LONG_VALUE_VR = {VR.LT, VR.UC, VR.UT} | BYTES_VR | AMBIGUOUS_VR
+
 # VRs that use 2 byte length fields for Explicit VR from Table 7.1-2 in Part 5
 #   All other explicit VRs and all implicit VRs use 4 byte length fields
 EXPLICIT_VR_LENGTH_16 = {
