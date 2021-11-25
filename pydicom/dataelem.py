@@ -656,7 +656,7 @@ class DataElement:
         .. deprecated:: 2.3
 
             ``DataElement.description()`` will be removed in v3.0, use
-            :meth:`~pydicom.dataelem.DataElement.name` instead
+            :attr:`~pydicom.dataelem.DataElement.name` instead
         """
         warnings.warn(
             "'DataElement.description()' is deprecated and will be removed "
