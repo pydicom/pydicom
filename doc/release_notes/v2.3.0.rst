@@ -1,0 +1,18 @@
+Version 2.2.0
+=================================
+
+Changes
+-------
+
+* :attr:`DataElement.description<pydicom.dataelem.DataElement.description>`` is
+  deprecated and will be removed in v3.0, use
+  :attr:`~pydicom.dataelem.DataElement.name` instead
+
+Enhancements
+------------
+
+* Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
+
+
+Fixes
+-----

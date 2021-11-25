@@ -23,3 +23,4 @@ or TM and utilities.
    PersonName
    PersonNameUnicode
    TM
+   VR
