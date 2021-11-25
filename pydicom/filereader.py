@@ -374,7 +374,7 @@ def read_dataset(
     fp : file-like
         An opened file-like object.
     is_implicit_VR : bool
-        ``True`` if file transfer syntax is implicit VR_.
+        ``True`` if file transfer syntax is implicit VR.
     is_little_endian : bool
         ``True`` if file has little endian transfer syntax.
     bytelength : int, None, optional

@@ -700,7 +700,7 @@ def convert_value(
     Parameters
     ----------
     VR : str
-        The element's VR_.
+        The element's VR.
     raw_data_element : pydicom.dataelem.RawDataElement
         The encoded element value.
     encodings : list of str, optional
@@ -768,9 +768,9 @@ def convert_value(
         f"Unable to convert tag {raw_data_element.tag} with VR {VR} using "
         "the standard value converter"
     )
-    for VR in [val for val in convert_retry_VR_order if val != VR]:
+    for vr in [val for val in convert_retry_VR_order if val != VR]:
         try:
-            return convert_value(VR, raw_data_element, encodings)
+            return convert_value(vr, raw_data_element, encodings)
         except Exception:
             pass
 
