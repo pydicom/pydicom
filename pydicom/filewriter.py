@@ -272,7 +272,12 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
 
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other byte' (OB)."""
-    fp.write(cast(bytes, elem.value))
+    if len(elem.value) % 2:
+        # Pad odd length values
+        fp.write(cast(bytes, elem.value))
+        fp.write(b'\x00')
+    else:
+        fp.write(cast(bytes, elem.value))
 
 
 def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:

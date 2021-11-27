@@ -474,6 +474,20 @@ class TestWriteDataElement:
         data_elem = DataElement(0x00080060, 'CS', b'REG')
         self.check_data_element(data_elem, expected)
 
+    def test_write_OB_odd(self):
+        """Test an odd-length OB element is padded during write"""
+        value = b'\x00\x01\x02'
+        elem = DataElement(0x7FE00010, 'OB', value)
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\xe0\x7f\x10\x00\x04\x00\x00\x00' + value + b"\x00"
+        assert ref_bytes == encoded_elem
+
+        # Empty data
+        elem.value = b''
+        encoded_elem = self.encode_element(elem)
+        ref_bytes = b'\xe0\x7f\x10\x00\x00\x00\x00\x00'
+        assert ref_bytes == encoded_elem
+
     def test_write_OD_implicit_little(self):
         """Test writing elements with VR of OD works correctly."""
         # VolumetricCurvePoints
