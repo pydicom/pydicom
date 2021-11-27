@@ -1,0 +1,13 @@
+Version 2.3.0
+=================================
+
+Changes
+-------
+
+Enhancements
+------------
+
+Fixes
+-----
+
+* Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
