@@ -42,7 +42,6 @@ raw_hex_code = open(raw_hex_module, "rb").read()
 
 class TestCodify:
     """Test the utils.codify module"""
-
     def test_camel_to_underscore(self):
         """Test utils.codify.camel_to_underscore"""
         input_str = ['TheNameToConvert', 'Some12Variable_Name']
@@ -156,7 +155,6 @@ class TestCodify:
 
 class TestDump:
     """Test the utils.dump module"""
-
     def test_print_character(self):
         """Test utils.dump.print_character"""
         assert print_character(0x30) == '0'
@@ -174,13 +172,13 @@ class TestDump:
         s = filedump(p, start_address=500, stop_address=1000)
 
         assert (
-                   "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) not in s
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
         assert (
-                   "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
-                   ".1.1.1.1.2004011"
-               ) in s
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
 
     def test_datadump(self):
         """Test utils.dump.datadump"""
@@ -189,9 +187,9 @@ class TestDump:
             s = datadump(f.read(), 500, 1000)
 
         assert (
-                   "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
-                   ".1.1.1.1.2004011"
-               ) in s
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
 
     def test_hexdump(self):
         """Test utils.dump.hexdump"""
@@ -201,58 +199,58 @@ class TestDump:
             s = hexdump(f)
 
         assert (
-                   "0000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) in s
+            "0000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
         assert (
-                   "0170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
-                   "AL.PRIMARY.AXIAL"
-               ) in s
+            "0170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
+            "AL.PRIMARY.AXIAL"
+        ) in s
         assert (
-                   "9920  08 00 00 00 00 00                                ......"
-               ) in s
+            "9920  08 00 00 00 00 00                                ......"
+        ) in s
 
         # `stop_address` parameter
         with open(p, 'rb') as f:
             s = hexdump(f, stop_address=1000)
 
         assert (
-                   "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) in s
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
         assert (
-                   "170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
-                   "AL.PRIMARY.AXIAL"
-               ) in s
+            "170  41 4C 5C 50 52 49 4D 41 52 59 5C 41 58 49 41 4C  "
+            "AL.PRIMARY.AXIAL"
+        ) in s
         assert (
-                   "9920  08 00 00 00 00 00                                ......"
-               ) not in s
+            "9920  08 00 00 00 00 00                                ......"
+        ) not in s
 
         # `show_address` parameter
         with open(p, 'rb') as f:
             s = hexdump(f, show_address=False, stop_address=1000)
 
         assert (
-                   "49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) in s
+            "49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) in s
         assert (
-                   "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) not in s
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
 
         # `start_address` parameter
         with open(p, 'rb') as f:
             s = hexdump(f, start_address=500, stop_address=1000)
 
         assert (
-                   "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
-                   "II*.T..........."
-               ) not in s
+            "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
+            "II*.T..........."
+        ) not in s
         assert (
-                   "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
-                   ".1.1.1.1.2004011"
-               ) in s
+            "1F4  2E 31 2E 31 2E 31 2E 31 2E 32 30 30 34 30 31 31  "
+            ".1.1.1.1.2004011"
+        ) in s
 
     def test_pretty_print(self, capsys):
         """Test utils.dump.pretty_print"""
@@ -261,23 +259,22 @@ class TestDump:
 
         s = capsys.readouterr().out
         assert (
-                   "(0008, 0005) Specific Character Set              CS: 'ISO_IR 100'"
-               ) in s
+            "(0008, 0005) Specific Character Set              CS: 'ISO_IR 100'"
+        ) in s
         assert (
-                   "(0010, 1002) Other Patient IDs Sequence -- 2 item(s)"
-               ) in s
+            "(0010, 1002) Other Patient IDs Sequence -- 2 item(s)"
+        ) in s
         assert (
-                   "  (0010, 0022) Type of Patient ID                  CS: 'TEXT'"
-               ) in s
+            "  (0010, 0022) Type of Patient ID                  CS: 'TEXT'"
+        ) in s
         assert (
-                   "(fffc, fffc) Data Set Trailing Padding           OB: Array of "
-                   "126 elements"
-               ) in s
+            "(fffc, fffc) Data Set Trailing Padding           OB: Array of "
+            "126 elements"
+        ) in s
 
 
 class TestFixer:
     """Test the utils.fixer module"""
-
     def test_fix_separator_callback(self):
         """Test utils.fixer.fix_separator_callback"""
         pass
@@ -297,7 +294,6 @@ class TestFixer:
 
 class TestHexUtil:
     """Test the utils.hexutil module"""
-
     def test_hex_to_bytes(self):
         """Test utils.hexutil.hex2bytes"""
         hexstring = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"

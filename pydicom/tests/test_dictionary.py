@@ -97,7 +97,8 @@ class TestDict:
 
     def test_add_private_entry(self):
         with save_private_dict():
-            add_private_dict_entry('ACME 3.1', 0x10011101, 'DS', 'Test One', '3')
+            add_private_dict_entry(
+                'ACME 3.1', 0x10011101, 'DS', 'Test One', '3')
             entry = get_private_entry((0x1001, 0x0001), 'ACME 3.1')
             assert 'DS' == entry[0]  # VR
             assert '3' == entry[1]  # VM

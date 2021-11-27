@@ -705,7 +705,8 @@ class TestRawDataElement:
     def test_read_known_private_tag_explicit_no_lookup(
             self, dont_replace_un_with_known_vr):
         with save_private_dict():
-            add_private_dict_entry("ACME 3.2", 0x00410003, "IS", "Another Number")
+            add_private_dict_entry(
+                "ACME 3.2", 0x00410003, "IS", "Another Number")
             fp = DicomBytesIO()
             ds = Dataset()
             ds.is_implicit_VR = False
