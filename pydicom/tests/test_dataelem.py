@@ -21,6 +21,7 @@ from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
+from pydicom.tests.test_util import save_private_dict
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat
 
@@ -663,18 +664,19 @@ class TestRawDataElement:
         assert elem.name == "Private tag data"
         assert elem.value == b"\x2A\x00"
 
-        add_private_dict_entry("ACME 3.2", 0x00410001, "US", "Some Number")
-        ds = dcmread(fp, force=True)
-        elem = ds[0x00411001]
-        assert elem.VR == "US"
-        assert elem.name == "[Some Number]"
-        assert elem.value == 42
+        with save_private_dict():
+            add_private_dict_entry("ACME 3.2", 0x00410001, "US", "Some Number")
+            ds = dcmread(fp, force=True)
+            elem = ds[0x00411001]
+            assert elem.VR == "US"
+            assert elem.name == "[Some Number]"
+            assert elem.value == 42
 
-        # Unknown private tag is handled as before
-        elem = ds[0x00431001]
-        assert elem.VR == "UN"
-        assert elem.name == "Private tag data"
-        assert elem.value == b"Unknown "
+            # Unknown private tag is handled as before
+            elem = ds[0x00431001]
+            assert elem.VR == "UN"
+            assert elem.name == "Private tag data"
+            assert elem.value == b"Unknown "
 
     def test_read_known_private_tag_explicit(self):
         fp = DicomBytesIO()
@@ -692,27 +694,29 @@ class TestRawDataElement:
         assert elem.name == "Private tag data"
         assert elem.value == b"SOME_AET"
 
-        add_private_dict_entry("ACME 3.2", 0x00410002, "AE", "Some AET")
-        ds = dcmread(fp, force=True)
-        elem = ds[0x00411002]
-        assert elem.VR == "AE"
-        assert elem.name == "[Some AET]"
-        assert elem.value == "SOME_AET"
+        with save_private_dict():
+            add_private_dict_entry("ACME 3.2", 0x00410002, "AE", "Some AET")
+            ds = dcmread(fp, force=True)
+            elem = ds[0x00411002]
+            assert elem.VR == "AE"
+            assert elem.name == "[Some AET]"
+            assert elem.value == "SOME_AET"
 
     def test_read_known_private_tag_explicit_no_lookup(
             self, dont_replace_un_with_known_vr):
-        add_private_dict_entry("ACME 3.2", 0x00410003, "IS", "Another Number")
-        fp = DicomBytesIO()
-        ds = Dataset()
-        ds.is_implicit_VR = False
-        ds.is_little_endian = True
-        ds[0x00410010] = RawDataElement(
-            Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True)
-        ds[0x00411003] = RawDataElement(
-            Tag(0x00411003), "UN", 8, b"12345678", 0, False, True)
-        ds.save_as(fp)
-        ds = dcmread(fp, force=True)
-        elem = ds[0x00411003]
-        assert elem.VR == "UN"
-        assert elem.name == "[Another Number]"
-        assert elem.value == b"12345678"
+        with save_private_dict():
+            add_private_dict_entry("ACME 3.2", 0x00410003, "IS", "Another Number")
+            fp = DicomBytesIO()
+            ds = Dataset()
+            ds.is_implicit_VR = False
+            ds.is_little_endian = True
+            ds[0x00410010] = RawDataElement(
+                Tag(0x00410010), "LO", 8, b"ACME 3.2", 0, False, True)
+            ds[0x00411003] = RawDataElement(
+                Tag(0x00411003), "UN", 8, b"12345678", 0, False, True)
+            ds.save_as(fp)
+            ds = dcmread(fp, force=True)
+            elem = ds[0x00411003]
+            assert elem.VR == "UN"
+            assert elem.name == "[Another Number]"
+            assert elem.value == b"12345678"

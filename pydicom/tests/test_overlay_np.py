@@ -204,9 +204,13 @@ class TestNumpy_NumpyHandler:
     def test_typing_imports(self, monkeypatch):
         """Test the imports required for typing are OK."""
         assert not hasattr(NP_HANDLER, "Dataset")
-        monkeypatch.setattr(typing, "TYPE_CHECKING", True)
-        reload(NP_HANDLER)
-        assert hasattr(NP_HANDLER, "Dataset")
+        try:
+            monkeypatch.setattr(typing, "TYPE_CHECKING", True)
+            reload(NP_HANDLER)
+            assert hasattr(NP_HANDLER, "Dataset")
+        finally:
+            monkeypatch.setattr(typing, "TYPE_CHECKING", False)
+            reload(NP_HANDLER)
 
 
 # Tests for numpy_handler module with Numpy available
