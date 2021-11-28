@@ -12,6 +12,7 @@ from pydicom.datadict import (keyword_for_tag, dictionary_description,
                               private_dictionary_VM, add_private_dict_entries,
                               add_private_dict_entry)
 from pydicom.datadict import add_dict_entry, add_dict_entries
+from pydicom.tests.test_util import save_private_dict
 
 
 class TestDict:
@@ -95,11 +96,13 @@ class TestDict:
             add_dict_entries(new_dict_items)
 
     def test_add_private_entry(self):
-        add_private_dict_entry('ACME 3.1', 0x10011101, 'DS', 'Test One', '3')
-        entry = get_private_entry((0x1001, 0x0001), 'ACME 3.1')
-        assert 'DS' == entry[0]  # VR
-        assert '3' == entry[1]  # VM
-        assert 'Test One' == entry[2]  # description
+        with save_private_dict():
+            add_private_dict_entry(
+                'ACME 3.1', 0x10011101, 'DS', 'Test One', '3')
+            entry = get_private_entry((0x1001, 0x0001), 'ACME 3.1')
+            assert 'DS' == entry[0]  # VR
+            assert '3' == entry[1]  # VM
+            assert 'Test One' == entry[2]  # description
 
     def test_add_private_entry_raises_for_non_private_tag(self):
         msg = (

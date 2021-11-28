@@ -1,14 +1,13 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Test suite for util functions"""
-
-from io import BytesIO
-import os
+import copy
+from contextlib import contextmanager
 
 import pytest
 
 from pydicom import config, dcmread
 from pydicom import filereader
-from pydicom import valuerep
+from pydicom._private_dict import private_dictionaries
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset
@@ -29,7 +28,6 @@ from pydicom.util.codify import (
 from pydicom.util.dump import *
 from pydicom.util.hexutil import hex2bytes, bytes2hex
 from pydicom.util.leanread import dicomfile
-
 
 have_numpy = True
 try:
@@ -434,3 +432,13 @@ class TestLeanRead:
             with pytest.raises(NotImplementedError, match=msg):
                 for elem in ds:
                     pass
+
+
+@contextmanager
+def save_private_dict():
+    saved_private_dict = copy.deepcopy(private_dictionaries)
+    try:
+        yield
+    finally:
+        private_dictionaries.clear()
+        private_dictionaries.update(saved_private_dict)

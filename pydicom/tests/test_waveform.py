@@ -45,15 +45,6 @@ def test_simple():
 
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-def test_typing_imports(monkeypatch):
-    """Test the imports required for typing are OK."""
-    assert not hasattr(NP_HANDLER, "Dataset")
-    monkeypatch.setattr(typing, "TYPE_CHECKING", True)
-    reload(NP_HANDLER)
-    assert hasattr(NP_HANDLER, "Dataset")
-
-
-@pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerGenerateMultiplex:
     """Tests for the waveform numpy_handler.generate_multiplex."""
     def test_no_waveform_sequence(self):
