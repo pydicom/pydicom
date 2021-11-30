@@ -21,8 +21,9 @@ enforcement of valid DICOM, and a flag to enable "future" pydicom changes.
 Enforcing Valid DICOM
 ---------------------
 
-*pydicom* has a configuration option to help enforce valid DICOM: 
-:attr:`~pydicom.config.enforce_valid_values`.
+*pydicom* has configuration options to help enforce valid DICOM:
+:attr:`~pydicom.config.enforce_valid_values` (for reading) and
+:attr:`~pydicom.config.enforce_create_valid_values` (for writing).
 
 If set to `True`, some non-standard DICOM will result in *pydicom* raising
 an error rather than assuming a default behavior or issuing a warning.

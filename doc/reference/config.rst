@@ -18,6 +18,7 @@ Configuration Options (:mod:`pydicom.config`)
    datetime_conversion
    debug
    enforce_valid_values
+   enforce_create_valid_values
    future_behavior
    overlay_data_handlers
    pixel_data_handlers

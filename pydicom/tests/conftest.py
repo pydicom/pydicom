@@ -48,3 +48,19 @@ def dont_replace_un_with_known_vr():
     config.replace_un_with_known_vr = False
     yield
     config.replace_un_with_known_vr = old_value
+
+
+@pytest.fixture
+def dont_raise_on_writing_invalid_value():
+    old_value = config.enforce_create_valid_values
+    config.enforce_create_valid_values = False
+    yield
+    config.enforce_create_valid_values = old_value
+
+
+@pytest.fixture
+def raise_on_writing_invalid_value():
+    old_value = config.enforce_create_valid_values
+    config.enforce_create_valid_values = True
+    yield
+    config.enforce_create_valid_values = old_value

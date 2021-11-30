@@ -451,7 +451,10 @@ class Dataset:
               :class:`Dataset`
         """
 
-        data_element = DataElement(tag, VR, value)
+        data_element = DataElement(
+            tag, VR, value,
+            raise_on_error=pydicom.config.enforce_create_valid_values
+        )
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
@@ -1379,15 +1382,16 @@ class Dataset:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.enforce_valid_values:
+                    if config.enforce_create_valid_values:
                         raise KeyError(f"Unknown DICOM tag {tag}")
-                    else:
-                        vr = 'UN'
-                        warnings.warn(
-                            f"Unknown DICOM tag {tag} - setting VR to 'UN'"
-                        )
+                    vr = 'UN'
+                    warnings.warn(
+                        f"Unknown DICOM tag {tag} - setting VR to 'UN'"
+                    )
 
-            default = DataElement(tag, vr, default)
+            default = DataElement(
+                tag, vr, default,
+                raise_on_error=pydicom.config.enforce_create_valid_values)
 
         self[key] = default
 
@@ -1946,7 +1950,8 @@ class Dataset:
         str
             A string representation of an element.
         """
-        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear')
+        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear',
+                     'validate')
         for elem in self.iterall():
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
@@ -2116,7 +2121,9 @@ class Dataset:
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
-                data_element = DataElement(tag, VR, value)
+                data_element = DataElement(
+                    tag, VR, value,
+                    raise_on_error=pydicom.config.enforce_create_valid_values)
                 if VR == 'SQ':
                     # let a sequence know its parent dataset to pass it
                     # to its items, who may need parent dataset tags

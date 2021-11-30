@@ -440,7 +440,8 @@ class TestDataElement:
     @pytest.mark.parametrize('use_none, empty_value',
                              ((True, None), (False, '')))
     def test_empty_text_values(self, use_none, empty_value,
-                               no_datetime_conversion):
+                               no_datetime_conversion,
+                               dont_raise_on_writing_invalid_value):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
             setattr(ds, tag_name, value)
@@ -721,3 +722,29 @@ class TestRawDataElement:
             assert elem.VR == "UN"
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
+
+
+class TestDataElementValidation:
+
+    @pytest.mark.parametrize("vr, length", (
+            ("AE", 17), ("AS", 5), ("CS", 17), ("DA", 9), ("DS", 27),
+            ("DT", 27), ("LO", 66), ("LT", 10250), ("PN", 200),
+            ("SH", 17), ("ST", 1025), ("TM", 16), ("UI", 65)
+    ))
+    def test_maxvalue_exceeded(self, vr, length, no_datetime_conversion):
+        msg = fr"The value length \({length}\) exceeds the maximum length *"
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, "1" * length, raise_on_error=False)
+
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, "2" * length, raise_on_error=True)
+
+    @pytest.mark.parametrize("vr, length", (("AS", 3), ("DA", 7)))
+    def test_too_short_for_fixed_length(self, vr, length,
+                                        no_datetime_conversion):
+        msg = fr"The value length \({length}\) is less than the fixed length *"
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, "1" * length, raise_on_error=False)
+
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, "2" * length, raise_on_error=True)

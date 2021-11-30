@@ -43,6 +43,58 @@ TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5e}
 
+FIXED_VALUE_VRS = ("AS", "DA")
+
+MAX_VALUE_LEN = {
+    "AE": 16,
+    "AS": 4,
+    "CS": 16,
+    "DA": 8,
+    "DS": 16,
+    "DT": 26,
+    "IS": 12,
+    "LO": 64,
+    "LT": 10240,
+    "PN": 196,
+    "SH": 16,
+    "ST": 1024,
+    "TM": 14,
+    "UI": 64
+}
+
+
+def validate_value(vr: str, value: Any, raise_on_error: bool) -> None:
+    """Validate the given value against the DICOM standard.
+
+    Parameters
+    ----------
+    vr: The VR of the tag the value is added to.
+    value: The value to be validated.
+    raise_on_error: If True, a :class:`ValueError` is raised for a validation
+        error, otherwise a warning is issued.
+
+    The values are checked for a length valid for the given VR.
+    """
+    msg = None
+    if isinstance(value, (str, bytes)):
+        max_length = MAX_VALUE_LEN.get(vr, 0)
+        value_length = len(value)
+        if max_length > 0:
+            if value_length > max_length:
+                msg = (
+                    f"The value length ({value_length}) exceeds the "
+                    f"maximum length of {max_length} allowed for VR {vr}."
+                )
+            elif vr in FIXED_VALUE_VRS and value_length < max_length:
+                msg = (
+                    f"The value length ({value_length}) is less than the "
+                    f"fixed length of {max_length} allowed for VR {vr}."
+                )
+    if msg is not None:
+        if raise_on_error:
+            raise ValueError(msg)
+        warnings.warn(msg)
+
 
 class _DateTimeBase:
     """Base class for DT, DA and TM element sub-classes."""
@@ -489,7 +541,7 @@ class DSfloat(float):
     def __new__(  # type: ignore[misc]
         cls: Type["DSfloat"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False, raise_on_error: bool = False
     ) -> Optional[Union[str, "DSfloat"]]:
         if val is None:
             return val
@@ -501,7 +553,7 @@ class DSfloat(float):
 
     def __init__(
         self, val: Union[str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False, raise_on_error: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -531,7 +583,7 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if config.enforce_valid_values and not self.auto_format:
+        if raise_on_error and not self.auto_format:
             if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
@@ -598,7 +650,7 @@ class DSdecimal(Decimal):
     def __new__(  # type: ignore[misc]
         cls: Type["DSdecimal"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False, raise_on_error: bool = False
     ) -> Optional[Union[str, "DSdecimal"]]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -627,7 +679,8 @@ class DSdecimal(Decimal):
     def __init__(
         self,
         val: Union[str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False,
+        raise_on_error: bool = False
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
@@ -658,7 +711,7 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if config.enforce_valid_values:
+        if raise_on_error:
             if len(repr(self).strip("'")) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' values must be "
@@ -710,7 +763,8 @@ else:
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal], auto_format: bool = False
+    val: Union[None, str, int, float, Decimal], auto_format: bool = False,
+    raise_on_error: bool = False
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -725,13 +779,15 @@ def DS(
     if val is None:
         return val
 
-    if isinstance(val, str) and val.strip() == '':
-        return val
+    if isinstance(val, str):
+        if val.strip() == '':
+            return val
+        validate_value("DS", val, raise_on_error)
 
     if config.use_DS_decimal:
-        return DSdecimal(val, auto_format=auto_format)
+        return DSdecimal(val, auto_format, raise_on_error)
 
-    return DSfloat(val, auto_format=auto_format)
+    return DSfloat(val, auto_format, raise_on_error)
 
 
 class IS(int):
@@ -742,7 +798,8 @@ class IS(int):
     """
 
     def __new__(  # type: ignore[misc]
-        cls: Type["IS"], val: Union[None, str, int, float, Decimal]
+            cls: Type["IS"], val: Union[None, str, int, float, Decimal],
+            raise_on_error: bool = False
     ) -> Optional[Union[str, "IS"]]:
         """Create instance if new integer string"""
         if val is None:
@@ -764,7 +821,7 @@ class IS(int):
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -2**31 <= newval < 2**31 and config.enforce_valid_values:
+        if not -2**31 <= newval < 2**31 and raise_on_error:
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
@@ -773,9 +830,11 @@ class IS(int):
 
         return newval
 
-    def __init__(self, val: Union[str, int, float, Decimal]) -> None:
+    def __init__(self, val: Union[str, int, float, Decimal],
+                 raise_on_error: bool = False) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
+            validate_value("IS", val, raise_on_error)
             self.original_string = val.strip()
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string
@@ -808,7 +867,8 @@ _T = TypeVar('_T')
 
 
 def MultiString(
-    val: str, valtype: Optional[Callable[[str], _T]] = None
+    val: str, valtype: Optional[Callable[[str], _T]] = None,
+    raise_on_error: bool = False
 ) -> Union[_T, MutableSequence[_T]]:
     """Split a string by delimiters if there are any
 
@@ -838,7 +898,7 @@ def MultiString(
     if len(splitup) == 1:
         return valtype(splitup[0])
 
-    return MultiValue(valtype, splitup)
+    return MultiValue(valtype, splitup, raise_on_error=raise_on_error)
 
 
 def _verify_encodings(
@@ -934,7 +994,8 @@ class PersonName:
         self,
         val: Union[bytes, str, "PersonName"],
         encodings: Optional[Sequence[str]] = None,
-        original_string: Optional[bytes] = None
+        original_string: Optional[bytes] = None,
+        raise_on_error: bool = False
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -970,6 +1031,7 @@ class PersonName:
             # val: str
             # `val` is the decoded person name value
             # `original_string`  should be the original encoded value
+            validate_value("PN", val, raise_on_error)
             self.original_string = cast(bytes, original_string)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='

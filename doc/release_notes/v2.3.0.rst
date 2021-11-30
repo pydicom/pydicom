@@ -5,8 +5,13 @@ Changes
 -------
 * Updated the private dictionary
 
+
 Enhancements
 ------------
+* Values are now validated on valid length on reading and writing. Depending
+  on the value of :attr:`~pydicom.config.enforce_valid_values` (for reading)
+  and the new attribute :attr:`~pydicom.config.enforce_create_valid_values`
+  (for writing) a warning is logged or a :class:`ValueError` is raised.
 
 Fixes
 -----

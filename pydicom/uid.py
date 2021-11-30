@@ -11,7 +11,7 @@ from typing import List, Optional, TypeVar, Type, Union, Any
 import warnings
 
 from pydicom._uid_dict import UID_dictionary
-
+from pydicom.valuerep import validate_value
 
 _deprecations = {
     "JPEGBaseline": "JPEGBaseline8Bit",
@@ -84,13 +84,16 @@ class UID(str):
     >>> uid.name
     'JPEG Baseline (Process 1)'
     """
-    def __new__(cls: Type[_UID], val: str) -> _UID:
+    def __new__(cls: Type[_UID], val: str,
+                raise_on_error: bool = False) -> _UID:
         """Setup new instance of the class.
 
         Parameters
         ----------
         val : str or pydicom.uid.UID
             The UID string to use to create the UID object.
+        raise_on_error: If True, a :class:`ValueError` is raised for a
+            validation error, otherwise a warning is issued.
 
         Returns
         -------
@@ -98,6 +101,7 @@ class UID(str):
             The UID object.
         """
         if isinstance(val, str):
+            validate_value("UI", val, raise_on_error)
             return super().__new__(cls, val.strip())
 
         raise TypeError("A UID must be created from a string")

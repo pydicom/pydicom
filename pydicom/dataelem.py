@@ -16,7 +16,7 @@ from typing import (
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
-from pydicom.config import logger
+from pydicom.config import logger, enforce_valid_values
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -28,7 +28,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import PersonName
+from pydicom.valuerep import PersonName, validate_value
 
 if config.have_numpy:
     import numpy
@@ -172,7 +172,8 @@ class DataElement:
         value: Any,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
-        already_converted: bool = False
+        already_converted: bool = False,
+        raise_on_error: bool = False
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -220,6 +221,7 @@ class DataElement:
                 pass
 
         self.VR = VR  # Note: you must set VR before setting value
+        self.raise_on_error = raise_on_error
         if already_converted:
             self._value = value
         else:
@@ -228,6 +230,12 @@ class DataElement:
         self.is_undefined_length = is_undefined_length
         self.private_creator: Optional[str] = None
         self.parent: Optional["Dataset"] = None
+
+    def validate(self, value: Any) -> None:
+        """Validate the current value against the DICOM standard.
+        See :func:`~pydicom.valuerep.validate_value` for details.
+        """
+        validate_value(self.VR, value, self.raise_on_error)
 
     @classmethod
     def from_json(
@@ -526,7 +534,8 @@ class DataElement:
         except AttributeError:  # not a list
             return self._convert(val)
         else:
-            return MultiValue(self._convert, val)
+            return MultiValue(self._convert, val,
+                              raise_on_error=self.raise_on_error)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -538,19 +547,19 @@ class DataElement:
             val = val.decode()
 
         if self.VR == 'IS':
-            return pydicom.valuerep.IS(val)
+            return pydicom.valuerep.IS(val, self.raise_on_error)
         elif self.VR == 'DA' and config.datetime_conversion:
-            return pydicom.valuerep.DA(val)
+            return pydicom.valuerep.DA(val, raise_on_error=self.raise_on_error)
         elif self.VR == 'DS':
-            return pydicom.valuerep.DS(val)
+            return pydicom.valuerep.DS(val, False, self.raise_on_error)
         elif self.VR == 'DT' and config.datetime_conversion:
-            return pydicom.valuerep.DT(val)
+            return pydicom.valuerep.DT(val, raise_on_error=self.raise_on_error)
         elif self.VR == 'TM' and config.datetime_conversion:
-            return pydicom.valuerep.TM(val)
+            return pydicom.valuerep.TM(val, raise_on_error=self.raise_on_error)
         elif self.VR == "UI":
-            return UID(val) if val is not None else None
+            return UID(val, self.raise_on_error) if val is not None else None
         elif self.VR == "PN":
-            return PersonName(val)
+            return PersonName(val, raise_on_error=self.raise_on_error)
         elif self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
         # Later may need this for PersonName as for UI,
@@ -558,6 +567,7 @@ class DataElement:
         # elif self.VR == "PN":
         #    return PersonName(val)
         else:  # is either a string or a type 2 optionally blank string
+            self.validate(val)
             return val  # this means a "numeric" value could be empty string ""
         # except TypeError:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
@@ -874,4 +884,5 @@ def DataElement_from_raw(
             pass
 
     return DataElement(raw.tag, VR, value, raw.value_tell,
-                       raw.length == 0xFFFFFFFF, already_converted=True)
+                       raw.length == 0xFFFFFFFF, already_converted=True,
+                       raise_on_error=enforce_valid_values)

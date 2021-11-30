@@ -31,7 +31,8 @@ class MultiValue(MutableSequence[_ItemType]):
     def __init__(
         self,
         type_constructor: Callable[[_T], _ItemType],
-        iterable: Iterable[_T]
+        iterable: Iterable[_T],
+        raise_on_error: bool = False
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.
@@ -52,7 +53,11 @@ class MultiValue(MutableSequence[_ItemType]):
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
         def DS_IS_constructor(x: _T) -> _ItemType:
-            return self.type_constructor(x) if x != '' else cast(_ItemType, x)
+            return (
+                self.type_constructor(  # type: ignore[call-arg]
+                    x, raise_on_error=raise_on_error)
+                if x != '' else cast(_ItemType, x)
+            )
 
         self._list: List[_ItemType] = list()
         self.type_constructor = type_constructor

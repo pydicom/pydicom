@@ -250,7 +250,7 @@ def dummy():
     ds.RTPlanDate = "20201006"
     ds.RTPlanTime = "120600"
     ds.DoseSummationType = "PLAN"
-    ds.StructureSetLabel = "Structure set label"
+    ds.StructureSetLabel = "Struct set label"
     ds.StructureSetDate = "20201007"
     ds.StructureSetTime = "120700"
 

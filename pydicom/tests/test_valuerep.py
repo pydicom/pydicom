@@ -602,10 +602,10 @@ class TestDSfloat:
         assert str(x) == '1.234e-1'
         assert repr(x) == repr("1.234e-1")
 
-    def test_enforce_valid_values_length(self, enforce_valid_true_fixture):
+    def test_enforce_valid_values_length(self):
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
-            valuerep.DSfloat('3.141592653589793')
+            valuerep.DSfloat('3.141592653589793', raise_on_error=True)
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
@@ -626,11 +626,11 @@ class TestDSfloat:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[float, str], enforce_valid_true_fixture
+        self, val: Union[float, str]
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSfloat(val)
+            valuerep.DSfloat(val, raise_on_error=True)
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
@@ -778,11 +778,11 @@ class TestDSdecimal:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[Decimal, str], enforce_valid_true_fixture
+        self, val: Union[Decimal, str]
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSdecimal(val)
+            valuerep.DSdecimal(val, raise_on_error=True)
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
@@ -891,14 +891,14 @@ class TestIS:
         x2 = pickle.loads(data1_string)
         assert x.real == x2.real
 
-    def test_overflow(self, enforce_valid_values):
+    def test_overflow(self):
         msg = (
             r"Elements with a VR of IS must have a value between -2\*\*31 "
             r"and \(2\*\*31 - 1\). Set 'config.enforce_valid_values' to False "
             r"to override the value check"
         )
         with pytest.raises(OverflowError, match=msg):
-            IS(3103050000)
+            IS(3103050000, raise_on_error=True)
 
     def test_str(self):
         """Test IS.__str__()."""
@@ -1024,11 +1024,11 @@ class TestDecimalString:
         assert isinstance(ds, valuerep.DSdecimal)
         assert len(str(ds)) <= 16
 
-    def test_invalid_decimal_strings(self, enforce_valid_values):
+    def test_invalid_decimal_strings(self):
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
-        with pytest.raises(OverflowError):
-            valuerep.DS(invalid_string)
+        with pytest.raises(ValueError):
+            valuerep.DS(invalid_string, raise_on_error=True)
 
 
 class TestPersonName:
@@ -1511,7 +1511,8 @@ VALUE_REFERENCE = [
 
 
 @pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
-def test_set_value(vr, pytype, vm0, vmN, keyword):
+def test_set_value(vr, pytype, vm0, vmN, keyword,
+                   dont_raise_on_writing_invalid_value):
     """Test that element values are set consistently"""
     # Test VM = 0
     ds = Dataset()
