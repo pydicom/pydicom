@@ -43,23 +43,194 @@ TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5e}
 
-FIXED_VALUE_VRS = ("AS", "DA")
-
+# maximum allowed value length for string VRs
 MAX_VALUE_LEN = {
     "AE": 16,
-    "AS": 4,
     "CS": 16,
-    "DA": 8,
     "DS": 16,
-    "DT": 26,
     "IS": 12,
     "LO": 64,
     "LT": 10240,
     "PN": 196,
     "SH": 16,
     "ST": 1024,
-    "TM": 14,
     "UI": 64
+}
+
+
+def _range_regex(regex):
+    """Compose a regex that allows ranges of the given regex,
+    as defined for VRs DA, DT and TM in PS 3.4, C.2.2.2.5.
+    """
+    return fr"^{regex}$|^\-{regex} ?$|^{regex}\- ?$|^{regex}\-{regex} ?$"
+
+
+# regular expressions to match valid values for some VRs
+AS_REGEX = re.compile(r"^\d\d\d[DWMY]$")
+CS_REGEX = re.compile(r"^[A-Z0-9 _]*$")
+DS_REGEX = re.compile(
+    r"^ *[+\-]?(\d+|\d+\.\d*|\.\d+)([eE][+\-]?\d+)? *$"
+)
+IS_REGEX = re.compile(r"^ *[+\-]?\d+ *$")
+DA_REGEX = re.compile(_range_regex(r"\d{4}(0[1-9]|1[0-2])([0-2]\d|3[01])"))
+DT_REGEX = re.compile(_range_regex(
+    r"\d{4}((0[1-9]|1[0-2])(([0-2]\d|3[01])(([01]\d|2[0-3])"
+    r"([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?)?)?)?([+-][01]\d\d\d)?")
+)
+TM_REGEX = re.compile(_range_regex(
+    r"([01]\d|2[0-3])([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?"))
+
+
+def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value length for a given VR.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str or bytes
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    max_length = MAX_VALUE_LEN.get(vr, 0)
+    if max_length > 0:
+        value_length = len(value)
+        if value_length > max_length:
+            return False, (
+                f"The value length ({value_length}) exceeds the "
+                f"maximum length of {max_length} allowed for VR {vr}."
+            )
+    return True, ''
+
+
+def validate_regex(vr: str, value: Union[str, bytes],
+                   regex: re.Pattern) -> Tuple[bool, str]:
+    """Validate the value for a given VR using a regular expression.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str or bytes
+        The value to validate.
+    regex : re.Pattern
+        The precompiled regex pattern used for matching.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if isinstance(value, bytes):
+        try:
+            str_value = value.decode(encoding="ascii", errors="strict")
+        except UnicodeDecodeError:
+            str_value = None
+    else:
+        str_value = value
+    is_valid = str_value is not None and re.match(regex, str_value)
+    if not is_valid:
+        return False, f"Invalid value for VR {vr}: '{value}'."
+    return True, ''
+
+
+def validate_ascii(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate that the given value is an ASCII string or byte array.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str or bytes
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    is_ascii = True
+    if isinstance(value, str):
+        try:
+            byte_value = value.encode(encoding="ascii", errors="strict")
+        except UnicodeEncodeError:
+            byte_value = b''
+            is_ascii = False
+    else:
+        byte_value = value
+    is_ascii = is_ascii and all(0x20 <= ch < 0x80 for ch in byte_value)
+    if not is_ascii:
+        return False, (f"Invalid value for VR {vr}: must be an ASCII "
+                       f"string and not contain control characters.")
+    return True, ''
+
+
+def validate_length_and_regex(vr: str, value: Union[str, bytes],
+                              regex: re.Pattern) -> Tuple[bool, str]:
+    is_valid_len, msg1 = validate_length(vr, value)
+    is_valid_expr, msg2 = validate_regex(vr, value, regex)
+    return is_valid_len and is_valid_expr, ' '.join([msg1, msg2]).strip()
+
+
+def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    is_valid_len, msg1 = validate_length(vr, value)
+    is_valid_ascii, msg2 = validate_ascii(vr, value)
+    return is_valid_len and is_valid_ascii, ' '.join([msg1, msg2]).strip()
+
+
+def validate_as(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_regex(vr, value, AS_REGEX)
+
+
+def validate_cs(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_length_and_regex(vr, value, CS_REGEX)
+
+
+def validate_da(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_regex(vr, value, DA_REGEX)
+
+
+def validate_ds(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_length_and_regex(vr, value, DS_REGEX)
+
+
+def validate_dt(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_regex(vr, value, DT_REGEX)
+
+
+def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_length_and_regex(vr, value, IS_REGEX)
+
+
+def validate_ui(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    from pydicom.uid import RE_VALID_UID
+    return validate_length_and_regex(vr, value, RE_VALID_UID)
+
+
+def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_regex(vr, value, TM_REGEX)
+
+
+VALIDATORS = {
+    "AE": validate_ae,
+    "AS": validate_as,
+    "AT": validate_length,
+    "CS": validate_cs,
+    "DA": validate_da,
+    "DS": validate_ds,
+    "DT": validate_dt,
+    "IS": validate_is,
+    "LO": validate_length,
+    "LT": validate_length,
+    "PN": validate_length,
+    "SH": validate_length,
+    "ST": validate_length,
+    "TM": validate_tm,
+    "UC": validate_length,
+    "UI": validate_ui,
+    "UR": validate_length,
+    "UT": validate_length,
 }
 
 
@@ -68,32 +239,24 @@ def validate_value(vr: str, value: Any, raise_on_error: bool) -> None:
 
     Parameters
     ----------
-    vr: The VR of the tag the value is added to.
-    value: The value to be validated.
-    raise_on_error: If True, a :class:`ValueError` is raised for a validation
+    vr : str
+        The VR of the tag the value is added to.
+    value : Any
+        The value to be validated.
+    raise_on_error : bool
+        If True, a :class:`ValueError` is raised for a validation
         error, otherwise a warning is issued.
 
     The values are checked for a length valid for the given VR.
     """
-    msg = None
-    if isinstance(value, (str, bytes)):
-        max_length = MAX_VALUE_LEN.get(vr, 0)
-        value_length = len(value)
-        if max_length > 0:
-            if value_length > max_length:
-                msg = (
-                    f"The value length ({value_length}) exceeds the "
-                    f"maximum length of {max_length} allowed for VR {vr}."
-                )
-            elif vr in FIXED_VALUE_VRS and value_length < max_length:
-                msg = (
-                    f"The value length ({value_length}) is less than the "
-                    f"fixed length of {max_length} allowed for VR {vr}."
-                )
-    if msg is not None:
-        if raise_on_error:
-            raise ValueError(msg)
-        warnings.warn(msg)
+    if value is not None and isinstance(value, (str, bytes)):
+        validator = VALIDATORS.get(vr)
+        if validator is not None:
+            is_valid, msg = validator(vr, value)
+            if not is_valid:
+                if raise_on_error:
+                    raise ValueError(msg)
+                warnings.warn(msg)
 
 
 class _DateTimeBase:
@@ -413,10 +576,6 @@ class TM(_DateTimeBase, datetime.time):
                 self.original_string += f".{val.microsecond:06}"
 
 
-# Regex to match strings that represent valid DICOM decimal strings (DS)
-_DS_REGEX = re.compile(r'\s*[\+\-]?\d+(\.\d+)?([eE][\+\-]?\d+)?\s*$')
-
-
 def is_valid_ds(s: str) -> bool:
     """Check whether this string is a valid decimal string.
 
@@ -433,11 +592,7 @@ def is_valid_ds(s: str) -> bool:
     bool
         True if the string is a valid decimal string. Otherwise False.
     """
-    # Check that the length is within the limits
-    if len(s) > 16:
-        return False
-
-    return _DS_REGEX.match(s) is not None
+    return validate_ds("DS", s)[0]
 
 
 def format_number_as_ds(val: Union[float, Decimal]) -> str:
@@ -805,8 +960,10 @@ class IS(int):
         if val is None:
             return val
 
-        if isinstance(val, str) and val.strip() == '':
-            return val
+        if isinstance(val, str):
+            if val.strip() == '':
+                return val
+            validate_value("IS", val, raise_on_error)
 
         try:
             newval = super().__new__(cls, val)
@@ -834,7 +991,6 @@ class IS(int):
                  raise_on_error: bool = False) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
-            validate_value("IS", val, raise_on_error)
             self.original_string = val.strip()
         elif isinstance(val, IS) and hasattr(val, 'original_string'):
             self.original_string = val.original_string

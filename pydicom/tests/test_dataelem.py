@@ -36,7 +36,7 @@ class TestDataElement:
                                              ['42.1', '42.2', '42.3'])
         self.data_elementCommand = DataElement(0x00000000, 'UL', 100)
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
-        self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
+        self.data_elementRetired = DataElement(0x00080010, 'SH', "102")
         config.use_none_as_empty_text_VR_value = False
 
     def teardown(self):
@@ -137,22 +137,22 @@ class TestDataElement:
 
     def test_description_group_length(self):
         """Test DataElement.description for Group Length element"""
-        elem = DataElement(0x00100000, 'LO', 12345)
+        elem = DataElement(0x00100000, 'LO', "12345")
         assert 'Group Length' == elem.description()
 
     def test_description_unknown_private(self):
         """Test DataElement.description with an unknown private element"""
-        elem = DataElement(0x00110010, 'LO', 12345)
+        elem = DataElement(0x00110010, 'LO', "12345")
         elem.private_creator = 'TEST'
         assert 'Private tag data' == elem.description()
-        elem = DataElement(0x00110F00, 'LO', 12345)
+        elem = DataElement(0x00110F00, 'LO', "12345")
         assert elem.tag.is_private
         assert elem.private_creator is None
         assert 'Private tag data' == elem.description()
 
     def test_description_unknown(self):
         """Test DataElement.description with an unknown element"""
-        elem = DataElement(0x00000004, 'LO', 12345)
+        elem = DataElement(0x00000004, 'LO', "12345")
         assert '' == elem.description()
 
     def test_equality_standard_element(self):
@@ -326,7 +326,7 @@ class TestDataElement:
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
-        elem = DataElement(0x00100010, 'LO', 12345)
+        elem = DataElement(0x00100010, 'US', 123)
         with pytest.raises(TypeError):
             elem[0]
 
@@ -726,25 +726,112 @@ class TestRawDataElement:
 
 class TestDataElementValidation:
 
+    @staticmethod
+    def check_invalid_vr(vr, value, check_warn=True):
+        msg = fr"Invalid value for VR {vr}: *"
+        if check_warn:
+            with pytest.warns(UserWarning, match=msg):
+                DataElement(0x00410001, vr, value, raise_on_error=False)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value, raise_on_error=True)
+
     @pytest.mark.parametrize("vr, length", (
-            ("AE", 17), ("AS", 5), ("CS", 17), ("DA", 9), ("DS", 27),
-            ("DT", 27), ("LO", 66), ("LT", 10250), ("PN", 200),
-            ("SH", 17), ("ST", 1025), ("TM", 16), ("UI", 65)
+            ("AE", 17), ("CS", 17), ("DS", 27),
+            ("LO", 66), ("LT", 10250), ("PN", 200),
+            ("SH", 17), ("ST", 1025), ("UI", 65)
     ))
     def test_maxvalue_exceeded(self, vr, length, no_datetime_conversion):
         msg = fr"The value length \({length}\) exceeds the maximum length *"
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, vr, "1" * length, raise_on_error=False)
-
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, "2" * length, raise_on_error=True)
 
-    @pytest.mark.parametrize("vr, length", (("AS", 3), ("DA", 7)))
-    def test_too_short_for_fixed_length(self, vr, length,
-                                        no_datetime_conversion):
-        msg = fr"The value length \({length}\) is less than the fixed length *"
-        with pytest.warns(UserWarning, match=msg):
-            DataElement(0x00410001, vr, "1" * length, raise_on_error=False)
+    @pytest.mark.parametrize("value", ("12Y", "0012Y", "012B", "Y012"))
+    def test_invalid_as(self, value):
+        self.check_invalid_vr("AS", value)
 
-        with pytest.raises(ValueError, match=msg):
-            DataElement(0x00410001, vr, "2" * length, raise_on_error=True)
+    @pytest.mark.parametrize("value", ("012Y", "345M", "052W", "789D"))
+    def test_valid_as(self, value):
+        DataElement(0x00410001, "AS", value, raise_on_error=True)
+
+    @pytest.mark.parametrize("value", ("abcd", "ABC+D", "ABCD-Z", "ÄÖÜ"))
+    def test_invalid_cs(self, value):
+        self.check_invalid_vr("CS", value)
+
+    def test_valid_cs(self):
+        DataElement(0x00410001, "CS", "VALID_13579 ", raise_on_error=True)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("201012", "2010122505", "20102525", "-20101225-", "20101620",
+         "20101040", "20101033", "20101225 20201224 ")
+    )
+    def test_invalid_da(self, value):
+        self.check_invalid_vr("DA", value)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("19560303", "20101225-20201224 ", "-19560303", "19560303-")
+    )
+    def test_valid_da(self, value):
+        DataElement(0x00410001, "DA", value, raise_on_error=True)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("201012+", "20A0", "+-123.66", "-123.5 E4", "123F4 ", "- 195.6")
+    )
+    def test_invalid_ds(self, value):
+        self.check_invalid_vr("DS", value, check_warn=False)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("12345", "+.1234 ", "-0345.76", "1956E3", "-1956e+3", "+195.6e-3")
+    )
+    def test_valid_ds(self, value):
+        DataElement(0x00410001, "DS", value, raise_on_error=True)
+
+    @pytest.mark.parametrize(
+        "value", ("201012+", "20A0", "123.66", "-1235E4", "12 34")
+    )
+    def test_invalid_is(self, value):
+        self.check_invalid_vr("IS", value, check_warn=False)
+
+    @pytest.mark.parametrize("value", (" 12345 ", "+1234 ", "-034576"))
+    def test_valid_is(self, value):
+        DataElement(0x00410001, "IS", value, raise_on_error=True)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("234", "1", "01015", "225959.", "0000.345", "222222.2222222",
+         "-1234-", "+123456", "-123456-1330")
+    )
+    def test_invalid_tm(self, value):
+        self.check_invalid_vr("TM", value)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("23", "1234", "010159", "225959.3", "000000.345", "222222.222222",
+         "-1234", "123456-", "123456-1330")
+    )
+    def test_valid_tm(self, value):
+        DataElement(0x00410001, "TM", value, raise_on_error=True)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("19", "198", "20011", "20200101.222", "187712311", "20001301",
+         "19190432010159", "203002020222.2222222", "203002020270.2",
+         "1984+2000", "+1877123112-0030")
+    )
+    def test_invalid_dt(self, value):
+        self.check_invalid_vr("DT", value)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("1984", "200112", "20200101", "1877123112", "200006012020",
+         "19190420010159", "20300202022222.222222", "20300202022222.2",
+         "1984+0600", "1877123112-0030", "20300202022222.2-1200",
+         "20000101-", "-2020010100", "1929-1997")
+    )
+    def test_valid_dt(self, value):
+        DataElement(0x00410001, "DT", value, raise_on_error=True)

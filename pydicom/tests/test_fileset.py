@@ -145,7 +145,7 @@ def private(dicomdir):
     bottom = private_record()
     bottom.ReferencedSOPClassUIDInFile = "1.2.3.4"
     bottom.ReferencedFileID = [
-        "tiny_alpha", "PT000000", "ST000000", "SE000000", "IM000000"
+        "TINY_ALPHA", "PT000000", "ST000000", "SE000000", "IM000000"
     ]
     bottom.ReferencedSOPInstanceUIDInFile = (
         "1.2.276.0.7230010.3.1.4.0.31906.1359940846.78187"
@@ -215,7 +215,7 @@ def dummy():
     ds.InstanceNumber = "1"
     ds.ContentDate = "20201002"
     ds.ContentTime = "120100"
-    ds.ContentLabel = "Content label"
+    ds.ContentLabel = "CONTENT LABEL"
     ds.ContentDescription = "Content description"
     ds.ContentCreatorName = "Content^Creator^Name"
     ds.TreatmentDate = "20201003"
@@ -658,7 +658,7 @@ class TestRecordNode:
         with pytest.raises(ValueError, match=msg):
             FileSet(private)
 
-        private.DirectoryRecordSequence[0].PatientID = 77654033
+        private.DirectoryRecordSequence[0].PatientID = "77654033"
         del private.DirectoryRecordSequence[1].StudyInstanceUID
         msg = (
             r"The STUDY directory record at offset 510 is missing a required "
@@ -1007,7 +1007,7 @@ class TestFileInstance:
             assert node.record_type == "PRIVATE"
 
         path = os.fspath(
-            Path("tiny_alpha/PT000000/ST000000/SE000000/IM000000")
+            Path("TINY_ALPHA/PT000000/ST000000/SE000000/IM000000")
         )
         assert path in instances[-1].path
 
@@ -2701,7 +2701,7 @@ REFERENCE_4LEVEL = [
     ("MEASUREMENT", LensometryMeasurementsStorage, "LEN", None),
     ("SURFACE", SurfaceSegmentationStorage, "LS", None),
     ("SURFACE SCAN", SurfaceScanMeshStorage, "LS", None),
-    ("TRACT", TractographyResultsStorage, "None", None),
+    ("TRACT", TractographyResultsStorage, "NONE", None),
     ("ASSESSMENT", ContentAssessmentResultsStorage, "ASMT", None),
     ("RADIOTHERAPY", CArmPhotonElectronRadiationStorage, "RTRAD", None),
 ]
