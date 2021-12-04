@@ -38,7 +38,7 @@ from pydicom.uid import (
 
 
 TEST_FILE = get_testdata_file('DICOMDIR')
-TINY_ALPHA_FILESET = get_testdata_file("tiny_alpha/DICOMDIR")
+TINY_ALPHA_FILESET = get_testdata_file("TINY_ALPHA/DICOMDIR")
 IMPLICIT_TEST_FILE = get_testdata_file('DICOMDIR-implicit')
 BIGENDIAN_TEST_FILE = get_testdata_file('DICOMDIR-bigEnd')
 

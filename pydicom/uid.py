@@ -56,9 +56,9 @@ pydicom's (0002,0012) *Implementation Class UID*
 """
 
 # Regexes for valid UIDs and valid UID prefixes
-RE_VALID_UID = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$'
+RE_VALID_UID = re.compile(r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$')
 """Regex for a valid UID"""
-RE_VALID_UID_PREFIX = r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$'
+RE_VALID_UID_PREFIX = re.compile(r'^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$')
 """Regex for a valid UID prefix"""
 
 

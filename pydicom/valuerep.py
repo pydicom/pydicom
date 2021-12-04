@@ -58,7 +58,7 @@ MAX_VALUE_LEN = {
 }
 
 
-def _range_regex(regex):
+def _range_regex(regex: str) -> str:
     """Compose a regex that allows ranges of the given regex,
     as defined for VRs DA, DT and TM in PS 3.4, C.2.2.2.5.
     """
@@ -107,7 +107,7 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
 
 
 def validate_regex(vr: str, value: Union[str, bytes],
-                   regex: re.Pattern) -> Tuple[bool, str]:
+                   regex: Any) -> Tuple[bool, str]:
     """Validate the value for a given VR using a regular expression.
 
     Parameters
@@ -123,6 +123,7 @@ def validate_regex(vr: str, value: Union[str, bytes],
     -------
         A tuple of a boolean validation result and the error message.
     """
+    str_value: Optional[str]
     if isinstance(value, bytes):
         try:
             str_value = value.decode(encoding="ascii", errors="strict")
@@ -132,7 +133,7 @@ def validate_regex(vr: str, value: Union[str, bytes],
         str_value = value
     is_valid = str_value is not None and re.match(regex, str_value)
     if not is_valid:
-        return False, f"Invalid value for VR {vr}: '{value}'."
+        return False, f"Invalid value for VR {vr}: '{value!r}'."
     return True, ''
 
 
@@ -167,7 +168,7 @@ def validate_ascii(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
 
 
 def validate_length_and_regex(vr: str, value: Union[str, bytes],
-                              regex: re.Pattern) -> Tuple[bool, str]:
+                              regex: Any) -> Tuple[bool, str]:
     is_valid_len, msg1 = validate_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value, regex)
     return is_valid_len and is_valid_expr, ' '.join([msg1, msg2]).strip()
