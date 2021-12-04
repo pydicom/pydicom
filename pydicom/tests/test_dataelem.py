@@ -747,24 +747,34 @@ class TestDataElementValidation:
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, "2" * length, raise_on_error=True)
 
-    @pytest.mark.parametrize("value", ("12Y", "0012Y", "012B", "Y012"))
+    @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", 'Äneas'))
+    def test_invalid_ae(self, value):
+        self.check_invalid_vr("AE", value)
+
+    @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle"))
+    def test_valid_ae(self, value):
+        DataElement(0x00410001, "AE", value, raise_on_error=True)
+
+    @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012"))
     def test_invalid_as(self, value):
         self.check_invalid_vr("AS", value)
 
-    @pytest.mark.parametrize("value", ("012Y", "345M", "052W", "789D"))
+    @pytest.mark.parametrize("value", ("012Y", "345M", b"052W", b"789D"))
     def test_valid_as(self, value):
         DataElement(0x00410001, "AS", value, raise_on_error=True)
 
-    @pytest.mark.parametrize("value", ("abcd", "ABC+D", "ABCD-Z", "ÄÖÜ"))
+    @pytest.mark.parametrize("value", (
+            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8")))
     def test_invalid_cs(self, value):
         self.check_invalid_vr("CS", value)
 
-    def test_valid_cs(self):
-        DataElement(0x00410001, "CS", "VALID_13579 ", raise_on_error=True)
+    @pytest.mark.parametrize("value", ("VALID_13579 ", b"VALID_13579"))
+    def test_valid_cs(self, value):
+        DataElement(0x00410001, "CS", value, raise_on_error=True)
 
     @pytest.mark.parametrize(
         "value",
-        ("201012", "2010122505", "20102525", "-20101225-", "20101620",
+        ("201012", "2010122505", b"20102525", b"-20101225-", "20101620",
          "20101040", "20101033", "20101225 20201224 ")
     )
     def test_invalid_da(self, value):
@@ -772,55 +782,55 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize(
         "value",
-        ("19560303", "20101225-20201224 ", "-19560303", "19560303-")
+        (b"19560303", "20101225-20201224 ", b"-19560303", "19560303-")
     )
     def test_valid_da(self, value):
         DataElement(0x00410001, "DA", value, raise_on_error=True)
 
     @pytest.mark.parametrize(
         "value",
-        ("201012+", "20A0", "+-123.66", "-123.5 E4", "123F4 ", "- 195.6")
+        ("201012+", "20A0", "+-123.66", "-123.5 E4", b"123F4 ", "- 195.6")
     )
     def test_invalid_ds(self, value):
         self.check_invalid_vr("DS", value, check_warn=False)
 
     @pytest.mark.parametrize(
         "value",
-        ("12345", "+.1234 ", "-0345.76", "1956E3", "-1956e+3", "+195.6e-3")
+        ("12345", "+.1234 ", "-0345.76", b"1956E3", b"-1956e+3", "+195.6e-3")
     )
     def test_valid_ds(self, value):
         DataElement(0x00410001, "DS", value, raise_on_error=True)
 
     @pytest.mark.parametrize(
-        "value", ("201012+", "20A0", "123.66", "-1235E4", "12 34")
+        "value", ("201012+", "20A0", b"123.66", "-1235E4", "12 34")
     )
     def test_invalid_is(self, value):
         self.check_invalid_vr("IS", value, check_warn=False)
 
-    @pytest.mark.parametrize("value", (" 12345 ", "+1234 ", "-034576"))
+    @pytest.mark.parametrize("value", (" 12345 ", b"+1234 ", "-034576"))
     def test_valid_is(self, value):
         DataElement(0x00410001, "IS", value, raise_on_error=True)
 
     @pytest.mark.parametrize(
         "value",
-        ("234", "1", "01015", "225959.", "0000.345", "222222.2222222",
-         "-1234-", "+123456", "-123456-1330")
+        ("234", "1", "01015", "225959.", b"0000.345", "222222.2222222",
+         "-1234-", "+123456", b"-123456-1330")
     )
     def test_invalid_tm(self, value):
         self.check_invalid_vr("TM", value)
 
     @pytest.mark.parametrize(
         "value",
-        ("23", "1234", "010159", "225959.3", "000000.345", "222222.222222",
-         "-1234", "123456-", "123456-1330")
+        ("23", "1234", b"010159", "225959.3", "000000.345", "222222.222222",
+         "-1234", "123456-", b"123456-1330")
     )
     def test_valid_tm(self, value):
         DataElement(0x00410001, "TM", value, raise_on_error=True)
 
     @pytest.mark.parametrize(
         "value",
-        ("19", "198", "20011", "20200101.222", "187712311", "20001301",
-         "19190432010159", "203002020222.2222222", "203002020270.2",
+        ("19", "198", "20011", b"20200101.222", "187712311", "20001301",
+         "19190432010159", "203002020222.2222222", b"203002020270.2",
          "1984+2000", "+1877123112-0030")
     )
     def test_invalid_dt(self, value):
@@ -828,10 +838,20 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize(
         "value",
-        ("1984", "200112", "20200101", "1877123112", "200006012020",
-         "19190420010159", "20300202022222.222222", "20300202022222.2",
+        ("1984", "200112", b"20200101", "1877123112", "200006012020",
+         "19190420010159", "20300202022222.222222", b"20300202022222.2",
          "1984+0600", "1877123112-0030", "20300202022222.2-1200",
          "20000101-", "-2020010100", "1929-1997")
     )
     def test_valid_dt(self, value):
         DataElement(0x00410001, "DT", value, raise_on_error=True)
+
+    @pytest.mark.parametrize("value", (
+            "Руссский", "ctrl\tchar", '"url"', "a<b", "{abc}"))
+    def test_invalid_ur(self, value):
+        self.check_invalid_vr("UR", value)
+
+    @pytest.mark.parametrize("value", (
+            "https://www.a.b/sdf_g?a=1&b=5", "/a#b(c)[d]@!", "'url'"))
+    def test_valid_ur(self, value):
+        DataElement(0x00410001, "UR", value, raise_on_error=True)

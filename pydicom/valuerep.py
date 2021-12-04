@@ -66,6 +66,7 @@ def _range_regex(regex: str) -> str:
 
 
 # regular expressions to match valid values for some VRs
+AE_REGEX = re.compile(r"^[\x20-\x7e]*$")
 AS_REGEX = re.compile(r"^\d\d\d[DWMY]$")
 CS_REGEX = re.compile(r"^[A-Z0-9 _]*$")
 DS_REGEX = re.compile(
@@ -79,6 +80,7 @@ DT_REGEX = re.compile(_range_regex(
 )
 TM_REGEX = re.compile(_range_regex(
     r"([01]\d|2[0-3])([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?"))
+UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]*$")
 
 
 def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
@@ -106,15 +108,14 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ''
 
 
-def validate_regex(vr: str, value: Union[str, bytes],
-                   regex: Any) -> Tuple[bool, str]:
+def validate_regex(vr: str, value: str, regex: Any) -> Tuple[bool, str]:
     """Validate the value for a given VR using a regular expression.
 
     Parameters
     ----------
     vr : str
         The value representation to validate against.
-    value : str or bytes
+    value : str
         The value to validate.
     regex : re.Pattern
         The precompiled regex pattern used for matching.
@@ -123,47 +124,8 @@ def validate_regex(vr: str, value: Union[str, bytes],
     -------
         A tuple of a boolean validation result and the error message.
     """
-    str_value: Optional[str]
-    if isinstance(value, bytes):
-        try:
-            str_value = value.decode(encoding="ascii", errors="strict")
-        except UnicodeDecodeError:
-            str_value = None
-    else:
-        str_value = value
-    is_valid = str_value is not None and re.match(regex, str_value)
-    if not is_valid:
+    if not re.match(regex, value):
         return False, f"Invalid value for VR {vr}: '{value!r}'."
-    return True, ''
-
-
-def validate_ascii(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate that the given value is an ASCII string or byte array.
-
-    Parameters
-    ----------
-    vr : str
-        The value representation to validate against.
-    value : str or bytes
-        The value to validate.
-
-    Returns
-    -------
-        A tuple of a boolean validation result and the error message.
-    """
-    is_ascii = True
-    if isinstance(value, str):
-        try:
-            byte_value = value.encode(encoding="ascii", errors="strict")
-        except UnicodeEncodeError:
-            byte_value = b''
-            is_ascii = False
-    else:
-        byte_value = value
-    is_ascii = is_ascii and all(0x20 <= ch < 0x80 for ch in byte_value)
-    if not is_ascii:
-        return False, (f"Invalid value for VR {vr}: must be an ASCII "
-                       f"string and not contain control characters.")
     return True, ''
 
 
@@ -175,9 +137,7 @@ def validate_length_and_regex(vr: str, value: Union[str, bytes],
 
 
 def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    is_valid_len, msg1 = validate_length(vr, value)
-    is_valid_ascii, msg2 = validate_ascii(vr, value)
-    return is_valid_len and is_valid_ascii, ' '.join([msg1, msg2]).strip()
+    return validate_length_and_regex(vr, value, AE_REGEX)
 
 
 def validate_as(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
@@ -204,19 +164,22 @@ def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return validate_length_and_regex(vr, value, IS_REGEX)
 
 
+def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_regex(vr, value, TM_REGEX)
+
+
 def validate_ui(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     from pydicom.uid import RE_VALID_UID
     return validate_length_and_regex(vr, value, RE_VALID_UID)
 
 
-def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    return validate_regex(vr, value, TM_REGEX)
+def validate_ur(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    return validate_length_and_regex(vr, value, UR_REGEX)
 
 
 VALIDATORS = {
     "AE": validate_ae,
     "AS": validate_as,
-    "AT": validate_length,
     "CS": validate_cs,
     "DA": validate_da,
     "DS": validate_ds,
@@ -230,7 +193,7 @@ VALIDATORS = {
     "TM": validate_tm,
     "UC": validate_length,
     "UI": validate_ui,
-    "UR": validate_length,
+    "UR": validate_ur,
     "UT": validate_length,
 }
 
