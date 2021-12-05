@@ -13,7 +13,7 @@ from typing import (
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
-from pydicom.config import logger, have_numpy
+from pydicom.config import logger, have_numpy, enforce_valid_values
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
@@ -23,7 +23,7 @@ from pydicom.tag import (Tag, TupleTag, BaseTag)
 import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
-    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, text_VRs
+    MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, text_VRs, validate_value
 )
 
 try:
@@ -498,10 +498,30 @@ def convert_string(
     return MultiString(byte_string.decode(default_encoding))
 
 
+def convert_lo_text(
+    byte_string: bytes, encodings: Optional[List[str]] = None
+) -> Union[str, MutableSequence[str]]:
+    """Validate text length for VR of 'LO' and  return decoded text.
+    See :func:`~pydicom.values.convert_text` for details.
+    """
+    validate_value("LO", byte_string, raise_on_error=enforce_valid_values)
+    return convert_text(byte_string, encodings)
+
+
+def convert_sh_text(
+    byte_string: bytes, encodings: Optional[List[str]] = None
+) -> Union[str, MutableSequence[str]]:
+    """Validate text length for VR of 'SH' and  return decoded text.
+    See :func:`~pydicom.values.convert_text` for details.
+    """
+    validate_value("SH", byte_string, raise_on_error=enforce_valid_values)
+    return convert_text(byte_string, encodings)
+
+
 def convert_text(
     byte_string: bytes, encodings: Optional[List[str]] = None
 ) -> Union[str, MutableSequence[str]]:
-    """Return a decoded text VR value, ignoring backslashes.
+    """Return a decoded text VR value.
 
     Text VRs are 'SH', 'LO' and 'UC'.
 
@@ -523,6 +543,26 @@ def convert_text(
         return as_strings[0]
 
     return MultiValue(str, as_strings)
+
+
+def convert_lt_text(
+        byte_string: bytes, encodings: Optional[List[str]] = None
+) -> Union[str, MutableSequence[str]]:
+    """Validate text length for VR of 'LT' and  return decoded text.
+    See :func:`~pydicom.values.convert_single_string` for details.
+    """
+    validate_value("LT", byte_string, raise_on_error=enforce_valid_values)
+    return convert_single_string(byte_string, encodings)
+
+
+def convert_st_text(
+        byte_string: bytes, encodings: Optional[List[str]] = None
+) -> Union[str, MutableSequence[str]]:
+    """Validate text length for VR of 'ST' and  return decoded text.
+    See :func:`~pydicom.values.convert_single_string` for details.
+    """
+    validate_value("ST", byte_string, raise_on_error=enforce_valid_values)
+    return convert_single_string(byte_string, encodings)
 
 
 def convert_single_string(
@@ -800,8 +840,8 @@ converters = {
     'FD': (convert_numbers, 'd'),
     'FL': (convert_numbers, 'f'),
     'IS': convert_IS_string,
-    'LO': convert_text,
-    'LT': convert_single_string,
+    'LO': convert_lo_text,
+    'LT': convert_lt_text,
     'OB': convert_OBvalue,
     'OD': convert_OBvalue,
     'OF': convert_OWvalue,
@@ -809,11 +849,11 @@ converters = {
     'OW': convert_OWvalue,
     'OV': convert_OVvalue,
     'PN': convert_PN,
-    'SH': convert_text,
+    'SH': convert_sh_text,
     'SL': (convert_numbers, 'l'),
     'SQ': convert_SQ,
     'SS': (convert_numbers, 'h'),
-    'ST': convert_single_string,
+    'ST': convert_st_text,
     'SV': (convert_numbers, 'q'),
     'TM': convert_TM_string,
     'UC': convert_text,

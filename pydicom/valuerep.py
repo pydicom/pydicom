@@ -96,8 +96,6 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     -------
         A tuple of a boolean validation result and the error message.
     """
-    if vr in ("LO", "LT", "PN", "SH", "ST"):
-        print(vr)
     max_length = MAX_VALUE_LEN.get(vr, 0)
     if max_length > 0:
         value_length = len(value)
@@ -1160,6 +1158,7 @@ class PersonName:
         self.original_string: bytes
         self._components: Optional[Tuple[str, ...]] = None
         self.encodings: Optional[Tuple[str, ...]]
+        self.raise_on_error = raise_on_error
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1168,16 +1167,17 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
-            validate_value("PN", original_string, raise_on_error)
+            validate_value("PN", val, raise_on_error)
             self._components = None
         else:
             # val: str
             # `val` is the decoded person name value
-            # `original_string`  should be the original encoded value
+            # `original_string` should be the original encoded value
             self.original_string = cast(bytes, original_string)
-            if not self.original_string:
-                # if original_string is set, it was already validated
-                validate_value("PN", val, raise_on_error)
+            # if we don't have the byte string at this point, we at least
+            # validate the length of the string components
+            validate_value("PN", original_string if original_string else val,
+                           raise_on_error)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:
@@ -1356,6 +1356,8 @@ class PersonName:
             self.original_string = _encode_personname(
                 self.components, self.encodings or [default_encoding]
             )
+            # now that we have the byte length, we re-validate the value
+            validate_value("PN", self.original_string, self.raise_on_error)
 
         return PersonName(self.original_string, encodings)
 

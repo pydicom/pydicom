@@ -854,3 +854,12 @@ class TestDataElementValidation:
             "https://www.a.b/sdf_g?a=1&b=5", "/a#b(c)[d]@!", "'url'"))
     def test_valid_ur(self, value):
         DataElement(0x00410001, "UR", value, raise_on_error=True)
+
+    def test_invalid_pn(self):
+        msg = r"The number of PN components length \(4\) exceeds *"
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, "PN", "Jim=John=Jimmy=Jonny",
+                        raise_on_error=True)
+        msg = r"The PN component length \(65\) exceeds *"
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, "PN", b"Jimmy" * 13, raise_on_error=True)
