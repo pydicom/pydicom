@@ -736,8 +736,7 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, value, raise_on_error=True)
 
     @pytest.mark.parametrize("vr, length", (
-            ("AE", 17), ("CS", 17), ("DS", 27),
-            ("LO", 66), ("LT", 10250), ("PN", 200),
+            ("AE", 17), ("CS", 17), ("DS", 27), ("LO", 66), ("LT", 10250),
             ("SH", 17), ("ST", 1025), ("UI", 65)
     ))
     def test_maxvalue_exceeded(self, vr, length, no_datetime_conversion):

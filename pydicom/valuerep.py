@@ -51,7 +51,6 @@ MAX_VALUE_LEN = {
     "IS": 12,
     "LO": 64,
     "LT": 10240,
-    "PN": 196,
     "SH": 16,
     "ST": 1024,
     "UI": 64
@@ -80,7 +79,7 @@ DT_REGEX = re.compile(_range_regex(
 )
 TM_REGEX = re.compile(_range_regex(
     r"([01]\d|2[0-3])([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?"))
-UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]*$")
+UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$")
 
 
 def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
@@ -97,6 +96,8 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     -------
         A tuple of a boolean validation result and the error message.
     """
+    if vr in ("LO", "LT", "PN", "SH", "ST"):
+        print(vr)
     max_length = MAX_VALUE_LEN.get(vr, 0)
     if max_length > 0:
         value_length = len(value)
@@ -105,7 +106,7 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
                 f"The value length ({value_length}) exceeds the "
                 f"maximum length of {max_length} allowed for VR {vr}."
             )
-    return True, ''
+    return True, ""
 
 
 def validate_regex(vr: str, value: str, regex: Any) -> Tuple[bool, str]:
@@ -126,14 +127,14 @@ def validate_regex(vr: str, value: str, regex: Any) -> Tuple[bool, str]:
     """
     if not re.match(regex, value):
         return False, f"Invalid value for VR {vr}: '{value!r}'."
-    return True, ''
+    return True, ""
 
 
 def validate_length_and_regex(vr: str, value: Union[str, bytes],
                               regex: Any) -> Tuple[bool, str]:
     is_valid_len, msg1 = validate_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value, regex)
-    return is_valid_len and is_valid_expr, ' '.join([msg1, msg2]).strip()
+    return is_valid_len and is_valid_expr, " ".join([msg1, msg2]).strip()
 
 
 def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
@@ -164,6 +165,25 @@ def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return validate_length_and_regex(vr, value, IS_REGEX)
 
 
+def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    if not value:
+        return True, ""
+    split_char = b"=" if isinstance(value, bytes) else "="
+    components = value.split(split_char)
+    if len(components) > 3:
+        return False, (
+            f"The number of PN components length ({len(components)}) exceeds "
+            f"the maximum allowed number of 3."
+        )
+    for comp in components:
+        if len(comp) > 64:
+            return False, (
+                f"The PN component length ({len(comp)}) exceeds the "
+                f"maximum allowed length of 64."
+            )
+    return True, ""
+
+
 def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return validate_regex(vr, value, TM_REGEX)
 
@@ -187,14 +207,12 @@ VALIDATORS = {
     "IS": validate_is,
     "LO": validate_length,
     "LT": validate_length,
-    "PN": validate_length,
+    "PN": validate_pn,
     "SH": validate_length,
     "ST": validate_length,
     "TM": validate_tm,
-    "UC": validate_length,
     "UI": validate_ui,
     "UR": validate_ur,
-    "UT": validate_length,
 }
 
 
@@ -1146,13 +1164,16 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
+            validate_value("PN", original_string, raise_on_error)
             self._components = None
         else:
             # val: str
             # `val` is the decoded person name value
             # `original_string`  should be the original encoded value
-            validate_value("PN", val, raise_on_error)
             self.original_string = cast(bytes, original_string)
+            if not self.original_string:
+                # if original_string is set, it was already validated
+                validate_value("PN", val, raise_on_error)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:

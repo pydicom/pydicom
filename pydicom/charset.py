@@ -833,9 +833,9 @@ def decode_element(
                 cast(PersonName, vv).decode(encodings) for vv in elem.value
             ]
     elif elem.VR in text_VRs:
-        # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
             if isinstance(elem.value, str):
+                # already decoded
                 return
             elem.value = decode_bytes(elem.value, encodings, TEXT_VR_DELIMS)
         else:
