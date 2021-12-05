@@ -109,7 +109,8 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_regex(vr: str, value: str, regex: Any) -> Tuple[bool, str]:
+def validate_regex(vr: str, value: Union[str, bytes],
+                   regex: Any) -> Tuple[bool, str]:
     """Validate the value for a given VR using a regular expression.
 
     Parameters
@@ -168,8 +169,11 @@ def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
 def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     if not value:
         return True, ""
-    split_char = b"=" if isinstance(value, bytes) else "="
-    components = value.split(split_char)
+    components: Sequence[Union[str, bytes]]
+    if isinstance(value, bytes):
+        components = value.split(b"=")
+    else:
+        components = value.split("=")
     if len(components) > 3:
         return False, (
             f"The number of PN components length ({len(components)}) exceeds "
