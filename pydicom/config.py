@@ -143,6 +143,12 @@ Default: ``False``.
 .. versionadded:: 2.0
 """
 
+allow_IS_float = False
+"""Set to ``True`` to allow : class`~pydicom.valuerep.IS` instances to be
+created using :class:`floats<float`; otherwise, a TypeError will be raised when
+creating an IS VR value with a float.
+"""
+
 allow_DS_float = False
 """Set to ``True`` to allow :class:`~pydicom.valuerep.DSdecimal`
 instances to be created using :class:`floats<float>`; otherwise, they must be
