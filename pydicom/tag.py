@@ -62,7 +62,7 @@ def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
           group and element numbers of the tag
         * If :class:`str` then the corresponding element's keyword
         * If :class:`tuple` then the (group, element) numbers as
-          ``(:class:`int`, :class:`int`)``.
+          (:class:`int`, :class:`int`).
     arg2 : int, optional
         The element number of the DICOM tag, required when `arg` only contains
         the group number of the tag.
