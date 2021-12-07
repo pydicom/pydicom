@@ -373,6 +373,17 @@ class TestDataElementCallbackTests:
         else:
             assert expected == got
 
+    def testDataElementCallback(self):
+        """Ensure data_element_callback has access to dataset."""
+        def callback(raw_elem, dataset, **_kwargs):
+            assert 'PatientName' in dataset.dir()
+            return raw_elem
+        config.data_element_callback = callback
+        ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
+                                     is_implicit_VR=True)
+        assert ds.InstanceNumber is None
+        config.reset_data_element_callback()
+
 
 class TestLeanRead:
     def test_explicit_little(self):
