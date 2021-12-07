@@ -813,6 +813,7 @@ def DataElement_from_raw(
         raw = config.data_element_callback(
             raw_data_element,
             encoding=encoding,
+            dataset=dataset,
             **config.data_element_callback_kwargs
         )
 
