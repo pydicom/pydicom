@@ -102,10 +102,10 @@ class TestCharset:
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
-        ds.SpecificCharacterSet = 'Unsupported'
+        ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.warns(
             UserWarning,
-            match=("Unknown encoding 'Unsupported' "
+            match=("Unknown encoding 'UNSUPPORTED' "
                    "- using default encoding instead")
         ):
             ds.decode()
@@ -115,9 +115,9 @@ class TestCharset:
         """charset: raise on invalid encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
-        ds.SpecificCharacterSet = 'Unsupported'
+        ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.raises(LookupError,
-                           match="Unknown encoding 'Unsupported'"):
+                           match="Unknown encoding 'UNSUPPORTED'"):
             ds.decode()
 
     def test_decoding_with_specific_tags(self):

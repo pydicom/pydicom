@@ -13,7 +13,7 @@ from typing import (
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
-from pydicom.config import logger, have_numpy, enforce_valid_values
+from pydicom.config import logger, have_numpy, enforce_valid_values, Config
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
@@ -498,28 +498,9 @@ def convert_string(
     return MultiString(byte_string.decode(default_encoding))
 
 
-def convert_lo_text(
-    byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[str, MutableSequence[str]]:
-    """Validate text length for VR of 'LO' and  return decoded text.
-    See :func:`~pydicom.values.convert_text` for details.
-    """
-    validate_value("LO", byte_string, raise_on_error=enforce_valid_values)
-    return convert_text(byte_string, encodings)
-
-
-def convert_sh_text(
-    byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[str, MutableSequence[str]]:
-    """Validate text length for VR of 'SH' and  return decoded text.
-    See :func:`~pydicom.values.convert_text` for details.
-    """
-    validate_value("SH", byte_string, raise_on_error=enforce_valid_values)
-    return convert_text(byte_string, encodings)
-
-
 def convert_text(
-    byte_string: bytes, encodings: Optional[List[str]] = None
+    byte_string: bytes, encodings: Optional[List[str]] = None,
+    vr: str = None
 ) -> Union[str, MutableSequence[str]]:
     """Return a decoded text VR value.
 
@@ -531,6 +512,8 @@ def convert_text(
         The encoded text VR element value.
     encodings : list of str, optional
         A list of the character encoding schemes used to encode the value.
+    vr : str
+        The value representation of the element. Needed for validation.
 
     Returns
     -------
@@ -538,35 +521,18 @@ def convert_text(
         The decoded value(s).
     """
     values = byte_string.split(b'\\')
-    as_strings = [convert_single_string(value, encodings) for value in values]
+    as_strings = [convert_single_string(value, encodings, vr)
+                  for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
 
-    return MultiValue(str, as_strings)
-
-
-def convert_lt_text(
-        byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[str, MutableSequence[str]]:
-    """Validate text length for VR of 'LT' and  return decoded text.
-    See :func:`~pydicom.values.convert_single_string` for details.
-    """
-    validate_value("LT", byte_string, raise_on_error=enforce_valid_values)
-    return convert_single_string(byte_string, encodings)
-
-
-def convert_st_text(
-        byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[str, MutableSequence[str]]:
-    """Validate text length for VR of 'ST' and  return decoded text.
-    See :func:`~pydicom.values.convert_single_string` for details.
-    """
-    validate_value("ST", byte_string, raise_on_error=enforce_valid_values)
-    return convert_single_string(byte_string, encodings)
+    return MultiValue(str, as_strings,
+                      validation_mode=config.settings.reading_validation_mode)
 
 
 def convert_single_string(
-    byte_string: bytes, encodings: Optional[List[str]] = None
+    byte_string: bytes, encodings: Optional[List[str]] = None,
+    vr: str = None,
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
 
@@ -576,12 +542,16 @@ def convert_single_string(
         The encoded string.
     encodings : list of str, optional
         A list of the character encoding schemes used to encode the text.
+    vr : str
+        The value representation of the element. Needed for validation.
 
     Returns
     -------
     str
         The decoded text.
     """
+    if vr is not None:
+        validate_value(vr, byte_string, config.settings.reading_validation_mode)
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
     return value.rstrip('\0 ')
@@ -784,8 +754,11 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if VR in text_VRs or VR == 'PN':
+        if VR in text_VRs:
             # SH, LO, ST, LT, UC, UT
+            return converter(byte_string, encodings, VR)
+
+        if VR == "PN":
             return converter(byte_string, encodings)
 
         if VR != "SQ":
@@ -840,8 +813,8 @@ converters = {
     'FD': (convert_numbers, 'd'),
     'FL': (convert_numbers, 'f'),
     'IS': convert_IS_string,
-    'LO': convert_lo_text,
-    'LT': convert_lt_text,
+    'LO': convert_text,
+    'LT': convert_single_string,
     'OB': convert_OBvalue,
     'OD': convert_OBvalue,
     'OF': convert_OWvalue,
@@ -849,11 +822,11 @@ converters = {
     'OW': convert_OWvalue,
     'OV': convert_OVvalue,
     'PN': convert_PN,
-    'SH': convert_sh_text,
+    'SH': convert_text,
     'SL': (convert_numbers, 'l'),
     'SQ': convert_SQ,
     'SS': (convert_numbers, 'h'),
-    'ST': convert_st_text,
+    'ST': convert_single_string,
     'SV': (convert_numbers, 'q'),
     'TM': convert_TM_string,
     'UC': convert_text,

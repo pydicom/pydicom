@@ -2376,7 +2376,7 @@ class TestFileSet_Modify:
         with pytest.raises(ValueError, match=msg):
             fs.add(ds)
 
-    def test_add_rt_dose(self, tdir):
+    def test_add_rt_dose(self, tdir, disable_value_validation):
         """Test adding an RT Dose instance."""
         fs = FileSet()
         ds = dcmread(get_testdata_file("rtdose.dcm"))

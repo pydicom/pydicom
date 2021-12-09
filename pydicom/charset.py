@@ -9,7 +9,7 @@ from typing import (
 )
 import warnings
 
-from pydicom import config
+from pydicom.config import settings, ValidationMode
 from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -330,7 +330,7 @@ def decode_bytes(
         try:
             return value.decode(first_encoding)
         except LookupError:
-            if config.enforce_valid_values:
+            if settings.reading_validation_mode == ValidationMode.RaiseOnError:
                 raise
             warnings.warn(
                 f"Unknown encoding '{first_encoding}' - using default "
@@ -339,7 +339,7 @@ def decode_bytes(
             first_encoding = default_encoding
             return value.decode(first_encoding)
         except UnicodeError:
-            if config.enforce_valid_values:
+            if settings.reading_validation_mode == ValidationMode.RaiseOnError:
                 raise
             warnings.warn(
                 "Failed to decode byte string with encoding "
@@ -421,7 +421,7 @@ def _decode_fragment(
         # no escape sequence - use first encoding
         return byte_str.decode(encodings[0])
     except UnicodeError:
-        if config.enforce_valid_values:
+        if settings.reading_validation_mode == ValidationMode.RaiseOnError:
             raise
         warnings.warn(
             "Failed to decode byte string with encodings: "
@@ -469,7 +469,7 @@ def _decode_escaped_fragment(
 
     # unknown escape code - use first encoding
     msg = "Found unknown escape sequence in encoded string value"
-    if config.enforce_valid_values:
+    if settings.reading_validation_mode == ValidationMode.RaiseOnError:
         raise ValueError(msg)
 
     warnings.warn(msg + f" - using encoding {encodings[0]}")
@@ -529,7 +529,7 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
             pass
     # all attempts failed - raise or warn and encode with replacement
     # characters
-    if config.enforce_valid_values:
+    if settings.reading_validation_mode == ValidationMode.RaiseOnError:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 
@@ -754,7 +754,7 @@ def _warn_about_invalid_encoding(
     is set, LookupError is raised.
     """
     if patched_encoding is None:
-        if config.enforce_valid_values:
+        if settings.reading_validation_mode == ValidationMode.RaiseOnError:
             raise LookupError(f"Unknown encoding '{encoding}'")
 
         msg = f"Unknown encoding '{encoding}' - using default encoding instead"

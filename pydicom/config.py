@@ -5,6 +5,7 @@
 
 import logging
 import os
+from contextlib import contextmanager
 from typing import Optional, Dict, Any, TYPE_CHECKING
 
 have_numpy = True
@@ -152,21 +153,77 @@ precision of digits and rounding.
 Default ``False``.
 """
 
+
 enforce_valid_values = False
-"""Raise exceptions if any value is not allowed by DICOM Standard.
+"""Obsolete. Use settings.reading_validation_mode instead."""
 
-e.g. DS strings that are longer than 16 characters; IS strings outside
-the allowed range.
 
-Default ``False``.
-"""
+class ValidationMode:
+    """Defines how data element values shall be validated"""
+    NoValidation = 0
+    WarnOnError = 1
+    RaiseOnError = 2
 
-enforce_create_valid_values = True
-"""Raise exception if trying to add a value that is not allowed by the
-DICOM Standard.
 
-Default ``True``.
-"""
+class Config:
+    """Collection of several configuration values.
+
+    Attributes
+    ----------
+    reading_validation_mode : int
+        Defines behavior for value validation while reading value.
+        Value validation checks if a value is allowed by the DICOM Standard,
+        e.g. that DS strings are not longer than 16 characters and contain only
+        allowed characters.
+        The default (WarnOnError) is to log a warning in the case of an invalid
+        value, RaiseOnError will raise an error in this case, and NoValidation
+        will bypass the validation.
+    writing_validation_mode : int
+        Defines behavior for value validation while writing a value.
+        See :attr:`~pydicom.config.Config.reading_validation_mode`.
+    """
+
+    def __init__(self):
+        self._reading_validation_mode = ValidationMode.WarnOnError
+        self.writing_validation_mode = ValidationMode.RaiseOnError
+
+    @property
+    def reading_validation_mode(self) -> int:
+        # upwards compatibility:
+        # if enforce_valid_values has been set, we use that
+        if enforce_valid_values:
+            return ValidationMode.RaiseOnError
+        return self._reading_validation_mode
+
+    @reading_validation_mode.setter
+    def reading_validation_mode(self, value: int) -> None:
+        global enforce_valid_values
+        if value == ValidationMode.RaiseOnError:
+            print(value)
+        self._reading_validation_mode = value
+        enforce_valid_values = value == ValidationMode.RaiseOnError
+
+
+settings = Config()
+"""The global configuration object."""
+
+
+@contextmanager
+def disable_value_validation():
+    """Context manager to temporarily disable value validation
+    both for reading and writing.
+    Can be used for performance reasons if the values are known to be valid.
+    """
+    reading_mode = settings.reading_validation_mode
+    writing_mode = settings.writing_validation_mode
+    try:
+        settings.reading_validation_mode = ValidationMode.NoValidation
+        settings.writing_validation_mode = ValidationMode.NoValidation
+        yield
+    finally:
+        settings.reading_validation_mode = reading_mode
+        settings.writing_validation_mode = writing_mode
+
 
 convert_wrong_length_to_UN = False
 """Convert a field VR to "UN" and return bytes if bytes length is invalid.

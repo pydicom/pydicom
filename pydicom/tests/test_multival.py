@@ -2,9 +2,10 @@
 """Unit tests for the pydicom.multival module."""
 
 import pytest
+
+from pydicom.config import ValidationMode
 from pydicom.multival import MultiValue
 from pydicom.valuerep import DS, DSfloat, DSdecimal, IS
-from pydicom import config
 from copy import deepcopy
 
 import sys
@@ -38,7 +39,8 @@ class TestMultiValue:
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
         with pytest.raises(OverflowError):
-            MultiValue(IS, [1, -2 ** 31 - 1], raise_on_error=True)
+            MultiValue(IS, [1, -2 ** 31 - 1],
+                       validation_mode=ValidationMode.RaiseOnError)
         # Overflow error not raised for IS out of DICOM valid range
 
     def testAppend(self):

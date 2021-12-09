@@ -14,6 +14,7 @@ from typing import (
 
 # don't import datetime_conversion directly
 from pydicom import config
+from pydicom.config import ValidationMode
 from pydicom.multival import MultiValue
 
 
@@ -218,7 +219,8 @@ VALIDATORS = {
 }
 
 
-def validate_value(vr: str, value: Any, raise_on_error: bool) -> None:
+def validate_value(vr: str, value: Any,
+                   validation_mode: int) -> None:
     """Validate the given value against the DICOM standard.
 
     Parameters
@@ -227,18 +229,21 @@ def validate_value(vr: str, value: Any, raise_on_error: bool) -> None:
         The VR of the tag the value is added to.
     value : Any
         The value to be validated.
-    raise_on_error : bool
-        If True, a :class:`ValueError` is raised for a validation
-        error, otherwise a warning is issued.
+    validation_mode : int
+        Defines if values are validated and how validation errors are
+        handled.
 
     The values are checked for a length valid for the given VR.
     """
+    if validation_mode == ValidationMode.NoValidation:
+        return
+
     if value is not None and isinstance(value, (str, bytes)):
         validator = VALIDATORS.get(vr)
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
-                if raise_on_error:
+                if validation_mode == ValidationMode.RaiseOnError:
                     raise ValueError(msg)
                 warnings.warn(msg)
 
@@ -680,7 +685,8 @@ class DSfloat(float):
     def __new__(  # type: ignore[misc]
         cls: Type["DSfloat"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False, raise_on_error: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> Optional[Union[str, "DSfloat"]]:
         if val is None:
             return val
@@ -692,11 +698,15 @@ class DSfloat(float):
 
     def __init__(
         self, val: Union[str, int, float, Decimal],
-        auto_format: bool = False, raise_on_error: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
         has_attribute = hasattr(val, 'original_string')
@@ -722,7 +732,8 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if raise_on_error and not self.auto_format:
+        if (validation_mode == ValidationMode.RaiseOnError and
+                not self.auto_format):
             if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
@@ -789,7 +800,8 @@ class DSdecimal(Decimal):
     def __new__(  # type: ignore[misc]
         cls: Type["DSdecimal"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False, raise_on_error: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> Optional[Union[str, "DSdecimal"]]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -819,12 +831,15 @@ class DSdecimal(Decimal):
         self,
         val: Union[str, int, float, Decimal],
         auto_format: bool = False,
-        raise_on_error: bool = False
+        validation_mode: int = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
         write ``'123'``, but :class:`DS` will use the original.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
         pre_checked = False
@@ -850,9 +865,9 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if raise_on_error:
+        if validation_mode != ValidationMode.NoValidation:
             if len(repr(self).strip("'")) > 16:
-                raise OverflowError(
+                msg = (
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
                     "'config.enforce_valid_values' to False to override the "
@@ -860,12 +875,18 @@ class DSdecimal(Decimal):
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
+                if validation_mode == ValidationMode.RaiseOnError:
+                    raise OverflowError(msg)
+                warnings.warn(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                raise ValueError(
+                msg = (
                     f'Value "{str(self)}" is not valid for elements with a VR '
                     'of DS'
                 )
+                if validation_mode == ValidationMode.RaiseOnError:
+                    raise ValueError(msg)
+                warnings.warn(msg)
 
     def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
@@ -903,7 +924,7 @@ else:
 
 def DS(
     val: Union[None, str, int, float, Decimal], auto_format: bool = False,
-    raise_on_error: bool = False
+    validation_mode: int = None
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -918,15 +939,18 @@ def DS(
     if val is None:
         return val
 
+    if validation_mode is None:
+        validation_mode = config.settings.reading_validation_mode
+
     if isinstance(val, str):
         if val.strip() == '':
             return val
-        validate_value("DS", val, raise_on_error)
+        validate_value("DS", val, validation_mode)
 
     if config.use_DS_decimal:
-        return DSdecimal(val, auto_format, raise_on_error)
+        return DSdecimal(val, auto_format, validation_mode)
 
-    return DSfloat(val, auto_format, raise_on_error)
+    return DSfloat(val, auto_format, validation_mode)
 
 
 class IS(int):
@@ -938,16 +962,19 @@ class IS(int):
 
     def __new__(  # type: ignore[misc]
             cls: Type["IS"], val: Union[None, str, int, float, Decimal],
-            raise_on_error: bool = False
+            validation_mode: int = None
     ) -> Optional[Union[str, "IS"]]:
         """Create instance if new integer string"""
         if val is None:
             return val
 
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         if isinstance(val, str):
             if val.strip() == '':
                 return val
-            validate_value("IS", val, raise_on_error)
+            validate_value("IS", val, validation_mode)
 
         try:
             newval = super().__new__(cls, val)
@@ -962,7 +989,8 @@ class IS(int):
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -2**31 <= newval < 2**31 and raise_on_error:
+        if (not -2**31 <= newval < 2**31 and
+                validation_mode == ValidationMode.RaiseOnError):
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
@@ -972,7 +1000,7 @@ class IS(int):
         return newval
 
     def __init__(self, val: Union[str, int, float, Decimal],
-                 raise_on_error: bool = False) -> None:
+                 validation_mode: int = None) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val.strip()
@@ -1007,8 +1035,8 @@ _T = TypeVar('_T')
 
 
 def MultiString(
-    val: str, valtype: Optional[Callable[[str], _T]] = None,
-    raise_on_error: bool = False
+        val: str, valtype: Optional[Callable[[str], _T]] = None,
+        validation_mode: int = None
 ) -> Union[_T, MutableSequence[_T]]:
     """Split a string by delimiters if there are any
 
@@ -1019,6 +1047,9 @@ def MultiString(
     valtype : type or callable, optional
         Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
         overwrite to a specific type.
+    validation_mode : int
+        Defines if values are validated and how validation errors are
+        handled.
 
     Returns
     -------
@@ -1038,7 +1069,7 @@ def MultiString(
     if len(splitup) == 1:
         return valtype(splitup[0])
 
-    return MultiValue(valtype, splitup, raise_on_error=raise_on_error)
+    return MultiValue(valtype, splitup, validation_mode)
 
 
 def _verify_encodings(
@@ -1135,7 +1166,7 @@ class PersonName:
         val: Union[bytes, str, "PersonName"],
         encodings: Optional[Sequence[str]] = None,
         original_string: Optional[bytes] = None,
-        raise_on_error: bool = False
+        validation_mode: int = None
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -1158,7 +1189,9 @@ class PersonName:
         self.original_string: bytes
         self._components: Optional[Tuple[str, ...]] = None
         self.encodings: Optional[Tuple[str, ...]]
-        self.raise_on_error = raise_on_error
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+        self.validation_mode = validation_mode
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1167,7 +1200,7 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
-            validate_value("PN", val, raise_on_error)
+            validate_value("PN", val, validation_mode)
             self._components = None
         else:
             # val: str
@@ -1177,7 +1210,7 @@ class PersonName:
             # if we don't have the byte string at this point, we at least
             # validate the length of the string components
             validate_value("PN", original_string if original_string else val,
-                           raise_on_error)
+                           validation_mode)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:
@@ -1357,7 +1390,7 @@ class PersonName:
                 self.components, self.encodings or [default_encoding]
             )
             # now that we have the byte length, we re-validate the value
-            validate_value("PN", self.original_string, self.raise_on_error)
+            validate_value("PN", self.original_string, self.validation_mode)
 
         return PersonName(self.original_string, encodings)
 

@@ -16,7 +16,7 @@ from typing import (
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
-from pydicom.config import logger, enforce_valid_values
+from pydicom.config import logger
 from pydicom.datadict import (dictionary_has_tag, dictionary_description,
                               dictionary_keyword, dictionary_is_retired,
                               private_dictionary_description, dictionary_VR,
@@ -114,7 +114,7 @@ class DataElement:
     it to a :class:`~pydicom.dataset.Dataset`:
 
     >>> from pydicom import Dataset
-    >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
+    >>> elem = DataElement(0x00100010,'PN','CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
@@ -173,7 +173,7 @@ class DataElement:
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        raise_on_error: bool = False
+        validation_mode: config.ValidationMode = None
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -201,7 +201,13 @@ class DataElement:
         already_converted : bool
             Used to determine whether or not the element's value requires
             conversion to a value with VM > 1. Default is ``False``.
+        validation_mode : int
+            Defines if values are validated and how validation errors are
+            handled.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag
@@ -221,7 +227,7 @@ class DataElement:
                 pass
 
         self.VR = VR  # Note: you must set VR before setting value
-        self.raise_on_error = raise_on_error
+        self.validation_mode = validation_mode
         if already_converted:
             self._value = value
         else:
@@ -235,7 +241,7 @@ class DataElement:
         """Validate the current value against the DICOM standard.
         See :func:`~pydicom.valuerep.validate_value` for details.
         """
-        validate_value(self.VR, value, self.raise_on_error)
+        validate_value(self.VR, value, self.validation_mode)
 
     @classmethod
     def from_json(
@@ -535,7 +541,7 @@ class DataElement:
             return self._convert(val)
         else:
             return MultiValue(self._convert, val,
-                              raise_on_error=self.raise_on_error)
+                              validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -547,19 +553,22 @@ class DataElement:
             val = val.decode()
 
         if self.VR == 'IS':
-            return pydicom.valuerep.IS(val, self.raise_on_error)
+            return pydicom.valuerep.IS(val, self.validation_mode)
         elif self.VR == 'DA' and config.datetime_conversion:
-            return pydicom.valuerep.DA(val, raise_on_error=self.raise_on_error)
+            return pydicom.valuerep.DA(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == 'DS':
-            return pydicom.valuerep.DS(val, False, self.raise_on_error)
+            return pydicom.valuerep.DS(val, False, self.validation_mode)
         elif self.VR == 'DT' and config.datetime_conversion:
-            return pydicom.valuerep.DT(val, raise_on_error=self.raise_on_error)
+            return pydicom.valuerep.DT(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == 'TM' and config.datetime_conversion:
-            return pydicom.valuerep.TM(val, raise_on_error=self.raise_on_error)
+            return pydicom.valuerep.TM(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == "UI":
-            return UID(val, self.raise_on_error) if val is not None else None
+            return UID(val, self.validation_mode) if val is not None else None
         elif self.VR == "PN":
-            return PersonName(val, raise_on_error=self.raise_on_error)
+            return PersonName(val, validation_mode=self.validation_mode)
         elif self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
         # Later may need this for PersonName as for UI,
@@ -884,5 +893,4 @@ def DataElement_from_raw(
             pass
 
     return DataElement(raw.tag, VR, value, raw.value_tell,
-                       raw.length == 0xFFFFFFFF, already_converted=True,
-                       raise_on_error=enforce_valid_values)
+                       raw.length == 0xFFFFFFFF, already_converted=True)

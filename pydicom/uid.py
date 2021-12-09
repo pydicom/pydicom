@@ -10,7 +10,9 @@ import sys
 from typing import List, Optional, TypeVar, Type, Union, Any
 import warnings
 
+from pydicom import config
 from pydicom._uid_dict import UID_dictionary
+from pydicom.config import disable_value_validation
 from pydicom.valuerep import validate_value
 
 _deprecations = {
@@ -85,15 +87,16 @@ class UID(str):
     'JPEG Baseline (Process 1)'
     """
     def __new__(cls: Type[_UID], val: str,
-                raise_on_error: bool = False) -> _UID:
+                validation_mode: int = None) -> _UID:
         """Setup new instance of the class.
 
         Parameters
         ----------
         val : str or pydicom.uid.UID
             The UID string to use to create the UID object.
-        raise_on_error: If True, a :class:`ValueError` is raised for a
-            validation error, otherwise a warning is issued.
+        validation_mode : int
+            Defines if values are validated and how validation errors are
+            handled.
 
         Returns
         -------
@@ -101,7 +104,9 @@ class UID(str):
             The UID object.
         """
         if isinstance(val, str):
-            validate_value("UI", val, raise_on_error)
+            if validation_mode is None:
+                validation_mode = config.settings.reading_validation_mode
+            validate_value("UI", val, validation_mode)
             return super().__new__(cls, val.strip())
 
         raise TypeError("A UID must be created from a string")
@@ -243,55 +248,56 @@ class UID(str):
         return False
 
 
-# Pre-defined Transfer Syntax UIDs (for convenience)
-ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
-"""1.2.840.10008.1.2"""
-ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
-"""1.2.840.10008.1.2.1"""
-DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
-"""1.2.840.10008.1.2.1.99"""
-ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
-"""1.2.840.10008.1.2.2"""
-JPEGBaseline8Bit = UID('1.2.840.10008.1.2.4.50')
-"""1.2.840.10008.1.2.4.50"""
-JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
-"""1.2.840.10008.1.2.4.51"""
-JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')  # needs to be updated
-"""1.2.840.10008.1.2.4.57"""
-JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')  # Old JPEGLossless
-"""1.2.840.10008.1.2.4.70"""
-JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
-"""1.2.840.10008.1.2.4.80"""
-JPEGLSNearLossless = UID('1.2.840.10008.1.2.4.81')
-"""1.2.840.10008.1.2.4.81"""
-JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
-"""1.2.840.10008.1.2.4.90"""
-JPEG2000 = UID('1.2.840.10008.1.2.4.91')
-"""1.2.840.10008.1.2.4.91"""
-JPEG2000MCLossless = UID('1.2.840.10008.1.2.4.92')
-"""1.2.840.10008.1.2.4.92"""
-JPEG2000MC = UID('1.2.840.10008.1.2.4.93')
-"""1.2.840.10008.1.2.4.93"""
-MPEG2MPML = UID('1.2.840.10008.1.2.4.100')
-"""1.2.840.10008.1.2.4.100"""
-MPEG2MPHL = UID('1.2.840.10008.1.2.4.101')
-"""1.2.840.10008.1.2.4.101"""
-MPEG4HP41 = UID('1.2.840.10008.1.2.4.102')
-"""1.2.840.10008.1.2.4.102"""
-MPEG4HP41BD = UID('1.2.840.10008.1.2.4.103')
-"""1.2.840.10008.1.2.4.103"""
-MPEG4HP422D = UID('1.2.840.10008.1.2.4.104')
-"""1.2.840.10008.1.2.4.104"""
-MPEG4HP423D = UID('1.2.840.10008.1.2.4.105')
-"""1.2.840.10008.1.2.4.105"""
-MPEG4HP42STEREO = UID('1.2.840.10008.1.2.4.106')
-"""1.2.840.10008.1.2.4.106"""
-HEVCMP51 = UID('1.2.840.10008.1.2.4.107')
-"""1.2.840.10008.1.2.4.107"""
-HEVCM10P51 = UID('1.2.840.10008.1.2.4.108')
-"""1.2.840.10008.1.2.4.108"""
-RLELossless = UID('1.2.840.10008.1.2.5')
-"""1.2.840.10008.1.2.5"""
+with disable_value_validation():
+    # Pre-defined Transfer Syntax UIDs (for convenience)
+    ImplicitVRLittleEndian = UID('1.2.840.10008.1.2')
+    """1.2.840.10008.1.2"""
+    ExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1')
+    """1.2.840.10008.1.2.1"""
+    DeflatedExplicitVRLittleEndian = UID('1.2.840.10008.1.2.1.99')
+    """1.2.840.10008.1.2.1.99"""
+    ExplicitVRBigEndian = UID('1.2.840.10008.1.2.2')
+    """1.2.840.10008.1.2.2"""
+    JPEGBaseline8Bit = UID('1.2.840.10008.1.2.4.50')
+    """1.2.840.10008.1.2.4.50"""
+    JPEGExtended12Bit = UID('1.2.840.10008.1.2.4.51')
+    """1.2.840.10008.1.2.4.51"""
+    JPEGLosslessP14 = UID('1.2.840.10008.1.2.4.57')  # needs to be updated
+    """1.2.840.10008.1.2.4.57"""
+    JPEGLosslessSV1 = UID('1.2.840.10008.1.2.4.70')  # Old JPEGLossless
+    """1.2.840.10008.1.2.4.70"""
+    JPEGLSLossless = UID('1.2.840.10008.1.2.4.80')
+    """1.2.840.10008.1.2.4.80"""
+    JPEGLSNearLossless = UID('1.2.840.10008.1.2.4.81')
+    """1.2.840.10008.1.2.4.81"""
+    JPEG2000Lossless = UID('1.2.840.10008.1.2.4.90')
+    """1.2.840.10008.1.2.4.90"""
+    JPEG2000 = UID('1.2.840.10008.1.2.4.91')
+    """1.2.840.10008.1.2.4.91"""
+    JPEG2000MCLossless = UID('1.2.840.10008.1.2.4.92')
+    """1.2.840.10008.1.2.4.92"""
+    JPEG2000MC = UID('1.2.840.10008.1.2.4.93')
+    """1.2.840.10008.1.2.4.93"""
+    MPEG2MPML = UID('1.2.840.10008.1.2.4.100')
+    """1.2.840.10008.1.2.4.100"""
+    MPEG2MPHL = UID('1.2.840.10008.1.2.4.101')
+    """1.2.840.10008.1.2.4.101"""
+    MPEG4HP41 = UID('1.2.840.10008.1.2.4.102')
+    """1.2.840.10008.1.2.4.102"""
+    MPEG4HP41BD = UID('1.2.840.10008.1.2.4.103')
+    """1.2.840.10008.1.2.4.103"""
+    MPEG4HP422D = UID('1.2.840.10008.1.2.4.104')
+    """1.2.840.10008.1.2.4.104"""
+    MPEG4HP423D = UID('1.2.840.10008.1.2.4.105')
+    """1.2.840.10008.1.2.4.105"""
+    MPEG4HP42STEREO = UID('1.2.840.10008.1.2.4.106')
+    """1.2.840.10008.1.2.4.106"""
+    HEVCMP51 = UID('1.2.840.10008.1.2.4.107')
+    """1.2.840.10008.1.2.4.107"""
+    HEVCM10P51 = UID('1.2.840.10008.1.2.4.108')
+    """1.2.840.10008.1.2.4.108"""
+    RLELossless = UID('1.2.840.10008.1.2.5')
+    """1.2.840.10008.1.2.5"""
 
 AllTransferSyntaxes = [
     ImplicitVRLittleEndian,

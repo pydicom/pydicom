@@ -39,12 +39,10 @@ except ImportError:
     pass
 
 import pydicom  # for dcmwrite
-import pydicom.charset
-import pydicom.config
 from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
-from pydicom.config import logger
+from pydicom.config import logger, settings
 from pydicom.datadict import (
     dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
 )
@@ -451,10 +449,7 @@ class Dataset:
               :class:`Dataset`
         """
 
-        data_element = DataElement(
-            tag, VR, value,
-            raise_on_error=pydicom.config.enforce_create_valid_values
-        )
+        data_element = DataElement(tag, VR, value)
         # use data_element.tag since DataElement verified it
         self._dict[data_element.tag] = data_element
 
@@ -1382,16 +1377,15 @@ class Dataset:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.enforce_create_valid_values:
+                    if (settings.writing_validation_mode ==
+                            config.ValidationMode.RaiseOnError):
                         raise KeyError(f"Unknown DICOM tag {tag}")
                     vr = 'UN'
                     warnings.warn(
                         f"Unknown DICOM tag {tag} - setting VR to 'UN'"
                     )
 
-            default = DataElement(
-                tag, vr, default,
-                raise_on_error=pydicom.config.enforce_create_valid_values)
+            default = DataElement(tag, vr, default)
 
         self[key] = default
 
@@ -2121,9 +2115,7 @@ class Dataset:
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
                 VR = dictionary_VR(tag)
-                data_element = DataElement(
-                    tag, VR, value,
-                    raise_on_error=pydicom.config.enforce_create_valid_values)
+                data_element = DataElement(tag, VR, value)
                 if VR == 'SQ':
                     # let a sequence know its parent dataset to pass it
                     # to its items, who may need parent dataset tags

@@ -9,6 +9,7 @@ import pytest
 
 from pydicom import filewriter, config, dcmread
 from pydicom.charset import default_encoding
+from pydicom.config import ValidationMode
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_private_dict_entry
 from pydicom.dataelem import (
@@ -28,7 +29,8 @@ from pydicom.valuerep import DSfloat
 
 class TestDataElement:
     """Tests for dataelem.DataElement."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def create_data(self, disable_value_validation):
         self.data_elementSH = DataElement((1, 2), "SH", "hello")
         self.data_elementIS = DataElement((1, 2), "IS", "42")
         self.data_elementDS = DataElement((1, 2), "DS", "42.00001")
@@ -38,8 +40,7 @@ class TestDataElement:
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
         self.data_elementRetired = DataElement(0x00080010, 'SH', "102")
         config.use_none_as_empty_text_VR_value = False
-
-    def teardown(self):
+        yield
         config.use_none_as_empty_text_VR_value = False
 
     @pytest.fixture
@@ -440,8 +441,7 @@ class TestDataElement:
     @pytest.mark.parametrize('use_none, empty_value',
                              ((True, None), (False, '')))
     def test_empty_text_values(self, use_none, empty_value,
-                               no_datetime_conversion,
-                               dont_raise_on_writing_invalid_value):
+                               no_datetime_conversion):
         """Test that assigning an empty value behaves as expected."""
         def check_empty_text_element(value):
             setattr(ds, tag_name, value)
@@ -731,9 +731,11 @@ class TestDataElementValidation:
         msg = fr"Invalid value for VR {vr}: *"
         if check_warn:
             with pytest.warns(UserWarning, match=msg):
-                DataElement(0x00410001, vr, value, raise_on_error=False)
+                DataElement(0x00410001, vr, value,
+                            validation_mode=ValidationMode.WarnOnError)
         with pytest.raises(ValueError, match=msg):
-            DataElement(0x00410001, vr, value, raise_on_error=True)
+            DataElement(0x00410001, vr, value,
+                        validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize("vr, length", (
             ("AE", 17), ("CS", 17), ("DS", 27), ("LO", 66), ("LT", 10250),
@@ -742,9 +744,11 @@ class TestDataElementValidation:
     def test_maxvalue_exceeded(self, vr, length, no_datetime_conversion):
         msg = fr"The value length \({length}\) exceeds the maximum length *"
         with pytest.warns(UserWarning, match=msg):
-            DataElement(0x00410001, vr, "1" * length, raise_on_error=False)
+            DataElement(0x00410001, vr, "1" * length,
+                        validation_mode=ValidationMode.WarnOnError)
         with pytest.raises(ValueError, match=msg):
-            DataElement(0x00410001, vr, "2" * length, raise_on_error=True)
+            DataElement(0x00410001, vr, "2" * length,
+                        validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", 'Äneas'))
     def test_invalid_ae(self, value):
@@ -752,7 +756,8 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle"))
     def test_valid_ae(self, value):
-        DataElement(0x00410001, "AE", value, raise_on_error=True)
+        DataElement(0x00410001, "AE", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012"))
     def test_invalid_as(self, value):
@@ -760,7 +765,8 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", ("012Y", "345M", b"052W", b"789D"))
     def test_valid_as(self, value):
-        DataElement(0x00410001, "AS", value, raise_on_error=True)
+        DataElement(0x00410001, "AS", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize("value", (
             "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8")))
@@ -769,7 +775,8 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", ("VALID_13579 ", b"VALID_13579"))
     def test_valid_cs(self, value):
-        DataElement(0x00410001, "CS", value, raise_on_error=True)
+        DataElement(0x00410001, "CS", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize(
         "value",
@@ -784,7 +791,8 @@ class TestDataElementValidation:
         (b"19560303", "20101225-20201224 ", b"-19560303", "19560303-")
     )
     def test_valid_da(self, value):
-        DataElement(0x00410001, "DA", value, raise_on_error=True)
+        DataElement(0x00410001, "DA", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize(
         "value",
@@ -798,7 +806,8 @@ class TestDataElementValidation:
         ("12345", "+.1234 ", "-0345.76", b"1956E3", b"-1956e+3", "+195.6e-3")
     )
     def test_valid_ds(self, value):
-        DataElement(0x00410001, "DS", value, raise_on_error=True)
+        DataElement(0x00410001, "DS", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize(
         "value", ("201012+", "20A0", b"123.66", "-1235E4", "12 34")
@@ -808,7 +817,8 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", (" 12345 ", b"+1234 ", "-034576"))
     def test_valid_is(self, value):
-        DataElement(0x00410001, "IS", value, raise_on_error=True)
+        DataElement(0x00410001, "IS", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize(
         "value",
@@ -824,7 +834,8 @@ class TestDataElementValidation:
          "-1234", "123456-", b"123456-1330")
     )
     def test_valid_tm(self, value):
-        DataElement(0x00410001, "TM", value, raise_on_error=True)
+        DataElement(0x00410001, "TM", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize(
         "value",
@@ -843,7 +854,8 @@ class TestDataElementValidation:
          "20000101-", "-2020010100", "1929-1997")
     )
     def test_valid_dt(self, value):
-        DataElement(0x00410001, "DT", value, raise_on_error=True)
+        DataElement(0x00410001, "DT", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     @pytest.mark.parametrize("value", (
             "Руссский", "ctrl\tchar", '"url"', "a<b", "{abc}"))
@@ -853,13 +865,15 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("value", (
             "https://www.a.b/sdf_g?a=1&b=5", "/a#b(c)[d]@!", "'url'"))
     def test_valid_ur(self, value):
-        DataElement(0x00410001, "UR", value, raise_on_error=True)
+        DataElement(0x00410001, "UR", value,
+                    validation_mode=ValidationMode.RaiseOnError)
 
     def test_invalid_pn(self):
         msg = r"The number of PN components length \(4\) exceeds *"
-        with pytest.raises(ValueError, match=msg):
+        with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, "PN", "Jim=John=Jimmy=Jonny",
-                        raise_on_error=True)
+                        validation_mode=ValidationMode.WarnOnError)
         msg = r"The PN component length \(65\) exceeds *"
         with pytest.raises(ValueError, match=msg):
-            DataElement(0x00410001, "PN", b"Jimmy" * 13, raise_on_error=True)
+            DataElement(0x00410001, "PN", b"Jimmy" * 13,
+                        validation_mode=ValidationMode.RaiseOnError)

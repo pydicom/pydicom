@@ -3,24 +3,24 @@
 """Fixtures used in different tests."""
 
 import pytest
-
 from pydicom import config
+from pydicom.config import ValidationMode, settings
 
 
 @pytest.fixture
 def enforce_valid_values():
-    value = config.enforce_valid_values
-    config.enforce_valid_values = True
+    value = settings.reading_validation_mode
+    settings.reading_validation_mode = ValidationMode.RaiseOnError
     yield
-    config.enforce_valid_values = value
+    settings.reading_validation_mode = value
 
 
 @pytest.fixture
 def allow_invalid_values():
-    value = config.enforce_valid_values
-    config.enforce_valid_values = False
+    value = settings.reading_validation_mode
+    settings.reading_validation_mode = ValidationMode.WarnOnError
     yield
-    config.enforce_valid_values = value
+    settings.reading_validation_mode = value
 
 
 @pytest.fixture
@@ -52,15 +52,21 @@ def dont_replace_un_with_known_vr():
 
 @pytest.fixture
 def dont_raise_on_writing_invalid_value():
-    old_value = config.enforce_create_valid_values
-    config.enforce_create_valid_values = False
+    old_value = settings.writing_validation_mode
+    settings.writing_validation_mode = ValidationMode.WarnOnError
     yield
-    config.enforce_create_valid_values = old_value
+    settings.writing_validation_mode = old_value
 
 
 @pytest.fixture
 def raise_on_writing_invalid_value():
-    old_value = config.enforce_create_valid_values
-    config.enforce_create_valid_values = True
+    old_value = settings.writing_validation_mode
+    settings.writing_validation_mode = ValidationMode.RaiseOnError
     yield
-    config.enforce_create_valid_values = old_value
+    settings.writing_validation_mode = old_value
+
+
+@pytest.fixture
+def disable_value_validation():
+    with config.disable_value_validation():
+        yield
