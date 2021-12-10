@@ -10,7 +10,7 @@ import math
 import sys
 from typing import Union
 
-from pydicom.config import ValidationMode, settings
+from pydicom.config import settings
 from pydicom.tag import Tag
 from pydicom.values import convert_value
 
@@ -36,8 +36,8 @@ def enforce_valid_both_fixture(request):
     """
     orig_reading_validation_mode = settings.reading_validation_mode
     settings.reading_validation_mode = (
-        ValidationMode.RaiseOnError if request.param
-        else ValidationMode.WarnOnError
+        config.RAISE_ON_ERROR if request.param
+        else config.WARN_ON_ERROR
     )
     yield
     settings.reading_validation_mode = orig_reading_validation_mode
@@ -600,7 +600,7 @@ class TestDSfloat:
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
             valuerep.DSfloat('3.141592653589793',
-                             validation_mode=ValidationMode.RaiseOnError)
+                             validation_mode=config.RAISE_ON_ERROR)
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
@@ -625,7 +625,7 @@ class TestDSfloat:
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSfloat(val, validation_mode=ValidationMode.RaiseOnError)
+            valuerep.DSfloat(val, validation_mode=config.RAISE_ON_ERROR)
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
@@ -785,7 +785,7 @@ class TestDSdecimal:
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
             valuerep.DSdecimal(val,
-                               validation_mode=ValidationMode.RaiseOnError)
+                               validation_mode=config.RAISE_ON_ERROR)
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
@@ -897,11 +897,12 @@ class TestIS:
     def test_overflow(self):
         msg = (
             r"Elements with a VR of IS must have a value between -2\*\*31 "
-            r"and \(2\*\*31 - 1\). Set 'config.enforce_valid_values' to False "
+            r"and \(2\*\*31 - 1\). Set "
+            r"'config.settings.reading_validation_mode' to 'WARN_ON_ERROR' "
             r"to override the value check"
         )
         with pytest.raises(OverflowError, match=msg):
-            IS(3103050000, validation_mode=ValidationMode.RaiseOnError)
+            IS(3103050000, validation_mode=config.RAISE_ON_ERROR)
 
     def test_str(self, disable_value_validation):
         """Test IS.__str__()."""
@@ -1031,8 +1032,7 @@ class TestDecimalString:
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
         with pytest.raises(ValueError):
-            valuerep.DS(invalid_string,
-                        validation_mode=ValidationMode.RaiseOnError)
+            valuerep.DS(invalid_string, validation_mode=config.RAISE_ON_ERROR)
 
 
 class TestPersonName:

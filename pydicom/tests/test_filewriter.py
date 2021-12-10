@@ -2552,7 +2552,7 @@ class TestWriteText:
 
     def test_invalid_encoding_enforce_standard(self, enforce_valid_values):
         """Test encoding text with invalid encodings with
-        `config.enforce_valid_values` enabled"""
+        `config.settings.reading_validation_mode` is RAISE_ON_ERROR"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value

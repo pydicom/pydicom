@@ -114,7 +114,7 @@ class DataElement:
     it to a :class:`~pydicom.dataset.Dataset`:
 
     >>> from pydicom import Dataset
-    >>> elem = DataElement(0x00100010,'PN','CITIZEN^Joan')
+    >>> elem = DataElement(0x00100010, 'PN', 'CITIZEN^Joan')
     >>> ds = Dataset()
     >>> ds.add(elem)
 
@@ -173,7 +173,7 @@ class DataElement:
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: config.ValidationMode = None
+        validation_mode: int = None
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -818,7 +818,8 @@ def DataElement_from_raw(
     ------
     KeyError
         If `raw_data_element` belongs to an unknown non-private tag and
-        `config.enforce_valid_values` is set.
+        :attr:`~pydicom.config.settings.reading_validation_mode` is set
+        to ``RAISE_ON_ERROR``.
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader
@@ -850,7 +851,8 @@ def DataElement_from_raw(
                 VR = 'UL'
             else:
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
-                if config.enforce_valid_values:
+                if (config.settings.reading_validation_mode ==
+                        config.RAISE_ON_ERROR):
                     msg += " can't look up VR"
                     raise KeyError(msg)
                 else:

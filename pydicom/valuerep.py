@@ -14,7 +14,6 @@ from typing import (
 
 # don't import datetime_conversion directly
 from pydicom import config
-from pydicom.config import ValidationMode
 from pydicom.multival import MultiValue
 
 
@@ -235,7 +234,7 @@ def validate_value(vr: str, value: Any,
 
     The values are checked for a length valid for the given VR.
     """
-    if validation_mode == ValidationMode.NoValidation:
+    if validation_mode == config.NO_VALIDATION:
         return
 
     if value is not None and isinstance(value, (str, bytes)):
@@ -243,7 +242,7 @@ def validate_value(vr: str, value: Any,
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
-                if validation_mode == ValidationMode.RaiseOnError:
+                if validation_mode == config.RAISE_ON_ERROR:
                     raise ValueError(msg)
                 warnings.warn(msg)
 
@@ -732,16 +731,17 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if (validation_mode == ValidationMode.RaiseOnError and
+        if (validation_mode == config.RAISE_ON_ERROR and
                 not self.auto_format):
             if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
                     "characters long, but the float provided requires > 16 "
                     "characters to be accurately represented. Use a smaller "
-                    "string, set 'config.enforce_valid_values' to False to "
-                    "override the length check, or explicitly construct a DS "
-                    "object with 'auto_format' set to True"
+                    "string, set 'config.settings.reading_validation_mode' to "
+                    "'WARN_ON_ERROR' to override the length check, or "
+                    "explicitly construct a DS object with 'auto_format' "
+                    "set to True"
                 )
             if not is_valid_ds(repr(self)[1:-1]):
                 # This will catch nan and inf
@@ -865,17 +865,18 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode != ValidationMode.NoValidation:
+        if validation_mode != config.NO_VALIDATION:
             if len(repr(self).strip("'")) > 16:
                 msg = (
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
-                    "'config.enforce_valid_values' to False to override the "
-                    "length check, use 'Decimal.quantize()' and initialize "
+                    "'config.settings.reading_validation_mode' to "
+                    "'WARN_ON_ERROR' to override the length check, use "
+                    "'Decimal.quantize()' and initialize "
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-                if validation_mode == ValidationMode.RaiseOnError:
+                if validation_mode == config.RAISE_ON_ERROR:
                     raise OverflowError(msg)
                 warnings.warn(msg)
             if not is_valid_ds(repr(self).strip("'")):
@@ -884,7 +885,7 @@ class DSdecimal(Decimal):
                     f'Value "{str(self)}" is not valid for elements with a VR '
                     'of DS'
                 )
-                if validation_mode == ValidationMode.RaiseOnError:
+                if validation_mode == config.RAISE_ON_ERROR:
                     raise ValueError(msg)
                 warnings.warn(msg)
 
@@ -990,11 +991,12 @@ class IS(int):
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
         if (not -2**31 <= newval < 2**31 and
-                validation_mode == ValidationMode.RaiseOnError):
+                validation_mode == config.RAISE_ON_ERROR):
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
-                "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
-                "to override the value check"
+                "and (2**31 - 1). Set "
+                "'config.settings.reading_validation_mode' to "
+                "'WARN_ON_ERROR' to override the value check"
             )
 
         return newval

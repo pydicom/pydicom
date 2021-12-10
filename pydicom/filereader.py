@@ -348,7 +348,7 @@ def _is_implicit_vr(
         found_vr = 'implicit' if found_implicit else 'explicit'
         expected_vr = 'implicit' if not found_implicit else 'explicit'
         msg = f"Expected {expected_vr} VR, but found {found_vr} VR"
-        if config.enforce_valid_values:
+        if config.settings.reading_validation_mode == config.RAISE_ON_ERROR:
             raise InvalidDicomError(msg)
 
         warnings.warn(msg + f" - using {found_vr} VR for reading", UserWarning)
@@ -435,7 +435,7 @@ def read_dataset(
     except StopIteration:
         pass
     except EOFError as details:
-        if config.enforce_valid_values:
+        if config.settings.reading_validation_mode == config.RAISE_ON_ERROR:
             raise
         msg = str(details) + " in file " + getattr(fp, "name", "<no filename>")
         warnings.warn(msg, UserWarning)
@@ -860,7 +860,7 @@ def read_partial(
             specific_tags=specific_tags,
         )
     except EOFError:
-        if config.enforce_valid_values:
+        if config.settings.reading_validation_mode == config.RAISE_ON_ERROR:
             raise
         # warning already logged in read_dataset
 

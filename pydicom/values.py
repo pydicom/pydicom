@@ -13,7 +13,7 @@ from typing import (
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
-from pydicom.config import logger, have_numpy, enforce_valid_values, Config
+from pydicom.config import logger, have_numpy, enforce_valid_values, Settings
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence

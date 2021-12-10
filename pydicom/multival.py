@@ -53,8 +53,8 @@ class MultiValue(MutableSequence[_ItemType]):
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
         def DS_IS_constructor(x: _T) -> _ItemType:
-            return (
-                self.type_constructor(  # type: ignore[call-arg]
+            return (  # type: ignore[no-any-return]
+                self.type_constructor(  # type: ignore[has-type]
                     x, validation_mode=validation_mode)
                 if x != '' else cast(_ItemType, x)
             )

@@ -6,7 +6,7 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Dict, Any, TYPE_CHECKING, Generator
 
 have_numpy = True
 try:
@@ -158,14 +158,18 @@ enforce_valid_values = False
 """Obsolete. Use settings.reading_validation_mode instead."""
 
 
-class ValidationMode:
-    """Defines how data element values shall be validated"""
-    NoValidation = 0
-    WarnOnError = 1
-    RaiseOnError = 2
+# Constants used to define how data element values shall be validated
+NO_VALIDATION = 0
+"""No value validation will be performed."""
+
+WARN_ON_ERROR = 1
+"""A warning is issued on a value validation error."""
+
+RAISE_ON_ERROR = 2
+"""An exception is raised on a value validation error."""
 
 
-class Config:
+class Settings:
     """Collection of several configuration values.
 
     Attributes
@@ -175,41 +179,39 @@ class Config:
         Value validation checks if a value is allowed by the DICOM Standard,
         e.g. that DS strings are not longer than 16 characters and contain only
         allowed characters.
-        The default (WarnOnError) is to log a warning in the case of an invalid
-        value, RaiseOnError will raise an error in this case, and NoValidation
-        will bypass the validation.
+        The default (WARN_ON_ERROR) is to log a warning in the case of an
+        invalid value, RAISE_ON_ERROR will raise an error in this case, and
+        NO_VALIDATION will bypass the validation.
     writing_validation_mode : int
         Defines behavior for value validation while writing a value.
-        See :attr:`~pydicom.config.Config.reading_validation_mode`.
+        See :attr:`~pydicom.config.Settings.reading_validation_mode`.
     """
 
-    def __init__(self):
-        self._reading_validation_mode = ValidationMode.WarnOnError
-        self.writing_validation_mode = ValidationMode.RaiseOnError
+    def __init__(self) -> None:
+        self._reading_validation_mode: int = WARN_ON_ERROR
+        self.writing_validation_mode = RAISE_ON_ERROR
 
     @property
     def reading_validation_mode(self) -> int:
         # upwards compatibility:
         # if enforce_valid_values has been set, we use that
         if enforce_valid_values:
-            return ValidationMode.RaiseOnError
+            return RAISE_ON_ERROR
         return self._reading_validation_mode
 
     @reading_validation_mode.setter
     def reading_validation_mode(self, value: int) -> None:
         global enforce_valid_values
-        if value == ValidationMode.RaiseOnError:
-            print(value)
         self._reading_validation_mode = value
-        enforce_valid_values = value == ValidationMode.RaiseOnError
+        enforce_valid_values = value == RAISE_ON_ERROR
 
 
-settings = Config()
+settings = Settings()
 """The global configuration object."""
 
 
 @contextmanager
-def disable_value_validation():
+def disable_value_validation() -> Generator:
     """Context manager to temporarily disable value validation
     both for reading and writing.
     Can be used for performance reasons if the values are known to be valid.
@@ -217,8 +219,8 @@ def disable_value_validation():
     reading_mode = settings.reading_validation_mode
     writing_mode = settings.writing_validation_mode
     try:
-        settings.reading_validation_mode = ValidationMode.NoValidation
-        settings.writing_validation_mode = ValidationMode.NoValidation
+        settings.reading_validation_mode = NO_VALIDATION
+        settings.writing_validation_mode = NO_VALIDATION
         yield
     finally:
         settings.reading_validation_mode = reading_mode

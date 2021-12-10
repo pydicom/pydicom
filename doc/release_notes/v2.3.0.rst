@@ -4,14 +4,15 @@ Version 2.3.0
 Changes
 -------
 * Updated the private dictionary
-
+* :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
+  :attr:`~pydicom.config.settings.reading_validation_mode`
 
 Enhancements
 ------------
 * Values are now validated on valid length on reading and writing. Depending
-  on the value of :attr:`~pydicom.config.enforce_valid_values` (for reading)
-  and the new attribute :attr:`~pydicom.config.enforce_create_valid_values`
-  (for writing) a warning is logged or a :class:`ValueError` is raised.
+  on the value of :attr:`~pydicom.config.settings.reading_validation_mode`
+  and :attr:`~pydicom.config.settings.writing_valiadtion_mode`
+  a warning is logged, an exception is raised, or the validation is skipped.
 
 Fixes
 -----

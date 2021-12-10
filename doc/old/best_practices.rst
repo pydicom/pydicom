@@ -22,28 +22,41 @@ Enforcing Valid DICOM
 ---------------------
 
 *pydicom* has configuration options to help enforce valid DICOM:
-:attr:`~pydicom.config.enforce_valid_values` (for reading) and
-:attr:`~pydicom.config.enforce_create_valid_values` (for writing).
+:attr:`~pydicom.config.settings.reading_validation_mode` and
+:attr:`~pydicom.config.settings.writing_validation_mode`.
+The first setting is about validation of values read from existing DICOM data,
+the second about validation of newly created and written values.
 
-If set to `True`, some non-standard DICOM will result in *pydicom* raising
-an error rather than assuming a default behavior or issuing a warning.
+Both can have the values `~pydicom.config.NO_VALIDATION`,
+`~pydicom.config.WARN_ON_ERROR` and `~pydicom.config.RAISE_ON_ERROR`.
 
-This flag does not guarantee strict DICOM results, but is a help for 
+As the name says, some non-standard DICOM may result in a warning (this is the
+default for `reading_validation_mode`) or in a raised exception (the default
+for `writing_validation_mode`). If `NO_VALIDATION` is set, the validation is
+not performed in most cases, which may be used in some special cases.
+
+The setting for `writing_validation_mode` may be changed for some cases,
+where writing invalid DICOM is needed to support some legacy software, but
+this is generally not recommended.
+
+The default setting for `reading_validation_mode` allows to deal with files
+that do not strictly adhere to the DICOM Standard. Setting it to
+`RAISE_ON_ERROR` can help to ensure that only valid DICOM data is accepted.
+
+These flags do not guarantee strict DICOM results, as there do not check all
+possible validations of the DICOM standard, but are a help for
 some specific situations that have been added to *pydicom* over time.
 
-In some cases, especially if you are dealing with files that do not 
-strictly adhere to the DICOM Standard, you may need to disable this flag.
-
-To turn on the flag in your code:
+To change a flag in your code:
 
 .. code-block:: python
 
   from pydicom import config
-  config.enforce_valid_values = True
+  config.settings.reading_validation_mode = config.RAISE_ON_ERROR
 
 Note that you *must not* use 
-:code:`from pydicom.config import enforce_valid_values`.
-That makes the `enforce_valid_values` variable local only to that module,
+:code:`from pydicom.config.settings import reading_validation_mode`.
+That makes the `reading_validation_mode` variable local only to that module,
 so *pydicom* would not see your change to its value.
 
 Future-proofing your code
