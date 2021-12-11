@@ -505,7 +505,7 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
     Raises
     ------
     UnicodeEncodeError
-        If  :attr:`~pydicom.config.settings.reading_validation_mode`
+        If  :attr:`~pydicom.config.settings.writing_validation_mode`
         is set to ``RAISE_ON_ERROR`` and `value` could not be encoded with the
         supplied encodings.
     """
@@ -532,7 +532,7 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
             pass
     # all attempts failed - raise or warn and encode with replacement
     # characters
-    if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+    if settings.writing_validation_mode == config.RAISE_ON_ERROR:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 

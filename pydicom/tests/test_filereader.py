@@ -394,7 +394,8 @@ class TestReader:
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
 
-    def test_tag_with_unknown_length_tag_too_short(self, allow_invalid_values):
+    def test_tag_with_unknown_length_tag_too_short(
+            self, allow_reading_invalid_values):
         """Tests handling of incomplete sequence value."""
         # the data set is the same as emri_jpeg_2k_lossless,
         # with the last 8 bytes removed to provoke the EOF error
@@ -562,7 +563,7 @@ class TestReader:
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
 
-    def test_long_specific_char_set(self, allow_invalid_values):
+    def test_long_specific_char_set(self, allow_reading_invalid_values):
         """Test that specific character set is read even if it is longer
          than defer_size"""
         ds = Dataset()
@@ -760,7 +761,7 @@ class TestReader:
         assert ds.preamble is None
         assert Dataset() == ds.file_meta
 
-    def test_file_meta_dataset_implicit_vr(self, allow_invalid_values):
+    def test_file_meta_dataset_implicit_vr(self, allow_reading_invalid_values):
         """Test reading a file meta dataset that is implicit VR"""
 
         bytestream = (
@@ -922,8 +923,8 @@ class TestIncorrectVR:
             b"\x08\x00\x20\x00\x08\x00\x00\x0020000101"
         )
 
-    def test_implicit_vr_expected_explicit_used(self, allow_invalid_values,
-                                                no_datetime_conversion):
+    def test_implicit_vr_expected_explicit_used(
+            self, allow_reading_invalid_values, no_datetime_conversion):
         msg = (
             "Expected implicit VR, but found explicit VR - "
             "using explicit VR for reading"
@@ -944,8 +945,8 @@ class TestIncorrectVR:
                 self.ds_explicit, is_implicit_VR=True, is_little_endian=True
             )
 
-    def test_explicit_vr_expected_implicit_used(self, allow_invalid_values,
-                                                no_datetime_conversion):
+    def test_explicit_vr_expected_implicit_used(
+            self, allow_reading_invalid_values, no_datetime_conversion):
         msg = (
             "Expected explicit VR, but found implicit VR - "
             "using implicit VR for reading"

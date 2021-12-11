@@ -2527,7 +2527,7 @@ class TestWriteText:
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
 
-    def test_invalid_encoding(self, allow_invalid_values):
+    def test_invalid_encoding(self, allow_writing_invalid_values):
         """Test encoding text with invalid encodings"""
         fp = DicomBytesIO()
         fp.is_little_endian = True

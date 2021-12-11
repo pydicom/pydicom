@@ -44,6 +44,7 @@ TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 PN_DELIMS = {0x5e}
 
 # maximum allowed value length for string VRs
+# VRs with a maximum length of 2^32 (UR and UT) are not checked
 MAX_VALUE_LEN = {
     "AE": 16,
     "CS": 16,
@@ -82,7 +83,7 @@ TM_REGEX = re.compile(_range_regex(
 UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$")
 
 
-def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     """Validate the value length for a given VR.
 
     Parameters
@@ -109,7 +110,8 @@ def validate_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
 
 def validate_regex(vr: str, value: Union[str, bytes],
                    regex: Any) -> Tuple[bool, str]:
-    """Validate the value for a given VR using a regular expression.
+    """Validate the value for a given VR for allowed characters
+    using a regular expression.
 
     Parameters
     ----------
@@ -131,40 +133,110 @@ def validate_regex(vr: str, value: Union[str, bytes],
 
 def validate_length_and_regex(vr: str, value: Union[str, bytes],
                               regex: Any) -> Tuple[bool, str]:
-    is_valid_len, msg1 = validate_length(vr, value)
+    """Validate the value for a given VR both for maximum length and
+    for allowed characters using a regular expression.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str
+        The value to validate.
+    regex : re.Pattern
+        The precompiled regex pattern used for matching.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    is_valid_len, msg1 = validate_vr_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value, regex)
     return is_valid_len and is_valid_expr, " ".join([msg1, msg2]).strip()
 
 
 def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR AE.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
     return validate_length_and_regex(vr, value, AE_REGEX)
 
 
 def validate_as(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR AS.
+    See :func:`~pydicom.valuerep.validate_regex`."""
     return validate_regex(vr, value, AS_REGEX)
 
 
 def validate_cs(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR CS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
     return validate_length_and_regex(vr, value, CS_REGEX)
 
 
 def validate_da(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DA.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
     return validate_regex(vr, value, DA_REGEX)
 
 
 def validate_ds(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
     return validate_length_and_regex(vr, value, DS_REGEX)
 
 
 def validate_dt(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DT.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
     return validate_regex(vr, value, DT_REGEX)
 
 
 def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR IS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
     return validate_length_and_regex(vr, value, IS_REGEX)
 
 
+def validate_pn_component_length(
+        vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the PN component value for the maximum length.
+
+    Parameters
+    ----------
+    vr : str
+        Ignored.
+    value : str
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if len(value) > 64:
+        return False, (
+            f"The PN component length ({len(value)}) exceeds the "
+            f"maximum allowed length of 64."
+        )
+    return True, ""
+
+
 def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR PN for the maximum number of components
+    and for the maximum length of each component.
+    the .
+
+    Parameters
+    ----------
+    vr : str
+        Ignored.
+    value : str
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
     if not value:
         return True, ""
     components: Sequence[Union[str, bytes]]
@@ -178,25 +250,48 @@ def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
             f"the maximum allowed number of 3."
         )
     for comp in components:
-        if len(comp) > 64:
-            return False, (
-                f"The PN component length ({len(comp)}) exceeds the "
-                f"maximum allowed length of 64."
-            )
+        valid, msg = validate_pn_component_length("PN", comp)
+        if not valid:
+            return False, msg
     return True, ""
 
 
 def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR TM.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
     return validate_regex(vr, value, TM_REGEX)
 
 
 def validate_ui(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VRUIS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
     from pydicom.uid import RE_VALID_UID
     return validate_length_and_regex(vr, value, RE_VALID_UID)
 
 
 def validate_ur(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    return validate_length_and_regex(vr, value, UR_REGEX)
+    """Validate the value for VR UR.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, UR_REGEX)
+
+
+def validate_pn_component(value: Union[str, bytes]) -> None:
+    """Validate the value of a single component of VR PN for maximum length.
+
+    Parameters
+    ----------
+    value : str or bytes
+        The component value to validate.
+
+    Raises
+    ------
+    ValueError
+        If the validation fails and the validation mode is set to
+        `RAISE_ON_ERROR`.
+    """
+    validate_value("PN", value, config.settings.writing_validation_mode,
+                   validate_pn_component_length)
 
 
 VALIDATORS = {
@@ -207,11 +302,11 @@ VALIDATORS = {
     "DS": validate_ds,
     "DT": validate_dt,
     "IS": validate_is,
-    "LO": validate_length,
-    "LT": validate_length,
+    "LO": validate_vr_length,
+    "LT": validate_vr_length,
     "PN": validate_pn,
-    "SH": validate_length,
-    "ST": validate_length,
+    "SH": validate_vr_length,
+    "ST": validate_vr_length,
     "TM": validate_tm,
     "UI": validate_ui,
     "UR": validate_ur,
@@ -219,7 +314,9 @@ VALIDATORS = {
 
 
 def validate_value(vr: str, value: Any,
-                   validation_mode: int) -> None:
+                   validation_mode: int,
+                   validator: Optional[Callable[[str, Any],
+                                       Tuple[bool, str]]] = None) -> None:
     """Validate the given value against the DICOM standard.
 
     Parameters
@@ -231,14 +328,20 @@ def validate_value(vr: str, value: Any,
     validation_mode : int
         Defines if values are validated and how validation errors are
         handled.
+    validator : Callable or None
+        If given, it
 
-    The values are checked for a length valid for the given VR.
+    Raises
+    ------
+    ValueError
+        If the validation fails and the validation mode is set to
+        `RAISE_ON_ERROR`.
     """
     if validation_mode == config.NO_VALIDATION:
         return
 
     if value is not None and isinstance(value, (str, bytes)):
-        validator = VALIDATORS.get(vr)
+        validator = validator or VALIDATORS.get(vr)
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
@@ -1145,7 +1248,9 @@ def _encode_personname(
         groups = [
             encode_string(group, encodings) for group in comp.split('^')
         ]
-        encoded_comps.append(b'^'.join(groups))
+        encoded_comp = b'^'.join(groups)
+        validate_pn_component(encoded_comp)
+        encoded_comps.append(encoded_comp)
 
     # Remove empty elements from the end
     while len(encoded_comps) and not encoded_comps[-1]:
@@ -1485,7 +1590,10 @@ class PersonName:
         from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
-            return encode_string(s, encodings or [default_encoding])
+            b = encode_string(s, encodings or [default_encoding])
+            validate_value("PN", b, config.settings.writing_validation_mode,
+                           validate_pn_component_length)
+            return b
 
         def dec(s: bytes) -> str:
             return decode_bytes(s, encodings or [default_encoding], set())

@@ -16,11 +16,19 @@ def enforce_valid_values():
 
 
 @pytest.fixture
-def allow_invalid_values():
+def allow_reading_invalid_values():
     value = settings.reading_validation_mode
     settings.reading_validation_mode = config.WARN_ON_ERROR
     yield
     settings.reading_validation_mode = value
+
+
+@pytest.fixture
+def allow_writing_invalid_values():
+    value = settings.writing_validation_mode
+    settings.writing_validation_mode = config.WARN_ON_ERROR
+    yield
+    settings.writing_validation_mode = value
 
 
 @pytest.fixture

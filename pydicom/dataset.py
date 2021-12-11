@@ -448,10 +448,7 @@ class Dataset:
             * for a sequence element, an empty :class:`list` or ``list`` of
               :class:`Dataset`
         """
-
-        data_element = DataElement(tag, VR, value)
-        # use data_element.tag since DataElement verified it
-        self._dict[data_element.tag] = data_element
+        self.add(DataElement(tag, VR, value))
 
     def __array__(self) -> "numpy.ndarray":
         """Support accessing the dataset from a numpy array."""

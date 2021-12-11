@@ -566,7 +566,7 @@ class TestDataElement:
 class TestRawDataElement:
 
     """Tests for dataelem.RawDataElement."""
-    def test_invalid_tag_warning(self, allow_invalid_values):
+    def test_invalid_tag_warning(self, allow_reading_invalid_values):
         """RawDataElement: conversion of unknown tag warns..."""
         raw = RawDataElement(Tag(0x88880088), None, 4, b'unknown',
                              0, True, True)
@@ -876,3 +876,54 @@ class TestDataElementValidation:
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, "PN", b"Jimmy" * 13,
                         validation_mode=config.RAISE_ON_ERROR)
+
+    def test_write_invalid_length_non_ascii_text(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        # the string length is 9, so constructing the data element
+        # is possible
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+
+        # encoding the element during writing shall fail,
+        # as the encoded length is 21, while only 16 bytes are allowed for SH
+        msg = r"The value length \(21\) exceeds the maximum length of 16 *"
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+    def test_write_invalid_non_ascii_pn(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = False
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        # string length is 40
+        ds.add(DataElement(0x00100010, "PN", "洪^吉洞" * 10))
+
+        msg = r"The PN component length \(100\) exceeds the maximum allowed *"
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+    def test_read_invalid_length_non_ascii_text(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        # disable value validation to write an invalid value
+        with config.disable_value_validation():
+            ds.save_as(fp)
+
+        # no warning will be issued during reading, as only RawDataElement
+        # objects are read
+        ds = dcmread(fp, force=True)
+        assert 'AccessionNumber' in ds
+
+        # the length is 22 due to the padding byte
+        msg = r"The value length \(22\) exceeds the maximum length*"
+        with pytest.warns(UserWarning, match=msg):
+            # the warning is issued only as the value is accessed
+            assert ds.AccessionNumber == "洪^吉洞=홍^길동"

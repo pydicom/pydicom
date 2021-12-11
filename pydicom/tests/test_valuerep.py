@@ -886,7 +886,7 @@ class TestIS:
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
-    def test_longint(self, allow_invalid_values):
+    def test_longint(self, allow_reading_invalid_values):
         # Check that a long int is read properly
         # Will not work with enforce_valid_values
         x = IS(3103050000)
