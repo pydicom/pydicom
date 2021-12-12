@@ -551,7 +551,8 @@ def convert_single_string(
         The decoded text.
     """
     if vr is not None:
-        validate_value(vr, byte_string, config.settings.reading_validation_mode)
+        validate_value(
+            vr, byte_string, config.settings.reading_validation_mode)
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
     return value.rstrip('\0 ')

@@ -737,6 +737,18 @@ class TestDSdecimal:
         x = DSdecimal('1.2345')
         assert repr(x) == repr('1.2345')
 
+    def test_string_too_long(self):
+        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
+               "characters long. Use a smaller string, *")
+        with pytest.warns(UserWarning, match=msg):
+            x = DSdecimal(Decimal(math.pi), auto_format=False)
+
+    def test_string_too_long_raises(self, enforce_valid_values):
+        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
+               "characters long. Use a smaller string, *")
+        with pytest.raises(OverflowError, match=msg):
+            x = DSdecimal(Decimal(math.pi), auto_format=False)
+
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating decimal"""
         x = DSdecimal(Decimal(math.pi), auto_format=True)

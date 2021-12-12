@@ -43,9 +43,10 @@ The default setting for `reading_validation_mode` allows to deal with files
 that do not strictly adhere to the DICOM Standard. Setting it to
 `RAISE_ON_ERROR` can help to ensure that only valid DICOM data is accepted.
 
-These flags do not guarantee strict DICOM results, as there do not check all
-possible validations of the DICOM standard, but are a help for
-some specific situations that have been added to *pydicom* over time.
+These flags do not guarantee strict DICOM results, as not all possible
+validations of the DICOM standard are checked. Included are checks for
+correct value length, contained character set and for predefined format where
+applicable (such as for date/time related values).
 
 To change a flag in your code:
 

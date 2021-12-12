@@ -131,8 +131,8 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
         JIS X 0201.
     """
 
-    Encoder = codecs.getincrementalencoder('shift_jis')
-    encoder = Encoder()
+    encoder_class = codecs.getincrementalencoder('shift_jis')
+    encoder = encoder_class()
 
     # If errors is not strict, this function is used as fallback.
     # In this case, we use only ISO IR 14 to encode given value
@@ -142,7 +142,7 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
         for c in value:
             try:
                 b = encoder.encode(c)
-            except UnicodeEncodeError as e:
+            except UnicodeEncodeError:
                 b = b'?'
 
             if len(b) != 1 or 0x80 <= ord(b):
@@ -221,8 +221,8 @@ def _encode_to_given_charset(
     if errors != 'strict':
         return value.encode(encoding, errors=errors)
 
-    Encoder = codecs.getincrementalencoder(encoding)
-    encoder = Encoder()
+    encoder_class = codecs.getincrementalencoder(encoding)
+    encoder = encoder_class()
 
     encoded = encoder.encode(value[0])
     if not encoded.startswith(ENCODINGS_TO_CODES[encoding]):
@@ -316,14 +316,19 @@ def decode_bytes(
     str
         The decoded unicode string. If the value could not be decoded,
         and :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``False``, a warning is issued, and `value` is decoded using the
-        first encoding with replacement characters, resulting in data loss.
+        is not ``RAISE_ON_ERROR``, a warning is issued, and `value` is
+        decoded using the first encoding with replacement characters,
+        resulting in data loss.
 
     Raises
     ------
     UnicodeDecodeError
         If :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``True`` and `value` could not be decoded with the given encodings.
+        is ``RAISE_ON_ERROR`` and `value` could not be decoded with the given
+        encodings.
+    LookupError
+        If :attr:`~pydicom.config.settings.reading_validation_mode`
+        is ``RAISE_ON_ERROR`` and the given encodings are invalid.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
@@ -333,6 +338,8 @@ def decode_bytes(
         except LookupError:
             if settings.reading_validation_mode == config.RAISE_ON_ERROR:
                 raise
+            # NO_VALIDATION is handled as WARN_ON_ERROR here, as this is
+            # not an optional validation check
             warnings.warn(
                 f"Unknown encoding '{first_encoding}' - using default "
                 "encoding instead"
@@ -498,9 +505,9 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
     bytes
         The encoded string. If `value` could not be encoded with any of
         the given encodings, and
-        :attr:`~pydicom.config.settings.reading_validation_mode` is
-        ``False``, a warning is issued, and `value` is encoded using the first
-        encoding with replacement characters, resulting in data loss.
+        :attr:`~pydicom.config.settings.reading_validation_mode` is not
+        ``RAISE_ON_ERROR``, a warning is issued, and `value` is encoded using
+        the first encoding with replacement characters, resulting in data loss.
 
     Raises
     ------
@@ -572,7 +579,7 @@ def _encode_string_parts(value: str, encodings: Sequence[str]) -> bytes:
     """
     encoded = bytearray()
     unencoded_part = value
-    best_encoding: str
+    best_encoding = default_encoding
     while unencoded_part:
         # find the encoding that can encode the longest part of the rest
         # of the string still to be encoded

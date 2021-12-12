@@ -224,7 +224,6 @@ def validate_pn_component_length(
 def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     """Validate the value for VR PN for the maximum number of components
     and for the maximum length of each component.
-    the .
 
     Parameters
     ----------
@@ -329,7 +328,8 @@ def validate_value(vr: str, value: Any,
         Defines if values are validated and how validation errors are
         handled.
     validator : Callable or None
-        If given, it
+        Function that does the actual validation. If not given,
+        the validator is taken from the VR-specific validator table instead.
 
     Raises
     ------
@@ -753,9 +753,9 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
         # represented by floats). Due to floating point limitations
         # this is best checked for by doing the string conversion
         remaining_chars = 10 - sign_chars
-        trunc_str = f'%.{remaining_chars}e' % val
+        trunc_str = f'{val:.{remaining_chars}e}'
         if len(trunc_str) > 16:
-            trunc_str = f'%.{remaining_chars - 1}e' % val
+            trunc_str = f'{val:.{remaining_chars - 1}e}'
         return trunc_str
     else:
         if logval >= 1.0:
@@ -763,7 +763,7 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
             remaining_chars = 14 - sign_chars - int(floor(logval))
         else:
             remaining_chars = 14 - sign_chars
-        return f'%.{remaining_chars}f' % val
+        return f'{val:.{remaining_chars}f}'
 
 
 class DSfloat(float):
