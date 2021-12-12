@@ -31,3 +31,10 @@ Configuration Options (:mod:`pydicom.config`)
    APPLY_J2K_CORRECTIONS
    INVALID_KEY_BEHAVIOR
    INVALID_KEYWORD_BEHAVIOR
+   NO_VALIDATION
+   WARN_ON_ERROR
+   RAISE_ON_ERROR
+
+.. autoclass:: Settings
+   :exclude-members: __init__, reading_validation_mode
+

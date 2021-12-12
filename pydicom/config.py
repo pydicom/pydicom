@@ -29,7 +29,7 @@ if TYPE_CHECKING:  # pragma: no cover
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal: bool = False
-"""Set using :func:`~pydicom.config.DS_decimal` to control if elements with a
+"""Set using :func:`DS_decimal` to control if elements with a
 VR of **DS** are represented as :class:`~decimal.Decimal`.
 
 Default ``False``.
@@ -130,7 +130,7 @@ def DS_decimal(use_Decimal_boolean: bool = True) -> None:
 
 # Configuration flags
 use_DS_numpy = False
-"""Set using the function :func:`~pydicom.config.DS_numpy` to control
+"""Set using the function :func:`DS_numpy` to control
 whether arrays of VR **DS** are returned as numpy arrays.
 Default: ``False``.
 
@@ -155,22 +155,31 @@ Default ``False``.
 
 
 enforce_valid_values = False
-"""Obsolete. Use settings.reading_validation_mode instead."""
+"""Obsolete.
+Use :attr:`Settings.reading_validation_mode` instead.
+"""
 
 
 # Constants used to define how data element values shall be validated
 NO_VALIDATION = 0
-"""No value validation will be performed."""
+"""If one of the validation modes is set this value, no value validation
+will be performed.
+"""
 
 WARN_ON_ERROR = 1
-"""A warning is issued on a value validation error."""
+"""If one of the validation modes is set this value, a warning is issued fn
+a value validation error occurs.
+"""
 
 RAISE_ON_ERROR = 2
-"""An exception is raised on a value validation error."""
+"""If one of the validation modes is set this value, an exception is raised
+if a value validation error occurs.
+"""
 
 
 class Settings:
     """Collection of several configuration values.
+    Accessed via the singleton :attr:`settings`.
 
     Attributes
     ----------
@@ -179,12 +188,15 @@ class Settings:
         Value validation checks if a value is allowed by the DICOM Standard,
         e.g. that DS strings are not longer than 16 characters and contain only
         allowed characters.
-        The default (WARN_ON_ERROR) is to log a warning in the case of an
-        invalid value, RAISE_ON_ERROR will raise an error in this case, and
-        NO_VALIDATION will bypass the validation.
+        The default (:attr:`WARN_ON_ERROR`) is to log a warning in the case of
+        an invalid value, :attr:`RAISE_ON_ERROR` will raise an error in this
+        case, and :attr:`NO_VALIDATION` will bypass the
+        validation (with the exception of some encoding errors).
     writing_validation_mode : int
         Defines behavior for value validation while writing a value.
-        See :attr:`~pydicom.config.Settings.reading_validation_mode`.
+        See :attr:`Settings.reading_validation_mode`.
+
+    New in version 2.3
     """
 
     def __init__(self) -> None:
@@ -268,11 +280,11 @@ not DICOM conformant and would lead to a failure if accessing it.
 
 show_file_meta = True
 """
-.. versionadded:: 2.0
-
 If ``True`` (default), the 'str' and 'repr' methods
 of :class:`~pydicom.dataset.Dataset` begin with a separate section
 displaying the file meta information data elements
+
+.. versionadded:: 2.0
 """
 
 # Logging system and debug function to change logging level
@@ -528,8 +540,8 @@ def future_behavior(enable_future: bool = True) -> None:
 
     See also
     --------
-    :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR`
-    :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR`
+    :attr:`INVALID_KEYWORD_BEHAVIOR`
+    :attr:`INVALID_KEY_BEHAVIOR`
 
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR

@@ -11,7 +11,8 @@ To get started, create a new virtualenv using Python 3:
 mkvirtualenv -p /path/to/python3.X pydicom-sphinx
 cd pydicom/
 pip install -e .
-pip install sphinx sphinx_rtd_theme sphinx_gallery
+pip install matplotlib
+pip install sphinx sphinx_rtd_theme sphinx_gallery sphinx_copybutton sphinx_issues
 cd doc
 ```
 
