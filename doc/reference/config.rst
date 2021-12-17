@@ -7,9 +7,13 @@ Configuration Options (:mod:`pydicom.config`)
 
 *pydicom* configuration options
 
+.. autoclass:: Settings
+   :exclude-members: __init__, reading_validation_mode
+
 .. autosummary::
    :toctree: generated/
 
+   settings
    allow_DS_float
    assume_implicit_vr_switch
    convert_wrong_length_to_UN
@@ -34,7 +38,4 @@ Configuration Options (:mod:`pydicom.config`)
    NO_VALIDATION
    WARN_ON_ERROR
    RAISE_ON_ERROR
-
-.. autoclass:: Settings
-   :exclude-members: __init__, reading_validation_mode
 

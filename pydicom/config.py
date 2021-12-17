@@ -181,6 +181,8 @@ class Settings:
     """Collection of several configuration values.
     Accessed via the singleton :attr:`settings`.
 
+    .. versionadded:: 2.3
+
     Attributes
     ----------
     reading_validation_mode : int
@@ -195,8 +197,6 @@ class Settings:
     writing_validation_mode : int
         Defines behavior for value validation while writing a value.
         See :attr:`Settings.reading_validation_mode`.
-
-    New in version 2.3
     """
 
     def __init__(self) -> None:
@@ -219,7 +219,11 @@ class Settings:
 
 
 settings = Settings()
-"""The global configuration object."""
+"""The global configuration object of type :class:`Settings` to access some
+of the settings. More settings may move here in later versions.
+
+.. versionadded:: 2.3
+"""
 
 
 @contextmanager
