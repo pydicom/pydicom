@@ -1106,9 +1106,10 @@ def dcmwrite(
             write_file_meta_info(
                 fp, dataset.file_meta, enforce_standard=not write_like_original
             )
-            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
+            tsyntax = cast(UID, getattr(
+                dataset.file_meta, "TransferSyntaxUID", None))
 
-        if (tsyntax == DeflatedExplicitVRLittleEndian):
+        if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
             # when writing, the entire dataset following
             #     the file metadata is prepared the normal way,
