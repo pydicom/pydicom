@@ -731,10 +731,10 @@ class TestDataElementValidation:
         if check_warn:
             with pytest.warns(UserWarning, match=msg):
                 DataElement(0x00410001, vr, value,
-                            validation_mode=config.WARN_ON_ERROR)
+                            validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, value,
-                        validation_mode=config.RAISE_ON_ERROR)
+                        validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("vr, length", (
             ("AE", 17), ("CS", 17), ("DS", 27), ("LO", 66), ("LT", 10250),
@@ -744,10 +744,10 @@ class TestDataElementValidation:
         msg = fr"The value length \({length}\) exceeds the maximum length *"
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, vr, "1" * length,
-                        validation_mode=config.WARN_ON_ERROR)
+                        validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, vr, "2" * length,
-                        validation_mode=config.RAISE_ON_ERROR)
+                        validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", 'Äneas'))
     def test_invalid_ae(self, value):
@@ -756,7 +756,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle"))
     def test_valid_ae(self, value):
         DataElement(0x00410001, "AE", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012"))
     def test_invalid_as(self, value):
@@ -765,7 +765,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("value", ("012Y", "345M", b"052W", b"789D"))
     def test_valid_as(self, value):
         DataElement(0x00410001, "AS", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", (
             "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8")))
@@ -775,7 +775,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("value", ("VALID_13579 ", b"VALID_13579"))
     def test_valid_cs(self, value):
         DataElement(0x00410001, "CS", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize(
         "value",
@@ -791,7 +791,7 @@ class TestDataElementValidation:
     )
     def test_valid_da(self, value):
         DataElement(0x00410001, "DA", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize(
         "value",
@@ -806,7 +806,7 @@ class TestDataElementValidation:
     )
     def test_valid_ds(self, value):
         DataElement(0x00410001, "DS", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize(
         "value", ("201012+", "20A0", b"123.66", "-1235E4", "12 34")
@@ -817,7 +817,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("value", (" 12345 ", b"+1234 ", "-034576"))
     def test_valid_is(self, value):
         DataElement(0x00410001, "IS", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize(
         "value",
@@ -834,7 +834,7 @@ class TestDataElementValidation:
     )
     def test_valid_tm(self, value):
         DataElement(0x00410001, "TM", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize(
         "value",
@@ -854,7 +854,7 @@ class TestDataElementValidation:
     )
     def test_valid_dt(self, value):
         DataElement(0x00410001, "DT", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", (
             "Руссский", "ctrl\tchar", '"url"', "a<b", "{abc}"))
@@ -865,17 +865,17 @@ class TestDataElementValidation:
             "https://www.a.b/sdf_g?a=1&b=5", "/a#b(c)[d]@!", "'url'"))
     def test_valid_ur(self, value):
         DataElement(0x00410001, "UR", value,
-                    validation_mode=config.RAISE_ON_ERROR)
+                    validation_mode=config.RAISE)
 
     def test_invalid_pn(self):
         msg = r"The number of PN components length \(4\) exceeds *"
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, "PN", "Jim=John=Jimmy=Jonny",
-                        validation_mode=config.WARN_ON_ERROR)
+                        validation_mode=config.WARN)
         msg = r"The PN component length \(65\) exceeds *"
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, "PN", b"Jimmy" * 13,
-                        validation_mode=config.RAISE_ON_ERROR)
+                        validation_mode=config.RAISE)
 
     def test_write_invalid_length_non_ascii_text(self):
         fp = DicomBytesIO()

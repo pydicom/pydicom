@@ -1361,7 +1361,7 @@ class Dataset:
             keyword.
         KeyError
             If :attr:`~pydicom.config.settings.reading_validation_mode` is
-             ``RAISE_ON_ERROR`` and `key` is an unknown non-private tag.
+             ``RAISE`` and `key` is an unknown non-private tag.
         """
         tag = Tag(key)
         if tag in self:
@@ -1375,7 +1375,7 @@ class Dataset:
                     vr = dictionary_VR(tag)
                 except KeyError:
                     if (settings.writing_validation_mode ==
-                            config.RAISE_ON_ERROR):
+                            config.RAISE):
                         raise KeyError(f"Unknown DICOM tag {tag}")
                     vr = 'UN'
                     warnings.warn(

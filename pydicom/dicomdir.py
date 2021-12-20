@@ -65,7 +65,7 @@ class DicomDir(FileDataset):
         InvalidDicomError
             If the file transfer syntax is not Little Endian Explicit and
             :attr:`~pydicom.config.settings.reading_validation_mode`
-            is ``RAISE_ON_ERROR``.
+            is ``RAISE``.
 
         """
         # Usually this class is created through filereader.read_partial,
@@ -80,7 +80,7 @@ class DicomDir(FileDataset):
             msg = ('Invalid transfer syntax for DICOMDIR - '
                    'Explicit Little Endian expected.')
             if (config.settings.reading_validation_mode ==
-                    config.RAISE_ON_ERROR):
+                    config.RAISE):
                 raise InvalidDicomError(msg)
             warnings.warn(msg, UserWarning)
         FileDataset.__init__(

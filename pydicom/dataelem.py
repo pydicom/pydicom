@@ -819,7 +819,7 @@ def DataElement_from_raw(
     KeyError
         If `raw_data_element` belongs to an unknown non-private tag and
         :attr:`~pydicom.config.settings.reading_validation_mode` is set
-        to ``RAISE_ON_ERROR``.
+        to ``RAISE``.
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader
@@ -852,7 +852,7 @@ def DataElement_from_raw(
             else:
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
                 if (config.settings.reading_validation_mode ==
-                        config.RAISE_ON_ERROR):
+                        config.RAISE):
                     msg += " can't look up VR"
                     raise KeyError(msg)
                 else:

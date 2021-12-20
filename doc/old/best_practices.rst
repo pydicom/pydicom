@@ -27,12 +27,12 @@ Enforcing Valid DICOM
 The first setting is about validation of values read from existing DICOM data,
 the second about validation of newly created and written values.
 
-Both can have the values `~pydicom.config.NO_VALIDATION`,
-`~pydicom.config.WARN_ON_ERROR` and `~pydicom.config.RAISE_ON_ERROR`.
+Both can have the values `~pydicom.config.NO_CHECK`,
+`~pydicom.config.WARN` and `~pydicom.config.RAISE`.
 
 As the name says, some non-standard DICOM may result in a warning (this is the
 default for `reading_validation_mode`) or in a raised exception (the default
-for `writing_validation_mode`). If `NO_VALIDATION` is set, the validation is
+for `writing_validation_mode`). If `NO_CHECK` is set, the validation is
 not performed in most cases, which may be used in some special cases.
 
 The setting for `writing_validation_mode` may be changed for some cases,
@@ -41,7 +41,7 @@ this is generally not recommended.
 
 The default setting for `reading_validation_mode` allows to deal with files
 that do not strictly adhere to the DICOM Standard. Setting it to
-`RAISE_ON_ERROR` can help to ensure that only valid DICOM data is accepted.
+`RAISE` can help to ensure that only valid DICOM data is accepted.
 
 These flags do not guarantee strict DICOM results, as not all possible
 validations of the DICOM standard are checked. Included are checks for
@@ -53,7 +53,7 @@ To change a flag in your code:
 .. code-block:: python
 
   from pydicom import config
-  config.settings.reading_validation_mode = config.RAISE_ON_ERROR
+  config.settings.reading_validation_mode = config.RAISE
 
 Note that you *must not* use 
 :code:`from pydicom.config.settings import reading_validation_mode`.

@@ -162,7 +162,7 @@ class TestCharset:
     def test_bad_encoded_single_encoding_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        config.settings.reading_validation_mode is RAISE_ON_ERROR."""
+        config.settings.reading_validation_mode is RAISE."""
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'utf.?8' codec can't decode byte 0xc4 in position 0: "
@@ -221,7 +221,7 @@ class TestCharset:
     def test_bad_decoded_multi_byte_encoding_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        `config.settings.reading_validation_mode` is RAISE_ON_ERROR"""
+        `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
@@ -242,7 +242,7 @@ class TestCharset:
     def test_unknown_escape_sequence_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        `config.settings.reading_validation_mode` is RAISE_ON_ERROR"""
+        `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         with pytest.raises(ValueError, match='Found unknown escape sequence '

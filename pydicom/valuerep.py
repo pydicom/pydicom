@@ -287,7 +287,7 @@ def validate_pn_component(value: Union[str, bytes]) -> None:
     ------
     ValueError
         If the validation fails and the validation mode is set to
-        `RAISE_ON_ERROR`.
+        `RAISE`.
     """
     validate_value("PN", value, config.settings.writing_validation_mode,
                    validate_pn_component_length)
@@ -335,9 +335,9 @@ def validate_value(vr: str, value: Any,
     ------
     ValueError
         If the validation fails and the validation mode is set to
-        `RAISE_ON_ERROR`.
+        `RAISE`.
     """
-    if validation_mode == config.NO_VALIDATION:
+    if validation_mode == config.NO_CHECK:
         return
 
     if value is not None and isinstance(value, (str, bytes)):
@@ -345,7 +345,7 @@ def validate_value(vr: str, value: Any,
         if validator is not None:
             is_valid, msg = validator(vr, value)
             if not is_valid:
-                if validation_mode == config.RAISE_ON_ERROR:
+                if validation_mode == config.RAISE:
                     raise ValueError(msg)
                 warnings.warn(msg)
 
@@ -834,7 +834,7 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if (validation_mode == config.RAISE_ON_ERROR and
+        if (validation_mode == config.RAISE and
                 not self.auto_format):
             if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
@@ -842,7 +842,7 @@ class DSfloat(float):
                     "characters long, but the float provided requires > 16 "
                     "characters to be accurately represented. Use a smaller "
                     "string, set 'config.settings.reading_validation_mode' to "
-                    "'WARN_ON_ERROR' to override the length check, or "
+                    "'WARN' to override the length check, or "
                     "explicitly construct a DS object with 'auto_format' "
                     "set to True"
                 )
@@ -968,18 +968,18 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode != config.NO_VALIDATION:
+        if validation_mode != config.NO_CHECK:
             if len(repr(self).strip("'")) > 16:
                 msg = (
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
                     "'config.settings.reading_validation_mode' to "
-                    "'WARN_ON_ERROR' to override the length check, use "
+                    "'WARN' to override the length check, use "
                     "'Decimal.quantize()' and initialize "
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
-                if validation_mode == config.RAISE_ON_ERROR:
+                if validation_mode == config.RAISE:
                     raise OverflowError(msg)
                 warnings.warn(msg)
             if not is_valid_ds(repr(self).strip("'")):
@@ -988,7 +988,7 @@ class DSdecimal(Decimal):
                     f'Value "{str(self)}" is not valid for elements with a VR '
                     'of DS'
                 )
-                if validation_mode == config.RAISE_ON_ERROR:
+                if validation_mode == config.RAISE:
                     raise ValueError(msg)
                 warnings.warn(msg)
 
@@ -1094,12 +1094,12 @@ class IS(int):
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
         if (not -2**31 <= newval < 2**31 and
-                validation_mode == config.RAISE_ON_ERROR):
+                validation_mode == config.RAISE):
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
                 "and (2**31 - 1). Set "
                 "'config.settings.reading_validation_mode' to "
-                "'WARN_ON_ERROR' to override the value check"
+                "'WARN' to override the value check"
             )
 
         return newval

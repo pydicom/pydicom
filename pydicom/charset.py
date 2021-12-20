@@ -316,7 +316,7 @@ def decode_bytes(
     str
         The decoded unicode string. If the value could not be decoded,
         and :attr:`~pydicom.config.settings.reading_validation_mode`
-        is not ``RAISE_ON_ERROR``, a warning is issued, and `value` is
+        is not ``RAISE``, a warning is issued, and `value` is
         decoded using the first encoding with replacement characters,
         resulting in data loss.
 
@@ -324,11 +324,11 @@ def decode_bytes(
     ------
     UnicodeDecodeError
         If :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``RAISE_ON_ERROR`` and `value` could not be decoded with the given
+        is ``RAISE`` and `value` could not be decoded with the given
         encodings.
     LookupError
         If :attr:`~pydicom.config.settings.reading_validation_mode`
-        is ``RAISE_ON_ERROR`` and the given encodings are invalid.
+        is ``RAISE`` and the given encodings are invalid.
     """
     # shortcut for the common case - no escape sequences present
     if ESC not in value:
@@ -336,9 +336,9 @@ def decode_bytes(
         try:
             return value.decode(first_encoding)
         except LookupError:
-            if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+            if settings.reading_validation_mode == config.RAISE:
                 raise
-            # NO_VALIDATION is handled as WARN_ON_ERROR here, as this is
+            # NO_CHECK is handled as WARN here, as this is
             # not an optional validation check
             warnings.warn(
                 f"Unknown encoding '{first_encoding}' - using default "
@@ -347,7 +347,7 @@ def decode_bytes(
             first_encoding = default_encoding
             return value.decode(first_encoding)
         except UnicodeError:
-            if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+            if settings.reading_validation_mode == config.RAISE:
                 raise
             warnings.warn(
                 "Failed to decode byte string with encoding "
@@ -406,7 +406,7 @@ def _decode_fragment(
     str
         The decoded unicode string. If the value could not be decoded,
         and :attr:`~pydicom.config.settings.reading_validation_mode` is not
-        set to ``RAISE_ON_ERROR``, a warning is issued, and the value is
+        set to ``RAISE``, a warning is issued, and the value is
         decoded using the first encoding with replacement characters,
         resulting in data loss.
 
@@ -414,7 +414,7 @@ def _decode_fragment(
     ------
     UnicodeDecodeError
         If :attr:`~pydicom.config.settings.reading_validation_mode` is set
-        to ``RAISE_ON_ERROR`` and `value` could not be decoded with the given
+        to ``RAISE`` and `value` could not be decoded with the given
         encodings.
 
     References
@@ -431,7 +431,7 @@ def _decode_fragment(
         # no escape sequence - use first encoding
         return byte_str.decode(encodings[0])
     except UnicodeError:
-        if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+        if settings.reading_validation_mode == config.RAISE:
             raise
         warnings.warn(
             "Failed to decode byte string with encodings: "
@@ -479,7 +479,7 @@ def _decode_escaped_fragment(
 
     # unknown escape code - use first encoding
     msg = "Found unknown escape sequence in encoded string value"
-    if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+    if settings.reading_validation_mode == config.RAISE:
         raise ValueError(msg)
 
     warnings.warn(msg + f" - using encoding {encodings[0]}")
@@ -506,14 +506,14 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
         The encoded string. If `value` could not be encoded with any of
         the given encodings, and
         :attr:`~pydicom.config.settings.reading_validation_mode` is not
-        ``RAISE_ON_ERROR``, a warning is issued, and `value` is encoded using
+        ``RAISE``, a warning is issued, and `value` is encoded using
         the first encoding with replacement characters, resulting in data loss.
 
     Raises
     ------
     UnicodeEncodeError
         If  :attr:`~pydicom.config.settings.writing_validation_mode`
-        is set to ``RAISE_ON_ERROR`` and `value` could not be encoded with the
+        is set to ``RAISE`` and `value` could not be encoded with the
         supplied encodings.
     """
     for i, encoding in enumerate(encodings):
@@ -539,7 +539,7 @@ def encode_string(value: str, encodings: Sequence[str]) -> bytes:
             pass
     # all attempts failed - raise or warn and encode with replacement
     # characters
-    if settings.writing_validation_mode == config.RAISE_ON_ERROR:
+    if settings.writing_validation_mode == config.RAISE:
         # force raising a valid UnicodeEncodeError
         value.encode(encodings[0])
 
@@ -663,8 +663,8 @@ def convert_encodings(
     Invalid encodings are replaced with the default encoding with a
     respective warning issued, if
     :attr:`~pydicom.config.settings.reading_validation_mode` is
-    ``WARN_ON_ERROR``, or an exception is raised if it is set to
-    ``RAISE_ON_ERROR``.
+    ``WARN``, or an exception is raised if it is set to
+    ``RAISE``.
 
     Parameters
     ----------
@@ -680,14 +680,14 @@ def convert_encodings(
         unchanged. Encodings with common spelling errors are replaced by the
         correct encoding, and invalid encodings are replaced with the default
         encoding if :attr:`~pydicom.config.settings.reading_validation_mode`
-        is not set to ``RAISE_ON_ERROR``.
+        is not set to ``RAISE``.
 
     Raises
     ------
     LookupError
         If `encodings` contains a value that could not be converted and
         :attr:`~pydicom.config.settings.reading_validation_mode` is
-        ``RAISE_ON_ERROR``.
+        ``RAISE``.
     """
 
     encodings = encodings or ['']
@@ -762,10 +762,10 @@ def _warn_about_invalid_encoding(
     replacement encoding, other the default encoding.
     If no replacement encoding is given, and
     :attr:`~pydicom.config.settings.reading_validation_mode` is set to
-    ``RAISE_ON_ERROR``, `LookupError` is raised.
+    ``RAISE``, `LookupError` is raised.
     """
     if patched_encoding is None:
-        if settings.reading_validation_mode == config.RAISE_ON_ERROR:
+        if settings.reading_validation_mode == config.RAISE:
             raise LookupError(f"Unknown encoding '{encoding}'")
 
         msg = f"Unknown encoding '{encoding}' - using default encoding instead"

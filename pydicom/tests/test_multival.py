@@ -40,7 +40,7 @@ class TestMultiValue:
         """MultiValue: Raise error if any item outside DICOM limits...."""
         with pytest.raises(OverflowError):
             MultiValue(IS, [1, -2 ** 31 - 1],
-                       validation_mode=config.RAISE_ON_ERROR)
+                       validation_mode=config.RAISE)
         # Overflow error not raised for IS out of DICOM valid range
 
     def testAppend(self):

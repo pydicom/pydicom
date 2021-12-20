@@ -161,18 +161,18 @@ Use :attr:`Settings.reading_validation_mode` instead.
 
 
 # Constants used to define how data element values shall be validated
-NO_VALIDATION = 0
+NO_CHECK = 0
 """If one of the validation modes is set this value, no value validation
 will be performed.
 """
 
-WARN_ON_ERROR = 1
-"""If one of the validation modes is set this value, a warning is issued fn
+WARN = 1
+"""If one of the validation modes is set to this value, a warning is issued if
 a value validation error occurs.
 """
 
-RAISE_ON_ERROR = 2
-"""If one of the validation modes is set this value, an exception is raised
+RAISE = 2
+"""If one of the validation modes is set to this value, an exception is raised
 if a value validation error occurs.
 """
 
@@ -190,9 +190,9 @@ class Settings:
         Value validation checks if a value is allowed by the DICOM Standard,
         e.g. that DS strings are not longer than 16 characters and contain only
         allowed characters.
-        The default (:attr:`WARN_ON_ERROR`) is to log a warning in the case of
-        an invalid value, :attr:`RAISE_ON_ERROR` will raise an error in this
-        case, and :attr:`NO_VALIDATION` will bypass the
+        The default (:attr:`WARN`) is to log a warning in the case of
+        an invalid value, :attr:`RAISE` will raise an error in this
+        case, and :attr:`NO_CHECK` will bypass the
         validation (with the exception of some encoding errors).
     writing_validation_mode : int
         Defines behavior for value validation while writing a value.
@@ -200,22 +200,22 @@ class Settings:
     """
 
     def __init__(self) -> None:
-        self._reading_validation_mode: int = WARN_ON_ERROR
-        self.writing_validation_mode = RAISE_ON_ERROR
+        self._reading_validation_mode: int = WARN
+        self.writing_validation_mode = RAISE
 
     @property
     def reading_validation_mode(self) -> int:
         # upwards compatibility:
         # if enforce_valid_values has been set, we use that
         if enforce_valid_values:
-            return RAISE_ON_ERROR
+            return RAISE
         return self._reading_validation_mode
 
     @reading_validation_mode.setter
     def reading_validation_mode(self, value: int) -> None:
         global enforce_valid_values
         self._reading_validation_mode = value
-        enforce_valid_values = value == RAISE_ON_ERROR
+        enforce_valid_values = value == RAISE
 
 
 settings = Settings()
@@ -235,8 +235,8 @@ def disable_value_validation() -> Generator:
     reading_mode = settings.reading_validation_mode
     writing_mode = settings.writing_validation_mode
     try:
-        settings.reading_validation_mode = NO_VALIDATION
-        settings.writing_validation_mode = NO_VALIDATION
+        settings.reading_validation_mode = NO_CHECK
+        settings.writing_validation_mode = NO_CHECK
         yield
     finally:
         settings.reading_validation_mode = reading_mode
