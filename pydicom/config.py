@@ -155,7 +155,7 @@ Default ``False``.
 
 
 enforce_valid_values = False
-"""Obsolete.
+"""Deprecated.
 Use :attr:`Settings.reading_validation_mode` instead.
 """
 
@@ -200,22 +200,19 @@ class Settings:
     """
 
     def __init__(self) -> None:
-        self._reading_validation_mode: int = WARN
+        self._reading_validation_mode: Optional[int] = None
         self.writing_validation_mode = RAISE
 
     @property
     def reading_validation_mode(self) -> int:
-        # upwards compatibility:
-        # if enforce_valid_values has been set, we use that
-        if enforce_valid_values:
-            return RAISE
+        # upwards compatibility
+        if self._reading_validation_mode is None:
+            return RAISE if enforce_valid_values else WARN
         return self._reading_validation_mode
 
     @reading_validation_mode.setter
     def reading_validation_mode(self, value: int) -> None:
-        global enforce_valid_values
         self._reading_validation_mode = value
-        enforce_valid_values = value == RAISE
 
 
 settings = Settings()

@@ -4,31 +4,30 @@
 
 import pytest
 from pydicom import config
-from pydicom.config import settings
 
 
 @pytest.fixture
 def enforce_valid_values():
-    value = settings.reading_validation_mode
-    settings.reading_validation_mode = config.RAISE
+    value = config.settings.reading_validation_mode
+    config.settings.reading_validation_mode = config.RAISE
     yield
-    settings.reading_validation_mode = value
+    config.settings.reading_validation_mode = value
 
 
 @pytest.fixture
 def allow_reading_invalid_values():
-    value = settings.reading_validation_mode
-    settings.reading_validation_mode = config.WARN
+    value = config.settings.reading_validation_mode
+    config.settings.reading_validation_mode = config.WARN
     yield
-    settings.reading_validation_mode = value
+    config.settings.reading_validation_mode = value
 
 
 @pytest.fixture
 def allow_writing_invalid_values():
-    value = settings.writing_validation_mode
-    settings.writing_validation_mode = config.WARN
+    value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.WARN
     yield
-    settings.writing_validation_mode = value
+    config.settings.writing_validation_mode = value
 
 
 @pytest.fixture
@@ -60,18 +59,18 @@ def dont_replace_un_with_known_vr():
 
 @pytest.fixture
 def dont_raise_on_writing_invalid_value():
-    old_value = settings.writing_validation_mode
-    settings.writing_validation_mode = config.WARN
+    old_value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.WARN
     yield
-    settings.writing_validation_mode = old_value
+    config.settings.writing_validation_mode = old_value
 
 
 @pytest.fixture
 def raise_on_writing_invalid_value():
-    old_value = settings.writing_validation_mode
-    settings.writing_validation_mode = config.RAISE
+    old_value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.RAISE
     yield
-    settings.writing_validation_mode = old_value
+    config.settings.writing_validation_mode = old_value
 
 
 @pytest.fixture

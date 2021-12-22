@@ -42,7 +42,7 @@ import pydicom  # for dcmwrite
 from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
-from pydicom.config import logger, settings
+from pydicom.config import logger
 from pydicom.datadict import (
     dictionary_VR, tag_for_keyword, keyword_for_tag, repeater_has_keyword
 )
@@ -1374,7 +1374,7 @@ class Dataset:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if (settings.writing_validation_mode ==
+                    if (config.settings.writing_validation_mode ==
                             config.RAISE):
                         raise KeyError(f"Unknown DICOM tag {tag}")
                     vr = 'UN'
@@ -2310,7 +2310,7 @@ class Dataset:
 
         Parameters
         ----------
-        dictionary : dict or Dataset
+        d : dict or Dataset
             The :class:`dict` or :class:`Dataset` to use when updating the
             current object.
         """
@@ -2606,7 +2606,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename_or_obj: Union[str, os.PathLike, BinaryIO],
         dataset: _DatasetType,
         preamble: Optional[bytes] = None,
         file_meta: Optional["FileMetaDataset"] = None,

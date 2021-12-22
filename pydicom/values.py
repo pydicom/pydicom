@@ -13,7 +13,7 @@ from typing import (
 # don't import datetime_conversion directly
 from pydicom import config
 from pydicom.charset import default_encoding, decode_bytes
-from pydicom.config import logger, have_numpy, enforce_valid_values, Settings
+from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
 from pydicom.filereader import read_sequence
@@ -487,7 +487,7 @@ def convert_string(
         The encoded text VR element value.
     is_little_endian : bool
         ``True`` if the value is encoded as little endian, ``False`` otherwise.
-    format_str : str, optional
+    struct_format : str, optional
         Not used.
 
     Returns
@@ -774,7 +774,7 @@ def convert_value(
             raw_data_element.value_tell
         )
     except ValueError:
-        if config.enforce_valid_values:
+        if config.settings.reading_validation_mode == config.RAISE:
             # The user really wants an exception here
             raise
 
