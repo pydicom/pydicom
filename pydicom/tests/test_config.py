@@ -8,11 +8,14 @@ import importlib
 
 import pytest
 
-from pydicom import dcmread
+from pydicom import dcmread, DataElement
 from pydicom.config import debug
 from pydicom.data import get_testdata_file
 from pydicom import config
+from pydicom.dataelem import RawDataElement, DataElement_from_raw
 from pydicom.dataset import Dataset
+from pydicom.filebase import DicomBytesIO
+from pydicom.tag import Tag
 
 DS_PATH = get_testdata_file("CT_small.dcm")
 PYTEST = [int(x) for x in pytest.__version__.split(".")]
@@ -144,3 +147,52 @@ class TestFuture:
         ds = Dataset()
         with pytest.raises(ValueError):
             ds.bitsStored = 42
+
+    def test_write_invalid_values(self, future_setter):
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO())
+
+
+class TestSettings:
+    @pytest.fixture
+    def enforce_valid_values(self):
+        config.enforce_valid_values = True
+        yield
+        config.enforce_valid_values = False
+
+    def test_default_for_reading_validation_mode(self):
+        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
+                             0, True, True)
+        with pytest.warns(UserWarning):
+            DataElement_from_raw(raw)
+
+    def test_reading_validation_mode_with_enforce_valid_values(
+            self, enforce_valid_values):
+        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
+                             0, True, True)
+        with pytest.raises(KeyError):
+            DataElement_from_raw(raw)
+
+    def test_default_for_writing_validation_mode(self):
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        with pytest.warns(UserWarning):
+            ds.save_as(DicomBytesIO())
+
+    def test_writing_validation_mode_with_enforce_valid_values(
+            self, enforce_valid_values):
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        with pytest.raises(ValueError):
+            ds.save_as(DicomBytesIO())

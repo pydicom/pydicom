@@ -27,12 +27,12 @@ Enforcing Valid DICOM
 The first setting is about validation of values read from existing DICOM data,
 the second about validation of newly created and written values.
 
-Both can have the values `~pydicom.config.NO_CHECK`,
+Both can have the values `~pydicom.config.IGNORE`,
 `~pydicom.config.WARN` and `~pydicom.config.RAISE`.
 
 As the name says, some non-standard DICOM may result in a warning (this is the
 default for `reading_validation_mode`) or in a raised exception (the default
-for `writing_validation_mode`). If `NO_CHECK` is set, the validation is
+for `writing_validation_mode`). If `IGNORE` is set, the validation is
 not performed in most cases, which may be used in some special cases.
 
 The setting for `writing_validation_mode` may be changed for some cases,

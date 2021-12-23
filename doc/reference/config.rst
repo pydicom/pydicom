@@ -8,7 +8,7 @@ Configuration Options (:mod:`pydicom.config`)
 *pydicom* configuration options
 
 .. autoclass:: Settings
-   :exclude-members: __init__, reading_validation_mode
+   :exclude-members: __init__
 
 .. autosummary::
    :toctree: generated/
@@ -35,7 +35,7 @@ Configuration Options (:mod:`pydicom.config`)
    APPLY_J2K_CORRECTIONS
    INVALID_KEY_BEHAVIOR
    INVALID_KEYWORD_BEHAVIOR
-   NO_CHECK
+   IGNORE
    WARN
    RAISE
 

@@ -337,7 +337,7 @@ def validate_value(vr: str, value: Any,
         If the validation fails and the validation mode is set to
         `RAISE`.
     """
-    if validation_mode == config.NO_CHECK:
+    if validation_mode == config.IGNORE:
         return
 
     if value is not None and isinstance(value, (str, bytes)):
@@ -968,7 +968,7 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if validation_mode != config.NO_CHECK:
+        if validation_mode != config.IGNORE:
             if len(repr(self).strip("'")) > 16:
                 msg = (
                     "Values for elements with a VR of 'DS' values must be "

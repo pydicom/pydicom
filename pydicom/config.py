@@ -26,6 +26,9 @@ if TYPE_CHECKING:  # pragma: no cover
         ) -> "RawDataElement": ...
 
 
+_use_future = False
+_use_future_env = os.getenv("PYDICOM_FUTURE")
+
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
 use_DS_decimal: bool = False
@@ -161,7 +164,7 @@ Use :attr:`Settings.reading_validation_mode` instead.
 
 
 # Constants used to define how data element values shall be validated
-NO_CHECK = 0
+IGNORE = 0
 """If one of the validation modes is set this value, no value validation
 will be performed.
 """
@@ -182,29 +185,26 @@ class Settings:
     Accessed via the singleton :attr:`settings`.
 
     .. versionadded:: 2.3
-
-    Attributes
-    ----------
-    reading_validation_mode : int
-        Defines behavior for value validation while reading value.
-        Value validation checks if a value is allowed by the DICOM Standard,
-        e.g. that DS strings are not longer than 16 characters and contain only
-        allowed characters.
-        The default (:attr:`WARN`) is to log a warning in the case of
-        an invalid value, :attr:`RAISE` will raise an error in this
-        case, and :attr:`NO_CHECK` will bypass the
-        validation (with the exception of some encoding errors).
-    writing_validation_mode : int
-        Defines behavior for value validation while writing a value.
-        See :attr:`Settings.reading_validation_mode`.
     """
 
     def __init__(self) -> None:
         self._reading_validation_mode: Optional[int] = None
-        self.writing_validation_mode = RAISE
+        # in future version, writing invalid values will raise by default,
+        # currently the default value depends on enforce_valid_values
+        self._writing_validation_mode: Optional[int] = (
+            RAISE if _use_future else None
+        )
 
     @property
     def reading_validation_mode(self) -> int:
+        """Defines behavior of validation while reading values, compared with
+        the DICOM standard, e.g. that DS strings are not longer than
+        16 characters and contain only allowed characters.
+        The default (:attr:`WARN`) is to log a warning in the case of
+        an invalid value, :attr:`RAISE` will raise an error in this
+        case, and :attr:`IGNORE` will bypass the
+        validation (with the exception of some encoding errors).
+        """
         # upwards compatibility
         if self._reading_validation_mode is None:
             return RAISE if enforce_valid_values else WARN
@@ -213,6 +213,19 @@ class Settings:
     @reading_validation_mode.setter
     def reading_validation_mode(self, value: int) -> None:
         self._reading_validation_mode = value
+
+    @property
+    def writing_validation_mode(self) -> int:
+        """Defines behavior for value validation while writing a value.
+        See :attr:`Settings.reading_validation_mode`.
+        """
+        if self._writing_validation_mode is None:
+            return RAISE if enforce_valid_values else WARN
+        return self._writing_validation_mode
+
+    @writing_validation_mode.setter
+    def writing_validation_mode(self, value: int) -> None:
+        self._writing_validation_mode = value
 
 
 settings = Settings()
@@ -229,15 +242,15 @@ def disable_value_validation() -> Generator:
     both for reading and writing.
     Can be used for performance reasons if the values are known to be valid.
     """
-    reading_mode = settings.reading_validation_mode
-    writing_mode = settings.writing_validation_mode
+    reading_mode = settings._reading_validation_mode
+    writing_mode = settings._writing_validation_mode
     try:
-        settings.reading_validation_mode = NO_CHECK
-        settings.writing_validation_mode = NO_CHECK
+        settings.reading_validation_mode = IGNORE
+        settings.writing_validation_mode = IGNORE
         yield
     finally:
-        settings.reading_validation_mode = reading_mode
-        settings.writing_validation_mode = writing_mode
+        settings._reading_validation_mode = reading_mode
+        settings._writing_validation_mode = writing_mode
 
 
 convert_wrong_length_to_UN = False
@@ -509,9 +522,6 @@ def debug(debug_on: bool = True, default_handler: bool = True) -> None:
 # force level=WARNING, in case logging default is set differently (issue 103)
 debug(False, False)
 
-_use_future = False
-_use_future_env = os.getenv("PYDICOM_FUTURE")
-
 if _use_future_env:
     if _use_future_env.lower() in ["true", "yes", "on", "1"]:
         _use_future = True
@@ -550,9 +560,11 @@ def future_behavior(enable_future: bool = True) -> None:
     if enable_future:
         _use_future = True
         INVALID_KEYWORD_BEHAVIOR = "RAISE"
+        settings._writing_validation_mode = RAISE
     else:
         _use_future = False
         INVALID_KEYWORD_BEHAVIOR = "WARN"
+        settings._writing_validation_mode = None
 
 
 if _use_future:

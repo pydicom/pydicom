@@ -23,6 +23,14 @@ def allow_reading_invalid_values():
 
 
 @pytest.fixture
+def enforce_writing_invalid_values():
+    value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.RAISE
+    yield
+    config.settings.writing_validation_mode = value
+
+
+@pytest.fixture
 def allow_writing_invalid_values():
     value = config.settings.writing_validation_mode
     config.settings.writing_validation_mode = config.WARN

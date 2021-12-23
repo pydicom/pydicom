@@ -337,7 +337,7 @@ def decode_bytes(
         except LookupError:
             if config.settings.reading_validation_mode == config.RAISE:
                 raise
-            # NO_CHECK is handled as WARN here, as this is
+            # IGNORE is handled as WARN here, as this is
             # not an optional validation check
             warnings.warn(
                 f"Unknown encoding '{first_encoding}' - using default "

@@ -877,7 +877,8 @@ class TestDataElementValidation:
             DataElement(0x00410001, "PN", b"Jimmy" * 13,
                         validation_mode=config.RAISE)
 
-    def test_write_invalid_length_non_ascii_text(self):
+    def test_write_invalid_length_non_ascii_text(
+            self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_implicit_VR = True
@@ -893,7 +894,7 @@ class TestDataElementValidation:
         with pytest.raises(ValueError, match=msg):
             ds.save_as(fp)
 
-    def test_write_invalid_non_ascii_pn(self):
+    def test_write_invalid_non_ascii_pn(self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_implicit_VR = False
