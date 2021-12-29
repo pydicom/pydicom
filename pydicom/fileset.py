@@ -2865,10 +2865,10 @@ _FOUR_LEVEL_SOP_CLASSES = {
 
 def _single_level_record_type(ds: Dataset) -> str:
     """Return a single-level *Directory Record Type* for `ds`."""
-    sop_class = getattr(ds, "SOPClassUID", None)
+    sop_class = cast(Optional[UID], getattr(ds, "SOPClassUID", None))
 
     try:
-        return _SINGLE_LEVEL_SOP_CLASSES[sop_class]
+        return _SINGLE_LEVEL_SOP_CLASSES[sop_class]  # type: ignore[index]
     except KeyError:
         return "PATIENT"
 
@@ -2888,9 +2888,9 @@ def _four_level_record_type(ds: Dataset) -> str:
     if "RTPlanLabel" in ds:
         return "RT PLAN"
 
-    sop_class = getattr(ds, "SOPClassUID", None)
+    sop_class = cast(Optional[UID], getattr(ds, "SOPClassUID", None))
 
     try:
-        return _FOUR_LEVEL_SOP_CLASSES[sop_class]
+        return _FOUR_LEVEL_SOP_CLASSES[sop_class]  # type: ignore[index]
     except KeyError:
         return "IMAGE"

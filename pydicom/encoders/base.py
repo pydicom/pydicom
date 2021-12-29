@@ -84,11 +84,11 @@ class Encoder:
         module = import_module(import_path[0])
 
         # `is_available(UID)` is required for plugins
-        if module.is_available(self.UID):  # type: ignore[attr-defined]
+        if module.is_available(self.UID):
             self._available[label] = getattr(module, import_path[1])
         else:
             # `ENCODER_DEPENDENCIES[UID]` is required for plugins
-            deps = module.ENCODER_DEPENDENCIES  # type: ignore[attr-defined]
+            deps = module.ENCODER_DEPENDENCIES
             self._unavailable[label] = deps[self.UID]
 
     @staticmethod

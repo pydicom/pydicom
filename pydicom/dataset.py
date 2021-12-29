@@ -1488,7 +1488,7 @@ class Dataset:
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
-            and hh.supports_transfer_syntax(ts)  # type: ignore[attr-defined]
+            and hh.supports_transfer_syntax(ts)
         ]
 
         # No handlers support the transfer syntax
@@ -1504,7 +1504,7 @@ class Dataset:
         #   dependencies met
         available_handlers = [
             hh for hh in possible_handlers
-            if hh.is_available()  # type: ignore[attr-defined]
+            if hh.is_available()
         ]
 
         # There are handlers that support the transfer syntax but none of them
@@ -1518,13 +1518,13 @@ class Dataset:
             )
             pkg_msg = []
             for hh in possible_handlers:
-                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
+                hh_deps = hh.DEPENDENCIES
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"{hh.HANDLER_NAME} "
                     f"(req. {', '.join(names)})"
                 )
 
@@ -1819,7 +1819,7 @@ class Dataset:
 
         available_handlers = [
             hh for hh in overlay_data_handlers
-            if hh.is_available()  # type: ignore[attr-defined]
+            if hh.is_available()
         ]
         if not available_handlers:
             # For each of the handlers we want to find which
@@ -1830,13 +1830,13 @@ class Dataset:
             )
             pkg_msg = []
             for hh in overlay_data_handlers:
-                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
+                hh_deps = hh.DEPENDENCIES
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"{hh.HANDLER_NAME} "
                     f"(req. {', '.join(names)})"
                 )
 
@@ -1846,7 +1846,7 @@ class Dataset:
         for handler in available_handlers:
             try:
                 # Use the handler to get an ndarray of the pixel data
-                func = handler.get_overlay_array  # type: ignore[attr-defined]
+                func = handler.get_overlay_array
                 return cast("numpy.ndarray", func(self, group))
             except Exception as exc:
                 logger.debug(

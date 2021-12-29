@@ -890,6 +890,10 @@ class TestNumpy_ModalityLUT:
         out = apply_modality_lut(arr, ds)
         assert arr is out
 
+        ds.ModalityLUTSequence = []
+        out = apply_modality_lut(arr, ds)
+        assert arr is out
+
     def test_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = dcmread(MOD_16_SEQ)
@@ -1839,6 +1843,10 @@ class TestNumpy_ApplyWindowing:
         out = apply_windowing(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
 
+        ds.ModalityLUTSequence = []
+        out = apply_windowing(arr, ds)
+        assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
     def test_rescale_empty(self):
         """Test RescaleSlope and RescaleIntercept being empty."""
         ds = dcmread(WIN_12_1F)
@@ -2051,6 +2059,11 @@ class TestNumpy_ApplyVOI:
         out = apply_voi(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
 
+        ds.VOILUTSequence = []
+        out = apply_voi(arr, ds)
+        assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+
     def test_voi_lutdata_ow(self):
         """Test LUT Data with VR OW."""
         ds = Dataset()
@@ -2072,6 +2085,7 @@ class TestNumpy_ApplyVOI:
 
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ApplyVOILUT:
+    """Tests for util.apply_voi_lut()"""
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""
         ds = Dataset()
@@ -2079,6 +2093,10 @@ class TestNumpy_ApplyVOILUT:
         ds.PixelRepresentation = 1
         ds.BitsStored = 8
         arr = np.asarray([-128, -127, -1, 0, 1, 126, 127], dtype='int8')
+        out = apply_voi_lut(arr, ds)
+        assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
+
+        ds.VOILUTSequence = []
         out = apply_voi_lut(arr, ds)
         assert [-128, -127, -1, 0, 1, 126, 127] == out.tolist()
 
