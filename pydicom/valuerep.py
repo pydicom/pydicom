@@ -55,7 +55,8 @@ class _DateTimeBase:
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
 
-    def __reduce_ex__(self, protocol: int) -> Tuple[Any, ...]:
+    def __reduce_ex__(self, protocol: int) -> Tuple[Any, ...]:  # type: ignore[override]
+        # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
         reduce_ex = cast(Tuple[Any, ...], super().__reduce_ex__(protocol))
@@ -324,17 +325,17 @@ class TM(_DateTimeBase, datetime.time):
             if match.group('ms'):
                 microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, hour, minute, second, microsecond
             )
 
         if isinstance(val, datetime.time):
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
         try:
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, *args, **kwargs
             )
         except Exception as exc:
@@ -925,7 +926,7 @@ class PersonName:
         if len(args) and args[0] is None:
             return None
 
-        return cast("PersonName", super().__new__(cls))
+        return super().__new__(cls)
 
     def __init__(
         self,

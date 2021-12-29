@@ -1000,6 +1000,7 @@ def dcmwrite(
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
+    tsyntax: Optional[UID]
 
     # Ensure is_little_endian and is_implicit_VR are set
     if None in (dataset.is_little_endian, dataset.is_implicit_VR):
@@ -1090,7 +1091,7 @@ def dcmwrite(
             fp.write(preamble)
             fp.write(b'DICM')
 
-        tsyntax: Optional[UID] = None  # type: ignore[no-redef]
+        tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(
