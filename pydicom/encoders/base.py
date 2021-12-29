@@ -640,7 +640,7 @@ class Encoder:
         if byteorder == '>':
             arr = arr.astype(dtype.newbyteorder('<'))
 
-        return arr.tobytes()
+        return cast(bytes, arr.tobytes())
 
     def _process(
         self,
