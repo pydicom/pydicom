@@ -244,7 +244,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if len(ds.get("ModalityLUTSequence", [])):
+    if ds.get("ModalityLUTSequence"):
         item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
         nr_entries = cast(List[int], item.LUTDescriptor)[0] or 2**16
         first_map = cast(List[int], item.LUTDescriptor)[1]
@@ -342,7 +342,7 @@ def apply_voi_lut(
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     valid_voi = False
-    if len(ds.get('VOILUTSequence', [])):
+    if ds.get('VOILUTSequence'):
         ds.VOILUTSequence = cast(List["Dataset"], ds.VOILUTSequence)
         valid_voi = None not in [
             ds.VOILUTSequence[0].get('LUTDescriptor', None),
@@ -408,7 +408,7 @@ def apply_voi(
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if not len(ds.get('VOILUTSequence', [])):
+    if not ds.get('VOILUTSequence'):
         return arr
 
     if not np.issubdtype(arr.dtype, np.integer):
@@ -529,7 +529,7 @@ def apply_windowing(
     ds.BitsStored = cast(int, ds.BitsStored)
     y_min: float
     y_max: float
-    if len(ds.get('ModalityLUTSequence', [])):
+    if ds.get('ModalityLUTSequence'):
         # Unsigned - see PS3.3 C.11.1.1.1
         y_min = 0
         item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
