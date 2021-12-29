@@ -55,9 +55,9 @@ class _DateTimeBase:
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
 
-    def __reduce_ex__(
+    def __reduce_ex__(  # type: ignore[override]
         self, protocol: int
-    ) -> Tuple[Any, ...]:  # type: ignore[override]
+    ) -> Tuple[Any, ...]:
         # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
