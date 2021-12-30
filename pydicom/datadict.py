@@ -306,9 +306,7 @@ def dictionary_is_retired(tag: TagType) -> bool:
     KeyError
         If the tag is not present in the DICOM data dictionary.
     """
-    if 'retired' in get_entry(tag)[3].lower():
-        return True
-    return False
+    return 'retired' in get_entry(tag)[3].lower()
 
 
 def dictionary_VR(tag: TagType) -> str:
@@ -405,7 +403,7 @@ def dictionary_keyword(tag: TagType) -> str:
     return get_entry(tag)[4]
 
 
-def dictionary_has_tag(tag: TagType) -> bool:
+def dictionary_has_tag(tag: int) -> bool:
     """Return ``True`` if `tag` is in the official DICOM data dictionary.
 
     Parameters
