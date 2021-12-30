@@ -3613,7 +3613,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx40': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx41': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx42': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx43': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx43': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx44': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx45': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx46': ('IS', '1', 'Unknown', ''),  # noqa
