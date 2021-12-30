@@ -775,25 +775,23 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
     return "UN"
 
 
-def DataElement_from_raw(
-    raw_data_element: RawDataElement,
-    encoding: Optional[Union[str, MutableSequence[str]]] = None,
-    dataset: Optional["Dataset"] = None
-) -> DataElement:
-    """Return a :class:`DataElement` created from `raw_data_element`.
+def pydicom_raw_elem_preprocess(
+    raw: RawDataElement,
+    dataset: Optional["Dataset"] = None,
+    **_kwargs,
+) -> RawDataElement:
+    """Process a :class:`RawDataElement` before converting values.
 
     Parameters
     ----------
     raw_data_element : RawDataElement
-        The raw data to convert to a :class:`DataElement`.
-    encoding : str or list of str, optional
-        The character encoding of the raw data.
+        The raw data element with the VR and value to convert.
     dataset : Dataset, optional
         If given, used to resolve the VR for known private tags.
 
     Returns
     -------
-    DataElement
+    RawDataElement
 
     Raises
     ------
@@ -801,21 +799,6 @@ def DataElement_from_raw(
         If `raw_data_element` belongs to an unknown non-private tag and
         `config.enforce_valid_values` is set.
     """
-    # XXX buried here to avoid circular import
-    # filereader->Dataset->convert_value->filereader
-    # (for SQ parsing)
-
-    from pydicom.values import convert_value
-    raw = raw_data_element
-
-    # If user has hooked into conversion of raw values, call his/her routine
-    if config.data_element_callback:
-        raw = config.data_element_callback(
-            raw_data_element,
-            encoding=encoding,
-            **config.data_element_callback_kwargs
-        )
-
     VR = raw.VR
     if VR is None:  # Can be if was implicit VR
         try:
@@ -848,30 +831,125 @@ def DataElement_from_raw(
                 VR = dictionary_VR(raw.tag)
             except KeyError:
                 pass
+    if VR != raw.VR:
+        raw = raw._replace(VR=VR)
+    return raw
+
+
+def pydicom_raw_elem_convert_value(
+    raw: RawDataElement,
+    encoding: Optional[Union[str, MutableSequence[str]]] = None,
+    **_kwargs,
+) -> RawDataElement:
+    """Attempt to convert the raw value to a native type.
+
+    Parameters
+    ----------
+    raw_data_element : RawDataElement
+        The raw data element with the VR and value to convert.
+    encoding : str or list of str, optional
+        The character encoding of the raw data.
+
+    Returns
+    -------
+    RawDataElement
+    """
+    # XXX buried here to avoid circular import
+    # filereader->Dataset->convert_value->filereader
+    # (for SQ parsing)
+
+    from pydicom.values import convert_value
+    assert raw.VR
     try:
-        value = convert_value(VR, raw, encoding)
+        value = convert_value(raw.VR, raw, encoding)
     except NotImplementedError as e:
         raise NotImplementedError("{0:s} in tag {1!r}".format(str(e), raw.tag))
     except BytesLengthException as e:
         message = (f"{e} This occurred while trying to parse "
-                   f"{raw.tag} according to VR '{VR}'.")
+                   f"{raw.tag} according to VR '{raw.VR}'.")
         if config.convert_wrong_length_to_UN:
             warnings.warn(f"{message} Setting VR to 'UN'.")
-            VR = "UN"
+            raw = raw._replace(VR="UN")
             value = raw.value
         else:
             raise BytesLengthException(
                 f"{message} To replace this error with a warning set "
                 "pydicom.config.convert_wrong_length_to_UN = True."
             )
+    if value != raw.value:
+        raw = raw._replace(value=value)
+    return raw
 
-    if raw.tag in _LUT_DESCRIPTOR_TAGS and value:
+
+def pydicom_raw_elem_postprocess(
+    raw: RawDataElement,
+    **_kwargs,
+) -> RawDataElement:
+    """Handle post-convert_value processing of a :class:`RawDataElement`.
+
+    Parameters
+    ----------
+    raw_data_element : RawDataElement
+        The raw data element with the VR and value to convert.
+
+    Returns
+    -------
+    RawDataElement
+    """
+    value = None
+    if raw.tag in _LUT_DESCRIPTOR_TAGS and raw.value:
         # We only fix the first value as the third value is 8 or 16
         try:
-            if value[0] < 0:
-                value[0] += 65536
+            if raw.value[0] < 0:
+                raw = raw._replace(value = (raw.value[0] + 65536))
         except TypeError:
             pass
+    return raw
 
-    return DataElement(raw.tag, VR, value, raw.value_tell,
+
+def DataElement_from_raw(
+    raw_data_element: RawDataElement,
+    encoding: Optional[Union[str, MutableSequence[str]]] = None,
+    dataset: Optional["Dataset"] = None
+) -> DataElement:
+    """Return a :class:`DataElement` created from `raw_data_element`.
+
+    Call the configured data_element_callbacks to do relevant
+    pre/post-processing and convert values from raw to native types
+
+    Parameters
+    ----------
+    raw_data_element : RawDataElement
+        The raw data to convert to a :class:`DataElement`.
+    encoding : str or list of str, optional
+        The character encoding of the raw data.
+    dataset : Dataset, optional
+        If given, used to resolve the VR for known private tags.
+
+    Returns
+    -------
+    DataElement
+
+    """
+    raw = raw_data_element
+
+    # If user has hooked into conversion of raw values, call his/her routine
+    if config.data_element_callback:
+        if isinstance(config.data_element_callback, list):
+            for cb in config.data_element_callback:
+                raw = cb(
+                    raw_data_element,
+                    encoding=encoding,
+                    **config.data_element_callback_kwargs
+                )
+        else:
+            raw = config.data_element_callback(
+                raw_data_element,
+                encoding=encoding,
+                dataset=dataset,
+                **config.data_element_callback_kwargs
+            )
+
+    assert raw.VR
+    return DataElement(raw.tag, raw.VR, raw.value, raw.value_tell,
                        raw.length == 0xFFFFFFFF, already_converted=True)

@@ -5,7 +5,13 @@
 
 import logging
 import os
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Dict, Any, TYPE_CHECKING, List, Union
+
+from .dataelem import (
+    pydicom_raw_elem_convert_value,
+    pydicom_raw_elem_preprocess,
+    pydicom_raw_elem_postprocess
+)
 
 have_numpy = True
 try:
@@ -35,7 +41,12 @@ Default ``False``.
 """
 
 
-data_element_callback: Optional["ElementCallback"] = None
+data_element_callback: Optional[
+    Union["ElementCallback", List["ElementCallback"]]] = [
+    pydicom_raw_elem_convert_value,
+    pydicom_raw_elem_preprocess,
+    pydicom_raw_elem_postprocess
+]
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
 :class:`~pydicom.dataelem.RawDataElement` has been returned,
