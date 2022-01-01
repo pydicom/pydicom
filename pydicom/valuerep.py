@@ -79,7 +79,7 @@ DT_REGEX = re.compile(_range_regex(
     r"([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?)?)?)?([+-][01]\d\d\d)?")
 )
 TM_REGEX = re.compile(_range_regex(
-    r"([01]\d|2[0-3])([0-6]\d([0-5]\d(\.\d{1,6} ?)?)?)?"))
+    r"([01]\d|2[0-3])((60|[0-5]\d)([0-5]\d(\.\d{1,6} ?)?)?)?"))
 UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$")
 
 
@@ -104,6 +104,9 @@ def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
             return False, (
                 f"The value length ({value_length}) exceeds the "
                 f"maximum length of {max_length} allowed for VR {vr}."
+                f"Please see "
+                f"<https://dicom.nema.org/medical/dicom/current/output/html/"
+                f"part05.html#table_6.2-1> for allowed values for each VR."
             )
     return True, ""
 
@@ -127,7 +130,11 @@ def validate_regex(vr: str, value: Union[str, bytes],
         A tuple of a boolean validation result and the error message.
     """
     if not re.match(regex, value):
-        return False, f"Invalid value for VR {vr}: '{value!r}'."
+        return False, (
+            f"Invalid value for VR {vr}: '{value!r}'. Please see "
+            " <https://dicom.nema.org/medical/dicom/current/output"
+            "/html/part05.html#table_6.2-1> for allowed values for each VR."
+        )
     return True, ""
 
 

@@ -822,7 +822,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize(
         "value",
         ("234", "1", "01015", "225959.", b"0000.345", "222222.2222222",
-         "-1234-", "+123456", b"-123456-1330")
+         "-1234-", "+123456", b"-123456-1330", "006100")
     )
     def test_invalid_tm(self, value):
         self.check_invalid_vr("TM", value)
