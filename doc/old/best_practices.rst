@@ -44,9 +44,9 @@ The default setting for `reading_validation_mode` allows you to deal with files
 that do not strictly adhere to the DICOM Standard. Setting it to
 `RAISE` can help to ensure that only valid DICOM data is accepted.
 
-These flags do not guarantee strict DICOM results, as not all possible
-validations of the DICOM standard are checked. Included are checks for
-correct value length, contained character set and for predefined format where
+These flags do not guarantee strict DICOM results, as not all of the possible
+validations from the DICOM Standard are checked. Included are checks for
+correct value length, contained character set and for predefined formats where
 applicable (such as for date/time related values).
 
 To change a flag in your code:

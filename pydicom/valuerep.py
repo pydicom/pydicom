@@ -104,9 +104,6 @@ def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
             return False, (
                 f"The value length ({value_length}) exceeds the "
                 f"maximum length of {max_length} allowed for VR {vr}."
-                f"Please see "
-                f"<https://dicom.nema.org/medical/dicom/current/output/html/"
-                f"part05.html#table_6.2-1> for allowed values for each VR."
             )
     return True, ""
 
@@ -130,11 +127,7 @@ def validate_regex(vr: str, value: Union[str, bytes],
         A tuple of a boolean validation result and the error message.
     """
     if not re.match(regex, value):
-        return False, (
-            f"Invalid value for VR {vr}: '{value!r}'. Please see "
-            " <https://dicom.nema.org/medical/dicom/current/output"
-            "/html/part05.html#table_6.2-1> for allowed values for each VR."
-        )
+        return False, f"Invalid value for VR {vr}: '{value!r}'"
     return True, ""
 
 
@@ -158,7 +151,13 @@ def validate_length_and_regex(vr: str, value: Union[str, bytes],
     """
     is_valid_len, msg1 = validate_vr_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value, regex)
-    return is_valid_len and is_valid_expr, " ".join([msg1, msg2]).strip()
+    msg = " ".join([msg1, msg2]).strip()
+    if msg:
+        msg += (
+            " Please see <https://dicom.nema.org/medical/dicom/current/output"
+            "/html/part05.html#table_6.2-1> for allowed values for each VR."
+        )
+    return is_valid_len and is_valid_expr, msg
 
 
 def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
