@@ -749,7 +749,8 @@ class TestDataElementValidation:
             DataElement(0x00410001, vr, "2" * length,
                         validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", 'Äneas'))
+    @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", "new\n",
+                                       b"newline\n", "Äneas"))
     def test_invalid_ae(self, value):
         self.check_invalid_vr("AE", value)
 
@@ -758,7 +759,8 @@ class TestDataElementValidation:
         DataElement(0x00410001, "AE", value,
                     validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012"))
+    @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012",
+                                       "012Y\n"))
     def test_invalid_as(self, value):
         self.check_invalid_vr("AS", value)
 
@@ -768,7 +770,7 @@ class TestDataElementValidation:
                     validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", (
-            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8")))
+            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8"), "ABC\n"))
     def test_invalid_cs(self, value):
         self.check_invalid_vr("CS", value)
 
