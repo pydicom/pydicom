@@ -33,6 +33,318 @@ TEXT_VR_DELIMS = {0x0d, 0x0a, 0x09, 0x0c}
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5e}
 
+# maximum allowed value length for string VRs
+# VRs with a maximum length of 2^32 (UR and UT) are not checked
+MAX_VALUE_LEN = {
+    "AE": 16,
+    "CS": 16,
+    "DS": 16,
+    "IS": 12,
+    "LO": 64,
+    "LT": 10240,
+    "SH": 16,
+    "ST": 1024,
+    "UI": 64
+}
+
+
+def _range_regex(regex: str) -> str:
+    """Compose a regex that allows ranges of the given regex,
+    as defined for VRs DA, DT and TM in PS 3.4, C.2.2.2.5.
+    """
+    return fr"^{regex}$|^\-{regex} ?$|^{regex}\- ?$|^{regex}\-{regex} ?$"
+
+
+# regular expressions to match valid values for some VRs
+AE_REGEX = re.compile(r"^[\x20-\x7e]*$")
+AS_REGEX = re.compile(r"^\d\d\d[DWMY]$")
+CS_REGEX = re.compile(r"^[A-Z0-9 _]*$")
+DS_REGEX = re.compile(
+    r"^ *[+\-]?(\d+|\d+\.\d*|\.\d+)([eE][+\-]?\d+)? *$"
+)
+IS_REGEX = re.compile(r"^ *[+\-]?\d+ *$")
+DA_REGEX = re.compile(_range_regex(r"\d{4}(0[1-9]|1[0-2])([0-2]\d|3[01])"))
+DT_REGEX = re.compile(_range_regex(
+    r"\d{4}((0[1-9]|1[0-2])(([0-2]\d|3[01])(([01]\d|2[0-3])"
+    r"([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?)?)?)?([+-][01]\d\d\d)?")
+)
+TM_REGEX = re.compile(_range_regex(
+    r"([01]\d|2[0-3])([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?"))
+UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$")
+
+
+def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value length for a given VR.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str or bytes
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    max_length = MAX_VALUE_LEN.get(vr, 0)
+    if max_length > 0:
+        value_length = len(value)
+        if value_length > max_length:
+            return False, (
+                f"The value length ({value_length}) exceeds the "
+                f"maximum length of {max_length} allowed for VR {vr}."
+            )
+    return True, ""
+
+
+def validate_regex(vr: str, value: Union[str, bytes],
+                   regex: Any) -> Tuple[bool, str]:
+    """Validate the value for a given VR for allowed characters
+    using a regular expression.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str
+        The value to validate.
+    regex : re.Pattern
+        The precompiled regex pattern used for matching.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if not re.match(regex, value) or value and value[-1] == "\n":
+        return False, f"Invalid value for VR {vr}: {value!r}."
+    return True, ""
+
+
+def validate_length_and_regex(vr: str, value: Union[str, bytes],
+                              regex: Any) -> Tuple[bool, str]:
+    """Validate the value for a given VR both for maximum length and
+    for allowed characters using a regular expression.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : str
+        The value to validate.
+    regex : re.Pattern
+        The precompiled regex pattern used for matching.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    is_valid_len, msg1 = validate_vr_length(vr, value)
+    is_valid_expr, msg2 = validate_regex(vr, value, regex)
+    msg = " ".join([msg1, msg2]).strip()
+    if msg:
+        msg += (
+            " Please see <https://dicom.nema.org/medical/dicom/current/output"
+            "/html/part05.html#table_6.2-1> for allowed values for each VR."
+        )
+    return is_valid_len and is_valid_expr, msg
+
+
+def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR AE.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
+    return validate_length_and_regex(vr, value, AE_REGEX)
+
+
+def validate_as(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR AS.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, AS_REGEX)
+
+
+def validate_cs(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR CS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
+    return validate_length_and_regex(vr, value, CS_REGEX)
+
+
+def validate_da(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DA.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, DA_REGEX)
+
+
+def validate_ds(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
+    return validate_length_and_regex(vr, value, DS_REGEX)
+
+
+def validate_dt(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR DT.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, DT_REGEX)
+
+
+def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR IS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
+    return validate_length_and_regex(vr, value, IS_REGEX)
+
+
+def validate_pn_component_length(
+        vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the PN component value for the maximum length.
+
+    Parameters
+    ----------
+    vr : str
+        Ignored.
+    value : str
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if len(value) > 64:
+        return False, (
+            f"The PN component length ({len(value)}) exceeds the "
+            f"maximum allowed length of 64."
+        )
+    return True, ""
+
+
+def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR PN for the maximum number of components
+    and for the maximum length of each component.
+
+    Parameters
+    ----------
+    vr : str
+        Ignored.
+    value : str
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if not value:
+        return True, ""
+    components: Sequence[Union[str, bytes]]
+    if isinstance(value, bytes):
+        components = value.split(b"=")
+    else:
+        components = value.split("=")
+    if len(components) > 3:
+        return False, (
+            f"The number of PN components length ({len(components)}) exceeds "
+            f"the maximum allowed number of 3."
+        )
+    for comp in components:
+        valid, msg = validate_pn_component_length("PN", comp)
+        if not valid:
+            return False, msg
+    return True, ""
+
+
+def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR TM.
+    Values used for range matching in a query are considered valid.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, TM_REGEX)
+
+
+def validate_ui(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VRUIS.
+    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
+    from pydicom.uid import RE_VALID_UID
+    return validate_length_and_regex(vr, value, RE_VALID_UID)
+
+
+def validate_ur(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+    """Validate the value for VR UR.
+    See :func:`~pydicom.valuerep.validate_regex`."""
+    return validate_regex(vr, value, UR_REGEX)
+
+
+def validate_pn_component(value: Union[str, bytes]) -> None:
+    """Validate the value of a single component of VR PN for maximum length.
+
+    Parameters
+    ----------
+    value : str or bytes
+        The component value to validate.
+
+    Raises
+    ------
+    ValueError
+        If the validation fails and the validation mode is set to
+        `RAISE`.
+    """
+    validate_value("PN", value, config.settings.writing_validation_mode,
+                   validate_pn_component_length)
+
+
+VALIDATORS = {
+    "AE": validate_ae,
+    "AS": validate_as,
+    "CS": validate_cs,
+    "DA": validate_da,
+    "DS": validate_ds,
+    "DT": validate_dt,
+    "IS": validate_is,
+    "LO": validate_vr_length,
+    "LT": validate_vr_length,
+    "PN": validate_pn,
+    "SH": validate_vr_length,
+    "ST": validate_vr_length,
+    "TM": validate_tm,
+    "UI": validate_ui,
+    "UR": validate_ur,
+}
+
+
+def validate_value(vr: str, value: Any,
+                   validation_mode: int,
+                   validator: Optional[Callable[[str, Any],
+                                       Tuple[bool, str]]] = None) -> None:
+    """Validate the given value against the DICOM standard.
+
+    Parameters
+    ----------
+    vr : str
+        The VR of the tag the value is added to.
+    value : Any
+        The value to be validated.
+    validation_mode : int
+        Defines if values are validated and how validation errors are
+        handled.
+    validator : Callable or None
+        Function that does the actual validation. If not given,
+        the validator is taken from the VR-specific validator table instead.
+
+    Raises
+    ------
+    ValueError
+        If the validation fails and the validation mode is set to
+        `RAISE`.
+    """
+    if validation_mode == config.IGNORE:
+        return
+
+    if value is not None and isinstance(value, (str, bytes)):
+        validator = validator or VALIDATORS.get(vr)
+        if validator is not None:
+            is_valid, msg = validator(vr, value)
+            if not is_valid:
+                if validation_mode == config.RAISE:
+                    raise ValueError(msg)
+                warnings.warn(msg)
+
 
 @unique
 class VR(str, Enum):
@@ -143,7 +455,10 @@ class _DateTimeBase:
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
 
-    def __reduce_ex__(self, protocol: int) -> Tuple[Any, ...]:
+    def __reduce_ex__(  # type: ignore[override]
+        self, protocol: int
+    ) -> Tuple[Any, ...]:
+        # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
         reduce_ex = cast(Tuple[Any, ...], super().__reduce_ex__(protocol))
@@ -412,17 +727,17 @@ class TM(_DateTimeBase, datetime.time):
             if match.group('ms'):
                 microsecond = int(match.group('ms').rstrip().ljust(6, '0'))
 
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, hour, minute, second, microsecond
             )
 
         if isinstance(val, datetime.time):
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, val.hour, val.minute, val.second, val.microsecond
             )
 
         try:
-            return super().__new__(  # type: ignore[call-arg, no-any-return]
+            return super().__new__(
                 cls, *args, **kwargs
             )
         except Exception as exc:
@@ -446,10 +761,6 @@ class TM(_DateTimeBase, datetime.time):
                 self.original_string += f".{val.microsecond:06}"
 
 
-# Regex to match strings that represent valid DICOM decimal strings (DS)
-_DS_REGEX = re.compile(r'\s*[\+\-]?\d+(\.\d+)?([eE][\+\-]?\d+)?\s*$')
-
-
 def is_valid_ds(s: str) -> bool:
     """Check whether this string is a valid decimal string.
 
@@ -466,11 +777,7 @@ def is_valid_ds(s: str) -> bool:
     bool
         True if the string is a valid decimal string. Otherwise False.
     """
-    # Check that the length is within the limits
-    if len(s) > 16:
-        return False
-
-    return _DS_REGEX.match(s) is not None
+    return validate_ds("DS", s)[0]
 
 
 def format_number_as_ds(val: Union[float, Decimal]) -> str:
@@ -540,9 +847,9 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
         # represented by floats). Due to floating point limitations
         # this is best checked for by doing the string conversion
         remaining_chars = 10 - sign_chars
-        trunc_str = f'%.{remaining_chars}e' % val
+        trunc_str = f'{val:.{remaining_chars}e}'
         if len(trunc_str) > 16:
-            trunc_str = f'%.{remaining_chars - 1}e' % val
+            trunc_str = f'{val:.{remaining_chars - 1}e}'
         return trunc_str
     else:
         if logval >= 1.0:
@@ -550,7 +857,7 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
             remaining_chars = 14 - sign_chars - int(floor(logval))
         else:
             remaining_chars = 14 - sign_chars
-        return f'%.{remaining_chars}f' % val
+        return f'{val:.{remaining_chars}f}'
 
 
 class DSfloat(float):
@@ -574,7 +881,8 @@ class DSfloat(float):
     def __new__(  # type: ignore[misc]
         cls: Type["DSfloat"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> Optional[Union[str, "DSfloat"]]:
         if val is None:
             return val
@@ -586,11 +894,15 @@ class DSfloat(float):
 
     def __init__(
         self, val: Union[str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         # ... also if user changes a data element value, then will get
         # a different object, because float is immutable.
         has_attribute = hasattr(val, 'original_string')
@@ -616,15 +928,17 @@ class DSfloat(float):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if config.enforce_valid_values and not self.auto_format:
+        if (validation_mode == config.RAISE and
+                not self.auto_format):
             if len(repr(self)[1:-1]) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
                     "characters long, but the float provided requires > 16 "
                     "characters to be accurately represented. Use a smaller "
-                    "string, set 'config.enforce_valid_values' to False to "
-                    "override the length check, or explicitly construct a DS "
-                    "object with 'auto_format' set to True"
+                    "string, set 'config.settings.reading_validation_mode' to "
+                    "'WARN' to override the length check, or "
+                    "explicitly construct a DS object with 'auto_format' "
+                    "set to True"
                 )
             if not is_valid_ds(repr(self)[1:-1]):
                 # This will catch nan and inf
@@ -683,7 +997,8 @@ class DSdecimal(Decimal):
     def __new__(  # type: ignore[misc]
         cls: Type["DSdecimal"],
         val: Union[None, str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> Optional[Union[str, "DSdecimal"]]:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
@@ -712,12 +1027,16 @@ class DSdecimal(Decimal):
     def __init__(
         self,
         val: Union[str, int, float, Decimal],
-        auto_format: bool = False
+        auto_format: bool = False,
+        validation_mode: int = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
         write ``'123'``, but :class:`DS` will use the original.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         # ... also if user changes a data element value, then will get
         # a different Decimal, as Decimal is immutable.
         pre_checked = False
@@ -743,22 +1062,29 @@ class DSdecimal(Decimal):
             else:
                 self.original_string = format_number_as_ds(self)
 
-        if config.enforce_valid_values:
+        if validation_mode != config.IGNORE:
             if len(repr(self).strip("'")) > 16:
-                raise OverflowError(
+                msg = (
                     "Values for elements with a VR of 'DS' values must be "
                     "<= 16 characters long. Use a smaller string, set "
-                    "'config.enforce_valid_values' to False to override the "
-                    "length check, use 'Decimal.quantize()' and initialize "
+                    "'config.settings.reading_validation_mode' to "
+                    "'WARN' to override the length check, use "
+                    "'Decimal.quantize()' and initialize "
                     "with a 'Decimal' instance, or explicitly construct a DS "
                     "instance with 'auto_format' set to True"
                 )
+                if validation_mode == config.RAISE:
+                    raise OverflowError(msg)
+                warnings.warn(msg)
             if not is_valid_ds(repr(self).strip("'")):
                 # This will catch nan and inf
-                raise ValueError(
+                msg = (
                     f'Value "{str(self)}" is not valid for elements with a VR '
                     'of DS'
                 )
+                if validation_mode == config.RAISE:
+                    raise ValueError(msg)
+                warnings.warn(msg)
 
     def __eq__(self, other: Any) -> Any:
         """Override to allow string equality comparisons."""
@@ -795,7 +1121,8 @@ else:
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal], auto_format: bool = False
+    val: Union[None, str, int, float, Decimal], auto_format: bool = False,
+    validation_mode: int = None
 ) -> Union[None, str, DSfloat, DSdecimal]:
     """Factory function for creating DS class instances.
 
@@ -810,13 +1137,18 @@ def DS(
     if val is None:
         return val
 
-    if isinstance(val, str) and val.strip() == '':
-        return val
+    if validation_mode is None:
+        validation_mode = config.settings.reading_validation_mode
+
+    if isinstance(val, str):
+        if val.strip() == '':
+            return val
+        validate_value("DS", val, validation_mode)
 
     if config.use_DS_decimal:
-        return DSdecimal(val, auto_format=auto_format)
+        return DSdecimal(val, auto_format, validation_mode)
 
-    return DSfloat(val, auto_format=auto_format)
+    return DSfloat(val, auto_format, validation_mode)
 
 
 class IS(int):
@@ -827,14 +1159,20 @@ class IS(int):
     """
 
     def __new__(  # type: ignore[misc]
-        cls: Type["IS"], val: Union[None, str, int, float, Decimal]
+            cls: Type["IS"], val: Union[None, str, int, float, Decimal],
+            validation_mode: int = None
     ) -> Optional[Union[str, "IS"]]:
         """Create instance if new integer string"""
         if val is None:
             return val
 
-        if isinstance(val, str) and val.strip() == '':
-            return val
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
+        if isinstance(val, str):
+            if val.strip() == '':
+                return val
+            validate_value("IS", val, validation_mode)
 
         try:
             newval = super().__new__(cls, val)
@@ -849,16 +1187,19 @@ class IS(int):
             raise TypeError("Could not convert value to integer without loss")
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
-        if not -2**31 <= newval < 2**31 and config.enforce_valid_values:
+        if (not -2**31 <= newval < 2**31 and
+                validation_mode == config.RAISE):
             raise OverflowError(
                 "Elements with a VR of IS must have a value between -2**31 "
-                "and (2**31 - 1). Set 'config.enforce_valid_values' to False "
-                "to override the value check"
+                "and (2**31 - 1). Set "
+                "'config.settings.reading_validation_mode' to "
+                "'WARN' to override the value check"
             )
 
         return newval
 
-    def __init__(self, val: Union[str, int, float, Decimal]) -> None:
+    def __init__(self, val: Union[str, int, float, Decimal],
+                 validation_mode: int = None) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val.strip()
@@ -893,7 +1234,8 @@ _T = TypeVar('_T')
 
 
 def MultiString(
-    val: str, valtype: Optional[Callable[[str], _T]] = None
+        val: str, valtype: Optional[Callable[[str], _T]] = None,
+        validation_mode: int = None
 ) -> Union[_T, MutableSequence[_T]]:
     """Split a string by delimiters if there are any
 
@@ -904,6 +1246,9 @@ def MultiString(
     valtype : type or callable, optional
         Default :class:`str`, but can be e.g. :class:`~pydicom.uid.UID` to
         overwrite to a specific type.
+    validation_mode : int
+        Defines if values are validated and how validation errors are
+        handled.
 
     Returns
     -------
@@ -923,7 +1268,7 @@ def MultiString(
     if len(splitup) == 1:
         return valtype(splitup[0])
 
-    return MultiValue(valtype, splitup)
+    return MultiValue(valtype, splitup, validation_mode)
 
 
 def _verify_encodings(
@@ -997,7 +1342,9 @@ def _encode_personname(
         groups = [
             encode_string(group, encodings) for group in comp.split('^')
         ]
-        encoded_comps.append(b'^'.join(groups))
+        encoded_comp = b'^'.join(groups)
+        validate_pn_component(encoded_comp)
+        encoded_comps.append(encoded_comp)
 
     # Remove empty elements from the end
     while len(encoded_comps) and not encoded_comps[-1]:
@@ -1013,13 +1360,14 @@ class PersonName:
         if len(args) and args[0] is None:
             return None
 
-        return cast("PersonName", super().__new__(cls))
+        return super().__new__(cls)
 
     def __init__(
         self,
         val: Union[bytes, str, "PersonName"],
         encodings: Optional[Sequence[str]] = None,
-        original_string: Optional[bytes] = None
+        original_string: Optional[bytes] = None,
+        validation_mode: int = None
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -1042,6 +1390,9 @@ class PersonName:
         self.original_string: bytes
         self._components: Optional[Tuple[str, ...]] = None
         self.encodings: Optional[Tuple[str, ...]]
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+        self.validation_mode = validation_mode
 
         if isinstance(val, PersonName):
             encodings = val.encodings
@@ -1050,12 +1401,17 @@ class PersonName:
         elif isinstance(val, bytes):
             # this is the raw byte string - decode it on demand
             self.original_string = val
+            validate_value("PN", val, validation_mode)
             self._components = None
         else:
             # val: str
             # `val` is the decoded person name value
-            # `original_string`  should be the original encoded value
+            # `original_string` should be the original encoded value
             self.original_string = cast(bytes, original_string)
+            # if we don't have the byte string at this point, we at least
+            # validate the length of the string components
+            validate_value("PN", original_string if original_string else val,
+                           validation_mode)
             components = val.split('=')
             # Remove empty elements from the end to avoid trailing '='
             while len(components) and not components[-1]:
@@ -1234,6 +1590,8 @@ class PersonName:
             self.original_string = _encode_personname(
                 self.components, self.encodings or [default_encoding]
             )
+            # now that we have the byte length, we re-validate the value
+            validate_value("PN", self.original_string, self.validation_mode)
 
         return PersonName(self.original_string, encodings)
 
@@ -1326,7 +1684,10 @@ class PersonName:
         from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
-            return encode_string(s, encodings or [default_encoding])
+            b = encode_string(s, encodings or [default_encoding])
+            validate_value("PN", b, config.settings.writing_validation_mode,
+                           validate_pn_component_length)
+            return b
 
         def dec(s: bytes) -> str:
             return decode_bytes(s, encodings or [default_encoding], set())

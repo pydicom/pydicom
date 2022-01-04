@@ -7,6 +7,7 @@ dictionary key is a map of DICOM tag to (VR, VM, name, is_retired).
 """
 from typing import Dict, Tuple
 
+
 private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
     '1.2.840.113663.1': {
         '0029xx00': ('US', '1', 'Unknown', ''),  # noqa
@@ -333,7 +334,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '3103xxa0': ('DA', '1', 'AMI Annotation Creation Date (RET)', ''),  # noqa
         '3103xxb0': ('TM', '1', 'AMI Annotation Creation Time (RET)', ''),  # noqa
         '3103xxc0': ('DA', '1', 'AMI Annotation Modification Dates (RET)', ''),  # noqa
-        '3103xxd0': ('TM', '1', 'AMI Annotation Mofification Times (RET)', ''),  # noqa
+        '3103xxd0': ('TM', '1', 'AMI Annotation Modification Times (RET)', ''),  # noqa
         '3103xxe0': ('US', '1', 'AMI Annotation Frame Number (RET)', ''),  # noqa
     },
     'AMI Sequence Annotations_02': {
@@ -1081,7 +1082,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0009xx00': ('LO', '1', 'Unknown', ''),  # noqa
         '0009xx01': ('LO', '1', 'Unknown', ''),  # noqa
     },
-    'Eclispe 60': {
+    'Eclipse 60': {
         '0029xx30': ('UL', '1', 'Private data', ''),  # noqa
         '0029xx31': ('UL', '1', 'Private data', ''),  # noqa
         '0029xx32': ('UL', '1', 'Private data', ''),  # noqa
@@ -1941,7 +1942,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xxdd': ('DS', '1-n', 'DRM Strength', ''),  # noqa
         '0019xxde': ('CS', '1', 'Acquisition Plane', ''),  # noqa
         '0019xxdf': ('FL', '1-n', 'LP off longitudinal position Z', ''),  # noqa
-        '0019xxe0': ('FL', '1', 'DAP of currect record', ''),  # noqa
+        '0019xxe0': ('FL', '1', 'DAP of current record', ''),  # noqa
         '0019xxe1': ('FL', '1', 'Pivot Lateral Angle', ''),  # noqa
         '0019xxe2': ('FL', '1', 'Carm Lateral Angle', ''),  # noqa
         '0019xxe3': ('FL', '1-n', 'Pivot Lateral Angle increment', ''),  # noqa
@@ -2054,7 +2055,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0015xx9d': ('IS', '1', 'Study record time lateral', ''),  # noqa
     },
     'GEMS_DRS_1': {
-        '0037xx10': ('LO', '1', 'Refering Department', ''),  # noqa
+        '0037xx10': ('LO', '1', 'Referring Department', ''),  # noqa
         '0037xx20': ('US', '1', 'Screen Number', ''),  # noqa
         '0037xx40': ('SH', '1', 'Left Orientation', ''),  # noqa
         '0037xx42': ('SH', '1', 'Right Orientation', ''),  # noqa
@@ -2425,7 +2426,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0045xx02': ('FL', '1', 'Macro width at ISO Center', ''),  # noqa
         '0045xx03': ('SS', '1', 'DAS type', ''),  # noqa
         '0045xx04': ('SS', '1', 'DAS gain', ''),  # noqa
-        '0045xx05': ('SS', '1', 'DAS Temprature', ''),  # noqa
+        '0045xx05': ('SS', '1', 'DAS Temperature', ''),  # noqa
         '0045xx06': ('CS', '1', 'Table Direction', ''),  # noqa
         '0045xx07': ('FL', '1', 'Z smoothing Factor', ''),  # noqa
         '0045xx08': ('SS', '1', 'View Weighting Mode', ''),  # noqa
@@ -3495,7 +3496,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0057xx02': ('UI', '1', 'SOPClassUID', ''),  # noqa
         '0057xx03': ('UI', '1', 'SOPInstanceUID', ''),  # noqa
         '0057xx10': ('IS', '1', 'ROINumber', ''),  # noqa
-        '0057xx11': ('UI', '1', 'Dimentions', ''),  # noqa
+        '0057xx11': ('UI', '1', 'Dimensions', ''),  # noqa
         '0057xx12': ('UI', '1', 'Points', ''),  # noqa
         '0057xx13': ('UI', '1', 'Type', ''),  # noqa
         '0057xx14': ('UI', '1', 'Description', ''),  # noqa
@@ -3612,7 +3613,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx40': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx41': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx42': ('IS', '1', 'Unknown', ''),  # noqa
-        '0019xx43': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx43': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx44': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx45': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx46': ('IS', '1', 'Unknown', ''),  # noqa
@@ -5001,7 +5002,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '2001xx3a': ('CS', '1', 'Pixel Shift', ''),  # noqa
         '2001xx3d': ('UL', '1', 'Unknown', ''),  # noqa
         '2001xx3f': ('CS', '1', 'Interpolation Method', ''),  # noqa
-        '2001xx42': ('CS', '1', 'Substraction Land Marking Active', ''),  # noqa
+        '2001xx42': ('CS', '1', 'Subtraction Land Marking Active', ''),  # noqa
         '2001xx46': ('CS', '1', 'Graphic Line Style', ''),  # noqa
         '2001xx47': ('FL', '1', 'Graphic Line Width', ''),  # noqa
         '2001xx48': ('SS', '1', 'Graphic Annotation ID', ''),  # noqa
@@ -5062,10 +5063,10 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '2001xx9a': ('SQ', '1', 'Graphic Number Sequence', ''),  # noqa
         '2001xx9b': ('UL', '1', 'Graphic Number', ''),  # noqa
         '2001xx9c': ('LO', '1', 'Unknown', ''),  # noqa
-        '2001xx9d': ('LO', '1', 'PIIM Substraction Type', ''),  # noqa
+        '2001xx9d': ('LO', '1', 'PIIM Subtraction Type', ''),  # noqa
         '2001xx9f': ('US', '2', 'Pixel Processing Kernel Size', ''),  # noqa
         '2001xxa1': ('CS', '1', 'Is Raw Image', ''),  # noqa
-        '2001xxa2': ('US', '1', 'LOG Substraction Curve Taste', ''),  # noqa
+        '2001xxa2': ('US', '1', 'LOG Subtraction Curve Taste', ''),  # noqa
         '2001xxa3': ('UL', '1', 'Text Color Foreground', ''),  # noqa
         '2001xxa4': ('UL', '1', 'Text Color Background', ''),  # noqa
         '2001xxa5': ('UL', '1', 'Text Color Shadow', ''),  # noqa
@@ -6255,7 +6256,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx42': ('US', '1-n', 'Processing Mask', ''),  # noqa
         '0019xx44': ('UL', '1-n', 'IRS Data Number', ''),  # noqa
         '0019xx45': ('UL', '1-n', 'IRS Data Length', ''),  # noqa
-        '0019xx62': ('IS', '1', 'Number of Virtuell Channels', ''),  # noqa
+        '0019xx62': ('IS', '1', 'Number of Virtual Channels', ''),  # noqa
         '0019xx70': ('IS', '1', 'Number of Reading', ''),  # noqa
         '0019xx71': ('CS', '1', 'Reading Code', ''),  # noqa
         '0019xx74': ('IS', '1', 'Number of Projections', ''),  # noqa
@@ -6384,9 +6385,9 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0017xx71': ('LO', '1', 'Landmark Current', ''),  # noqa
         '0017xx72': ('US', '1', 'Zoom Factor', ''),  # noqa
         '0017xx73': ('US', '1', 'Roam Horizontal', ''),  # noqa
-        '0017xx74': ('US', '1', 'Roam Vertikal', ''),  # noqa
+        '0017xx74': ('US', '1', 'Roam Vertical', ''),  # noqa
         '0017xx77': ('IS', '1', 'Pixel Shift Horizontal', ''),  # noqa
-        '0017xx78': ('IS', '1', 'Pixel Shift Vertikal', ''),  # noqa
+        '0017xx78': ('IS', '1', 'Pixel Shift Vertical', ''),  # noqa
         '0017xx79': ('US', '1', 'Image Flip', ''),  # noqa
         '0017xx7a': ('US', '1', 'Invers Current', ''),  # noqa
         '0017xx80': ('US', '1', 'Unknown', ''),  # noqa
@@ -7120,8 +7121,8 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0031xx17': ('SS', '1-n', 'Unknown', ''),  # noqa
         '0031xx20': ('ST', '1', 'Unknown', ''),  # noqa
         '0031xx21': ('SS', '1', 'Unknown', ''),  # noqa
-        '0033xx00': ('FL', '1-n', 'Flood correction Matrix Det 1 upto SR 2.0', ''),  # noqa
-        '0033xx01': ('FL', '1-n', 'Flood correction Matrix Det 2 upto SR 2.0', ''),  # noqa
+        '0033xx00': ('FL', '1-n', 'Flood correction Matrix Det 1 up to SR 2.0', ''),  # noqa
+        '0033xx01': ('FL', '1-n', 'Flood correction Matrix Det 2 up to SR 2.0', ''),  # noqa
         '0033xx10': ('FL', '1-n', 'COR Data for Detector 1', ''),  # noqa
         '0033xx11': ('FL', '1-n', 'COR Data for Detector 2', ''),  # noqa
         '0033xx14': ('FL', '1', 'MHR ( Y-Shift) data for detector 1', ''),  # noqa
@@ -8476,7 +8477,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx50': ('US', '1', 'Video Scan Mode', ''),  # noqa
         '0019xx51': ('US', '1', 'Video LineRate', ''),  # noqa
         '0019xx60': ('US', '1', 'Xray Technique', ''),  # noqa
-        '0019xx61': ('DS', '1', 'Image Identifier Fromat', ''),  # noqa
+        '0019xx61': ('DS', '1', 'Image Identifier Format', ''),  # noqa
         '0019xx62': ('US', '1', 'Iris Diaphragm', ''),  # noqa
         '0019xx63': ('CS', '1', 'Filter', ''),  # noqa
         '0019xx64': ('CS', '1', 'Cine Parallel', ''),  # noqa
@@ -9063,7 +9064,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0029xx01': ('IS', '1', 'Storage State', ''),  # noqa
         '0029xx02': ('IS', '1', 'Referenced Image SOP Class', ''),  # noqa
         '0029xx03': ('LO', '1', 'Ref. Image Instance UID', ''),  # noqa
-        '0029xx04': ('IS', '1', 'Rel. Pres. State Number', ''),  # noqa
+        '0029xx04': ('IS', '1', 'Rel. Presentation State Number', ''),  # noqa
         '0029xx05': ('LO', '1', 'Rel. Presentation State UID', ''),  # noqa
     },
     'Siemens Ultrasound Miscellaneous': {
@@ -9484,16 +9485,19 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '7ff1xx0d': ('US', '1-n', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_MR3': {
+        '00290089': ('LO', '1', 'Unknown', ''),  # noqa
         '700dxx00': ('DS', '1', 'Scale Factor', ''),  # noqa
         '700dxx01': ('OB', '1', 'Acquisition Order', ''),  # noqa
         '700dxx02': ('DS', '9', 'Orientation Vector', ''),  # noqa
         '700dxx03': ('SS', '1', 'Flip Flag', ''),  # noqa
         '700dxx04': ('OB', '1', 'Rotate Information', ''),  # noqa
-        '700dxx05': ('DS', '4', 'FOV', ''),  # noqa
+        '700dxx05': ('DS', '1', 'FOV', ''),  # noqa
         '700dxx06': ('US', '4', 'Image Matrix', ''),  # noqa
         '700dxx07': ('OB', '1', 'Image Information', ''),  # noqa
         '700dxx08': ('OB', '1', 'Original Data', ''),  # noqa
         '700dxx09': ('SS', '1', 'Original Data Flag', ''),  # noqa
+        '700dxx0c': ('CS', '1', 'Receiver Gain Correction Check Flag', ''),  # noqa
+        '700dxx20': ('SH', '1', 'Identification Flag of 3D GDC', ''),  # noqa
         '700dxx80': ('US', '1', 'Number of PAC channel', ''),  # noqa
         '700dxx81': ('US', '1', 'Reference mode', ''),  # noqa
         '700dxx82': ('SQ', '1', 'Gain value group for MRS', ''),  # noqa
@@ -9512,6 +9516,504 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '700dxx8f': ('OB', '1', 'MRS Raw Data', ''),  # noqa
         '700dxx90': ('OF', '1', 'MRS Ref Raw Data', ''),  # noqa
         '700dxx91': ('FL', '1', 'Receiver gain of prescan', ''),  # noqa
+    },
+    'TOSHIBA_MEC_MR3^10': {
+        '00090002': ('SH', '1', 'Unknown', ''),  # noqa
+        '00110003': ('US', '1', 'Unknown', ''),  # noqa
+        '00110004': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00110005': ('US', '1', 'Unknown', ''),  # noqa
+        '00110006': ('US', '1', 'Unknown', ''),  # noqa
+        '00110007': ('US', '1-n', 'Unknown', ''),  # noqa
+        '00110008': ('SH', '1', 'Unknown', ''),  # noqa
+        '0011000c': ('SS', '1', 'Unknown', ''),  # noqa
+        '00190001': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('US', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190005': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190006': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190007': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190008': ('US', '1', 'Unknown', ''),  # noqa
+        '00190009': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000a': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000b': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019000c': ('US', '3', 'Unknown', ''),  # noqa
+        '0019000d': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000e': ('SL', '6', 'Unknown', ''),  # noqa
+        '0019000f': ('SL', '6', 'Unknown', ''),  # noqa
+        '00190010': ('US', '2', 'Unknown', ''),  # noqa
+        '00190011': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190012': ('US', '1', 'Unknown', ''),  # noqa
+        '00190013': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190014': ('US', '1', 'Unknown', ''),  # noqa
+        '00190015': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190016': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190017': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190018': ('US', '1', 'Unknown', ''),  # noqa
+        '00190019': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001a': ('US', '1', 'Unknown', ''),  # noqa
+        '0019001b': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019001e': ('US', '1', 'Unknown', ''),  # noqa
+        '00190027': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190029': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002b': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019002c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019002f': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190030': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190031': ('OF', '1-n', 'Unknown', ''),  # noqa
+        '00190032': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190033': ('SL', '3', 'Unknown', ''),  # noqa
+        '00190034': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190035': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190036': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190038': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003a': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003b': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019003c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019003f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190042': ('US', '1', 'Unknown', ''),  # noqa
+        '00190043': ('US', '1', 'Unknown', ''),  # noqa
+        '00190044': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190045': ('SS', '1', 'Unknown', ''),  # noqa
+        '00190046': ('US', '1', 'Unknown', ''),  # noqa
+        '00190047': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190048': ('US', '1', 'Unknown', ''),  # noqa
+        '00190049': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004b': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004c': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004e': ('US', '1', 'Unknown', ''),  # noqa
+        '0019004f': ('US', '1', 'Unknown', ''),  # noqa
+        '00190050': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190051': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190052': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190054': ('US', '1', 'Unknown', ''),  # noqa
+        '00190055': ('US', '1', 'Unknown', ''),  # noqa
+        '00190057': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190058': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190059': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005a': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005d': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '0019005e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005f': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190060': ('US', '1', 'Unknown', ''),  # noqa
+        '00190061': ('US', '1', 'Unknown', ''),  # noqa
+        '00190062': ('US', '1', 'Unknown', ''),  # noqa
+        '00190063': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190064': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190065': ('SL', '2', 'Unknown', ''),  # noqa
+        '00190069': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006a': ('US', '1', 'Unknown', ''),  # noqa
+        '0019006b': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006e': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190070': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190071': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190073': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190075': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190076': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190078': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007b': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019007c': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007d': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190085': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190086': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190087': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190088': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019008a': ('SL', '1-n', 'Unknown', ''),  # noqa
+        '0019008c': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019008e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190092': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190093': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190096': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009b': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009c': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900a0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900a1': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900a2': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900a3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900a4': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900ac': ('US', '1', 'Unknown', ''),  # noqa
+        '001900ad': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900ae': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900af': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b7': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900ba': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900bb': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900bc': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900bd': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900be': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c6': ('FL', '2', 'Unknown', ''),  # noqa
+        '001900c9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ca': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900cb': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900cc': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900cd': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ce': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900cf': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900d0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900d1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900d2': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900d3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900d4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900d8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900d9': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900da': ('US', '1', 'Unknown', ''),  # noqa
+        '001900db': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900dc': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900e1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900e4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900e9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ea': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900eb': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
+        '001900ee': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900ef': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900f0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900f2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f4': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900f5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f6': ('UI', '1', 'Unknown', ''),  # noqa
+        '001900f8': ('US', '1', 'Unknown', ''),  # noqa
+        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900fa': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900fb': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900fd': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ff': ('SL', '3', 'Unknown', ''),  # noqa
+        '00210002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00210003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00210004': ('US', '1', 'Unknown', ''),  # noqa
+        '00210008': ('DS', '3', 'Unknown', ''),  # noqa
+        '00210009': ('DS', '3', 'Unknown', ''),  # noqa
+        '0021000a': ('DS', '3', 'Unknown', ''),  # noqa
+        '0021000b': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000c': ('US', '1', 'Unknown', ''),  # noqa
+        '0021000d': ('FL', '1', 'Unknown', ''),  # noqa
+        '0021000f': ('US', '1', 'Unknown', ''),  # noqa
+        '00210012': ('DS', '3', 'Unknown', ''),  # noqa
+        '00210014': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00210015': ('FL', '1', 'Unknown', ''),  # noqa
+        '00210016': ('FL', '2', 'Unknown', ''),  # noqa
+        '00210018': ('US', '1', 'Unknown', ''),  # noqa
+        '0021001d': ('IS', '1', 'Unknown', ''),  # noqa
+        '0021001f': ('US', '1', 'Unknown', ''),  # noqa
+        '00210022': ('US', '1', 'Unknown', ''),  # noqa
+        '00290001': ('SL', '1', 'Unknown', ''),  # noqa
+        '00290005': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00290006': ('FL', '1', 'Unknown', ''),  # noqa
+        '00290007': ('FL', '1', 'Unknown', ''),  # noqa
+        '0029001c': ('FL', '2', 'Unknown', ''),  # noqa
+        '00290021': ('SL', '3', 'Unknown', ''),  # noqa
+        '0029004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00290050': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290051': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290052': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290054': ('LO', '1', 'Unknown', ''),  # noqa
+        '00290067': ('FD', '4', 'Unknown', ''),  # noqa
+        '00290068': ('SS', '1', 'Unknown', ''),  # noqa
+        '0029006e': ('OB', '1', 'Unknown', ''),  # noqa
+        '700d0010': ('DS', '1', '2nd Flip Angle [degree]', ''),  # noqa
+        '700d0011': ('US', '2', 'Acquisition Inner Matrix', ''),  # noqa
+        '700d0012': ('US', '1', 'MP2RAGE Flag', ''),  # noqa
+        '700d0013': ('FL', '1', 'Inversion efficiency of inversion recovery pulse', ''),  # noqa
+        '700d0014': ('SL', '1', 'Number of dummy shot', ''),  # noqa
+        '700d0015': ('FL', '1', 'FFE total repetition time[s]', ''),  # noqa
+        '700d0016': ('LO', '3', 'PAS Name', ''),  # noqa
+        '700d0017': ('LT', '1', 'Intended Processing', ''),  # noqa
+        '700d0018': ('SS', '1-n', 'Scanned Orientation IDs', ''),  # noqa
+        '700d0019': ('OB', '1', 'PAS Reproduct Information', ''),  # noqa
+        '700d0080': ('US', '1', 'Unknown', ''),  # noqa
+        'e2010002': ('US', '1', 'Unknown', ''),  # noqa
+        'e3010000': ('SH', '1', 'Unknown', ''),  # noqa
+        'e4010000': ('US', '1', 'Unknown', ''),  # noqa
+        'e4010001': ('US', '1', 'Unknown', ''),  # noqa
+        'e4010002': ('US', '1', 'Unknown', ''),  # noqa
+        'e4010003': ('US', '1', 'Unknown', ''),  # noqa
+        'e4010004': ('US', '1', 'Unknown', ''),  # noqa
+        'e4010005': ('OB', '1', 'Unknown', ''),  # noqa
+        'e4010008': ('FL', '1', 'Unknown', ''),  # noqa
+        'e4010012': ('FL', '1', 'Unknown', ''),  # noqa
+        'e4010013': ('OB', '1', 'Unknown', ''),  # noqa
+        'e4010020': ('SQ', '1', 'Unknown', ''),  # noqa
+        'e4010021': ('SQ', '1', 'Unknown', ''),  # noqa
+        'e4010022': ('LO', '1', 'Unknown', ''),  # noqa
+        'e4010023': ('SH', '1', 'Unknown', ''),  # noqa
+        'e4010024': ('OB', '1', 'Unknown', ''),  # noqa
+        'e4030000': ('SQ', '1', 'Unknown', ''),  # noqa
+        'ee010000': ('US', '1', 'Unknown', ''),  # noqa
+        'ee010001': ('OB', '1', 'Unknown', ''),  # noqa
+        'ee010002': ('US', '1', 'Unknown', ''),  # noqa
+    },
+    'TOSHIBA_MEC_MR3^11': {
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190008': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190009': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000b': ('OB', '1', 'Unknown', ''),  # noqa
+        '0019000c': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190019': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190024': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190025': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190026': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190029': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019002a': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002b': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019002c': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002d': ('SL', '3', 'Unknown', ''),  # noqa
+        '0019002e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190030': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190031': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190032': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190034': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190035': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190036': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190037': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190038': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190039': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019003a': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019003c': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019003e': ('FL', '9', 'Unknown', ''),  # noqa
+        '0019003f': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190040': ('US', '1', 'Unknown', ''),  # noqa
+        '00190041': ('US', '1', 'Unknown', ''),  # noqa
+        '00190042': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190043': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190044': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190046': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190048': ('LT', '1', 'Unknown', ''),  # noqa
+        '00190049': ('LT', '1', 'Unknown', ''),  # noqa
+        '0019004c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019004e': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190055': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190057': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190058': ('US', '1', 'Unknown', ''),  # noqa
+        '00190059': ('US', '1', 'Unknown', ''),  # noqa
+        '0019005c': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019005f': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190060': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190061': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190062': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190063': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190067': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190068': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019006c': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019006d': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006e': ('SH', '1', 'Unknown', ''),  # noqa
+        '0019006f': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190071': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190072': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190078': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007a': ('SL', '2', 'Unknown', ''),  # noqa
+        '0019007c': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019007d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019007f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190080': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190084': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190087': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008f': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190091': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190092': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190094': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009a': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009b': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009c': ('FL', '1', 'Unknown', ''),  # noqa
+        '0019009d': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009e': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019009f': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900a0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900a5': ('US', '1', 'Unknown', ''),  # noqa
+        '001900a6': ('US', '1', 'Unknown', ''),  # noqa
+        '001900a8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ad': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ae': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900b1': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900b3': ('US', '1', 'Unknown', ''),  # noqa
+        '001900b4': ('US', '1', 'Unknown', ''),  # noqa
+        '001900b5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900b6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900b7': ('US', '1', 'Unknown', ''),  # noqa
+        '001900b9': ('US', '1', 'Unknown', ''),  # noqa
+        '001900bb': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900bc': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900bd': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900be': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900bf': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c0': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c1': ('US', '1', 'Unknown', ''),  # noqa
+        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900cd': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900e0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900e1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900e3': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900e4': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900e5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900e6': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900f0': ('SL', '4', 'Unknown', ''),  # noqa
+        '001900f1': ('SL', '3', 'Unknown', ''),  # noqa
+        '001900f2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900f3': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f5': ('SQ', '1', 'Unknown', ''),  # noqa
+        '001900f6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f7': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f8': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900f9': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900fa': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900fb': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900fc': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900fd': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900ff': ('SL', '1', 'Unknown', ''),  # noqa
+    },
+    'TOSHIBA_MEC_MR3^12': {
+        '00190000': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190001': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190002': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190005': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190006': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190007': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '00190008': ('UL', '1-n', 'Unknown', ''),  # noqa
+        '00190009': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000a': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000b': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019000c': ('UL', '1', 'Unknown', ''),  # noqa
+        '0019000d': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000e': ('US', '1', 'Unknown', ''),  # noqa
+        '00190010': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190011': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190012': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190013': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190014': ('FL', '1', 'Unknown', ''),  # noqa
+        '00190018': ('UL', '1', 'Unknown', ''),  # noqa
+        '00190028': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019002a': ('DS', '3', 'Unknown', ''),  # noqa
+        '0019002b': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190032': ('SH', '1', 'Unknown', ''),  # noqa
+        '00190034': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190052': ('FL', '2', 'Unknown', ''),  # noqa
+        '00190076': ('OB', '1', 'Unknown', ''),  # noqa
+        '00190079': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190080': ('FD', '1', 'Unknown', ''),  # noqa
+        '00190085': ('US', '1', 'Unknown', ''),  # noqa
+        '00190086': ('LO', '1', 'Unknown', ''),  # noqa
+        '00190087': ('SQ', '1', 'Unknown', ''),  # noqa
+        '00190088': ('US', '1', 'Unknown', ''),  # noqa
+        '00190089': ('SL', '1', 'Unknown', ''),  # noqa
+        '0019008a': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008b': ('US', '1', 'Unknown', ''),  # noqa
+        '0019008f': ('OB', '1', 'Unknown', ''),  # noqa
+        '00190093': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190094': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190095': ('UI', '1', 'Unknown', ''),  # noqa
+        '00190098': ('FL', '3', 'Unknown', ''),  # noqa
+        '00190099': ('LO', '1', 'Unknown', ''),  # noqa
+        '0019009a': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009c': ('DS', '1', 'Unknown', ''),  # noqa
+        '0019009d': ('US', '1', 'Unknown', ''),  # noqa
+        '0019009e': ('FL', '3', 'Unknown', ''),  # noqa
+        '0019009f': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a0': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a1': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a2': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a4': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a6': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900a7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900a8': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900aa': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900ab': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900ac': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900ad': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900ae': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900af': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900b3': ('FD', '1', 'Unknown', ''),  # noqa
+        '001900b4': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900c2': ('US', '1', 'Unknown', ''),  # noqa
+        '001900c3': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900c4': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c5': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c6': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900c7': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900cd': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900ce': ('UL', '1', 'Unknown', ''),  # noqa
+        '001900cf': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900d1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900d2': ('US', '3', 'Unknown', ''),  # noqa
+        '001900d3': ('SS', '1', 'Unknown', ''),  # noqa
+        '001900d4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900d5': ('FL', '1', 'Unknown', ''),  # noqa
+        '001900d6': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900d7': ('US', '2', 'Unknown', ''),  # noqa
+        '001900d8': ('FL', '1-n', 'Unknown', ''),  # noqa
+        '001900de': ('US', '1', 'Unknown', ''),  # noqa
+        '001900df': ('US', '1', 'Unknown', ''),  # noqa
+        '001900e0': ('US', '1', 'Unknown', ''),  # noqa
+        '001900e1': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900e2': ('FL', '3', 'Unknown', ''),  # noqa
+        '001900e3': ('TM', '1', 'Unknown', ''),  # noqa
+        '001900e4': ('US', '2', 'Unknown', ''),  # noqa
+        '001900eb': ('US', '1', 'Unknown', ''),  # noqa
+        '001900ec': ('US', '1', 'Unknown', ''),  # noqa
+        '001900ef': ('DS', '1', 'Unknown', ''),  # noqa
+        '001900f0': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900f1': ('LO', '1', 'Unknown', ''),  # noqa
+        '001900fd': ('SL', '1', 'Unknown', ''),  # noqa
+        '001900fe': ('SL', '1', 'Unknown', ''),  # noqa
+    },
+    'TOSHIBA_MEC_MR3^13': {
+        '00190002': ('US', '1', 'Unknown', ''),  # noqa
+        '00190003': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190004': ('US', '1', 'Unknown', ''),  # noqa
+        '00190005': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190008': ('SL', '1', 'Unknown', ''),  # noqa
+        '00190009': ('SQ', '1', 'Unknown', ''),  # noqa
+        '0019000a': ('FD', '3', 'Unknown', ''),  # noqa
+        '0019000b': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000c': ('FD', '1', 'Unknown', ''),  # noqa
+        '0019000f': ('SH', '1', 'Unknown', ''),  # noqa
+        'e4030000': ('SH', '1', 'Unknown', ''),  # noqa
+        'e4030001': ('OB', '1', 'Unknown', ''),  # noqa
+        'e4030002': ('OB', '1', 'Unknown', ''),  # noqa
+        'e4030003': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'TOSHIBA_MEC_OT3': {
         '0009xx00': ('LO', '1', 'HIS/RIS Study ID', ''),  # noqa

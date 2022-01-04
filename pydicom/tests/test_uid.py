@@ -296,7 +296,7 @@ class TestUID:
         assert not self.uid.is_retired
         assert UID('1.2.840.10008.1.2.2').is_retired
 
-    def test_is_valid(self):
+    def test_is_valid(self, disable_value_validation):
         """Test that UID.is_valid works."""
         for invalid_uid in ('1' * 65,
                             '1.' + ('2' * 63),

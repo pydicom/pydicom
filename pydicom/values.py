@@ -24,7 +24,7 @@ import pydicom.uid
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     MultiString, DA, DT, TM, TEXT_VR_DELIMS, IS, CUSTOMIZABLE_CHARSET_VR,
-    VR as VR_
+    VR as VR_, validate_value
 )
 
 try:
@@ -488,7 +488,7 @@ def convert_string(
         The encoded text VR element value.
     is_little_endian : bool
         ``True`` if the value is encoded as little endian, ``False`` otherwise.
-    format_str : str, optional
+    struct_format : str, optional
         Not used.
 
     Returns
@@ -500,9 +500,10 @@ def convert_string(
 
 
 def convert_text(
-    byte_string: bytes, encodings: Optional[List[str]] = None
+    byte_string: bytes, encodings: Optional[List[str]] = None,
+    vr: str = None
 ) -> Union[str, MutableSequence[str]]:
-    """Return a decoded text VR value, ignoring backslashes.
+    """Return a decoded text VR value.
 
     Text VRs are 'SH', 'LO' and 'UC'.
 
@@ -512,6 +513,8 @@ def convert_text(
         The encoded text VR element value.
     encodings : list of str, optional
         A list of the character encoding schemes used to encode the value.
+    vr : str
+        The value representation of the element. Needed for validation.
 
     Returns
     -------
@@ -519,15 +522,18 @@ def convert_text(
         The decoded value(s).
     """
     values = byte_string.split(b'\\')
-    as_strings = [convert_single_string(value, encodings) for value in values]
+    as_strings = [convert_single_string(value, encodings, vr)
+                  for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
 
-    return MultiValue(str, as_strings)
+    return MultiValue(str, as_strings,
+                      validation_mode=config.settings.reading_validation_mode)
 
 
 def convert_single_string(
-    byte_string: bytes, encodings: Optional[List[str]] = None
+    byte_string: bytes, encodings: Optional[List[str]] = None,
+    vr: str = None,
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
 
@@ -537,12 +543,17 @@ def convert_single_string(
         The encoded string.
     encodings : list of str, optional
         A list of the character encoding schemes used to encode the text.
+    vr : str
+        The value representation of the element. Needed for validation.
 
     Returns
     -------
     str
         The decoded text.
     """
+    if vr is not None:
+        validate_value(
+            vr, byte_string, config.settings.reading_validation_mode)
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
     return value.rstrip('\0 ')
@@ -746,6 +757,10 @@ def convert_value(
     # Pass all encodings to the converter if needed
     try:
         if VR in CUSTOMIZABLE_CHARSET_VR:
+            # SH, LO, ST, LT, UC, UT
+            return converter(byte_string, encodings, VR)
+
+        if VR == "PN":
             return converter(byte_string, encodings)
 
         if VR != VR_.SQ:
@@ -760,7 +775,7 @@ def convert_value(
             raw_data_element.value_tell
         )
     except ValueError:
-        if config.enforce_valid_values:
+        if config.settings.reading_validation_mode == config.RAISE:
             # The user really wants an exception here
             raise
 

@@ -182,15 +182,15 @@ class DicomFileLike(DicomIO):
         self.close = file_like_obj.close
         self.name: str = getattr(file_like_obj, 'name', '<no filename>')
 
-    def no_write(self, bytes_read: bytes) -> None:
+    def no_write(self, bytes_read: bytes) -> int:
         """Used for file-like objects where no write is available"""
         raise IOError("This DicomFileLike object has no write() method")
 
-    def no_read(self, bytes_read: Optional[int] = None) -> None:
+    def no_read(self, size: int = -1) -> bytes:
         """Used for file-like objects where no read is available"""
         raise IOError("This DicomFileLike object has no read() method")
 
-    def no_seek(self, offset: int, from_what: int = 0) -> None:
+    def no_seek(self, offset: int, whence: int = 0) -> int:
         """Used for file-like objects where no seek is available"""
         raise IOError("This DicomFileLike object has no seek() method")
 

@@ -10,7 +10,10 @@ from typing import (
 import warnings
 import zlib
 
-from pydicom.charset import default_encoding, convert_encodings, encode_string
+from pydicom import config
+from pydicom.charset import (
+    default_encoding, text_VRs, convert_encodings, encode_string
+)
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
@@ -22,7 +25,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import (
     PersonName, IS, DSclass, DA, DT, TM, EXPLICIT_VR_LENGTH_32, VR,
-    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR
+    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR, validate_value
 )
 from pydicom.values import convert_numbers
 
@@ -279,7 +282,12 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
 
 def write_OBvalue(fp: DicomIO, elem: DataElement) -> None:
     """Write a data_element with VR of 'other byte' (OB)."""
-    fp.write(cast(bytes, elem.value))
+    if len(elem.value) % 2:
+        # Pad odd length values
+        fp.write(cast(bytes, elem.value))
+        fp.write(b'\x00')
+    else:
+        fp.write(cast(bytes, elem.value))
 
 
 def write_OWvalue(fp: DicomIO, elem: DataElement) -> None:
@@ -344,6 +352,13 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
         fp.write(val)  # type: ignore[arg-type]
 
 
+def _encode_and_validate_string(vr: str, value: str,
+                                encodings: Sequence[str]) -> bytes:
+    encoded = encode_string(value, encodings)
+    validate_value(vr, encoded, config.settings.writing_validation_mode)
+    return encoded
+
+
 def write_text(
     fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
 ) -> None:
@@ -356,7 +371,8 @@ def write_text(
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
                 val = b'\\'.join(
-                    [encode_string(val, encodings) for val in val]
+                    [_encode_and_validate_string(elem.VR, val, encodings)
+                     for val in val]
                 )
             else:
                 val = cast(Sequence[bytes], val)
@@ -364,7 +380,7 @@ def write_text(
         else:
             val = cast(Union[bytes, str], val)
             if isinstance(val, str):
-                val = encode_string(val, encodings)
+                val = _encode_and_validate_string(elem.VR, val, encodings)
 
         if len(val) % 2 != 0:
             val = val + b' '  # pad to even length
@@ -1009,6 +1025,7 @@ def dcmwrite(
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
+    tsyntax: Optional[UID]
 
     # Ensure is_little_endian and is_implicit_VR are set
     if None in (dataset.is_little_endian, dataset.is_implicit_VR):
@@ -1099,15 +1116,16 @@ def dcmwrite(
             fp.write(preamble)
             fp.write(b'DICM')
 
-        tsyntax: Optional[UID] = None  # type: ignore[no-redef]
+        tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(
                 fp, dataset.file_meta, enforce_standard=not write_like_original
             )
-            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
+            tsyntax = cast(UID, getattr(
+                dataset.file_meta, "TransferSyntaxUID", None))
 
-        if (tsyntax == DeflatedExplicitVRLittleEndian):
+        if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
             # when writing, the entire dataset following
             #     the file metadata is prepared the normal way,
