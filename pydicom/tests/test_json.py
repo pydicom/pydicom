@@ -13,7 +13,7 @@ from pydicom.valuerep import PersonName
 
 
 class TestPersonName:
-    def test_json_pn_from_file(self):
+    def test_json_pn_from_file(self, disable_value_validation):
         with open(get_testdata_file("test_PN.json")) as s:
             ds = Dataset.from_json(s.read())
         assert isinstance(ds[0x00080090].value, PersonName)
@@ -159,7 +159,8 @@ class TestAT:
 
 
 class TestDataSetToJson:
-    def test_json_from_dicom_file(self, no_numpy_use):
+    def test_json_from_dicom_file(self, no_numpy_use,
+                                  disable_value_validation):
         ds1 = dcmread(get_testdata_file("CT_small.dcm"))
         ds_json = ds1.to_json()
         ds2 = Dataset.from_json(ds_json)
@@ -285,7 +286,7 @@ class TestDataSetToJson:
 
 
 class TestSequence:
-    def test_nested_sequences(self):
+    def test_nested_sequences(self, disable_value_validation):
         test1_json = get_testdata_file("test1.json")
         with open(test1_json) as f:
             with pytest.warns(UserWarning,

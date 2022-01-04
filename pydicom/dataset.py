@@ -39,8 +39,6 @@ except ImportError:
     pass
 
 import pydicom  # for dcmwrite
-import pydicom.charset
-import pydicom.config
 from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
@@ -450,10 +448,7 @@ class Dataset:
             * for a sequence element, an empty :class:`list` or ``list`` of
               :class:`Dataset`
         """
-
-        data_element = DataElement(tag, VR, value)
-        # use data_element.tag since DataElement verified it
-        self._dict[data_element.tag] = data_element
+        self.add(DataElement(tag, VR, value))
 
     def __array__(self) -> "numpy.ndarray":
         """Support accessing the dataset from a numpy array."""
@@ -1365,8 +1360,8 @@ class Dataset:
             If `key` is not convertible to a valid tag or a known element
             keyword.
         KeyError
-            If :attr:`~pydicom.config.enforce_valid_values` is ``True`` and
-            `key` is an unknown non-private tag.
+            If :attr:`~pydicom.config.settings.reading_validation_mode` is
+             ``RAISE`` and `key` is an unknown non-private tag.
         """
         tag = Tag(key)
         if tag in self:
@@ -1379,13 +1374,13 @@ class Dataset:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.enforce_valid_values:
+                    if (config.settings.writing_validation_mode ==
+                            config.RAISE):
                         raise KeyError(f"Unknown DICOM tag {tag}")
-                    else:
-                        vr = 'UN'
-                        warnings.warn(
-                            f"Unknown DICOM tag {tag} - setting VR to 'UN'"
-                        )
+                    vr = 'UN'
+                    warnings.warn(
+                        f"Unknown DICOM tag {tag} - setting VR to 'UN'"
+                    )
 
             default = DataElement(tag, vr, default)
 
@@ -1946,7 +1941,8 @@ class Dataset:
         str
             A string representation of an element.
         """
-        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear')
+        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear',
+                     'validate')
         for elem in self.iterall():
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
@@ -2314,7 +2310,7 @@ class Dataset:
 
         Parameters
         ----------
-        dictionary : dict or Dataset
+        d : dict or Dataset
             The :class:`dict` or :class:`Dataset` to use when updating the
             current object.
         """
@@ -2610,7 +2606,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename_or_obj: Union[str, os.PathLike, BinaryIO],
         dataset: _DatasetType,
         preamble: Optional[bytes] = None,
         file_meta: Optional["FileMetaDataset"] = None,

@@ -28,7 +28,7 @@ from pydicom.tag import Tag, BaseTag
 from pydicom.uid import UID
 from pydicom import jsonrep
 import pydicom.valuerep  # don't import DS directly as can be changed by config
-from pydicom.valuerep import PersonName
+from pydicom.valuerep import PersonName, validate_value
 
 if config.have_numpy:
     import numpy
@@ -172,7 +172,8 @@ class DataElement:
         value: Any,
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
-        already_converted: bool = False
+        already_converted: bool = False,
+        validation_mode: int = None
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -200,7 +201,13 @@ class DataElement:
         already_converted : bool
             Used to determine whether or not the element's value requires
             conversion to a value with VM > 1. Default is ``False``.
+        validation_mode : int
+            Defines if values are validated and how validation errors are
+            handled.
         """
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
+
         if not isinstance(tag, BaseTag):
             tag = Tag(tag)
         self.tag = tag
@@ -220,6 +227,7 @@ class DataElement:
                 pass
 
         self.VR = VR  # Note: you must set VR before setting value
+        self.validation_mode = validation_mode
         if already_converted:
             self._value = value
         else:
@@ -228,6 +236,12 @@ class DataElement:
         self.is_undefined_length = is_undefined_length
         self.private_creator: Optional[str] = None
         self.parent: Optional["Dataset"] = None
+
+    def validate(self, value: Any) -> None:
+        """Validate the current value against the DICOM standard.
+        See :func:`~pydicom.valuerep.validate_value` for details.
+        """
+        validate_value(self.VR, value, self.validation_mode)
 
     @classmethod
     def from_json(
@@ -526,7 +540,8 @@ class DataElement:
         except AttributeError:  # not a list
             return self._convert(val)
         else:
-            return MultiValue(self._convert, val)
+            return MultiValue(self._convert, val,
+                              validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -538,19 +553,22 @@ class DataElement:
             val = val.decode()
 
         if self.VR == 'IS':
-            return pydicom.valuerep.IS(val)
+            return pydicom.valuerep.IS(val, self.validation_mode)
         elif self.VR == 'DA' and config.datetime_conversion:
-            return pydicom.valuerep.DA(val)
+            return pydicom.valuerep.DA(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == 'DS':
-            return pydicom.valuerep.DS(val)
+            return pydicom.valuerep.DS(val, False, self.validation_mode)
         elif self.VR == 'DT' and config.datetime_conversion:
-            return pydicom.valuerep.DT(val)
+            return pydicom.valuerep.DT(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == 'TM' and config.datetime_conversion:
-            return pydicom.valuerep.TM(val)
+            return pydicom.valuerep.TM(val,
+                                       validation_mode=self.validation_mode)
         elif self.VR == "UI":
-            return UID(val) if val is not None else None
+            return UID(val, self.validation_mode) if val is not None else None
         elif self.VR == "PN":
-            return PersonName(val)
+            return PersonName(val, validation_mode=self.validation_mode)
         elif self.VR == "AT" and (val == 0 or val):
             return val if isinstance(val, BaseTag) else Tag(val)
         # Later may need this for PersonName as for UI,
@@ -558,6 +576,7 @@ class DataElement:
         # elif self.VR == "PN":
         #    return PersonName(val)
         else:  # is either a string or a type 2 optionally blank string
+            self.validate(val)
             return val  # this means a "numeric" value could be empty string ""
         # except TypeError:
             # print "Could not convert value '%s' to VR '%s' in tag %s" \
@@ -799,7 +818,8 @@ def DataElement_from_raw(
     ------
     KeyError
         If `raw_data_element` belongs to an unknown non-private tag and
-        `config.enforce_valid_values` is set.
+        :attr:`~pydicom.config.settings.reading_validation_mode` is set
+        to ``RAISE``.
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader
@@ -831,7 +851,8 @@ def DataElement_from_raw(
                 VR = 'UL'
             else:
                 msg = "Unknown DICOM tag {0:s}".format(str(raw.tag))
-                if config.enforce_valid_values:
+                if (config.settings.reading_validation_mode ==
+                        config.RAISE):
                     msg += " can't look up VR"
                     raise KeyError(msg)
                 else:

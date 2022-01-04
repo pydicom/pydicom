@@ -3,24 +3,39 @@
 """Fixtures used in different tests."""
 
 import pytest
-
 from pydicom import config
 
 
 @pytest.fixture
 def enforce_valid_values():
-    value = config.enforce_valid_values
-    config.enforce_valid_values = True
+    value = config.settings.reading_validation_mode
+    config.settings.reading_validation_mode = config.RAISE
     yield
-    config.enforce_valid_values = value
+    config.settings.reading_validation_mode = value
 
 
 @pytest.fixture
-def allow_invalid_values():
-    value = config.enforce_valid_values
-    config.enforce_valid_values = False
+def allow_reading_invalid_values():
+    value = config.settings.reading_validation_mode
+    config.settings.reading_validation_mode = config.WARN
     yield
-    config.enforce_valid_values = value
+    config.settings.reading_validation_mode = value
+
+
+@pytest.fixture
+def enforce_writing_invalid_values():
+    value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.RAISE
+    yield
+    config.settings.writing_validation_mode = value
+
+
+@pytest.fixture
+def allow_writing_invalid_values():
+    value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.WARN
+    yield
+    config.settings.writing_validation_mode = value
 
 
 @pytest.fixture
@@ -48,3 +63,25 @@ def dont_replace_un_with_known_vr():
     config.replace_un_with_known_vr = False
     yield
     config.replace_un_with_known_vr = old_value
+
+
+@pytest.fixture
+def dont_raise_on_writing_invalid_value():
+    old_value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.WARN
+    yield
+    config.settings.writing_validation_mode = old_value
+
+
+@pytest.fixture
+def raise_on_writing_invalid_value():
+    old_value = config.settings.writing_validation_mode
+    config.settings.writing_validation_mode = config.RAISE
+    yield
+    config.settings.writing_validation_mode = old_value
+
+
+@pytest.fixture
+def disable_value_validation():
+    with config.disable_value_validation():
+        yield
