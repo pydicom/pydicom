@@ -424,7 +424,7 @@ def dictionary_has_tag(tag: TagType) -> bool:
     """
     try:
         return Tag(tag) in DicomDictionary
-    except:
+    except Exception:
         return False
 
 
