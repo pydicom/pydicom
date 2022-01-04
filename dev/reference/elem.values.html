@@ -189,7 +189,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_PN.html#pydicom.values.convert_PN" title="pydicom.values.convert_PN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_PN</span></code></a>(byte_string[, encodings])</p></td>
 <td><p>Return a decoded 'PN' value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string" title="pydicom.values.convert_single_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_single_string</span></code></a>(byte_string[, encodings])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_single_string.html#pydicom.values.convert_single_string" title="pydicom.values.convert_single_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_single_string</span></code></a>(byte_string[, ...])</p></td>
 <td><p>Return decoded text, ignoring backslashes and trailing spaces.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_SQ.html#pydicom.values.convert_SQ" title="pydicom.values.convert_SQ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_SQ</span></code></a>(byte_string, is_implicit_VR, ...)</p></td>
@@ -201,8 +201,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_tag.html#pydicom.values.convert_tag" title="pydicom.values.convert_tag"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_tag</span></code></a>(byte_string, is_little_endian[, ...])</p></td>
 <td><p>Return a decoded <a class="reference internal" href="generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTag</span></code></a> from the encoded <cite>byte_string</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_text.html#pydicom.values.convert_text" title="pydicom.values.convert_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_text</span></code></a>(byte_string[, encodings])</p></td>
-<td><p>Return a decoded text VR value, ignoring backslashes.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.values.convert_text.html#pydicom.values.convert_text" title="pydicom.values.convert_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_text</span></code></a>(byte_string[, encodings, vr])</p></td>
+<td><p>Return a decoded text VR value.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.values.convert_TM_string.html#pydicom.values.convert_TM_string" title="pydicom.values.convert_TM_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_TM_string</span></code></a>(byte_string, is_little_endian)</p></td>
 <td><p>Return a decoded 'TM' value.</p></td>
@@ -234,7 +234,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

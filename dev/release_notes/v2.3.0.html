@@ -104,10 +104,19 @@
 <h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Updated the private dictionary</p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is deprecated in favor of
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code></p></li>
 </ul>
 </section>
 <section id="enhancements">
 <h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Values are now validated for valid length, allowed character set and format
+on reading and writing. Depending on the value of
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code>
+and <code class="xref py py-attr docutils literal notranslate"><span class="pre">writing_validation_mode</span></code>
+a warning is logged, an exception is raised, or the validation is skipped.</p></li>
+</ul>
 </section>
 <section id="fixes">
 <h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h2>
@@ -126,7 +135,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -64,6 +64,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
@@ -85,6 +86,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.WARN.html">pydicom.config.WARN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.RAISE.html">pydicom.config.RAISE</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -163,7 +167,7 @@ sized numpy array from an <em>Overlay Data</em> element.</p>
 <dt>def is_available():</dt><dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the handler’s dependencies are installed, <code class="docutils literal notranslate"><span class="pre">False</span></code>
 otherwise.</p>
 </dd>
-<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
+<dt>def get_overlay_array(ds, group):</dt><dd><p>Return a correctly shaped <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> derived from the
 <em>Overlay Data</em> with element tag <cite>group</cite>, in <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <cite>ds</cite> or raise
 an exception.</p>
 </dd>
@@ -195,7 +199,7 @@ data.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

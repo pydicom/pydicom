@@ -64,6 +64,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
@@ -85,6 +86,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.WARN.html">pydicom.config.WARN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.RAISE.html">pydicom.config.RAISE</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -147,7 +151,7 @@
 <h1>pydicom.config.reset_data_element_callback<a class="headerlink" href="#pydicom-config-reset-data-element-callback" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.config.reset_data_element_callback">
-<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">reset_data_element_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/01a2fa503/pydicom/config.py#L54"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.reset_data_element_callback" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">reset_data_element_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1a035a88/pydicom/config.py#L58"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.reset_data_element_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the <a class="reference internal" href="pydicom.config.data_element_callback.html#pydicom.config.data_element_callback" title="pydicom.config.data_element_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_element_callback()</span></code></a> function to the default.</p>
 </dd></dl>
 
@@ -164,7 +168,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

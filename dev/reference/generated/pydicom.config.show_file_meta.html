@@ -64,6 +64,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
@@ -85,6 +86,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.WARN.html">pydicom.config.WARN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.RAISE.html">pydicom.config.RAISE</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -148,12 +152,12 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.config.show_file_meta">
 <span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">show_file_meta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pydicom.config.show_file_meta" title="Permalink to this definition">¶</a></dt>
-<dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 2.0.</span></p>
-</div>
-<p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the ‘str’ and ‘repr’ methods
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), the ‘str’ and ‘repr’ methods
 of <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> begin with a separate section
 displaying the file meta information data elements</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.</span></p>
+</div>
 </dd></dl>
 
 </section>
@@ -169,7 +173,7 @@ displaying the file meta information data elements</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

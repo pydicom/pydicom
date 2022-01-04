@@ -64,6 +64,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.convert_wrong_length_to_UN.html">pydicom.config.convert_wrong_length_to_UN</a></li>
@@ -85,6 +86,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.APPLY_J2K_CORRECTIONS.html">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.WARN.html">pydicom.config.WARN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pydicom.config.RAISE.html">pydicom.config.RAISE</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../data.html">Getting Included Datasets (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.data</span></code>)</a></li>
@@ -147,7 +151,7 @@
 <h1>pydicom.config.future_behavior<a class="headerlink" href="#pydicom-config-future-behavior" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.config.future_behavior">
-<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">future_behavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable_future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/01a2fa503/pydicom/config.py#L448"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.future_behavior" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">future_behavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable_future</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1a035a88/pydicom/config.py#L537"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.future_behavior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Imitate the behavior for the next major version of <em>pydicom</em>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.</span></p>
@@ -180,7 +184,7 @@ deprecations become errors, and default values of config flags may change.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -130,7 +130,7 @@
 <h1>pydicom.charset.convert_encodings<a class="headerlink" href="#pydicom-charset-convert-encodings" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.charset.convert_encodings">
-<span class="sig-prename descclassname"><span class="pre">pydicom.charset.</span></span><span class="sig-name descname"><span class="pre">convert_encodings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encodings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MutableSequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/01a2fa503/pydicom/charset.py#L642"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.charset.convert_encodings" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.charset.</span></span><span class="sig-name descname"><span class="pre">convert_encodings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encodings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MutableSequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/e1a035a88/pydicom/charset.py#L651"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.charset.convert_encodings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert DICOM <cite>encodings</cite> into corresponding Python encodings.</p>
 <p>Handles some common spelling mistakes and issues a warning in this case.</p>
 <p>Handles stand-alone encodings: if they are the first encodings,
@@ -138,8 +138,9 @@ additional encodings are ignored, if they are not the first encoding,
 they are ignored. In both cases, a warning is issued.</p>
 <p>Invalid encodings are replaced with the default encoding with a
 respective warning issued, if
-<a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
-<code class="docutils literal notranslate"><span class="pre">False</span></code>, otherwise an exception is raised.</p>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code> is
+<code class="docutils literal notranslate"><span class="pre">WARN</span></code>, or an exception is raised if it is set to
+<code class="docutils literal notranslate"><span class="pre">RAISE</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>encodings</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><em>list of str</em>) – The encoding or list of encodings as read from (0008,0005)
@@ -150,17 +151,16 @@ respective warning issued, if
 encodings. If an encoding is already a Python encoding, it is returned
 unchanged. Encodings with common spelling errors are replaced by the
 correct encoding, and invalid encodings are replaced with the default
-encoding if
-<a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
-<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+encoding if <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code>
+is not set to <code class="docutils literal notranslate"><span class="pre">RAISE</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list of str</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.10)"><strong>LookupError</strong></a> – If <cite>encodings</cite> contains a value that could not be converted and
-    <a class="reference internal" href="pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-func docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is
-    <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+    <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code> is
+    <code class="docutils literal notranslate"><span class="pre">RAISE</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -178,7 +178,7 @@ encoding if
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
