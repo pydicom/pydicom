@@ -7,10 +7,6 @@ Changes
 Enhancements
 ------------
 
-* Added *convert* keyword parameter to
-  :func:`~pydicom.datadict.dictionary_has_tag` to allow lookup of generic
-  tag types (:issue:`1561`)
-
 Fixes
 -----
 

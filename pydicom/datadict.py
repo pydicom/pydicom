@@ -407,22 +407,14 @@ def dictionary_keyword(tag: TagType) -> str:
     return get_entry(tag)[4]
 
 
-def dictionary_has_tag(tag: TagType, convert: bool = False) -> bool:
+def dictionary_has_tag(tag: TagType) -> bool:
     """Return ``True`` if `tag` is in the official DICOM data dictionary.
-
-    .. versionchanged:: 2.3
-
-        Added the *convert* keyword parameter
 
     Parameters
     ----------
     tag : int or str or Tuple[int, int]
-        The tag to check, as :class:`int` (if `convert` is ``False``),
-        otherwise in any of the forms accepted by :func:`~pydicom.tag.Tag`.
-    convert : bool
-        If ``False`` (default) then `tag` must be :class:`int` and will
-        perform the fastest lookup, otherwiseIf `tag` will be converted
-        to :class:`~pydicom.tag.BaseTag` prior to the lookup.
+        The tag to check, in any of the forms accepted by
+        :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -430,10 +422,10 @@ def dictionary_has_tag(tag: TagType, convert: bool = False) -> bool:
         ``True`` if the tag corresponds to an element present in the official
         DICOM data dictionary, ``False`` otherwise.
     """
-    if not convert:
-        return tag in DicomDictionary
-
-    return Tag(tag) in DicomDictionary
+    try:
+        return Tag(tag) in DicomDictionary
+    except:
+        return False
 
 
 def keyword_for_tag(tag: TagType) -> str:
