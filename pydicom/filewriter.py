@@ -10,6 +10,7 @@ from typing import (
 import warnings
 import zlib
 
+from pydicom import config
 from pydicom.charset import (
     default_encoding, text_VRs, convert_encodings, encode_string
 )
@@ -23,7 +24,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import (
-    extra_length_VRs, PersonName, IS, DSclass, DA, DT, TM
+    extra_length_VRs, PersonName, IS, DSclass, DA, DT, TM, validate_value
 )
 from pydicom.values import convert_numbers
 
@@ -342,6 +343,13 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
         fp.write(val)  # type: ignore[arg-type]
 
 
+def _encode_and_validate_string(vr: str, value: str,
+                                encodings: Sequence[str]) -> bytes:
+    encoded = encode_string(value, encodings)
+    validate_value(vr, encoded, config.settings.writing_validation_mode)
+    return encoded
+
+
 def write_text(
     fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
 ) -> None:
@@ -354,7 +362,8 @@ def write_text(
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
                 val = b'\\'.join(
-                    [encode_string(val, encodings) for val in val]
+                    [_encode_and_validate_string(elem.VR, val, encodings)
+                     for val in val]
                 )
             else:
                 val = cast(Sequence[bytes], val)
@@ -362,7 +371,7 @@ def write_text(
         else:
             val = cast(Union[bytes, str], val)
             if isinstance(val, str):
-                val = encode_string(val, encodings)
+                val = _encode_and_validate_string(elem.VR, val, encodings)
 
         if len(val) % 2 != 0:
             val = val + b' '  # pad to even length
@@ -1097,9 +1106,10 @@ def dcmwrite(
             write_file_meta_info(
                 fp, dataset.file_meta, enforce_standard=not write_like_original
             )
-            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
+            tsyntax = cast(UID, getattr(
+                dataset.file_meta, "TransferSyntaxUID", None))
 
-        if (tsyntax == DeflatedExplicitVRLittleEndian):
+        if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
             # when writing, the entire dataset following
             #     the file metadata is prepared the normal way,

@@ -945,7 +945,7 @@ class TestNumpy_PaletteColor:
         with pytest.raises(ValueError, match=msg):
             apply_color_lut(ds.pixel_array)
 
-    def test_palette_unknown_raises(self):
+    def test_palette_unknown_raises(self, disable_value_validation):
         """Test using an unknown `palette` raise an exception."""
         ds = dcmread(PAL_08_256_0_16_1F)
         # Palette name
@@ -958,7 +958,7 @@ class TestNumpy_PaletteColor:
         with pytest.raises(ValueError, match=msg):
             apply_color_lut(ds.pixel_array, palette='1.2.840.10008.1.1')
 
-    def test_palette_unavailable_raises(self):
+    def test_palette_unavailable_raises(self, disable_value_validation):
         """Test using a missing `palette` raise an exception."""
         os.rename(self.o_palette, self.n_palette)
         ds = dcmread(PAL_08_256_0_16_1F)
@@ -1145,7 +1145,7 @@ class TestNumpy_PaletteColor:
         assert 32768 == rgba[:, :, 3][0, 0]
         assert (32768 == rgba[:, :, 3]).any()
 
-    def test_well_known_palette(self):
+    def test_well_known_palette(self, disable_value_validation):
         """Test using a well-known palette."""
         ds = dcmread(PAL_08_256_0_16_1F)
         # Drop it to 8-bit

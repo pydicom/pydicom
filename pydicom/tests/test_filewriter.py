@@ -2527,7 +2527,7 @@ class TestWriteText:
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
 
-    def test_invalid_encoding(self, allow_invalid_values):
+    def test_invalid_encoding(self, allow_writing_invalid_values):
         """Test encoding text with invalid encodings"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
@@ -2550,9 +2550,10 @@ class TestWriteText:
             write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
             assert expected == fp.getvalue()
 
-    def test_invalid_encoding_enforce_standard(self, enforce_valid_values):
+    def test_invalid_encoding_enforce_standard(
+            self, enforce_writing_invalid_values):
         """Test encoding text with invalid encodings with
-        `config.enforce_valid_values` enabled"""
+        `config.settings.reading_validation_mode` is RAISE"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value

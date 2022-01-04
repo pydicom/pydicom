@@ -3,11 +3,20 @@ Version 2.3.0
 
 Changes
 -------
+* Updated the private dictionary
+* :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
+  :attr:`~pydicom.config.settings.reading_validation_mode`
 
 Enhancements
 ------------
+* Values are now validated for valid length, allowed character set and format
+  on reading and writing. Depending on the value of
+  :attr:`~pydicom.config.settings.reading_validation_mode`
+  and :attr:`~pydicom.config.settings.writing_validation_mode`
+  a warning is logged, an exception is raised, or the validation is skipped.
 
 Fixes
 -----
 
 * Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
+* Fixed Hologic private dictionary entry (0019xx43)

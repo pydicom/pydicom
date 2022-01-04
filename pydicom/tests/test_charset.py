@@ -98,14 +98,14 @@ class TestCharset:
         ds.decode()
         assert 'CompressedSamples^CT1' == ds.PatientName
 
-    def test_invalid_character_set(self, allow_invalid_values):
+    def test_invalid_character_set(self, allow_reading_invalid_values):
         """charset: replace invalid encoding with default encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
-        ds.SpecificCharacterSet = 'Unsupported'
+        ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.warns(
             UserWarning,
-            match=("Unknown encoding 'Unsupported' "
+            match=("Unknown encoding 'UNSUPPORTED' "
                    "- using default encoding instead")
         ):
             ds.decode()
@@ -115,9 +115,9 @@ class TestCharset:
         """charset: raise on invalid encoding"""
         ds = dcmread(get_testdata_file("CT_small.dcm"))
         ds.read_encoding = None
-        ds.SpecificCharacterSet = 'Unsupported'
+        ds.SpecificCharacterSet = "UNSUPPORTED"
         with pytest.raises(LookupError,
-                           match="Unknown encoding 'Unsupported'"):
+                           match="Unknown encoding 'UNSUPPORTED'"):
             ds.decode()
 
     def test_decoding_with_specific_tags(self):
@@ -149,7 +149,7 @@ class TestCharset:
         pydicom.charset.decode_element(elem, None)
         assert ('iso8859',) == elem.value.encodings
 
-    def test_bad_encoded_single_encoding(self, allow_invalid_values):
+    def test_bad_encoded_single_encoding(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -162,7 +162,7 @@ class TestCharset:
     def test_bad_encoded_single_encoding_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        config.enforce_valid_values is set"""
+        config.settings.reading_validation_mode is RAISE."""
         elem = DataElement(0x00100010, 'PN',
                            b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'utf.?8' codec can't decode byte 0xc4 in position 0: "
@@ -207,7 +207,8 @@ class TestCharset:
         encodings = None
         assert ['iso8859'] == pydicom.charset.convert_encodings(encodings)
 
-    def test_bad_decoded_multi_byte_encoding(self, allow_invalid_values):
+    def test_bad_decoded_multi_byte_encoding(
+            self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -220,7 +221,7 @@ class TestCharset:
     def test_bad_decoded_multi_byte_encoding_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        `config.enforce_valid_values` is set"""
+        `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b$(D\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         msg = ("'iso2022_jp_2' codec can't decode byte 0xc4 in position 4: "
@@ -228,7 +229,7 @@ class TestCharset:
         with pytest.raises(UnicodeDecodeError, match=msg):
             pydicom.charset.decode_element(elem, ['ISO 2022 IR 159'])
 
-    def test_unknown_escape_sequence(self, allow_invalid_values):
+    def test_unknown_escape_sequence(self, allow_reading_invalid_values):
         """Test handling bad encoding for single encoding"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
@@ -241,14 +242,14 @@ class TestCharset:
     def test_unknown_escape_sequence_enforce_standard(
             self, enforce_valid_values):
         """Test handling bad encoding for single encoding if
-        `config.enforce_valid_values` is set"""
+        `config.settings.reading_validation_mode` is RAISE"""
         elem = DataElement(0x00100010, 'PN',
                            b'\x1b\x2d\x46\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
         with pytest.raises(ValueError, match='Found unknown escape sequence '
                                              'in encoded string value'):
             pydicom.charset.decode_element(elem, ['ISO_IR 100'])
 
-    def test_patched_charset(self, allow_invalid_values):
+    def test_patched_charset(self, allow_reading_invalid_values):
         """Test some commonly misspelled charset values"""
         elem = DataElement(0x00100010, 'PN', b'Buc^J\xc3\xa9r\xc3\xb4me')
         pydicom.charset.decode_element(elem, ['ISO_IR 192'])
@@ -435,7 +436,7 @@ class TestCharset:
         # we expect UTF-8 encoding here
         assert b'Buc^J\xc3\xa9r\xc3\xb4me' == ds_out.get_item(0x00100010).value
 
-    def test_invalid_second_encoding(self, allow_invalid_values):
+    def test_invalid_second_encoding(self, allow_reading_invalid_values):
         # regression test for #850
         elem = DataElement(0x00100010, 'PN', 'CITIZEN')
         with pytest.warns(UserWarning,

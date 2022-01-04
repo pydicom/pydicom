@@ -5,7 +5,8 @@
 
 import logging
 import os
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from contextlib import contextmanager
+from typing import Optional, Dict, Any, TYPE_CHECKING, Generator
 
 have_numpy = True
 try:
@@ -25,10 +26,13 @@ if TYPE_CHECKING:  # pragma: no cover
         ) -> "RawDataElement": ...
 
 
+_use_future = False
+_use_future_env = os.getenv("PYDICOM_FUTURE")
+
 # Set the type used to hold DS values
 #    default False; was decimal-based in pydicom 0.9.7
-use_DS_decimal = False
-"""Set using :func:`~pydicom.config.DS_decimal` to control if elements with a
+use_DS_decimal: bool = False
+"""Set using :func:`DS_decimal` to control if elements with a
 VR of **DS** are represented as :class:`~decimal.Decimal`.
 
 Default ``False``.
@@ -129,7 +133,7 @@ def DS_decimal(use_Decimal_boolean: bool = True) -> None:
 
 # Configuration flags
 use_DS_numpy = False
-"""Set using the function :func:`~pydicom.config.DS_numpy` to control
+"""Set using the function :func:`DS_numpy` to control
 whether arrays of VR **DS** are returned as numpy arrays.
 Default: ``False``.
 
@@ -152,14 +156,102 @@ precision of digits and rounding.
 Default ``False``.
 """
 
+
 enforce_valid_values = False
-"""Raise exceptions if any value is not allowed by DICOM Standard.
-
-e.g. DS strings that are longer than 16 characters; IS strings outside
-the allowed range.
-
-Default ``False``.
+"""Deprecated.
+Use :attr:`Settings.reading_validation_mode` instead.
 """
+
+
+# Constants used to define how data element values shall be validated
+IGNORE = 0
+"""If one of the validation modes is set to this value, no value validation
+will be performed.
+"""
+
+WARN = 1
+"""If one of the validation modes is set to this value, a warning is issued if
+a value validation error occurs.
+"""
+
+RAISE = 2
+"""If one of the validation modes is set to this value, an exception is raised
+if a value validation error occurs.
+"""
+
+
+class Settings:
+    """Collection of several configuration values.
+    Accessed via the singleton :attr:`settings`.
+
+    .. versionadded:: 2.3
+    """
+
+    def __init__(self) -> None:
+        self._reading_validation_mode: Optional[int] = None
+        # in future version, writing invalid values will raise by default,
+        # currently the default value depends on enforce_valid_values
+        self._writing_validation_mode: Optional[int] = (
+            RAISE if _use_future else None
+        )
+
+    @property
+    def reading_validation_mode(self) -> int:
+        """Defines behavior of validation while reading values, compared with
+        the DICOM standard, e.g. that DS strings are not longer than
+        16 characters and contain only allowed characters.
+        The default (:attr:`WARN`) is to issue a warning in the case of
+        an invalid value, :attr:`RAISE` will raise an error in this
+        case, and :attr:`IGNORE` will bypass the
+        validation (with the exception of some encoding errors).
+        """
+        # upwards compatibility
+        if self._reading_validation_mode is None:
+            return RAISE if enforce_valid_values else WARN
+        return self._reading_validation_mode
+
+    @reading_validation_mode.setter
+    def reading_validation_mode(self, value: int) -> None:
+        self._reading_validation_mode = value
+
+    @property
+    def writing_validation_mode(self) -> int:
+        """Defines behavior for value validation while writing a value.
+        See :attr:`Settings.reading_validation_mode`.
+        """
+        if self._writing_validation_mode is None:
+            return RAISE if enforce_valid_values else WARN
+        return self._writing_validation_mode
+
+    @writing_validation_mode.setter
+    def writing_validation_mode(self, value: int) -> None:
+        self._writing_validation_mode = value
+
+
+settings = Settings()
+"""The global configuration object of type :class:`Settings` to access some
+of the settings. More settings may move here in later versions.
+
+.. versionadded:: 2.3
+"""
+
+
+@contextmanager
+def disable_value_validation() -> Generator:
+    """Context manager to temporarily disable value validation
+    both for reading and writing.
+    Can be used for performance reasons if the values are known to be valid.
+    """
+    reading_mode = settings._reading_validation_mode
+    writing_mode = settings._writing_validation_mode
+    try:
+        settings.reading_validation_mode = IGNORE
+        settings.writing_validation_mode = IGNORE
+        yield
+    finally:
+        settings._reading_validation_mode = reading_mode
+        settings._writing_validation_mode = writing_mode
+
 
 convert_wrong_length_to_UN = False
 """Convert a field VR to "UN" and return bytes if bytes length is invalid.
@@ -202,11 +294,11 @@ not DICOM conformant and would lead to a failure if accessing it.
 
 show_file_meta = True
 """
-.. versionadded:: 2.0
-
 If ``True`` (default), the 'str' and 'repr' methods
 of :class:`~pydicom.dataset.Dataset` begin with a separate section
 displaying the file meta information data elements
+
+.. versionadded:: 2.0
 """
 
 # Logging system and debug function to change logging level
@@ -430,9 +522,6 @@ def debug(debug_on: bool = True, default_handler: bool = True) -> None:
 # force level=WARNING, in case logging default is set differently (issue 103)
 debug(False, False)
 
-_use_future = False
-_use_future_env = os.getenv("PYDICOM_FUTURE")
-
 if _use_future_env:
     if _use_future_env.lower() in ["true", "yes", "on", "1"]:
         _use_future = True
@@ -462,8 +551,8 @@ def future_behavior(enable_future: bool = True) -> None:
 
     See also
     --------
-    :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR`
-    :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR`
+    :attr:`INVALID_KEYWORD_BEHAVIOR`
+    :attr:`INVALID_KEY_BEHAVIOR`
 
     """
     global _use_future, INVALID_KEYWORD_BEHAVIOR
@@ -471,9 +560,11 @@ def future_behavior(enable_future: bool = True) -> None:
     if enable_future:
         _use_future = True
         INVALID_KEYWORD_BEHAVIOR = "RAISE"
+        settings._writing_validation_mode = RAISE
     else:
         _use_future = False
         INVALID_KEYWORD_BEHAVIOR = "WARN"
+        settings._writing_validation_mode = None
 
 
 if _use_future:

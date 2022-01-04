@@ -10,6 +10,7 @@ import math
 import sys
 from typing import Union
 
+from pydicom.config import settings
 from pydicom.tag import Tag
 from pydicom.values import convert_value
 
@@ -28,25 +29,18 @@ badvr_name = get_testdata_file("badVR.dcm")
 default_encoding = "iso8859"
 
 
-@pytest.fixture()
-def enforce_valid_true_fixture():
-    """Fixture to run tests with enforce_valid_values True and ensure it is
-       reset afterwards regardless of whether test succeeds."""
-    enforce_flag_original = config.enforce_valid_values
-    config.enforce_valid_values = True
-    yield
-    config.enforce_valid_values = enforce_flag_original
-
-
 @pytest.fixture(params=(True, False))
 def enforce_valid_both_fixture(request):
     """Fixture to run tests with enforce_valid_values with both True and False
        and ensure it is reset afterwards regardless of whether test succeeds.
     """
-    enforce_flag_original = config.enforce_valid_values
-    config.enforce_valid_values = request.param
+    orig_reading_validation_mode = settings.reading_validation_mode
+    settings.reading_validation_mode = (
+        config.RAISE if request.param
+        else config.WARN
+    )
     yield
-    config.enforce_valid_values = enforce_flag_original
+    settings.reading_validation_mode = orig_reading_validation_mode
 
 
 class TestTM:
@@ -568,7 +562,7 @@ class TestDSfloat:
         assert str(x) == '3.14159265358979'
         assert repr(x) == repr('3.14159265358979')
 
-    def test_auto_format_from_invalid_DS(self):
+    def test_auto_format_from_invalid_DS(self, disable_value_validation):
         """Test truncating floats"""
         # A DSfloat that has a non-valid string representation
         x = DSfloat(math.pi)
@@ -602,10 +596,11 @@ class TestDSfloat:
         assert str(x) == '1.234e-1'
         assert repr(x) == repr("1.234e-1")
 
-    def test_enforce_valid_values_length(self, enforce_valid_true_fixture):
+    def test_enforce_valid_values_length(self):
         """Test that errors are raised when length is too long."""
         with pytest.raises(OverflowError):
-            valuerep.DSfloat('3.141592653589793')
+            valuerep.DSfloat('3.141592653589793',
+                             validation_mode=config.RAISE)
 
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
@@ -626,11 +621,11 @@ class TestDSfloat:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[float, str], enforce_valid_true_fixture
+        self, val: Union[float, str]
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSfloat(val)
+            valuerep.DSfloat(val, validation_mode=config.RAISE)
 
     def test_comparison_operators(self):
         """Tests for the comparison operators"""
@@ -675,6 +670,13 @@ class TestDSfloat:
 
 
 class TestDSdecimal:
+    @pytest.fixture
+    def allow_ds_float(self):
+        old_value = config.allow_DS_float
+        config.allow_DS_float = True
+        yield
+        config.allow_DS_float = old_value
+
     """Unit tests for pickling DSdecimal"""
     def test_pickling(self):
         # Check that a pickled DSdecimal is read back properly
@@ -687,13 +689,12 @@ class TestDSdecimal:
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
-    def test_float_value(self):
+    def test_float_value(self, allow_ds_float):
+        assert 9 == DSdecimal(9.0)
         config.allow_DS_float = False
         msg = "cannot be instantiated with a float value"
         with pytest.raises(TypeError, match=msg):
             DSdecimal(9.0)
-        config.allow_DS_float = True
-        assert 9 == DSdecimal(9.0)
 
     def test_new_empty(self):
         """Test passing an empty value."""
@@ -724,7 +725,7 @@ class TestDSdecimal:
         assert Decimal("1.2345") == y
         assert "1.2345" == y.original_string
 
-    def test_DSdecimal(self):
+    def test_DSdecimal(self, allow_ds_float):
         """Test creating a value using DSdecimal."""
         x = DSfloat('1.2345')
         y = DSdecimal(x)
@@ -736,6 +737,18 @@ class TestDSdecimal:
         x = DSdecimal('1.2345')
         assert repr(x) == repr('1.2345')
 
+    def test_string_too_long(self):
+        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
+               "characters long. Use a smaller string, *")
+        with pytest.warns(UserWarning, match=msg):
+            x = DSdecimal(Decimal(math.pi), auto_format=False)
+
+    def test_string_too_long_raises(self, enforce_valid_values):
+        msg = ("Values for elements with a VR of 'DS' values must be <= 16 "
+               "characters long. Use a smaller string, *")
+        with pytest.raises(OverflowError, match=msg):
+            x = DSdecimal(Decimal(math.pi), auto_format=False)
+
     def test_auto_format(self, enforce_valid_both_fixture):
         """Test truncating decimal"""
         x = DSdecimal(Decimal(math.pi), auto_format=True)
@@ -746,7 +759,8 @@ class TestDSdecimal:
         assert str(x) == '3.14159265358979'
         assert repr(x) == repr("3.14159265358979")
 
-    def test_auto_format_from_invalid_DS(self):
+    def test_auto_format_from_invalid_DS(self, allow_ds_float,
+                                         disable_value_validation):
         """Test truncating floats"""
         # A DSdecimal that has a non-valid string representation
         x = DSdecimal(math.pi)
@@ -778,11 +792,12 @@ class TestDSdecimal:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[Decimal, str], enforce_valid_true_fixture
+        self, val: Union[Decimal, str]
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
-            valuerep.DSdecimal(val)
+            valuerep.DSdecimal(val,
+                               validation_mode=config.RAISE)
 
     def test_auto_format_valid_string(self, enforce_valid_both_fixture):
         """If the user supplies a valid string, this should not be altered."""
@@ -794,7 +809,7 @@ class TestDSdecimal:
         assert str(x) == '1.234e-1'
         assert repr(x) == repr("1.234e-1")
 
-    def test_DSdecimal_auto_format(self):
+    def test_DSdecimal_auto_format(self, allow_ds_float):
         """Test creating a value using DSdecimal copies auto_format"""
         x = DSdecimal(math.pi, auto_format=True)
         y = DSdecimal(x)
@@ -805,7 +820,7 @@ class TestDSdecimal:
         assert str(y) == '3.14159265358979'
         assert repr(y) == repr("3.14159265358979")
 
-    def test_comparison_operators(self):
+    def test_comparison_operators(self, allow_ds_float):
         """Tests for the comparison operators"""
         decimal_decimal = DSdecimal(Decimal(1234.5))
         for val in (DSdecimal("1234.5"), DSdecimal(1234.5), decimal_decimal):
@@ -841,7 +856,7 @@ class TestDSdecimal:
             with pytest.raises(TypeError, match="'>=' not supported"):
                 val >= "1233"
 
-    def test_hash(self):
+    def test_hash(self, allow_ds_float, disable_value_validation):
         """Test hash(DSdecimal)"""
         assert hash(DSdecimal(1.2345)) == hash(Decimal(1.2345))
         assert hash(DSdecimal('1.2345')) == hash(Decimal('1.2345'))
@@ -860,13 +875,13 @@ class TestIS:
         assert IS('1 ') == 1
         assert IS(' 1 ') == 1
 
-    def test_valid_value(self):
+    def test_valid_value(self, disable_value_validation):
         assert 42 == IS(42)
         assert 42 == IS("42")
         assert 42 == IS("42.0")
         assert 42 == IS(42.0)
 
-    def test_invalid_value(self):
+    def test_invalid_value(self, disable_value_validation):
         with pytest.raises(TypeError, match="Could not convert value"):
             IS(0.9)
         with pytest.raises(TypeError, match="Could not convert value"):
@@ -883,7 +898,7 @@ class TestIS:
         assert x.real == x2.real
         assert x.original_string == x2.original_string
 
-    def test_longint(self, allow_invalid_values):
+    def test_longint(self, allow_reading_invalid_values):
         # Check that a long int is read properly
         # Will not work with enforce_valid_values
         x = IS(3103050000)
@@ -891,16 +906,17 @@ class TestIS:
         x2 = pickle.loads(data1_string)
         assert x.real == x2.real
 
-    def test_overflow(self, enforce_valid_values):
+    def test_overflow(self):
         msg = (
             r"Elements with a VR of IS must have a value between -2\*\*31 "
-            r"and \(2\*\*31 - 1\). Set 'config.enforce_valid_values' to False "
+            r"and \(2\*\*31 - 1\). Set "
+            r"'config.settings.reading_validation_mode' to 'WARN' "
             r"to override the value check"
         )
         with pytest.raises(OverflowError, match=msg):
-            IS(3103050000)
+            IS(3103050000, validation_mode=config.RAISE)
 
-    def test_str(self):
+    def test_str(self, disable_value_validation):
         """Test IS.__str__()."""
         val = IS(1)
         assert str(val) == '1'
@@ -911,7 +927,7 @@ class TestIS:
         val = IS("1.0")
         assert str(val) == '1.0'
 
-    def test_repr(self):
+    def test_repr(self, disable_value_validation):
         """Test IS.__repr__()."""
         val = IS(1)
         assert repr(val) == repr('1')
@@ -982,7 +998,7 @@ class TestBadValueRead:
     def teardown(self):
         pydicom.values.convert_retry_VR_order = self.default_retry_order
 
-    def test_read_bad_value_in_VR_default(self, allow_invalid_values):
+    def test_read_bad_value_in_VR_default(self, disable_value_validation):
         # found a conversion
         assert "1A" == convert_value("SH", self.tag)
         # converted with fallback vr "SH"
@@ -1024,11 +1040,11 @@ class TestDecimalString:
         assert isinstance(ds, valuerep.DSdecimal)
         assert len(str(ds)) <= 16
 
-    def test_invalid_decimal_strings(self, enforce_valid_values):
+    def test_invalid_decimal_strings(self):
         # Now the input string truly is invalid
         invalid_string = "-9.813386743e-006"
-        with pytest.raises(OverflowError):
-            valuerep.DS(invalid_string)
+        with pytest.raises(ValueError):
+            valuerep.DS(invalid_string, validation_mode=config.RAISE)
 
 
 class TestPersonName:
@@ -1511,7 +1527,7 @@ VALUE_REFERENCE = [
 
 
 @pytest.mark.parametrize("vr, pytype, vm0, vmN, keyword", VALUE_REFERENCE)
-def test_set_value(vr, pytype, vm0, vmN, keyword):
+def test_set_value(vr, pytype, vm0, vmN, keyword, disable_value_validation):
     """Test that element values are set consistently"""
     # Test VM = 0
     ds = Dataset()
