@@ -842,9 +842,9 @@ def DataElement_from_raw(
                 if config.settings.reading_validation_mode == config.RAISE:
                     raise KeyError(msg + " can't look up VR")
 
-                VR = VR._UN
+                vr = VR_.UN
                 warnings.warn(msg + " - setting VR to 'UN'")
-    elif VR == VR_.UN and config.replace_un_with_known_vr:
+    elif vr == VR_.UN and config.replace_un_with_known_vr:
         # handle rare case of incorrectly set 'UN' in explicit encoding
         # see also DataElement.__init__()
         if raw.tag.is_private:

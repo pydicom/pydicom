@@ -756,12 +756,12 @@ def convert_value(
     # Not only two cases. Also need extra info if is a raw sequence
     # Pass all encodings to the converter if needed
     try:
-        if VR in CUSTOMIZABLE_CHARSET_VR:
-            # SH, LO, ST, LT, UC, UT
-            return converter(byte_string, encodings, VR)
-
-        if VR == "PN":
+        if VR == VR_.PN:
             return converter(byte_string, encodings)
+
+        if VR in CUSTOMIZABLE_CHARSET_VR:
+            # SH, LO, ST, LT, UC, UT - PN already done
+            return converter(byte_string, encodings, VR)
 
         if VR != VR_.SQ:
             return converter(byte_string, is_little_endian, num_format)

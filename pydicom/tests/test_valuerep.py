@@ -11,6 +11,7 @@ import math
 import sys
 from typing import Union
 
+import pytest
 
 import pydicom
 from pydicom import config, valuerep

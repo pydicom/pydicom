@@ -11,9 +11,7 @@ import warnings
 import zlib
 
 from pydicom import config
-from pydicom.charset import (
-    default_encoding, text_VRs, convert_encodings, encode_string
-)
+from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
