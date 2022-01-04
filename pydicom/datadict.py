@@ -417,8 +417,8 @@ def dictionary_has_tag(tag: TagType, convert: bool = False) -> bool:
     Parameters
     ----------
     tag : int or str or Tuple[int, int]
-        The tag to check, as :class:`int` (if `convert` is ``True``), otherwise
-        in any of the forms accepted by :func:`~pydicom.tag.Tag`.
+        The tag to check, as :class:`int` (if `convert` is ``False``),
+        otherwise in any of the forms accepted by :func:`~pydicom.tag.Tag`.
     convert : bool
         If ``False`` (default) then `tag` must be :class:`int` and will
         perform the fastest lookup, otherwiseIf `tag` will be converted
