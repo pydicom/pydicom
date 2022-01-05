@@ -517,7 +517,7 @@ class DataElement:
                               validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
-        """Convert `val` to an appropriate type for the element's VR_."""
+        """Convert `val` to an appropriate type for the element's VR."""
         # If the value is bytes and has a VR that can only be encoded
         # using the default character repertoire, convert it to a string
         if self.VR in DEFAULT_CHARSET_VR and isinstance(val, bytes):
