@@ -249,9 +249,10 @@ def get_entry(tag: TagType) -> Tuple[str, str, str, str, str]:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose entry is to be retrieved. Only entries
-        in the official DICOM dictionary will be checked, not entries in the
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose entry is to be retrieved, in any of the
+        forms accepted by :func:`~pydicom.tag.Tag`. Only entries in the
+        official DICOM dictionary will be checked, not entries in the
         private dictionary.
 
     Returns
@@ -292,8 +293,9 @@ def dictionary_is_retired(tag: TagType) -> bool:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose retirement status is being checked.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose retirement status is being checked, in
+        any of the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -306,9 +308,7 @@ def dictionary_is_retired(tag: TagType) -> bool:
     KeyError
         If the tag is not present in the DICOM data dictionary.
     """
-    if 'retired' in get_entry(tag)[3].lower():
-        return True
-    return False
+    return 'retired' in get_entry(tag)[3].lower()
 
 
 def dictionary_VR(tag: TagType) -> str:
@@ -318,9 +318,9 @@ def dictionary_VR(tag: TagType) -> str:
 
     Parameters
     ----------
-    tag : int
+    tag : int or str or Tuple[int, int]
         The tag for the element whose value representation (VR) is being
-        retrieved.
+        retrieved, in any of the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -342,9 +342,9 @@ def dictionary_VM(tag: TagType) -> str:
 
     Parameters
     ----------
-    tag : int
+    tag : int or str or Tuple[int, int]
         The tag for the element whose value multiplicity (VM) is being
-        retrieved.
+        retrieved, in any of the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -366,8 +366,9 @@ def dictionary_description(tag: TagType) -> str:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose description is being retrieved.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose description is being retrieved, in any
+        of the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -389,8 +390,9 @@ def dictionary_keyword(tag: TagType) -> str:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose keyword is being retrieved.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose keyword is being retrieved, in any of
+        the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -410,8 +412,9 @@ def dictionary_has_tag(tag: TagType) -> bool:
 
     Parameters
     ----------
-    tag : int
-        The tag to check.
+    tag : int or str or Tuple[int, int]
+        The tag to check, in any of the forms accepted by
+        :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -419,7 +422,10 @@ def dictionary_has_tag(tag: TagType) -> bool:
         ``True`` if the tag corresponds to an element present in the official
         DICOM data dictionary, ``False`` otherwise.
     """
-    return (tag in DicomDictionary)
+    try:
+        return Tag(tag) in DicomDictionary
+    except Exception:
+        return False
 
 
 def keyword_for_tag(tag: TagType) -> str:
@@ -427,8 +433,9 @@ def keyword_for_tag(tag: TagType) -> str:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose keyword is being retrieved.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose keyword is being retrieved, in any of
+        the forms accepted by :func:`~pydicom.tag.Tag`.
 
     Returns
     -------
@@ -514,9 +521,10 @@ def get_private_entry(
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose entry is to be retrieved. Only entries
-        in the private dictionary will be checked.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose entry is to be retrieved, in any of the
+        forms accepted by :func:`~pydicom.tag.Tag`. Only entries in the
+        private dictionary will be checked.
     private_creator : str
         The name of the private creator.
 
@@ -574,9 +582,9 @@ def private_dictionary_VR(tag: TagType, private_creator: str) -> str:
 
     Parameters
     ----------
-    tag : int
+    tag : int or str or Tuple[int, int]
         The tag for the element whose value representation (VR) is being
-        retrieved.
+        retrieved, in any of the forms accepted by :func:`~pydicom.tag.Tag`.
     private_creator : str
         The name of the private creator.
 
@@ -598,9 +606,9 @@ def private_dictionary_VM(tag: TagType, private_creator: str) -> str:
 
     Parameters
     ----------
-    tag : int
+    tag : int or str or Tuple[int, int]
         The tag for the element whose value multiplicity (VM) is being
-        retrieved.
+        retrieved, in any of the forms accepted by :func:`~pydicom.tag.Tag`.
     private_creator : str
         The name of the private creator.
 
@@ -622,8 +630,9 @@ def private_dictionary_description(tag: TagType, private_creator: str) -> str:
 
     Parameters
     ----------
-    tag : int
-        The tag for the element whose description is being retrieved.
+    tag : int or str or Tuple[int, int]
+        The tag for the element whose description is being retrieved, in any
+        of the forms accepted by :func:`~pydicom.tag.Tag`.
     private_creator : str
         The name of the private createor.
 

@@ -30,6 +30,8 @@ class TestDict:
         """Test dictionary_has_tag"""
         assert dictionary_has_tag(0x00100010)
         assert not dictionary_has_tag(0x11110010)
+        assert dictionary_has_tag("PatientName")
+        assert not dictionary_has_tag("PatientMane")
 
     def test_repeater_has_tag(self):
         """Test repeater_has_tag"""
