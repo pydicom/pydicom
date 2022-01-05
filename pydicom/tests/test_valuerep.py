@@ -5,24 +5,26 @@
 import copy
 from datetime import datetime, date, time, timedelta, timezone
 from decimal import Decimal
+from itertools import chain
 import pickle
 import math
 import sys
 from typing import Union
 
-from pydicom.config import settings
-from pydicom.tag import Tag
-from pydicom.values import convert_value
-
-import pydicom
-from pydicom import config
-from pydicom import valuerep
-from pydicom.data import get_testdata_file
-from pydicom.dataset import Dataset
-from pydicom.valuerep import DS, IS, DSfloat, DSdecimal
 import pytest
 
-from pydicom.valuerep import PersonName
+import pydicom
+from pydicom import config, valuerep
+from pydicom.config import settings
+from pydicom.data import get_testdata_file
+from pydicom.dataset import Dataset
+from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
+from pydicom.tag import Tag
+from pydicom.valuerep import (
+    DS, IS, DSfloat, DSdecimal, PersonName, VR, STANDARD_VR,
+    AMBIGUOUS_VR, STR_VR, BYTES_VR, FLOAT_VR, INT_VR, LIST_VR
+)
+from pydicom.values import convert_value
 
 
 badvr_name = get_testdata_file("badVR.dcm")
@@ -1575,3 +1577,19 @@ def test_assigning_bytes(vr, pytype, vm0, vmN, keyword):
         assert elem.VR == vr
         assert elem.value == value
         assert elem.VM == 1
+
+
+class TestVR:
+    def test_behavior(self):
+        """Test that VR class behaves as expected"""
+        assert isinstance(VR.AE, str)
+        assert VR.AE == "AE"
+        assert VR.US_SS_OW == "US or SS or OW"
+
+    def test_all_present(self):
+        """Test all VRs are configured"""
+        elem = chain(DicomDictionary.values(), RepeatersDictionary.values())
+        ref = {v[0] for v in elem} - {"NONE"}
+        assert ref == STANDARD_VR | AMBIGUOUS_VR
+        # Test all have Python built-in
+        assert STANDARD_VR == BYTES_VR | FLOAT_VR | INT_VR | LIST_VR | STR_VR

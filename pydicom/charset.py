@@ -1,4 +1,4 @@
-# Copyright 2008-2020 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Handle alternate character sets for character strings."""
 
 import codecs
@@ -10,7 +10,9 @@ from typing import (
 import warnings
 
 from pydicom import config
-from pydicom.valuerep import text_VRs, TEXT_VR_DELIMS, PersonName
+from pydicom.valuerep import (
+    TEXT_VR_DELIMS, PersonName, VR, CUSTOMIZABLE_CHARSET_VR
+)
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataelem import DataElement
@@ -833,7 +835,7 @@ def decode_element(
 
     # decode the string value to unicode
     # PN is special case as may have 3 components with different chr sets
-    if elem.VR == "PN":
+    if elem.VR == VR.PN:
         if elem.VM == 1:
             # elem.value: Union[PersonName, bytes]
             elem.value = cast(PersonName, elem.value).decode(encodings)
@@ -842,7 +844,8 @@ def decode_element(
             elem.value = [
                 cast(PersonName, vv).decode(encodings) for vv in elem.value
             ]
-    elif elem.VR in text_VRs:
+    elif elem.VR in CUSTOMIZABLE_CHARSET_VR:
+        # You can't re-decode unicode (string literals in py3)
         if elem.VM == 1:
             if isinstance(elem.value, str):
                 # already decoded

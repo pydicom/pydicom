@@ -135,25 +135,25 @@ class TestDataElement:
         assert self.data_elementRetired.is_retired is True
         assert self.data_elementPrivate.is_retired is False
 
-    def test_description_group_length(self):
-        """Test DataElement.description for Group Length element"""
-        elem = DataElement(0x00100000, 'LO', "12345")
-        assert 'Group Length' == elem.description()
+    def test_name_group_length(self):
+        """Test DataElement.name for Group Length element"""
+        elem = DataElement(0x00100000, 'LO', 12345)
+        assert 'Group Length' == elem.name
 
-    def test_description_unknown_private(self):
-        """Test DataElement.description with an unknown private element"""
-        elem = DataElement(0x00110010, 'LO', "12345")
+    def test_name_unknown_private(self):
+        """Test DataElement.name with an unknown private element"""
+        elem = DataElement(0x00110010, 'LO', 12345)
         elem.private_creator = 'TEST'
-        assert 'Private tag data' == elem.description()
-        elem = DataElement(0x00110F00, 'LO', "12345")
+        assert 'Private tag data' == elem.name
+        elem = DataElement(0x00110F00, 'LO', 12345)
         assert elem.tag.is_private
         assert elem.private_creator is None
-        assert 'Private tag data' == elem.description()
+        assert 'Private tag data' == elem.name
 
-    def test_description_unknown(self):
-        """Test DataElement.description with an unknown element"""
-        elem = DataElement(0x00000004, 'LO', "12345")
-        assert '' == elem.description()
+    def test_name_unknown(self):
+        """Test DataElement.name with an unknown element"""
+        elem = DataElement(0x00000004, 'LO', 12345)
+        assert '' == elem.name
 
     def test_equality_standard_element(self):
         """DataElement: equality returns correct value for simple elements"""
@@ -924,10 +924,14 @@ class TestDataElementValidation:
         # no warning will be issued during reading, as only RawDataElement
         # objects are read
         ds = dcmread(fp, force=True)
-        assert 'AccessionNumber' in ds
 
-        # the length is 22 due to the padding byte
-        msg = r"The value length \(22\) exceeds the maximum length*"
-        with pytest.warns(UserWarning, match=msg):
-            # the warning is issued only as the value is accessed
-            assert ds.AccessionNumber == "洪^吉洞=홍^길동"
+
+def test_elem_description_deprecated():
+    """Test deprecation warning for DataElement.description()"""
+    elem = DataElement("PatientName", "PN", "Citizen^Jan")
+    msg = (
+        r"'DataElement.description\(\)' is deprecated and will be removed in "
+        r"v3.0, use 'DataElement.name' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        assert elem.description() == "Patient's Name"

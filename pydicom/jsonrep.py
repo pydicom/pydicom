@@ -1,4 +1,4 @@
-# Copyright 2008-2019 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Methods for converting Datasets and DataElements to/from json"""
 
 import base64
@@ -9,17 +9,13 @@ from typing import (
 )
 import warnings
 
+from pydicom.valuerep import FLOAT_VR, INT_VR, VR
+
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
 JSON_VALUE_KEYS = ('Value', 'BulkDataURI', 'InlineBinary')
-BINARY_VR_VALUES = [
-    'OB', 'OD', 'OF', 'OL', 'OV', 'OW', 'UN',
-    'OB or OW', 'US or OW', 'US or SS or OW'
-]
-VRs_TO_BE_FLOATS = ['DS', 'FD', 'FL']
-VRs_TO_BE_INTS = ['IS', 'SL', 'SS', 'SV', 'UL', 'US', 'UV', 'US or SS']
 
 
 def convert_to_python_number(value: Any, vr: str) -> Any:
@@ -53,9 +49,9 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
         return value
 
     number_type: Optional[Union[Type[int], Type[float]]] = None
-    if vr in VRs_TO_BE_INTS:
+    if vr in (INT_VR - {VR.AT}) | {VR.US_SS}:
         number_type = int
-    if vr in VRs_TO_BE_FLOATS:
+    if vr in FLOAT_VR:
         number_type = float
 
     if number_type is None:
@@ -182,7 +178,7 @@ class JsonDataElementConverter:
 
             val = cast(List[ValueType], self.value)
             element_value = [self.get_regular_element_value(v) for v in val]
-            if len(element_value) == 1 and self.vr != 'SQ':
+            if len(element_value) == 1 and self.vr != VR.SQ:
                 element_value = element_value[0]
 
             return convert_to_python_number(element_value, self.vr)
@@ -245,7 +241,7 @@ class JsonDataElementConverter:
         from pydicom.dataelem import empty_value_for_VR
 
         # Table F.2.3-1 has JSON type mappings
-        if self.vr == 'SQ':  # Dataset
+        if self.vr == VR.SQ:  # Dataset
             # May be an empty dict
             value = cast(Dict[str, Any], value)
             return self.get_sequence_item(value)
@@ -253,11 +249,11 @@ class JsonDataElementConverter:
         if value is None:
             return empty_value_for_VR(self.vr)
 
-        if self.vr == 'PN':  # str
+        if self.vr == VR.PN:  # str
             value = cast(Dict[str, str], value)
             return self.get_pn_element_value(value)
 
-        if self.vr == 'AT':  # Optional[int]
+        if self.vr == VR.AT:  # Optional[int]
             # May be an empty str
             value = cast(str, value)
             try:

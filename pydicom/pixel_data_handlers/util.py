@@ -16,6 +16,7 @@ except ImportError:
 
 from pydicom.data import get_palette_files
 from pydicom.uid import UID
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
@@ -254,7 +255,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
-        if item['LUTData'].VR == 'OW':
+        if item['LUTData'].VR == VR.OW:
             endianness = '<' if ds.is_little_endian else '>'
             unpack_fmt = '{}{}H'.format(endianness, nr_entries)
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
@@ -436,7 +437,7 @@ def apply_voi(
 
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
-    if item['LUTData'].VR == 'OW':
+    if item['LUTData'].VR == VR.OW:
         endianness = '<' if ds.is_little_endian else '>'
         unpack_fmt = f'{endianness}{nr_entries}H'
         unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))

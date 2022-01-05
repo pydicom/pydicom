@@ -25,7 +25,7 @@ An encoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def foo(src: bytes, **kwargs: Dict[str, Any]) -> bytes:
+      def foo(src: bytes, **kwargs: Any) -> bytes:
 
   Where
 

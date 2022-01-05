@@ -25,14 +25,14 @@ from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (
     write_data_element, write_dataset, correct_ambiguous_vr,
     write_file_meta_info, correct_ambiguous_vr_element, write_numbers,
-    write_PN, _format_DT, write_text, write_OWvalue
+    write_PN, _format_DT, write_text, write_OWvalue, writers
 )
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
                          PYDICOM_IMPLEMENTATION_UID)
 from pydicom.util.hexutil import hex2bytes
-from pydicom.valuerep import DA, DT, TM
+from pydicom.valuerep import DA, DT, TM, VR
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
@@ -2727,3 +2727,8 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.seek(0)
         ds = read_dataset(self.fp, False, False)
         assert 'UN' == ds[0x30040058].VR
+
+
+def test_all_writers():
+    """Test that the VR writer functions are complete"""
+    assert set(VR) == set(writers)

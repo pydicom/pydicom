@@ -900,8 +900,8 @@ class TestNumpy_ModalityLUT:
         assert ds.is_little_endian is True
         seq = ds.ModalityLUTSequence[0]
         assert [4096, -2048, 16] == seq.LUTDescriptor
-        seq.LUTData = pack('<4096H', *seq.LUTData)
         seq['LUTData'].VR = 'OW'
+        seq.LUTData = pack('<4096H', *seq.LUTData)
         arr = ds.pixel_array
         assert -2048 == arr.min()
         assert 4095 == arr.max()
