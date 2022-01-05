@@ -271,6 +271,9 @@
 <section id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.description" title="pydicom.dataelem.DataElement.description"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataElement.description</span></code></a> is
+deprecated and will be removed in v3.0, use
+<a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.name" title="pydicom.dataelem.DataElement.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.name</span></code></a> instead</p></li>
 <li><p>Updated the private dictionary</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is deprecated in favor of
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code></p></li>
@@ -284,6 +287,7 @@ on reading and writing. Depending on the value of
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code>
 and <code class="xref py py-attr docutils literal notranslate"><span class="pre">writing_validation_mode</span></code>
 a warning is logged, an exception is raised, or the validation is skipped.</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><code class="xref py py-class docutils literal notranslate"><span class="pre">VR</span></code></a> enum (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1500">#1500</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
