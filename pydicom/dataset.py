@@ -1712,7 +1712,12 @@ class Dataset:
         else:
             self.PixelData = encapsulate(encoded)
 
+        # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self['PixelData'].is_undefined_length = True
+
+        # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
+        self.is_implicit_VR = False
+        self.is_little_endian = True
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, 'file_meta'):
