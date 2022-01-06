@@ -1030,9 +1030,10 @@ def dcmwrite(
         tsyntax = None
 
     cls_name = dataset.__class__.__name__
+    encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
 
     # Ensure is_little_endian and is_implicit_VR are set
-    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
+    if None in encoding:
         if tsyntax and not tsyntax.is_private:
             dataset.is_little_endian = tsyntax.is_little_endian
             dataset.is_implicit_VR = tsyntax.is_implicit_VR
@@ -1044,7 +1045,7 @@ def dcmwrite(
                 "before saving"
             )
 
-    encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
+
     if tsyntax and not tsyntax.is_private:
         # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
         #   and native pixel data uses actual length
