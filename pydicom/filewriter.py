@@ -1045,7 +1045,6 @@ def dcmwrite(
                 "before saving"
             )
 
-
     if tsyntax and not tsyntax.is_private:
         # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
         #   and native pixel data uses actual length

@@ -23,7 +23,8 @@ The requirements for compressed *Pixel Data* in the DICOM Standard are:
   of encoded data is too large for the basic offset table then the use of
   the :func:`extended offset table <pydicom.encaps.encapsulate_extended>` is
   recommended.
-* A dataset with encapsulated data must use explicit VR, little endian encoding
+* A dataset with encapsulated pixel data must use explicit VR little endian
+  encoding
 
 See the :dcm:`relevant sections of the DICOM Standard<part05/sect_8.2.html>`
 for more information.
