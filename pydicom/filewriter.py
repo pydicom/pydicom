@@ -1024,33 +1024,41 @@ def dcmwrite(
         ``save_as()`` wraps ``dcmwrite()``.
     """
     tsyntax: Optional[UID]
-
-    # Ensure is_little_endian and is_implicit_VR are set
-    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
-        has_tsyntax = False
-        try:
-            tsyntax = dataset.file_meta.TransferSyntaxUID
-            if not tsyntax.is_private:
-                dataset.is_little_endian = tsyntax.is_little_endian
-                dataset.is_implicit_VR = tsyntax.is_implicit_VR
-                has_tsyntax = True
-        except AttributeError:
-            pass
-
-        if not has_tsyntax:
-            name = dataset.__class__.__name__
-            raise AttributeError(
-                f"'{name}.is_little_endian' and '{name}.is_implicit_VR' must "
-                f"be set appropriately before saving"
-            )
-
-    # Try and ensure that `is_undefined_length` is set correctly
     try:
         tsyntax = dataset.file_meta.TransferSyntaxUID
+    except AttributeError:
+        tsyntax = None
+
+    cls_name = dataset.__class__.__name__
+    encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
+
+    # Ensure is_little_endian and is_implicit_VR are set
+    if None in encoding:
+        if tsyntax is None:
+            raise AttributeError(
+                f"'{cls_name}.is_little_endian' and "
+                f"'{cls_name}.is_implicit_VR' must be set appropriately "
+                "before saving"
+            )
+
         if not tsyntax.is_private:
+            dataset.is_little_endian = tsyntax.is_little_endian
+            dataset.is_implicit_VR = tsyntax.is_implicit_VR
+
+    if tsyntax and not tsyntax.is_private:
+        # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
+        #   and native pixel data uses actual length
+        if "PixelData" in dataset:
             dataset['PixelData'].is_undefined_length = tsyntax.is_compressed
-    except (AttributeError, KeyError):
-        pass
+
+        # PS3.5 Annex A.4 - encapsulated datasets use Explicit VR Little
+        if tsyntax.is_compressed and encoding != (False, True):
+            warnings.warn(
+                "All encapsulated (compressed) transfer syntaxes must use "
+                "explicit VR little endian encoding for the dataset. Set "
+                f"'{cls_name}.is_little_endian = True' and '{cls_name}."
+                "is_implicit_VR = False' before saving"
+            )
 
     # Check that dataset's group 0x0002 elements are only present in the
     #   `dataset.file_meta` Dataset - user may have added them to the wrong

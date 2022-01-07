@@ -23,6 +23,8 @@ The requirements for compressed *Pixel Data* in the DICOM Standard are:
   of encoded data is too large for the basic offset table then the use of
   the :func:`extended offset table <pydicom.encaps.encapsulate_extended>` is
   recommended.
+* A dataset with encapsulated pixel data must use explicit VR little endian
+  encoding
 
 See the :dcm:`relevant sections of the DICOM Standard<part05/sect_8.2.html>`
 for more information.
@@ -49,6 +51,12 @@ for more information.
 
     # Basic encapsulation
     ds.PixelData = encapsulate(frames)
+
+    # Set the dataset encoding
+    ds.is_little_endian = True
+    ds.is_implicit_VR = False
+
+    # Save!
     ds.save_as("CT_small_compressed_basic.dcm")
 
     # Extended encapsulation
@@ -111,6 +119,7 @@ A specific encoding plugin can be used by passing the plugin name via the
 
 .. code-block:: python
 
+    # Will set `ds.is_little_endian` and `ds.is_implicit_VR` automatically
     ds.compress(RLELossless, encoding_plugin='pylibjpeg')
     ds.save_as("CT_small_rle.dcm")
 
