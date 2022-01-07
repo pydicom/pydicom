@@ -1034,16 +1034,16 @@ def dcmwrite(
 
     # Ensure is_little_endian and is_implicit_VR are set
     if None in encoding:
-        if tsyntax and not tsyntax.is_private:
-            dataset.is_little_endian = tsyntax.is_little_endian
-            dataset.is_implicit_VR = tsyntax.is_implicit_VR
-
         if tsyntax is None:
             raise AttributeError(
                 f"'{cls_name}.is_little_endian' and "
                 f"'{cls_name}.is_implicit_VR' must be set appropriately "
                 "before saving"
             )
+
+        if not tsyntax.is_private:
+            dataset.is_little_endian = tsyntax.is_little_endian
+            dataset.is_implicit_VR = tsyntax.is_implicit_VR
 
     if tsyntax and not tsyntax.is_private:
         # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
