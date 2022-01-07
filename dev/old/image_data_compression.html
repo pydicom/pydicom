@@ -138,6 +138,8 @@ dataset.</p>
 of encoded data is too large for the basic offset table then the use of
 the <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">extended</span> <span class="pre">offset</span> <span class="pre">table</span></code></a> is
 recommended.</p></li>
+<li><p>A dataset with encapsulated pixel data must use explicit VR little endian
+encoding</p></li>
 </ul>
 <p>See the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_8.2.html">relevant sections of the DICOM Standard</a>
 for more information.</p>
@@ -161,6 +163,12 @@ for more information.</p>
 
 <span class="c1"># Basic encapsulation</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">PixelData</span> <span class="o">=</span> <span class="n">encapsulate</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+
+<span class="c1"># Set the dataset encoding</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">is_little_endian</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">is_implicit_VR</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Save!</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_compressed_basic.dcm&quot;</span><span class="p">)</span>
 
 <span class="c1"># Extended encapsulation</span>
@@ -228,7 +236,8 @@ be used to compress an uncompressed dataset in-place:</p>
 </div>
 <p>A specific encoding plugin can be used by passing the plugin name via the
 <cite>encoding_plugin</cite> argument:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s1">&#39;pylibjpeg&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Will set `ds.is_little_endian` and `ds.is_implicit_VR` automatically</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="o">=</span><span class="s1">&#39;pylibjpeg&#39;</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="s2">&quot;CT_small_rle.dcm&quot;</span><span class="p">)</span>
 </pre></div>
 </div>

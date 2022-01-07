@@ -295,6 +295,8 @@ a warning is logged, an exception is raised, or the validation is skipped.</p></
 <ul class="simple">
 <li><p>Fixed odd-length <strong>OB</strong> values not being padded during write (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1511">#1511</a>)</p></li>
 <li><p>Fixed Hologic private dictionary entry (0019xx43)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> not setting the correct
+encoding for the rest of the dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1565">#1565</a>)</p></li>
 </ul>
 </section>
 </section>
