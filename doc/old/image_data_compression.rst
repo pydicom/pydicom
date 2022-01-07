@@ -119,7 +119,7 @@ A specific encoding plugin can be used by passing the plugin name via the
 
 .. code-block:: python
 
-    # Will set `ds.is_little_endian` an `ds.is_implicit_VR` automatically
+    # Will set `ds.is_little_endian` and `ds.is_implicit_VR` automatically
     ds.compress(RLELossless, encoding_plugin='pylibjpeg')
     ds.save_as("CT_small_rle.dcm")
 
