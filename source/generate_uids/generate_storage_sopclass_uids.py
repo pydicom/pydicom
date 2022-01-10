@@ -2,12 +2,9 @@
 """
 Create UIDs for the Storage SOP Classes taken from the generated ``_uids.py``.
 """
-import os
 from pathlib import Path
 import re
-import tokenize
 
-import pydicom
 from pydicom._uid_dict import UID_dictionary
 
 
