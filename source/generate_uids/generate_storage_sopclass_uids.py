@@ -26,8 +26,7 @@ def is_storage_class(attributes):
 
 
 def uid_line(uid, keyword):
-    """Return the UID class definition line to be written into the python file."""
-    # add a line break after UID to avoid too long lines
+    """Return the UID class definition line to be written to the file."""
     return f"{keyword} = UID('{uid}')  # noqa\n"
 
 
@@ -78,8 +77,7 @@ def update_api_reference(path: Path) -> None:
 if __name__ == "__main__":
     p = Path(__file__).parent.parent.parent / "pydicom" / "uid.py"
     p.resolve(strict=True)
-
-    #update_uids(p)
+    update_uids(p)
 
     p = Path(__file__).parent.parent.parent / "doc" / "reference" / "uid.rst"
     p.resolve(strict=True)

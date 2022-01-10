@@ -85,7 +85,9 @@ class UID(str):
     'JPEG Baseline (Process 1)'
     """
 
-    def __new__(cls: Type["UID"], val: str, validation_mode: int = None) -> "UID":
+    def __new__(
+        cls: Type["UID"], val: str, validation_mode: int = None
+    ) -> "UID":
         """Setup new instance of the class.
 
         Parameters
@@ -340,7 +342,9 @@ JPEGTransferSyntaxes = [
 JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC]
+JPEG2000TransferSyntaxes = [
+    JPEG2000Lossless, JPEG2000, JPEG2000MCLossless, JPEG2000MC
+]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
 MPEGTransferSyntaxes = [
@@ -376,7 +380,9 @@ if sys.version_info[:2] < (3, 7):
     JPEG2000MultiComponentLossless = JPEG2000MCLossless
     JPEG2000MultiComponent = JPEG2000MC
 
-JPEGLossyCompressedPixelTransferSyntaxes = [JPEGBaseline8Bit, JPEGExtended12Bit]
+JPEGLossyCompressedPixelTransferSyntaxes = [
+    JPEGBaseline8Bit, JPEGExtended12Bit
+]
 JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
 JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
 PILSupportedCompressedPixelTransferSyntaxes = [
