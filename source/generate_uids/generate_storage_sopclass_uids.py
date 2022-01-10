@@ -48,6 +48,7 @@ def update_uids(path: Path) -> None:
         for uid, attr in sorted(UID_dictionary.items()):
             if is_storage_class(attr):
                 f.write(uid_line(uid, attr[4]))
+                f.write(f'"""{uid}"""\n')
 
 
 def update_api_reference(path: Path) -> None:
