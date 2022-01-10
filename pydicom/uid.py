@@ -381,7 +381,8 @@ if sys.version_info[:2] < (3, 7):
     JPEG2000MultiComponent = JPEG2000MC
 
 JPEGLossyCompressedPixelTransferSyntaxes = [
-    JPEGBaseline8Bit, JPEGExtended12Bit
+    JPEGBaseline8Bit,
+    JPEGExtended12Bit,
 ]
 JPEGLSSupportedCompressedPixelTransferSyntaxes = JPEGLSTransferSyntaxes
 JPEG2000CompressedPixelTransferSyntaxes = JPEG2000TransferSyntaxes
@@ -446,7 +447,7 @@ def generate_uid(
     """
     if prefix is None:
         # UUID -> as 128-bit int -> max 39 characters long
-        return UID("2.25.{}".format(uuid.uuid4().int))
+        return UID(f"2.25.{uuid.uuid4().int}")
 
     max_uid_len = 64
     if len(prefix) > max_uid_len - 1:
