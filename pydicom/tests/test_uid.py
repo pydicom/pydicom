@@ -48,7 +48,7 @@ def test_deprecation_warnings():
         for name, (value, replacement) in _deprecations.items():
             msg = (
                 f"The UID constant '{name}' is deprecated and will be removed "
-                f"in pydicom v2.2, use '{replacement}' instead"
+                f"in pydicom v3.0, use '{replacement}' instead"
             )
             with pytest.warns(DeprecationWarning, match=msg):
                 uid = getattr(pydicom.uid, name)
