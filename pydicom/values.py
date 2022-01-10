@@ -120,7 +120,7 @@ def convert_ATvalue(
 
     # length > 4
     if length % 4 != 0:
-        logger.warn(
+        logger.warning(
             "Expected length to be multiple of 4 for VR 'AT', "
             f"got length {length}"
         )
@@ -246,7 +246,9 @@ def _DT_from_str(value: str) -> DT:
     value = value.rstrip()
     length = len(value)
     if length < 4 or length > 26:
-        logger.warn(f"Expected length between 4 and 26, got length {length}")
+        logger.warning(
+            f"Expected length between 4 and 26, got length {length}"
+        )
 
     return DT(value)
 
@@ -598,7 +600,9 @@ def _TM_from_str(value: str) -> TM:
     value = value.rstrip()
     length = len(value)
     if (length < 2 or length > 16) and length != 0:
-        logger.warn(f"Expected length between 2 and 16, got length {length}")
+        logger.warning(
+            f"Expected length between 2 and 16, got length {length}"
+        )
 
     return TM(value)
 
