@@ -12,7 +12,9 @@ import numpy as np
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
+from pydicom.pixel_data_handlers.numpy_handler import (
+    get_pixeldata, unpack_bits, pack_bits
+)
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
 # 1/1, 1 sample/pixel, 1 frame
@@ -212,3 +214,21 @@ class TimeGetPixelData:
         """Time retrieval of YBR_FULL_422 data."""
         for ii in range(self.no_runs):
             get_pixeldata(self.ds_ybr_422)
+
+
+class TimePackUnpack:
+    def setup(self):
+        """Setup the tests."""
+        self.no_runs = 100
+        self.ds_1_1_1 = dcmread(EXPL_1_1_1F)
+        self.unpacked = unpack_bits(self.ds_1_1_1.PixelData)
+
+    def time_unpack(self):
+        """Time unpacking"""
+        for ii in range(self.no_runs):
+            unpack_bits(self.ds_1_1_1.PixelData)
+
+    def time_pack(self):
+        """Time packing."""
+        for ii in range(self.no_runs):
+            pack_bits(self.unpacked)
