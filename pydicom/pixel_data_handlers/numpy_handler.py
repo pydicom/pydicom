@@ -173,8 +173,7 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     if arr.shape[0] % 8:
         arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
-    # Reshape so each row is 8 bits
-    arr = np.packbits(arr.astype('uint8'), bitorder="little")
+    arr = np.packbits(arr.astype('u1'), bitorder="little")
 
     packed: bytes = arr.tobytes()
     if pad:
@@ -207,7 +206,6 @@ def unpack_bits(bytestream: bytes) -> "np.ndarray":
     :dcm:`Annex D<part05/chapter_D.html>`
     """
     arr = np.frombuffer(bytestream, dtype='u1')
-
     return cast("np.ndarray", np.unpackbits(arr, bitorder="little"))
 
 
@@ -367,6 +365,6 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         ds.PhotometricInterpretation = "RGB"
 
     if not read_only and ds.BitsAllocated > 1:
-        return cast("np.ndarray", arr.copy())
+        return arr.copy()
 
-    return cast("np.ndarray", arr)
+    return arr
