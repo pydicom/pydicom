@@ -63,6 +63,7 @@ JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.d
 JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
 JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
+# Codestream is RGB and PI is RGB
 JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_jpeg_no_color_transform.dcm")
 JPGB_08_08_3_0_1F_RGB_APP14 = get_testdata_file("SC_jpeg_no_color_transform_2.dcm")  # noqa
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
@@ -245,7 +246,6 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
@@ -264,7 +264,6 @@ JPEG_MATCHING_DATASETS = [
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
             (192, 192, 192), (255, 255, 255),
         ],
-        marks=pytest.mark.xfail(reason="Resulting image is a bad match")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,
@@ -292,6 +291,7 @@ JPEG_MATCHING_DATASETS = [
             (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
             (244, 244, 244), (244, 244, 244),
         ],
+        marks=pytest.mark.xfail(reason="Source data is RGB but no APP14")
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB_APP14,
@@ -569,8 +569,9 @@ class TestPillowHandler_JPEG:
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
         arr = ds.pixel_array
+
         if 'YBR' in ds.PhotometricInterpretation:
-            arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
+           arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
         ref = dcmread(rpath).pixel_array
 

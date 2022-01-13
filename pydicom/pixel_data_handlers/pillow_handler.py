@@ -5,11 +5,11 @@ to decode *Pixel Data*.
 
 import io
 import logging
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, Tuple
 import warnings
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset
 
 try:
     import numpy
@@ -29,7 +29,8 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
+from pydicom.jpeg import parse_jpeg, parse_jpeg2k
+from pydicom.pixel_data_handlers.util import pixel_dtype
 from pydicom.uid import (
     UID, JPEG2000, JPEG2000Lossless, JPEGBaseline8Bit, JPEGExtended12Bit
 )
@@ -89,49 +90,142 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
 
 
 def _decompress_single_frame(
-    data: bytes,
-    transfer_syntax: str,
-    photometric_interpretation: str
+    src: bytes,
+    tsyntax: str,
+    photometric_interpretation: str,
+    shape: Tuple[int, int, int],
 ) -> "Image":
     """Decompresses a single frame of an encapsulated Pixel Data element.
 
     Parameters
     ----------
-    data: bytes
-        Compressed pixel data
-    transfer_syntax: str
-        Transfer Syntax UID
-    photometric_interpretation: str
-        Photometric Interpretation
+    src : bytes
+        The compressed pixel data.
+    tsyntax : str
+        The corresponding *Transfer Syntax UID*.
+    photometric_interpretation : str
+        The *Photometric Interpretation* from the corresponding dataset.
+    shape : Tuple[int, int, int]
+        The (rows, columns, samples per pixel).
 
     Returns
     -------
     PIL.Image
         Decompressed pixel data
-
     """
-    fio = io.BytesIO(data)
-    image = Image.open(fio)
-    # This hack ensures that RGB color images, which were not
-    # color transformed (i.e. not transformed into YCbCr color space)
-    # upon JPEG compression are decompressed correctly.
-    # Since Pillow assumes that images were transformed into YCbCr color
-    # space prior to compression, setting the value of "mode" to YCbCr
-    # signals Pillow to not apply any color transformation upon
-    # decompression.
-    if (transfer_syntax in PillowJPEGTransferSyntaxes and
-            photometric_interpretation == 'RGB'):
-        if 'adobe_transform' not in image.info:
-            color_mode = 'YCbCr'
-            image.tile = [(
-                'jpeg',
-                image.tile[0][1],
-                image.tile[0][2],
-                (color_mode, ''),
-            )]
-            image.mode = color_mode
-            image.rawmode = color_mode
-    return image
+    im = Image.open(io.BytesIO(src))
+    if tsyntax in PillowJPEG2000TransferSyntaxes or shape[2] == 1:
+        return im
+
+    cs = None
+
+    # Parse the JPEG codestream for the APP and SOF markers
+    param = parse_jpeg(src)
+
+    # APP0 JFIF implies YCbCr
+    # https://www.w3.org/Graphics/JPEG/jfif3.pdf
+    if "APPn" in param:
+        if param["APPn"].get(b"\xFF\xE0", b"").startswith(b"JFIF"):
+            cs = "YCbCr"
+
+    # ISO/IEC 10918-1 (ITU T.81)
+    # https://www.w3.org/Graphics/JPEG/itu-t81.pdf
+    if "SOF" in param:
+        # If any components are subsampled then it's very likely not RGB
+        c_ss = [x[1] != 1 or x[2] != 1 for x in param["SOF"]["Components"]]
+        if any(c_ss):
+            cs = "YCbCr"
+
+        # Some applications use the SOF marker's component IDs to flag
+        #   the colour components
+        c_ids = [x[0] for x in param["SOF"]["Components"]]
+        if c_ids in ([b"R", b"G", b"B"], [b"r", b"g", b"b"]):
+            cs = "RGB"
+
+    # APP14 (Adobe)
+    # ISO/IEC 10918-6 (ITU T.872): JPEG Printing Extensions
+    # http://www.itu.int/rec/T-REC-T.872-201206-I/en
+    # Section 6.5.3:
+    #   AP12 is assumed to contain a single-byte transform flag as:
+    #     0: CMYK (if 4 components) or RGB (if 3 components)
+    #     1: YCbCr (3 components)
+    #     2: YCCK (4 components)
+    # In Image.info, "adobe_transform" is the APP14 AP12 value as int
+    if "adobe_transform" in im.info:
+        cs = "RGB" if im.info["adobe_transform"] == 0 else "YCbCr"
+
+    # We want to return the pixel data in the color space specified by
+    #   *Photometric Interpretation*, with a warning if that color space
+    #   doesn't actually match that of the encoded source data
+
+    # The possibilities are:
+    #   cs    | PI  -> transform    | return | warn
+    #   ------+---------------------+--------+-----
+    #   None  | RGB -> YCbCr to RGB | RGB    | yes
+    #   None  | YBR -> (none)       | YBR    |
+    #   YCbCr | RGB -> YCbCr to RGB | RGB    | yes
+    #   YCbCr | YBR -> (none)       | YBR    |
+    #   RGB   | RGB -> (none)       | RGB    |
+    #   RGB   | YBR -> RGB to YCbCr | YBR    | yes
+
+    if photometric_interpretation == "RGB" and cs is None:
+        # Source data is either YCbCr (most likely) or RGB (less likely)
+        # If the decoded pixel data is correct then source is YCbCr and
+        #   PI should be YBR_FULL_422
+        # If the decoded pixel data is incorrect then source is RGB
+        #   but this can't be managed with current pixel data handlers
+        return im
+
+    if photometric_interpretation == "RGB" and cs == "YCbCr":
+        # Source data is YCbCr - transform to RGB and warn
+        # YBR_FULL_422 is only a valid recommendation if we don't
+        #   support JPEGLosslessP14 and JPEGLosslessSV1
+        warnings.warn(
+            "A mismatch was found between the JPEG codestream and dataset "
+            "'Photometric Interpretation' value. If the decoded pixel data "
+            "is in the RGB color space then the 'Photometric Interpretation' "
+            "should be 'YBR_FULL_422'"
+        )
+        return im
+
+    if "YBR" in photometric_interpretation and cs in (None, "YCbCr"):
+        # Source data is YCbCr - no transform
+        im.draft("YCbCr", (shape[0], shape[1]))
+        return im
+
+    if cs == "RGB" and photometric_interpretation == "RGB":
+        # Source data is RGB - no transform
+        im.tile = [(
+            "jpeg",
+            im.tile[0][1],
+            im.tile[0][2],
+            ("RGB", ""),
+        )]
+        im.mode = "RGB"
+        im.rawmode = "RGB"
+        return im
+
+    # Source data is RGB - transform to YBR and warn
+    warnings.warn(
+        "The JPEG codestream indicates the encoded pixel data is "
+        "in the RGB color space, but the (0028,0004) "
+        f"'Photometric Interpretation' is '{photometric_interpretation}'."
+        "The pixel data will be returned in the YCbCr colour space, but "
+        "it's recommended that you change the 'Photometric "
+        "Interpretation' to 'RGB'"
+    )
+    # Uh, how do I convert here...
+    im.tile = [(
+        "jpeg",
+        im.tile[0][1],
+        im.tile[0][2],
+        ("RGB", ""),
+    )]
+    im.mode = "RGB"
+    im.rawmode = "RGB"
+    # ?
+    im.draft("YCbCr", (shape[0], shape[1]))
+    return im
 
 
 def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
@@ -188,6 +282,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     bits_stored = cast(int, ds.BitsStored)
     bits_allocated = cast(int, ds.BitsAllocated)
     nr_frames = getattr(ds, 'NumberOfFrames', 1) or 1
+    samples_per_pixel = cast(int, ds.SamplesPerPixel)
 
     pixel_bytes = bytearray()
     if nr_frames > 1:
@@ -197,14 +292,15 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             im = _decompress_single_frame(
                 frame,
                 transfer_syntax,
-                photometric_interpretation
+                photometric_interpretation,
+                (rows, columns, samples_per_pixel),
             )
-            if 'YBR' in photometric_interpretation:
-                im.draft('YCbCr', (rows, columns))
+            # if 'YBR' in photometric_interpretation:
+            #     im.draft('YCbCr', (rows, columns))
             pixel_bytes.extend(im.tobytes())
 
             if not j2k_precision:
-                params = get_j2k_parameters(frame)
+                params = parse_jpeg2k(frame)
                 j2k_precision = cast(
                     int, params.setdefault("precision", bits_stored)
                 )
@@ -216,13 +312,14 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         im = _decompress_single_frame(
             pixel_data,
             transfer_syntax,
-            photometric_interpretation
+            photometric_interpretation,
+            (rows, columns, samples_per_pixel),
         )
-        if 'YBR' in photometric_interpretation:
-            im.draft('YCbCr', (rows, columns))
+        # if 'YBR' in photometric_interpretation:
+        #     im.draft('YCbCr', (rows, columns))
         pixel_bytes.extend(im.tobytes())
 
-        params = get_j2k_parameters(pixel_data)
+        params = parse_jpeg2k(pixel_data)
         j2k_precision = cast(int, params.setdefault("precision", bits_stored))
         j2k_sign = params.setdefault("is_signed", None)
 
