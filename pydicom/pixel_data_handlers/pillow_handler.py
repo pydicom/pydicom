@@ -121,6 +121,7 @@ def _decompress_single_frame(
 
     # Parse the JPEG codestream for the APP and SOF markers
     param = parse_jpeg(src)
+    print(param)
 
     # APP0 JFIF implies YCbCr
     # https://www.w3.org/Graphics/JPEG/jfif3.pdf
@@ -161,7 +162,7 @@ def _decompress_single_frame(
     # The possibilities are:
     #   cs    | PI  -> transform    | return | warn
     #   ------+---------------------+--------+-----
-    #   None  | RGB -> YCbCr to RGB | RGB    | yes
+    #   None  | RGB -> YCbCr to RGB | RGB    |
     #   None  | YBR -> (none)       | YBR    |
     #   YCbCr | RGB -> YCbCr to RGB | RGB    | yes
     #   YCbCr | YBR -> (none)       | YBR    |
@@ -170,10 +171,15 @@ def _decompress_single_frame(
 
     if photometric_interpretation == "RGB" and cs is None:
         # Source data is either YCbCr (most likely) or RGB (less likely)
-        # If the decoded pixel data is correct then source is YCbCr and
-        #   PI should be YBR_FULL_422
-        # If the decoded pixel data is incorrect then source is RGB
-        #   but this can't be managed with current pixel data handlers
+        # Assume *Photometric Interpretation* is correct:
+        # * If the decoded pixel data is correct then source is RGB
+        # * If the decoded pixel data is incorrect then source is YCbCr
+        #   but this can be fixed by user applying YCbCr -> RGB transform
+        # Source data is RGB - no transform
+        #im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("YCbCr", ""))]
+        #im.mode = "YCbCr"
+        #im.rawmode = "YCbCr"
+        im.draft("YCbCr", (shape[0], shape[1]))
         return im
 
     if photometric_interpretation == "RGB" and cs == "YCbCr":
@@ -195,14 +201,11 @@ def _decompress_single_frame(
 
     if cs == "RGB" and photometric_interpretation == "RGB":
         # Source data is RGB - no transform
-        im.tile = [(
-            "jpeg",
-            im.tile[0][1],
-            im.tile[0][2],
-            ("RGB", ""),
-        )]
-        im.mode = "RGB"
-        im.rawmode = "RGB"
+        # im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("YCbCr", ""))]
+        # im.mode = "YCbCr"
+        # im.rawmode = "YCbCr"
+        #im.draft("RGB", (shape[0], shape[1]))
+        im.draft("YCbCr", (shape[0], shape[1]))
         return im
 
     # Source data is RGB - transform to YBR and warn
@@ -215,12 +218,7 @@ def _decompress_single_frame(
         "Interpretation' to 'RGB'"
     )
     # Uh, how do I convert here...
-    im.tile = [(
-        "jpeg",
-        im.tile[0][1],
-        im.tile[0][2],
-        ("RGB", ""),
-    )]
+    im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("RGB", ""))]
     im.mode = "RGB"
     im.rawmode = "RGB"
     # ?
