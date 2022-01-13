@@ -177,7 +177,7 @@ def parse_jpeg(src: bytes) -> Dict[str, Any]:
                 return d
 
             marker, idx = _find_marker(src, idx + 4 + length)
-    except:
+    except Exception:
         pass
 
     return {}
