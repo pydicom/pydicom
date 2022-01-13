@@ -67,7 +67,7 @@ def _find_marker(src: bytes, idx: int = 0) -> Tuple[bytes, int]:
     if idx == eof:
         raise ValueError(msg)
 
-    return src[idx : idx + 2], idx
+    return src[idx:idx + 2], idx
 
 
 def _get_bit(b: bytes, idx: int) -> int:
@@ -135,14 +135,14 @@ def parse_jpeg(src: bytes) -> Dict[str, Any]:
         # Then SOF marker
         marker, idx = _find_marker(src, idx + 2)
         while marker in _MARKERS:
-            length = _UNPACK_UINT(src[idx + 2 : idx + 4])[0] - 2
+            length = _UNPACK_UINT(src[idx + 2:idx + 4])[0] - 2
 
             if marker in _APP_MARKERS:
                 # Parse APP marker - Section B.2.4.6
                 app = d.setdefault("APPn", {})
-                app[marker] = src[idx + 4 : idx + 4 + length]
+                app[marker] = src[idx + 4:idx + 4 + length]
             elif marker == b"\xFF\xFE":
-                d["COM"] = src[idx + 4 : idx + 4 + length]
+                d["COM"] = src[idx + 4:idx + 4 + length]
             elif marker in _SOF_MARKERS:
                 # Parse SOF frame header - Section B.2.2
                 # SOF | Lf | P |  Y |  X | Nf | Components |
@@ -152,13 +152,13 @@ def parse_jpeg(src: bytes) -> Dict[str, Any]:
                 # SOF marker
                 sof["SOFn"] = marker
                 # Sample precision in bits
-                sof["P"] = _UNPACK_UCHAR(src[idx + 4 : idx + 5])[0]
+                sof["P"] = _UNPACK_UCHAR(src[idx + 4:idx + 5])[0]
                 # Number of lines
-                sof["Y"] = _UNPACK_UINT(src[idx + 5 : idx + 7])[0]
+                sof["Y"] = _UNPACK_UINT(src[idx + 5:idx + 7])[0]
                 # Number of samples per line
-                sof["X"] = _UNPACK_UINT(src[idx + 7 : idx + 9])[0]
+                sof["X"] = _UNPACK_UINT(src[idx + 7:idx + 9])[0]
                 # Number of image components
-                sof["Nf"] = _UNPACK_UCHAR(src[idx + 9 : idx + 10])[0]
+                sof["Nf"] = _UNPACK_UCHAR(src[idx + 9:idx + 10])[0]
 
                 sof["Components"] = []
                 idx += 10
@@ -167,9 +167,9 @@ def parse_jpeg(src: bytes) -> Dict[str, Any]:
                     #  8 |  4 |  4 |   8 | bits
                     #  0 |       1 |   2 | offset
                     # Ci, component ID
-                    c_id = src[idx : idx + 1]
+                    c_id = src[idx:idx + 1]
                     # Hi and Vi, horizontal and vertical sampling factors
-                    h_samples, v_samples = _split_byte(src[idx + 1 : idx + 2])
+                    h_samples, v_samples = _split_byte(src[idx + 1:idx + 2])
                     idx += 3
 
                     sof["Components"].append((c_id, h_samples, v_samples))

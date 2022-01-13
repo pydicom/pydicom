@@ -571,7 +571,7 @@ class TestPillowHandler_JPEG:
         arr = ds.pixel_array
 
         if 'YBR' in ds.PhotometricInterpretation:
-           arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
+            arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
         ref = dcmread(rpath).pixel_array
 
