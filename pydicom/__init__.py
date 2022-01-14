@@ -38,17 +38,21 @@ with warnings.catch_warnings():
 
 from pydicom.filereader import dcmread
 from pydicom.filewriter import dcmwrite
+from pydicom.pixel_data_handlers.util import debug_pixel_data
 from pydicom.sequence import Sequence
 
 from ._version import __version__, __version_info__, __dicom_version__
 
-__all__ = ['DataElement',
-           'Dataset',
-           'FileDataset',
-           'Sequence',
-           'dcmread',
-           'dcmwrite',
-           'read_file',
-           'write_file',
-           '__version__',
-           '__version_info__']
+__all__ = [
+    'DataElement',
+    'Dataset',
+    'debug_pixel_data',
+    'FileDataset',
+    'Sequence',
+    'dcmread',
+    'dcmwrite',
+    'read_file',
+    'write_file',
+    '__version__',
+    '__version_info__',
+]

@@ -19,6 +19,8 @@ Enhancements
   and :attr:`~pydicom.config.settings.writing_validation_mode`
   a warning is logged, an exception is raised, or the validation is skipped.
 * Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
+* Improved JPEG 10918 color space determination when using the Pillow pixel
+  data handler
 
 
 Fixes

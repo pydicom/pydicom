@@ -2,19 +2,17 @@
 """Utility functions for JPEG (ISO/IEC 10918-1) compressed pixel data."""
 
 from struct import Struct
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, List
 
 
 _UNPACK_UINT = Struct(">H").unpack
 _UNPACK_UCHAR = Struct("B").unpack
 
 
-# 0xFFEO to 0xFFEF
-_APP_MARKERS = {bytes([255, x]) for x in range(224, 240)}
-# 0xFFC0 to 0xFFC3, 0xFFC5 to 0xFFC7, 0xFFC9 to 0xFFCF
 _sof_markers = [bytes([255, x]) for x in range(192, 208)]
 _sof_markers.remove(b"\xFF\xC4")
 _sof_markers.remove(b"\xFF\xC8")
+_sof_markers.remove(b"\xFF\xCC")
 _SOF_MARKERS = {x for x in _sof_markers}
 _MISC_MARKERS = {
     b"\xFF\xFE",  # COM
@@ -24,7 +22,68 @@ _MISC_MARKERS = {
     b"\xFF\xDB",  # DQT
     b"\xFF\xDD",  # DRI
 }
+_APP_MARKERS = {bytes([255, x]) for x in range(224, 240)}
 _MARKERS = _APP_MARKERS | _SOF_MARKERS | _MISC_MARKERS
+
+
+def _as_str(src: bytes, cutoff: int = 32) -> str:
+    """Return bytes as a formatted str."""
+    s = " ".join([f"{b:02X}" for b in src[:cutoff]])
+
+    if len(src) > cutoff:
+        s += " ..."
+
+    return s
+
+
+def debug_jpeg(src: bytes) -> List[str]:
+    """Return JPEG debugging information.
+
+    Parameters
+    ----------
+    src : bytes
+        The JPEG codestream.
+
+    Returns
+    -------
+    list of str
+    """
+    s = []
+
+    marker, idx = _find_marker(src)
+    if marker != b"\xFF\xD8":
+        s.append("No SOI (FF D8) marker found at the start of the codestream")
+        return s
+
+    s.append("SOI (FF D8) marker found")
+
+    d = parse_jpeg(src)
+    if "APPn" in d:
+        s.append("APP segment(s) found")
+        for marker in d["APPn"]:
+            ap_n = d["APPn"][marker]
+            s.append(f"  APP{marker[-1] - 0xE0}: {_as_str(ap_n)}")
+
+    if "COM" in d:
+        s.append("COM segment found")
+        s.append(f"  {_as_str(d['COM'])}")
+        s.append("")
+
+    if "SOF" in d:
+        sof = d["SOF"]
+        s.append(f"SOF ({_as_str(sof['SOFn'])}) segment found")
+        s.append(f"  Precision: {sof['P']}")
+        s.append(f"  Rows: {sof['Y']}")
+        s.append(f"  Columns: {sof['X']}")
+        s.append(f"  Components:")
+        for c in sof["Components"]:
+            s.append(
+                f"    ID: 0x{c[0][0]:02X}, subsampling h{c[1]} v{c[2]}"
+            )
+    else:
+        s.append("Error: No SOF markers found in JPEG codestream")
+
+    return s
 
 
 def _find_marker(src: bytes, idx: int = 0) -> Tuple[bytes, int]:

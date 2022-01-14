@@ -121,7 +121,6 @@ def _decompress_single_frame(
 
     # Parse the JPEG codestream for the APP and SOF markers
     param = parse_jpeg(src)
-    print(param)
 
     # APP0 JFIF implies YCbCr
     # https://www.w3.org/Graphics/JPEG/jfif3.pdf
@@ -163,65 +162,56 @@ def _decompress_single_frame(
     #   cs    | PI  -> transform    | return | warn
     #   ------+---------------------+--------+-----
     #   None  | RGB -> YCbCr to RGB | RGB    |
-    #   None  | YBR -> (none)       | YBR    |
     #   YCbCr | RGB -> YCbCr to RGB | RGB    | yes
-    #   YCbCr | YBR -> (none)       | YBR    |
     #   RGB   | RGB -> (none)       | RGB    |
+    #   None  | YBR -> (none)       | YBR    |
+    #   YCbCr | YBR -> (none)       | YBR    |
     #   RGB   | YBR -> RGB to YCbCr | YBR    | yes
 
-    if photometric_interpretation == "RGB" and cs is None:
-        # Source data is either YCbCr (most likely) or RGB (less likely)
-        # Assume *Photometric Interpretation* is correct:
-        # * If the decoded pixel data is correct then source is RGB
-        # * If the decoded pixel data is incorrect then source is YCbCr
-        #   but this can be fixed by user applying YCbCr -> RGB transform
-        # Source data is RGB - no transform
-        #im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("YCbCr", ""))]
-        #im.mode = "YCbCr"
-        #im.rawmode = "YCbCr"
-        im.draft("YCbCr", (shape[0], shape[1]))
+    if photometric_interpretation == "RGB":
+        if cs == "RGB":
+            # Source data is RGB - allow libjpeg to skip transform
+            # If "adobe_transform" is present, or if the component IDs are
+            #   RGB then libjpeg will use that info to skip the YCbCr -> RGB
+            #   transform
+            # https://github.com/libjpeg-turbo/ijg/blob/main/jdapimin.c
+            pass
+
+        if cs is None:
+            # Source data may be YCbCr (most likely) or RGB (less likely)
+            # libjpeg assumes source is YCbCr - force no transform
+            # Assume *Photometric Interpretation* is correct:
+            # * If the decoded pixel data is correct then source is RGB
+            # * If the decoded pixel data is incorrect then source is YCbCr
+            #   but this can be fixed by user applying YCbCr -> RGB transform
+            im.draft("YCbCr", (shape[0], shape[1]))
+
+        if cs == "YCbCr":
+            # Source data is YCbCr - allow libjpeg transform to RGB and warn
+            # YBR_FULL_422 is only a valid recommendation if we don't
+            #   support JPEGLosslessP14 and JPEGLosslessSV1
+            warnings.warn(
+                "A mismatch was found between the JPEG codestream and dataset "
+                "'Photometric Interpretation' value. If the decoded pixel "
+                "data is in the RGB color space then the (0028,0004) "
+                "'Photometric Interpretation' should be 'YBR_FULL_422' "
+                "instead of 'RGB'"
+            )
+
         return im
 
-    if photometric_interpretation == "RGB" and cs == "YCbCr":
-        # Source data is YCbCr - transform to RGB and warn
-        # YBR_FULL_422 is only a valid recommendation if we don't
-        #   support JPEGLosslessP14 and JPEGLosslessSV1
-        warnings.warn(
-            "A mismatch was found between the JPEG codestream and dataset "
-            "'Photometric Interpretation' value. If the decoded pixel data "
-            "is in the RGB color space then the 'Photometric Interpretation' "
-            "should be 'YBR_FULL_422'"
+    if cs == "RGB":
+        # Source data is RGB but PI is YBR
+        # Trying to forcibly decode to YCbCr results in a
+        #   OSError: broken data stream when reading image file
+        raise AttributeError(
+            "Unable to decode as the JPEG codestream indicates the encoded "
+            "pixel data is in the RGB color space, but the (0028,0004) "
+            f"'Photometric Interpretation' is '{photometric_interpretation}'. "
+            "Change the 'Photometric Interpretation' to 'RGB'"
         )
-        return im
 
-    if "YBR" in photometric_interpretation and cs in (None, "YCbCr"):
-        # Source data is YCbCr - no transform
-        im.draft("YCbCr", (shape[0], shape[1]))
-        return im
-
-    if cs == "RGB" and photometric_interpretation == "RGB":
-        # Source data is RGB - no transform
-        # im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("YCbCr", ""))]
-        # im.mode = "YCbCr"
-        # im.rawmode = "YCbCr"
-        #im.draft("RGB", (shape[0], shape[1]))
-        im.draft("YCbCr", (shape[0], shape[1]))
-        return im
-
-    # Source data is RGB - transform to YBR and warn
-    warnings.warn(
-        "The JPEG codestream indicates the encoded pixel data is "
-        "in the RGB color space, but the (0028,0004) "
-        f"'Photometric Interpretation' is '{photometric_interpretation}'."
-        "The pixel data will be returned in the YCbCr colour space, but "
-        "it's recommended that you change the 'Photometric "
-        "Interpretation' to 'RGB'"
-    )
-    # Uh, how do I convert here...
-    im.tile = [("jpeg", im.tile[0][1], im.tile[0][2], ("RGB", ""))]
-    im.mode = "RGB"
-    im.rawmode = "RGB"
-    # ?
+    # Source is YCbCr or libjpeg assumes so - force no transform
     im.draft("YCbCr", (shape[0], shape[1]))
     return im
 
@@ -293,8 +283,6 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
                 photometric_interpretation,
                 (rows, columns, samples_per_pixel),
             )
-            # if 'YBR' in photometric_interpretation:
-            #     im.draft('YCbCr', (rows, columns))
             pixel_bytes.extend(im.tobytes())
 
             if not j2k_precision:
@@ -313,8 +301,6 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             photometric_interpretation,
             (rows, columns, samples_per_pixel),
         )
-        # if 'YBR' in photometric_interpretation:
-        #     im.draft('YCbCr', (rows, columns))
         pixel_bytes.extend(im.tobytes())
 
         params = parse_jpeg2k(pixel_data)

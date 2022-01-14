@@ -570,11 +570,6 @@ class TestPillowHandler_JPEG:
         ds = dcmread(fpath)
         arr = ds.pixel_array
 
-        print(ds.group_dataset(0x0028))
-        import matplotlib.pyplot as plt
-        plt.imshow(arr)
-        plt.show()
-
         if 'YBR' in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
@@ -631,3 +626,31 @@ class TestPillowHandler_JPEG:
         pixel_data = ds.pixel_array
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)
+
+    def test_RGB_to_YBR_raises(self):
+        """Test exception raised when RGB source data is decoded to YBR"""
+        # Flagged RGB source data
+        ds = dcmread(JPGB_08_08_3_0_1F_RGB_APP14)
+        ds.PhotometricInterpretation = "YBR_FULL_422"
+        msg = (
+            r"Unable to decode as the JPEG codestream indicates the encoded "
+            r"pixel data is in the RGB color space, but the \(0028,0004\) "
+            r"'Photometric Interpretation' is 'YBR_FULL_422'. "
+            r"Change the 'Photometric Interpretation' to 'RGB'"
+        )
+        with pytest.raises(AttributeError, match=msg):
+            ds.pixel_array
+
+    def test_YBR_to_RGB_warns(self):
+        """Test warning issued when YBR source data is decoded to RGB"""
+        ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        ds.PhotometricInterpretation = "RGB"
+        msg = (
+            r"A mismatch was found between the JPEG codestream and dataset "
+            r"'Photometric Interpretation' value. If the decoded pixel "
+            r"data is in the RGB color space then the \(0028,0004\) "
+            r"'Photometric Interpretation' should be 'YBR_FULL_422' "
+            r"instead of 'RGB'"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            ds.pixel_array
