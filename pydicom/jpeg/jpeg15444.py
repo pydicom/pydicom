@@ -29,50 +29,64 @@ def debug_jpeg2k(src: bytes) -> List[str]:
     """
     s = []
 
-    if src[0:2] != b"\xff\x4f":
-        s.append("No SOI (FF 4F) marker found @ offset 0")
-        s.append(f"  {_as_str(src)}")
-        return s
+    try:
+        if src[0:2] != b"\xff\x4f":
+            s.append("No SOI (FF 4F) marker found @ offset 0")
+            if src:
+                s.append(f"  {_as_str(src, 16)}")
+            return s
 
-    s.append("SOI (FF 4F) marker found @ offset 0")
+        s.append("SOI (FF 4F) marker found @ offset 0")
 
-    # SIZ segment
-    if src[2:4] != b"\xff\x51":
-        s.append("No SIZ (FF 51) marker found @ offset 2")
-        s.append(f"  {_as_str(src)}")
-        return s
+        # SIZ segment
+        if src[2:4] != b"\xff\x51":
+            s.append("No SIZ (FF 51) marker found @ offset 2")
+            if src[2:]:
+                s.append(f"  {_as_str(src[2:], 16)}")
+            return s
 
-    s.append("SIZ (FF 51) segment @ offset 2")
-    xsiz, ysiz = unpack(">2I", src[8:16])
-    s.append(f"  Rows: {ysiz}")
-    s.append(f"  Columns: {xsiz}")
+        s.append("SIZ (FF 51) segment found @ offset 2")
+        xsiz, ysiz = unpack(">2I", src[8:16])
+        s.append(f"  Rows: {ysiz}")
+        s.append(f"  Columns: {xsiz}")
 
-    csiz = unpack(">H", src[40:42])[0]
-    s.append(f"  Components:")
-    idx = 42
-    for ii in range(csiz):
-        ssiz = src[idx]
-        idx += 3
-        if ssiz & 0x80:
-            s.append(f"    {ii}: signed, precision {(ssiz & 0x7F) + 1}")
+        csiz = unpack(">H", src[40:42])[0]
+        s.append(f"  Components:")
+        idx = 42
+        for ii in range(csiz):
+            ssiz = src[idx]
+            idx += 3
+            if ssiz & 0x80:
+                s.append(f"    {ii}: signed, precision {(ssiz & 0x7F) + 1}")
+            else:
+                s.append(f"    {ii}: unsigned, precision {ssiz + 1}")
+
+        # COD segment
+        if src[idx:idx + 2] != b"\xFF\x52":
+            s.append(f"No COD (FF 52) marker found @ offset {idx}")
+            if src[idx:]:
+                s.append(f"  {_as_str(src[idx:])}")
+
+            return s
+
+        s.append(f"COD (FF 52) segment found @ offset {idx}")
+
+        # COD: SGcod
+        if src[idx + 8] in (0, 1):
+            mct = ["none", "applied"][src[idx + 8]]
+            s.append(f"  Multiple component transform: {mct}")
         else:
-            s.append(f"    {ii}: unsigned, precision {ssiz + 1}")
+            s.append(f"  Multiple component transform: 0b{src[idx + 8]:08b}")
 
-    # COD segment
-    if src[idx:idx + 2] != b"\xFF\x52":
-        s.append(f"No COD (FF 52) marker found @ offset {idx}")
-        s.append(f"  {_as_str(src[idx:])}")
-        return s
+        # COD: SPcod
+        if src[idx + 13] in (0, 1):
+            transform = ["9-7 irreversible", "5-3 reversible"][src[idx + 13]]
+            s.append(f"  Wavelet transform: {transform}")
+        else:
+            s.append(f"  Wavelet transform: 0b{src[idx + 13]:08b}")
 
-    s.append(f"COD (FF 52) segment found @ offset {idx}")
-
-    # COD: SGcod
-    mct = ["none", "applied"][src[idx + 8]]
-    s.append(f"  Multiple component transform: {mct}")
-
-    # COD: SPcod
-    transform = ["9-7 irreversible", "5-3 reversible"][src[idx + 13]]
-    s.append(f"  Wavelet transform: {transform}")
+    except Exception:
+        s.append("Insufficient data for JPEG 2000 codestream")
 
     return s
 

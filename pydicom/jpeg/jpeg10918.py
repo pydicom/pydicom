@@ -69,6 +69,10 @@ def debug_jpeg(src: bytes) -> List[str]:
     s.append("SOI (FF D8) marker found")
 
     d = parse_jpeg(src)
+    if not d:
+        s.append("Unable to parse the JPEG codestream")
+        return s
+
     if "APPn" in d:
         s.append("APP segment(s) found")
         for marker in d["APPn"]:
@@ -91,8 +95,6 @@ def debug_jpeg(src: bytes) -> List[str]:
             s.append(
                 f"    ID: 0x{c[0][0]:02X}, subsampling h{c[1]} v{c[2]}"
             )
-    else:
-        s.append("No SOF marker found in the JPEG codestream")
 
     return s
 
