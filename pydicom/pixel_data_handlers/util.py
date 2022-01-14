@@ -812,7 +812,6 @@ def debug_pixel_data(ds: "Dataset", idx: int = 0) -> None:
             s.append(f"  Transfer Syntax UID: {tsyntax} ({tsyntax.name})")
         else:
             s.append(f"  Transfer Syntax UID: {tsyntax}")
-
     else:
         s.append("  Transfer Syntax UID: (none available)")
 
