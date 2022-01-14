@@ -130,11 +130,10 @@ def _find_marker(src: bytes, idx: int = 0) -> Tuple[bytes, int]:
 
     eof = len(src) - 1
     while src[idx] == 255 and idx != eof:
-        if src[idx + 1] == 255:
-            idx += 1
-            continue
+        if src[idx + 1] != 255:
+            break
 
-        break
+        idx += 1
 
     if idx == eof:
         raise ValueError(msg)

@@ -121,6 +121,7 @@ def _decompress_single_frame(
 
     # Parse the JPEG codestream for the APP and SOF markers
     param = parse_jpeg(src)
+    print(param)
 
     # APP0 JFIF implies YCbCr
     # https://www.w3.org/Graphics/JPEG/jfif3.pdf
@@ -168,6 +169,7 @@ def _decompress_single_frame(
     #   YCbCr | YBR -> (none)       | YBR    |
     #   RGB   | YBR -> RGB to YCbCr | YBR    | yes
 
+    print(cs, photometric_interpretation)
     if photometric_interpretation == "RGB":
         if cs == "RGB":
             # Source data is RGB - allow libjpeg to skip transform

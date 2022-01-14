@@ -61,8 +61,7 @@ _SOF_YBR = (
     b"\x03\x00\x11\x00\x01\x11\x00\x02\x11\x00"
 )
 _SOF_RGB = (
-    b"\xFF\xCF\x00\x12\x08\x00\x64\x00\x64"
-    b"\x03R\x11\x00G\x11\x00B\x11\x00"
+    b"\xFF\xCF\x00\x12\x08\x00\x64\x00\x64\x03R\x11\x00G\x11\x00B\x11\x00"
 )
 
 
@@ -230,8 +229,8 @@ class TestDebugJPEG2K:
         assert "0: signed, precision 1" in s[5]
         assert "No COD (FF 52) marker found @ offset 45" in s[6]
 
-        s = debug_jpeg2k(b"\xff\x4f" + _SIZ_UNSIGNED)
-        assert len(s) == 9
+        s = debug_jpeg2k(b"\xff\x4f" + _SIZ_UNSIGNED + b"\xff\xbb")
+        assert len(s) == 10
         assert "SOI (FF 4F) marker found @ offset 0" in s[0]
         assert "SIZ (FF 51) segment found @ offset 2" in s[1]
         assert "Rows: 101" in s[2]
@@ -240,6 +239,7 @@ class TestDebugJPEG2K:
         assert "1: unsigned, precision 14" in s[6]
         assert "2: unsigned, precision 33" in s[7]
         assert "No COD (FF 52) marker found @ offset 51" in s[8]
+        assert "FF BB" in s[9]
 
     def test_bad_COD(self):
         """Test COD debug output"""
