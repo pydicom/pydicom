@@ -48,11 +48,22 @@ def debug_jpeg(src: bytes) -> List[str]:
     -------
     list of str
     """
+
+    if len(src) < 2:
+        return ["Insufficient data for JPEG codestream"]
+
     s = []
 
-    marker, idx = _find_marker(src)
+    try:
+        marker, idx = _find_marker(src)
+    except Exception:
+        s.append("No SOI (FF D8) marker found at the start of the codestream")
+        s.append(f"  {_as_str(src, 16)}")
+        return s
+
     if marker != b"\xFF\xD8":
         s.append("No SOI (FF D8) marker found at the start of the codestream")
+        s.append(f"  {_as_str(src, 16)}")
         return s
 
     s.append("SOI (FF D8) marker found")
@@ -65,7 +76,7 @@ def debug_jpeg(src: bytes) -> List[str]:
             s.append(f"  APP{marker[-1] - 0xE0}: {_as_str(ap_n)}")
 
     if "COM" in d:
-        s.append("COM segment found")
+        s.append("COM (FF FE) segment found")
         s.append(f"  {_as_str(d['COM'])}")
         s.append("")
 
@@ -81,7 +92,7 @@ def debug_jpeg(src: bytes) -> List[str]:
                 f"    ID: 0x{c[0][0]:02X}, subsampling h{c[1]} v{c[2]}"
             )
     else:
-        s.append("Error: No SOF markers found in JPEG codestream")
+        s.append("No SOF marker found in the JPEG codestream")
 
     return s
 
@@ -115,8 +126,8 @@ def _find_marker(src: bytes, idx: int = 0) -> Tuple[bytes, int]:
 
     msg = f"No JPEG markers found after offset {idx}"
 
-    eof = len(src) - 2
-    while src[idx] == 255 and idx <= eof:
+    eof = len(src) - 1
+    while src[idx] == 255 and idx != eof:
         if src[idx + 1] == 255:
             idx += 1
             continue

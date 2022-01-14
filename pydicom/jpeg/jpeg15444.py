@@ -7,7 +7,12 @@ from typing import Dict, Any, List
 
 def _as_str(src: bytes, cutoff: int = 32) -> str:
     """Return bytes as a formatted str."""
-    return " ".join([f"{b:02X}" for b in src[:cutoff]])
+    s = " ".join([f"{b:02X}" for b in src[:cutoff]])
+
+    if len(src) > cutoff:
+        s += " ..."
+
+    return s
 
 
 def debug_jpeg2k(src: bytes) -> List[str]:

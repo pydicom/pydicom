@@ -634,7 +634,7 @@ class TestPillowHandler_JPEG:
         ds.PhotometricInterpretation = "YBR_FULL_422"
         msg = (
             r"Unable to decode as the JPEG codestream indicates the encoded "
-            r"pixel data is in the RGB color space, but the \(0028,0004\) "
+            r"pixel data is in RGB color space, but the \(0028,0004\) "
             r"'Photometric Interpretation' is 'YBR_FULL_422'. "
             r"Change the 'Photometric Interpretation' to 'RGB'"
         )
@@ -648,7 +648,7 @@ class TestPillowHandler_JPEG:
         msg = (
             r"A mismatch was found between the JPEG codestream and dataset "
             r"'Photometric Interpretation' value. If the decoded pixel "
-            r"data is in the RGB color space then the \(0028,0004\) "
+            r"data is in RGB color space then the \(0028,0004\) "
             r"'Photometric Interpretation' should be 'YBR_FULL_422' "
             r"instead of 'RGB'"
         )

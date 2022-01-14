@@ -193,7 +193,7 @@ def _decompress_single_frame(
             warnings.warn(
                 "A mismatch was found between the JPEG codestream and dataset "
                 "'Photometric Interpretation' value. If the decoded pixel "
-                "data is in the RGB color space then the (0028,0004) "
+                "data is in RGB color space then the (0028,0004) "
                 "'Photometric Interpretation' should be 'YBR_FULL_422' "
                 "instead of 'RGB'"
             )
@@ -206,7 +206,7 @@ def _decompress_single_frame(
         #   OSError: broken data stream when reading image file
         raise AttributeError(
             "Unable to decode as the JPEG codestream indicates the encoded "
-            "pixel data is in the RGB color space, but the (0028,0004) "
+            "pixel data is in RGB color space, but the (0028,0004) "
             f"'Photometric Interpretation' is '{photometric_interpretation}'. "
             "Change the 'Photometric Interpretation' to 'RGB'"
         )
