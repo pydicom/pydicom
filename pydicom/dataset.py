@@ -33,6 +33,8 @@ from typing import (
 import warnings
 import weakref
 
+from pydicom.filebase import DicomFileLike
+
 try:
     import numpy
 except ImportError:
@@ -48,7 +50,7 @@ from pydicom.datadict import (
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
-from pydicom.fileutil import path_from_pathlike
+from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, reshape_pixel_array, get_image_pixel_ids
 )
@@ -2616,7 +2618,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, os.PathLike, BinaryIO],
+        filename_or_obj: Union[PathType, BinaryIO, DicomFileLike],
         dataset: _DatasetType,
         preamble: Optional[bytes] = None,
         file_meta: Optional["FileMetaDataset"] = None,
@@ -2657,8 +2659,8 @@ class FileDataset(Dataset):
 
         filename: Optional[str] = None
         filename_or_obj = path_from_pathlike(filename_or_obj)
-        self.fileobj_type: Any
-        self.filename: Union[str, BinaryIO]
+        self.fileobj_type: Any = None
+        self.filename: Union[PathType, BinaryIO] = ""
 
         if isinstance(filename_or_obj, str):
             filename = filename_or_obj

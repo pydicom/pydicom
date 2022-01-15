@@ -1925,6 +1925,15 @@ class TestFileDataset:
         ds.preamble = None
         assert ds == ds2
 
+    def test_deepcopy_without_filename(self):
+        """Regression test for #1571."""
+        file_meta = FileMetaDataset()
+        ds = FileDataset(filename_or_obj="", dataset={}, file_meta=file_meta,
+                         preamble=b"\0" * 128)
+
+        ds2 = copy.deepcopy(ds)
+        assert ds2.filename == ""
+
 
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""

@@ -23,8 +23,9 @@ Enhancements
 
 Fixes
 -----
-
 * Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
 * Fixed Hologic private dictionary entry (0019xx43)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` not setting the correct
   encoding for the rest of the dataset (:issue:`1565`)
+* Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
+  (:issue:`1571`)
