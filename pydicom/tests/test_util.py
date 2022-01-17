@@ -10,13 +10,12 @@ from pydicom import filereader
 from pydicom._private_dict import private_dictionaries
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian, ExplicitVRBigEndian, ExplicitVRLittleEndian
 )
-from pydicom.util import fixer
-from pydicom.util import hexutil
+from pydicom.util import fixer, hexutil, debug_pixel_data
 from pydicom.util.codify import (
     camel_to_underscore,
     tag_repr,
@@ -432,6 +431,202 @@ class TestLeanRead:
             with pytest.raises(NotImplementedError, match=msg):
                 for elem in ds:
                     pass
+
+
+class TestDebugPixelData:
+    """Tests for pydicom.util.debug.debug_pixel_data"""
+    def test_bad_dataset_raises(self):
+        """Test bad ds type raises"""
+        msg = r"'ds' should be pydicom.dataset.Dataset, not 'int'"
+        with pytest.raises(TypeError, match=msg):
+            debug_pixel_data(1234)
+
+    def test_meta(self, capsys):
+        """Test file meta information"""
+        ds = Dataset()
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: absent" in out
+        assert "Transfer Syntax UID: (none available)" in out
+        assert "Dataset" in out
+        assert "No pixel data elements found" in out
+
+        ds.file_meta = FileMetaDataset()
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: present" in out
+        assert "Transfer Syntax UID: (none available)" in out
+        assert "Dataset" in out
+        assert "No pixel data elements found" in out
+
+    def test_tsyntax(self, capsys):
+        """Test transfer syntax UID"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+
+        # Public
+        ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: present" in out
+        assert (
+            "Transfer Syntax UID: 1.2.840.10008.1.2.1 (Explicit VR "
+            "Little Endian)"
+        ) in out
+        assert "Dataset" in out
+        assert "No pixel data elements found" in out
+
+        # Private
+        ds.file_meta.TransferSyntaxUID = "9.10.11.12"
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: present" in out
+        assert "Transfer Syntax UID: 9.10.11.12" in out
+        assert "Dataset" in out
+        assert "No pixel data elements found" in out
+
+    def test_image_pixel(self, capsys):
+        """Test image pixel module"""
+        ds = get_testdata_file("CT_small.dcm", read=True)
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: present" in out
+        assert "Transfer Syntax UID: 1.2.840.10008.1.2.1" in out
+        assert "Dataset" in out
+        assert (
+            "(0028, 0010) Rows                                US: 128"
+        ) in out
+        assert (
+            "(0028, 0011) Columns                             US: 128"
+        ) in out
+        assert (
+            "(0028, 0030) Pixel Spacing                       DS: "
+            "[0.661468, 0.661468]"
+        ) in out
+        assert (
+            "(0028, 0100) Bits Allocated                      US: 16"
+        ) in out
+        assert (
+            "(0028, 0101) Bits Stored                         US: 16"
+        ) in out
+        assert (
+            "(0028, 0102) High Bit                            US: 15"
+        ) in out
+        assert (
+            "(0028, 0103) Pixel Representation                US: 1"
+        ) in out
+        assert (
+            "(0028, 0120) Pixel Padding Value                 SS: -2000"
+        ) in out
+        assert (
+            "(0028, 1052) Rescale Intercept                   DS: '-1024.0'"
+        ) in out
+        assert (
+            "(0028, 1053) Rescale Slope                       DS: '1.0'"
+        ) in out
+        assert (
+            "(7fe0, 0010) Pixel Data                          OW: "
+            "Array of 32768 elements"
+        ) in out
+
+    def test_pixel_keywords(self, capsys):
+        """Test multiple pixel data elements"""
+        ds = Dataset()
+        ds.PixelData = None
+        ds.FloatPixelData = None
+
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert (
+            "Multiple pixel data elements found: PixelData, FloatPixelData"
+        ) in out
+
+    def test_jpeg(self, capsys):
+        """Test jpeg info"""
+        ds = get_testdata_file("SC_jpeg_no_color_transform_2.dcm", read=True)
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+        assert "File Meta Information: present" in out
+        assert (
+            "Transfer Syntax UID: 1.2.840.10008.1.2.4.50 "
+            "(JPEG Baseline (Process 1))"
+        ) in out
+        assert "Dataset" in out
+        assert "(0028, 0002) Samples per Pixel                   US: 3" in out
+        assert (
+            "(0028, 0004) Photometric Interpretation          CS: 'RGB'"
+        ) in out
+        assert "(0028, 0006) Planar Configuration                US: 0" in out
+        assert (
+            "(0028, 0010) Rows                                US: 256"
+        ) in out
+        assert (
+            "(0028, 0011) Columns                             US: 256"
+        ) in out
+        assert "(0028, 0100) Bits Allocated                      US: 8" in out
+        assert "(0028, 0101) Bits Stored                         US: 8" in out
+        assert "(0028, 0102) High Bit                            US: 7" in out
+        assert "(0028, 0103) Pixel Representation                US: 0" in out
+        assert (
+            "(7fe0, 0010) Pixel Data                          OB: "
+            "Array of 3422 elements"
+        ) in out
+
+        assert "JPEG codestream info for frame 0" in out
+        assert "SOI (FF D8) marker found" in out
+        assert "APP segment(s) found" in out
+        assert "APP14: 41 64 6F 62 65 00 65 00 00 00 00 00" in out
+        assert "SOF (FF C0) segment found" in out
+        assert "Precision: 8" in out
+        assert "Rows: 256" in out
+        assert "Columns: 256" in out
+        assert "Components:" in out
+        assert "ID: 0x00, subsampling h1 v1" in out
+        assert "ID: 0x01, subsampling h1 v1" in out
+        assert "ID: 0x02, subsampling h1 v1" in out
+
+    def test_jpeg2k(self, capsys):
+        """Test jpeg2k info"""
+        ds = get_testdata_file("JPEG2000.dcm", read=True)
+        debug_pixel_data(ds)
+        out = capsys.readouterr().out
+
+        assert "File Meta Information: present" in out
+        assert (
+            "Transfer Syntax UID: 1.2.840.10008.1.2.4.91 "
+            "(JPEG 2000 Image Compression)"
+        ) in out
+
+        assert "JPEG 2000 codestream info for frame 0" in out
+        assert "SOI (FF 4F) marker found @ offset 0" in out
+        assert "SIZ (FF 51) segment found @ offset 2" in out
+        assert "Rows: 1024" in out
+        assert "Columns: 256" in out
+        assert "Components:" in out
+        assert "0: signed, precision 16" in out
+        assert "COD (FF 52) segment found @ offset 45" in out
+        assert "Multiple component transform: none" in out
+        assert "Wavelet transform: 9-7 irreversible" in out
+
+    def test_index(self, capsys):
+        """Test using the index parameter"""
+        # 10 frames
+        ds = get_testdata_file("emri_small_jpeg_2k_lossless.dcm", read=True)
+        with pytest.raises(StopIteration):
+            debug_pixel_data(ds, idx=10)
+
+        debug_pixel_data(ds, idx=9)
+        out = capsys.readouterr().out
+        assert "JPEG 2000 codestream info for frame 9" in out
+        assert "SOI (FF 4F) marker found @ offset 0" in out
+        assert "SIZ (FF 51) segment found @ offset 2" in out
+        assert "Rows: 64" in out
+        assert "Columns: 64" in out
+        assert "Components:" in out
+        assert "0: unsigned, precision 16" in out
+        assert "COD (FF 52) segment found @ offset 45" in out
+        assert "Multiple component transform: none" in out
+        assert "Wavelet transform: 5-3 reversible" in out
 
 
 @contextmanager

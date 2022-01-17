@@ -159,14 +159,16 @@ def _decompress_single_frame(
     #   doesn't actually match that of the encoded source data
 
     # The possibilities are:
-    #   cs    | PI  -> transform    | return | warn
-    #   ------+---------------------+--------+-----
-    #   None  | RGB -> YCbCr to RGB | RGB    |
-    #   YCbCr | RGB -> YCbCr to RGB | RGB    | yes
-    #   RGB   | RGB -> (none)       | RGB    |
-    #   None  | YBR -> (none)       | YBR    |
-    #   YCbCr | YBR -> (none)       | YBR    |
-    #   RGB   | YBR -> RGB to YCbCr | YBR    | yes
+    #   cs    | PI  -> transform     | return | warn | note
+    #   ------+----------------------+--------+------+-----------------
+    #   None  | RGB -> YCbCr to RGB  | RGB    |      | source is
+    #         |     -> (none)        | RGB    |      | probably YCbCr
+    #   YCbCr | RGB -> YCbCr to RGB  | RGB    | yes  |
+    #   RGB   | RGB -> (none)        | RGB    |      |
+    #   None  | YBR -> (none)        | YBR    |      |
+    #   YCbCr | YBR -> (none)        | YBR    |      |
+    #   RGB   | YBR -> RGB to YCbCr* | YBR    | yes  | can't return YBR
+
 
     if photometric_interpretation == "RGB":
         if cs == "RGB":
@@ -184,6 +186,12 @@ def _decompress_single_frame(
             # * If the decoded pixel data is correct then source is RGB
             # * If the decoded pixel data is incorrect then source is YCbCr
             #   but this can be fixed by user applying YCbCr -> RGB transform
+            warnings.warn(
+                "No color space indicators were found in the JPEG codestream, "
+                "if the returned pixel data is not in RGB color space then "
+                "you may need to convert from YCbCr to RGB using 'pydicom."
+                "pixel_data_handlers.convert_color_space()'"
+            )
             im.draft("YCbCr", (shape[0], shape[1]))
 
         if cs == "YCbCr":

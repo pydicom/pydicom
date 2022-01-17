@@ -571,7 +571,6 @@ class TestPillowHandler_JPEG:
         """Test pixel_array returns correct values."""
         ds = dcmread(fpath)
         arr = ds.pixel_array
-
         if 'YBR' in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
