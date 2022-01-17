@@ -754,7 +754,7 @@ class TestDataElementValidation:
     def test_invalid_ae(self, value):
         self.check_invalid_vr("AE", value)
 
-    @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle"))
+    @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle", "", None))
     def test_valid_ae(self, value):
         DataElement(0x00410001, "AE", value,
                     validation_mode=config.RAISE)
@@ -764,7 +764,8 @@ class TestDataElementValidation:
     def test_invalid_as(self, value):
         self.check_invalid_vr("AS", value)
 
-    @pytest.mark.parametrize("value", ("012Y", "345M", b"052W", b"789D"))
+    @pytest.mark.parametrize("value",
+                             ("012Y", "345M", b"052W", b"789D", "", None))
     def test_valid_as(self, value):
         DataElement(0x00410001, "AS", value,
                     validation_mode=config.RAISE)
@@ -774,7 +775,9 @@ class TestDataElementValidation:
     def test_invalid_cs(self, value):
         self.check_invalid_vr("CS", value)
 
-    @pytest.mark.parametrize("value", ("VALID_13579 ", b"VALID_13579"))
+    @pytest.mark.parametrize(
+        "value", ("VALID_13579 ", b"VALID_13579", "", None)
+    )
     def test_valid_cs(self, value):
         DataElement(0x00410001, "CS", value,
                     validation_mode=config.RAISE)
@@ -788,8 +791,8 @@ class TestDataElementValidation:
         self.check_invalid_vr("DA", value)
 
     @pytest.mark.parametrize(
-        "value",
-        (b"19560303", "20101225-20201224 ", b"-19560303", "19560303-")
+        "value", (b"19560303", "20101225-20201224 ",
+                  b"-19560303", "19560303-", "", None)
     )
     def test_valid_da(self, value):
         DataElement(0x00410001, "DA", value,
@@ -803,8 +806,8 @@ class TestDataElementValidation:
         self.check_invalid_vr("DS", value, check_warn=False)
 
     @pytest.mark.parametrize(
-        "value",
-        ("12345", "+.1234 ", "-0345.76", b"1956E3", b"-1956e+3", "+195.6e-3")
+        "value", ("12345", "+.1234 ", "-0345.76", b"1956E3",
+                  b"-1956e+3", "+195.6e-3", "", None)
     )
     def test_valid_ds(self, value):
         DataElement(0x00410001, "DS", value,
@@ -816,7 +819,9 @@ class TestDataElementValidation:
     def test_invalid_is(self, value):
         self.check_invalid_vr("IS", value, check_warn=False)
 
-    @pytest.mark.parametrize("value", (" 12345 ", b"+1234 ", "-034576"))
+    @pytest.mark.parametrize(
+        "value", (" 12345 ", b"+1234 ", "-034576", "", None)
+    )
     def test_valid_is(self, value):
         DataElement(0x00410001, "IS", value,
                     validation_mode=config.RAISE)
@@ -833,7 +838,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize(
         "value",
         ("23", "1234", b"010159", "225959.3", "000000.345", "222222.222222",
-         "-1234", "123456-", b"123460-1330", "005960")
+         "-1234", "123456-", b"123460-1330", "005960", "", None)
     )
     def test_valid_tm(self, value):
         DataElement(0x00410001, "TM", value,
@@ -853,7 +858,7 @@ class TestDataElementValidation:
         ("1984", "200112", b"20200101", "1877123112", "200006012020",
          "19190420015960", "20300202022222.222222", b"20300202022222.2",
          "1984+0600", "1877123112-0030", "20300202022222.2-1200",
-         "20000101-", "-2020010100", "1929-1997")
+         "20000101-", "-2020010100", "1929-1997", "", None)
     )
     def test_valid_dt(self, value):
         DataElement(0x00410001, "DT", value,
@@ -861,11 +866,26 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", (
             "Руссский", "ctrl\tchar", '"url"', "a<b", "{abc}"))
-    def test_invalid_ur(self, value):
+    def test_invalid_ui(self, value):
         self.check_invalid_vr("UR", value)
 
+    @pytest.mark.parametrize(
+        "value", ("1234.567890.333", "0.0.0", "1234." * 12 + "1234"
+                  "", None)
+    )
+    def test_valid_ui(self, value):
+        DataElement(0x00410001, "UI", value,
+                    validation_mode=config.RAISE)
+
     @pytest.mark.parametrize("value", (
-            "https://www.a.b/sdf_g?a=1&b=5", "/a#b(c)[d]@!", "'url'"))
+            ".123.456", "00.1.2", "123..456", "123.45.", "12a.45", "123.04"))
+    def test_invalid_ur(self, value):
+        self.check_invalid_vr("UI", value)
+
+    @pytest.mark.parametrize(
+        "value", ("https://www.a.b/sdf_g?a=1&b=5",
+                  "/a#b(c)[d]@!", "'url'", "", None)
+    )
     def test_valid_ur(self, value):
         DataElement(0x00410001, "UR", value,
                     validation_mode=config.RAISE)
@@ -879,6 +899,13 @@ class TestDataElementValidation:
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, "PN", b"Jimmy" * 13,
                         validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value", ("John^Doe", "Yamada^Tarou=山田^太郎", "", None)
+    )
+    def test_valid_pn(self, value):
+        DataElement(0x00410001, "PN", value,
+                    validation_mode=config.RAISE)
 
     def test_write_invalid_length_non_ascii_text(
             self, enforce_writing_invalid_values):
