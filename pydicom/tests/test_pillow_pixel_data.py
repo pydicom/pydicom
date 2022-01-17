@@ -1,7 +1,5 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 
-from struct import unpack
-
 import pytest
 
 import pydicom
@@ -221,7 +219,7 @@ REFERENCE_DATA = [
     (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
-    #(JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
+    # (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (JPGB_08_08_3_0_1F_RGB_APP14, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (J2KR_08_08_3_0_1F_YBR_ICT, (J2KR, 8, 3, 0, 1, (480, 640, 3), 'uint8')),
     (J2KR_16_10_1_0_1F_M1, (J2KR, 16, 1, 0, 1, (1760, 1760), 'uint16')),
@@ -286,15 +284,6 @@ JPEG_MATCHING_DATASETS = [
             (192, 192, 192), (255, 255, 255),
         ],
     ),
-    # pytest.param(
-    #     JPGB_08_08_3_0_1F_RGB,
-    #     get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
-    #     [
-    #         (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
-    #         (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
-    #         (244, 244, 244), (244, 244, 244),
-    #     ],
-    # ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB_APP14,
         get_testdata_file("SC_rgb_jpeg_app14_dcmd.dcm"),
