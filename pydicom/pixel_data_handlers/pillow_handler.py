@@ -27,6 +27,12 @@ except ImportError:
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
+try:
+    HAVE_LIBJPEG_T = features.check_feature("libjpeg_turbo")
+except ValueError:
+    HAVE_LIBJPEG = False
+
+
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
 from pydicom.jpeg import parse_jpeg, parse_jpeg2k
@@ -121,7 +127,6 @@ def _decompress_single_frame(
 
     # Parse the JPEG codestream for the APP and SOF markers
     param = parse_jpeg(src)
-    print(param)
 
     # APP0 JFIF implies YCbCr
     # https://www.w3.org/Graphics/JPEG/jfif3.pdf
@@ -169,13 +174,12 @@ def _decompress_single_frame(
     #   YCbCr | YBR -> (none)       | YBR    |
     #   RGB   | YBR -> RGB to YCbCr | YBR    | yes
 
-    print(cs, photometric_interpretation)
     if photometric_interpretation == "RGB":
         if cs == "RGB":
             # Source data is RGB - allow libjpeg to skip transform
             # If "adobe_transform" is present, or if the component IDs are
-            #   RGB then libjpeg will use that info to skip the YCbCr -> RGB
-            #   transform
+            #   RGB then libjpeg/turbo will use that info to skip the
+            #   YCbCr -> RGB transform
             # https://github.com/libjpeg-turbo/ijg/blob/main/jdapimin.c
             pass
 

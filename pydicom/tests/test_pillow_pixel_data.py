@@ -643,31 +643,26 @@ class TestPillowHandler_JPEG:
         with pytest.raises(AttributeError, match=msg):
             ds.pixel_array
 
-    @pytest.mark.skip()
     def test_component_ID(self):
-        """Test exception raised when RGB source data is decoded to YBR"""
+        """Test RGB component IDs result in correct decode."""
         # Unflagged RGB source data
         ds = dcmread(JPGB_08_08_3_0_1F_RGB)
+        # Add component ID flags for RGB - need to update SOF and SOS
         b = bytearray(ds.PixelData)
-        # Add component ID flags for RGB
-        #b[313] = b"R"[0]
-        #b[316] = b"G"[0]
-        #b[319] = b"B"[0]
-
-        # Add APP14
-        #app14 = b"\xff\xee\x00\x0eAdobe\x00\x64\x00\x00\x00\x00\x01"
-        #b = b[:12] + b"\xAC\x0D\x00\x00\xFF\xD8" + app14 + b[18:]
-
-        #s = [f"{x:02X}" for x in b[:350]]
-        #for ii in range(0, 350, 10):
-        #    print(s[ii:ii + 10])
+        # FF C0 is SOF0 @ offset 303
+        b[313] = b"R"[0]
+        b[316] = b"G"[0]
+        b[319] = b"B"[0]
+        # FF DA is SOS @ offset 322
+        b[327] = b"R"[0]
+        b[329] = b"G"[0]
+        b[331] = b"B"[0]
 
         ds.PixelData = bytes(b)
         arr = ds.pixel_array
 
-        import matplotlib.pyplot as plt
-        plt.imshow(arr)
-        plt.show()
+        ref = dcmread(get_testdata_file("SC_rgb_jpeg_dcmd.dcm")).pixel_array
+        assert np.array_equal(arr, ref)
 
     def test_YBR_to_RGB_warns(self):
         """Test warning issued when YBR source data is decoded to RGB"""
