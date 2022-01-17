@@ -80,6 +80,7 @@ def debug_pixel_data(ds: Dataset, idx: int = 0) -> None:
     for line in s:
         print(line)
 
+
 def _get_frame_data(ds: Dataset, idx: int) -> bytes:
     """Return the encapsulated frame data at index `idx`"""
     # May be absent, None, 0 or positive int

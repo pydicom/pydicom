@@ -169,7 +169,6 @@ def _decompress_single_frame(
     #   YCbCr | YBR -> (none)        | YBR    |      |
     #   RGB   | YBR -> RGB to YCbCr* | YBR    | yes  | can't return YBR
 
-
     if photometric_interpretation == "RGB":
         if cs == "RGB":
             # Source data is RGB - allow libjpeg to skip transform
