@@ -190,7 +190,8 @@ def _decompress_single_frame(
                 "No color space indicators were found in the JPEG codestream, "
                 "if the returned pixel data is not in RGB color space then "
                 "you may need to convert from YCbCr to RGB using 'pydicom."
-                "pixel_data_handlers.convert_color_space()'"
+                "pixel_data_handlers.convert_color_space()' and update "
+                "(0028,0004) 'Photometric Interpretation' to 'YBR_FULL_422'"
             )
             im.draft("YCbCr", (shape[0], shape[1]))
 

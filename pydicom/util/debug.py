@@ -53,9 +53,6 @@ def debug_pixel_data(ds: Dataset, idx: int = 0) -> None:
     for elem in ds.group_dataset(0x0028):
         s.append(f"  {str(elem)}")
 
-    # May be absent, None, 0 or positive int
-    nr_frames = int(ds.get("NumberOfFrames", 1) or 1)
-
     # Check pixel data
     px_keyword = ["PixelData", "FloatPixelData", "DoubleFloatPixelData"]
     px_keyword = [kw for kw in px_keyword if kw in ds]
@@ -70,28 +67,28 @@ def debug_pixel_data(ds: Dataset, idx: int = 0) -> None:
         s.append("")
 
         # Try and parse the JPEG info
-        frame_nr = 0
         if tsyntax in JPEGTransferSyntaxes:
-            gen = generate_pixel_data_frame(ds.PixelData, nr_frames)
-
-            while frame_nr != idx:
-                next(gen)
-                frame_nr += 1
-
             s.append(f"JPEG codestream info for frame {idx}")
-            info = debug_jpeg(next(gen))
+            info = debug_jpeg(_get_frame_data(ds, idx))
             s.extend([f"  {s}" for s in info])
 
         if tsyntax in JPEG2000TransferSyntaxes:
-            gen = generate_pixel_data_frame(ds.PixelData, nr_frames)
-
-            while frame_nr != idx:
-                next(gen)
-                frame_nr += 1
-
             s.append(f"JPEG 2000 codestream info for frame {idx}")
-            info = debug_jpeg2k(next(gen))
+            info = debug_jpeg2k(_get_frame_data(ds, idx))
             s.extend([f"  {s}" for s in info])
 
     for line in s:
         print(line)
+
+def _get_frame_data(ds: Dataset, idx: int) -> bytes:
+    """Return the encapsulated frame data at index `idx`"""
+    # May be absent, None, 0 or positive int
+    nr_frames = int(ds.get("NumberOfFrames", 1) or 1)
+
+    frame_nr = 0
+    gen = generate_pixel_data_frame(ds.PixelData, nr_frames)
+    while frame_nr != idx:
+        next(gen)
+        frame_nr += 1
+
+    return next(gen)

@@ -221,7 +221,7 @@ REFERENCE_DATA = [
     (JPGB_08_08_3_0_1F_YBR_FULL_411, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_422, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
     (JPGB_08_08_3_0_1F_YBR_FULL_444, (JPGB, 8, 3, 0, 1, (100, 100, 3), 'uint8')),  # noqa
-    (JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
+    #(JPGB_08_08_3_0_1F_RGB, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (JPGB_08_08_3_0_1F_RGB_APP14, (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')),
     (J2KR_08_08_3_0_1F_YBR_ICT, (J2KR, 8, 3, 0, 1, (480, 640, 3), 'uint8')),
     (J2KR_16_10_1_0_1F_M1, (J2KR, 16, 1, 0, 1, (1760, 1760), 'uint16')),
@@ -286,15 +286,15 @@ JPEG_MATCHING_DATASETS = [
             (192, 192, 192), (255, 255, 255),
         ],
     ),
-    pytest.param(
-        JPGB_08_08_3_0_1F_RGB,
-        get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
-        [
-            (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
-            (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
-            (244, 244, 244), (244, 244, 244),
-        ],
-    ),
+    # pytest.param(
+    #     JPGB_08_08_3_0_1F_RGB,
+    #     get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
+    #     [
+    #         (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+    #         (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
+    #         (244, 244, 244), (244, 244, 244),
+    #     ],
+    # ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB_APP14,
         get_testdata_file("SC_rgb_jpeg_app14_dcmd.dcm"),
@@ -588,6 +588,45 @@ class TestPillowHandler_JPEG:
             assert tuple(arr[85, 50, :]) == values[8]
             assert tuple(arr[95, 50, :]) == values[9]
 
+        assert np.array_equal(arr, ref)
+
+    def test_singleton(self):
+        """Test singleton datasets"""
+        data = (JPGB, 8, 3, 0, 1, (256, 256, 3), 'uint8')
+
+        ds = dcmread(JPGB_08_08_3_0_1F_RGB)
+        assert ds.file_meta.TransferSyntaxUID == data[0]
+        assert ds.BitsAllocated == data[1]
+        assert ds.SamplesPerPixel == data[2]
+        assert ds.PixelRepresentation == data[3]
+        assert getattr(ds, 'NumberOfFrames', 1) == data[4]
+
+        msg = (
+            r"No color space indicators were found in the JPEG codestream, "
+            r"if the returned pixel data is not in RGB color space then "
+            r"you may need to convert from YCbCr to RGB using 'pydicom."
+            r"pixel_data_handlers.convert_color_space\(\)' and update "
+            r"\(0028,0004\) 'Photometric Interpretation' to 'YBR_FULL_422'"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        assert arr.flags.writeable
+        assert arr.shape == data[5]
+        assert arr.dtype == data[6]
+
+        assert tuple(arr[5, 50, :]) == (244, 244, 244)
+        assert tuple(arr[15, 50, :]) == (244, 244, 244)
+        assert tuple(arr[25, 50, :]) == (244, 244, 244)
+        assert tuple(arr[35, 50, :]) == (244, 244, 244)
+        assert tuple(arr[45, 50, :]) == (236, 237, 234)
+        assert tuple(arr[55, 50, :]) == (244, 244, 244)
+        assert tuple(arr[65, 50, :]) == (244, 244, 244)
+        assert tuple(arr[75, 50, :]) == (244, 244, 244)
+        assert tuple(arr[85, 50, :]) == (244, 244, 244)
+        assert tuple(arr[95, 50, :]) == (244, 244, 244)
+
+        ref = dcmread(get_testdata_file("SC_rgb_jpeg_dcmd.dcm")).pixel_array
         assert np.array_equal(arr, ref)
 
     def test_color_3d(self):

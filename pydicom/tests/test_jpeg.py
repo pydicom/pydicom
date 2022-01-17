@@ -9,7 +9,7 @@ from pydicom.jpeg.jpeg10918 import (
     parse_jpeg,
     debug_jpeg,
 )
-from pydicom.jpeg.jpeg15444 import debug_jpeg2k
+from pydicom.jpeg.jpeg15444 import debug_jpeg2k, parse_jpeg2k
 
 
 def test_get_bit():
@@ -161,6 +161,39 @@ class TestDebugJPEG:
         assert len(s) == 2
         assert "SOI (FF D8) marker found" in s[0]
         assert "Unable to parse the JPEG codestream" in s[1]
+
+
+class TestParseJPEG2K:
+    """Tests for parse_jpeg2k."""
+    def test_precision(self):
+        """Test getting the precision for a JPEG2K bytestream."""
+        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
+        # Signed
+        for ii in range(135, 144):
+            params = parse_jpeg2k(base + bytes([ii]))
+            assert ii - 127 == params["precision"]
+            assert params["is_signed"]
+
+        # Unsigned
+        for ii in range(7, 16):
+            params = parse_jpeg2k(base + bytes([ii]))
+            assert ii + 1 == params["precision"]
+            assert not params["is_signed"]
+
+    def test_not_j2k(self):
+        """Test result when no JPEG2K SOF marker present"""
+        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
+        assert {} == parse_jpeg2k(base + b'\x8F')
+
+    def test_no_siz(self):
+        """Test result when no SIZ box present"""
+        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
+        assert {} == parse_jpeg2k(base + b'\x8F')
+
+    def test_short_bytestream(self):
+        """Test result when no SIZ box present"""
+        assert {} == parse_jpeg2k(b'')
+        assert {} == parse_jpeg2k(b'\xff\x4f\xff\x51' + b'\x00' * 20)
 
 
 _SIZ_SIGNED = (

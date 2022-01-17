@@ -2172,39 +2172,6 @@ class TestNumpy_ApplyVOILUT:
         assert [0, 1, 128, 254, 255] == out.tolist()
 
 
-class TestGetJ2KParameters:
-    """Tests for get_j2k_parameters."""
-    def test_precision(self):
-        """Test getting the precision for a JPEG2K bytestream."""
-        base = b'\xff\x4f\xff\x51' + b'\x00' * 38
-        # Signed
-        for ii in range(135, 144):
-            params = get_j2k_parameters(base + bytes([ii]))
-            assert ii - 127 == params["precision"]
-            assert params["is_signed"]
-
-        # Unsigned
-        for ii in range(7, 16):
-            params = get_j2k_parameters(base + bytes([ii]))
-            assert ii + 1 == params["precision"]
-            assert not params["is_signed"]
-
-    def test_not_j2k(self):
-        """Test result when no JPEG2K SOF marker present"""
-        base = b'\xff\x4e\xff\x51' + b'\x00' * 38
-        assert {} == get_j2k_parameters(base + b'\x8F')
-
-    def test_no_siz(self):
-        """Test result when no SIZ box present"""
-        base = b'\xff\x4f\xff\x52' + b'\x00' * 38
-        assert {} == get_j2k_parameters(base + b'\x8F')
-
-    def test_short_bytestream(self):
-        """Test result when no SIZ box present"""
-        assert {} == get_j2k_parameters(b'')
-        assert {} == get_j2k_parameters(b'\xff\x4f\xff\x51' + b'\x00' * 20)
-
-
 class TestGetNrFrames:
     """Tests for get_nr_frames."""
     def test_none(self):
