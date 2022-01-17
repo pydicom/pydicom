@@ -629,19 +629,25 @@ class TestPillowHandler_JPEG:
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)
 
-    def test_RGB_to_YBR_raises(self):
+    def test_RGB_to_YBR_warns(self):
         """Test exception raised when RGB source data is decoded to YBR"""
         # Flagged RGB source data
         ds = dcmread(JPGB_08_08_3_0_1F_RGB_APP14)
         ds.PhotometricInterpretation = "YBR_FULL_422"
         msg = (
-            r"Unable to decode as the JPEG codestream indicates the encoded "
-            r"pixel data is in RGB color space, but the \(0028,0004\) "
-            r"'Photometric Interpretation' is 'YBR_FULL_422'. "
-            r"Change the 'Photometric Interpretation' to 'RGB'"
+            r"A mismatch was found between the JPEG codestream and dataset "
+            r"'Photometric Interpretation' value. If the returned pixel "
+            r"data is in RGB color space then the \(0028,0004\) "
+            r"'Photometric Interpretation' should be 'RGB' "
+            f"instead of 'YBR_FULL_422'"
         )
-        with pytest.raises(AttributeError, match=msg):
-            ds.pixel_array
+        with pytest.warns(UserWarning, match=msg):
+            arr = ds.pixel_array
+
+        ref = dcmread(
+            get_testdata_file("SC_rgb_jpeg_app14_dcmd.dcm")
+        ).pixel_array
+        assert np.array_equal(arr, ref)
 
     def test_component_ID(self):
         """Test RGB component IDs result in correct decode."""
@@ -670,7 +676,7 @@ class TestPillowHandler_JPEG:
         ds.PhotometricInterpretation = "RGB"
         msg = (
             r"A mismatch was found between the JPEG codestream and dataset "
-            r"'Photometric Interpretation' value. If the decoded pixel "
+            r"'Photometric Interpretation' value. If the returned pixel "
             r"data is in RGB color space then the \(0028,0004\) "
             r"'Photometric Interpretation' should be 'YBR_FULL_422' "
             r"instead of 'RGB'"

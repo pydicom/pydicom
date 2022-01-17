@@ -27,12 +27,6 @@ except ImportError:
     HAVE_JPEG = False
     HAVE_JPEG2K = False
 
-try:
-    HAVE_LIBJPEG_T = features.check_feature("libjpeg_turbo")
-except ValueError:
-    HAVE_LIBJPEG = False
-
-
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
 from pydicom.jpeg import parse_jpeg, parse_jpeg2k
@@ -142,7 +136,7 @@ def _decompress_single_frame(
         if any(c_ss):
             cs = "YCbCr"
 
-        # Some applications use the SOF marker's component IDs to flag
+        # Some applications use the component IDs to flag
         #   the colour components
         c_ids = [x[0] for x in param["SOF"]["Components"]]
         if c_ids in ([b"R", b"G", b"B"], [b"r", b"g", b"b"]):
@@ -198,7 +192,7 @@ def _decompress_single_frame(
             #   support JPEGLosslessP14 and JPEGLosslessSV1
             warnings.warn(
                 "A mismatch was found between the JPEG codestream and dataset "
-                "'Photometric Interpretation' value. If the decoded pixel "
+                "'Photometric Interpretation' value. If the returned pixel "
                 "data is in RGB color space then the (0028,0004) "
                 "'Photometric Interpretation' should be 'YBR_FULL_422' "
                 "instead of 'RGB'"
@@ -209,13 +203,16 @@ def _decompress_single_frame(
     if cs == "RGB":
         # Source data is RGB but PI is YBR
         # Trying to forcibly decode to YCbCr results in a
-        #   OSError: broken data stream when reading image file
-        raise AttributeError(
-            "Unable to decode as the JPEG codestream indicates the encoded "
-            "pixel data is in RGB color space, but the (0028,0004) "
-            f"'Photometric Interpretation' is '{photometric_interpretation}'. "
-            "Change the 'Photometric Interpretation' to 'RGB'"
+        #   OSError: broken data stream when reading image file,
+        #   so return as-is
+        warnings.warn(
+            "A mismatch was found between the JPEG codestream and dataset "
+            "'Photometric Interpretation' value. If the returned pixel "
+            "data is in RGB color space then the (0028,0004) "
+            "'Photometric Interpretation' should be 'RGB' "
+            f"instead of '{photometric_interpretation}'"
         )
+        return im
 
     # Source is YCbCr or libjpeg assumes so - force no transform
     im.draft("YCbCr", (shape[0], shape[1]))
