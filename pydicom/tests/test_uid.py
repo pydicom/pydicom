@@ -7,8 +7,13 @@ import uuid
 
 import pytest
 
+from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSNearLossless
 import pydicom.uid
+
+
+def test_storage_sopclass_uids():
+    assert CTImageStorage == pydicom.uid.CTImageStorage
 
 
 def test_jpeglossless_warning():
