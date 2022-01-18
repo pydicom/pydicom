@@ -7,8 +7,13 @@ import uuid
 
 import pytest
 
+from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom.uid import UID, generate_uid, PYDICOM_ROOT_UID, JPEGLSNearLossless
 import pydicom.uid
+
+
+def test_storage_sopclass_uids():
+    assert CTImageStorage == pydicom.uid.CTImageStorage
 
 
 def test_jpeglossless_warning():
@@ -48,7 +53,7 @@ def test_deprecation_warnings():
         for name, (value, replacement) in _deprecations.items():
             msg = (
                 f"The UID constant '{name}' is deprecated and will be removed "
-                f"in pydicom v2.2, use '{replacement}' instead"
+                f"in pydicom v3.0, use '{replacement}' instead"
             )
             with pytest.warns(DeprecationWarning, match=msg):
                 uid = getattr(pydicom.uid, name)

@@ -17,7 +17,8 @@ from pydicom.fileset import (
 )
 from pydicom.filewriter import write_dataset
 from pydicom.tag import Tag, BaseTag
-from pydicom._storage_sopclass_uids import (
+from pydicom.uid import (
+    ExplicitVRLittleEndian, generate_uid, ImplicitVRLittleEndian,
     MediaStorageDirectoryStorage, ComputedRadiographyImageStorage,
     CTImageStorage, RTBeamsTreatmentRecordStorage, RTPlanStorage,
     GrayscaleSoftcopyPresentationStateStorage, BasicTextSRStorage,
@@ -30,10 +31,7 @@ from pydicom._storage_sopclass_uids import (
     LensometryMeasurementsStorage, SurfaceSegmentationStorage,
     TractographyResultsStorage, SurfaceScanMeshStorage, RTDoseStorage,
     ContentAssessmentResultsStorage, RTStructureSetStorage,
-    RTBeamsDeliveryInstructionStorage, CArmPhotonElectronRadiationStorage
-)
-from pydicom.uid import (
-    ExplicitVRLittleEndian, generate_uid, ImplicitVRLittleEndian
+    RTBeamsDeliveryInstructionStorage, CArmPhotonElectronRadiationStorage,
 )
 
 
