@@ -1,0 +1,6 @@
+﻿pydicom.uid.XRayAngiographicImageStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: XRayAngiographicImageStorage

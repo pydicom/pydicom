@@ -1,0 +1,6 @@
+﻿pydicom.uid.CTPerformedProcedureProtocolStorage
+===============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: CTPerformedProcedureProtocolStorage

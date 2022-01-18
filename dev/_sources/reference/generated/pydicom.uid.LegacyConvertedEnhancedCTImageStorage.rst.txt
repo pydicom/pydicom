@@ -1,0 +1,6 @@
+﻿pydicom.uid.LegacyConvertedEnhancedCTImageStorage
+=================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: LegacyConvertedEnhancedCTImageStorage

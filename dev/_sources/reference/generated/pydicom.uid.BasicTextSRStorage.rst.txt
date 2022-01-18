@@ -1,0 +1,6 @@
+﻿pydicom.uid.BasicTextSRStorage
+==============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: BasicTextSRStorage

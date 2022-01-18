@@ -1,0 +1,6 @@
+﻿pydicom.uid.ProtocolApprovalStorage
+===================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ProtocolApprovalStorage

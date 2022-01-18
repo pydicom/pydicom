@@ -1,0 +1,6 @@
+﻿pydicom.uid.PseudoColorSoftcopyPresentationStateStorage
+=======================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: PseudoColorSoftcopyPresentationStateStorage

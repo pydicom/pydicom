@@ -1,0 +1,6 @@
+﻿pydicom.uid.CompositingPlanarMPRVolumetricPresentationStateStorage
+==================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: CompositingPlanarMPRVolumetricPresentationStateStorage

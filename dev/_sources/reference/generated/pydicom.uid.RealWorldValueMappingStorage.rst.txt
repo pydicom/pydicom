@@ -1,0 +1,6 @@
+﻿pydicom.uid.RealWorldValueMappingStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RealWorldValueMappingStorage

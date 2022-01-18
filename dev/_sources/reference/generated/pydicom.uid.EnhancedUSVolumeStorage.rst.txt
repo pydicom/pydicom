@@ -1,0 +1,6 @@
+﻿pydicom.uid.EnhancedUSVolumeStorage
+===================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: EnhancedUSVolumeStorage

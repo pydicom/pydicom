@@ -1,0 +1,6 @@
+﻿pydicom.uid.MRImageStorage
+==========================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MRImageStorage

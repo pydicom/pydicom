@@ -1,0 +1,6 @@
+﻿pydicom.uid.IntraocularLensCalculationsStorage
+==============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: IntraocularLensCalculationsStorage
