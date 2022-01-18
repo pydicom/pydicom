@@ -21,11 +21,14 @@ from pydicom.filereader import dcmread
 from pydicom.filewriter import (
     write_dataset, write_data_element, write_file_meta_info
 )
-from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
-import pydicom._storage_sopclass_uids as sop
 from pydicom.tag import Tag, BaseTag
+import pydicom.uid as sop
 from pydicom.uid import (
-    generate_uid, UID, ExplicitVRLittleEndian, ImplicitVRLittleEndian
+    generate_uid,
+    UID,
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    MediaStorageDirectoryStorage,
 )
 
 
