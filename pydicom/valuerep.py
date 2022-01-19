@@ -116,7 +116,7 @@ def validate_regex(vr: str, value: Union[str, bytes],
     -------
         A tuple of a boolean validation result and the error message.
     """
-    if not re.match(regex, value) or value and value[-1] == "\n":
+    if value and (not re.match(regex, value) or value and value[-1] == "\n"):
         return False, f"Invalid value for VR {vr}: {value!r}."
     return True, ""
 

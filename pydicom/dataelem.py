@@ -11,7 +11,7 @@ import base64
 import json
 from typing import (
     Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
-    List, NamedTuple, MutableSequence, cast
+    List, NamedTuple, MutableSequence
 )
 import warnings
 

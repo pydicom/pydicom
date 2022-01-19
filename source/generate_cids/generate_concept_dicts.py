@@ -141,7 +141,6 @@ def download_fhir_value_sets(local_dir):
     ftp_path = 'medical/dicom/resources/valuesets/fhir/json'
     logger.info('list files in directory "{}"'.format(ftp_path))
     fhir_value_set_files = ftp.nlst(ftp_path)
-    ftp_url = 'ftp://{host}/{path}'.format(host=ftp_host, path=ftp_path)
 
     try:
         for ftp_filepath in fhir_value_set_files:

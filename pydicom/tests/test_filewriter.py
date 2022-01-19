@@ -15,7 +15,6 @@ import zlib
 
 import pytest
 
-from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_file, get_charset_files
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
@@ -34,6 +33,7 @@ from pydicom.uid import (
     ExplicitVRBigEndian,
     RLELossless,
     PYDICOM_IMPLEMENTATION_UID,
+    CTImageStorage,
 )
 from pydicom.util.hexutil import hex2bytes
 from pydicom.valuerep import DA, DT, TM, VR
