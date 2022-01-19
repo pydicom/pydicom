@@ -11,7 +11,7 @@ import base64
 import json
 from typing import (
     Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
-    List, NamedTuple, MutableSequence
+    List, NamedTuple, MutableSequence, cast
 )
 import warnings
 
@@ -782,12 +782,12 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
     return VR_.UN
 
 
-def pydicom_raw_elem_preprocess(
+def raw_infer_vr_handler(
     raw: RawDataElement,
     dataset: Optional["Dataset"] = None,
     **_kwargs,
-) -> RawDataElement:
-    """Process a :class:`RawDataElement` before converting values.
+) -> Tuple[RawDataElement, dict]:
+    """Infer VR from a :class:`RawDataElement` before converting values.
 
     Parameters
     ----------
@@ -799,6 +799,9 @@ def pydicom_raw_elem_preprocess(
     Returns
     -------
     RawDataElement
+        The raw data element
+    dict
+        Any kwargs to pass into downstream handlers.
 
     Raises
     ------
@@ -807,21 +810,6 @@ def pydicom_raw_elem_preprocess(
         :attr:`~pydicom.config.settings.reading_validation_mode` is set
         to ``RAISE``.
     """
-    # XXX buried here to avoid circular import
-    # filereader->Dataset->convert_value->filereader
-    # (for SQ parsing)
-
-    from pydicom.values import convert_value
-    raw = raw_data_element
-
-    # If user has hooked into conversion of raw values, call his/her routine
-    if config.data_element_callback:
-        raw = config.data_element_callback(
-            raw_data_element,
-            encoding=encoding,
-            **config.data_element_callback_kwargs
-        )
-
     vr = raw.VR
     if vr is None:  # Can be if was implicit VR
         try:
@@ -852,16 +840,16 @@ def pydicom_raw_elem_preprocess(
                 vr = dictionary_VR(raw.tag)
             except KeyError:
                 pass
-    if VR != raw.VR:
-        raw = raw._replace(VR=VR)
-    return raw
+    if vr != raw.VR:
+        raw = raw._replace(vr=vr)
+    return raw, {}
 
 
-def pydicom_raw_elem_convert_value(
+def raw_convert_exception_handler(
     raw: RawDataElement,
     encoding: Optional[Union[str, MutableSequence[str]]] = None,
-    **_kwargs,
-) -> RawDataElement:
+    **kwargs,
+) -> Tuple[RawDataElement, dict]:
     """Attempt to convert the raw value to a native type.
 
     Parameters
@@ -874,13 +862,16 @@ def pydicom_raw_elem_convert_value(
     Returns
     -------
     RawDataElement
+        The raw data element
+    dict
+        Any kwargs to pass into downstream handlers.
     """
     # XXX buried here to avoid circular import
     # filereader->Dataset->convert_value->filereader
     # (for SQ parsing)
 
     from pydicom.values import convert_value
-    assert raw.VR
+    vr = cast(str, raw.VR)
     try:
         value = convert_value(vr, raw, encoding)
     except NotImplementedError as e:
@@ -899,15 +890,13 @@ def pydicom_raw_elem_convert_value(
                 f"{message} To replace this error with a warning set "
                 "pydicom.config.convert_wrong_length_to_UN = True."
             )
-    if value != raw.value:
-        raw = raw._replace(value=value)
-    return raw
+    return raw, {"value": value}
 
 
-def pydicom_raw_elem_postprocess(
+def raw_LUT_descriptor_handler(
     raw: RawDataElement,
-    **_kwargs,
-) -> RawDataElement:
+    **kwargs,
+) -> Tuple[RawDataElement, dict]:
     """Handle post-convert_value processing of a :class:`RawDataElement`.
 
     Parameters
@@ -918,8 +907,11 @@ def pydicom_raw_elem_postprocess(
     Returns
     -------
     RawDataElement
+        The raw data element
+    dict
+        Any kwargs to pass into downstream handlers.
     """
-    value = None
+    value = kwargs.get('value', raw.value)
     if raw.tag in _LUT_DESCRIPTOR_TAGS and raw.value:
         # We only fix the first value as the third value is 8 or 16
         try:
@@ -927,7 +919,7 @@ def pydicom_raw_elem_postprocess(
                 raw = raw._replace(value = (raw.value[0] + 65536))
         except TypeError:
             pass
-    return raw
+    return raw, {}
 
 
 def DataElement_from_raw(
@@ -956,28 +948,30 @@ def DataElement_from_raw(
     """
     raw = raw_data_element
 
-    # If user has hooked into conversion of raw values, call his/her routine
-    if config.data_element_callback:
-        if isinstance(config.data_element_callback, list):
-            for cb in config.data_element_callback:
-                raw = cb(
-                    raw_data_element,
-                    encoding=encoding,
-                    **config.data_element_callback_kwargs
-                )
-        else:
-            raw = config.data_element_callback(
-                raw_data_element,
-                encoding=encoding,
-                dataset=dataset,
-                **config.data_element_callback_kwargs
-            )
-
+    # If user has hooked into conversion of raw values, call the user routine(s)
+    callback_kwargs: dict[str, Any] = config.settings.data_element_callback_kwargs
+    for cb in config.settings.data_element_callbacks:
+        raw, out_kwargs = cb(
+            raw_data_element,
+            encoding=encoding,
+            **callback_kwargs
+        )
+        # Update kwargs for next callback.
+        callback_kwargs.update(out_kwargs)
+    # Allow callbacks to override raw.VR
+    VR = cast(str, callback_kwargs.get("VR", raw.VR))
+    # Allow user to specify value in callback, otherwise assume exceptions have
+    # been taken care of in callbacks and just convert.
+    if callback_kwargs.get("value", None):
+        value = callback_kwargs.get("value")
+    else:
+        from pydicom.values import convert_value
+        value = convert_value(VR, raw, encoding)
     return DataElement(
         raw.tag,
-        vr,
+        VR,
         value,
         raw.value_tell,
         raw.length == 0xFFFFFFFF,
-        already_converted=True,
+        already_converted=True
     )
