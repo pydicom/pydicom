@@ -2633,7 +2633,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0040A744: ('SQ', '1', "Language Code Sequence (Trial)", 'Retired', 'LanguageCodeSequenceTrial'),  # noqa
     0x0040A801: ('SQ', '1', "Tabulated Values Sequence", '', 'TabulatedValuesSequence'),  # noqa
     0x0040A802: ('UL', '1', "Number of Table Rows", '', 'NumberOfTableRows'),  # noqa
-    0x0040A803: ('UL', '1', "Number of Table Columns", '', 'NumbeOfTableColumns'),  # noqa
+    0x0040A803: ('UL', '1', "Number of Table Columns", '', 'NumberOfTableColumns'),  # noqa
     0x0040A804: ('UL', '1', "Table Row Number", '', 'TableRowNumber'),  # noqa
     0x0040A805: ('UL', '1', "Table Column Number", '', 'TableColumnNumber'),  # noqa
     0x0040A806: ('SQ', '1', "Table Row Definition Sequence", '', 'TableRowDefinitionSequence'),  # noqa
@@ -2954,7 +2954,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00620006: ('ST', '1', "Segment Description", '', 'SegmentDescription'),  # noqa
     0x00620007: ('SQ', '1', "Segmentation Algorithm Identification Sequence", '', 'SegmentationAlgorithmIdentificationSequence'),  # noqa
     0x00620008: ('CS', '1', "Segment Algorithm Type", '', 'SegmentAlgorithmType'),  # noqa
-    0x00620009: ('LO', '1', "Segment Algorithm Name", '', 'SegmentAlgorithmName'),  # noqa
+    0x00620009: ('LO', '1-n', "Segment Algorithm Name", '', 'SegmentAlgorithmName'),  # noqa
     0x0062000A: ('SQ', '1', "Segment Identification Sequence", '', 'SegmentIdentificationSequence'),  # noqa
     0x0062000B: ('US', '1-n', "Referenced Segment Number", '', 'ReferencedSegmentNumber'),  # noqa
     0x0062000C: ('US', '1', "Recommended Display Grayscale Value", '', 'RecommendedDisplayGrayscaleValue'),  # noqa
@@ -4540,7 +4540,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A0785: ('UI', '1', "Referenced Treatment Position Group UID", '', 'ReferencedTreatmentPositionGroupUID'),  # noqa
     0x300A0786: ('US', '1', "Radiation Order Index", '', 'RadiationOrderIndex'),  # noqa
     0x300A0787: ('SQ', '1', "Omitted Radiation Sequence", '', 'OmittedRadiationSequence'),  # noqa
-    0x300A0788: ('SQ', '1', "Reason for Omission Code Sequence", '', 'ReasonforOmissionCodeSequence'),  # noqa
+    0x300A0788: ('SQ', '1', "Reason for Omission Code Sequence", '', 'ReasonForOmissionCodeSequence'),  # noqa
     0x300A0789: ('SQ', '1', "RT Delivery Start Patient Position Sequence", '', 'RTDeliveryStartPatientPositionSequence'),  # noqa
     0x300A078A: ('SQ', '1', "RT Treatment Preparation Patient Position Sequence", '', 'RTTreatmentPreparationPatientPositionSequence'),  # noqa
     0x300A078B: ('SQ', '1', "Referenced RT Treatment Preparation Sequence", '', 'ReferencedRTTreatmentPreparationSequence'),  # noqa

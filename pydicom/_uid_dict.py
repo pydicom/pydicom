@@ -447,9 +447,10 @@ UID_dictionary = {
     '1.2.840.10008.1.4.2.2': ('ICBM Single Subject MRI Frame of Reference', 'Well-known frame of reference', '', '', 'ICBMSingleSubjectMRI'),  # noqa
     '1.2.840.10008.1.4.3.1': ('IEC 61217 Fixed Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'IEC61217FixedCoordinateSystem'),  # noqa
     '1.2.840.10008.1.4.3.2': ('Standard Robotic-Arm Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'StandardRoboticArmCoordinateSystem'),  # noqa
+    '1.2.840.10008.1.4.3.3': ('IEC 61217 Table Top Coordinate System Frame of Reference', 'Well-known frame of reference', '', '', 'IEC61217TableTopCoordinateSystem'),  # noqa
     '1.2.840.10008.1.4.4.1': ('SRI24 Frame of Reference', 'Well-known frame of reference', '', '', 'SRI24'),  # noqa
     '1.2.840.10008.1.4.5.1': ('Colin27 Frame of Reference', 'Well-known frame of reference', '', '', 'Colin27'),  # noqa
     '1.2.840.10008.1.4.6.1': ('LPBA40/AIR Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40AIR'),  # noqa
     '1.2.840.10008.1.4.6.2': ('LPBA40/FLIRT Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40FLIRT'),  # noqa
-    '1.2.840.10008.1.4.6.3': ('LPBA40/SPM5 Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40SPM5'),  # noqa
+    '1.2.840.10008.1.4.6.3': ('LPBA40/SPM5 Frame of Reference', 'Well-known frame of reference', '', '', 'LPBA40SPM5')  # noqa
 }
