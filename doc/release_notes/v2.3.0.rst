@@ -3,11 +3,31 @@ Version 2.3.0
 
 Changes
 -------
+* :meth:`DataElement.description<pydicom.dataelem.DataElement.description>` is
+  deprecated and will be removed in v3.0, use
+  :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
+* Updated the private dictionary
+* :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
+  :attr:`~pydicom.config.settings.reading_validation_mode`
+
 
 Enhancements
 ------------
+* Values are now validated for valid length, allowed character set and format
+  on reading and writing. Depending on the value of
+  :attr:`~pydicom.config.settings.reading_validation_mode`
+  and :attr:`~pydicom.config.settings.writing_validation_mode`
+  a warning is logged, an exception is raised, or the validation is skipped.
+* Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
+* UIDs for all Storage SOP Classes have been added to the ``uid`` module
+  (:issue:`1498`)
+
 
 Fixes
 -----
-
 * Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
+* Fixed Hologic private dictionary entry (0019xx43)
+* Fixed :meth:`~pydicom.dataset.Dataset.compress` not setting the correct
+  encoding for the rest of the dataset (:issue:`1565`)
+* Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
+  (:issue:`1571`)

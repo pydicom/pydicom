@@ -173,10 +173,7 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     if arr.shape[0] % 8:
         arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
 
-    # Reshape so each row is 8 bits
-    arr = np.reshape(arr, (-1, 8))
-    arr = np.fliplr(arr)
-    arr = np.packbits(arr.astype('uint8'))
+    arr = np.packbits(arr.astype('u1'), bitorder="little")
 
     packed: bytes = arr.tobytes()
     if pad:
@@ -208,21 +205,8 @@ def unpack_bits(bytestream: bytes) -> "np.ndarray":
     :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
     :dcm:`Annex D<part05/chapter_D.html>`
     """
-    # Thanks to @sbrodehl (#643)
-    # e.g. b'\xC0\x09' -> [192, 9]
-    arr = np.frombuffer(bytestream, dtype='uint8')
-    # -> [1 1 0 0 0 0 0 0 0 0 0 0 1 0 0 1]
-    arr = np.unpackbits(arr)
-    # -> [[1 1 0 0 0 0 0 0],
-    #     [0 0 0 0 1 0 0 1]]
-    arr = np.reshape(arr, (-1, 8))
-    # -> [[0 0 0 0 0 0 1 1],
-    #     [1 0 0 1 0 0 0 0]]
-    arr = np.fliplr(arr)
-    # -> [0 0 0 0 0 0 1 1 1 0 0 1 0 0 0 0]
-    arr = np.ravel(arr)
-
-    return cast("np.ndarray", arr)
+    arr = np.frombuffer(bytestream, dtype='u1')
+    return cast("np.ndarray", np.unpackbits(arr, bitorder="little"))
 
 
 def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
@@ -381,6 +365,6 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         ds.PhotometricInterpretation = "RGB"
 
     if not read_only and ds.BitsAllocated > 1:
-        return cast("np.ndarray", arr.copy())
+        return arr.copy()
 
-    return cast("np.ndarray", arr)
+    return arr

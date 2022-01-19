@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Define the Dataset and FileDataset classes.
 
 The Dataset class represents the DICOM Dataset while the FileDataset class
@@ -33,14 +33,14 @@ from typing import (
 import warnings
 import weakref
 
+from pydicom.filebase import DicomFileLike
+
 try:
     import numpy
 except ImportError:
     pass
 
 import pydicom  # for dcmwrite
-import pydicom.charset
-import pydicom.config
 from pydicom import jsonrep, config
 from pydicom._version import __version_info__
 from pydicom.charset import default_encoding, convert_encodings
@@ -50,7 +50,7 @@ from pydicom.datadict import (
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw, RawDataElement
 from pydicom.encaps import encapsulate, encapsulate_extended
-from pydicom.fileutil import path_from_pathlike
+from pydicom.fileutil import path_from_pathlike, PathType
 from pydicom.pixel_data_handlers.util import (
     convert_color_space, reshape_pixel_array, get_image_pixel_ids
 )
@@ -59,6 +59,7 @@ from pydicom.uid import (
     ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian,
     RLELossless, PYDICOM_IMPLEMENTATION_UID, UID
 )
+from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
 
 
@@ -450,10 +451,7 @@ class Dataset:
             * for a sequence element, an empty :class:`list` or ``list`` of
               :class:`Dataset`
         """
-
-        data_element = DataElement(tag, VR, value)
-        # use data_element.tag since DataElement verified it
-        self._dict[data_element.tag] = data_element
+        self.add(DataElement(tag, VR, value))
 
     def __array__(self) -> "numpy.ndarray":
         """Support accessing the dataset from a numpy array."""
@@ -540,7 +538,7 @@ class Dataset:
         # This simply calls the pydicom.charset.decode_element function
         def decode_callback(ds: "Dataset", data_element: DataElement) -> None:
             """Callback to decode `data_element`."""
-            if data_element.VR == 'SQ':
+            if data_element.VR == VR_.SQ:
                 for dset in data_element.value:
                     dset._parent_encoding = dicom_character_set
                     dset.decode()
@@ -915,7 +913,7 @@ class Dataset:
 
         elem = self._dict[tag]
         if isinstance(elem, DataElement):
-            if elem.VR == 'SQ' and elem.value:
+            if elem.VR == VR_.SQ and elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
                 elem.value.parent = self
@@ -941,7 +939,7 @@ class Dataset:
             self[tag] = DataElement_from_raw(elem, character_set, self)
 
             # If the Element has an ambiguous VR, try to correct it
-            if 'or' in self[tag].VR:
+            if self[tag].VR in AMBIGUOUS_VR:
                 from pydicom.filewriter import correct_ambiguous_vr_element
                 self[tag] = correct_ambiguous_vr_element(
                     self[tag], self, elem[6]
@@ -1365,27 +1363,29 @@ class Dataset:
             If `key` is not convertible to a valid tag or a known element
             keyword.
         KeyError
-            If :attr:`~pydicom.config.enforce_valid_values` is ``True`` and
-            `key` is an unknown non-private tag.
+            If :attr:`~pydicom.config.settings.reading_validation_mode` is
+             ``RAISE`` and `key` is an unknown non-private tag.
         """
         tag = Tag(key)
         if tag in self:
             return self[tag]
 
+        vr: Union[str, VR_]
         if not isinstance(default, DataElement):
             if tag.is_private:
-                vr = 'UN'
+                vr = VR_.UN
             else:
                 try:
                     vr = dictionary_VR(tag)
                 except KeyError:
-                    if config.enforce_valid_values:
+                    if (config.settings.writing_validation_mode ==
+                            config.RAISE):
                         raise KeyError(f"Unknown DICOM tag {tag}")
-                    else:
-                        vr = 'UN'
-                        warnings.warn(
-                            f"Unknown DICOM tag {tag} - setting VR to 'UN'"
-                        )
+
+                    vr = VR_.UN
+                    warnings.warn(
+                        f"Unknown DICOM tag {tag} - setting VR to 'UN'"
+                    )
 
             default = DataElement(tag, vr, default)
 
@@ -1488,7 +1488,7 @@ class Dataset:
         possible_handlers = [
             hh for hh in pydicom.config.pixel_data_handlers
             if hh is not None
-            and hh.supports_transfer_syntax(ts)  # type: ignore[attr-defined]
+            and hh.supports_transfer_syntax(ts)
         ]
 
         # No handlers support the transfer syntax
@@ -1504,7 +1504,7 @@ class Dataset:
         #   dependencies met
         available_handlers = [
             hh for hh in possible_handlers
-            if hh.is_available()  # type: ignore[attr-defined]
+            if hh.is_available()
         ]
 
         # There are handlers that support the transfer syntax but none of them
@@ -1518,13 +1518,13 @@ class Dataset:
             )
             pkg_msg = []
             for hh in possible_handlers:
-                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
+                hh_deps = hh.DEPENDENCIES
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"{hh.HANDLER_NAME} "
                     f"(req. {', '.join(names)})"
                 )
 
@@ -1714,7 +1714,12 @@ class Dataset:
         else:
             self.PixelData = encapsulate(encoded)
 
+        # PS3.5 Annex A.4 - encapsulated pixel data uses undefined length
         self['PixelData'].is_undefined_length = True
+
+        # PS3.5 Annex A.4 - encapsulated datasets use explicit VR little endian
+        self.is_implicit_VR = False
+        self.is_little_endian = True
 
         # Set the correct *Transfer Syntax UID*
         if not hasattr(self, 'file_meta'):
@@ -1819,7 +1824,7 @@ class Dataset:
 
         available_handlers = [
             hh for hh in overlay_data_handlers
-            if hh.is_available()  # type: ignore[attr-defined]
+            if hh.is_available()
         ]
         if not available_handlers:
             # For each of the handlers we want to find which
@@ -1830,13 +1835,13 @@ class Dataset:
             )
             pkg_msg = []
             for hh in overlay_data_handlers:
-                hh_deps = hh.DEPENDENCIES  # type: ignore[attr-defined]
+                hh_deps = hh.DEPENDENCIES
                 # Missing packages
                 missing = [dd for dd in hh_deps if have_package(dd) is None]
                 # Package names
                 names = [hh_deps[name][1] for name in missing]
                 pkg_msg.append(
-                    f"{hh.HANDLER_NAME} "  # type: ignore[attr-defined]
+                    f"{hh.HANDLER_NAME} "
                     f"(req. {', '.join(names)})"
                 )
 
@@ -1846,7 +1851,7 @@ class Dataset:
         for handler in available_handlers:
             try:
                 # Use the handler to get an ndarray of the pixel data
-                func = handler.get_overlay_array  # type: ignore[attr-defined]
+                func = handler.get_overlay_array
                 return cast("numpy.ndarray", func(self, group))
             except Exception as exc:
                 logger.debug(
@@ -1946,7 +1951,10 @@ class Dataset:
         str
             A string representation of an element.
         """
-        exclusion = ('from_json', 'to_json', 'to_json_dict', 'clear')
+        exclusion = (
+            'from_json', 'to_json', 'to_json_dict', 'clear', 'description',
+            'validate',
+        )
         for elem in self.iterall():
             # Get all the attributes possible for this data element (e.g.
             #   gets descriptive text name too)
@@ -1960,7 +1968,7 @@ class Dataset:
                 for attr in dir(elem) if not attr.startswith("_")
                 and attr not in exclusion
             }
-            if elem.VR == "SQ":
+            if elem.VR == VR_.SQ:
                 yield sequence_element_format % elem_dict
             else:
                 yield element_format % elem_dict
@@ -2011,9 +2019,9 @@ class Dataset:
 
         for elem in self:
             with tag_in_exception(elem.tag):
-                if elem.VR == "SQ":  # a sequence
+                if elem.VR == VR_.SQ:  # a sequence
                     strings.append(
-                        f"{indent_str}{str(elem.tag)}  {elem.description()}  "
+                        f"{indent_str}{str(elem.tag)}  {elem.name}  "
                         f"{len(elem.value)} item(s) ---- "
                     )
                     if not top_level_only:
@@ -2115,9 +2123,9 @@ class Dataset:
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:
                 # don't have this tag yet->create the data_element instance
-                VR = dictionary_VR(tag)
-                data_element = DataElement(tag, VR, value)
-                if VR == 'SQ':
+                vr = dictionary_VR(tag)
+                data_element = DataElement(tag, vr, value)
+                if vr == VR_.SQ:
                     # let a sequence know its parent dataset to pass it
                     # to its items, who may need parent dataset tags
                     # to resolve ambiguous tags
@@ -2314,7 +2322,7 @@ class Dataset:
 
         Parameters
         ----------
-        dictionary : dict or Dataset
+        d : dict or Dataset
             The :class:`dict` or :class:`Dataset` to use when updating the
             current object.
         """
@@ -2336,7 +2344,7 @@ class Dataset:
         """
         for elem in self:
             yield elem
-            if elem.VR == "SQ":
+            if elem.VR == VR_.SQ:
                 for ds in elem.value:
                     yield from ds.iterall()
 
@@ -2382,7 +2390,7 @@ class Dataset:
                 callback(self, data_element)  # self = this Dataset
                 # 'tag in self' below needed in case callback deleted
                 # data_element
-                if recursive and tag in self and data_element.VR == "SQ":
+                if recursive and tag in self and data_element.VR == VR_.SQ:
                     sequence = data_element.value
                     for dataset in sequence:
                         dataset.walk(callback)
@@ -2610,7 +2618,7 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename_or_obj: Union[PathType, BinaryIO, DicomFileLike],
         dataset: _DatasetType,
         preamble: Optional[bytes] = None,
         file_meta: Optional["FileMetaDataset"] = None,
@@ -2651,8 +2659,8 @@ class FileDataset(Dataset):
 
         filename: Optional[str] = None
         filename_or_obj = path_from_pathlike(filename_or_obj)
-        self.fileobj_type: Any
-        self.filename: Union[str, BinaryIO]
+        self.fileobj_type: Any = None
+        self.filename: Union[PathType, BinaryIO] = ""
 
         if isinstance(filename_or_obj, str):
             filename = filename_or_obj

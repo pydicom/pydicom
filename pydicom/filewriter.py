@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Functions related to writing DICOM data."""
 
 from struct import pack
@@ -10,9 +10,8 @@ from typing import (
 import warnings
 import zlib
 
-from pydicom.charset import (
-    default_encoding, text_VRs, convert_encodings, encode_string
-)
+from pydicom import config
+from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
@@ -23,13 +22,42 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
                          tag_in_exception)
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import (
-    extra_length_VRs, PersonName, IS, DSclass, DA, DT, TM
+    PersonName, IS, DSclass, DA, DT, TM, EXPLICIT_VR_LENGTH_32, VR,
+    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR, validate_value
 )
 from pydicom.values import convert_numbers
 
-
 if have_numpy:
     import numpy
+
+
+# (0018,9810) Zero Velocity Pixel Value
+# (0022,1452) Mapped Pixel Value
+# (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
+# (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
+# (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
+# (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
+# (0028,0120) Pixel Padding Value
+# (0028,0121) Pixel Padding Range Limit
+# (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
+# (0028,3002) LUT Descriptor
+# (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
+# (0060,3004)/(0060,3006) Histogram First/Last Bin Value
+_us_ss_tags = {
+    0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
+    0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
+    0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
+    0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006,
+}
+
+# (5400,0110) Channel Minimum Value
+# (5400,0112) Channel Maximum Value
+# (5400,100A) Waveform Padding Data
+# (5400,1010) Waveform Data
+_ob_ow_tags = {0x54000110, 0x54000112, 0x5400100A, 0x54001010}
+
+# (60xx,3000) Overlay Data
+_overlay_data_tags = {x << 16 | 0x3000 for x in range(0x6000, 0x601F, 2)}
 
 
 def _correct_ambiguous_vr_element(
@@ -44,11 +72,11 @@ def _correct_ambiguous_vr_element(
         # PS3.5 Annex A.4
         #   If encapsulated, VR is OB and length is undefined
         if elem.is_undefined_length:
-            elem.VR = 'OB'
+            elem.VR = VR.OB
         elif ds.is_implicit_VR:
             # Non-compressed Pixel Data - Implicit Little Endian
             # PS3.5 Annex A1: VR is always OW
-            elem.VR = 'OW'
+            elem.VR = VR.OW
         else:
             # Non-compressed Pixel Data - Explicit VR
             # PS3.5 Annex A.2:
@@ -57,27 +85,10 @@ def _correct_ambiguous_vr_element(
             # If we get here, the data has not been written before
             # or has been converted from Implicit Little Endian,
             # so we default to OB for BitsAllocated 1 or 8
-            elem.VR = 'OW' if cast(int, ds.BitsAllocated) > 8 else 'OB'
+            elem.VR = VR.OW if cast(int, ds.BitsAllocated) > 8 else VR.OB
 
     # 'US or SS' and dependent on PixelRepresentation
-    # (0018,9810) Zero Velocity Pixel Value
-    # (0022,1452) Mapped Pixel Value
-    # (0028,0104)/(0028,0105) Smallest/Largest Valid Pixel Value
-    # (0028,0106)/(0028,0107) Smallest/Largest Image Pixel Value
-    # (0028,0108)/(0028,0109) Smallest/Largest Pixel Value in Series
-    # (0028,0110)/(0028,0111) Smallest/Largest Image Pixel Value in Plane
-    # (0028,0120) Pixel Padding Value
-    # (0028,0121) Pixel Padding Range Limit
-    # (0028,1101-1103) Red/Green/Blue Palette Color Lookup Table Descriptor
-    # (0028,3002) LUT Descriptor
-    # (0040,9216)/(0040,9211) Real World Value First/Last Value Mapped
-    # (0060,3004)/(0060,3006) Histogram First/Last Bin Value
-    elif elem.tag in [
-            0x00189810, 0x00221452, 0x00280104, 0x00280105, 0x00280106,
-            0x00280107, 0x00280108, 0x00280109, 0x00280110, 0x00280111,
-            0x00280120, 0x00280121, 0x00281101, 0x00281102, 0x00281103,
-            0x00283002, 0x00409211, 0x00409216, 0x00603004, 0x00603006
-    ]:
+    elif elem.tag in _us_ss_tags:
         # US if PixelRepresentation value is 0x0000, else SS
         #   For references, see the list at
         #   https://github.com/darcymason/pydicom/pull/298
@@ -91,10 +102,10 @@ def _correct_ambiguous_vr_element(
             and 'PixelData' not in ds
             or ds.PixelRepresentation == 0
         ):
-            elem.VR = 'US'
+            elem.VR = VR.US
             byte_type = 'H'
         else:
-            elem.VR = 'SS'
+            elem.VR = VR.SS
             byte_type = 'h'
 
         if elem.VM == 0:
@@ -110,18 +121,16 @@ def _correct_ambiguous_vr_element(
             )
 
     # 'OB or OW' and dependent on WaveformBitsAllocated
-    # (5400, 0110) Channel Minimum Value
-    # (5400, 0112) Channel Maximum Value
-    # (5400, 100A) Waveform Padding Data
-    # (5400, 1010) Waveform Data
-    elif elem.tag in [0x54000110, 0x54000112, 0x5400100A, 0x54001010]:
+    elif elem.tag in _ob_ow_tags:
         # If WaveformBitsAllocated is > 8 then OW, otherwise may be
         #   OB or OW.
         #   See PS3.3 C.10.9.1.
         if ds.is_implicit_VR:
-            elem.VR = 'OW'
+            elem.VR = VR.OW
         else:
-            elem.VR = 'OW' if cast(int, ds.WaveformBitsAllocated) > 8 else 'OB'
+            elem.VR = (
+                VR.OW if cast(int, ds.WaveformBitsAllocated) > 8 else VR.OB
+            )
 
     # 'US or OW': 0028,3006 LUTData
     elif elem.tag == 0x00283006:
@@ -129,7 +138,7 @@ def _correct_ambiguous_vr_element(
         #   LUTData, if there's only one value then must be US
         # As per PS3.3 C.11.1.1.1
         if cast(Sequence[int], ds.LUTDescriptor)[0] == 1:
-            elem.VR = 'US'
+            elem.VR = VR.US
             if elem.VM == 0:
                 return elem
 
@@ -142,14 +151,13 @@ def _correct_ambiguous_vr_element(
                     cast(bytes, elem.value), is_little_endian, 'H'
                 )
         else:
-            elem.VR = 'OW'
+            elem.VR = VR.OW
 
     # 'OB or OW': 60xx,3000 OverlayData and dependent on Transfer Syntax
-    elif (elem.tag.group in range(0x6000, 0x601F, 2)
-          and elem.tag.elem == 0x3000):
+    elif elem.tag in _overlay_data_tags:
         # Implicit VR must be OW, explicit VR may be OB or OW
         #   as per PS3.5 Section 8.1.2 and Annex A
-        elem.VR = 'OW'
+        elem.VR = VR.OW
 
     return elem
 
@@ -180,7 +188,7 @@ def correct_ambiguous_vr_element(
     dataelem.DataElement
         The corrected element
     """
-    if 'or' in elem.VR:
+    if elem.VR in AMBIGUOUS_VR:
         # convert raw data elements before handling them
         if isinstance(elem, RawDataElement):
             elem = DataElement_from_raw(elem, dataset=ds)
@@ -227,10 +235,10 @@ def correct_ambiguous_vr(ds: Dataset, is_little_endian: bool) -> Dataset:
     for elem in ds:
         # raw data element sequences can be written as they are, because we
         # have ensured that the transfer syntax has not changed at this point
-        if elem.VR == 'SQ':
+        if elem.VR == VR.SQ:
             for item in cast(MutableSequence[Dataset], elem.value):
                 correct_ambiguous_vr(item, is_little_endian)
-        elif 'or' in elem.VR:
+        elif elem.VR in AMBIGUOUS_VR:
             correct_ambiguous_vr_element(elem, ds, is_little_endian)
     return ds
 
@@ -342,6 +350,13 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
         fp.write(val)  # type: ignore[arg-type]
 
 
+def _encode_and_validate_string(vr: str, value: str,
+                                encodings: Sequence[str]) -> bytes:
+    encoded = encode_string(value, encodings)
+    validate_value(vr, encoded, config.settings.writing_validation_mode)
+    return encoded
+
+
 def write_text(
     fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
 ) -> None:
@@ -354,7 +369,8 @@ def write_text(
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
                 val = b'\\'.join(
-                    [encode_string(val, encodings) for val in val]
+                    [_encode_and_validate_string(elem.VR, val, encodings)
+                     for val in val]
                 )
             else:
                 val = cast(Sequence[bytes], val)
@@ -362,7 +378,7 @@ def write_text(
         else:
             val = cast(Union[bytes, str], val)
             if isinstance(val, str):
-                val = encode_string(val, encodings)
+                val = _encode_and_validate_string(elem.VR, val, encodings)
 
         if len(val) % 2 != 0:
             val = val + b' '  # pad to even length
@@ -516,10 +532,10 @@ def write_data_element(
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
 
-    VR: Optional[str] = elem.VR
-    if not fp.is_implicit_VR and VR and len(VR) != 2:
+    vr: Optional[str] = elem.VR
+    if not fp.is_implicit_VR and vr and len(vr) != 2:
         msg = (
-            f"Cannot write ambiguous VR of '{VR}' for data element with "
+            f"Cannot write ambiguous VR of '{vr}' for data element with "
             f"tag {repr(elem.tag)}.\nSet the correct VR before "
             f"writing, or use an implicit VR transfer syntax"
         )
@@ -532,17 +548,17 @@ def write_data_element(
         is_undefined_length = elem.length == 0xFFFFFFFF
     else:
         elem = cast(DataElement, elem)
-        if VR not in writers:
+        if vr not in writers:
             raise NotImplementedError(
-                f"write_data_element: unknown Value Representation '{VR}'"
+                f"write_data_element: unknown Value Representation '{vr}'"
             )
 
         encodings = encodings or [default_encoding]
         encodings = convert_encodings(encodings)
-        fn, param = writers[VR]
+        fn, param = writers[cast(VR, vr)]
         is_undefined_length = elem.is_undefined_length
         if not elem.is_empty:
-            if VR in text_VRs or VR in ('PN', 'SQ'):
+            if vr in CUSTOMIZABLE_CHARSET_VR or vr == VR.SQ:
                 fn(buffer, elem, encodings=encodings)  # type: ignore[operator]
             else:
                 # Many numeric types use the same writer but with
@@ -568,28 +584,35 @@ def write_data_element(
             )
 
     value_length = buffer.tell()
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
-            not is_undefined_length and value_length > 0xffff):
+    if (
+        not fp.is_implicit_VR
+        and vr not in EXPLICIT_VR_LENGTH_32
+        and not is_undefined_length
+        and value_length > 0xffff
+    ):
         # see PS 3.5, section 6.2.2 for handling of this case
         msg = (
             f"The value for the data element {elem.tag} exceeds the "
             f"size of 64 kByte and cannot be written in an explicit transfer "
-            f"syntax. The data element VR is changed from '{VR}' to 'UN' "
+            f"syntax. The data element VR is changed from '{vr}' to 'UN' "
             f"to allow saving the data."
         )
         warnings.warn(msg)
-        VR = 'UN'
+        vr = VR.UN
 
     # write the VR for explicit transfer syntax
     if not fp.is_implicit_VR:
-        VR = cast(str, VR)
-        fp.write(bytes(VR, default_encoding))
+        vr = cast(str, vr)
+        fp.write(bytes(vr, default_encoding))
 
-        if VR in extra_length_VRs:
+        if vr in EXPLICIT_VR_LENGTH_32:
             fp.write_US(0)  # reserved 2 bytes
 
-    if (not fp.is_implicit_VR and VR not in extra_length_VRs and
-            not is_undefined_length):
+    if (
+        not fp.is_implicit_VR
+        and vr not in EXPLICIT_VR_LENGTH_32
+        and not is_undefined_length
+    ):
         fp.write_US(value_length)  # Explicit VR length field is 2 bytes
     else:
         # write the proper length of the data_element in the length slot,
@@ -1000,33 +1023,42 @@ def dcmwrite(
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
-
-    # Ensure is_little_endian and is_implicit_VR are set
-    if None in (dataset.is_little_endian, dataset.is_implicit_VR):
-        has_tsyntax = False
-        try:
-            tsyntax = dataset.file_meta.TransferSyntaxUID
-            if not tsyntax.is_private:
-                dataset.is_little_endian = tsyntax.is_little_endian
-                dataset.is_implicit_VR = tsyntax.is_implicit_VR
-                has_tsyntax = True
-        except AttributeError:
-            pass
-
-        if not has_tsyntax:
-            name = dataset.__class__.__name__
-            raise AttributeError(
-                f"'{name}.is_little_endian' and '{name}.is_implicit_VR' must "
-                f"be set appropriately before saving"
-            )
-
-    # Try and ensure that `is_undefined_length` is set correctly
+    tsyntax: Optional[UID]
     try:
         tsyntax = dataset.file_meta.TransferSyntaxUID
+    except AttributeError:
+        tsyntax = None
+
+    cls_name = dataset.__class__.__name__
+    encoding = (dataset.is_implicit_VR, dataset.is_little_endian)
+
+    # Ensure is_little_endian and is_implicit_VR are set
+    if None in encoding:
+        if tsyntax is None:
+            raise AttributeError(
+                f"'{cls_name}.is_little_endian' and "
+                f"'{cls_name}.is_implicit_VR' must be set appropriately "
+                "before saving"
+            )
+
         if not tsyntax.is_private:
+            dataset.is_little_endian = tsyntax.is_little_endian
+            dataset.is_implicit_VR = tsyntax.is_implicit_VR
+
+    if tsyntax and not tsyntax.is_private:
+        # PS3.5 Annex A.4 - the length of encapsulated pixel data is undefined
+        #   and native pixel data uses actual length
+        if "PixelData" in dataset:
             dataset['PixelData'].is_undefined_length = tsyntax.is_compressed
-    except (AttributeError, KeyError):
-        pass
+
+        # PS3.5 Annex A.4 - encapsulated datasets use Explicit VR Little
+        if tsyntax.is_compressed and encoding != (False, True):
+            warnings.warn(
+                "All encapsulated (compressed) transfer syntaxes must use "
+                "explicit VR little endian encoding for the dataset. Set "
+                f"'{cls_name}.is_little_endian = True' and '{cls_name}."
+                "is_implicit_VR = False' before saving"
+            )
 
     # Check that dataset's group 0x0002 elements are only present in the
     #   `dataset.file_meta` Dataset - user may have added them to the wrong
@@ -1090,15 +1122,16 @@ def dcmwrite(
             fp.write(preamble)
             fp.write(b'DICM')
 
-        tsyntax: Optional[UID] = None  # type: ignore[no-redef]
+        tsyntax = None
         if dataset.file_meta:  # May be an empty Dataset
             # If we want to `write_like_original`, don't enforce_standard
             write_file_meta_info(
                 fp, dataset.file_meta, enforce_standard=not write_like_original
             )
-            tsyntax = getattr(dataset.file_meta, "TransferSyntaxUID", None)
+            tsyntax = cast(UID, getattr(
+                dataset.file_meta, "TransferSyntaxUID", None))
 
-        if (tsyntax == DeflatedExplicitVRLittleEndian):
+        if tsyntax == DeflatedExplicitVRLittleEndian:
             # See PS3.5 section A.5
             # when writing, the entire dataset following
             #     the file metadata is prepared the normal way,
@@ -1144,42 +1177,42 @@ if sys.version_info[:2] < (3, 7):
 # for write_numbers, the Writer maps to a tuple (function, struct_format)
 #   (struct_format is python's struct module format)
 writers = {
-    'AE': (write_string, None),
-    'AS': (write_string, None),
-    'AT': (write_ATvalue, None),
-    'CS': (write_string, None),
-    'DA': (write_DA, None),
-    'DS': (write_number_string, None),
-    'DT': (write_DT, None),
-    'FD': (write_numbers, 'd'),
-    'FL': (write_numbers, 'f'),
-    'IS': (write_number_string, None),
-    'LO': (write_text, None),
-    'LT': (write_text, None),
-    'OB': (write_OBvalue, None),
-    'OD': (write_OWvalue, None),
-    'OF': (write_OWvalue, None),
-    'OL': (write_OWvalue, None),
-    'OW': (write_OWvalue, None),
-    'OV': (write_OWvalue, None),
-    'PN': (write_PN, None),
-    'SH': (write_text, None),
-    'SL': (write_numbers, 'l'),
-    'SQ': (write_sequence, None),
-    'SS': (write_numbers, 'h'),
-    'ST': (write_text, None),
-    'SV': (write_numbers, 'q'),
-    'TM': (write_TM, None),
-    'UC': (write_text, None),
-    'UI': (write_UI, None),
-    'UL': (write_numbers, 'L'),
-    'UN': (write_UN, None),
-    'UR': (write_string, None),
-    'US': (write_numbers, 'H'),
-    'UT': (write_text, None),
-    'UV': (write_numbers, 'Q'),
-    'US or SS': (write_OWvalue, None),
-    'US or OW': (write_OWvalue, None),
-    'US or SS or OW': (write_OWvalue, None),
-    'OB or OW': (write_OBvalue, None),
+    VR.AE: (write_string, None),
+    VR.AS: (write_string, None),
+    VR.AT: (write_ATvalue, None),
+    VR.CS: (write_string, None),
+    VR.DA: (write_DA, None),
+    VR.DS: (write_number_string, None),
+    VR.DT: (write_DT, None),
+    VR.FD: (write_numbers, 'd'),
+    VR.FL: (write_numbers, 'f'),
+    VR.IS: (write_number_string, None),
+    VR.LO: (write_text, None),
+    VR.LT: (write_text, None),
+    VR.OB: (write_OBvalue, None),
+    VR.OD: (write_OWvalue, None),
+    VR.OF: (write_OWvalue, None),
+    VR.OL: (write_OWvalue, None),
+    VR.OW: (write_OWvalue, None),
+    VR.OV: (write_OWvalue, None),
+    VR.PN: (write_PN, None),
+    VR.SH: (write_text, None),
+    VR.SL: (write_numbers, 'l'),
+    VR.SQ: (write_sequence, None),
+    VR.SS: (write_numbers, 'h'),
+    VR.ST: (write_text, None),
+    VR.SV: (write_numbers, 'q'),
+    VR.TM: (write_TM, None),
+    VR.UC: (write_text, None),
+    VR.UI: (write_UI, None),
+    VR.UL: (write_numbers, 'L'),
+    VR.UN: (write_UN, None),
+    VR.UR: (write_string, None),
+    VR.US: (write_numbers, 'H'),
+    VR.UT: (write_text, None),
+    VR.UV: (write_numbers, 'Q'),
+    VR.US_SS: (write_OWvalue, None),
+    VR.US_OW: (write_OWvalue, None),
+    VR.US_SS_OW: (write_OWvalue, None),
+    VR.OB_OW: (write_OBvalue, None),
 }

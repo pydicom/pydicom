@@ -9,6 +9,7 @@ from pydicom.values import (
     convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
     convert_text, convert_single_string, convert_AE_string
 )
+from pydicom.valuerep import VR
 
 
 class TestConvertTag:
@@ -56,7 +57,7 @@ class TestConvertText:
         """Test that encoding can change inside a text string"""
         bytestring = (b'Dionysios is \x1b\x2d\x46'
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2')
-        encodings = ('latin_1', 'iso_ir_126')
+        encodings = ['latin_1', 'iso_ir_126']
         assert 'Dionysios is Διονυσιος' == convert_text(bytestring, encodings)
 
     def test_multi_value(self):
@@ -65,7 +66,7 @@ class TestConvertText:
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
-        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
         assert ['Buc^Jérôme', 'Διονυσιος', 'Люкceмбypг'] == convert_text(
             bytestring, encodings)
 
@@ -75,9 +76,23 @@ class TestConvertText:
                       b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3')
-        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
         assert 'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
+
+    def test_single_value_with_unknown_encoding(self):
+        bytestring = b'Buc^J\xe9r\xf4me'
+        encodings = ['unknown']
+        msg = "Unknown encoding 'unknown' - using default encoding instead"
+        with pytest.warns(UserWarning, match=msg):
+            assert convert_single_string(bytestring, encodings) == 'Buc^Jérôme'
+
+    def test_single_value_with_unknown_encoding_raises(
+            self, enforce_valid_values):
+        bytestring = b'Buc^J\xe9r\xf4me'
+        encodings = ['unknown']
+        with pytest.raises(LookupError, match="unknown encoding: unknown"):
+            convert_single_string(bytestring, encodings)
 
     def test_single_value_with_delimiters(self):
         """Test that delimiters reset the encoding"""
@@ -87,7 +102,7 @@ class TestConvertText:
                       b'\x1b\x2d\x4C'
                       b'\xbb\xee\xda\x63\x65\xdc\xd1\x79\x70\xd3'
                       b'\tJ\xe9r\xf4me')
-        encodings = ('latin_1', 'iso_ir_144', 'iso_ir_126')
+        encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
         expected = 'Διονυσιος\r\nJérôme/Люкceмбypг\tJérôme'
         assert expected == convert_single_string(bytestring, encodings)
 
@@ -201,3 +216,8 @@ class TestConvertOValues:
         """Test converting OF."""
         fp = b'\x00\x01\x02\x03'
         assert b'\x00\x01\x02\x03' == converters['OF'](fp, True)
+
+
+def test_all_converters():
+    """Test that the VR decoder functions are complete"""
+    assert set(VR) == set(converters)

@@ -28,7 +28,8 @@ from pydicom.valuerep import DSfloat
 
 class TestDataElement:
     """Tests for dataelem.DataElement."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def create_data(self, disable_value_validation):
         self.data_elementSH = DataElement((1, 2), "SH", "hello")
         self.data_elementIS = DataElement((1, 2), "IS", "42")
         self.data_elementDS = DataElement((1, 2), "DS", "42.00001")
@@ -36,10 +37,9 @@ class TestDataElement:
                                              ['42.1', '42.2', '42.3'])
         self.data_elementCommand = DataElement(0x00000000, 'UL', 100)
         self.data_elementPrivate = DataElement(0x00090000, 'UL', 101)
-        self.data_elementRetired = DataElement(0x00080010, 'SH', 102)
+        self.data_elementRetired = DataElement(0x00080010, 'SH', "102")
         config.use_none_as_empty_text_VR_value = False
-
-    def teardown(self):
+        yield
         config.use_none_as_empty_text_VR_value = False
 
     @pytest.fixture
@@ -135,25 +135,25 @@ class TestDataElement:
         assert self.data_elementRetired.is_retired is True
         assert self.data_elementPrivate.is_retired is False
 
-    def test_description_group_length(self):
-        """Test DataElement.description for Group Length element"""
+    def test_name_group_length(self):
+        """Test DataElement.name for Group Length element"""
         elem = DataElement(0x00100000, 'LO', 12345)
-        assert 'Group Length' == elem.description()
+        assert 'Group Length' == elem.name
 
-    def test_description_unknown_private(self):
-        """Test DataElement.description with an unknown private element"""
+    def test_name_unknown_private(self):
+        """Test DataElement.name with an unknown private element"""
         elem = DataElement(0x00110010, 'LO', 12345)
         elem.private_creator = 'TEST'
-        assert 'Private tag data' == elem.description()
+        assert 'Private tag data' == elem.name
         elem = DataElement(0x00110F00, 'LO', 12345)
         assert elem.tag.is_private
         assert elem.private_creator is None
-        assert 'Private tag data' == elem.description()
+        assert 'Private tag data' == elem.name
 
-    def test_description_unknown(self):
-        """Test DataElement.description with an unknown element"""
+    def test_name_unknown(self):
+        """Test DataElement.name with an unknown element"""
         elem = DataElement(0x00000004, 'LO', 12345)
-        assert '' == elem.description()
+        assert '' == elem.name
 
     def test_equality_standard_element(self):
         """DataElement: equality returns correct value for simple elements"""
@@ -326,7 +326,7 @@ class TestDataElement:
 
     def test_getitem_raises(self):
         """Test DataElement.__getitem__ raise if value not indexable"""
-        elem = DataElement(0x00100010, 'LO', 12345)
+        elem = DataElement(0x00100010, 'US', 123)
         with pytest.raises(TypeError):
             elem[0]
 
@@ -566,7 +566,7 @@ class TestDataElement:
 class TestRawDataElement:
 
     """Tests for dataelem.RawDataElement."""
-    def test_invalid_tag_warning(self, allow_invalid_values):
+    def test_invalid_tag_warning(self, allow_reading_invalid_values):
         """RawDataElement: conversion of unknown tag warns..."""
         raw = RawDataElement(Tag(0x88880088), None, 4, b'unknown',
                              0, True, True)
@@ -721,3 +721,244 @@ class TestRawDataElement:
             assert elem.VR == "UN"
             assert elem.name == "[Another Number]"
             assert elem.value == b"12345678"
+
+
+class TestDataElementValidation:
+
+    @staticmethod
+    def check_invalid_vr(vr, value, check_warn=True):
+        msg = fr"Invalid value for VR {vr}: *"
+        if check_warn:
+            with pytest.warns(UserWarning, match=msg):
+                DataElement(0x00410001, vr, value,
+                            validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("vr, length", (
+            ("AE", 17), ("CS", 17), ("DS", 27), ("LO", 66), ("LT", 10250),
+            ("SH", 17), ("ST", 1025), ("UI", 65)
+    ))
+    def test_maxvalue_exceeded(self, vr, length, no_datetime_conversion):
+        msg = fr"The value length \({length}\) exceeds the maximum length *"
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, "1" * length,
+                        validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, "2" * length,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", ("Руссский", b"ctrl\tchar", "new\n",
+                                       b"newline\n", "Äneas"))
+    def test_invalid_ae(self, value):
+        self.check_invalid_vr("AE", value)
+
+    @pytest.mark.parametrize("value", ("My AETitle", b"My AETitle", "", None))
+    def test_valid_ae(self, value):
+        DataElement(0x00410001, "AE", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", ("12Y", "0012Y", b"012B", "Y012",
+                                       "012Y\n"))
+    def test_invalid_as(self, value):
+        self.check_invalid_vr("AS", value)
+
+    @pytest.mark.parametrize("value",
+                             ("012Y", "345M", b"052W", b"789D", "", None))
+    def test_valid_as(self, value):
+        DataElement(0x00410001, "AS", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (
+            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8"), "ABC\n"))
+    def test_invalid_cs(self, value):
+        self.check_invalid_vr("CS", value)
+
+    @pytest.mark.parametrize(
+        "value", ("VALID_13579 ", b"VALID_13579", "", None)
+    )
+    def test_valid_cs(self, value):
+        DataElement(0x00410001, "CS", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("201012", "2010122505", b"20102525", b"-20101225-", "20101620",
+         "20101040", "20101033", "20101225 20201224 ")
+    )
+    def test_invalid_da(self, value):
+        self.check_invalid_vr("DA", value)
+
+    @pytest.mark.parametrize(
+        "value", (b"19560303", "20101225-20201224 ",
+                  b"-19560303", "19560303-", "", None)
+    )
+    def test_valid_da(self, value):
+        DataElement(0x00410001, "DA", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("201012+", "20A0", "+-123.66", "-123.5 E4", b"123F4 ", "- 195.6")
+    )
+    def test_invalid_ds(self, value):
+        self.check_invalid_vr("DS", value, check_warn=False)
+
+    @pytest.mark.parametrize(
+        "value", ("12345", "+.1234 ", "-0345.76", b"1956E3",
+                  b"-1956e+3", "+195.6e-3", "", None)
+    )
+    def test_valid_ds(self, value):
+        DataElement(0x00410001, "DS", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value", ("201012+", "20A0", b"123.66", "-1235E4", "12 34")
+    )
+    def test_invalid_is(self, value):
+        self.check_invalid_vr("IS", value, check_warn=False)
+
+    @pytest.mark.parametrize(
+        "value", (" 12345 ", b"+1234 ", "-034576", "", None)
+    )
+    def test_valid_is(self, value):
+        DataElement(0x00410001, "IS", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("234", "1", "01015", "225959.", b"0000.345", "222222.2222222",
+         "-1234-", "+123456", b"-123456-1330", "006000", "005961", "0000aa",
+         "0000.00", "123461-1330", "123400-1360")
+    )
+    def test_invalid_tm(self, value):
+        self.check_invalid_vr("TM", value)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("23", "1234", b"010159", "225959.3", "000000.345", "222222.222222",
+         "-1234", "123456-", b"123460-1330", "005960", "", None)
+    )
+    def test_valid_tm(self, value):
+        DataElement(0x00410001, "TM", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("19", "198", "20011", b"20200101.222", "187712311", "20001301",
+         "19190432010159", "203002020222.2222222", b"203002020270.2",
+         "1984+2000", "+1877123112-0030", "19190430010161", "19190430016000")
+    )
+    def test_invalid_dt(self, value):
+        self.check_invalid_vr("DT", value)
+
+    @pytest.mark.parametrize(
+        "value",
+        ("1984", "200112", b"20200101", "1877123112", "200006012020",
+         "19190420015960", "20300202022222.222222", b"20300202022222.2",
+         "1984+0600", "1877123112-0030", "20300202022222.2-1200",
+         "20000101-", "-2020010100", "1929-1997", "", None)
+    )
+    def test_valid_dt(self, value):
+        DataElement(0x00410001, "DT", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (
+            "Руссский", "ctrl\tchar", '"url"', "a<b", "{abc}"))
+    def test_invalid_ui(self, value):
+        self.check_invalid_vr("UR", value)
+
+    @pytest.mark.parametrize(
+        "value", ("1234.567890.333", "0.0.0", "1234." * 12 + "1234"
+                  "", None)
+    )
+    def test_valid_ui(self, value):
+        DataElement(0x00410001, "UI", value,
+                    validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (
+            ".123.456", "00.1.2", "123..456", "123.45.", "12a.45", "123.04"))
+    def test_invalid_ur(self, value):
+        self.check_invalid_vr("UI", value)
+
+    @pytest.mark.parametrize(
+        "value", ("https://www.a.b/sdf_g?a=1&b=5",
+                  "/a#b(c)[d]@!", "'url'", "", None)
+    )
+    def test_valid_ur(self, value):
+        DataElement(0x00410001, "UR", value,
+                    validation_mode=config.RAISE)
+
+    def test_invalid_pn(self):
+        msg = r"The number of PN components length \(4\) exceeds *"
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, "PN", "Jim=John=Jimmy=Jonny",
+                        validation_mode=config.WARN)
+        msg = r"The PN component length \(65\) exceeds *"
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, "PN", b"Jimmy" * 13,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize(
+        "value", ("John^Doe", "Yamada^Tarou=山田^太郎", "", None)
+    )
+    def test_valid_pn(self, value):
+        DataElement(0x00410001, "PN", value,
+                    validation_mode=config.RAISE)
+
+    def test_write_invalid_length_non_ascii_text(
+            self, enforce_writing_invalid_values):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        # the string length is 9, so constructing the data element
+        # is possible
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+
+        # encoding the element during writing shall fail,
+        # as the encoded length is 21, while only 16 bytes are allowed for SH
+        msg = r"The value length \(21\) exceeds the maximum length of 16 *"
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+    def test_write_invalid_non_ascii_pn(self, enforce_writing_invalid_values):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = False
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        # string length is 40
+        ds.add(DataElement(0x00100010, "PN", "洪^吉洞" * 10))
+
+        msg = r"The PN component length \(100\) exceeds the maximum allowed *"
+        with pytest.raises(ValueError, match=msg):
+            ds.save_as(fp)
+
+    def test_read_invalid_length_non_ascii_text(self):
+        fp = DicomBytesIO()
+        ds = Dataset()
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
+        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        # disable value validation to write an invalid value
+        with config.disable_value_validation():
+            ds.save_as(fp)
+
+        # no warning will be issued during reading, as only RawDataElement
+        # objects are read
+        ds = dcmread(fp, force=True)
+
+
+def test_elem_description_deprecated():
+    """Test deprecation warning for DataElement.description()"""
+    elem = DataElement("PatientName", "PN", "Citizen^Jan")
+    msg = (
+        r"'DataElement.description\(\)' is deprecated and will be removed in "
+        r"v3.0, use 'DataElement.name' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        assert elem.description() == "Patient's Name"

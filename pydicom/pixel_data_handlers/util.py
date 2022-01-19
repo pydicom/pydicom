@@ -16,6 +16,7 @@ except ImportError:
 
 from pydicom.data import get_palette_files
 from pydicom.uid import UID
+from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
@@ -244,7 +245,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if 'ModalityLUTSequence' in ds:
+    if ds.get("ModalityLUTSequence"):
         item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
         nr_entries = cast(List[int], item.LUTDescriptor)[0] or 2**16
         first_map = cast(List[int], item.LUTDescriptor)[1]
@@ -254,7 +255,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
-        if item['LUTData'].VR == 'OW':
+        if item['LUTData'].VR == VR.OW:
             endianness = '<' if ds.is_little_endian else '>'
             unpack_fmt = '{}{}H'.format(endianness, nr_entries)
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
@@ -342,7 +343,7 @@ def apply_voi_lut(
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     valid_voi = False
-    if 'VOILUTSequence' in ds:
+    if ds.get('VOILUTSequence'):
         ds.VOILUTSequence = cast(List["Dataset"], ds.VOILUTSequence)
         valid_voi = None not in [
             ds.VOILUTSequence[0].get('LUTDescriptor', None),
@@ -408,7 +409,7 @@ def apply_voi(
     * DICOM Standard, Part 4, :dcm:`Annex N.2.1.1
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
-    if "VOILUTSequence" not in ds:
+    if not ds.get('VOILUTSequence'):
         return arr
 
     if not np.issubdtype(arr.dtype, np.integer):
@@ -436,7 +437,7 @@ def apply_voi(
 
     # Ambiguous VR, US or OW
     unc_data: Iterable[int]
-    if item['LUTData'].VR == 'OW':
+    if item['LUTData'].VR == VR.OW:
         endianness = '<' if ds.is_little_endian else '>'
         unpack_fmt = f'{endianness}{nr_entries}H'
         unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
@@ -529,7 +530,7 @@ def apply_windowing(
     ds.BitsStored = cast(int, ds.BitsStored)
     y_min: float
     y_max: float
-    if 'ModalityLUTSequence' in ds:
+    if ds.get('ModalityLUTSequence'):
         # Unsigned - see PS3.3 C.11.1.1.1
         y_min = 0
         item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]

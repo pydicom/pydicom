@@ -7,8 +7,8 @@ from typing import (
     Iterable, Union, List, overload, Callable, Any, cast,
     TypeVar, MutableSequence, Iterator
 )
-from typing import Sequence as SequenceType
 
+from pydicom import config
 
 _T = TypeVar("_T")
 _ItemType = TypeVar("_ItemType")
@@ -31,7 +31,8 @@ class MultiValue(MutableSequence[_ItemType]):
     def __init__(
         self,
         type_constructor: Callable[[_T], _ItemType],
-        iterable: Iterable[_T]
+        iterable: Iterable[_T],
+        validation_mode: int = None
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.
@@ -52,8 +53,14 @@ class MultiValue(MutableSequence[_ItemType]):
         from pydicom.valuerep import DSfloat, DSdecimal, IS
 
         def DS_IS_constructor(x: _T) -> _ItemType:
-            return self.type_constructor(x) if x != '' else cast(_ItemType, x)
+            return (  # type: ignore[no-any-return]
+                self.type_constructor(  # type: ignore[has-type]
+                    x, validation_mode=validation_mode)
+                if x != '' else cast(_ItemType, x)
+            )
 
+        if validation_mode is None:
+            validation_mode = config.settings.reading_validation_mode
         self._list: List[_ItemType] = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):

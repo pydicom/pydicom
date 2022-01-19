@@ -15,7 +15,6 @@ import zlib
 
 import pytest
 
-from pydicom._storage_sopclass_uids import CTImageStorage
 from pydicom import config, __version_info__, uid
 from pydicom.data import get_testdata_file, get_charset_files
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
@@ -25,14 +24,19 @@ from pydicom.filereader import dcmread, read_dataset
 from pydicom.filewriter import (
     write_data_element, write_dataset, correct_ambiguous_vr,
     write_file_meta_info, correct_ambiguous_vr_element, write_numbers,
-    write_PN, _format_DT, write_text, write_OWvalue
+    write_PN, _format_DT, write_text, write_OWvalue, writers, dcmwrite
 )
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pydicom.uid import (ImplicitVRLittleEndian, ExplicitVRBigEndian,
-                         PYDICOM_IMPLEMENTATION_UID)
+from pydicom.uid import (
+    ImplicitVRLittleEndian,
+    ExplicitVRBigEndian,
+    RLELossless,
+    PYDICOM_IMPLEMENTATION_UID,
+    CTImageStorage,
+)
 from pydicom.util.hexutil import hex2bytes
-from pydicom.valuerep import DA, DT, TM
+from pydicom.valuerep import DA, DT, TM, VR
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
@@ -280,8 +284,25 @@ class TestWriteFile:
             r"be set appropriately before saving"
         )
         with pytest.raises(AttributeError, match=msg):
-            write_dataset(bs, ds)
+            dcmwrite(bs, ds)
 
+    def test_write_encapsulated_mismatch_encoding(self):
+        """Test writing encapsulated dataset warns if mismatched encoding"""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.TransferSyntaxUID = RLELossless
+        ds.is_implicit_VR = True
+        ds.is_little_endian = True
+        bs = BytesIO()
+
+        msg = (
+            r"All encapsulated \(compressed\) transfer syntaxes must use "
+            r"explicit VR little endian encoding for the dataset. Set "
+            r"'Dataset.is_little_endian = True' and 'Dataset."
+            r"is_implicit_VR = False' before saving"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            dcmwrite(bs, ds)
 
 class TestScratchWriteDateTime(TestWriteFile):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
@@ -2527,7 +2548,7 @@ class TestWriteText:
         encoded = fp.getvalue()
         assert decoded == convert_text(encoded, encodings)
 
-    def test_invalid_encoding(self, allow_invalid_values):
+    def test_invalid_encoding(self, allow_writing_invalid_values):
         """Test encoding text with invalid encodings"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
@@ -2550,9 +2571,10 @@ class TestWriteText:
             write_text(fp, elem, encodings=['iso-2022-jp', 'iso_ir_58'])
             assert expected == fp.getvalue()
 
-    def test_invalid_encoding_enforce_standard(self, enforce_valid_values):
+    def test_invalid_encoding_enforce_standard(
+            self, enforce_writing_invalid_values):
         """Test encoding text with invalid encodings with
-        `config.enforce_valid_values` enabled"""
+        `config.settings.reading_validation_mode` is RAISE"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
@@ -2726,3 +2748,8 @@ class TestWriteUndefinedLengthPixelData:
         self.fp.seek(0)
         ds = read_dataset(self.fp, False, False)
         assert 'UN' == ds[0x30040058].VR
+
+
+def test_all_writers():
+    """Test that the VR writer functions are complete"""
+    assert set(VR) == set(writers)

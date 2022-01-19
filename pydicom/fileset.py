@@ -21,11 +21,14 @@ from pydicom.filereader import dcmread
 from pydicom.filewriter import (
     write_dataset, write_data_element, write_file_meta_info
 )
-from pydicom._storage_sopclass_uids import MediaStorageDirectoryStorage
-import pydicom._storage_sopclass_uids as sop
 from pydicom.tag import Tag, BaseTag
+import pydicom.uid as sop
 from pydicom.uid import (
-    generate_uid, UID, ExplicitVRLittleEndian, ImplicitVRLittleEndian
+    generate_uid,
+    UID,
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    MediaStorageDirectoryStorage,
 )
 
 
@@ -2865,10 +2868,10 @@ _FOUR_LEVEL_SOP_CLASSES = {
 
 def _single_level_record_type(ds: Dataset) -> str:
     """Return a single-level *Directory Record Type* for `ds`."""
-    sop_class = getattr(ds, "SOPClassUID", None)
+    sop_class = cast(Optional[UID], getattr(ds, "SOPClassUID", None))
 
     try:
-        return _SINGLE_LEVEL_SOP_CLASSES[sop_class]
+        return _SINGLE_LEVEL_SOP_CLASSES[sop_class]  # type: ignore[index]
     except KeyError:
         return "PATIENT"
 
@@ -2888,9 +2891,9 @@ def _four_level_record_type(ds: Dataset) -> str:
     if "RTPlanLabel" in ds:
         return "RT PLAN"
 
-    sop_class = getattr(ds, "SOPClassUID", None)
+    sop_class = cast(Optional[UID], getattr(ds, "SOPClassUID", None))
 
     try:
-        return _FOUR_LEVEL_SOP_CLASSES[sop_class]
+        return _FOUR_LEVEL_SOP_CLASSES[sop_class]  # type: ignore[index]
     except KeyError:
         return "IMAGE"

@@ -295,14 +295,15 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
-    def test_setdefault_unknown_tag(self, allow_invalid_values):
+    def test_setdefault_unknown_tag(self, dont_raise_on_writing_invalid_value):
         with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
             elem = self.ds.setdefault(0x88880002, 'foo')
         assert 'foo' == elem.value
         assert 'UN' == elem.VR
         assert 2 == len(self.ds)
 
-    def test_setdefault_unknown_tag_strict(self, enforce_valid_values):
+    def test_setdefault_unknown_tag_strict(
+            self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
             elem = self.ds.setdefault(0x88880004, 'foo')
 
@@ -315,18 +316,20 @@ class TestDataset:
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
 
-    def test_setdefault_unknown_tuple(self, allow_invalid_values):
+    def test_setdefault_unknown_tuple(
+            self, dont_raise_on_writing_invalid_value):
         with pytest.warns(UserWarning, match=r"\(8888, 0002\)"):
             elem = self.ds.setdefault((0x8888, 0x0002), 'foo')
         assert 'foo' == elem.value
         assert 'UN' == elem.VR
         assert 2 == len(self.ds)
 
-    def test_setdefault_unknown_tuple_strict(self, enforce_valid_values):
+    def test_setdefault_unknown_tuple_strict(
+            self, raise_on_writing_invalid_value):
         with pytest.raises(KeyError, match=r"\(8888, 0004\)"):
             elem = self.ds.setdefault((0x8888, 0x0004), 'foo')
 
-    def test_setdefault_use_value(self, allow_invalid_values):
+    def test_setdefault_use_value(self, dont_raise_on_writing_invalid_value):
         elem = self.ds.setdefault((0x0010, 0x0010), "Test")
         assert 'Test' == elem.value
         assert 2 == len(self.ds)
@@ -1921,6 +1924,15 @@ class TestFileDataset:
         ds.file_meta = None
         ds.preamble = None
         assert ds == ds2
+
+    def test_deepcopy_without_filename(self):
+        """Regression test for #1571."""
+        file_meta = FileMetaDataset()
+        ds = FileDataset(filename_or_obj="", dataset={}, file_meta=file_meta,
+                         preamble=b"\0" * 128)
+
+        ds2 = copy.deepcopy(ds)
+        assert ds2.filename == ""
 
 
 class TestDatasetOverlayArray:
