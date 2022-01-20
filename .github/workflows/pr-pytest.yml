@@ -38,9 +38,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         include:
-            ext-sources: pydicom-data
-            pytest-args: --cov=pydicom --cov-append
-            coverage: coverage
+          - pytest-args: --cov=pydicom --cov-append
+          - coverage: coverage
 
     steps:
     - uses: actions/checkout@v2
@@ -93,7 +92,7 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         python-version:  [ '3.6', '3.7', '3.8', '3.9', '3.10' ]
         include:
-            pytest-args: --cov=pydicom --cov-append
+          - pytest-args: --cov=pydicom --cov-append
 
     steps:
     - uses: actions/checkout@v2

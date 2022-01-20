@@ -16,8 +16,8 @@ See also: https://github.com/pydicom/pydicom/discussions/1577
 **Describe the issue**
 
 * A clear description of what the issue is.
-* It's very helpful if you can attach **anonymized** screenshots showing the issue.
 * The output from `python -m pydicom.env_info`
+* It's can be very helpful to include **anonymized** screenshots that demonstrate the issue.
 
 
 **Steps to reproduce**
