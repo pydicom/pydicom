@@ -1,4 +1,4 @@
-name: pr-lint-spellcheck
+name: pr-type-lint-spell
 
 on:
   pull_request:
