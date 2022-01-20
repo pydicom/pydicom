@@ -17,7 +17,10 @@ jobs:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         include:
           - ext-sources: pydicom-data
-          - pytest-args: --cov=pydicom --cov-append
+          - os: ubuntu-latest
+            python-version: '3.9'
+            send-coverage: true
+            pytest-args: --cov=pydicom --cov-append
 
     steps:
     - uses: actions/checkout@v2
@@ -79,10 +82,11 @@ jobs:
     - name: Install and test GDCM
       run: |
         python -m pip install python-gdcm
-        python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
+        python -c 'import gdcm; print("Using gdcm", gdcm.GDCM_VERSION)'
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
 
     - name: Install and test pylibjpeg
+      if: ${{ matrix.python-version != '3.10' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
@@ -91,5 +95,5 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Send coverage results
-      if: ${{ success() && matrix.os == 'ubuntu-latest'}}
+      if: ${{ success() && matrix.send-coverage }}
       uses: codecov/codecov-action@v1

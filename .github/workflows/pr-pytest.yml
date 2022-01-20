@@ -152,7 +152,7 @@ jobs:
     - name: Install and test GDCM
       run: |
         python -m pip install -U python-gdcm
-        python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
+        python -c 'import gdcm; print("Using gdcm", gdcm.GDCM_VERSION)'
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
 
     - name: Install and test pylibjpeg
