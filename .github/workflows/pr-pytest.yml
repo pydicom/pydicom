@@ -30,18 +30,66 @@ jobs:
         python -m pip install -U numpy
         pytest
 
-  test-all:
+  test-core-only:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
-        handler-py-version: [ '3.9' ]
+        python-version: ['3.6', '3.7', '3.8', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Get pip cache dir
+      id: pip-cache
+      run: |
+        python -m pip install -U pip
+        echo "::set-output name=dir::$(pip cache dir)"
+    - name: pip cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
+    - name: Cache pydicom test data
+      id: cache-testdata
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.HOME }}/.pydicom
+        key: pydicom-testdata
+    - name: Initial test environment setup
+      run: |
+        python -m pip install -e .
+        python -m pip install wheel
+        python -m pip install pytest pytest-cov
+
+    # Core library tests
+    - name: Test core library
+      run: |
+        pytest ${{ matrix.pytest-args }}
+
+    - name: Test external sources using pydicom-data
+      if: ${{ matrix.ext-sources == 'pydicom-data' }}
+      run: |
+        python -m pip install git+https://github.com/pydicom/pydicom-data
+        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
+
+  test-core-handlers:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9']
         include:
-          - python-version: '3.9'
-            pytest-args: --cov=pydicom --cov-append
+          - os: 'ubuntu-latest'
             send-coverage: true
+            pytest-args: --cov=pydicom --cov-append
 
     steps:
     - uses: actions/checkout@v2
@@ -91,27 +139,23 @@ jobs:
         pytest ${{ matrix.pytest-args }}
 
     - name: Install and test Pillow
-      if: ${{ matrix.python-version == matrix.handler-py-version }}
       run: |
         python -m pip install -U pillow
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
 
     - name: Install and test jpeg_ls
-      if: ${{ matrix.python-version == matrix.handler-py-version }}
       run: |
         python -m pip install -U cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py
 
     - name: Install and test GDCM
-      if: ${{ matrix.python-version == matrix.handler-py-version }}
       run: |
         python -m pip install -U python-gdcm
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
 
     - name: Install and test pylibjpeg
-      if: ${{ matrix.python-version == matrix.handler-py-version }}
       run: |
         python -m pip install -U pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle

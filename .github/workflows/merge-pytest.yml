@@ -60,8 +60,9 @@ jobs:
         pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
     # Pixel data tests
-    - name: Test with numpy
+    - name: Install and test with numpy
       run: |
+        pip install -U numpy
         pytest ${{ matrix.pytest-args }}
 
     - name: Install and test Pillow

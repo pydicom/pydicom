@@ -197,7 +197,7 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
         new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
         new.file_meta = ds.file_meta
         tfile = NamedTemporaryFile('wb')
-        new.save_as(tfile)
+        new.save_as(tfile.name)
         fname = tfile.name
 
     image_reader.SetFileName(fname)
