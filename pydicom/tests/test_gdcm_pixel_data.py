@@ -640,4 +640,3 @@ class TestSupportFunctions:
         ds = dcmread(mr_name)
         image_reader = gdcm_handler.create_image_reader(ds)
         assert image_reader is not None
-        assert image_reader.Read()

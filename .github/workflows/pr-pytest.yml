@@ -152,8 +152,8 @@ jobs:
     - name: Install and test GDCM
       run: |
         python -m pip install -U python-gdcm
-        python -c 'import gdcm; print("Using gdcm", gdcm.GDCM_VERSION)'
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
+        python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py pydicom/tests/test_encoders_gdcm.py
 
     - name: Install and test pylibjpeg
       run: |
@@ -162,6 +162,10 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install -U pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+
+    - name: Test everything
+      run: |
+        pytest ${{ matrix.pytest-args }}
 
     - name: Send coverage results
       if: ${{ success() && matrix.send-coverage }}

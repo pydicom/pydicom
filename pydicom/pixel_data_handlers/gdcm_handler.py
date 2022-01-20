@@ -3,6 +3,7 @@
 pixel transfer syntaxes.
 """
 
+import os
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
@@ -187,6 +188,7 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
     """
     image_reader = gdcm.ImageReader()
     fname = getattr(ds, 'filename', None)
+    tfile = None
     if fname and isinstance(fname, str):
         pass
     else:
@@ -196,12 +198,18 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
         new = ds.group_dataset(0x0028)
         new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
         new.file_meta = ds.file_meta
-        tfile = NamedTemporaryFile('wb')
+        tfile = NamedTemporaryFile('wb', delete=False)
         new.save_as(tfile)
-        tfile.seek(0)
+        tfile.close()
         fname = tfile.name
 
     image_reader.SetFileName(fname)
+    if not image_reader.Read():
+        raise TypeError("GDCM could not read DICOM image")
+
+    if tfile is not None and os.path.isfile(tfile.name):
+        os.remove(tfile.name)
+
     return image_reader
 
 
@@ -231,8 +239,6 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
         gdcm_image = create_image(ds, gdcm_data_element)
     else:
         gdcm_image_reader = create_image_reader(ds)
-        if not gdcm_image_reader.Read():
-            raise TypeError("GDCM could not read DICOM image")
         gdcm_image = gdcm_image_reader.GetImage()
 
     # GDCM returns char* as type str. Python 3 decodes this to
