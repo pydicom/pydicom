@@ -1,8 +1,6 @@
 name: type-hints
 
 on:
-  pull_request:  # Testing only!
-    branches: [ master ]
   push:
     branches: [ master ]
 
