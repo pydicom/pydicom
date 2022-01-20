@@ -39,7 +39,7 @@ jobs:
         python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
         handler-py-version: [ '3.9' ]
         include:
-          - python-version: ${{ matrix.handler-py-version }}
+          - python-version: '3.9'
             pytest-args: --cov=pydicom --cov-append
             send-coverage: true
 
