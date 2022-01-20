@@ -1,8 +1,6 @@
 name: unit-tests
 
 on:
-  pull_request:  # Testing only!
-    brances: [ master ]
   push:
     branches:
       - master
