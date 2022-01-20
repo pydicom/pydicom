@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  test-base:
+  test-all:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -47,7 +47,9 @@ jobs:
       run: |
         python -m pip install -e .
         python -m pip install -U wheel pytest pytest-cov
-    - name: Test with no external libraries
+
+    # Core library tests
+    - name: Test core library
       run: |
         pytest ${{ matrix.pytest-args }}
 
@@ -57,70 +59,27 @@ jobs:
         python -m pip install git+https://github.com/pydicom/pydicom-data
         pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
-    - name: Send coverage results
-      if: ${{ success() }}
-      uses: codecov/codecov-action@v1
-
-  test-pixel-handlers:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version:  ['3.10']
-        include:
-          - pytest-args: --cov=pydicom --cov-append
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Get pip cache dir
-      id: pip-cache
-      run: |
-        python -m pip install -U pip
-        echo "::set-output name=dir::$(pip cache dir)"
-    - name: pip cache
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
-    - name: Cache pydicom test data
-      id: cache-testdata
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.HOME }}/.pydicom
-        key: pydicom-testdata
-    - name: Initial test environment setup
-      run: |
-        python -m pip install -e .
-        python -m pip install -U wheel pytest pytest-cov numpy
-
+    # Pixel data tests
     - name: Test with numpy
       run: |
         pytest ${{ matrix.pytest-args }}
 
     - name: Install and test Pillow
       run: |
-        python -m pip install pillow cython
-        python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
-        pytest ${{ matrix.pytest-args }}
+        python -m pip install -U pillow
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
 
     - name: Install and test jpeg_ls
       run: |
-        python -m pip install cython
+        python -m pip install -U cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
-        pytest ${{ matrix.pytest-args }}
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py
 
     - name: Install and test GDCM
       run: |
         python -m pip install python-gdcm
         python -c 'import gdcm; print(f"Using gdcm {gdcm.GDCM_VERSION}")'
-        pytest ${{ matrix.pytest-args }}
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
 
     - name: Install and test pylibjpeg
       run: |
@@ -131,5 +90,5 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Send coverage results
-      if: ${{ success() }}
+      if: ${{ success() && matrix.os == 'ubuntu-latest'}}
       uses: codecov/codecov-action@v1
