@@ -355,11 +355,11 @@ import pydicom.pixel_data_handlers.pylibjpeg_handler as pylibjpeg_handler  # noq
 
 pixel_data_handlers = [
     np_handler,
-    rle_handler,
     gdcm_handler,
     pillow_handler,
     jpegls_handler,
     pylibjpeg_handler,
+    rle_handler,
 ]
 """Handlers for converting (7FE0,0010) *Pixel Data*.
 
