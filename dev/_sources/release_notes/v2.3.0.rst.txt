@@ -21,6 +21,8 @@ Enhancements
 * Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
 * UIDs for all Storage SOP Classes have been added to the ``uid`` module
   (:issue:`1498`)
+* Use rle_handler as last resort handler for decoding RLE encoded data as it is
+  the slowest handler (:issue:`1487`)
 
 
 Fixes

@@ -290,6 +290,8 @@ a warning is logged, an exception is raised, or the validation is skipped.</p></
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.VR.html#pydicom.valuerep.VR" title="pydicom.valuerep.VR"><code class="xref py py-class docutils literal notranslate"><span class="pre">VR</span></code></a> enum (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1500">#1500</a>)</p></li>
 <li><p>UIDs for all Storage SOP Classes have been added to the <code class="docutils literal notranslate"><span class="pre">uid</span></code> module
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1498">#1498</a>)</p></li>
+<li><p>Use rle_handler as last resort handler for decoding RLE encoded data as it is
+the slowest handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1487">#1487</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
