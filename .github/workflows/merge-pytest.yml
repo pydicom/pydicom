@@ -1,6 +1,7 @@
 name: unit-tests
 
 on:
+  pull_request: # Testing!
   push:
     branches:
       - master
@@ -24,26 +25,31 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Get pip cache dir
       id: pip-cache
       run: |
         python -m pip install -U pip
         echo "::set-output name=dir::$(pip cache dir)"
+
     - name: pip cache
       uses: actions/cache@v2
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
+
     - name: Cache pydicom test data
       id: cache-testdata
       uses: actions/cache@v2
       with:
         path: ${{ env.HOME }}/.pydicom
         key: pydicom-testdata
+
     - name: Initial test environment setup
       run: |
         python -m pip install -e .
@@ -58,7 +64,8 @@ jobs:
       if: ${{ matrix.ext-sources == 'pydicom-data' }}
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
-        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
+        cd pydicom/tests
+        pytest ${{ matrix.pytest-args}} test_data_manager.py
 
     # Pixel data tests
     - name: Install and test with numpy
@@ -69,31 +76,37 @@ jobs:
     - name: Install and test Pillow
       run: |
         python -m pip install -U pillow
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
+        pytest ${{ matrix.pytest-args }} test_pillow_pixel_data.py
+        python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
       run: |
         python -m pip install -U cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py
+        pytest ${{ matrix.pytest-args }} test_jpeg_ls_pixel_data.py test_JPEG_LS_transfer_syntax.py
+        python -m pip uninstall -y jpeg_ls
 
     - name: Install and test GDCM
       run: |
         python -m pip install python-gdcm
         python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py pydicom/tests/test_encoders_gdcm.py
+        pytest ${{ matrix.pytest-args }} test_gdcm_pixel_data.py
+        pytest ${{ matrix.pytest-args }} test_encoders_gdcm.py
+        python -m pip uninstall -y python-gddcm
 
     - name: Install and test pylibjpeg
       if: ${{ matrix.python-version != '3.10' }}
       run: |
         python -m pip install pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} test_pylibjpeg.py
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} test_pylibjpeg.py
 
     - name: Test everything
       run: |
+        python -m pip install pillow python-gdcm
+        python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         pytest ${{ matrix.pytest-args }}
 
     - name: Send coverage results
