@@ -12,12 +12,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ubuntu-latest
-        python-version: '3.9'
+        os: [ubuntu-latest]
+        python-version: ['3.9']
 
     steps:
     - name: Test PR Comment
-    - uses: actions/github-script@v5
+      uses: actions/github-script@v5
       if: github.event_name == "pull_request"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
