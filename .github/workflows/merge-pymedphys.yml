@@ -26,7 +26,7 @@ jobs:
             issue: { number: issue_number },
             repo: { owner, repo }
           } = context;
-          github.issues.createComment({
+          github.rest.issues.createComment({
             issue_number,
             owner,
             repo,
