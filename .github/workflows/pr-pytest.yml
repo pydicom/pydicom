@@ -157,7 +157,7 @@ jobs:
         python -m pip install -U cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py pydicom/tests/test_jpeg_ls_pixel_data.py
-        python -m pip uninstall -y jpeg_ls
+        python -m pip uninstall -y CharPyLS
 
     - name: Install and test GDCM
       if: matrix.os == 'ubuntu-latest'
