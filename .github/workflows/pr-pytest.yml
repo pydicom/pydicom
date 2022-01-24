@@ -76,7 +76,6 @@ jobs:
         python -m pip install -e .
         python -m pip install wheel pytest pytest-cov
 
-    # Core library tests
     - name: Test core library
       run: |
         pytest ${{ matrix.pytest-args }}
@@ -85,7 +84,7 @@ jobs:
       if: ${{ success() && matrix.send-coverage }}
       uses: codecov/codecov-action@v1
 
-  test-core-handlers:
+  test-core-extras:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -101,26 +100,31 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Get pip cache dir
       id: pip-cache
       run: |
         python -m pip install -U pip
         echo "::set-output name=dir::$(pip cache dir)"
+
     - name: pip cache
       uses: actions/cache@v2
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
+
     - name: Cache pydicom test data
       id: cache-testdata
       uses: actions/cache@v2
       with:
         path: ${{ env.HOME }}/.pydicom
         key: pydicom-testdata
+
     - name: Initial test environment setup
       run: |
         python -m pip install -e .
@@ -137,7 +141,7 @@ jobs:
         python -m pip install git+https://github.com/pydicom/pydicom-data
         pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
-    # Pixel data tests
+    # Pixel data decoding and encoding
     - name: Install and test with numpy
       run: |
         python -m pip install -U numpy
@@ -173,7 +177,7 @@ jobs:
         python -m pip install -U pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
-    - name: Test everything
+    - name: Test all pixel handling
       if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install -U pillow python-gdcm
@@ -181,7 +185,6 @@ jobs:
         pytest ${{ matrix.pytest-args }}
 
     - name: Test external sources using pydicom-data
-      if: ${{ matrix.ext-sources == 'pydicom-data' }}
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
         pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py

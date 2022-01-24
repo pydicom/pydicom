@@ -94,7 +94,7 @@ jobs:
         python -m pip install pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
-    - name: Test everything
+    - name: Test all pixel handling
       if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install pillow python-gdcm
