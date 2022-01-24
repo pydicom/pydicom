@@ -1,7 +1,6 @@
 name: unit-tests-pymedphys
 
 on:
-  pull_request: # Testing!
   push:
     branches:
       - master

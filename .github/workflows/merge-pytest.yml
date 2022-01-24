@@ -1,7 +1,6 @@
 name: unit-tests
 
 on:
-  pull_request: # Testing!
   push:
     branches:
       - master
