@@ -1,0 +1,24 @@
+name: notify-pymedphys
+
+on:
+  workflow_run:
+    workflows: [unit-tests-pymedphys]
+    types: [completed]
+
+jobs:
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Test PR Comment
+        uses: actions/github-script@v5
+        if: github.event.workflow_run.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Hello, world'
+            });
