@@ -22,14 +22,10 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const {
-            issue: { number: issue_number },
-            repo: { owner, repo }
-          } = context;
           github.rest.issues.createComment({
-            issue_number,
-            owner,
-            repo,
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
             body: 'Hello, world'
           });
 
