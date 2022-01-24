@@ -136,8 +136,7 @@ jobs:
       if: ${{ matrix.ext-sources == 'pydicom-data' }}
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
-        cd pydicom/tests
-        pytest ${{ matrix.pytest-args}} test_data_manager.py
+        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
 
     # Pixel data tests
     - name: Install and test with numpy
@@ -148,31 +147,31 @@ jobs:
     - name: Install and test Pillow
       run: |
         python -m pip install -U pillow
-        pytest ${{ matrix.pytest-args }} test_pillow_pixel_data.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
         python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
       run: |
         python -m pip install -U cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
-        pytest ${{ matrix.pytest-args }} test_JPEG_LS_transfer_syntax.py test_jpeg_ls_pixel_data.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py pydicom/tests/test_jpeg_ls_pixel_data.py
         python -m pip uninstall -y jpeg_ls
 
     - name: Install and test GDCM
       run: |
         python -m pip install -U python-gdcm
         python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
-        pytest ${{ matrix.pytest-args }} test_gdcm_pixel_data.py
-        pytest ${{ matrix.pytest-args }} test_encoders_gdcm.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_encoders_gdcm.py
         python -m pip uninstall -y python-gdcm
 
     - name: Install and test pylibjpeg
       run: |
         python -m pip install -U pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
         python -m pip install -U pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test everything
       run: |

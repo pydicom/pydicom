@@ -1,7 +1,6 @@
 name: publish-pypi-deploy
 
 on:
-  pull_request: # Testing!
   release:
     types: [ published ]
 

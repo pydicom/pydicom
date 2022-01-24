@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Test PR Comment
       uses: actions/github-script@v5
-      if: github.event_name == "pull_request"
+      if: github.event_name == 'pull_request'
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
@@ -30,7 +30,7 @@ jobs:
             issue_number,
             owner,
             repo,
-            body: "Hello, world"
+            body: 'Hello, world'
           });
 
     - uses: actions/checkout@v2
