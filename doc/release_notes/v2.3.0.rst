@@ -31,4 +31,3 @@ Fixes
   encoding for the rest of the dataset (:issue:`1565`)
 * Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
   (:issue:`1571`)
-* Fixed using the GDCM handler on Windows with GDCM < 2.8.8 (:issue:`1581`)
