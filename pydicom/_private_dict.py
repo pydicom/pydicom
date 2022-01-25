@@ -3612,7 +3612,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0019xx37': ('LO', '1', 'Unknown', ''),  # noqa
         '0019xx40': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx41': ('DS', '1', 'Unknown', ''),  # noqa
-        '0019xx42': ('IS', '1', 'Unknown', ''),  # noqa
+        '0019xx42': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx43': ('DS', '1', 'Unknown', ''),  # noqa
         '0019xx44': ('IS', '1', 'Unknown', ''),  # noqa
         '0019xx45': ('IS', '1', 'Unknown', ''),  # noqa
@@ -3841,11 +3841,7 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0009xx00': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'MITRA LINKED ATTRIBUTES 1.0': {
-        '0031xx20': ('IS', '1', 'Unknown', ''),  # noqa
-    },
-    'MITRA MARKUP 1.0': {
-        '0029xx00': ('LO', '1-n', 'Unknown', ''),  # noqa
-        '0029xx01': ('LO', '1-n', 'Unknown', ''),  # noqa
+        '0031xx20': ('LO', '1', 'Global Patient ID', ''),  # noqa
     },
     'MITRA OBJECT ATTRIBUTES 1.0': {
         '0033xx02': ('LO', '1', 'Unknown', ''),  # noqa
@@ -3858,24 +3854,37 @@ private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]] = {
         '0029xx00': ('OB', '1', 'Unknown', ''),  # noqa
     },
     'MITRA OBJECT UTF8 ATTRIBUTES 1.0': {
-        '0033xx02': ('OB', '1', 'Unknown', ''),  # noqa
+        '0033xx02': ('PN', '1', "Patient's Name", ''),  # noqa
         '0033xx04': ('CS', '1', 'Study Description', ''),  # noqa
-        '0033xx06': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx08': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx0a': ('OB', '1', 'Unknown', ''),  # noqa
+        '0033xx06': ('PN', '1', "Referring Physician's Name", ''),  # noqa
+        '0033xx08': ('PN', '1', "Requesting Physician's Name", ''),  # noqa
+        '0033xx0a': ('PN', '1', "Performing Physician's Name", ''),  # noqa
         '0033xx0c': ('LO', '1', 'Reason for Study', ''),  # noqa
-        '0033xx0e': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx13': ('PN', '1', "Patient's Name", ''),  # noqa
-        '0033xx14': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx15': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx16': ('OB', '1', 'Unknown', ''),  # noqa
-        '0033xx19': ('PN', '1', "Referring Physician's Name", ''),  # noqa
+        '0033xx0e': ('LT', '1', 'Study Comments', ''),  # noqa
+        '0033xx13': ('PN', '1', "Patient's Name Single Byte", ''),  # noqa
+        '0033xx14': ('PN', '1', "Patient's Name Ideographic", ''),  # noqa
+        '0033xx15': ('PN', '1', "Patient's Name Phonetic", ''),  # noqa
+        '0033xx16': ('PN', '1', "Referring Physician's Name Single Byte", ''),  # noqa
+        '0033xx17': ('PN', '1', "Referring Physician's Name Ideographic", ''),  # noqa
+        '0033xx18': ('PN', '1', "Referring Physician's Name Phonetic", ''),  # noqa
+        '0033xx19': ('PN', '1', "Requesting Physician's Name Single Byte", ''),  # noqa
+        '0033xx1a': ('PN', '1', "Requesting Physician's Name Ideographic", ''),  # noqa
+        '0033xx1b': ('PN', '1', "Requesting Physician's Name Phonetic", ''),  # noqa
+        '0033xx1c': ('PN', '1', "Performing Physician's Name Single Byte", ''),  # noqa
+        '0033xx1d': ('PN', '1', "Performing Physician's Name Ideographic", ''),  # noqa
+        '0033xx1e': ('PN', '1', "Performing Physician's Name Phonetic", ''),  # noqa
     },
     'MITRA PRESENTATION 1.0': {
-        '0029xx00': ('LO', '1', 'Unknown', ''),  # noqa
-        '0029xx01': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xx02': ('UN', '1', 'Unknown', ''),  # noqa
-        '0029xx03': ('LO', '1', 'Unknown', ''),  # noqa
+        '0029xx00': ('CS', '1', 'Mitra Rotation', ''),  # noqa
+        '0029xx01': ('LO', '1', 'Mitra Window Width', ''),  # noqa
+        '0029xx02': ('LO', '1', 'Mitra Window Centre', ''),  # noqa
+        '0029xx03': ('IS', '1', 'Mitra Invert', ''),  # noqa
+        '0029xx04': ('IS', '1', 'Mitra Has Tabstop', ''),  # noqa
+        '0029xx05': ('CS', '1', 'Smooth Rotation', ''),  # noqa
+        '0029xx10': ('CS', '1', 'Breast Box x0', ''),  # noqa
+        '0029xx11': ('CS', '1', 'Breast Box y0', ''),  # noqa
+        '0029xx12': ('CS', '1', 'Breast Box x1', ''),  # noqa
+        '0029xx13': ('CS', '1', 'Breast Box y1', ''),  # noqa
     },
     'MMCPrivate': {
         '0009xx48': ('LO', '1', 'Unknown', ''),  # noqa
