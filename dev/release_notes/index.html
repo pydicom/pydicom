@@ -292,6 +292,7 @@ a warning is logged, an exception is raised, or the validation is skipped.</p></
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1498">#1498</a>)</p></li>
 <li><p>Use rle_handler as last resort handler for decoding RLE encoded data as it is
 the slowest handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1487">#1487</a>)</p></li>
+<li><p>Added, enhanced, or removed a number of Mitra private dictionary entries (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -299,6 +300,7 @@ the slowest handler (<a class="reference external" href="https://github.com/pydi
 <ul class="simple">
 <li><p>Fixed odd-length <strong>OB</strong> values not being padded during write (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1511">#1511</a>)</p></li>
 <li><p>Fixed Hologic private dictionary entry (0019xx43)</p></li>
+<li><p>Fixed Mitra global patient ID private dictionary entry (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> not setting the correct
 encoding for the rest of the dataset (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1565">#1565</a>)</p></li>
 <li><p>Fixed <cite>AttributeError</cite> on deep copy of <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a>

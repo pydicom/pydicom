@@ -23,12 +23,14 @@ Enhancements
   (:issue:`1498`)
 * Use rle_handler as last resort handler for decoding RLE encoded data as it is
   the slowest handler (:issue:`1487`)
+* Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
 
 
 Fixes
 -----
 * Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
 * Fixed Hologic private dictionary entry (0019xx43)
+* Fixed Mitra global patient ID private dictionary entry (:pr:`1588`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` not setting the correct
   encoding for the rest of the dataset (:issue:`1565`)
 * Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
