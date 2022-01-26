@@ -634,10 +634,3 @@ class TestSupportFunctions:
         assert px_repr == pixel_format.GetPixelRepresentation()
         planar = dataset_3d.PlanarConfiguration
         assert planar == image.GetPlanarConfiguration()
-
-    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    def test_create_image_reader(self):
-        ds = dcmread(mr_name)
-        image_reader = gdcm_handler.create_image_reader(ds)
-        assert image_reader is not None
-        assert image_reader.Read()
