@@ -3,6 +3,7 @@
 pixel transfer syntaxes.
 """
 
+import os
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
@@ -204,6 +205,38 @@ def create_image_reader(ds: "Dataset") -> "gdcm.ImageReader":
     return image_reader
 
 
+def _get_pixel_str_fileio(ds: "Dataset") -> str:
+    reader = gdcm.ImageReader()
+    fname = getattr(ds, 'filename', None)
+    if fname and isinstance(fname, str):
+        reader.SetFileName(fname)
+        if not reader.Read():
+            raise TypeError("GDCM could not read DICOM image")
+
+        return reader.GetImage().GetBuffer()
+    
+    # Copy the relevant elements and write to a temporary file to avoid
+    #   having to deal with all the possible objects the dataset may
+    #   originate with
+    new = ds.group_dataset(0x0028)
+    new["PixelData"] = ds["PixelData"]  # avoid ambiguous VR
+    new.file_meta = ds.file_meta
+    with NamedTemporaryFile('wb', delete=False) as t:
+        new.save_as(t)
+        
+    reader.SetFileName(t.name)
+    if not reader.Read():
+        raise TypeError("GDCM could not read DICOM image")
+    
+    pixel_str = reader.GetImage().GetBuffer()
+
+    # Need to kill the gdcm.ImageReader to free file access
+    reader = None
+    os.remove(t.name)
+
+    return pixel_str
+
+
 def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     """Use the GDCM package to decode *Pixel Data*.
 
@@ -228,21 +261,18 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
     if HAVE_GDCM_IN_MEMORY_SUPPORT:
         gdcm_data_element = create_data_element(ds)
         gdcm_image = create_image(ds, gdcm_data_element)
+        pixel_str = gdcm_image.GetBuffer()
     else:
-        gdcm_image_reader = create_image_reader(ds)
-        if not gdcm_image_reader.Read():
-            raise TypeError("GDCM could not read DICOM image")
-        gdcm_image = gdcm_image_reader.GetImage()
+        pixel_str = _get_pixel_str_fileio(ds)
 
-    # GDCM returns char* as type str. Python 3 decodes this to
+    # GDCM returns char* as type str. Python decodes this to
     # unicode strings by default.
     # The SWIG docs mention that they always decode byte streams
-    # as utf-8 strings for Python 3, with the `surrogateescape`
+    # as utf-8 strings, with the `surrogateescape`
     # error handler configured.
-    # Therefore, we can encode them back to their original bytearray
-    # representation on Python 3 by using the same parameters.
-
-    pixel_bytearray = gdcm_image.GetBuffer().encode("utf-8", "surrogateescape")
+    # Therefore, we can encode them back to a bytearray
+    # by using the same parameters.
+    pixel_bytearray = pixel_str.encode("utf-8", "surrogateescape")
 
     # Here we need to be careful because in some cases, GDCM reads a
     # buffer that is too large, so we need to make sure we only include

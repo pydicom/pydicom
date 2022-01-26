@@ -85,12 +85,18 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         The encoded image data.
     """
     # Check the parameters are valid for RLE encoding with GDCM
-    samples_per_pixel: int = kwargs['samples_per_pixel']
-    bits_allocated: int = kwargs['bits_allocated']
+    rows = kwargs['rows']
+    columns = kwargs['columns']
+    samples_per_pixel = kwargs['samples_per_pixel']
+    number_of_frames = kwargs['number_of_frames']
+    pixel_representation = kwargs['pixel_representation']
+    bits_allocated = kwargs['bits_allocated']
+    bits_stored = kwargs['bits_stored']
+    photometric_interpretation = kwargs['photometric_interpretation']
 
     # Bug up to v3.0.9 (Apr 2021) in handling 32-bit, 3 sample/px data
     gdcm_version = [int(c) for c in gdcm.Version.GetVersion().split('.')]
-    if gdcm_version < [3, 1, 0]:
+    if gdcm_version < [3, 0, 10]:
         if bits_allocated == 32 and samples_per_pixel == 3:
             raise RuntimeError(
                 "The 'gdcm' plugin is unable to RLE encode 32-bit, 3 "
@@ -103,14 +109,57 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         )
 
     # Create a gdcm.Image with the uncompressed `src` data
-    image = _create_gdcm_image(src, **kwargs)
+    pi = gdcm.PhotometricInterpretation.GetPIType(
+        photometric_interpretation
+    )
 
+    # GDCM's null photometric interpretation gets used for invalid values
+    if pi == gdcm.PhotometricInterpretation.PI_END:
+        raise ValueError(
+            "An error occurred with the 'gdcm' plugin: invalid photometric "
+            f"interpretation '{photometric_interpretation}'"
+        )
+
+    # `src` uses little-endian byte ordering
+    ts = gdcm.TransferSyntax.ImplicitVRLittleEndian
+
+    # Must use ImageWriter().GetImage() to create a gdcmImage
+    w = gdcm.ImageWriter()
+    image = w.GetImage()
+    image.SetNumberOfDimensions(2)
+    image.SetDimensions((columns, rows, 1))
+    image.SetPhotometricInterpretation(
+        gdcm.PhotometricInterpretation(pi)
+    )
+    image.SetTransferSyntax(gdcm.TransferSyntax(ts))
+
+    pixel_format = gdcm.PixelFormat(
+        samples_per_pixel,
+        bits_allocated,
+        bits_stored,
+        bits_stored - 1,
+        pixel_representation
+    )
+    image.SetPixelFormat(pixel_format)
+    if samples_per_pixel > 1:
+        # Default `src` is planar configuration 0 (i.e. R1 G1 B1 R2 G2 B2)
+        image.SetPlanarConfiguration(0)
+
+    # Add the Pixel Data element and set the value to `src`
+    elem = gdcm.DataElement(
+        gdcm.Tag(0x7FE0, 0x0010), 
+        gdcm.VL(len(src)), 
+        gdcm.VR(gdcm.VR.OB),
+    )
+    elem.SetByteStringValue(src)
+    image.SetDataElement(elem)
+    
     # Converts an image to match the set transfer syntax
     converter = gdcm.ImageChangeTransferSyntax()
 
     # Set up the converter with the intended transfer syntax...
-    ts = gdcm.TransferSyntax.GetTSType(kwargs['transfer_syntax_uid'])
-    converter.SetTransferSyntax(gdcm.TransferSyntax(ts))
+    rle = gdcm.TransferSyntax.GetTSType(kwargs['transfer_syntax_uid'])
+    converter.SetTransferSyntax(gdcm.TransferSyntax(rle))
     # ...and image to be converted
     converter.SetInput(image)
 
@@ -123,11 +172,10 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
             "ImageChangeTransferSyntax.Change() returned a failure result"
         )
 
-    # The converted image as gdcm.Image
-    # Weirdly, reusing `image` as the variable name causes a segfault here
-    output = converter.GetOutput()
+    image = converter.GetOutput()
     # The element's value is the encapsulated encoded pixel data
-    seq = output.GetDataElement().GetSequenceOfFragments()
+
+    seq = image.GetDataElement().GetSequenceOfFragments()
 
     # RLECodec::Code() uses only 1 fragment per frame
     if seq is None or seq.GetNumberOfFragments() != 1:
@@ -137,7 +185,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
             "fragments found in the 'Pixel Data'"
         )
 
-    fragment: str = seq.GetFragment(0).GetByteValue().GetBuffer()
+    fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
     return fragment.encode("utf-8", "surrogateescape")
 
 
@@ -188,7 +236,8 @@ def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
     # `src` uses little-endian byte ordering
     ts = gdcm.TransferSyntax.ImplicitVRLittleEndian
 
-    image = gdcm.Image()
+    w = gdcm.ImageWriter()
+    image = w.GetImage()
     image.SetNumberOfDimensions(2)
     image.SetDimensions((columns, rows, 1))
     image.SetPhotometricInterpretation(
@@ -209,7 +258,11 @@ def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
         image.SetPlanarConfiguration(0)
 
     # Add the Pixel Data element and set the value to `src`
-    elem = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
+    elem = gdcm.DataElement(
+        gdcm.Tag(0x7FE0, 0x0010), 
+        gdcm.VL(len(src)), 
+        gdcm.VR(gdcm.VR.OB),
+    )
     elem.SetByteStringValue(src)
     image.SetDataElement(elem)
 
