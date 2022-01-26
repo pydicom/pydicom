@@ -21,6 +21,9 @@ Enhancements
 * Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
 * UIDs for all Storage SOP Classes have been added to the ``uid`` module
   (:issue:`1498`)
+* Use rle_handler as last resort handler for decoding RLE encoded data as it is
+  the slowest handler (:issue:`1487`)
+* Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
 * Improved JPEG 10918 color space determination when using the Pillow pixel
   data handler
 
@@ -29,7 +32,12 @@ Fixes
 -----
 * Fixed odd-length **OB** values not being padded during write (:issue:`1511`)
 * Fixed Hologic private dictionary entry (0019xx43)
+* Fixed Mitra global patient ID private dictionary entry (:pr:`1588`)
 * Fixed :meth:`~pydicom.dataset.Dataset.compress` not setting the correct
   encoding for the rest of the dataset (:issue:`1565`)
 * Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
   (:issue:`1571`)
+* Fixed an exception during pixel decoding if using GDCM < 2.8.8 on Windows
+  (:issue:`1581`)
+* Fixed crashes on Windows and MacOS when using the GDCM plugin to compress
+  into *RLE Lossless* (:issue:`1581`)

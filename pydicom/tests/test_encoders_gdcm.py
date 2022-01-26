@@ -135,7 +135,7 @@ class TestRLELossless:
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skipif(GDCM_VERSION < [3, 1, 0], reason="GDCM bug")
+    @pytest.mark.skipif(GDCM_VERSION < [3, 0, 10], reason="GDCM bug")
     def test_cycle_u32_3s_1f(self):
         """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
         ds = dcmread(EXPL_32_3_1F)
@@ -159,7 +159,7 @@ class TestRLELossless:
 
         assert np.array_equal(ref, arr)
 
-    @pytest.mark.skipif(GDCM_VERSION >= [3, 1, 0], reason="GDCM bug fixed")
+    @pytest.mark.skipif(GDCM_VERSION >= [3, 0, 10], reason="GDCM bug fixed")
     def test_cycle_u32_3s_1f_raises(self):
         """Test that 32-bit, 3 sample/px data raises exception."""
         ds = dcmread(EXPL_32_3_1F)
