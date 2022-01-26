@@ -213,8 +213,8 @@ def _get_pixel_str_fileio(ds: "Dataset") -> str:
         if not reader.Read():
             raise TypeError("GDCM could not read DICOM image")
 
-        return reader.GetImage().GetBuffer()
-    
+        return cast(str, reader.GetImage().GetBuffer())
+
     # Copy the relevant elements and write to a temporary file to avoid
     #   having to deal with all the possible objects the dataset may
     #   originate with
@@ -223,12 +223,12 @@ def _get_pixel_str_fileio(ds: "Dataset") -> str:
     new.file_meta = ds.file_meta
     with NamedTemporaryFile('wb', delete=False) as t:
         new.save_as(t)
-        
+
     reader.SetFileName(t.name)
     if not reader.Read():
         raise TypeError("GDCM could not read DICOM image")
-    
-    pixel_str = reader.GetImage().GetBuffer()
+
+    pixel_str: str = reader.GetImage().GetBuffer()
 
     # Need to kill the gdcm.ImageReader to free file access
     reader = None

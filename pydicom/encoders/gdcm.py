@@ -188,7 +188,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         )
 
     fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
-    return fragment.encode("utf-8", "surrogateescape")
+    return cast(bytes, fragment.encode("utf-8", "surrogateescape"))
 
 
 _ENCODERS = {
