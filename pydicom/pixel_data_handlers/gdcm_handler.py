@@ -175,6 +175,20 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
 
 
 def _get_pixel_str_fileio(ds: "Dataset") -> str:
+    """Return the pixel data from `ds` as a str.
+
+    Used for GDCM < 2.8.8.
+
+    Parameters
+    ----------
+    ds : pydicom.dataset.Dataset
+        The dataset to create the str from.
+
+    Returns
+    -------
+    str
+        The UTF-8 encoded pixel data.
+    """
     reader = gdcm.ImageReader()
     fname = getattr(ds, 'filename', None)
     if fname and isinstance(fname, str):
