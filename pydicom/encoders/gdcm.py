@@ -147,11 +147,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         image.SetPlanarConfiguration(0)
 
     # Add the Pixel Data element and set the value to `src`
-    elem = gdcm.DataElement(
-        gdcm.Tag(0x7FE0, 0x0010),
-        gdcm.VL(len(src)),
-        gdcm.VR(gdcm.VR.OB),
-    )
+    elem = gdcm.DataElement(gdcm.Tag(0x7FE0, 0x0010))
     elem.SetByteStringValue(src)
     image.SetDataElement(elem)
 
