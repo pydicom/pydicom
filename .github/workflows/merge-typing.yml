@@ -1,7 +1,7 @@
-name: pull-request-typing
+name: type-hints
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
 
 jobs:
@@ -12,19 +12,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9]
+        python-version: [ '3.6', '3.7', '3.8', '3.9', '3.10' ]
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install typing dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install mypy
-        pip install types-requests types-pkg_resources types-setuptools
+        python -m pip install -U pip
+        python -m pip install -U mypy
+        python -m pip install -U types-requests types-pkg_resources types-setuptools
     - name: Run typing check with mypy
       run: |
         mypy
