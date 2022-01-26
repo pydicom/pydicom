@@ -35,3 +35,7 @@ Fixes
   encoding for the rest of the dataset (:issue:`1565`)
 * Fixed `AttributeError` on deep copy of :class:`~pydicom.dataset.FileDataset`
   (:issue:`1571`)
+* Fixed an exception during pixel decoding if using GDCM < 2.8.8 on Windows
+  (:issue:`1581`)
+* Fixed crashes on Windows and MacOS when using the GDCM plugin to compress
+  into *RLE Lossless* (:issue:`1581`)
