@@ -160,7 +160,6 @@ jobs:
         python -m pip uninstall -y CharPyLS
 
     - name: Install and test GDCM
-      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install -U python-gdcm
         python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
@@ -177,7 +176,6 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test all pixel handling
-      if: matrix.os == 'ubuntu-latest'
       run: |
         python -m pip install -U pillow python-gdcm
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS

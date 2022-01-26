@@ -124,8 +124,9 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
     ts = gdcm.TransferSyntax.ImplicitVRLittleEndian
 
     # Must use ImageWriter().GetImage() to create a gdcmImage
-    w = gdcm.ImageWriter()
-    image = w.GetImage()
+    #   also have to make sure `writer` doesn't go out of scope
+    writer = gdcm.ImageWriter()
+    image = writer.GetImage()
     image.SetNumberOfDimensions(2)
     image.SetDimensions((columns, rows, 1))
     image.SetPhotometricInterpretation(
@@ -147,13 +148,13 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
 
     # Add the Pixel Data element and set the value to `src`
     elem = gdcm.DataElement(
-        gdcm.Tag(0x7FE0, 0x0010), 
-        gdcm.VL(len(src)), 
+        gdcm.Tag(0x7FE0, 0x0010),
+        gdcm.VL(len(src)),
         gdcm.VR(gdcm.VR.OB),
     )
     elem.SetByteStringValue(src)
     image.SetDataElement(elem)
-    
+
     # Converts an image to match the set transfer syntax
     converter = gdcm.ImageChangeTransferSyntax()
 
@@ -172,9 +173,10 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
             "ImageChangeTransferSyntax.Change() returned a failure result"
         )
 
+    # A new gdcmImage with the converted godamnit
     image = converter.GetOutput()
-    # The element's value is the encapsulated encoded pixel data
 
+    # The element's value is the encapsulated encoded pixel data
     seq = image.GetDataElement().GetSequenceOfFragments()
 
     # RLECodec::Code() uses only 1 fragment per frame
@@ -187,86 +189,6 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
 
     fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
     return fragment.encode("utf-8", "surrogateescape")
-
-
-def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
-    """Return a gdcm.Image from the `src`.
-
-    Parameters
-    ----------
-    src : bytes
-        The raw image frame data to be encoded.
-    **kwargs
-        Required parameters:
-
-        * `rows`: int
-        * `columns`: int
-        * `samples_per_pixel`: int
-        * `number_of_frames`: int
-        * `bits_allocated`: int
-        * `bits_stored`: int
-        * `pixel_representation`: int
-        * `photometric_interpretation`: str
-
-    Returns
-    -------
-    gdcm.Image
-        An Image containing the `src` as a single uncompressed frame.
-    """
-    rows = kwargs['rows']
-    columns = kwargs['columns']
-    samples_per_pixel = kwargs['samples_per_pixel']
-    number_of_frames = kwargs['number_of_frames']
-    pixel_representation = kwargs['pixel_representation']
-    bits_allocated = kwargs['bits_allocated']
-    bits_stored = kwargs['bits_stored']
-    photometric_interpretation = kwargs['photometric_interpretation']
-
-    pi = gdcm.PhotometricInterpretation.GetPIType(
-        photometric_interpretation
-    )
-
-    # GDCM's null photometric interpretation gets used for invalid values
-    if pi == gdcm.PhotometricInterpretation.PI_END:
-        raise ValueError(
-            "An error occurred with the 'gdcm' plugin: invalid photometric "
-            f"interpretation '{photometric_interpretation}'"
-        )
-
-    # `src` uses little-endian byte ordering
-    ts = gdcm.TransferSyntax.ImplicitVRLittleEndian
-
-    w = gdcm.ImageWriter()
-    image = w.GetImage()
-    image.SetNumberOfDimensions(2)
-    image.SetDimensions((columns, rows, 1))
-    image.SetPhotometricInterpretation(
-        gdcm.PhotometricInterpretation(pi)
-    )
-    image.SetTransferSyntax(gdcm.TransferSyntax(ts))
-
-    pixel_format = gdcm.PixelFormat(
-        samples_per_pixel,
-        bits_allocated,
-        bits_stored,
-        bits_stored - 1,
-        pixel_representation
-    )
-    image.SetPixelFormat(pixel_format)
-    if samples_per_pixel > 1:
-        # Default `src` is planar configuration 0 (i.e. R1 G1 B1 R2 G2 B2)
-        image.SetPlanarConfiguration(0)
-
-    # Add the Pixel Data element and set the value to `src`
-    elem = gdcm.DataElement(
-        gdcm.Tag(0x7FE0, 0x0010), 
-        gdcm.VL(len(src)), 
-        gdcm.VR(gdcm.VR.OB),
-    )
-    elem.SetByteStringValue(src)
-    image.SetDataElement(elem)
-
-    return cast("gdcm.Image", image)
 
 
 _ENCODERS = {
