@@ -173,7 +173,7 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
             "ImageChangeTransferSyntax.Change() returned a failure result"
         )
 
-    # A new gdcmImage with the converted godamnit
+    # A new gdcmImage with the converted pixel data element
     image = converter.GetOutput()
 
     # The element's value is the encapsulated encoded pixel data
