@@ -346,10 +346,14 @@ class TestDataElementCallbackTests:
         # Change "2\4\8\16" to "2,4,8,16"
         ds_bytes = ds_bytes.replace(b"\x32\x5c\x34\x5c\x38\x5c\x31\x36",
                                     b"\x32\x2c\x34\x2c\x38\x2c\x31\x36")
+        self.ds_bytes = ds_bytes
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def testBadSeparator(self, enforce_valid_values):
+    def teardown(self):
+        config.reset_data_element_callback()
+
+    def test_bad_separator(self, enforce_valid_values):
         """Ensure that unchanged bad separator does raise an error..."""
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
@@ -357,7 +361,7 @@ class TestDataElementCallbackTests:
         with pytest.raises(ValueError):
             getattr(contour, "ContourData")
 
-    def testImplVRcomma(self):
+    def test_impl_vr_comma(self):
         """util.fix_separator:
            Able to replace comma in Implicit VR dataset.."""
         fixer.fix_separator(b",", for_VRs=["DS", "IS"],
@@ -365,13 +369,67 @@ class TestDataElementCallbackTests:
         ds = filereader.read_dataset(self.bytesio, is_little_endian=True,
                                      is_implicit_VR=True)
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
-        config.reset_data_element_callback()
-
         expected = [2., 4., 8., 16.]
         if have_numpy and config.use_DS_numpy:
             assert numpy.allclose(expected, got)
         else:
             assert expected == got
+
+    def test_null_value_for_fixed_vr(self):
+        # Wipe first Contour Data, mark as length 0
+        null_ds_bytes = self.ds_bytes.replace(b"\x08\x00\x00\x00",
+                                              b"\x00\x00\x00\x00")
+        contour_data = b"\x32\x2c\x34\x2c\x38\x2c\x31\x36"
+        null_ds_bytes = null_ds_bytes.replace(contour_data, b"")
+        fixer.fix_separator(b",", for_VRs=["DS", "IS"],
+                            process_unknown_VRs=False)
+        ds = filereader.read_dataset(BytesIO(null_ds_bytes),
+                                     is_little_endian=True,
+                                     is_implicit_VR=True)
+
+        assert ds.ROIContourSequence[0].ContourSequence[0].ContourData is None
+
+    def test_space_delimiter(self):
+        # Change "32\64\128\196" to "32 64 128 196", keeping the trailing space
+        existing = b"\x33\x32\x5c\x36\x34\x5c\x31\x32\x38\x5c\x31\x39\x36\x20"
+        spaced = b"\x33\x32\x20\x36\x34\x20\x31\x32\x38\x20\x31\x39\x36\x20"
+        space_ds_bytes = self.ds_bytes.replace(existing, spaced)
+        fixer.fix_separator(b" ", for_VRs=["DS", "IS"],
+                            process_unknown_VRs=False)
+        ds = filereader.read_dataset(BytesIO(space_ds_bytes),
+                                     is_little_endian=True,
+                                     is_implicit_VR=True)
+        got = ds.ROIContourSequence[0].ContourSequence[1].ContourData
+
+        expected = [32., 64., 128., 196.]
+        if have_numpy and config.use_DS_numpy:
+            assert numpy.allclose(expected, got)
+        else:
+            assert expected == got
+
+    @pytest.mark.filterwarnings("ignore:Unknown DICOM tag")
+    def test_process_unknown_vr(self):
+        bad_vr_bytes = self.ds_bytes
+        # tag (0900, 0010), length 4, value "1,2"
+        bad_vr_bytes += (b"\x00\x09\x10\x00"
+                         b"\x04\x00\x00\x00"
+                         b"\x31\x2c\x32\x20")
+        fixer.fix_separator(b",", for_VRs=["DS", "IS"],
+                            process_unknown_VRs=True)
+        ds = filereader.read_dataset(BytesIO(bad_vr_bytes),
+                                     is_little_endian=True,
+                                     is_implicit_VR=True)
+        got = ds.get((0x0900, 0x0010))
+        assert got.value == b'1\\2 '
+
+        # with process_unknown_VRs=False, unknown VR separator is not replaced
+        fixer.fix_separator(b",", for_VRs=["DS", "IS"],
+                            process_unknown_VRs=False)
+        ds = filereader.read_dataset(BytesIO(bad_vr_bytes),
+                                     is_little_endian=True,
+                                     is_implicit_VR=True)
+        got = ds.get((0x0900, 0x0010))
+        assert got.value == b'1,2 '
 
 
 class TestLeanRead:
