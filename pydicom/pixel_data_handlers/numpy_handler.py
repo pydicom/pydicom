@@ -59,7 +59,9 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_expected_length
+from pydicom.pixel_data_handlers.util import (
+    pixel_dtype, get_expected_length, pack_bits, unpack_bits
+)
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -112,101 +114,6 @@ def should_change_PhotometricInterpretation_to_RGB(ds: "Dataset") -> bool:
     This affects JPEG transfer syntaxes.
     """
     return False
-
-
-def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
-    """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
-
-    .. versionadded:: 1.2
-
-    Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
-
-    .. versionchanged:: 2.1
-
-        Added the `pad` keyword parameter and changed to allow `arr` to be
-        2 or 3D.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
-        only contain integer values of 0 and 1 and must have an 'uint'  or
-        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
-        that the length of `arr` be a multiple of 8 (i.e. that any empty
-        bit-padding to round out the byte has already been added). The input
-        `arr` should either be shaped as (rows, columns) or (frames, rows,
-        columns) or the equivalent 1D array used to ensure that the packed
-        data is in the correct order.
-    pad : bool, optional
-        If ``True`` (default) then add a null byte to the end of the packed
-        data to ensure even length, otherwise no padding will be added.
-
-    Returns
-    -------
-    bytes
-        The bit packed data.
-
-    Raises
-    ------
-    ValueError
-        If `arr` contains anything other than 0 or 1.
-
-    References
-    ----------
-    DICOM Standard, Part 5,
-    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
-    :dcm:`Annex D<part05/chapter_D.html>`
-    """
-    if arr.shape == (0,):
-        return bytes()
-
-    # Test array
-    if not np.array_equal(arr, arr.astype(bool)):
-        raise ValueError(
-            "Only binary arrays (containing ones or zeroes) can be packed."
-        )
-
-    if len(arr.shape) > 1:
-        arr = arr.ravel()
-
-    # The array length must be a multiple of 8, pad the end
-    if arr.shape[0] % 8:
-        arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
-
-    arr = np.packbits(arr.astype('u1'), bitorder="little")
-
-    packed: bytes = arr.tobytes()
-    if pad:
-        return packed + b'\x00' if len(packed) % 2 else packed
-
-    return packed
-
-
-def unpack_bits(bytestream: bytes) -> "np.ndarray":
-    """Unpack bit packed *Pixel Data* or *Overlay Data* into a
-    :class:`numpy.ndarray`.
-
-    Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay
-    Bits Allocated* is 1.
-
-    Parameters
-    ----------
-    bytestream : bytes
-        The bit packed pixel data.
-
-    Returns
-    -------
-    numpy.ndarray
-        The unpacked *Pixel Data* as a 1D array.
-
-    References
-    ----------
-    DICOM Standard, Part 5,
-    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
-    :dcm:`Annex D<part05/chapter_D.html>`
-    """
-    arr = np.frombuffer(bytestream, dtype='u1')
-    return cast("np.ndarray", np.unpackbits(arr, bitorder="little"))
 
 
 def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
@@ -346,7 +253,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
         nr_pixels = get_expected_length(ds, unit='pixels')
-        arr = unpack_bits(pixel_data)[:nr_pixels]
+        arr = unpack_bits(pixel_data, as_array=True)[:nr_pixels]
     else:
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=('Float' in px_keyword[0]))
