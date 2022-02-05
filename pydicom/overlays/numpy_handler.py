@@ -37,7 +37,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers.numpy_handler import unpack_bits
+from pydicom.pixel_data_handlers import unpack_bits
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -254,6 +254,8 @@ def get_overlay_array(ds: "Dataset", group: int) -> "np.ndarray":
 
     # Unpack the pixel data into a 1D ndarray, skipping any trailing padding
     nr_pixels = get_expected_length(elem_values, unit='pixels')
-    arr = unpack_bits(elem_values['OverlayData'])[:nr_pixels]
+    arr = cast(
+        "np.ndarray", unpack_bits(elem_values['OverlayData'])[:nr_pixels]
+    )
 
     return reshape_overlay_array(elem_values, arr)

@@ -253,7 +253,9 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
     if ds.BitsAllocated == 1:
         # Skip any trailing padding bits
         nr_pixels = get_expected_length(ds, unit='pixels')
-        arr = unpack_bits(pixel_data, as_array=True)[:nr_pixels]
+        arr = cast(
+            "np.ndarray", unpack_bits(pixel_data, as_array=True)[:nr_pixels]
+        )
     else:
         # Skip the trailing padding byte(s) if present
         dtype = pixel_dtype(ds, as_float=('Float' in px_keyword[0]))
