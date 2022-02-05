@@ -1,5 +1,5 @@
 # Copyright 2020 pydicom authors. See LICENSE file for details.
-"""Use the `pylibjpeg <https://github.com/pydicom/pylibjpeg/>`_ package
+"""Use the :gh:`pylibjpeg <pylibjpeg/>` package
 to convert supported pixel data to a :class:`numpy.ndarray`.
 
 .. versionadded:: 2.1

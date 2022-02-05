@@ -14,8 +14,7 @@ This tutorial will take you through the process of:
 Download the documentation
 ==========================
 
-1. Sign up to `GitHub <https://github.com>`_ and
-   `fork pydicom <https://github.com/pydicom/pydicom/fork>`_
+1. Sign up to `GitHub <https://github.com>`_ and :gh:`fork pydicom <pydicom/fork>`
 2. Install `Git <https://git-scm.com/downloads>`_. If you're new to Git,
    the Django project has a good introduction on `working with Git and GitHub
    <https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/>`_.
@@ -226,12 +225,11 @@ After committing the changes, send them to your fork::
 
   $ git push origin doc-tut
 
-You can create a pull request by visiting the `pydicom GitHub page
-<https://github.com/pydicom/pydicom>`_ where you
-should see your branch under *"Your recently push branches"*. Click *"Compare &
-pull request"* and fill out the title (with a ``[WIP]`` prefix, i.e.
-``[WIP] Add documentation of reading a DICOM file``) and follow the
-instructions in the main entry window.
+You can create a pull request by visiting the :gh:`pydicom GitHub page
+<pydicom>` where you should see your branch under *"Your recently push
+branches"*. Click *"Compare & pull request"* and fill out the title (with a
+``[WIP]`` prefix, i.e. ``[WIP] Add documentation of reading a DICOM file``)
+and follow the instructions in the main entry window.
 
 To submit the pull request (PR) for real - **please don't do this for
 this example!** - then on the next page you would click *"Create pull
