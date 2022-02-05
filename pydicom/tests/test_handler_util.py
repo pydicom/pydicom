@@ -2240,6 +2240,7 @@ class TestGetNrFrames:
             assert not w
 
 
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestExpandYBR422:
     def test_8bit(self):
         """Test 8-bit expansion."""
