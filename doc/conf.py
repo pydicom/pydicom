@@ -321,7 +321,7 @@ def setup(app):
 # The following is used by sphinx.ext.linkcode to provide links to github
 linkcode_resolve = make_linkcode_resolve(
     'pydicom',
-    'https://github.com/pydicom/pydicom/blob/{revision}/{package}/{path}#L{lineno}'
+    'https://github.com/pydicom/pydicom/blob/{revision}/{package}/{path}#L{lineno}'  # noqa
 )
 
 doctest_global_setup = """

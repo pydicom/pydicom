@@ -29,7 +29,7 @@ def data_files_inventory():
 
 setup(
     name="pydicom",
-    version=__version__,
+    version=__version__,  # noqa: F821
     author="Darcy Mason and contributors",
     author_email="darcymason@gmail.com",
     description="A pure Python package for reading and writing DICOM data",
