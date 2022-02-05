@@ -24,6 +24,8 @@ Enhancements
 * Use rle_handler as last resort handler for decoding RLE encoded data as it is
   the slowest handler (:issue:`1487`)
 * Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
+* Added :func:`~pydicom.pixel_data_handlers.util.expand_ybr422` for expanding
+  uncompressed ``YBR_FULL_422`` data to ``YBR_FULL``.
 
 
 Fixes
