@@ -24,9 +24,9 @@ Python is supported, check :ref:`this table<faq_install_version>`.
 Install using pip
 -----------------
 
-*pydicom* is available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_, the
+*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
 official third-party Python software repository. The simplest way to install
-from PyPi is using `pip <https://pip.pypa.io/>`_ with the command::
+from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
   pip install pydicom
 
@@ -135,15 +135,14 @@ Installing GDCM
 `GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-The `python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project builds
-wheels for Python 3.6+ on Windows, MacOS and Linux, and can be
-installed using pip::
+The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`_ are built by the
+`python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
+versions of Python on Windows, MacOS and Linux, and can be installed using pip::
 
   pip install python-gdcm
 
-The wheels available through `conda-forge <https://github.com/conda-forge/gdcm-feedstock>`_
-tend to be older versions and are not as well supported. They're available on
-conda using::
+The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`_
+tend to be older versions and not as well supported. They're available on conda using::
 
   conda install gdcm -c conda-forge
 
@@ -159,7 +158,7 @@ RLE images provided a suitable plugin is installed.
 
 Using pip::
 
-  pip install -U "pylibjpeg>=1.2" pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
+  pip install -U pylibjpeg[all]
 
 
 .. _tut_install_dev:
