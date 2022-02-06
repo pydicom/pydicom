@@ -293,6 +293,8 @@ a warning is logged, an exception is raised, or the validation is skipped.</p></
 <li><p>Use rle_handler as last resort handler for decoding RLE encoded data as it is
 the slowest handler (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1487">#1487</a>)</p></li>
 <li><p>Added, enhanced, or removed a number of Mitra private dictionary entries (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
+<li><p>Added support for unpacking bit-packed data without using NumPy to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">unpack_bits`(:pr:`1594()</span></code>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -497,7 +499,7 @@ in <code class="xref py py-mod docutils literal notranslate"><span class="pre">p
 <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.generate_multiplex" title="pydicom.waveforms.numpy_handler.generate_multiplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiplex_array()</span></code></a> functions.</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code></a> which returns an
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at <cite>index</cite> within a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> for the multiplex group at <cite>index</cite> within a
 <em>Waveform Sequence</em> element.</p></li>
 </ul>
 </li>
@@ -526,7 +528,7 @@ variable “PYDICOM_FUTURE” to “True” or call <a class="reference internal
 allow for the communication of not just the URI but also the tag and VR
 to the handler. Previous handlers will work as expected, new signature
 handlers will get the additional information.</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="pydicom.pixel_data_handlers.numpy_handler.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a> can now be used
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code> can now be used
 with 2D or 3D input arrays and will pad the packed data to even length by
 default.</p></li>
 <li><p>Elements with the <a class="reference internal" href="../reference/generated/pydicom.valuerep.IS.html#pydicom.valuerep.IS" title="pydicom.valuerep.IS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IS</span></code></a> VR accept float strings that

@@ -157,7 +157,7 @@ requires <a class="reference external" href="http://numpy.org/">NumPy</a>.</p>
 <p>The <em>Overlay Data</em> element contains the raw bytes exactly as found in the file
 as bit-packed data. To unpack and get an overlay in a more useful form you
 can use the <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.overlay_array" title="pydicom.dataset.Dataset.overlay_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlay_array()</span></code></a> method to return a
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>. To use it you simply pass the group number of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>. To use it you simply pass the group number of the
 overlay elements you’re interested in:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">overlay_array</span><span class="p">(</span><span class="mh">0x6000</span><span class="p">)</span> 
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
@@ -180,7 +180,7 @@ the top left pixels are aligned and a value of <code class="docutils literal not
 overlay pixels start 1 row above and 1 row to the left of the image pixels.</p>
 <p>NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be bit-packed (using something like
-<a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.numpy_handler.html#pydicom.pixel_data_handlers.numpy_handler.pack_bits" title="pydicom.pixel_data_handlers.numpy_handler.pack_bits"><code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code></a>) and written
+<code class="xref py py-func docutils literal notranslate"><span class="pre">pack_bits()</span></code>) and written
 back to the correct element:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add a line</span>
 <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
