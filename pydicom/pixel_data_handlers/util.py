@@ -24,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 # Lookup table for unpacking bit-packed data
 _UNPACK_LUT: Dict[int, bytes] = {
-    k: bytes(reversed([int(s) for s in f"{k:08b}"])) for k in range(256)
+    k: bytes(int(s) for s in reversed(f"{k:08b}")) for k in range(256)
 }
 
 
