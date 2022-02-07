@@ -6,6 +6,8 @@ from pydicom.pixel_data_handlers.util import (
     convert_color_space,
     apply_voi,
     apply_windowing,
+    pack_bits,
+    unpack_bits,
     expand_ybr422,
 )
 

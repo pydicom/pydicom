@@ -13,8 +13,7 @@ import warnings
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary
 from pydicom.config import disable_value_validation
-from pydicom.valuerep import validate_value
-
+from pydicom.valuerep import validate_value, STR_VR_REGEXES
 
 _deprecations = {
     "JPEGBaseline": "JPEGBaseline8Bit",
@@ -59,7 +58,7 @@ pydicom's (0002,0012) *Implementation Class UID*
 """
 
 # Regexes for valid UIDs and valid UID prefixes
-RE_VALID_UID = re.compile(r"^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$")
+RE_VALID_UID = STR_VR_REGEXES["UI"]
 """Regex for a valid UID"""
 RE_VALID_UID_PREFIX = re.compile(r"^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$")
 """Regex for a valid UID prefix"""
