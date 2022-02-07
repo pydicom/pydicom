@@ -31,21 +31,15 @@ Download the documentation
    tutorial for more information.
 
    Create a new virtualenv ``pyd-doc``, using a Python 3.X version such
-   as 3.7::
+   as 3.10, then activate it::
 
-   $ mkvirtualenv -p /path/to/python3.7 pyd-doc
+   python3.10 -m venv pyd-doc
+   source pyd-doc/bin/activate
 
-5. Install the cloned copy of *pydicom* (``-e`` for editable mode)::
+5. Install the cloned copy of *pydicom* and the dependencies requires for
+   building the documentation (using ``-e`` for an editable install)::
 
-   $ pip install -e pydicom/
-
-
-Install required libraries
-==========================
-
-::
-
-  $ pip install sphinx sphinx-rtd-theme sphinx-gallery sphinx-issues sphinx-copybutton
+   $ pip install -e pydicom[docs]
 
 
 Build and preview the documentation
