@@ -450,6 +450,12 @@ class TestDataset:
         assert 'John' == self.ds[0x10, 0x10].value
         assert 'Johnny' == self.ds[0x10, 0x12].value
 
+    def test_dir_attr(self):
+        """Dataset.__dir__ returns class attributes"""
+        ds = Dataset()
+        assert hasattr(ds, "is_implicit_VR")
+        assert "is_implicit_VR" in dir(ds)
+
     def test_dir_subclass(self):
         """Dataset.__dir__ returns class specific dir"""
 
@@ -1875,7 +1881,7 @@ class TestFileDataset:
         """Ensure that we don't use inherited dict functionality"""
         ds = Dataset()
         di = dict()
-        expected_diff = {'__class__', '__doc__', '__hash__', 'fromkeys'}
+        expected_diff = {'fromkeys'}
         if sys.version_info[:2] >= (3, 8):
             expected_diff.add('__reversed__')
         if sys.version_info[:2] >= (3, 9):
