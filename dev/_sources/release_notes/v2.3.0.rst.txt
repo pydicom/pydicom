@@ -41,3 +41,4 @@ Fixes
   (:issue:`1581`)
 * Fixed crashes on Windows and MacOS when using the GDCM plugin to compress
   into *RLE Lossless* (:issue:`1581`)
+* Fixed ``dir(Dataset())`` not returning class attributes (:issue:`1599`)
