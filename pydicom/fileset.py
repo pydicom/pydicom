@@ -1717,6 +1717,7 @@ class FileSet:
                     f"{cast(Path, self.path) / file_id}"
                 )
                 continue
+
             # If the instance's existing directory structure doesn't match
             #   the pydicom semantics then stage for movement
             if instance.for_moving:
@@ -2255,6 +2256,10 @@ class FileSet:
             offset += 8  # a sequence item's (tag + length)
             # Copy safe - only modifies RecordNode._offset
             offset += node._encode_record(force_implicit)
+            # If the sequence item has undefined length then it uses a
+            #   sequence item delimiter item
+            if node._record.is_undefined_length_sequence_item:
+                offset += 8
 
         # Step 2: Update the records and add to *Directory Record Sequence*
         ds.DirectoryRecordSequence = []

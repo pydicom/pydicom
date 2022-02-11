@@ -2450,6 +2450,21 @@ class TestFileSet_Modify:
         with pytest.raises(ValueError, match=msg):
             fs.add(ds)
 
+    def test_write_undefined_length(self, dicomdir_copy):
+        """Test writing with undefined length items"""
+        t, ds = dicomdir_copy
+        elem = ds["DirectoryRecordSequence"]
+        ds["DirectoryRecordSequence"].is_undefined_length = True
+        for item in ds.DirectoryRecordSequence:
+            item.is_undefined_length_sequence_item = True
+
+        fs = FileSet(ds)
+        fs.write(use_existing=True)
+
+        ds = dcmread(Path(t.name) / "DICOMDIR")
+        item = ds.DirectoryRecordSequence[-1]
+        assert item.ReferencedFileID == ['98892003', 'MR700', '4648']
+
 
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Copy:
