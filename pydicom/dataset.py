@@ -647,21 +647,10 @@ class Dataset:
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Class methods
-        meths = {
-            v[0] for v in inspect.getmembers(type(self), inspect.isroutine)
-        }
-        # Class properties
-        props = {
-            v[0]
-            for v in inspect.getmembers(type(self), inspect.isdatadescriptor)
-        }
-        # Class attributes
-        attr = self.__dict__.keys()
-        # Element keywords
+        names = set(super().__dir__())
         keywords = set(self.dir())
 
-        return sorted(props | meths | attr | keywords)
+        return sorted(names | keywords)
 
     def dir(self, *filters: str) -> List[str]:
         """Return an alphabetical list of element keywords in the
