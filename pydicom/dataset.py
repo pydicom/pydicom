@@ -393,6 +393,9 @@ class Dataset:
         self.is_little_endian: Optional[bool] = None
         self.is_implicit_VR: Optional[bool] = None
 
+        # True if the dataset is a sequence item with undefined length
+        self.is_undefined_length_sequence_item = False
+
         # the parent data set, if this dataset is a sequence item
         self.parent: "Optional[weakref.ReferenceType[Dataset]]" = None
 
