@@ -1,1 +1,1 @@
-from pydicom.encoders.base import get_encoder, RLELosslessEncoder
+from pydicom.pixels import get_encoder, RLELosslessEncoder

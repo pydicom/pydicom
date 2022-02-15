@@ -181,7 +181,7 @@ A specific encoding plugin can be used by passing the plugin name via the
     >>> ds.compress(RLELossless, encoding_plugin='pylibjpeg')
 
 The plugins available for each encoder are listed in the
-:mod:`API reference<pydicom.encoders>` for the encoder type.
+:mod:`API reference<pydicom.pixels.encoders>` for the encoder type.
 
 Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing

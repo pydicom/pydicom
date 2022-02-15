@@ -92,7 +92,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import generate_pixel_data_frame
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     pixel_dtype, get_expected_length, reshape_pixel_array, get_j2k_parameters
 )
 from pydicom.uid import (

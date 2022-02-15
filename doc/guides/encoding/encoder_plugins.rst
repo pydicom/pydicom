@@ -4,7 +4,7 @@
 Pixel Data Encoder Plugins
 ==========================
 
-*Pixel Data* encoding in *pydicom* uses an :class:`~pydicom.encoders.base.Encoder`
+*Pixel Data* encoding in *pydicom* uses an :class:`~pydicom.pixels.encoders.base.Encoder`
 instance for the specific *Transfer Syntax* as a manager for plugins that
 perform the encoding work. This guide covers the requirements for those plugins
 and how to add them to *pydicom*. For a more general introduction to compression
@@ -102,7 +102,7 @@ Adding Plugins to an Encoder
 ============================
 
 Additional plugins can be added to an existing encoder with the
-:meth:`~pydicom.encoders.base.Encoder.add_plugin` method, which takes the
+:meth:`~pydicom.pixels.encoders.base.Encoder.add_plugin` method, which takes the
 a unique :class:`str` `plugin_label`, and a :class:`tuple` of ``('the import
 path to the encoder function's module', 'encoder function name')``. For
 example, if you'd import your encoder function `my_encoder_func` with
@@ -111,7 +111,7 @@ following:
 
 .. code-block:: python
 
-    from pydicom.encoders import RLELosslessEncoder
+    from pydicom.pixels import RLELosslessEncoder
 
     RLELosslessEncoder.add_plugin(
         'my_encoder',  # the plugin's label

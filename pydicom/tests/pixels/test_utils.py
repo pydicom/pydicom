@@ -1,5 +1,5 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-"""Tests for the pixel_data_handlers.util module."""
+# Copyright 2008-2022 pydicom authors. See LICENSE file for details.
+"""Tests for the pixels.utils module."""
 
 import os
 import random
@@ -17,7 +17,7 @@ except ImportError:
 from pydicom import dcmread, config
 from pydicom.data import get_testdata_file, get_palette_files
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     dtype_corrected_for_endianness,
     reshape_pixel_array,
     convert_color_space,

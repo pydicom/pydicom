@@ -47,8 +47,8 @@ except ImportError:
     HAVE_RLE = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.util import pixel_dtype
-from pydicom.encoders.native import _encode_frame
+from pydicom.pixels.utils import pixel_dtype
+from pydicom.pixels.encoders.native import _encode_frame
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover

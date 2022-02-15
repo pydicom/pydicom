@@ -18,7 +18,7 @@ except ImportError:
     HAVE_JPEGLS = False
 
 from pydicom.encaps import decode_data_sequence, defragment_data
-from pydicom.pixel_data_handlers.util import pixel_dtype
+from pydicom.pixels.utils import pixel_dtype
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover

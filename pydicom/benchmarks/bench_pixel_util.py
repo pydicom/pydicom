@@ -5,7 +5,7 @@ import numpy as np
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.pixel_data_handlers.util import convert_color_space
+from pydicom.pixels import convert_color_space
 
 
 # 32/32, 3 sample/pixel, 2 frame

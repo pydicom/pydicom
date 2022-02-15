@@ -48,9 +48,9 @@ Enhancements
 * Tolerate values with multiple and/or incorrect padding bytes (:issue:`940`)
 * Added support for uncompressed pixel data with (0028,0004) *Photometric
   Interpretation* of `YBR_FULL_422` to the numpy pixel data handler.
-* Added :func:`~pydicom.pixel_data_handlers.util.apply_color_lut` function for
+* Added :func:`~pydicom.pixels.utils.apply_color_lut` function for
   applying color palette LUTs (:issue:`205`)
-* Added :func:`~pydicom.pixel_data_handlers.util.apply_modality_lut` function
+* Added :func:`~pydicom.pixels.utils.apply_modality_lut` function
   for applying modality LUTs.
 * Added :func:`~pydicom.data.get_palette_files` for retrieving well-known
   palette color datasets.
@@ -62,7 +62,7 @@ Enhancements
 * Added optional `handler` argument to
   :func:`~pydicom.dataset.Dataset.decompress`. This lets you specify a
   particular handler, rather than following pydicom's default order (:issue:`537`)
-* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` function for
+* Added :func:`~pydicom.pixels.utils.apply_voi_lut` function for
   applying VOI LUTs or windowing operations.
 * Added support for (7fe0,0008) *Float Pixel Data* and (7fe0,0009) *Double
   Float Pixel Data* to :attr:`~pydicom.dataset.Dataset.pixel_array`
@@ -75,7 +75,7 @@ Enhancements
 * Updated DICOM dictionary to 2019e edition (:issue:`1013`)
 * Added support for new VRs OV, SV, UV (:issue:`1016`)
 * Code dictionaries and ``Code`` class for structured reporting added
-  (alpha release only).  See the 
+  (alpha release only).  See the
   :doc:`Structured Reporting tutorial <../tutorials/sr_basics>` for more
   information
 

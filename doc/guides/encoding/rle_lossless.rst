@@ -96,7 +96,7 @@ Available Plugins
 |                                            +---------+--------------------------------------+-----+----------------------+
 |                                            | Name    | Requires                             |Added| Known Limitations    |
 +============================================+=========+======================================+=====+======================+
-|:attr:`~pydicom.encoders.RLELosslessEncoder`| pydicom |                                      |v2.2 | ~20x slower to encode|
+|:attr:`~pydicom.pixels.RLELosslessEncoder`  | pydicom |                                      |v2.2 | ~20x slower to encode|
 |                                            +---------+--------------------------------------+-----+----------------------+
 |                                            |pylibjpeg|:ref:`NumPy<tut_install_np>`,         |v2.2 |                      |
 |                                            |         |:ref:`pylibjpeg<tut_install_pylj>`,   |     |                      |

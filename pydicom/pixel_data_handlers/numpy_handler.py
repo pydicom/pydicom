@@ -50,7 +50,7 @@ table below.
 
 """
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast, Any
 import warnings
 
 try:
@@ -59,7 +59,7 @@ try:
 except ImportError:
     HAVE_NP = False
 
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     pixel_dtype, get_expected_length, pack_bits, unpack_bits
 )
 import pydicom.uid
@@ -277,3 +277,24 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         return arr.copy()
 
     return arr
+
+
+_deprecations = {
+    "pack_bits": pack_bits,
+    "unpack_bits": unpack_bits,
+}
+
+
+def __getattr__(name: str) -> Any:
+    if name in _deprecations:
+        fn = _deprecations[name]
+        warnings.warn(
+            f"Importing '{name}' from "
+            "'pydicom.pixel_data_handlers.numpy_handler' is deprecated, "
+            "import from 'pydicom.pixels' instead",
+            DeprecationWarning,
+        )
+
+        return globals()[fn]
+
+    raise AttributeError(f"module {__name__} has no attribute {name}")

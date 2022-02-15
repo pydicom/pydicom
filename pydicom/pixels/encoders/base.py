@@ -66,7 +66,7 @@ class Encoder:
             The label to use for the plugin, should be unique for the encoder.
         import_path : Tuple[str, str]
             The module import path and the encoding function's name (e.g.
-            ``('pydicom.encoders.pylibjpeg', 'encode_pixel_data')``).
+            ``('pydicom.pixels.encoders.pylibjpeg', 'encode_pixel_data')``).
 
         Raises
         ------
@@ -143,7 +143,7 @@ class Encoder:
             `encoding_plugin` is not specified then all available
             plugins will be tried (default). For information on the available
             plugins for each encoder see the
-            :mod:`API documentation<pydicom.encoders>`.
+            :mod:`API documentation<pydicom.pixels.encoders>`.
         decoding_plugin : str, optional
             Placeholder for future functionality.
         **kwargs
@@ -355,7 +355,7 @@ class Encoder:
             `encoding_plugin` is not specified then all available
             plugins will be tried (default). For information on the available
             plugins for each encoder see the
-            :mod:`API documentation<pydicom.encoders>`.
+            :mod:`API documentation<pydicom.pixels.encoders>`.
         decoding_plugin : str, optional
             If `src` is a :class:`~pydicom.dataset.Dataset` containing
             compressed *Pixel Data* then this is the name of the
@@ -858,13 +858,13 @@ ENCODING_PROFILES: Dict[UID, List[ProfileType]] = {
 # Encoder names should be f"{UID.keyword}Encoder"
 RLELosslessEncoder = Encoder(RLELossless)
 RLELosslessEncoder.add_plugin(
-    'gdcm', ('pydicom.encoders.gdcm', 'encode_pixel_data'),
+    'gdcm', ('pydicom.pixels.encoders.gdcm', 'encode_pixel_data'),
 )
 RLELosslessEncoder.add_plugin(
-    'pylibjpeg', ('pydicom.encoders.pylibjpeg', 'encode_pixel_data'),
+    'pylibjpeg', ('pydicom.pixels.encoders.pylibjpeg', 'encode_pixel_data'),
 )
 RLELosslessEncoder.add_plugin(
-    'pydicom', ('pydicom.encoders.native', '_encode_frame'),
+    'pydicom', ('pydicom.pixels.encoders.native', '_encode_frame'),
 )
 
 
@@ -898,7 +898,7 @@ def _build_encoder_docstrings() -> None:
         s.append(f"Encoding plugins: {', '.join(plugins)}")
         s.append("")
         s.append(
-            "See the :class:`~pydicom.encoders.base.Encoder` "
+            "See the :class:`~pydicom.pixels.encoders.base.Encoder` "
             "reference for instance methods and attributes."
         )
         enc.__doc__ = "\n".join(s)

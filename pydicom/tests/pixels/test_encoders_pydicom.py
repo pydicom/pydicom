@@ -16,15 +16,15 @@ from pydicom import dcmread, Dataset
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
-from pydicom.encoders import RLELosslessEncoder
-from pydicom.encoders.native import (
+from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders.native import (
     _encode_frame, _encode_segment, _encode_row
 )
 from pydicom.pixel_data_handlers.rle_handler import (
     _rle_decode_frame, _rle_decode_segment
 )
 from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
-from pydicom.pixel_data_handlers.util import reshape_pixel_array
+from pydicom.pixels.utils import reshape_pixel_array
 from pydicom.uid import RLELossless
 
 

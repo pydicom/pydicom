@@ -22,10 +22,10 @@ Enhancements
   <https://github.com/pydicom/pylibjpeg>`_ which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 * Added :func:`~pydicom.pixel_data_handlers.apply_rescale`  alias
-* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi` and
-  :func:`~pydicom.pixel_data_handlers.util.apply_windowing`
+* Added :func:`~pydicom.pixels.utils.apply_voi` and
+  :func:`~pydicom.pixels.utils.apply_windowing`
 * Added *prefer_lut* keyword parameter to
-  :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and handle empty
+  :func:`~pydicom.pixels.utils.apply_voi_lut` and handle empty
   VOI LUT module elements (:issue:`1234`, :issue:`1237`)
 * Added ability to register external data sources for use with the functions
   in :mod:`pydicom.data` (:pr:`1156`)
@@ -138,7 +138,7 @@ Fixes
   :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
 * Gracefully handle empty Specific Character Set (:issue:`1190`)
 * Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
-* Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
+* Allow :func:`~pydicom.pixels.utils.apply_voi_lut` to apply VOI
   lookup to an input float array
 * Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
   adding working correctly when the `default` value is ``None`` and not

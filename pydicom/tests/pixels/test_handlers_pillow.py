@@ -6,7 +6,7 @@ import pydicom
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
 from pydicom.filereader import dcmread
-from pydicom.pixel_data_handlers.util import (
+from pydicom.pixels.utils import (
     convert_color_space, get_j2k_parameters
 )
 from pydicom.uid import (

@@ -29,7 +29,7 @@ except ImportError:
 
 from pydicom import config
 from pydicom.encaps import defragment_data, decode_data_sequence
-from pydicom.pixel_data_handlers.util import pixel_dtype, get_j2k_parameters
+from pydicom.pixels.utils import pixel_dtype, get_j2k_parameters
 from pydicom.uid import (
     UID, JPEG2000, JPEG2000Lossless, JPEGBaseline8Bit, JPEGExtended12Bit
 )
