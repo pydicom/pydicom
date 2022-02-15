@@ -4,7 +4,8 @@
 from struct import unpack
 from sys import byteorder
 from typing import (
-    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast, Iterable
+    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast, Iterable,
+    ByteString
 )
 import warnings
 
@@ -805,6 +806,50 @@ def dtype_corrected_for_endianness(
         return numpy_dtype.newbyteorder('S')
 
     return numpy_dtype
+
+
+def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
+    """Return ``YBR_FULL_422`` data expanded to ``YBR_FULL``.
+
+    Uncompressed datasets with a (0028,0004) *Photometric Interpretation* of
+    ``"YBR_FULL_422"`` are subsampled in the horizontal direction by halving
+    the number of Cb and Cr pixels (i.e. there are two Y pixels for every Cb
+    and Cr pixel). This function expands the ``YBR_FULL_422`` data to remove
+    the subsampling and the output is therefore ``YBR_FULL``.
+
+    Parameters
+    ----------
+    src : bytes or bytearray
+        The YBR_FULL_422 pixel data to be expanded.
+    bits_allocated : int
+        The number of bits used to store each pixel, as given by (0028,0100)
+        *Bits Allocated*.
+
+    Returns
+    -------
+    bytes
+        The expanded data (as YBR_FULL).
+    """
+    # YBR_FULL_422 is Y Y Cb Cr (i.e. 2 Y pixels for every Cb and Cr pixel)
+    n_bytes = bits_allocated // 8
+    length = len(src) // 2 * 3
+    dst = bytearray(length)
+
+    step_src = n_bytes * 4
+    step_dst = n_bytes * 6
+    for ii in range(n_bytes):
+        c_b = src[2 * n_bytes + ii::step_src]
+        c_r = src[3 * n_bytes + ii::step_src]
+
+        dst[0 * n_bytes + ii::step_dst] = src[0 * n_bytes + ii::step_src]
+        dst[1 * n_bytes + ii::step_dst] = c_b
+        dst[2 * n_bytes + ii::step_dst] = c_r
+
+        dst[3 * n_bytes + ii::step_dst] = src[1 * n_bytes + ii::step_src]
+        dst[4 * n_bytes + ii::step_dst] = c_b
+        dst[5 * n_bytes + ii::step_dst] = c_r
+
+    return bytes(dst)
 
 
 def _expand_segmented_lut(
