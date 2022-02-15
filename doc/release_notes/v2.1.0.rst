@@ -21,11 +21,11 @@ Enhancements
 * Added a new pixel data handler based on `pylibjpeg
   <https://github.com/pydicom/pylibjpeg>`_ which supports all
   (non-retired) JPEG transfer syntaxes (:issue:`1127`)
-* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`  alias
-* Added :func:`~pydicom.pixels.utils.apply_voi` and
-  :func:`~pydicom.pixels.utils.apply_windowing`
+* Added :func:`~pydicom.pixels.apply_rescale`  alias
+* Added :func:`~pydicom.pixels.apply_voi` and
+  :func:`~pydicom.pixels.apply_windowing`
 * Added *prefer_lut* keyword parameter to
-  :func:`~pydicom.pixels.utils.apply_voi_lut` and handle empty
+  :func:`~pydicom.pixels.apply_voi_lut` and handle empty
   VOI LUT module elements (:issue:`1234`, :issue:`1237`)
 * Added ability to register external data sources for use with the functions
   in :mod:`pydicom.data` (:pr:`1156`)
@@ -67,9 +67,8 @@ Enhancements
   allow for the communication of not just the URI but also the tag and VR
   to the handler. Previous handlers will work as expected, new signature
   handlers will get the additional information.
-* :func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits` can now be used
-  with 2D or 3D input arrays and will pad the packed data to even length by
-  default.
+* :func:`~pydicom.pixels.pack_bits` can now be used with 2D or 3D input arrays
+  and will pad the packed data to even length by default.
 * Elements with the :class:`~pydicom.valuerep.IS` VR accept float strings that
   are convertible to integers without loss, e.g. "1.0" (:pr:`1240`)
 * Added :func:`~pydicom.encaps.encapsulate_extended` function for use when
@@ -138,7 +137,7 @@ Fixes
   :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
 * Gracefully handle empty Specific Character Set (:issue:`1190`)
 * Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
-* Allow :func:`~pydicom.pixels.utils.apply_voi_lut` to apply VOI
+* Allow :func:`~pydicom.pixels.apply_voi_lut` to apply VOI
   lookup to an input float array
 * Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
   adding working correctly when the `default` value is ``None`` and not

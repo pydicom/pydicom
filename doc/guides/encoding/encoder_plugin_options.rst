@@ -4,7 +4,7 @@
 Encoder Plugins Options
 =======================
 
-.. currentmodule:: pydicom.pixels.encoders
+.. currentmodule:: pydicom.pixels
 
 
 .. _encoder_plugin_pydicom:

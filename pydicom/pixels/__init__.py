@@ -2,10 +2,10 @@ from pydicom.pixels.encoders.base import get_encoder, RLELosslessEncoder
 from pydicom.pixels.utils import (
     apply_color_lut,
     apply_modality_lut,
-    apply_voi_lut,
-    convert_color_space,
     apply_voi,
+    apply_voi_lut,
     apply_windowing,
+    convert_color_space,
     pack_bits,
     unpack_bits,
 )

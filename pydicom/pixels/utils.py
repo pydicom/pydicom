@@ -335,9 +335,9 @@ def apply_voi_lut(
 
     See Also
     --------
-    :func:`~pydicom.pixels.utils.apply_modality_lut`
-    :func:`~pydicom.pixels.utils.apply_voi`
-    :func:`~pydicom.pixels.utils.apply_windowing`
+    :func:`~pydicom.pixels.apply_modality_lut`
+    :func:`~pydicom.pixels.apply_voi`
+    :func:`~pydicom.pixels.apply_windowing`
 
     References
     ----------
@@ -403,8 +403,8 @@ def apply_voi(
 
     See Also
     --------
-    :func:`~pydicom.pixels.utils.apply_modality_lut`
-    :func:`~pydicom.pixels.utils.apply_windowing`
+    :func:`~pydicom.pixels.apply_modality_lut`
+    :func:`~pydicom.pixels.apply_windowing`
 
     References
     ----------
@@ -497,8 +497,8 @@ def apply_windowing(
 
     See Also
     --------
-    :func:`~pydicom.pixels.utils.apply_modality_lut`
-    :func:`~pydicom.pixels.utils.apply_voi`
+    :func:`~pydicom.pixels.apply_modality_lut`
+    :func:`~pydicom.pixels.apply_voi`
 
     References
     ----------

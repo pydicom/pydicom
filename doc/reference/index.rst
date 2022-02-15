@@ -22,7 +22,7 @@ This API reference guide details the functions, modules and objects included in
    elem
    dataset
    handlers
-   encoders
+   pixels
    fileset
    dicomdir
    encaps

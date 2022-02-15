@@ -165,11 +165,11 @@ exception:
         encoded = [f for f in frame_iterator]
       File ".../pydicom/dataset.py", line 1697, in <listcomp>
         encoded = [f for f in frame_iterator]
-      File ".../pydicom/encoders/base.py", line 382, in iter_encode
+      File ".../pydicom/pixels/encoders/base.py", line 382, in iter_encode
         yield self._encode_array(src, idx, encoding_plugin, **kwargs)
-      File ".../pydicom/encoders/base.py", line 209, in _encode_array
+      File ".../pydicom/pixels/encoders/base.py", line 209, in _encode_array
         src = self._preprocess(arr, **kwargs)
-      File ".../pydicom/encoders/base.py", line 533, in _preprocess
+      File ".../pydicom/pixels/encoders/base.py", line 533, in _preprocess
         raise ValueError(
     ValueError: Unable to encode as the shape of the ndarray (128, 129) doesn't match the values for the rows, columns and samples per pixel
 
@@ -181,7 +181,7 @@ A specific encoding plugin can be used by passing the plugin name via the
     >>> ds.compress(RLELossless, encoding_plugin='pylibjpeg')
 
 The plugins available for each encoder are listed in the
-:mod:`API reference<pydicom.pixels.encoders>` for the encoder type.
+:doc:`API reference<../../reference/pixels>` for the encoder type.
 
 Implicitly changing the compression on an already compressed dataset is not
 currently supported, however it can still be done explicitly by decompressing

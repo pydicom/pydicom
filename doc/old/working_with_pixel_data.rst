@@ -127,7 +127,7 @@ of ``3`` then the returned pixel data will be in the color space as given by
 
 *pydicom* offers a limited ability to convert between 8-bits/channel YBR and
 RGB color spaces through the
-:func:`~pydicom.pixels.utils.convert_color_space`
+:func:`~pydicom.pixels.convert_color_space`
 function. When changing the color space you should also change the value
 of *Photometric Interpretation* to match.
 
@@ -144,7 +144,7 @@ Some DICOM datasets store their output image pixel values in a lookup table
 (LUT), where the values in *Pixel Data* are the index to a corresponding
 LUT entry. When a dataset's (0028,0004) *Photometric Interpretation* value is
 ``PALETTE COLOR`` then the
-:func:`~pydicom.pixels.utils.apply_color_lut` function can be used
+:func:`~pydicom.pixels.apply_color_lut` function can be used
 to apply a palette color LUT to the pixel data to produce an RGB image.
 
 .. code-block:: python
@@ -185,7 +185,7 @@ Modality LUT or Rescale Operation
 The DICOM :dcm:`Modality LUT<part03/sect_C.11.html#sect_C.11.1>` module
 converts raw pixel data values to a specific (possibly unitless) physical
 quantity, such as Hounsfield units for CT. The
-:func:`~pydicom.pixels.utils.apply_modality_lut` function can be
+:func:`~pydicom.pixels.apply_modality_lut` function can be
 used with an input array of raw values and a dataset containing a Modality LUT
 module to return the converted values. When a dataset requires multiple
 grayscale transformations, the Modality LUT transformation is always applied
@@ -206,7 +206,7 @@ VOI LUT or Windowing Operation
 
 The DICOM :dcm:`VOI LUT<part03/sect_C.11.2.html>` module applies a
 VOI or windowing operation to input values. The
-:func:`~pydicom.pixels.utils.apply_voi_lut` function
+:func:`~pydicom.pixels.apply_voi_lut` function
 can be used with an input array and a dataset containing a VOI LUT module to
 return values with applied VOI LUT or windowing. When a dataset contains
 multiple VOI or windowing views then a particular view can be returned by

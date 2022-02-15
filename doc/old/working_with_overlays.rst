@@ -70,8 +70,7 @@ overlay pixels start 1 row above and 1 row to the left of the image pixels.
 
 NumPy can be used to modify the pixels, but if the changes are to be saved,
 they must be bit-packed (using something like
-:func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits`) and written
-back to the correct element:
+:func:`~pydicom.pixels.pack_bits`) and written back to the correct element:
 
 .. code-block:: python
 
@@ -79,7 +78,7 @@ back to the correct element:
   arr[10, :] = 1
 
   # Pack the data
-  from pydicom.pixel_data_handlers.numpy_handler import pack_bits
+  from pydicom.pixels import pack_bits
   packed_bytes = pack_bits(arr)
 
   # Update the element value

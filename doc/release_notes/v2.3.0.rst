@@ -8,20 +8,20 @@ Changes
   :attr:`DataElement.name<pydicom.dataelem.DataElement.name>` instead
 * Updated the private dictionary
 * :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
-  :attr:`~pydicom.config.settings.reading_validation_mode`
-* The ``pydicom.pixel_data_handlers`` module is deprecated and will be removed in
-  v4.0. The following functions should be imported from the new ``pydicom.pixels``
-  module instead:
+  :attr:`~pydicom.config.Settings.reading_validation_mode`
+* The :doc:`pydicom.pixel_data_handlers<../reference/handlers.pixel_data>` module is deprecated and will be removed in
+  v4.0. The following functions should be imported from the new :doc:`pydicom.pixels
+  <../reference/pixels>` module instead:
 
-  * :func:`~pydicom.pixels.utils.apply_color_lut`
-  * :func:`~pydicom.pixels.utils.apply_modality_lut`
-  * :func:`~pydicom.pixels.utils.apply_rescale`
-  * :func:`~pydicom.pixels.utils.apply_voi`
-  * :func:`~pydicom.pixels.utils.apply_voi_lut`
-  * :func:`~pydicom.pixels.utils.apply_windowing`
-  * :func:`~pydicom.pixels.utils.convert_color_space`
-  * :func:`~pydicom.pixels.utils.pack_bits`
-  * :func:`~pydicom.pixels.utils.unpack_bits`
+  * :func:`~pydicom.pixels.apply_color_lut`
+  * :func:`~pydicom.pixels.apply_modality_lut`
+  * :func:`~pydicom.pixels.apply_rescale`
+  * :func:`~pydicom.pixels.apply_voi`
+  * :func:`~pydicom.pixels.apply_voi_lut`
+  * :func:`~pydicom.pixels.apply_windowing`
+  * :func:`~pydicom.pixels.convert_color_space`
+  * :func:`~pydicom.pixels.pack_bits`
+  * :func:`~pydicom.pixels.unpack_bits`
 
 * The ``pydicom.encoders`` module has been moved to ``pydicom.pixels.encoders``,
   the old import path will be removed in v3.0
@@ -32,8 +32,8 @@ Enhancements
 ------------
 * Values are now validated for valid length, allowed character set and format
   on reading and writing. Depending on the value of
-  :attr:`~pydicom.config.settings.reading_validation_mode`
-  and :attr:`~pydicom.config.settings.writing_validation_mode`
+  :attr:`~pydicom.config.Settings.reading_validation_mode`
+  and :attr:`~pydicom.config.Settings.writing_validation_mode`
   a warning is logged, an exception is raised, or the validation is skipped.
 * Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
 * UIDs for all Storage SOP Classes have been added to the ``uid`` module
@@ -42,7 +42,7 @@ Enhancements
   the slowest handler (:issue:`1487`)
 * Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
 * Added support for unpacking bit-packed data without using NumPy to
-  :func:`~pydicom.pixels.utils.unpack_bits`(:pr:`1594`)
+  :func:`~pydicom.pixels.unpack_bits` (:pr:`1594`)
 
 
 Fixes

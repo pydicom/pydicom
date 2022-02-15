@@ -72,7 +72,7 @@ Enhancements
 * Added support for downloading the large test files with the `requests
   <https://docs.python-requests.org/en/master/>`_ package in addition to
   :mod:`urllib.request` (:pr:`1340`)
-* Ensured :func:`~pydicom.pixels.utils.convert_color_space` uses
+* Ensured :func:`~pydicom.pixels.convert_color_space` uses
   32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
   processing and improved the speed by ~20-60% (:issue:`1348`)
 * Optimisations for RLE encoding using *pydicom* (~40% faster).
