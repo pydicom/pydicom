@@ -171,9 +171,9 @@ jobs:
       run: |
         python -m pip install -U pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/pixels/test_handlers/pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/pixels/test_handlers_pylibjpeg.py
         python -m pip install -U pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/pixels/test_handlers/pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} pydicom/tests/pixels/test_handlers_pylibjpeg.py
 
     - name: Test all pixel handling
       run: |
