@@ -4,6 +4,7 @@
 import os
 import random
 from struct import unpack, pack
+import sys
 from sys import byteorder
 
 import pytest
@@ -2366,3 +2367,21 @@ class TestNumpy_PackBits:
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
+
+
+@pytest.mark.skipif(sys.version_info[:2] < (3, 7), reason="Requires 3.7+")
+def test_deprecations():
+    """Test deprecation warnings"""
+    msg = (
+        r"Importing 'unpack_bits' from 'pydicom.pixel_data_handlers.util' is "
+        r"deprecated, import from 'pydicom.pixels' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers.util import unpack_bits
+
+    msg = (
+        r"Importing 'unpack_bits' from 'pydicom.pixel_data_handlers' is "
+        r"deprecated, import from 'pydicom.pixels' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers import unpack_bits

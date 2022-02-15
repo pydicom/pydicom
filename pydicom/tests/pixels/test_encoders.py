@@ -1,5 +1,7 @@
 """Unit tests for the pydicom.pixels.encoders module and Dataset.compress()."""
 
+import sys
+
 import pytest
 
 try:
@@ -1116,3 +1118,14 @@ class TestDatasetCompress:
         )
         ds.SamplesPerPixel = 3
         assert np.array_equal(ref, ds.pixel_array)
+
+
+@pytest.mark.skipif(sys.version_info[:2] < (3, 7), reason="Requires 3.7+")
+def test_deprecations():
+    """Test deprecation warnings"""
+    msg = (
+        r"Importing 'get_encoder' from 'pydicom.encoders' is "
+        r"deprecated, import from 'pydicom.pixels' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.encoders import get_encoder

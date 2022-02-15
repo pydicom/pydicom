@@ -27,14 +27,14 @@ There are the following possibilities:
 """
 
 from copy import deepcopy
+import sys
 
 import pytest
 
-from pydicom import config
+from pydicom import config, dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.filereader import dcmread
-from pydicom.pixels import convert_color_space
+from pydicom.pixels import convert_color_space, unpack_bits, pack_bits
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
@@ -45,18 +45,13 @@ from pydicom.uid import (
 
 try:
     import numpy as np
-
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
     from pydicom.pixel_data_handlers import numpy_handler as NP_HANDLER
-    from pydicom.pixel_data_handlers.numpy_handler import (
-        get_pixeldata,
-        unpack_bits,
-        pack_bits,
-    )
+    from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
 except ImportError:
     NP_HANDLER = None
 
@@ -1307,3 +1302,15 @@ class TestNumpy_GetPixelData:
         ds.BitsAllocated = 64
         arr = get_pixeldata(ds)
         assert 'float64' == arr.dtype
+
+
+@pytest.mark.skipif(sys.version_info[:2] < (3, 7), reason="Requires 3.7+")
+def test_deprecations():
+    """Test deprecation warnings"""
+    msg = (
+        r"Importing 'unpack_bits' from "
+        r"'pydicom.pixel_data_handlers.numpy_handler' is "
+        r"deprecated, import from 'pydicom.pixels' instead"
+    )
+    with pytest.warns(DeprecationWarning, match=msg):
+        from pydicom.pixel_data_handlers.numpy_handler import unpack_bits

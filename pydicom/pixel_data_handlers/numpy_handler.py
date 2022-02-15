@@ -50,6 +50,7 @@ table below.
 
 """
 
+import sys
 from typing import TYPE_CHECKING, cast, Any
 import warnings
 
@@ -60,7 +61,10 @@ except ImportError:
     HAVE_NP = False
 
 from pydicom.pixels.utils import (
-    pixel_dtype, get_expected_length, pack_bits, unpack_bits
+    pixel_dtype,
+    get_expected_length,
+    pack_bits as _pack_bits,
+    unpack_bits as _unpack_bits,
 )
 import pydicom.uid
 
@@ -79,6 +83,29 @@ SUPPORTED_TRANSFER_SYNTAXES = [
     pydicom.uid.DeflatedExplicitVRLittleEndian,
     pydicom.uid.ExplicitVRBigEndian,
 ]
+
+
+_deprecations = {
+    "pack_bits": _pack_bits,
+    "unpack_bits": _unpack_bits,
+}
+
+def __getattr__(name: str) -> Any:
+    if name in _deprecations:
+        warnings.warn(
+            f"Importing '{name}' from "
+            "'pydicom.pixel_data_handlers.numpy_handler' is "
+            f"deprecated, import from 'pydicom.pixels' instead",
+            DeprecationWarning,
+        )
+
+        return _deprecations[name]
+
+    raise AttributeError(f"module {__name__} has no attribute {name}")
+
+if sys.version_info[:2] < (3, 7):
+    pack_bits = _pack_bits
+    unpack_bits = _unpack_bits
 
 
 def is_available() -> bool:
@@ -277,24 +304,3 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         return arr.copy()
 
     return arr
-
-
-_deprecations = {
-    "pack_bits": pack_bits,
-    "unpack_bits": unpack_bits,
-}
-
-
-def __getattr__(name: str) -> Any:
-    if name in _deprecations:
-        fn = _deprecations[name]
-        warnings.warn(
-            f"Importing '{name}' from "
-            "'pydicom.pixel_data_handlers.numpy_handler' is deprecated, "
-            "import from 'pydicom.pixels' instead",
-            DeprecationWarning,
-        )
-
-        return globals()[fn]
-
-    raise AttributeError(f"module {__name__} has no attribute {name}")

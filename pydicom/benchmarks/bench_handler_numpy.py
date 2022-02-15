@@ -12,9 +12,8 @@ import numpy as np
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
-from pydicom.pixel_data_handlers.numpy_handler import (
-    get_pixeldata, unpack_bits, pack_bits
-)
+from pydicom.pixel_data_handlers.numpy_handler import get_pixeldata
+from pydicom.pixels import unpack_bits, pack_bits
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
 # 1/1, 1 sample/pixel, 1 frame
