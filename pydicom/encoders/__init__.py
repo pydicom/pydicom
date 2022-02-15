@@ -2,7 +2,7 @@ import sys
 from typing import Any
 import warnings
 
-from pydicom.pixels import (
+from pydicom.pixels.encoders import (
     get_encoder as _get_encoder,
     RLELosslessEncoder as _RLELosslessEncoder,
 )
