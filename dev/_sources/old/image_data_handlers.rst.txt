@@ -23,8 +23,8 @@ The following packages can be used with *pydicom*:
 * `Pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
   ``jpeg`` and ``jpeg2000`` plugins
 * `jpeg_ls <https://github.com/Who8MyLunch/CharPyLS>`_
-* `pylibjpeg <https://github.com/pydicom/pylibjpeg>`_, with the ``-libjpeg``,
-  ``-openjpeg`` and ``-rle`` plugins
+* :gh:`pylibjpeg <pylibjpeg>`, with the ``-libjpeg``, ``-openjpeg`` and
+  ``-rle`` plugins
 
 Note that you always need the `NumPy <http://numpy.org/>`_ package to be able
 to handle pixel data.

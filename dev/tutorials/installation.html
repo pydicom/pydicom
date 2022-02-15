@@ -161,9 +161,9 @@ manage virtual environments.</p>
 Python is supported, check <a class="reference internal" href="../faq/index.html#faq-install-version"><span class="std std-ref">this table</span></a>.</p>
 <section id="install-using-pip">
 <h3>Install using pip<a class="headerlink" href="#install-using-pip" title="Permalink to this headline">¶</a></h3>
-<p><em>pydicom</em> is available on <a class="reference external" href="https://pypi.python.org/pypi/pydicom/">PyPi</a>, the
+<p><em>pydicom</em> is available on <a class="reference external" href="https://pypi.python.org/pypi/pydicom/">PyPI</a>, the
 official third-party Python software repository. The simplest way to install
-from PyPi is using <a class="reference external" href="https://pip.pypa.io/">pip</a> with the command:</p>
+from PyPI is using <a class="reference external" href="https://pip.pypa.io/">pip</a> with the command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pydicom</span>
 </pre></div>
 </div>
@@ -190,9 +190,8 @@ one of the release <code class="docutils literal notranslate"><span class="pre">
 <h3>Downloading example/test DICOM files<a class="headerlink" href="#downloading-example-test-dicom-files" title="Permalink to this headline">¶</a></h3>
 <p>To keep the package size small, a number of the larger DICOM files are not
 distributed with <em>pydicom</em> and are instead kept in the
-<a class="reference external" href="https://github.com/pydicom/pydicom-data">pydicom-data</a>
-repository. To get the complete set of testing and example files you can either
-install the <em>pydicom-data</em> repository:</p>
+<a class="reference external" href="https://github.com/pydicom/pydicom-data">pydicom-data</a> repository. To get the complete set of
+testing and example files you can either install the <em>pydicom-data</em> repository:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span><span class="o">-</span><span class="n">data</span>
 </pre></div>
 </div>
@@ -255,11 +254,14 @@ decompress JPEG-LS images.</p>
 <span id="tut-install-gdcm"></span><h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
-<p>Using pip:</p>
+<p>The wheels on <a class="reference external" href="https://pypi.org/project/python-gdcm/">PyPI</a> are built by the
+<a class="reference external" href="https://github.com/tfmoraes/python-gdcm">python-gdcm</a> project for current
+versions of Python on Windows, MacOS and Linux, and can be installed using pip:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">gdcm</span>
 </pre></div>
 </div>
-<p>Through conda:</p>
+<p>The wheels available through <a class="reference external" href="https://anaconda.org/conda-forge/gdcm">conda-forge</a>
+tend to be older versions and not as well supported. They’re available on conda using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">gdcm</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
 </div>
@@ -270,7 +272,7 @@ DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
 decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
 RLE images provided a suitable plugin is installed.</p>
 <p>Using pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="s2">&quot;pylibjpeg&gt;=1.2&quot;</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">libjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">openjpeg</span> <span class="n">pylibjpeg</span><span class="o">-</span><span class="n">rle</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">pylibjpeg</span><span class="p">[</span><span class="nb">all</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -279,7 +281,7 @@ RLE images provided a suitable plugin is installed.</p>
 <span id="tut-install-dev"></span><h2>Install the development version<a class="headerlink" href="#install-the-development-version" title="Permalink to this headline">¶</a></h2>
 <p>To install a snapshot of the latest code (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) from
 <a class="reference external" href="https://github.com/pydicom/pydicom">GitHub</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">master</span></code> branch is under active development and while it is usually

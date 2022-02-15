@@ -202,8 +202,7 @@ the test, <strong>s</strong> that the test was skipped (usually due to a missing
 optional library) and <strong>x</strong> that the test failed as expected.</p>
 <p>Once the tests are complete you should get a short summary of the results.
 At this stage the entire test suite <em>should</em> pass. If you get any failures
-or errors you should check the
-<a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
+or errors you should check the <a class="reference external" href="https://github.com/pydicom/pydicom/issues">issue tracker</a> for any
 relevant issues or create a new one if there are none.</p>
 </section>
 <section id="create-a-new-branch">
@@ -274,8 +273,7 @@ file and that the test itself is written correctly.</p>
 <section id="make-a-code-change-and-document-it">
 <h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Permalink to this headline">¶</a></h2>
 <p>Next we’ll make changes to the actual source code. Open
-<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in
-a text editor and around
+<a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in a text editor and around
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
 make the following changes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RLELossless</span> <span class="o">=</span> <span class="n">UID</span><span class="p">(</span><span class="s1">&#39;1.2.840.10008.1.2.5&#39;</span><span class="p">)</span>
@@ -340,11 +338,10 @@ patch, send it to your fork:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin new-uid
 </pre></div>
 </div>
-<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you
-should see your branch under <em>“Your recently push branches”</em>. Click <em>“Compare &amp;
-pull request”</em> and fill out the title (with a <code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e.
-<code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">NewDefinedUID</span> <span class="pre">to</span> <span class="pre">uid.py</span></code>) and follow the  instructions in the
-main entry window.</p>
+<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you should see your branch under <em>“Your recently push
+branches”</em>. Click <em>“Compare &amp; pull request”</em> and fill out the title (with a
+<code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e. <code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">NewDefinedUID</span> <span class="pre">to</span> <span class="pre">uid.py</span></code>) and follow the
+instructions in the main entry window.</p>
 <p>To submit the pull request (PR) for real - <strong>please don’t do this for
 this example!</strong> - then on the next page you would click <em>“Create pull
 request”</em>.

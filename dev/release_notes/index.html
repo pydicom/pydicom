@@ -295,6 +295,8 @@ the slowest handler (<a class="reference external" href="https://github.com/pydi
 <li><p>Added, enhanced, or removed a number of Mitra private dictionary entries (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1588">#1588</a>)</p></li>
 <li><p>Added support for unpacking bit-packed data without using NumPy to
 <code class="xref py py-func docutils literal notranslate"><span class="pre">unpack_bits`(:pr:`1594()</span></code>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.expand_ybr422" title="pydicom.pixel_data_handlers.util.expand_ybr422"><code class="xref py py-func docutils literal notranslate"><span class="pre">expand_ybr422()</span></code></a> for expanding
+uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> data to <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1593">#1593</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -402,7 +404,8 @@ See <a class="reference internal" href="../reference/generated/pydicom.valuerep.
 processing and improved the speed by ~20-60% (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
 <li><p>Optimisations for RLE encoding using <em>pydicom</em> (~40% faster).</p></li>
 <li><p>Added support for faster decoding (~4-5x) and encoding (~20x) of <em>RLE Lossless</em>
-<em>Pixel Data</em> via the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1361">#1361</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>).</p></li>
+<em>Pixel Data</em> via the <a class="reference external" href="https://github.com/pydicom/pylibjpeg-rle">pylibjpeg-rle</a> plugin
+(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1361">#1361</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a> function for
 compressing uncompressed pixel data using a given encoding format as specified
 by a UID. Only <em>RLE Lossless</em> is currently supported (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1372">#1372</a>)</p></li>
@@ -482,8 +485,8 @@ For example:</p>
 <code class="docutils literal notranslate"><span class="pre">pydicom.data.get_testdata_file(&quot;RG1_UNCI.dcm&quot;)</span></code></p></li>
 </ul>
 </li>
-<li><p>Added a new pixel data handler based on <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> which supports all
-(non-retired) JPEG transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1127">#1127</a>)</p></li>
+<li><p>Added a new pixel data handler based on <a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> which
+supports all (non-retired) JPEG transfer syntaxes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1127">#1127</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.apply_rescale.html#pydicom.pixel_data_handlers.apply_rescale" title="pydicom.pixel_data_handlers.apply_rescale"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_rescale()</span></code></a>  alias</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_voi" title="pydicom.pixel_data_handlers.util.apply_voi"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.apply_windowing" title="pydicom.pixel_data_handlers.util.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a></p></li>
@@ -914,7 +917,7 @@ default character set (<a class="reference external" href="https://github.com/py
 character sets with code extensions, added handling of encoding/decoding
 errors (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/716">#716</a>)</p></li>
 <li><p>Handle common spelling errors in Specific Character Set values
-(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/695">#695</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/737">#737</a>)</p></li>
+(<a class="reference external" href="https://github.com/pydicom/pydicom/pull/695,737">#695,737</a>)</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEGLosslessP14</span></code> for UID 1.2.840.10008.1.2.4.57</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponentLossless</span></code> for UID 1.2.840.10008.1.2.4.92</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">uid.JPEG2000MultiComponent</span></code> for UID 1.2.840.10008.1.2.4.93</p></li>
@@ -934,7 +937,7 @@ SamplesPerPixel &gt; 1 (<a class="reference external" href="https://github.com/p
 Pixel Data with pillow and jpeg-ls (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/682">#682</a>)</p></li>
 <li><p>Fixed handling of private tags in repeater range (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/689">#689</a>)</p></li>
 <li><p>Fixed Pillow pixel data handler for non-JPEG2k transfer syntax (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/663">#663</a>)</p></li>
-<li><p>Fixed handling of elements with ambiguous VR (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/700">#700</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/728">#728</a>)</p></li>
+<li><p>Fixed handling of elements with ambiguous VR (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/700, 728">#700, 728</a>)</p></li>
 <li><p>Adapted pixel handlers where endianness is explicitly adapted (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/704">#704</a>)</p></li>
 <li><p>Improve performance of bit unpacking (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/715">#715</a>)</p></li>
 <li><p>First character set no longer removed (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/707">#707</a>)</p></li>

@@ -46,8 +46,8 @@ Thanks to Roy Keyes for pointing out how to do this.
 Using pydicom with Tkinter
 --------------------------
 
-The program `pydicom_Tkinter.py
-<https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py>`_
+The program :gh:`pydicom_Tkinter.py
+<contrib-pydicom/blob/master/viewers/pydicom_Tkinter.py>`
 in the ``contrib-pydicom`` repository demonstrates how to show an image using the
 Tkinter graphics system, which comes by default with most Python installations.
 It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
@@ -55,15 +55,14 @@ It creates a Tkinter PhotoImage in a Label widget or a user-supplied widget.
 Using pydicom with Python Imaging Library (PIL)
 -----------------------------------------------
 
-The module `pydicom_PIL.py
-<https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py>`_
-in the ``contrib-pydicom`` repository
-uses PIL's ``Image.show()`` method after creating an Image instance
-from the pixel data and some basic information about it (bit depth, LUTs, etc).
+The module :gh:`pydicom_PIL.py <contrib-pydicom/blob/master/viewers/pydicom_PIL.py>`
+in the ``contrib-pydicom`` repository uses PIL's ``Image.show()`` method after
+creating an Image instance from the pixel data and some basic information
+about it (bit depth, LUTs, etc).
 
 Using pydicom with wxPython
 ---------------------------
 
-The module `imViewer-Simple.py <https://github.com/pydicom/contrib-pydicom/blob/master/viewers/imViewer_Simple.py>`_
+The module :gh:`imViewer-Simple.py <contrib-pydicom/blob/master/viewers/imViewer_Simple.py>`
 in the ``contrib-pydicom`` repository uses wxPython (also PIL, but it notes that it
 may not be strictly necessary) to display an image from a pydicom dataset.
