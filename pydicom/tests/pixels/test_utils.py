@@ -2396,6 +2396,7 @@ def test_deprecations():
         from pydicom import pixel_data_handlers
         pixel_data_handlers.foo
 
+
 @pytest.mark.skipif(sys.version_info[:2] >= (3, 7), reason="Requires 3.6")
 def test_deprecations_36():
     """Test deprecations with Python 3.6"""
@@ -2404,6 +2405,6 @@ def test_deprecations_36():
 
     assert deprecated is apply_rescale
 
-    from pydicom.pixel_data_handlers.utils import apply_rescale as deprecated
+    from pydicom.pixel_data_handlers.util import apply_rescale as deprecated
 
     assert deprecated is apply_rescale
