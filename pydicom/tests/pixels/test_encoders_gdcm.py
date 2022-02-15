@@ -4,7 +4,7 @@ import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
-from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.gdcm import _rle_encode as gdcm_rle_encode
 from pydicom.pixel_data_handlers.rle_handler import _rle_decode_frame
 from pydicom.pixels.utils import reshape_pixel_array

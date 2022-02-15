@@ -1668,7 +1668,7 @@ class Dataset:
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
         """
-        from pydicom.pixels import get_encoder
+        from pydicom.pixels.encoders import get_encoder
 
         uid = UID(transfer_syntax_uid)
 

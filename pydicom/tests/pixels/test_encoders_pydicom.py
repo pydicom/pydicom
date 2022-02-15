@@ -16,7 +16,7 @@ from pydicom import dcmread, Dataset
 from pydicom.data import get_testdata_file
 from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import defragment_data
-from pydicom.pixels import RLELosslessEncoder
+from pydicom.pixels.encoders import RLELosslessEncoder
 from pydicom.pixels.encoders.native import (
     _encode_frame, _encode_segment, _encode_row
 )

@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 <!--
-If your issue is that the pixel data "looks green/teal", or has strange colors, you probably need to apply a YCbCr to RGB color space conversion using `pydicom.pixels.convert_color_space()`.
+If your issue is that the pixel data "looks green/teal", or has strange colors, you probably need to apply a YCbCr to RGB color space conversion using `pydicom.pixel_data_handlers.convert_color_space()`.
 
 See also: https://github.com/pydicom/pydicom/discussions/1577
 -->

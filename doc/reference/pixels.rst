@@ -33,7 +33,7 @@ Pixel Data Encoding
 :class:`~pydicom.pixels.encoders.base.Encoder` class instances for compressing
 (7FE0,0010) *Pixel Data*.
 
-.. currentmodule:: pydicom.pixels
+.. currentmodule:: pydicom.pixels.encoders
 
 .. autosummary::
    :toctree: generated/

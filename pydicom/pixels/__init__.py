@@ -1,4 +1,3 @@
-from pydicom.pixels.encoders.base import get_encoder, RLELosslessEncoder
 from pydicom.pixels.utils import (
     apply_color_lut,
     apply_modality_lut,

@@ -111,7 +111,7 @@ following:
 
 .. code-block:: python
 
-    from pydicom.pixels import RLELosslessEncoder
+    from pydicom.pixels.encoders import RLELosslessEncoder
 
     RLELosslessEncoder.add_plugin(
         'my_encoder',  # the plugin's label
