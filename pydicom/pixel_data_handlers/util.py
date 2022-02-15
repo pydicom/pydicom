@@ -23,6 +23,12 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 
+# Lookup table for unpacking bit-packed data
+_UNPACK_LUT: Dict[int, bytes] = {
+    k: bytes(int(s) for s in reversed(f"{k:08b}")) for k in range(256)
+}
+
+
 def apply_color_lut(
     arr: "np.ndarray",
     ds: Optional["Dataset"] = None,
@@ -1063,6 +1069,74 @@ def get_nr_frames(ds: "Dataset") -> int:
     return nr_frames
 
 
+def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
+    """Pack a binary :class:`numpy.ndarray` for use with *Pixel Data*.
+
+    .. versionadded:: 1.2
+
+    Should be used in conjunction with (0028,0100) *Bits Allocated* = 1.
+
+    .. versionchanged:: 2.1
+
+        Added the `pad` keyword parameter and changed to allow `arr` to be
+        2 or 3D.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        The :class:`numpy.ndarray` containing 1-bit data as ints. `arr` must
+        only contain integer values of 0 and 1 and must have an 'uint'  or
+        'int' :class:`numpy.dtype`. For the sake of efficiency it's recommended
+        that the length of `arr` be a multiple of 8 (i.e. that any empty
+        bit-padding to round out the byte has already been added). The input
+        `arr` should either be shaped as (rows, columns) or (frames, rows,
+        columns) or the equivalent 1D array used to ensure that the packed
+        data is in the correct order.
+    pad : bool, optional
+        If ``True`` (default) then add a null byte to the end of the packed
+        data to ensure even length, otherwise no padding will be added.
+
+    Returns
+    -------
+    bytes
+        The bit packed data.
+
+    Raises
+    ------
+    ValueError
+        If `arr` contains anything other than 0 or 1.
+
+    References
+    ----------
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
+    """
+    if arr.shape == (0,):
+        return bytes()
+
+    # Test array
+    if not np.array_equal(arr, arr.astype(bool)):
+        raise ValueError(
+            "Only binary arrays (containing ones or zeroes) can be packed."
+        )
+
+    if len(arr.shape) > 1:
+        arr = arr.ravel()
+
+    # The array length must be a multiple of 8, pad the end
+    if arr.shape[0] % 8:
+        arr = np.append(arr, np.zeros(8 - arr.shape[0] % 8))
+
+    arr = np.packbits(arr.astype('u1'), bitorder="little")
+
+    packed: bytes = arr.tobytes()
+    if pad:
+        return packed + b'\x00' if len(packed) % 2 else packed
+
+    return packed
+
+
 def pixel_dtype(ds: "Dataset", as_float: bool = False) -> "np.dtype":
     """Return a :class:`numpy.dtype` for the pixel data in `ds`.
 
@@ -1313,3 +1387,57 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
                 arr = arr.transpose(1, 2, 0)
 
     return arr
+
+
+def unpack_bits(
+    src: bytes, as_array: bool = True
+) -> Union["np.ndarray", bytes]:
+    """Unpack the bit-packed data in `src`.
+
+    Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay
+    Bits Allocated* is 1.
+
+    If `NumPy <https://numpy.org/>`_ is available then it will be used to
+    unpack the data, otherwise only the standard library will be used, which
+    is about 20 times slower.
+
+    .. versionchanged:: 2.3
+
+        Added the `as_array` keyword parameter, support for unpacking
+        without NumPy, and added :class:`bytes` as a possible return type
+
+    Parameters
+    ----------
+    src : bytes
+        The bit-packed data.
+    as_array : bool, optional
+        If ``False`` then return the unpacked data as :class:`bytes`, otherwise
+        return a :class:`numpy.ndarray` (default, requires NumPy).
+
+    Returns
+    -------
+    bytes or numpy.ndarray
+        The unpacked data as an :class:`numpy.ndarray` (if NumPy is available
+        and ``as_array == True``) or :class:`bytes` otherwise.
+
+    Raises
+    ------
+    ValueError
+        If `as_array` is ``True`` and NumPy is not available.
+
+    References
+    ----------
+    DICOM Standard, Part 5,
+    :dcm:`Section 8.1.1<part05/chapter_8.html#sect_8.1.1>` and
+    :dcm:`Annex D<part05/chapter_D.html>`
+    """
+    if HAVE_NP:
+        arr = np.frombuffer(src, dtype="u1")
+        arr = np.unpackbits(arr, bitorder="little")
+
+        return arr if as_array else arr.tobytes()
+
+    if as_array:
+        raise ValueError("unpack_bits() requires NumPy if 'as_array = True'")
+
+    return b"".join(map(_UNPACK_LUT.__getitem__, src))

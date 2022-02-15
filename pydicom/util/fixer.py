@@ -20,14 +20,13 @@ def fix_separator_callback(
     """
     return_val = raw_elem
     try_replace = False
-
     # If elements are implicit VR, attempt to determine the VR
     if raw_elem.VR is None:
         try:
             vr = datadict.dictionary_VR(raw_elem.tag)
         # Not in the dictionary, process if flag says to do so
         except KeyError:
-            try_replace = kwargs['process_unkown_VR']
+            try_replace = kwargs['process_unknown_VRs']
         else:
             try_replace = vr in kwargs['for_VRs']
     else:
@@ -36,10 +35,18 @@ def fix_separator_callback(
     if try_replace:
         # Note value has not been decoded yet when this function called,
         #    so need to replace backslash as bytes
+        new_value = None
         if raw_elem.value is not None:
-            new_value = raw_elem.value.replace(
-                kwargs['invalid_separator'], b"\\"
-            )
+            if kwargs['invalid_separator'] == b" ":
+                stripped_val = raw_elem.value.strip()
+                strip_count = len(raw_elem.value) - len(stripped_val)
+                new_value = stripped_val.replace(
+                    kwargs['invalid_separator'], b"\\"
+                ) + b" " * strip_count
+            else:
+                new_value = raw_elem.value.replace(
+                    kwargs['invalid_separator'], b"\\"
+                )
         return_val = raw_elem._replace(value=new_value)
 
     return return_val
@@ -73,7 +80,8 @@ def fix_separator(
     config.data_element_callback = fix_separator_callback
     config.data_element_callback_kwargs = {
         'invalid_separator': invalid_separator,
-        'for_VRs': for_VRs
+        'for_VRs': for_VRs,
+        'process_unknown_VRs': process_unknown_VRs
     }
 
 

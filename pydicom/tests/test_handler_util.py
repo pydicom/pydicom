@@ -30,10 +30,15 @@ from pydicom.pixel_data_handlers.util import (
     get_j2k_parameters,
     get_nr_frames,
     apply_voi,
-    apply_windowing
+    apply_windowing,
+    pack_bits,
+    unpack_bits,
 )
-from pydicom.uid import (ExplicitVRLittleEndian, ImplicitVRLittleEndian,
-                         UncompressedPixelTransferSyntaxes)
+from pydicom.uid import (
+    ExplicitVRLittleEndian,
+    ImplicitVRLittleEndian,
+    UncompressedPixelTransferSyntaxes,
+)
 
 
 # PAL: PALETTE COLOR Photometric Interpretation
@@ -62,6 +67,8 @@ MOD_16_SEQ = get_testdata_file("mlut_18.dcm")
 # WIN: Windowing operation
 WIN_12_1F = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
 VOI_08_1F = get_testdata_file("vlut_04.dcm")
+# 1/1, 1 sample/pixel, 3 frame
+EXPL_1_1_3F = get_testdata_file("liver.dcm")
 
 
 # Tests with Numpy unavailable
@@ -2202,3 +2209,127 @@ class TestGetNrFrames:
         with pytest.warns(None) as w:
             assert ds.NumberOfFrames == get_nr_frames(ds)
             assert not w
+
+
+REFERENCE_PACK_UNPACK = [
+    (b'', []),
+    (b'\x00', [0, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x01', [1, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x02', [0, 1, 0, 0, 0, 0, 0, 0]),
+    (b'\x04', [0, 0, 1, 0, 0, 0, 0, 0]),
+    (b'\x08', [0, 0, 0, 1, 0, 0, 0, 0]),
+    (b'\x10', [0, 0, 0, 0, 1, 0, 0, 0]),
+    (b'\x20', [0, 0, 0, 0, 0, 1, 0, 0]),
+    (b'\x40', [0, 0, 0, 0, 0, 0, 1, 0]),
+    (b'\x80', [0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\xAA', [0, 1, 0, 1, 0, 1, 0, 1]),
+    (b'\xF0', [0, 0, 0, 0, 1, 1, 1, 1]),
+    (b'\x0F', [1, 1, 1, 1, 0, 0, 0, 0]),
+    (b'\xFF', [1, 1, 1, 1, 1, 1, 1, 1]),
+    #              | 1st byte              | 2nd byte
+    (b'\x00\x00', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x00\x01', [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]),
+    (b'\x00\x80', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\xFF', [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1]),
+    (b'\x01\x80', [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x80\x80', [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\xFF\x80', [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]),
+]
+
+
+class TestUnpackBits:
+    """Tests for unpack_bits."""
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    @pytest.mark.parametrize('src, output', REFERENCE_PACK_UNPACK)
+    def test_unpack_np(self, src, output):
+        """Test unpacking data using numpy."""
+        assert np.array_equal(
+            unpack_bits(src, as_array=True), np.asarray(output)
+        )
+
+        as_bytes = pack(f"{len(output)}B", *output)
+        assert unpack_bits(src, as_array=False) == as_bytes
+
+    @pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
+    @pytest.mark.parametrize('src, output', REFERENCE_PACK_UNPACK)
+    def test_unpack_bytes(self, src, output):
+        """Test unpacking data without numpy."""
+        as_bytes = pack(f"{len(output)}B", *output)
+        assert unpack_bits(src, as_array=False) == as_bytes
+
+        msg = r"unpack_bits\(\) requires NumPy if 'as_array = True'"
+        with pytest.raises(ValueError, match=msg):
+            unpack_bits(src, as_array=True)
+
+
+REFERENCE_PACK_PARTIAL = [
+    #              | 1st byte              | 2nd byte
+    (b'\x00\x40', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),  # 15-bits
+    (b'\x00\x20', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x10', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x08', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x04', [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x02', [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]),
+    (b'\x00\x01', [0, 0, 0, 0, 0, 0, 0, 0, 1]),  # 9-bits
+    (b'\x80', [0, 0, 0, 0, 0, 0, 0, 1]),  # 8-bits
+    (b'\x40', [0, 0, 0, 0, 0, 0, 1]),
+    (b'\x20', [0, 0, 0, 0, 0, 1]),
+    (b'\x10', [0, 0, 0, 0, 1]),
+    (b'\x08', [0, 0, 0, 1]),
+    (b'\x04', [0, 0, 1]),
+    (b'\x02', [0, 1]),
+    (b'\x01', [1]),
+    (b'', []),
+]
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestNumpy_PackBits:
+    """Tests for numpy_handler.pack_bits."""
+
+    @pytest.mark.parametrize('output, input', REFERENCE_PACK_UNPACK)
+    def test_pack(self, input, output):
+        """Test packing data."""
+        assert output == pack_bits(np.asarray(input), pad=False)
+
+    def test_non_binary_input(self):
+        """Test non-binary input raises exception."""
+        with pytest.raises(ValueError,
+                           match=r"Only binary arrays \(containing ones or"):
+            pack_bits(np.asarray([0, 0, 2, 0, 0, 0, 0, 0]))
+
+    def test_ndarray_input(self):
+        """Test non 1D input gets ravelled."""
+        arr = np.asarray(
+            [[0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 0, 1, 0, 1, 0, 1, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1]]
+        )
+        assert (3, 8) == arr.shape
+        b = pack_bits(arr, pad=False)
+        assert b'\x00\x55\xff' == b
+
+    def test_padding(self):
+        """Test odd length packed data is padded."""
+        arr = np.asarray(
+            [[0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 0, 1, 0, 1, 0, 1, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1]]
+        )
+        assert 3 == len(pack_bits(arr, pad=False))
+        b = pack_bits(arr, pad=True)
+        assert 4 == len(b)
+        assert 0 == b[-1]
+
+    @pytest.mark.parametrize('output, input', REFERENCE_PACK_PARTIAL)
+    def test_pack_partial(self, input, output):
+        """Test packing data that isn't a full byte long."""
+        assert output == pack_bits(np.asarray(input), pad=False)
+
+    def test_functional(self):
+        """Test against a real dataset."""
+        ds = dcmread(EXPL_1_1_3F)
+        arr = ds.pixel_array
+        arr = arr.ravel()
+        assert ds.PixelData == pack_bits(arr)

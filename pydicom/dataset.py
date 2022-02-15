@@ -393,6 +393,9 @@ class Dataset:
         self.is_little_endian: Optional[bool] = None
         self.is_implicit_VR: Optional[bool] = None
 
+        # True if the dataset is a sequence item with undefined length
+        self.is_undefined_length_sequence_item = False
+
         # the parent data set, if this dataset is a sequence item
         self.parent: "Optional[weakref.ReferenceType[Dataset]]" = None
 
@@ -641,19 +644,16 @@ class Dataset:
                 self._private_blocks = {}
 
     def __dir__(self) -> List[str]:
-        """Give a list of attributes available in the :class:`Dataset`.
+        """Return a list of methods, properties, attributes and element
+        keywords available in the :class:`Dataset`.
 
         List of attributes is used, for example, in auto-completion in editors
         or command-line environments.
         """
-        # Force zip object into a list
-        meths = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isroutine)))[0])
-        props = set(list(zip(
-            *inspect.getmembers(self.__class__, inspect.isdatadescriptor)))[0])
-        dicom_names = set(self.dir())
-        alldir = sorted(props | meths | dicom_names)
-        return alldir
+        names = set(super().__dir__())
+        keywords = set(self.dir())
+
+        return sorted(names | keywords)
 
     def dir(self, *filters: str) -> List[str]:
         """Return an alphabetical list of element keywords in the

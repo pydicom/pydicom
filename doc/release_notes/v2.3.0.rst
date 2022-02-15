@@ -24,6 +24,8 @@ Enhancements
 * Use rle_handler as last resort handler for decoding RLE encoded data as it is
   the slowest handler (:issue:`1487`)
 * Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
+* Added support for unpacking bit-packed data without using NumPy to
+  :func:`~pydicom.pixel_data_handlers.utils.unpack_bits`(:pr:`1594`)
 * Improved JPEG 10918 color space determination when using the Pillow pixel
   data handler
 
@@ -41,3 +43,7 @@ Fixes
   (:issue:`1581`)
 * Fixed crashes on Windows and MacOS when using the GDCM plugin to compress
   into *RLE Lossless* (:issue:`1581`)
+* Fixed ``dir(Dataset())`` not returning class attributes (:issue:`1599`)
+* Fixed bad DICOMDIR offsets when using :meth:`FileSet.write()
+  <pydicom.fileset.FileSet.write>` with a *Directory Record Sequence* using
+  undefined length items (:issue:`1596`)

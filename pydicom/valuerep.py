@@ -56,21 +56,25 @@ def _range_regex(regex: str) -> str:
 
 
 # regular expressions to match valid values for some VRs
-AE_REGEX = re.compile(r"^[\x20-\x7e]*$")
-AS_REGEX = re.compile(r"^\d\d\d[DWMY]$")
-CS_REGEX = re.compile(r"^[A-Z0-9 _]*$")
-DS_REGEX = re.compile(
-    r"^ *[+\-]?(\d+|\d+\.\d*|\.\d+)([eE][+\-]?\d+)? *$"
-)
-IS_REGEX = re.compile(r"^ *[+\-]?\d+ *$")
-DA_REGEX = re.compile(_range_regex(r"\d{4}(0[1-9]|1[0-2])([0-2]\d|3[01])"))
-DT_REGEX = re.compile(_range_regex(
-    r"\d{4}((0[1-9]|1[0-2])(([0-2]\d|3[01])(([01]\d|2[0-3])"
-    r"([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?)?)?)?([+-][01]\d\d\d)?")
-)
-TM_REGEX = re.compile(_range_regex(
-    r"([01]\d|2[0-3])([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?"))
-UR_REGEX = re.compile(r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$")
+VR_REGEXES = {
+    "AE": r"^[\x20-\x7e]*$",
+    "AS": r"^\d\d\d[DWMY]$",
+    "CS": r"^[A-Z0-9 _]*$",
+    "DS": r"^ *[+\-]?(\d+|\d+\.\d*|\.\d+)([eE][+\-]?\d+)? *$",
+    "IS": r"^ *[+\-]?\d+ *$",
+    "DA": _range_regex(r"\d{4}(0[1-9]|1[0-2])([0-2]\d|3[01])"),
+    "DT": _range_regex(
+        r"\d{4}((0[1-9]|1[0-2])(([0-2]\d|3[01])(([01]\d|2[0-3])"
+        r"([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?)?)?)?([+-][01]\d\d\d)?"),
+    "TM": _range_regex(
+        r"([01]\d|2[0-3])([0-5]\d((60|[0-5]\d)(\.\d{1,6} ?)?)?)?"),
+    "UI": r"^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*$",
+    "UR": r"^[A-Za-z_\d:/?#\[\]@!$&'()*+,;=%\-.~]* *$"
+}
+
+STR_VR_REGEXES = {vr: re.compile(regex) for (vr, regex) in VR_REGEXES.items()}
+BYTE_VR_REGEXES = {vr: re.compile(regex.encode())
+                   for (vr, regex) in VR_REGEXES.items()}
 
 
 def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
@@ -98,8 +102,7 @@ def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_regex(vr: str, value: Union[str, bytes],
-                   regex: Any) -> Tuple[bool, str]:
+def validate_regex(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     """Validate the value for a given VR for allowed characters
     using a regular expression.
 
@@ -109,20 +112,27 @@ def validate_regex(vr: str, value: Union[str, bytes],
         The value representation to validate against.
     value : str
         The value to validate.
-    regex : re.Pattern
-        The precompiled regex pattern used for matching.
 
     Returns
     -------
         A tuple of a boolean validation result and the error message.
     """
-    if value and (not re.match(regex, value) or value and value[-1] == "\n"):
-        return False, f"Invalid value for VR {vr}: {value!r}."
+    if value:
+        regex: Any
+        newline: Union[str, int]
+        if isinstance(value, str):
+            regex = STR_VR_REGEXES[vr]
+            newline = "\n"
+        else:
+            regex = BYTE_VR_REGEXES[vr]
+            newline = 10  # newline character
+        if not re.match(regex, value) or value and value[-1] == newline:
+            return False, f"Invalid value for VR {vr}: {value!r}."
     return True, ""
 
 
-def validate_length_and_regex(vr: str, value: Union[str, bytes],
-                              regex: Any) -> Tuple[bool, str]:
+def validate_length_and_regex(
+        vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     """Validate the value for a given VR both for maximum length and
     for allowed characters using a regular expression.
 
@@ -132,15 +142,13 @@ def validate_length_and_regex(vr: str, value: Union[str, bytes],
         The value representation to validate against.
     value : str
         The value to validate.
-    regex : re.Pattern
-        The precompiled regex pattern used for matching.
 
     Returns
     -------
         A tuple of a boolean validation result and the error message.
     """
     is_valid_len, msg1 = validate_vr_length(vr, value)
-    is_valid_expr, msg2 = validate_regex(vr, value, regex)
+    is_valid_expr, msg2 = validate_regex(vr, value)
     msg = " ".join([msg1, msg2]).strip()
     if msg:
         msg += (
@@ -148,50 +156,6 @@ def validate_length_and_regex(vr: str, value: Union[str, bytes],
             "/html/part05.html#table_6.2-1> for allowed values for each VR."
         )
     return is_valid_len and is_valid_expr, msg
-
-
-def validate_ae(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR AE.
-    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
-    return validate_length_and_regex(vr, value, AE_REGEX)
-
-
-def validate_as(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR AS.
-    See :func:`~pydicom.valuerep.validate_regex`."""
-    return validate_regex(vr, value, AS_REGEX)
-
-
-def validate_cs(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR CS.
-    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
-    return validate_length_and_regex(vr, value, CS_REGEX)
-
-
-def validate_da(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR DA.
-    Values used for range matching in a query are considered valid.
-    See :func:`~pydicom.valuerep.validate_regex`."""
-    return validate_regex(vr, value, DA_REGEX)
-
-
-def validate_ds(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR DS.
-    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
-    return validate_length_and_regex(vr, value, DS_REGEX)
-
-
-def validate_dt(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR DT.
-    Values used for range matching in a query are considered valid.
-    See :func:`~pydicom.valuerep.validate_regex`."""
-    return validate_regex(vr, value, DT_REGEX)
-
-
-def validate_is(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR IS.
-    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
-    return validate_length_and_regex(vr, value, IS_REGEX)
 
 
 def validate_pn_component_length(
@@ -251,26 +215,6 @@ def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_tm(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR TM.
-    Values used for range matching in a query are considered valid.
-    See :func:`~pydicom.valuerep.validate_regex`."""
-    return validate_regex(vr, value, TM_REGEX)
-
-
-def validate_ui(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VRUIS.
-    See :func:`~pydicom.valuerep.validate_length_and_regex`."""
-    from pydicom.uid import RE_VALID_UID
-    return validate_length_and_regex(vr, value, RE_VALID_UID)
-
-
-def validate_ur(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
-    """Validate the value for VR UR.
-    See :func:`~pydicom.valuerep.validate_regex`."""
-    return validate_regex(vr, value, UR_REGEX)
-
-
 def validate_pn_component(value: Union[str, bytes]) -> None:
     """Validate the value of a single component of VR PN for maximum length.
 
@@ -290,21 +234,21 @@ def validate_pn_component(value: Union[str, bytes]) -> None:
 
 
 VALIDATORS = {
-    "AE": validate_ae,
-    "AS": validate_as,
-    "CS": validate_cs,
-    "DA": validate_da,
-    "DS": validate_ds,
-    "DT": validate_dt,
-    "IS": validate_is,
+    "AE": validate_length_and_regex,
+    "AS": validate_regex,
+    "CS": validate_length_and_regex,
+    "DA": validate_regex,
+    "DS": validate_length_and_regex,
+    "DT": validate_regex,
+    "IS": validate_length_and_regex,
     "LO": validate_vr_length,
     "LT": validate_vr_length,
     "PN": validate_pn,
     "SH": validate_vr_length,
     "ST": validate_vr_length,
-    "TM": validate_tm,
-    "UI": validate_ui,
-    "UR": validate_ur,
+    "TM": validate_regex,
+    "UI": validate_length_and_regex,
+    "UR": validate_regex,
 }
 
 
@@ -777,7 +721,7 @@ def is_valid_ds(s: str) -> bool:
     bool
         True if the string is a valid decimal string. Otherwise False.
     """
-    return validate_ds("DS", s)[0]
+    return validate_length_and_regex("DS", s)[0]
 
 
 def format_number_as_ds(val: Union[float, Decimal]) -> str:
