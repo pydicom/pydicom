@@ -1122,10 +1122,24 @@ class TestDatasetCompress:
 
 @pytest.mark.skipif(sys.version_info[:2] < (3, 7), reason="Requires 3.7+")
 def test_deprecations():
-    """Test deprecation warnings"""
+    """Test deprecation warnings with Python 3.7+"""
     msg = (
         r"Importing 'get_encoder' from 'pydicom.encoders' is "
         r"deprecated, import from 'pydicom.pixels' instead"
     )
     with pytest.warns(DeprecationWarning, match=msg):
         from pydicom.encoders import get_encoder
+
+    msg = r"module pydicom.encoders has no attribute foo"
+    with pytest.raises(AttributeError, match=msg):
+        from pydicom import encoders
+        encoders.foo
+
+
+@pytest.mark.skipif(sys.version_info[:2] >= (3, 7), reason="Requires 3.6")
+def test_deprecations_36():
+    """Test deprecations with Python 3.6"""
+    from pydicom.encoders import get_encoder as deprecated
+    from pydicom.pixels.encoders import get_encoder
+
+    assert deprecated is get_encoder

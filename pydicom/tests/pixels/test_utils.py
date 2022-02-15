@@ -2385,3 +2385,25 @@ def test_deprecations():
     )
     with pytest.warns(DeprecationWarning, match=msg):
         from pydicom.pixel_data_handlers import unpack_bits
+
+    msg = r"module pydicom.pixel_data_handlers.util has no attribute foo"
+    with pytest.raises(AttributeError, match=msg):
+        from pydicom.pixel_data_handlers import util
+        util.foo
+
+    msg = r"module pydicom.pixel_data_handlers has no attribute foo"
+    with pytest.raises(AttributeError, match=msg):
+        from pydicom import pixel_data_handlers
+        pixel_data_handlers.foo
+
+@pytest.mark.skipif(sys.version_info[:2] >= (3, 7), reason="Requires 3.6")
+def test_deprecations_36():
+    """Test deprecations with Python 3.6"""
+    from pydicom.pixel_data_handlers import apply_rescale as deprecated
+    from pydicom.pixels import apply_rescale
+
+    assert deprecated is apply_rescale
+
+    from pydicom.pixel_data_handlers.utils import apply_rescale as deprecated
+
+    assert deprecated is apply_rescale
