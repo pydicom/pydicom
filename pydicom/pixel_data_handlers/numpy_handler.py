@@ -90,6 +90,7 @@ _deprecations = {
     "unpack_bits": _unpack_bits,
 }
 
+
 def __getattr__(name: str) -> Any:
     if name in _deprecations:
         warnings.warn(
@@ -102,6 +103,7 @@ def __getattr__(name: str) -> Any:
         return _deprecations[name]
 
     raise AttributeError(f"module {__name__} has no attribute {name}")
+
 
 if sys.version_info[:2] < (3, 7):
     pack_bits = _pack_bits
@@ -281,7 +283,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         # Skip any trailing padding bits
         nr_pixels = get_expected_length(ds, unit='pixels')
         arr = cast(
-            "np.ndarray", unpack_bits(pixel_data, as_array=True)[:nr_pixels]
+            "np.ndarray", _unpack_bits(pixel_data, as_array=True)[:nr_pixels]
         )
     else:
         # Skip the trailing padding byte(s) if present

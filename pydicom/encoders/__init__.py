@@ -13,6 +13,7 @@ _deprecations = {
     "RLELosslessEncoder": _RLELosslessEncoder,
 }
 
+
 def __getattr__(name: str) -> Any:
     if name in _deprecations:
         warnings.warn(
