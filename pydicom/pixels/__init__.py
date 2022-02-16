@@ -5,6 +5,7 @@ from pydicom.pixels.utils import (
     apply_voi_lut,
     apply_windowing,
     convert_color_space,
+    expand_ybr422,
     pack_bits,
     unpack_bits,
 )
