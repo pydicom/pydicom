@@ -77,8 +77,8 @@ Enhancements
   processing and improved the speed by ~20-60% (:issue:`1348`)
 * Optimisations for RLE encoding using *pydicom* (~40% faster).
 * Added support for faster decoding (~4-5x) and encoding (~20x) of *RLE Lossless*
-  *Pixel Data* via the `pylibjpeg-rle
-  <https://github.com/pydicom/pylibjpeg-rle>`_ plugin (:pr:`1361`, :pr:`1372`).
+  *Pixel Data* via the :gh:`pylibjpeg-rle <pylibjpeg-rle>` plugin
+  (:pr:`1361`, :pr:`1372`).
 * Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for
   compressing uncompressed pixel data using a given encoding format as specified
   by a UID. Only *RLE Lossless* is currently supported (:pr:`1372`)

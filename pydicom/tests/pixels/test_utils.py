@@ -34,6 +34,7 @@ from pydicom.pixels.utils import (
     apply_windowing,
     pack_bits,
     unpack_bits,
+    expand_ybr422,
 )
 from pydicom.uid import (
     ExplicitVRLittleEndian,
@@ -70,6 +71,8 @@ WIN_12_1F = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
 VOI_08_1F = get_testdata_file("vlut_04.dcm")
 # 1/1, 1 sample/pixel, 3 frame
 EXPL_1_1_3F = get_testdata_file("liver.dcm")
+# Uncompressed YBR_FULL_422
+EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
 
 
 # Tests with Numpy unavailable
@@ -2367,6 +2370,44 @@ class TestNumpy_PackBits:
         arr = ds.pixel_array
         arr = arr.ravel()
         assert ds.PixelData == pack_bits(arr)
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+class TestExpandYBR422:
+    def test_8bit(self):
+        """Test 8-bit expansion."""
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        assert ds.PhotometricInterpretation == 'YBR_FULL_422'
+        ref = ds.pixel_array
+
+        expanded = expand_ybr422(ds.PixelData, ds.BitsAllocated)
+        arr = np.frombuffer(expanded, dtype="u1")
+        assert np.array_equal(arr, ref.ravel())
+
+    def test_16bit(self):
+        """Test 16-bit expansion."""
+        # Have to make our own 16-bit data
+        ds = dcmread(EXPL_8_3_1F_YBR422)
+        ref = ds.pixel_array.astype('float32')
+        ref *= 65535 / 255
+        ref = ref.astype("u2")
+        # Subsample
+        # YY BB RR YY BB RR YY BB RR YY BB RR -> YY YY BB RR YY YY BB RR
+        src = bytearray(ref.tobytes())
+        del src[2::12]
+        del src[2::11]
+        del src[2::10]
+        del src[2::9]
+
+        # Should be 2/3rds of the original number of bytes
+        nr_bytes = ds.Rows * ds.Columns * ds.SamplesPerPixel * 2
+        assert len(src) == nr_bytes * 2 // 3
+        arr = np.frombuffer(expand_ybr422(src, 16), "u2")
+        assert np.array_equal(arr, ref.ravel())
+        # Spot check values
+        arr = arr.reshape(100, 100, 3)
+        assert (19532, 21845, 65535) == tuple(arr[5, 50, :])
+        assert (42662, 27242, 49601) == tuple(arr[15, 50, :])
 
 
 @pytest.mark.skipif(sys.version_info[:2] < (3, 7), reason="Requires 3.7+")

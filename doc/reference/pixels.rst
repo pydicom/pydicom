@@ -23,6 +23,7 @@ Functions for manipulating (7FE0,0010) *Pixel Data*.
   apply_voi
   apply_voi_lut
   convert_color_space
+  expand_ybr422
   pack_bits
   unpack_bits
 

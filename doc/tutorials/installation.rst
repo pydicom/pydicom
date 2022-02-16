@@ -24,9 +24,9 @@ Python is supported, check :ref:`this table<faq_install_version>`.
 Install using pip
 -----------------
 
-*pydicom* is available on `PyPi <https://pypi.python.org/pypi/pydicom/>`_, the
+*pydicom* is available on `PyPI <https://pypi.python.org/pypi/pydicom/>`_, the
 official third-party Python software repository. The simplest way to install
-from PyPi is using `pip <https://pip.pypa.io/>`_ with the command::
+from PyPI is using `pip <https://pip.pypa.io/>`_ with the command::
 
   pip install pydicom
 
@@ -35,7 +35,7 @@ You may need to use this instead, depending on your operating system::
   python -m pip install pydicom
 
 You can also perform an offline installation by
-`downloading <https://github.com/pydicom/pydicom/releases>`_ and installing
+:gh:`downloading <pydicom/releases>` and installing
 one of the release ``*.whl`` files. For example, with the v2.0 release::
 
   pip install pydicom-2.0.0-py3-none-any.whl
@@ -55,9 +55,8 @@ Downloading example/test DICOM files
 
 To keep the package size small, a number of the larger DICOM files are not
 distributed with *pydicom* and are instead kept in the
-`pydicom-data <https://github.com/pydicom/pydicom-data>`_
-repository. To get the complete set of testing and example files you can either
-install the *pydicom-data* repository::
+:gh:`pydicom-data <pydicom-data>` repository. To get the complete set of
+testing and example files you can either install the *pydicom-data* repository::
 
   pip install git+https://github.com/pydicom/pydicom-data
 
@@ -136,11 +135,14 @@ Installing GDCM
 `GDCM <http://gdcm.sourceforge.net/>`_ is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.
 
-Using pip::
+The wheels on `PyPI <https://pypi.org/project/python-gdcm/>`_ are built by the
+`python-gdcm <https://github.com/tfmoraes/python-gdcm>`_ project for current
+versions of Python on Windows, MacOS and Linux, and can be installed using pip::
 
   pip install python-gdcm
 
-Through conda::
+The wheels available through `conda-forge <https://anaconda.org/conda-forge/gdcm>`_
+tend to be older versions and not as well supported. They're available on conda using::
 
   conda install gdcm -c conda-forge
 
@@ -150,13 +152,13 @@ Through conda::
 Installing pylibjpeg
 --------------------
 
-`pylibjpeg <https://github.com/pydicom/pylibjpeg>`_ is a Python framework for
+:gh:`pylibjpeg <pylibjpeg>` is a Python framework for
 decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
 RLE images provided a suitable plugin is installed.
 
 Using pip::
 
-  pip install -U "pylibjpeg>=1.2" pylibjpeg-libjpeg pylibjpeg-openjpeg pylibjpeg-rle
+  pip install -U pylibjpeg[all]
 
 
 .. _tut_install_dev:
@@ -165,9 +167,9 @@ Install the development version
 ===============================
 
 To install a snapshot of the latest code (the ``master`` branch) from
-`GitHub <https://github.com/pydicom/pydicom>`_::
+:gh:`GitHub <pydicom>`::
 
-  pip install git+https://github.com/pydicom/pydicom.git
+  pip install git+https://github.com/pydicom/pydicom
 
 The ``master`` branch is under active development and while it is usually
 stable, it may have undocumented changes or bugs.
