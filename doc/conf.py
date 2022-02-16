@@ -62,15 +62,13 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',
     'sphinx.ext.ifconfig',
-    # 'sphinx.ext.viewcode',
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',  # Numpy style docstrings
     'sphinx.ext.linkcode',
     'sphinx.ext.extlinks',
-    'sphinx_copybutton',
     # Custom
-    'sphinx_issues',
+    'sphinx_copybutton',
 ]
 
 autosummary_generate = True
@@ -96,6 +94,8 @@ extlinks = {
         'https://github.com/pydicom/%s',
         None
     ),
+    "issue": ("https://github.com/pydicom/pydicom/issues/%s", "#"),
+    "pr": ("https://github.com/pydicom/pydicom/pull/%s", "#"),
 }
 
 # intersphinx configuration
@@ -139,7 +139,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'pydicom'
 year = datetime.now().strftime('%Y')
-copyright = '2008-{}, Darcy Mason and pydicom contributors'.format(year)
+copyright = f'2008-{year}, Darcy Mason and pydicom contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -309,10 +309,6 @@ def generate_example_rst(app, what, name, obj, options, lines):
         open(examples_path, 'w').close()
 
 
-# Config for sphinx_issues
-issues_github_path = 'pydicom/pydicom'
-
-
 def setup(app):
     app.connect('autodoc-process-docstring', generate_example_rst)
     app.add_css_file('css/pydicom.css')
@@ -323,10 +319,10 @@ def setup(app):
 
 
 # The following is used by sphinx.ext.linkcode to provide links to github
-linkcode_resolve = make_linkcode_resolve('pydicom',
-                                         'https://github.com/pydicom/'
-                                         'pydicom/blob/{revision}/'
-                                         '{package}/{path}#L{lineno}')
+linkcode_resolve = make_linkcode_resolve(
+    'pydicom',
+    'https://github.com/pydicom/pydicom/blob/{revision}/{package}/{path}#L{lineno}'  # noqa
+)
 
 doctest_global_setup = """
 import pydicom

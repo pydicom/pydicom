@@ -8,6 +8,7 @@ from pydicom.pixel_data_handlers.util import (
     apply_windowing,
     pack_bits,
     unpack_bits,
+    expand_ybr422,
 )
 
 apply_rescale = apply_modality_lut
