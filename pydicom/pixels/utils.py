@@ -926,6 +926,8 @@ def _expand_segmented_lut(
 def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
     """Return ``YBR_FULL_422`` data expanded to ``YBR_FULL``.
 
+    .. versionadded:: 2.3
+
     Uncompressed datasets with a (0028,0004) *Photometric Interpretation* of
     ``"YBR_FULL_422"`` are subsampled in the horizontal direction by halving
     the number of Cb and Cr pixels (i.e. there are two Y pixels for every Cb
