@@ -8,6 +8,8 @@ A DataElement has a tag,
 """
 
 import base64
+import functools
+import importlib
 import json
 from typing import (
     Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
@@ -922,6 +924,29 @@ def raw_LUT_descriptor_handler(
     return raw, {}
 
 
+@functools.lru_cache()
+def import_func(func_path: Union[str, Callable]) -> Callable:
+    """Return function imported from a fully qualified name."""
+    if callable(func_path):
+        return func_path
+    try:
+        module_name, func_name = func_path.rsplit(".", maxsplit=1)
+        module = importlib.import_module(module_name)
+        func = getattr(module, func_name)
+    except (ValueError, ImportError, AttributeError) as exc:
+        msg = f"Cannot import callback {func_path!r} ({exc})"
+        raise ValueError(msg) from exc
+    assert callable(func), f"{func_path} is not callable"
+    return func
+
+
+default_handlers = [
+    raw_infer_vr_handler,
+    raw_convert_exception_handler,
+    raw_LUT_descriptor_handler
+]
+
+
 def DataElement_from_raw(
     raw_data_element: RawDataElement,
     encoding: Optional[Union[str, MutableSequence[str]]] = None,
@@ -947,13 +972,27 @@ def DataElement_from_raw(
 
     """
     raw = raw_data_element
-
-    # If user has hooked into conversion of raw values, call the user routine(s)
-    callback_kwargs: dict[str, Any] = config.settings.data_element_callback_kwargs
-    for cb in config.settings.data_element_callbacks:
+    # Legacy callbacks if set
+    callback_kwargs: dict[str, Any] = {}
+    if config.data_element_callback:
+        raw = config.data_element_callback(
+            raw_data_element,
+            encoding=encoding,
+            **config.data_element_callback_kwargs
+        )
+        # Use default handlers if legacy callbacks are set
+        cbs = default_handlers
+    else:
+        # Otherwise use those provided in settings
+        cbs = config.settings.data_element_callbacks
+        callback_kwargs = config.settings.data_element_callback_kwargs
+    for cb_path in cbs:
+        # Allow for string path or direct callable
+        cb = import_func(cb_path)
         raw, out_kwargs = cb(
             raw_data_element,
             encoding=encoding,
+            dataset=dataset,
             **callback_kwargs
         )
         # Update kwargs for next callback.

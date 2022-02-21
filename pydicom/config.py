@@ -12,7 +12,6 @@ from typing import (
     Optional, Dict, Any, TYPE_CHECKING, Generator, Callable, List, Union
 )
 
-from pydicom.dataelem import LUT_descriptor_handler, converter_exception_handler, infer_vr_handler
 
 have_numpy = True
 try:
@@ -31,19 +30,6 @@ if TYPE_CHECKING:  # pragma: no cover
             **kwargs: Any,
         ) -> "RawDataElement": ...
 
-
-@functools.lru_cache()
-def import_func(func_path: str) -> Callable:
-    """Return function imported from a fully qualified name."""
-    try:
-        module_name, func_name = func_path.rsplit(".", maxsplit=1)
-        module = importlib.import_module(module_name)
-        func = getattr(module, func_name)
-    except (ValueError, ImportError, AttributeError) as exc:
-        msg = f"Cannot import callback {func_path!r} ({exc})"
-        raise ValueError(msg) from exc
-    assert callable(func), f"{func_path} is not callable"
-    return func
 
 _use_future = False
 _use_future_env = os.getenv("PYDICOM_FUTURE")
@@ -199,37 +185,12 @@ class Settings:
         self._writing_validation_mode: Optional[int] = (
             RAISE if _use_future else None
         )
-        self._data_element_callbacks: List[Union[str, Callable]] = [
+        self.data_element_callbacks: List[Union[str, Callable]] = [
             "pydicom.dataelem.raw_infer_vr_handler",
             "pydicom.dataelem.raw_convert_exception_handler",
             "pydicom.dataelem.raw_LUT_descriptor_handler"
         ]
-        self._data_element_callback_kwargs: Dict[str, Any] = {}
-
-    @property
-    def data_element_callbacks(self) -> List[Callable]:
-        """Set list of function paths to be imported and called in order from
-        to be called from :func:`~pydicom.filereader.dcmread` every time a
-        :class:`~pydicom.dataelem.RawDataElement` has been returned,
-        before it is added to the :class:`~pydicom.dataset.Dataset`.
-
-        Default ``[
-            "pydicom.dataelem.raw_infer_vr_handler",
-            "pydicom.dataelem.raw_convert_exception_handler",
-            "pydicom.dataelem.raw_LUT_descriptor_handler"
-        ]``.
-        """
-        # NOTE: import_func will be cached
-        return [
-            fn if callable(fn) else import_func(fn)
-            for fn in self._data_element_callbacks
-        ]
-
-    @data_element_callbacks.setter
-    def data_element_callbacks(
-        self, cbs: List[Union[str, Callable]]  # type: ignore
-    ) -> None:
-        self._data_element_callbacks = cbs
+        self.data_element_callback_kwargs: Dict[str, Any] = {}
 
     def reset_data_element_callback(self) -> None:
         """Reset the :func:`data_element_callback` function to the default."""
@@ -239,22 +200,6 @@ class Settings:
             "pydicom.dataelem.LUT_descriptor_handler"
         ]
         self._data_element_callback_kwargs = {}
-
-    @property
-    def data_element_callback_kwargs(self) -> Dict[str, Any]:
-        """Set the keyword arguments passed to :func:`data_element_callback`.
-
-        Default ``{}``.
-        """
-        return self._data_element_callback_kwargs
-
-    @data_element_callback_kwargs.setter
-    def data_element_callback_kwargs(self) -> Dict[str, Any]:
-        """Set the keyword arguments passed to :func:`data_element_callback`.
-
-        Default ``{}``.
-        """
-        return self._data_element_callback_kwargs
 
     @property
     def reading_validation_mode(self) -> int:
