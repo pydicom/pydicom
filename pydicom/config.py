@@ -3,8 +3,6 @@
 
 # doc strings following items are picked up by sphinx for documentation
 
-import importlib
-import functools
 import logging
 import os
 from contextlib import contextmanager
@@ -240,6 +238,13 @@ of the settings. More settings may move here in later versions.
 
 .. versionadded:: 2.3
 """
+
+
+def reset_data_element_callback():
+    """Reset both :class:`Settings` and legacy ``data_element_callback``."""
+    settings.reset_data_element_callback()
+    data_element_callback = None
+    data_element_callback_kwargs = {}
 
 
 @contextmanager

@@ -843,7 +843,7 @@ def raw_infer_vr_handler(
             except KeyError:
                 pass
     if vr != raw.VR:
-        raw = raw._replace(vr=vr)
+        raw = raw._replace(VR=vr)
     return raw, {}
 
 
@@ -885,7 +885,7 @@ def raw_convert_exception_handler(
         )
         if config.convert_wrong_length_to_UN:
             warnings.warn(f"{message} Setting VR to 'UN'.")
-            vr = VR_.UN
+            raw = raw._replace(VR=VR_.UN)
             value = raw.value
         else:
             raise BytesLengthException(
@@ -913,14 +913,15 @@ def raw_LUT_descriptor_handler(
     dict
         Any kwargs to pass into downstream handlers.
     """
-    value = kwargs.get('value', raw.value)
     if raw.tag in _LUT_DESCRIPTOR_TAGS and raw.value:
+        value = kwargs.get('value', [])
         # We only fix the first value as the third value is 8 or 16
         try:
-            if raw.value[0] < 0:
-                raw = raw._replace(value = (raw.value[0] + 65536))
+            if value[0] < 0:
+                value[0] += 65536
         except TypeError:
             pass
+        return raw, {'value': value}
     return raw, {}
 
 
@@ -990,7 +991,7 @@ def DataElement_from_raw(
         # Allow for string path or direct callable
         cb = import_func(cb_path)
         raw, out_kwargs = cb(
-            raw_data_element,
+            raw,
             encoding=encoding,
             dataset=dataset,
             **callback_kwargs
