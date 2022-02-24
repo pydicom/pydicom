@@ -512,9 +512,10 @@ class DataElement:
             val.append
         except AttributeError:  # not a list
             return self._convert(val)
-        else:
-            return MultiValue(self._convert, val,
-                              validation_mode=self.validation_mode)
+        if len(val) == 1:
+            return self._convert(val[0])
+        return MultiValue(self._convert, val,
+                          validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
