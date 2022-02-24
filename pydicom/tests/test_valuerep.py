@@ -1540,20 +1540,27 @@ def test_set_value(vr, pytype, vm0, vmN, keyword, disable_value_validation):
         assert value == elem.value
 
     # Test VM = 1
-    ds = Dataset()
-    value = vmN[0]
-    if vr == 'SQ':
-        setattr(ds, keyword, [value])
-        elem = ds[keyword]
-        assert elem.value[0] == value
-        assert value == elem.value[0]
-    else:
+    if vr != 'SQ':
+        ds = Dataset()
+        value = vmN[0]
         setattr(ds, keyword, value)
         elem = ds[keyword]
         assert elem.value == value
         assert value == elem.value
 
-    if vr[0] == 'O':
+    # Test VM = 1 as list
+    ds = Dataset()
+    value = vmN[0]
+    setattr(ds, keyword, [value])
+    elem = ds[keyword]
+    if vr == 'SQ':
+        assert elem.value[0] == value
+        assert value == elem.value[0]
+    else:
+        assert elem.value == value
+        assert value == elem.value
+
+    if vr[0] == 'O' or vr == 'UN':
         return
 
     # Test VM > 1

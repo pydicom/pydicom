@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
+from unittest import mock
 
 import pytest
 
@@ -271,13 +272,14 @@ class TestDataSetToJson:
         assert ds_json.index('"00100020"') < ds_json.index('"00100030"')
         assert ds_json.index('"00100030"') < ds_json.index('"00100040"')
 
-    def test_suppress_invalid_tags(self):
+    @mock.patch("pydicom.DataElement.to_json_dict", side_effect=ValueError)
+    def test_suppress_invalid_tags(self, _):
         """Test tags that raise exceptions don't if suppress_invalid_tags True.
         """
         ds = Dataset()
-        ds.add_new(0x00100010, 'PN', ['Jane^Doe'])
+        ds.add_new(0x00100010, 'PN', 'Jane^Doe')
 
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             ds.to_json_dict()
 
         ds_json = ds.to_json_dict(suppress_invalid_tags=True)
