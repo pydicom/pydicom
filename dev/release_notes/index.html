@@ -316,6 +316,8 @@ into <em>RLE Lossless</em> (<a class="reference external" href="https://github.c
 <li><p>Fixed <code class="docutils literal notranslate"><span class="pre">dir(Dataset())</span></code> not returning class attributes (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1599">#1599</a>)</p></li>
 <li><p>Fixed bad DICOMDIR offsets when using <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">FileSet.write()</span></code></a> with a <em>Directory Record Sequence</em> using
 undefined length items (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1596">#1596</a>)</p></li>
+<li><p>Assigning a list of length one as tag value is now correctly handled as
+assigning the single value (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1606">#1606</a>)</p></li>
 </ul>
 </section>
 </section>

@@ -47,3 +47,6 @@ Fixes
 * Fixed bad DICOMDIR offsets when using :meth:`FileSet.write()
   <pydicom.fileset.FileSet.write>` with a *Directory Record Sequence* using
   undefined length items (:issue:`1596`)
+* Assigning a list of length one as tag value is now correctly handled as
+  assigning the single value (:issue:`1606`)
+
