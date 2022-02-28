@@ -8,8 +8,6 @@ A DataElement has a tag,
 """
 
 import base64
-import functools
-import importlib
 import json
 from typing import (
     Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
@@ -787,7 +785,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 def raw_infer_vr_handler(
     raw: RawDataElement,
     dataset: Optional["Dataset"] = None,
-    **_kwargs,
+    **_kwargs: Any,
 ) -> Tuple[RawDataElement, dict]:
     """Infer VR from a :class:`RawDataElement` before converting values.
 
@@ -850,7 +848,7 @@ def raw_infer_vr_handler(
 def raw_convert_exception_handler(
     raw: RawDataElement,
     encoding: Optional[Union[str, MutableSequence[str]]] = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Tuple[RawDataElement, dict]:
     """Attempt to convert the raw value to a native type.
 
@@ -897,7 +895,7 @@ def raw_convert_exception_handler(
 
 def raw_LUT_descriptor_handler(
     raw: RawDataElement,
-    **kwargs,
+    **kwargs: Any,
 ) -> Tuple[RawDataElement, dict]:
     """Handle post-convert_value processing of a :class:`RawDataElement`.
 
@@ -925,23 +923,7 @@ def raw_LUT_descriptor_handler(
     return raw, {}
 
 
-@functools.lru_cache()
-def import_func(func_path: Union[str, Callable]) -> Callable:
-    """Return function imported from a fully qualified name."""
-    if callable(func_path):
-        return func_path
-    try:
-        module_name, func_name = func_path.rsplit(".", maxsplit=1)
-        module = importlib.import_module(module_name)
-        func = getattr(module, func_name)
-    except (ValueError, ImportError, AttributeError) as exc:
-        msg = f"Cannot import callback {func_path!r} ({exc})"
-        raise ValueError(msg) from exc
-    assert callable(func), f"{func_path} is not callable"
-    return func
-
-
-default_handlers = [
+default_handlers: List[Callable] = [
     raw_infer_vr_handler,
     raw_convert_exception_handler,
     raw_LUT_descriptor_handler
@@ -984,12 +966,12 @@ def DataElement_from_raw(
         # Use default handlers if legacy callbacks are set
         cbs = default_handlers
     else:
-        # Otherwise use those provided in settings
-        cbs = config.settings.data_element_callbacks
-        callback_kwargs = config.settings.data_element_callback_kwargs
-    for cb_path in cbs:
-        # Allow for string path or direct callable
-        cb = import_func(cb_path)
+        # Otherwise use those provided in settings, fall back to default if
+        # no handlers are set.
+        cbs = config.settings.data_element_callbacks or default_handlers
+        callback_kwargs = config.settings.data_element_callbacks_kwargs
+    for cb in cbs:
+        assert callable(cb)
         raw, out_kwargs = cb(
             raw,
             encoding=encoding,
