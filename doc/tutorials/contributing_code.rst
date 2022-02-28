@@ -16,7 +16,7 @@ Download the current source code
 ================================
 
 1. Sign up to `GitHub <https://github.com>`_ and
-   `fork pydicom <https://github.com/pydicom/pydicom/fork>`_
+   :gh:`fork pydicom <pydicom/fork>`
 2. Install `Git <https://git-scm.com/downloads>`_. If you're new to Git,
    the Django project has a good introduction on `working with Git and GitHub
    <https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/>`_.
@@ -81,8 +81,7 @@ optional library) and **x** that the test failed as expected.
 
 Once the tests are complete you should get a short summary of the results.
 At this stage the entire test suite *should* pass. If you get any failures
-or errors you should check the
-`issue tracker <https://github.com/pydicom/pydicom/issues>`_ for any
+or errors you should check the :gh:`issue tracker <pydicom/issues>` for any
 relevant issues or create a new one if there are none.
 
 
@@ -109,15 +108,15 @@ work as intended.
    find the following resources useful:
 
    * Take a look at the
-     `existing pydicom test suite <https://github.com/pydicom/pydicom/tree/master/pydicom/tests>`_
+     :gh:`existing pydicom test suite <pydicom/tree/master/pydicom/tests>`
      and see how the tests are written. There are examples for writing
-     `a single test <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137>`_,
-     `a group of related tests <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27>`_,
-     `testing for exceptions <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_handler_util.py#L834>`_,
-     `capturing log output <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_config.py#L28>`_,
-     `testing for warnings <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_pillow_pixel_data.py#L452>`_,
+     :gh:`a single test <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L137>`,
+     :gh:`a group of related tests <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_dataelem.py#L27>`,
+     :gh:`testing for exceptions <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_handler_util.py#L834>`,
+     :gh:`capturing log output <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_config.py#L28>`,
+     :gh:`testing for warnings <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_pillow_pixel_data.py#L452>`,
      and running
-     `parametrized tests <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L215>`_.
+     :gh:`parametrized tests <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/tests/test_rle_pixel_data.py#L215>`.
    * Dive Into Python has a very nice `section on unit testing
      <https://diveinto.org/python3/unit-testing.html>`_ (however it uses
      ``unittest`` instead of pytest).
@@ -131,8 +130,7 @@ work as intended.
 Let's say we wanted to add a new `pre-defined UID
 <https://pydicom.github.io/pydicom/dev/reference/uid.html#predefined-uids>`_
 to *pydicom* with a value of ``1.2.3.4.500``. We'd first add a new test at the
-bottom of `test_uid.py
-<https://github.com/pydicom/pydicom/blob/master/pydicom/tests/test_uid.py>`_::
+bottom of :gh:`test_uid.py <pydicom/blob/master/pydicom/tests/test_uid.py>`::
 
   def test_new_uid():
       """Test uid.NewDefinedUID."""
@@ -160,9 +158,8 @@ file and that the test itself is written correctly.
 Make a code change and document it
 ==================================
 Next we'll make changes to the actual source code. Open
-`uid.py <https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py>`_ in
-a text editor and around
-`line 236 <https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236>`_
+:gh:`uid.py <pydicom/blob/master/pydicom/uid.py>` in a text editor and around
+:gh:`line 236 <pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236>`
 make the following changes::
 
   RLELossless = UID('1.2.840.10008.1.2.5')
@@ -174,7 +171,7 @@ make the following changes::
 The line ``"""1.2.3.4.500"""`` is the `docstring
 <https://www.python.org/dev/peps/pep-0257/>`_ for our new UID. In order for
 it to be included in the API reference documentation we'll also need to update
-`uid.rst <https://github.com/pydicom/pydicom/blob/master/doc/reference/uid.rst>`_::
+:gh:`uid.rst <pydicom/blob/master/doc/reference/uid.rst>`::
 
   JPEG2000MultiComponentLossless
   JPEG2000MultiComponent
@@ -229,12 +226,11 @@ patch, send it to your fork::
 
   $ git push origin new-uid
 
-You can create a pull request by visiting the `pydicom GitHub page
-<https://github.com/pydicom/pydicom>`_ where you
-should see your branch under *"Your recently push branches"*. Click *"Compare &
-pull request"* and fill out the title (with a ``[WIP]`` prefix, i.e.
-``[WIP] Add NewDefinedUID to uid.py``) and follow the  instructions in the
-main entry window.
+You can create a pull request by visiting the :gh:`pydicom GitHub page
+<pydicom>` where you should see your branch under *"Your recently push
+branches"*. Click *"Compare & pull request"* and fill out the title (with a
+``[WIP]`` prefix, i.e. ``[WIP] Add NewDefinedUID to uid.py``) and follow the
+instructions in the main entry window.
 
 To submit the pull request (PR) for real - **please don't do this for
 this example!** - then on the next page you would click *"Create pull

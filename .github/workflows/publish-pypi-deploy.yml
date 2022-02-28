@@ -1,4 +1,4 @@
-name: release
+name: publish-pypi-deploy
 
 on:
   release:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version: [3.9]
+        python-version: [ '3.10' ]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
     - name: Build package
       run: |
         python -m pip install --upgrade pip
-        pip install wheel
+        python -m pip install wheel
         python setup.py sdist bdist_wheel
 
     - name: Upload artifacts
@@ -36,36 +36,25 @@ jobs:
 
     - name: Set up venv
       run: |
-        sudo apt-get install python3-venv
         python -m venv ~/myenv
         source ~/myenv/bin/activate
         echo "Virtual env: $VIRTUAL_ENV"
 
     - name: Install pytest and our package
       run: |
-        pip install pytest
+        python -m pip install -U pytest
         cd ..  # avoid pip seeing 'pydicom' package dir below
-        pip install -f pydicom/dist pydicom
+        python -m pip install -f pydicom/dist pydicom
 
     - name: Test with pytest (no numpy)
       run: |
         python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
 
-    - name: Install numpy
+    - name: Install numpy and test
       run: |
-        pip install numpy
-
-    - name: Test with pytest (numpy installed)
-      run: |
+        python -m pip install -U numpy
         python -c "import pytest; pytest.main(['--pyargs', 'pydicom.tests'])"
         cd pydicom  # back to root repo dir
-
-    # - name: Publish package to Test PyPi
-    #   uses: pypa/gh-action-pypi-publish@master
-    #   with:
-    #     user: __token__
-    #     password: ${{ secrets.TEST_PYPI_PASSWORD }}
-    #     repository_url: https://test.pypi.org/legacy/
 
     - name: Publish package to PyPi
       uses: pypa/gh-action-pypi-publish@master

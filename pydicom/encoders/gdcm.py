@@ -85,12 +85,18 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         The encoded image data.
     """
     # Check the parameters are valid for RLE encoding with GDCM
-    samples_per_pixel: int = kwargs['samples_per_pixel']
-    bits_allocated: int = kwargs['bits_allocated']
+    rows = kwargs['rows']
+    columns = kwargs['columns']
+    samples_per_pixel = kwargs['samples_per_pixel']
+    number_of_frames = kwargs['number_of_frames']
+    pixel_representation = kwargs['pixel_representation']
+    bits_allocated = kwargs['bits_allocated']
+    bits_stored = kwargs['bits_stored']
+    photometric_interpretation = kwargs['photometric_interpretation']
 
     # Bug up to v3.0.9 (Apr 2021) in handling 32-bit, 3 sample/px data
     gdcm_version = [int(c) for c in gdcm.Version.GetVersion().split('.')]
-    if gdcm_version < [3, 1, 0]:
+    if gdcm_version < [3, 0, 10]:
         if bits_allocated == 32 and samples_per_pixel == 3:
             raise RuntimeError(
                 "The 'gdcm' plugin is unable to RLE encode 32-bit, 3 "
@@ -103,77 +109,6 @@ def _rle_encode(src: bytes, **kwargs: Any) -> bytes:
         )
 
     # Create a gdcm.Image with the uncompressed `src` data
-    image = _create_gdcm_image(src, **kwargs)
-
-    # Converts an image to match the set transfer syntax
-    converter = gdcm.ImageChangeTransferSyntax()
-
-    # Set up the converter with the intended transfer syntax...
-    ts = gdcm.TransferSyntax.GetTSType(kwargs['transfer_syntax_uid'])
-    converter.SetTransferSyntax(gdcm.TransferSyntax(ts))
-    # ...and image to be converted
-    converter.SetInput(image)
-
-    # Perform the conversion, returns bool
-    # 'PALETTE COLOR' and a lossy transfer syntax will return False
-    result = converter.Change()
-    if not result:
-        raise RuntimeError(
-            "An error occurred with the 'gdcm' plugin: "
-            "ImageChangeTransferSyntax.Change() returned a failure result"
-        )
-
-    # The converted image as gdcm.Image
-    # Weirdly, reusing `image` as the variable name causes a segfault here
-    output = converter.GetOutput()
-    # The element's value is the encapsulated encoded pixel data
-    seq = output.GetDataElement().GetSequenceOfFragments()
-
-    # RLECodec::Code() uses only 1 fragment per frame
-    if seq is None or seq.GetNumberOfFragments() != 1:
-        # Covers both no sequence and unexpected number of fragments
-        raise RuntimeError(
-            "An error occurred with the 'gdcm' plugin: unexpected number of "
-            "fragments found in the 'Pixel Data'"
-        )
-
-    fragment: str = seq.GetFragment(0).GetByteValue().GetBuffer()
-    return fragment.encode("utf-8", "surrogateescape")
-
-
-def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
-    """Return a gdcm.Image from the `src`.
-
-    Parameters
-    ----------
-    src : bytes
-        The raw image frame data to be encoded.
-    **kwargs
-        Required parameters:
-
-        * `rows`: int
-        * `columns`: int
-        * `samples_per_pixel`: int
-        * `number_of_frames`: int
-        * `bits_allocated`: int
-        * `bits_stored`: int
-        * `pixel_representation`: int
-        * `photometric_interpretation`: str
-
-    Returns
-    -------
-    gdcm.Image
-        An Image containing the `src` as a single uncompressed frame.
-    """
-    rows = kwargs['rows']
-    columns = kwargs['columns']
-    samples_per_pixel = kwargs['samples_per_pixel']
-    number_of_frames = kwargs['number_of_frames']
-    pixel_representation = kwargs['pixel_representation']
-    bits_allocated = kwargs['bits_allocated']
-    bits_stored = kwargs['bits_stored']
-    photometric_interpretation = kwargs['photometric_interpretation']
-
     pi = gdcm.PhotometricInterpretation.GetPIType(
         photometric_interpretation
     )
@@ -188,7 +123,10 @@ def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
     # `src` uses little-endian byte ordering
     ts = gdcm.TransferSyntax.ImplicitVRLittleEndian
 
-    image = gdcm.Image()
+    # Must use ImageWriter().GetImage() to create a gdcmImage
+    #   also have to make sure `writer` doesn't go out of scope
+    writer = gdcm.ImageWriter()
+    image = writer.GetImage()
     image.SetNumberOfDimensions(2)
     image.SetDimensions((columns, rows, 1))
     image.SetPhotometricInterpretation(
@@ -213,7 +151,40 @@ def _create_gdcm_image(src: bytes, **kwargs: Any) -> "gdcm.Image":
     elem.SetByteStringValue(src)
     image.SetDataElement(elem)
 
-    return cast("gdcm.Image", image)
+    # Converts an image to match the set transfer syntax
+    converter = gdcm.ImageChangeTransferSyntax()
+
+    # Set up the converter with the intended transfer syntax...
+    rle = gdcm.TransferSyntax.GetTSType(kwargs['transfer_syntax_uid'])
+    converter.SetTransferSyntax(gdcm.TransferSyntax(rle))
+    # ...and image to be converted
+    converter.SetInput(image)
+
+    # Perform the conversion, returns bool
+    # 'PALETTE COLOR' and a lossy transfer syntax will return False
+    result = converter.Change()
+    if not result:
+        raise RuntimeError(
+            "An error occurred with the 'gdcm' plugin: "
+            "ImageChangeTransferSyntax.Change() returned a failure result"
+        )
+
+    # A new gdcmImage with the converted pixel data element
+    image = converter.GetOutput()
+
+    # The element's value is the encapsulated encoded pixel data
+    seq = image.GetDataElement().GetSequenceOfFragments()
+
+    # RLECodec::Code() uses only 1 fragment per frame
+    if seq is None or seq.GetNumberOfFragments() != 1:
+        # Covers both no sequence and unexpected number of fragments
+        raise RuntimeError(
+            "An error occurred with the 'gdcm' plugin: unexpected number of "
+            "fragments found in the 'Pixel Data'"
+        )
+
+    fragment = seq.GetFragment(0).GetByteValue().GetBuffer()
+    return cast(bytes, fragment.encode("utf-8", "surrogateescape"))
 
 
 _ENCODERS = {

@@ -10,41 +10,37 @@ import shutil
 
 import pytest
 
+try:
+    import numpy
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
+
 import pydicom
 from pydicom.filereader import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.encaps import defragment_data
+from pydicom.pixel_data_handlers import numpy_handler, gdcm_handler
 from pydicom.pixel_data_handlers.util import (
     _convert_YBR_FULL_to_RGB, get_j2k_parameters
 )
 from pydicom.tag import Tag
 
-gdcm_missing_message = "GDCM is not available in this test environment"
-gdcm_im_missing_message = "GDCM is not available or in-memory decoding"\
-    " not supported with this GDCM version"
-gdcm_present_message = "GDCM is being tested"
-have_numpy_testing = True
-
 try:
-    import numpy.testing
-except ImportError as e:
-    have_numpy_testing = False
-
-# Python 3.4 pytest does not have pytest.param?
-have_pytest_param = True
-try:
-    x = pytest.param
-except AttributeError:
-    have_pytest_param = False
-
-from pydicom.pixel_data_handlers import numpy_handler
-have_numpy_handler = numpy_handler.is_available()
-
-from pydicom.pixel_data_handlers import gdcm_handler
-HAVE_GDCM = gdcm_handler.is_available()
-HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
-if HAVE_GDCM:
     import gdcm
+    HAVE_GDCM = True
+except ImportError:
+    HAVE_GDCM = False
+
+HAVE_GDCM_IN_MEMORY_SUPPORT = gdcm_handler.HAVE_GDCM_IN_MEMORY_SUPPORT
+
+
+gdcm_present_message = "GDCM is being tested"
+gdcm_missing_message = "GDCM is not available in this test environment"
+gdcm_im_missing_message = (
+    "GDCM is not available or in-memory decoding "
+    "not supported with this GDCM version"
+)
 
 
 empty_number_tags_name = get_testdata_file(
@@ -212,131 +208,114 @@ class TestGDCM_JPEGlossless_no_gdcm:
             self.jpeg_lossless.pixel_array
 
 
-if have_pytest_param:
-    pi_rgb_test_ids = [
-        "JPEG_RGB_411_AS_YBR_FULL",
-        "JPEG_RGB_411_AS_YBR_FULL_422",
-        "JPEG_RGB_422_AS_YBR_FULL",
-        "JPEG_RGB_422_AS_YBR_FULL_422",
-        "JPEG_RGB_444_AS_YBR_FULL",
-    ]
+pi_rgb_test_ids = [
+    "JPEG_RGB_411_AS_YBR_FULL",
+    "JPEG_RGB_411_AS_YBR_FULL_422",
+    "JPEG_RGB_422_AS_YBR_FULL",
+    "JPEG_RGB_422_AS_YBR_FULL_422",
+    "JPEG_RGB_444_AS_YBR_FULL",
+]
 
-    pi_rgb_testdata = [
-        pytest.param(
-            sc_rgb_jpeg_dcmtk_411_YBR_FULL,
-            "YBR_FULL",
-            [
-                (253, 1, 0),
-                (253, 128, 132),
-                (0, 255, 5),
-                (127, 255, 127),
-                (1, 0, 254),
-                (127, 128, 255),
-                (0, 0, 0),
-                (64, 64, 64),
-                (192, 192, 192),
-                (255, 255, 255),
-            ],
-            True,
-            marks=pytest.mark.xfail(
-                reason="GDCM does not support "
-                "non default jpeg lossy colorspaces")),
-        pytest.param(
-            sc_rgb_jpeg_dcmtk_411_YBR_FULL_422,
-            "YBR_FULL_422",
-            [
-                (253, 1, 0),
-                (253, 128, 132),
-                (0, 255, 5),
-                (127, 255, 127),
-                (1, 0, 254),
-                (127, 128, 255),
-                (0, 0, 0),
-                (64, 64, 64),
-                (192, 192, 192),
-                (255, 255, 255),
-            ],
-            True,
-            marks=pytest.mark.xfail(
-                reason="GDCM does not support "
-                "non default jpeg lossy colorspaces")),
-        pytest.param(
-            sc_rgb_jpeg_dcmtk_422_YBR_FULL,
-            "YBR_FULL",
-            [
-                (254, 0, 0),
-                (255, 127, 127),
-                (0, 255, 5),
-                (129, 255, 129),
-                (0, 0, 254),
-                (128, 127, 255),
-                (0, 0, 0),
-                (64, 64, 64),
-                (192, 192, 192),
-                (255, 255, 255),
-            ],
-            True,
-            marks=pytest.mark.xfail(
-                reason="GDCM does not support "
-                "non default jpeg lossy colorspaces")),
-        pytest.param(
-            sc_rgb_jpeg_dcmtk_422_YBR_FULL_422,
-            "YBR_FULL_422",
-            [
-                (254, 0, 0),
-                (255, 127, 127),
-                (0, 255, 5),
-                (129, 255, 129),
-                (0, 0, 254),
-                (128, 127, 255),
-                (0, 0, 0),
-                (64, 64, 64),
-                (192, 192, 192),
-                (255, 255, 255),
-            ],
-            True,
-            marks=pytest.mark.xfail(
-                reason="GDCM does not support "
-                "non default jpeg lossy colorspaces")),
-        pytest.param(
-            sc_rgb_jpeg_dcmtk_444_YBR_FULL,
-            "YBR_FULL",
-            [
-                (254, 0, 0),
-                (255, 127, 127),
-                (0, 255, 5),
-                (129, 255, 129),
-                (0, 0, 254),
-                (128, 127, 255),
-                (0, 0, 0),
-                (64, 64, 64),
-                (192, 192, 192),
-                (255, 255, 255),
-            ],
-            True,
-            marks=pytest.mark.xfail(
-                reason="GDCM does not support "
-                "non default jpeg lossy colorspaces"))]
+pi_rgb_testdata = [
+    pytest.param(
+        sc_rgb_jpeg_dcmtk_411_YBR_FULL,
+        "YBR_FULL",
+        [
+            (253, 1, 0),
+            (253, 128, 132),
+            (0, 255, 5),
+            (127, 255, 127),
+            (1, 0, 254),
+            (127, 128, 255),
+            (0, 0, 0),
+            (64, 64, 64),
+            (192, 192, 192),
+            (255, 255, 255),
+        ],
+        True,
+    ),
+    pytest.param(
+        sc_rgb_jpeg_dcmtk_411_YBR_FULL_422,
+        "YBR_FULL_422",
+        [
+            (253, 1, 0),
+            (253, 128, 132),
+            (0, 255, 5),
+            (127, 255, 127),
+            (1, 0, 254),
+            (127, 128, 255),
+            (0, 0, 0),
+            (64, 64, 64),
+            (192, 192, 192),
+            (255, 255, 255),
+        ],
+        True,
+    ),
+    pytest.param(
+        sc_rgb_jpeg_dcmtk_422_YBR_FULL,
+        "YBR_FULL",
+        [
+            (254, 0, 0),
+            (255, 127, 127),
+            (0, 255, 5),
+            (129, 255, 129),
+            (0, 0, 254),
+            (128, 127, 255),
+            (0, 0, 0),
+            (64, 64, 64),
+            (192, 192, 192),
+            (255, 255, 255),
+        ],
+        True,
+    ),
+    pytest.param(
+        sc_rgb_jpeg_dcmtk_422_YBR_FULL_422,
+        "YBR_FULL_422",
+        [
+            (254, 0, 0),
+            (255, 127, 127),
+            (0, 255, 5),
+            (129, 255, 129),
+            (0, 0, 254),
+            (128, 127, 255),
+            (0, 0, 0),
+            (64, 64, 64),
+            (192, 192, 192),
+            (255, 255, 255),
+        ],
+        True,
+    ),
+    pytest.param(
+        sc_rgb_jpeg_dcmtk_444_YBR_FULL,
+        "YBR_FULL",
+        [
+            (254, 0, 0),
+            (255, 127, 127),
+            (0, 255, 5),
+            (129, 255, 129),
+            (0, 0, 254),
+            (128, 127, 255),
+            (0, 0, 0),
+            (64, 64, 64),
+            (192, 192, 192),
+            (255, 255, 255),
+        ],
+        True,
+    )
+]
 
-    with_gdcm_params = [
-        pytest.param('File', marks=pytest.mark.skipif(
-            not HAVE_GDCM, reason=gdcm_missing_message)),
-        pytest.param('InMemory', marks=pytest.mark.skipif(
-            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message))]
-else:
-    # python 3.4 can't parameterize with xfails...
-    pi_rgb_test_ids = [
-        "JPEG_RGB_RGB",
-    ]
-    pi_rgb_testdata = [
-    ]
-
-    if HAVE_GDCM_IN_MEMORY_SUPPORT:
-        with_gdcm_params = ['File', 'InMemory']
-    elif HAVE_GDCM:
-        with_gdcm_params = ['File']
-    else:
-        with_gdcm_params = []
+with_gdcm_params = [
+    pytest.param(
+        'File',
+        marks=pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
+    ),
+    pytest.param(
+        'InMemory',
+        marks=pytest.mark.skipif(
+            not HAVE_GDCM_IN_MEMORY_SUPPORT, reason=gdcm_im_missing_message
+        )
+    )
+]
 
 
 class TestsWithGDCM:
@@ -456,19 +435,12 @@ class TestsWithGDCM:
                             ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm):
         a = sc_rgb_jpeg2k_gdcm_KY.pixel_array
         b = ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm.pixel_array
-        if have_numpy_testing:
-            numpy.testing.assert_array_equal(a, b)
+        if HAVE_NP:
+            assert numpy.array_equal(a, b)
         else:
             assert a.mean() == b.mean()
 
         assert a.flags.writeable
-
-    def test_JPEGlossless(self, jpeg_lossless):
-        """JPEGlossless: Returns correct values for sample data elements"""
-        got = jpeg_lossless.\
-            SourceImageSequence[0].\
-            PurposeOfReferenceCodeSequence[0].CodeMeaning
-        assert 'Uncompressed predecessor' == got
 
     def test_JPEGlosslessPixelArray(self, jpeg_lossless):
         """JPEGlossless: Fails gracefully when uncompressed data asked for"""
@@ -510,13 +482,11 @@ class TestsWithGDCM:
         assert "YBR_FULL_422" == color_3d_jpeg.PhotometricInterpretation
 
     @pytest.mark.parametrize(
-        "image,PhotometricInterpretation,results,convert_yuv_to_rgb",
-        pi_rgb_testdata,
-        ids=pi_rgb_test_ids)
-    def test_PI_RGB(self, image, PhotometricInterpretation, results,
-                    convert_yuv_to_rgb):
+        "image,pi,results,convert_yuv_to_rgb",
+        pi_rgb_testdata, ids=pi_rgb_test_ids)
+    def test_PI_RGB(self, image, pi, results, convert_yuv_to_rgb):
         t = dcmread(image)
-        assert t.PhotometricInterpretation == PhotometricInterpretation
+        assert t.PhotometricInterpretation == pi
         a = t.pixel_array
 
         assert a.flags.writeable
@@ -535,7 +505,7 @@ class TestsWithGDCM:
         assert results[7] == tuple(a[75, 50, :])
         assert results[8] == tuple(a[85, 50, :])
         assert results[9] == tuple(a[95, 50, :])
-        assert PhotometricInterpretation == t.PhotometricInterpretation
+        assert pi == t.PhotometricInterpretation
 
     def test_bytes_io(self):
         """Test using a BytesIO as the dataset source."""
@@ -570,7 +540,6 @@ class TestsWithGDCM:
         assert [-377, -121, 141, 383, 633, 910, 1198, 1455, 1638, 1732] == (
             arr[328:338, 106].tolist()
         )
-
 
 
 class TestSupportFunctions:
@@ -665,10 +634,3 @@ class TestSupportFunctions:
         assert px_repr == pixel_format.GetPixelRepresentation()
         planar = dataset_3d.PlanarConfiguration
         assert planar == image.GetPlanarConfiguration()
-
-    @pytest.mark.skipif(not HAVE_GDCM, reason=gdcm_missing_message)
-    def test_create_image_reader(self):
-        ds = dcmread(mr_name)
-        image_reader = gdcm_handler.create_image_reader(ds)
-        assert image_reader is not None
-        assert image_reader.Read()
