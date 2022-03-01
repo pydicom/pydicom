@@ -1522,6 +1522,10 @@ class TestDeferredRead:
         filelike = io.BytesIO(data)
         dataset = pydicom.dcmread(filelike, defer_size=1024)
         assert 32768 == len(dataset.PixelData)
+        # The 'Histogram tables' private data element is also > 1024 bytes so
+        # pluck this out to confirm multiple deferred reads work (#1609).
+        private_block = dataset.private_block(0x43, 'GEMS_PARM_01')
+        assert 2068 == len(private_block[0x29].value)
 
 
 class TestReadTruncatedFile:

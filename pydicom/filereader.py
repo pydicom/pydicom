@@ -1190,7 +1190,8 @@ def read_deferred_data_element(
     # The first element out of the iterator should be the same type as the
     #   the deferred element == RawDataElement
     elem = cast(RawDataElement, next(elem_gen))
-    fp.close()
+    if is_filename:
+        fp.close()
     if elem.VR != raw_data_elem.VR:
         raise ValueError(
             f"Deferred read VR {elem.VR} does not match original "
