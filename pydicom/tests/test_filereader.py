@@ -9,6 +9,7 @@ import os
 import shutil
 from pathlib import Path
 from struct import unpack
+from random import shuffle
 import sys
 import tempfile
 
@@ -19,8 +20,10 @@ from pydicom import config
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.data import get_testdata_file
 from pydicom.datadict import add_dict_entries
+from pydicom.filebase import DicomFile
 from pydicom.filereader import (
-    dcmread, read_dataset, read_dicomdir, data_element_generator
+    dcmread, read_dataset, read_dicomdir, data_element_generator,
+    ImageFileReader
 )
 from pydicom.dataelem import DataElement, DataElement_from_raw
 from pydicom.errors import InvalidDicomError
@@ -31,7 +34,6 @@ from pydicom.tag import Tag, TupleTag
 from pydicom.uid import ImplicitVRLittleEndian
 import pydicom.valuerep
 from pydicom import values
-
 
 from pydicom.pixel_data_handlers import gdcm_handler
 
@@ -1659,7 +1661,7 @@ def test_read_dicomdir_deprecated():
         r"'dcmread\(\)' instead"
     )
     with pytest.warns(DeprecationWarning, match=msg):
-        ds = read_dicomdir(get_testdata_file("DICOMDIR"))
+        read_dicomdir(get_testdata_file("DICOMDIR"))
 
 
 def test_read_file_deprecated():
@@ -1675,3 +1677,93 @@ def test_read_file_deprecated():
             from pydicom.filereader import read_file
 
     assert read_file == dcmread
+
+
+class TestImageFileReader:
+
+    def setup(self):
+        file_path = Path(__file__)
+        self._test_dir = file_path.parent.parent.joinpath(
+            'data',
+            'test_files'
+        )
+
+    def test_construct_image_file_reader_from_string(self):
+        filename = str(get_testdata_file('CT_small.dcm'))
+        reader = ImageFileReader(filename)
+        assert reader._filename == Path(filename)
+        assert reader._fp is None
+
+    def test_construct_image_file_reader_from_path(self):
+        filepath = Path(get_testdata_file('CT_small.dcm'))
+        reader = ImageFileReader(filepath)
+        assert reader._filename == filepath
+        assert reader._fp is None
+
+    def test_construct_image_file_reader_from_file_object(self):
+        filename = str(get_testdata_file('CT_small.dcm'))
+        fp = DicomFile(filename, mode='rb')
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+        reader = ImageFileReader(fp)
+        assert reader._filename is None
+        assert reader._fp == fp
+
+    @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
+    def test_read_single_frame_ct_image_native(self):
+        filename = str(get_testdata_file('CT_small.dcm'))
+        fp = DicomFile(filename, 'rb')
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+        dataset = dcmread(filename)
+        pixel_array = dataset.pixel_array
+        reader = ImageFileReader(fp)
+        assert reader.number_of_frames == 1
+        frame = reader.read_frame(0)
+        assert isinstance(frame, numpy.ndarray)
+        assert frame.ndim == 2
+        assert frame.dtype == numpy.int16
+        assert frame.shape == (
+            reader.metadata.Rows,
+            reader.metadata.Columns,
+        )
+        numpy.testing.assert_array_equal(frame, pixel_array)
+
+    @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
+    def test_read_multi_frame_ct_image_native(self):
+        filename = str(get_testdata_file('eCT_Supplemental.dcm'))
+        dataset = dcmread(filename)
+        pixel_array = dataset.pixel_array
+        with ImageFileReader(filename) as reader:
+            assert reader.number_of_frames == 2
+            frame_index = 0
+            frame = reader.read_frame(frame_index)
+            assert isinstance(frame, numpy.ndarray)
+            assert frame.ndim == 2
+            assert frame.dtype == numpy.uint16
+            assert frame.shape == (
+                reader.metadata.Rows,
+                reader.metadata.Columns,
+            )
+            numpy.testing.assert_array_equal(frame, pixel_array[frame_index])
+
+    @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
+    def test_read_multi_frame_sm_image_native(self):
+        filename = str(get_testdata_file('SM_small.dcm'))
+        dataset = dcmread(filename)
+        pixel_array = dataset.pixel_array
+        with ImageFileReader(filename) as reader:
+            assert reader.number_of_frames == 25
+            indices = list(range(reader.number_of_frames))
+            shuffle(indices)
+            for i in indices:
+                frame = reader.read_frame(i)
+                assert isinstance(frame, numpy.ndarray)
+                assert frame.ndim == 3
+                assert frame.dtype == numpy.uint8
+                assert frame.shape == (
+                    reader.metadata.Rows,
+                    reader.metadata.Columns,
+                    reader.metadata.SamplesPerPixel,
+                )
+                numpy.testing.assert_array_equal(frame, pixel_array[i, ...])
