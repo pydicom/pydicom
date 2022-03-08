@@ -233,6 +233,7 @@ class UID(str):
 
         return False
 
+
 # Many thanks to the Medical Connections for offering free
 # valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
 # Their service was used to obtain the following root UID for pydicom:
