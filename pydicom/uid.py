@@ -1,19 +1,19 @@
 # Copyright 2008-2022 pydicom authors. See LICENSE file for details.
 """Functions for handling DICOM unique identifiers (UIDs)"""
 
-import os
-import uuid
-import random
 import hashlib
+import os
+import random
 import re
 import sys
-from typing import List, Optional, TypeVar, Type, Union, Any
+import uuid
 import warnings
+from typing import Any, List, Optional, Type, TypeVar, Union
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary
 from pydicom.config import disable_value_validation
-from pydicom.valuerep import validate_value, STR_VR_REGEXES
+from pydicom.valuerep import STR_VR_REGEXES, validate_value
 
 _deprecations = {
     "JPEGBaseline": "JPEGBaseline8Bit",
@@ -45,23 +45,6 @@ def __getattr__(name: str) -> Any:
 
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
-
-# Many thanks to the Medical Connections for offering free
-# valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
-# Their service was used to obtain the following root UID for pydicom:
-PYDICOM_ROOT_UID = "1.2.826.0.1.3680043.8.498."
-"""pydicom's root UID ``'1.2.826.0.1.3680043.8.498.'``"""
-PYDICOM_IMPLEMENTATION_UID = PYDICOM_ROOT_UID + "1"
-"""
-pydicom's (0002,0012) *Implementation Class UID*
-``'1.2.826.0.1.3680043.8.498.1'``
-"""
-
-# Regexes for valid UIDs and valid UID prefixes
-RE_VALID_UID = STR_VR_REGEXES["UI"]
-"""Regex for a valid UID"""
-RE_VALID_UID_PREFIX = re.compile(r"^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$")
-"""Regex for a valid UID prefix"""
 
 
 class UID(str):
@@ -249,6 +232,23 @@ class UID(str):
             return True
 
         return False
+
+# Many thanks to the Medical Connections for offering free
+# valid UIDs (http://www.medicalconnections.co.uk/FreeUID.html)
+# Their service was used to obtain the following root UID for pydicom:
+PYDICOM_ROOT_UID = "1.2.826.0.1.3680043.8.498."
+"""pydicom's root UID ``'1.2.826.0.1.3680043.8.498.'``"""
+PYDICOM_IMPLEMENTATION_UID = UID(f'{PYDICOM_ROOT_UID}1')
+"""
+pydicom's (0002,0012) *Implementation Class UID*
+``'1.2.826.0.1.3680043.8.498.1'``
+"""
+
+# Regexes for valid UIDs and valid UID prefixes
+RE_VALID_UID = STR_VR_REGEXES["UI"]
+"""Regex for a valid UID"""
+RE_VALID_UID_PREFIX = re.compile(r"^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*))*\.$")
+"""Regex for a valid UID prefix"""
 
 
 with disable_value_validation():
