@@ -26,7 +26,7 @@ This example shows how to write a DICOM file from scratch using pydicom. This
 example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-77
+.. GENERATED FROM PYTHON SOURCE LINES 11-78
 
 
 
@@ -39,32 +39,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpqczyp47w.dcm
+    Writing test file /tmp/tmp95t6hxjy.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmp0qzv3ov2.dcm
-    Load file /tmp/tmpqczyp47w.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmp0lvt9ftb.dcm
+    Load file /tmp/tmp95t6hxjy.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20220302'
-    (0008, 0033) Content Time                        TM: '013407.089412'
+    (0008, 0023) Content Date                        DA: '20220309'
+    (0008, 0033) Content Time                        TM: '012041.779477'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpqczyp47w.dcm ...
-    Load file /tmp/tmp0qzv3ov2.dcm ...
+    Remove file /tmp/tmp95t6hxjy.dcm ...
+    Load file /tmp/tmp0lvt9ftb.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20220302'
-    (0008, 0033) Content Time                        TM: '013407.089412'
+    (0008, 0023) Content Date                        DA: '20220309'
+    (0008, 0033) Content Time                        TM: '012041.779477'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmp0qzv3ov2.dcm ...
+    Remove file /tmp/tmp0lvt9ftb.dcm ...
 
 
 
@@ -79,12 +79,13 @@ have to change UIDs to valid values and add all required DICOM data elements.
     # authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
     # license : MIT
 
+    import datetime
     import os
     import tempfile
-    import datetime
 
     import pydicom
     from pydicom.dataset import FileDataset, FileMetaDataset
+    from pydicom.uid import UID
 
     # Create some temporary filenames
     suffix = '.dcm'
@@ -94,9 +95,9 @@ have to change UIDs to valid values and add all required DICOM data elements.
     print("Setting file meta information...")
     # Populate required values for file meta information
     file_meta = FileMetaDataset()
-    file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
-    file_meta.MediaStorageSOPInstanceUID = "1.2.3"
-    file_meta.ImplementationClassUID = "1.2.3.4"
+    file_meta.MediaStorageSOPClassUID = UID('1.2.840.10008.5.1.4.1.1.2')
+    file_meta.MediaStorageSOPInstanceUID = UID("1.2.3")
+    file_meta.ImplementationClassUID = UID("1.2.3.4")
 
     print("Setting dataset values...")
     # Create the FileDataset instance (initially no data elements, but file_meta
