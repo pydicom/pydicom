@@ -301,6 +301,15 @@ displaying the file meta information data elements
 .. versionadded:: 2.0
 """
 
+infer_sq_for_un_vr = True
+"""
+If ``True``, and the VR of a known data element is encoded as **UN** in
+an explicit encoding, the VR is changed to SQ per PS 3.5, section 6.2.2
+Can be set to ``False`` where the content of the tag shown as **UN** is
+not DICOM conformant and would lead to a failure if accessing it.
+.. versionadded:: 2.3
+"""
+
 # Logging system and debug function to change logging level
 logger = logging.getLogger("pydicom")
 logger.addHandler(logging.NullHandler())
