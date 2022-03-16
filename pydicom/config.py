@@ -6,7 +6,10 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Dict, Any, TYPE_CHECKING, Generator
+from typing import (
+    Optional, Dict, Any, TYPE_CHECKING, Generator, Callable, List
+)
+
 
 have_numpy = True
 try:
@@ -38,7 +41,6 @@ VR of **DS** are represented as :class:`~decimal.Decimal`.
 Default ``False``.
 """
 
-
 data_element_callback: Optional["ElementCallback"] = None
 """Set to a callable function to be called from
 :func:`~pydicom.filereader.dcmread` every time a
@@ -46,17 +48,30 @@ data_element_callback: Optional["ElementCallback"] = None
 before it is added to the :class:`~pydicom.dataset.Dataset`.
 
 Default ``None``.
+
+.. deprecated:: 2.3
+    ``data_element_callback`` will be removed in v3.0, use
+    :attr:`Settings.data_element_callbacks` instead.
 """
 
 data_element_callback_kwargs: Dict[str, Any] = {}
 """Set the keyword arguments passed to :func:`data_element_callback`.
 
 Default ``{}``.
+
+.. deprecated:: 2.3
+    ``data_element_callback_kwargs`` will be removed in v3.0, use
+    :attr:`Settings.data_element_callbacks_kwargs` instead.
 """
 
 
 def reset_data_element_callback() -> None:
-    """Reset the :func:`data_element_callback` function to the default."""
+    """Reset the :func:`data_element_callback` function to the default.
+
+    .. deprecated:: 2.3
+        ``reset_data_element_callback()`` will be removed in v3.0, use
+        :meth:`Settings.reset_data_element_callbacks` instead.
+    """
     global data_element_callback
     global data_element_callback_kwargs
     data_element_callback = None
@@ -194,6 +209,12 @@ class Settings:
         self._writing_validation_mode: Optional[int] = (
             RAISE if _use_future else None
         )
+        self.reset_data_element_callbacks()
+
+    def reset_data_element_callbacks(self) -> None:
+        """Reset the :attr:`data_element_callbacks` function to the default."""
+        self.data_element_callbacks: List[Callable] = []
+        self.data_element_callbacks_kwargs: Dict[str, Any] = {}
 
     @property
     def reading_validation_mode(self) -> int:
