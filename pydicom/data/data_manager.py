@@ -325,16 +325,22 @@ def get_testdata_file(
         The absolute path of the file if found, the dataset itself if `read` is
         ``True``, or ``None`` if the file is not found.
     """
-    from pydicom.filereader import dcmread
+    path = _get_testdata_file(name=name, download=download)
+    if read and path is not None:
+        from pydicom.filereader import dcmread
+        return dcmread(path, force=True)
+    return path
 
+
+def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
     # Check pydicom local
     data_path = Path(DATA_ROOT) / 'test_files'
     matches = [m for m in data_path.rglob(name)]
     if matches:
-        path = os.fspath(matches[0])
-        return dcmread(path, force=True) if read else path
+        return os.fspath(matches[0])
 
     # Check external data sources
+    fpath: Optional[str]
     for lib, source in external_data_sources().items():
         try:
             fpath = source.get_path(name, dtype=DataTypes.DATASET)
@@ -344,9 +350,9 @@ def get_testdata_file(
         # For pydicom-data, check the hash against hashes.json
         if lib == "pydicom-data":
             if fpath and _check_data_hash(fpath):
-                return dcmread(fpath, force=True) if read else fpath
+                return fpath
         elif fpath:
-            return dcmread(fpath, force=True) if read else fpath
+            return fpath
 
     # Try online
     if download:
@@ -354,8 +360,7 @@ def get_testdata_file(
             if filename != name:
                 continue
             try:
-                path = os.fspath(data_path_with_download(filename))
-                return dcmread(path, force=True) if read else path
+                return os.fspath(data_path_with_download(filename))
             except Exception:
                 warnings.warn(
                     f"A download failure occurred while attempting to "
