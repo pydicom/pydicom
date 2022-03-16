@@ -284,7 +284,7 @@ def get_palette_files(pattern: str = "**/*") -> List[str]:
 
 
 def get_testdata_file(
-    name: str, read: bool = False
+    name: str, *, read: bool = False, download: bool = True,
 ) -> Union[str, "Dataset", None]:
     """Return an absolute path to the first matching dataset with filename
     `name`.
@@ -304,6 +304,10 @@ def get_testdata_file(
 
         Added the `read` keyword parameter.
 
+    .. versionchanged:: 2.3
+
+        Added the `download` keyword parameter.
+
     Parameters
     ----------
     name : str
@@ -312,6 +316,8 @@ def get_testdata_file(
         If ``True`` then use :func:`~pydicom.filereader.dcmread` to read the
         file and return the corresponding
         :class:`~pydicom.dataset.FileDataset`. Default ``False``.
+    download : bool, optional
+        If ``True`` (default) download the file if missed locally.
 
     Returns
     -------
@@ -343,8 +349,10 @@ def get_testdata_file(
             return dcmread(fpath, force=True) if read else fpath
 
     # Try online
-    for filename in get_url_map().keys():
-        if filename == name:
+    if download:
+        for filename in get_url_map().keys():
+            if filename != name:
+                continue
             try:
                 path = os.fspath(data_path_with_download(filename))
                 return dcmread(path, force=True) if read else path
