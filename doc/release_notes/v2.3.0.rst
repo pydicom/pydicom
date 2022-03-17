@@ -9,7 +9,8 @@ Changes
 * Updated the private dictionary
 * :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
   :attr:`~pydicom.config.settings.reading_validation_mode`
-
+* Added `downlaod` parameter to :func:`~pydicom.data.get_testdata_file`
+  to allow skipping downloading the file if missed locally (:pr:`1617`)
 
 Enhancements
 ------------

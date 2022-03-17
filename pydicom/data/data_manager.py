@@ -284,7 +284,7 @@ def get_palette_files(pattern: str = "**/*") -> List[str]:
 
 
 def get_testdata_file(
-    name: str, *, read: bool = False, download: bool = True,
+    name: str, read: bool = False, download: bool = True,
 ) -> Union[str, "Dataset", None]:
     """Return an absolute path to the first matching dataset with filename
     `name`.
