@@ -67,10 +67,10 @@ def dont_replace_un_with_known_vr():
 
 @pytest.fixture
 def dont_replace_un_with_sq_vr():
-    old_value = config.infer_sq_for_un_vr
-    config.infer_sq_for_un_vr = False
+    old_value = config.settings.infer_sq_for_un_vr
+    config.settings.infer_sq_for_un_vr = False
     yield
-    config.infer_sq_for_un_vr = old_value
+    config.settings.infer_sq_for_un_vr = old_value
 
 
 @pytest.fixture
