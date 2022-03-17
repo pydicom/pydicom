@@ -258,7 +258,10 @@ class TestDownload:
     """Tests for the download module."""
 
     def test_get_testdata_file_no_download(self, recwarn):
-        """Test that `data_path_with_download` is not called with `download=False`."""
+        """
+        Test that `data_path_with_download`
+        is not called when `download=False`.
+        """
         fname = "693_UNCI.dcm"
         assert get_testdata_file(fname, download=False) is None
         assert not recwarn.list
