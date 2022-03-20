@@ -865,8 +865,6 @@ def read_partial(
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set)
 
-    #ds_class: Union[FileDataset, DicomDir]
-
     # (0002, 0002) Media Storage SOP Class UID
     elem = file_meta.get(0x00020002, None)
     sop_class = elem.value.name if (elem and elem.VM == 1) else ""
