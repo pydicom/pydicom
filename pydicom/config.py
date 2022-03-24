@@ -229,7 +229,7 @@ class Settings:
         self._writing_validation_mode = value
 
     @property
-    def infer_sq_for_un_vr(self) -> int:
+    def infer_sq_for_un_vr(self) -> bool:
         """If ``True``, and the VR of a known data element is encoded as
         **UN** in an explicit encoding for an undefined length data element,
         the VR is changed to SQ per PS 3.5, section 6.2.2. Can be set to
