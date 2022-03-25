@@ -151,12 +151,22 @@
 <p><em>pydicom</em> configuration options</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.config.Settings">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/b1d404adf/pydicom/config.py#L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/85d09482f/pydicom/config.py#L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collection of several configuration values.
 Accessed via the singleton <a class="reference internal" href="generated/pydicom.config.settings.html#pydicom.config.settings" title="pydicom.config.settings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">settings</span></code></a>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.3.</span></p>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="pydicom.config.Settings.infer_sq_for_un_vr">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">infer_sq_for_un_vr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#pydicom.config.Settings.infer_sq_for_un_vr" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, and the VR of a known data element is encoded as
+<strong>UN</strong> in an explicit encoding for an undefined length data element,
+the VR is changed to SQ per PS 3.5, section 6.2.2. Can be set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code> where the content of the tag shown as <strong>UN</strong> is not DICOM
+conformant and would lead to a failure if accessing it.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.config.Settings.reading_validation_mode">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reading_validation_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><a class="headerlink" href="#pydicom.config.Settings.reading_validation_mode" title="Permalink to this definition">¶</a></dt>

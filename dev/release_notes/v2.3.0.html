@@ -131,6 +131,9 @@ the slowest handler (<a class="reference external" href="https://github.com/pydi
 <code class="xref py py-func docutils literal notranslate"><span class="pre">unpack_bits`(:pr:`1594()</span></code>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.pixel_data_handlers.util.html#pydicom.pixel_data_handlers.util.expand_ybr422" title="pydicom.pixel_data_handlers.util.expand_ybr422"><code class="xref py py-func docutils literal notranslate"><span class="pre">expand_ybr422()</span></code></a> for expanding
 uncompressed <code class="docutils literal notranslate"><span class="pre">YBR_FULL_422</span></code> data to <code class="docutils literal notranslate"><span class="pre">YBR_FULL</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1593">#1593</a>)</p></li>
+<li><p>Replacement of <code class="docutils literal notranslate"><span class="pre">UN</span></code> VR with <code class="docutils literal notranslate"><span class="pre">SQ</span></code> VR for undefined length data elements
+(introduced in 2.2.2), can now be configured via
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">infer_sq_for_un_vr</span></code></p></li>
 </ul>
 </section>
 <section id="fixes">
