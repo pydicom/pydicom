@@ -29,7 +29,9 @@ Enhancements
   :func:`~pydicom.pixel_data_handlers.utils.unpack_bits`(:pr:`1594`)
 * Added :func:`~pydicom.pixel_data_handlers.util.expand_ybr422` for expanding
   uncompressed ``YBR_FULL_422`` data to ``YBR_FULL`` (:pr:`1593`)
-
+* Replacement of ``UN`` VR with ``SQ`` VR for undefined length data elements
+  (introduced in 2.2.2), can now be configured via
+  :attr:`~pydicom.config.settings.infer_sq_for_un_vr`
 
 Fixes
 -----

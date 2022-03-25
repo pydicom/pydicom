@@ -236,7 +236,7 @@ def data_element_generator(
         else:
             # VR UN with undefined length shall be handled as SQ
             # see PS 3.5, section 6.2.2
-            if vr == VR_.UN:
+            if vr == VR_.UN and config.settings.infer_sq_for_un_vr:
                 vr = VR_.SQ
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,

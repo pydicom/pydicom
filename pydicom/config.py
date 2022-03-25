@@ -194,6 +194,7 @@ class Settings:
         self._writing_validation_mode: Optional[int] = (
             RAISE if _use_future else None
         )
+        self._infer_sq_for_un_vr: bool = True
 
     @property
     def reading_validation_mode(self) -> int:
@@ -226,6 +227,20 @@ class Settings:
     @writing_validation_mode.setter
     def writing_validation_mode(self, value: int) -> None:
         self._writing_validation_mode = value
+
+    @property
+    def infer_sq_for_un_vr(self) -> bool:
+        """If ``True``, and the VR of a known data element is encoded as
+        **UN** in an explicit encoding for an undefined length data element,
+        the VR is changed to SQ per PS 3.5, section 6.2.2. Can be set to
+        ``False`` where the content of the tag shown as **UN** is not DICOM
+        conformant and would lead to a failure if accessing it.
+        """
+        return self._infer_sq_for_un_vr
+
+    @infer_sq_for_un_vr.setter
+    def infer_sq_for_un_vr(self, value: bool) -> None:
+        self._infer_sq_for_un_vr = value
 
 
 settings = Settings()
