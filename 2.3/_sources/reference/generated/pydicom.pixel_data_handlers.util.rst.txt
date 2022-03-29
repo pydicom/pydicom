@@ -20,12 +20,15 @@
       apply_windowing
       convert_color_space
       dtype_corrected_for_endianness
+      expand_ybr422
       get_expected_length
       get_image_pixel_ids
       get_j2k_parameters
       get_nr_frames
+      pack_bits
       pixel_dtype
       reshape_pixel_array
+      unpack_bits
    
    
 

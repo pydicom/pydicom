@@ -1,0 +1,6 @@
+﻿pydicom.config.IGNORE
+=====================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: IGNORE

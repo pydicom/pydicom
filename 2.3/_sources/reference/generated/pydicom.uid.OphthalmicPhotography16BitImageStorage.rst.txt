@@ -1,0 +1,6 @@
+﻿pydicom.uid.OphthalmicPhotography16BitImageStorage
+==================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: OphthalmicPhotography16BitImageStorage

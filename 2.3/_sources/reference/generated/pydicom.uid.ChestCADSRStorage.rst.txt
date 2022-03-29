@@ -1,0 +1,6 @@
+﻿pydicom.uid.ChestCADSRStorage
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ChestCADSRStorage

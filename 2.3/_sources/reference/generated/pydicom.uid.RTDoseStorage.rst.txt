@@ -1,0 +1,6 @@
+﻿pydicom.uid.RTDoseStorage
+=========================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RTDoseStorage

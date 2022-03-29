@@ -1,0 +1,6 @@
+﻿pydicom.uid.LegacyConvertedEnhancedMRImageStorage
+=================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: LegacyConvertedEnhancedMRImageStorage

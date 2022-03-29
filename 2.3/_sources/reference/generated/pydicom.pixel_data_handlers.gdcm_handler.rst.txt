@@ -15,7 +15,6 @@
    
       create_data_element
       create_image
-      create_image_reader
       get_pixeldata
       is_available
       needs_to_convert_to_RGB

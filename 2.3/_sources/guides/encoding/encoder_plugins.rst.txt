@@ -25,7 +25,7 @@ An encoding plugin must implement three objects within the same module:
 
   .. code-block:: python
 
-      def foo(src: bytes, **kwargs: Dict[str, Any]) -> bytes:
+      def foo(src: bytes, **kwargs: Any) -> bytes:
 
   Where
 
@@ -95,8 +95,8 @@ An encoding plugin must implement three objects within the same module:
   This will be used to provide the user with a list of missing dependencies
   required by the plugin.
 
-An example of the requirements of a plugin is available `here
-<https://github.com/pydicom/pydicom/tree/master/pydicom/encoders/pylibjpeg.py>`_.
+An example of the requirements of a plugin is available :gh:`here
+<pydicom/tree/master/pydicom/encoders/pylibjpeg.py>`.
 
 Adding Plugins to an Encoder
 ============================

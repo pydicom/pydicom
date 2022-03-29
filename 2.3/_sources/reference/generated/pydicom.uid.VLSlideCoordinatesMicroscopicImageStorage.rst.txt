@@ -1,0 +1,6 @@
+﻿pydicom.uid.VLSlideCoordinatesMicroscopicImageStorage
+=====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: VLSlideCoordinatesMicroscopicImageStorage

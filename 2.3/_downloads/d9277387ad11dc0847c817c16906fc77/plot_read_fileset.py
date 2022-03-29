@@ -7,7 +7,6 @@ This example shows how to read and interact with a DICOM File-set.
 
 """
 
-import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import warnings

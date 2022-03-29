@@ -1,0 +1,6 @@
+﻿pydicom.uid.ComprehensiveSRStorage
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ComprehensiveSRStorage

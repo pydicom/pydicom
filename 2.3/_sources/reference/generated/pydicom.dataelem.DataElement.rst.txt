@@ -19,6 +19,7 @@
       ~DataElement.from_json
       ~DataElement.to_json
       ~DataElement.to_json_dict
+      ~DataElement.validate
    
    
 

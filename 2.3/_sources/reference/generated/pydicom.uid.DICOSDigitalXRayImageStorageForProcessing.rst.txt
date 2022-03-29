@@ -1,0 +1,6 @@
+﻿pydicom.uid.DICOSDigitalXRayImageStorageForProcessing
+=====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DICOSDigitalXRayImageStorageForProcessing

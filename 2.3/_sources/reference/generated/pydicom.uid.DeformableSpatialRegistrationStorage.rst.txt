@@ -1,0 +1,6 @@
+﻿pydicom.uid.DeformableSpatialRegistrationStorage
+================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DeformableSpatialRegistrationStorage

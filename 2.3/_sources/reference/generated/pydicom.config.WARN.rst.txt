@@ -1,0 +1,6 @@
+﻿pydicom.config.WARN
+===================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: WARN

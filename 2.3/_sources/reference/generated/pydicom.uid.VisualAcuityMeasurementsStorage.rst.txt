@@ -1,0 +1,6 @@
+﻿pydicom.uid.VisualAcuityMeasurementsStorage
+===========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: VisualAcuityMeasurementsStorage

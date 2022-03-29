@@ -1,0 +1,6 @@
+﻿pydicom.uid.SpectaclePrescriptionReportStorage
+==============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SpectaclePrescriptionReportStorage
