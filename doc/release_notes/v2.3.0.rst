@@ -32,6 +32,7 @@ Enhancements
 * Replacement of ``UN`` VR with ``SQ`` VR for undefined length data elements
   (introduced in 2.2.2), can now be configured via
   :attr:`~pydicom.config.settings.infer_sq_for_un_vr`
+* Updated dictionaries to DICOM 2022a
 
 Fixes
 -----
