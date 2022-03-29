@@ -1,0 +1,6 @@
+﻿pydicom.config.RAISE
+====================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: RAISE

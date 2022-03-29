@@ -1,0 +1,6 @@
+﻿pydicom.uid.CardiacElectrophysiologyWaveformStorage
+===================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: CardiacElectrophysiologyWaveformStorage

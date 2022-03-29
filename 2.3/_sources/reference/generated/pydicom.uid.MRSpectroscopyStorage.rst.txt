@@ -1,0 +1,6 @@
+﻿pydicom.uid.MRSpectroscopyStorage
+=================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MRSpectroscopyStorage

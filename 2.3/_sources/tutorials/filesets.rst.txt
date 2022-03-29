@@ -332,7 +332,7 @@ use the :meth:`~pydicom.fileset.FileSet.add_custom` method.
 The :meth:`~pydicom.fileset.FileSet.add` method uses *pydicom's* default
 directory record creation functions to create the necessary records based on
 the SOP instance's attributes, such as *SOP Class UID* and *Modality*.
-Occassionally they may fail when an element required by these functions
+Occasionally they may fail when an element required by these functions
 is empty or missing:
 
 .. code-block:: python

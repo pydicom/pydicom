@@ -1,0 +1,6 @@
+﻿pydicom.uid.GeneralAudioWaveformStorage
+=======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: GeneralAudioWaveformStorage

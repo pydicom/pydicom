@@ -29,9 +29,10 @@ matplotlib.
 
 
 
-.. image:: /auto_examples/image_processing/images/sphx_glr_plot_waveforms_001.png
-    :alt: RHYTHM: Lead I (Einthoven), MEDIAN BEAT: Lead I (Einthoven)
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/image_processing/images/sphx_glr_plot_waveforms_001.png
+   :alt: RHYTHM: Lead I (Einthoven), MEDIAN BEAT: Lead I (Einthoven)
+   :srcset: /auto_examples/image_processing/images/sphx_glr_plot_waveforms_001.png
+   :class: sphx-glr-single-img
 
 
 
@@ -86,7 +87,7 @@ matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.329 seconds)
+   **Total running time of the script:** ( 0 minutes  0.341 seconds)
 
 
 .. _sphx_glr_download_auto_examples_image_processing_plot_waveforms.py:

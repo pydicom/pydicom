@@ -1,0 +1,6 @@
+﻿pydicom.uid.RTTreatmentSummaryRecordStorage
+===========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RTTreatmentSummaryRecordStorage

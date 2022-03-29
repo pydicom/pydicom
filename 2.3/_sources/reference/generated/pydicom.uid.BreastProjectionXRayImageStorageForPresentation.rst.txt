@@ -1,0 +1,6 @@
+﻿pydicom.uid.BreastProjectionXRayImageStorageForPresentation
+===========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: BreastProjectionXRayImageStorageForPresentation

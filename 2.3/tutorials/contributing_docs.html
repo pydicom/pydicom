@@ -1,90 +1,47 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Contributing a documentation change &mdash; pydicom 2.2.0-rc.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
-
-  
-  
+  <title>Contributing a documentation change &mdash; pydicom 2.3.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-
-  
-  
-
-  
-
-  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Guides" href="../guides/index.html" />
     <link rel="prev" title="Contributing a source code change" href="contributing_code.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pydicom
-          
-
-          
-            
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.2.0-rc.1
+                2.3.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -92,18 +49,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">How to install pydicom</a></li>
@@ -125,7 +71,6 @@
 <li class="toctree-l2"><a class="reference internal" href="contributing_code.html">Contributing a source code change</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Contributing a documentation change</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#download-the-documentation">Download the documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#install-required-libraries">Install required libraries</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#build-and-preview-the-documentation">Build and preview the documentation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#create-a-new-branch">Create a new branch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#make-a-change-to-the-documentation">Make a change to the documentation</a></li>
@@ -152,72 +97,31 @@
 <li class="toctree-l1"><a class="reference internal" href="../release_notes/index.html">Release notes</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pydicom</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Tutorials</a> &raquo;</li>
-        
       <li>Contributing a documentation change</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="contributing-a-documentation-change">
+             
+  <section id="contributing-a-documentation-change">
 <h1>Contributing a documentation change<a class="headerlink" href="#contributing-a-documentation-change" title="Permalink to this headline">¶</a></h1>
 <p>This tutorial will take you through the process of:</p>
 <ul class="simple">
@@ -228,18 +132,17 @@
 <li><p>Making a change to the documentation</p></li>
 <li><p>Committing the changes and making a pull request</p></li>
 </ul>
-<div class="section" id="download-the-documentation">
+<section id="download-the-documentation">
 <h2>Download the documentation<a class="headerlink" href="#download-the-documentation" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and
-<a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
+<li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and <a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
 <li><p>Install <a class="reference external" href="https://git-scm.com/downloads">Git</a>. If you’re new to Git,
 the Django project has a good introduction on <a class="reference external" href="https://docs.djangoproject.com/en/3.0/internals/contributing/writing-code/working-with-git/">working with Git and GitHub</a>.
 You can also take a look at the <a class="reference external" href="https://guides.github.com/introduction/flow/">GitHub branch-based workflow</a></p></li>
 <li><p>Using the command line, <code class="docutils literal notranslate"><span class="pre">cd</span></code> to the directory where you want your
 local copy of <em>pydicom</em> to live. The documentation can then be downloaded
 using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YourUsername/pydicom.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">YourUsername</span><span class="o">/</span><span class="n">pydicom</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
@@ -247,33 +150,25 @@ using:</p>
 in a virtual environment. See the <a class="reference internal" href="virtualenvs.html"><span class="doc">virtual environments</span></a>
 tutorial for more information.</p>
 <p>Create a new virtualenv <code class="docutils literal notranslate"><span class="pre">pyd-doc</span></code>, using a Python 3.X version such
-as 3.7:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv -p /path/to/python3.7 pyd-doc
-</pre></div>
-</div>
+as 3.10, then activate it:</p>
+<p>python3.10 -m venv pyd-doc
+source pyd-doc/bin/activate</p>
 </li>
-<li><p>Install the cloned copy of <em>pydicom</em> (<code class="docutils literal notranslate"><span class="pre">-e</span></code> for editable mode):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e pydicom/
-</pre></div>
-</div>
+<li><p>Install the cloned copy of <em>pydicom</em> and the dependencies requires for
+building the documentation (using <code class="docutils literal notranslate"><span class="pre">-e</span></code> for an editable install):</p>
+<p>pip install -e pydicom[docs]</p>
 </li>
 </ol>
-</div>
-<div class="section" id="install-required-libraries">
-<h2>Install required libraries<a class="headerlink" href="#install-required-libraries" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install sphinx sphinx-rtd-theme sphinx-gallery sphinx-issues sphinx-copybutton
-</pre></div>
-</div>
-</div>
-<div class="section" id="build-and-preview-the-documentation">
+</section>
+<section id="build-and-preview-the-documentation">
 <h2>Build and preview the documentation<a class="headerlink" href="#build-and-preview-the-documentation" title="Permalink to this headline">¶</a></h2>
 <p><em>pydicom’s</em> documentation consists of a series of <a class="reference external" href="https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html">reStructuredText</a> (reST) files
 located in the project’s <code class="docutils literal notranslate"><span class="pre">pydicom/doc</span></code> directory which are converted to
 HTML using <a class="reference external" href="http://www.sphinx-doc.org">Sphinx</a> during our build process.
 To build the documentation locally, navigate to the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory and
 run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd pydicom/doc
-$ make html
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">pydicom</span><span class="o">/</span><span class="n">doc</span>
+<span class="n">make</span> <span class="n">html</span>
 </pre></div>
 </div>
 <p>Occasionally you may need to clean up the generated files before a change
@@ -283,23 +178,23 @@ gets applied:</p>
 </div>
 <p>The HTML generated by the build can be viewed by opening
 <code class="docutils literal notranslate"><span class="pre">_build/html/index.html</span></code> in a web browser or by doing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd _build/html
-$ python -m http.server 9999
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">_build</span><span class="o">/</span><span class="n">html</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">http</span><span class="o">.</span><span class="n">server</span> <span class="mi">9999</span>
 </pre></div>
 </div>
 <p>And then going to <a class="reference external" href="http://localhost:9999">http://localhost:9999</a></p>
-</div>
-<div class="section" id="create-a-new-branch">
+</section>
+<section id="create-a-new-branch">
 <h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h2>
 <p>Create a new branch <code class="docutils literal notranslate"><span class="pre">doc-tut</span></code> for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
 it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) of
 the documentation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b doc-tut
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">doc</span><span class="o">-</span><span class="n">tut</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="make-a-change-to-the-documentation">
+</section>
+<section id="make-a-change-to-the-documentation">
 <h2>Make a change to the documentation<a class="headerlink" href="#make-a-change-to-the-documentation" title="Permalink to this headline">¶</a></h2>
 <p>Let’s add a new guide on how to read a DICOM file. Create a new <code class="docutils literal notranslate"><span class="pre">reading.rst</span></code>
 file in <code class="docutils literal notranslate"><span class="pre">doc/tutorials</span></code>, open it in a text editor and add in a title and some
@@ -413,26 +308,25 @@ these <a class="reference external" href="https://www.sphinx-doc.org/en/master/u
 <a class="reference internal" href="../guides/writing_documentation.html"><span class="doc">writing documentation</span></a>.</p>
 <p>Just like before, you should build and preview the updated page. When you’re
 happy with the results move on to the next section.</p>
-</div>
-<div class="section" id="commit-your-changes-and-make-a-pull-request">
+</section>
+<section id="commit-your-changes-and-make-a-pull-request">
 <h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this headline">¶</a></h2>
 <p>First we add our new file to git:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add tutorials/reading.rst
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="n">tutorials</span><span class="o">/</span><span class="n">reading</span><span class="o">.</span><span class="n">rst</span>
 </pre></div>
 </div>
 <p>And then stage the remaining changes (<code class="docutils literal notranslate"><span class="pre">-a</span></code>) and commit at the same time:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit -am &quot;Add documentation on reading a DICOM file&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">am</span> <span class="s2">&quot;Add documentation on reading a DICOM file&quot;</span>
 </pre></div>
 </div>
 <p>After committing the changes, send them to your fork:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push origin doc-tut
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">doc</span><span class="o">-</span><span class="n">tut</span>
 </pre></div>
 </div>
-<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you
-should see your branch under <em>“Your recently push branches”</em>. Click <em>“Compare &amp;
-pull request”</em> and fill out the title (with a <code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e.
-<code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">documentation</span> <span class="pre">of</span> <span class="pre">reading</span> <span class="pre">a</span> <span class="pre">DICOM</span> <span class="pre">file</span></code>) and follow the
-instructions in the main entry window.</p>
+<p>You can create a pull request by visiting the <a class="reference external" href="https://github.com/pydicom/pydicom">pydicom GitHub page</a> where you should see your branch under <em>“Your recently push
+branches”</em>. Click <em>“Compare &amp; pull request”</em> and fill out the title (with a
+<code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> prefix, i.e. <code class="docutils literal notranslate"><span class="pre">[WIP]</span> <span class="pre">Add</span> <span class="pre">documentation</span> <span class="pre">of</span> <span class="pre">reading</span> <span class="pre">a</span> <span class="pre">DICOM</span> <span class="pre">file</span></code>)
+and follow the instructions in the main entry window.</p>
 <p>To submit the pull request (PR) for real - <strong>please don’t do this for
 this example!</strong> - then on the next page you would click <em>“Create pull
 request”</em>. Creating the PR would automatically start the documentation build
@@ -447,8 +341,8 @@ and can be used to preview the results of the build by clicking Artifacts
 <p>If all the checks passed and you were happy with your changes, you’d change
 the PR title prefix to <code class="docutils literal notranslate"><span class="pre">[MRG]</span></code>. This would indicate that you considered the
 PR ready to be reviewed and merged into the main branch.</p>
-</div>
-<div class="section" id="what-happens-next">
+</section>
+<section id="what-happens-next">
 <h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this headline">¶</a></h2>
 <p>One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
@@ -456,65 +350,48 @@ the pull request would be approved and your changes merged into the
 <code class="docutils literal notranslate"><span class="pre">master</span></code> branch where they would become part of <em>pydicom</em>.</p>
 <p>However, because this is just an example, all we’re going to do is clean up the
 changes we’ve made. First we switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout master
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
 </pre></div>
 </div>
 <p>We delete the local copy of the branch we created:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git branch -d doc-tut
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">d</span> <span class="n">doc</span><span class="o">-</span><span class="n">tut</span>
 </pre></div>
 </div>
 <p>And lastly we delete the remote copy on GitHub. Go to
 <code class="docutils literal notranslate"><span class="pre">https://github.com/YourUsername/pydicom/branches</span></code>, find the <code class="docutils literal notranslate"><span class="pre">doc-tut</span></code>
 branch and click the corresponding red bin icon. All done!</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../guides/index.html" class="btn btn-neutral float-right" title="Guides" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="contributing_code.html" class="btn btn-neutral float-left" title="Contributing a source code change" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../guides/index.html" class="btn btn-neutral float-right" title="Guides" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2008-2021, Darcy Mason and pydicom contributors.
-
-    </p>
+    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

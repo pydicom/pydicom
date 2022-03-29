@@ -1,0 +1,6 @@
+﻿pydicom.uid.BlendingSoftcopyPresentationStateStorage
+====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: BlendingSoftcopyPresentationStateStorage

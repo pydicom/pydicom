@@ -18,9 +18,8 @@ Enhancements
   * To download an individual file and get its path on disk you can use
     :func:`pydicom.data.get_testdata_file`, e.g. for ``RG1_UNCI.dcm`` use
     ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
-* Added a new pixel data handler based on `pylibjpeg
-  <https://github.com/pydicom/pylibjpeg>`_ which supports all
-  (non-retired) JPEG transfer syntaxes (:issue:`1127`)
+* Added a new pixel data handler based on :gh:`pylibjpeg <pylibjpeg>` which
+  supports all (non-retired) JPEG transfer syntaxes (:issue:`1127`)
 * Added :func:`~pydicom.pixel_data_handlers.apply_rescale`  alias
 * Added :func:`~pydicom.pixel_data_handlers.util.apply_voi` and
   :func:`~pydicom.pixel_data_handlers.util.apply_windowing`

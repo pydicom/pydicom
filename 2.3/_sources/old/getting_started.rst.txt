@@ -40,10 +40,9 @@ head-first-prone, and save to a new file::
 ..
   >>> os.remove("rtplan2.dcm")
 
-*pydicom* is not a DICOM server (see
-`pynetdicom <https://github.com/pydicom/pynetdicom>`_ instead), and is not
-primarily about viewing images. It is designed to let you manipulate data
-elements in DICOM files with Python code.
+*pydicom* is not a DICOM server (see :gh:`pynetdicom <pynetdicom>` instead),
+and is not primarily about viewing images. It is designed to let you manipulate
+data elements in DICOM files with Python code.
 
 *pydicom* is easy to install and use, and because it is a pure Python package,
 it should run wherever Python runs.
@@ -56,8 +55,7 @@ DICOM file the same way as initially uncompressed data.
 License
 =======
 
-*pydicom* has an MIT-based `license
-<https://github.com/pydicom/pydicom/blob/master/LICENSE>`_.
+*pydicom* has an MIT-based :gh:`license <pydicom/blob/master/LICENSE>`.
 
 Installing
 ==========
@@ -69,8 +67,7 @@ Using pydicom
 
 Once installed, the package can be imported at a Python command line or used
 in your own Python program with ``import pydicom``.
-See the `examples directory
-<https://github.com/pydicom/pydicom/tree/master/examples>`_
+See the :gh:`examples directory <pydicom/tree/master/examples>`
 for both kinds of uses. Also see the :doc:`User Guide <pydicom_user_guide>`
 for more details of how to use the package.
 
@@ -79,10 +76,7 @@ Support
 
 Please join the `pydicom discussion group
 <http://groups.google.com/group/pydicom>`_ to ask questions or give feedback.
-Bugs can be submitted through the `issue tracker
-<https://github.com/pydicom/pydicom/issues>`_.  Besides the example directory,
-cookbook recipes are encouraged to be posted on the `wiki page
-<https://github.com/pydicom/pydicom/wiki>`_.
+Bugs can be submitted through the :gh:`issue tracker <pydicom/issues>`.
 
 New versions, major bug fixes, etc. will also be announced through the group.
 
