@@ -7,6 +7,7 @@ from struct import unpack, pack
 from sys import byteorder
 
 import pytest
+from pydicom.tests.test_helpers import assert_no_warning
 
 try:
     import numpy as np
@@ -2234,17 +2235,15 @@ class TestGetNrFrames:
         """Test return value when (0028,0008) 'Number of Frames' does not
             exist"""
         ds = Dataset()
-        with pytest.warns(None) as w:
+        with assert_no_warning():
             assert 1 == get_nr_frames(ds)
-            assert not w
 
     def test_existing(self):
         """Test return value when (0028,0008) 'Number of Frames' exists."""
         ds = Dataset()
         ds.NumberOfFrames = random.randint(1, 10)
-        with pytest.warns(None) as w:
+        with assert_no_warning():
             assert ds.NumberOfFrames == get_nr_frames(ds)
-            assert not w
 
 
 REFERENCE_PACK_UNPACK = [

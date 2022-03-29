@@ -9,6 +9,7 @@ import sys
 import weakref
 
 import pytest
+from pydicom.tests.test_helpers import assert_no_warning
 
 try:
     import numpy
@@ -247,9 +248,8 @@ class TestDataset:
 
     def test_contains_ignore(self, contains_ignore):
         """Test ignoring invalid keys."""
-        with pytest.warns(None) as record:
+        with assert_no_warning():
             assert 'invalid' not in self.ds
-            assert len(record) == 0
 
     def test_clear(self):
         assert 1 == len(self.ds)
@@ -2210,15 +2210,13 @@ def setattr_warn():
 
 def test_setattr_warns(setattr_warn):
     """"Test warnings for Dataset.__setattr__() for close matches."""
-    with pytest.warns(None) as record:
+    with assert_no_warning():
         ds = Dataset()
-        assert len(record) == 0
 
     for s in CAMEL_CASE[0]:
-        with pytest.warns(None) as record:
+        with assert_no_warning():
             val = getattr(ds, s, None)
             setattr(ds, s, val)
-            assert len(record) == 0
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2232,15 +2230,13 @@ def test_setattr_warns(setattr_warn):
 
 def test_setattr_raises(setattr_raise):
     """"Test exceptions for Dataset.__setattr__() for close matches."""
-    with pytest.warns(None) as record:
+    with assert_no_warning():
         ds = Dataset()
-        assert len(record) == 0
 
     for s in CAMEL_CASE[0]:
-        with pytest.warns(None) as record:
+        with assert_no_warning():
             val = getattr(ds, s, None)
             setattr(ds, s, val)
-            assert len(record) == 0
 
     for s in CAMEL_CASE[1]:
         msg = (
@@ -2254,19 +2250,16 @@ def test_setattr_raises(setattr_raise):
 
 def test_setattr_ignore(setattr_ignore):
     """Test config.INVALID_KEYWORD_BEHAVIOR = 'IGNORE'"""
-    with pytest.warns(None) as record:
+    with assert_no_warning():
         ds = Dataset()
-        assert len(record) == 0
 
     for s in CAMEL_CASE[0]:
-        with pytest.warns(None) as record:
+        with assert_no_warning():
             val = getattr(ds, s, None)
             setattr(ds, s, val)
-            assert len(record) == 0
 
     ds = Dataset()
     for s in CAMEL_CASE[1]:
-        with pytest.warns(None) as record:
-            val = getattr(ds, s, None)
+        with assert_no_warning():
+            getattr(ds, s, None)
             setattr(ds, s, None)
-            assert len(record) == 0
