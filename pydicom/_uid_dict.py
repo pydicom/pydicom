@@ -81,6 +81,8 @@ UID_dictionary = {
     '1.2.840.10008.2.16.14': ('Radiomics Ontology', 'Coding Scheme', '', '', 'RO'),  # noqa
     '1.2.840.10008.2.16.15': ('RadElement', 'Coding Scheme', '', '', 'RADELEMENT'),  # noqa
     '1.2.840.10008.2.16.16': ('ICD-11', 'Coding Scheme', '', '', 'I11'),  # noqa
+    '1.2.840.10008.2.16.17': ('Unified numbering system (UNS) for metals and alloys', 'Coding Scheme', '', '', 'UNS'),  # noqa
+    '1.2.840.10008.2.16.18': ('Research Resource Identification', 'Coding Scheme', '', '', 'RRID'),  # noqa
     '1.2.840.10008.3.1.1.1': ('DICOM Application Context Name', 'Application Context Name', '', '', 'DICOMApplicationContext'),  # noqa
     '1.2.840.10008.3.1.2.1.1': ('Detached Patient Management SOP Class', 'SOP Class', '', 'Retired', 'DetachedPatientManagement'),  # noqa
     '1.2.840.10008.3.1.2.1.4': ('Detached Patient Management Meta SOP Class', 'Meta SOP Class', '', 'Retired', 'DetachedPatientManagementMeta'),  # noqa
