@@ -1,0 +1,6 @@
+﻿pydicom.uid.GenericImplantTemplateStorage
+=========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: GenericImplantTemplateStorage

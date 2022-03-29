@@ -1,0 +1,145 @@
+Version 2.1.0
+=================================
+
+Changelog
+---------
+* Dropped support for Python 3.5 (only Python 3.6+ supported)
+
+Enhancements
+............
+* Large testing data is no longer distributed within the pydicom package
+  with the aim to reduce the package download size. These test files
+  will download on-the-fly whenever either the tests are run, or should
+  the file(s) be requested via the data manager functions.
+  For example:
+
+  * To download all files and get their paths on disk you can run
+    :func:`pydicom.data.get_testdata_files`.
+  * To download an individual file and get its path on disk you can use
+    :func:`pydicom.data.get_testdata_file`, e.g. for ``RG1_UNCI.dcm`` use
+    ``pydicom.data.get_testdata_file("RG1_UNCI.dcm")``
+* Added a new pixel data handler based on :gh:`pylibjpeg <pylibjpeg>` which
+  supports all (non-retired) JPEG transfer syntaxes (:issue:`1127`)
+* Added :func:`~pydicom.pixel_data_handlers.apply_rescale`  alias
+* Added :func:`~pydicom.pixel_data_handlers.util.apply_voi` and
+  :func:`~pydicom.pixel_data_handlers.util.apply_windowing`
+* Added *prefer_lut* keyword parameter to
+  :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` and handle empty
+  VOI LUT module elements (:issue:`1234`, :issue:`1237`)
+* Added ability to register external data sources for use with the functions
+  in :mod:`pydicom.data` (:pr:`1156`)
+* ``__contains__``, ``__next__`` and ``__iter__`` implementations added to
+  :class:`~pydicom.valuerep.PersonName` (:issue:`1103`)
+* Added convenience constants for the MPEG transfer syntaxes to
+  :mod:`pydicom.uid` (:pr:`1155`)
+* Added support for decoding *Waveform Data*:
+
+  * Added :mod:`pydicom.waveforms` module and
+    :func:`~pydicom.waveforms.numpy_handler.generate_multiplex` and
+    :func:`~pydicom.waveforms.numpy_handler.multiplex_array` functions.
+  * Added :meth:`Dataset.waveform_array()
+    <pydicom.dataset.Dataset.waveform_array>` which returns an
+    :class:`~numpy.ndarray` for the multiplex group at `index` within a
+    *Waveform Sequence* element.
+* When JPEG 2000 image data is unsigned and the *Pixel Representation* is 1
+  the image data is converted to signed (:issue:`1149`)
+* Added :attr:`~pydicom.uid.UID.keyword` property for the new UID keywords
+  in version 2020d of the DICOM Standard
+* Added testing of the variable names used when setting
+  :class:`~pydicom.dataset.Dataset` attributes and
+  :attr:`~pydicom.config.INVALID_KEYWORD_BEHAVIOR` config option to allow
+  customizing the behavior when a camel case variable name is used that isn't
+  a known element keyword (:issue:`1014`)
+* Added :attr:`~pydicom.config.INVALID_KEY_BEHAVIOR` config option to allow
+  customizing the behavior when an invalid key is used with the
+  :class:`~pydicom.dataset.Dataset` :func:`in<operator.__contains__>` operator
+  (:issue:`1200`)
+* Implemented full support (loading, accessing, modifying, writing) of
+  DICOM File-sets and their DICOMDIR files via the
+  :class:`~pydicom.fileset.FileSet` class (:issue:`9`, :issue:`243`,
+  :issue:`1093`)
+* Added :attr:`~pydicom.uid.AllTransferSyntaxes`
+* Added option to turn on *pydicom* future breaking behavior to allow user code
+  to check itself against the next major version release.  Set environment
+  variable "PYDICOM_FUTURE" to "True" or call :func:`~pydicom.config.future_behavior`
+* Added another signature to the `bulk_data_uri_handler` in `from_json` to
+  allow for the communication of not just the URI but also the tag and VR
+  to the handler. Previous handlers will work as expected, new signature
+  handlers will get the additional information.
+* :func:`~pydicom.pixel_data_handlers.numpy_handler.pack_bits` can now be used
+  with 2D or 3D input arrays and will pad the packed data to even length by
+  default.
+* Elements with the :class:`~pydicom.valuerep.IS` VR accept float strings that
+  are convertible to integers without loss, e.g. "1.0" (:pr:`1240`)
+* Added :func:`~pydicom.encaps.encapsulate_extended` function for use when
+  an Extended Offset Table is required (:issue:`1178`)
+
+Changes
+.......
+* Reading and adding unknown non-private tags now does not raise an exception
+  per default, only when :attr:`~pydicom.config.enforce_valid_values` is set
+  (:issue:`1161`)
+* Data dictionaries updated to version 2020d of the DICOM Standard
+* Updated a handful of the SOP Class variable names in
+  ``_storage_sopclass_uids``
+  to use the new UID keywords. Variables with ``Multiframe`` in them
+  become ``MultiFrame``, those with ``and`` in them become ``And``, and
+  ``DICOSQuadrupoleResonanceQRStorage`` becomes
+  ``DICOSQuadrupoleResonanceStorage``.
+* The following UID constants are deprecated and will be removed in v2.2:
+
+  * ``JPEGBaseline``: use :attr:`~pydicom.uid.JPEGBaseline8Bit`
+  * ``JPEGExtended``: use :attr:`~pydicom.uid.JPEGExtended12Bit`
+  * ``JPEGLossless``: use :attr:`~pydicom.uid.JPEGLosslessSV1`
+  * ``JPEGLSLossy``: use :attr:`~pydicom.uid.JPEGLSNearLossless`
+  * ``JPEG2000MultiComponentLossless``: use
+    :attr:`~pydicom.uid.JPEG2000MCLossless`
+  * ``JPEG2000MultiComponent``: use :attr:`~pydicom.uid.JPEG2000MC`
+
+* In v3.0 the value for ``JPEGLossless`` will change from
+  1.2.840.10008.1.2.4.70 to 1.2.840.10008.1.2.4.57 to match its UID keyword
+* The following lists of UIDs are deprecated and will be removed in v2.2:
+
+  * ``JPEGLossyCompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEGTransferSyntaxes`
+  * ``JPEGLSSupportedCompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEGLSTransferSyntaxes`
+  * ``JPEG2000CompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.JPEG2000TransferSyntaxes`
+  * ``RLECompressedLosslessSyntaxes``: use
+    :attr:`~pydicom.uid.RLETransferSyntaxes`
+  * ``UncompressedPixelTransferSyntaxes``: use
+    :attr:`~pydicom.uid.UncompressedTransferSyntaxes`
+  * ``PILSupportedCompressedPixelTransferSyntaxes``
+* :class:`~pydicom.dicomdir.DicomDir` and the ``dicomdir`` module are
+  deprecated and will be removed in v3.0. Use :class:`~pydicom.fileset.FileSet`
+  instead (:issue:`1211`)
+* ``pydicom.overlay_data_handlers`` is deprecated, use ``pydicom.overlays``
+  instead
+* Removed transfer syntax limitations when converting overlays to an
+  ``ndarray`` (:issue:`1181`)
+* The :attr:`~pydicom.config.overlay_data_handlers` config option is
+  deprecated, the default handler will always be used.
+
+Fixes
+.....
+* :meth:`Dataset.copy()<pydicom.dataset.Dataset.copy>` now works as expected
+  (:issue:`1146`)
+* Optimistically parse undefined length non-SQ data as if it's encapsulated
+  pixel data to avoid erroring out on embedded sequence delimiter
+  (:issue:`1140`)
+* Fixed :func:`~pydicom.data.get_testdata_file` and
+  :func:`~pydicom.data.get_testdata_files` raising an exception if no network
+  connection is available (:pr:`1156`)
+* Fixed GDCM < v2.8.8 not returning the pixel array for datasets not read from
+  a file-like (:issue:`1153`)
+* Raise :class:`TypeError` if :func:`~pydicom.filereader.dcmread` or
+  :func:`~pydicom.filewriter.dcmwrite` is called with wrong argument
+* Gracefully handle empty Specific Character Set (:issue:`1190`)
+* Fixed empty ambiguous VR elements raising an exception (:issue:`1193`)
+* Allow :func:`~pydicom.pixel_data_handlers.util.apply_voi_lut` to apply VOI
+  lookup to an input float array
+* Fixed :meth:`Dataset.setdefault()<pydicom.dataset.Dataset.setdefault>` not
+  adding working correctly when the `default` value is ``None`` and not
+  adding private elements when :attr:`~pydicom.config.enforce_valid_values` is
+  ``True`` (:issue:`1215`)

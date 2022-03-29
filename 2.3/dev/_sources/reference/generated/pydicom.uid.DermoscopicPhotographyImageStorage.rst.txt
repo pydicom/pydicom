@@ -1,0 +1,6 @@
+﻿pydicom.uid.DermoscopicPhotographyImageStorage
+==============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DermoscopicPhotographyImageStorage

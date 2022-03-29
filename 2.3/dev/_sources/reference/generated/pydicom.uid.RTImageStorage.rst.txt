@@ -1,0 +1,6 @@
+﻿pydicom.uid.RTImageStorage
+==========================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RTImageStorage

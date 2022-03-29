@@ -1,0 +1,6 @@
+﻿pydicom.uid.CornealTopographyMapStorage
+=======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: CornealTopographyMapStorage

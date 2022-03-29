@@ -1,0 +1,6 @@
+﻿pydicom.uid.HEVCMP51
+====================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HEVCMP51

@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGExtended12Bit
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGExtended12Bit

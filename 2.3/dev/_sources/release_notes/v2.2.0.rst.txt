@@ -1,0 +1,120 @@
+Version 2.2.0
+=================================
+
+Changes
+-------
+
+* Data elements with a VR of **AT** must now be set with values
+  acceptable to :func:`~pydicom.tag.Tag`, and are always stored as a
+  :class:`~pydicom.tag.BaseTag`.  Previously, any Python type could be
+  set.
+* :meth:`BaseTag.__eq__()<pydicom.tag.BaseTag.__eq__>` returns ``False`` rather
+  than raising an exception when the operand cannot be converted to
+  :class:`~pydicom.tag.BaseTag` (:pr:`1327`)
+* :meth:`DA.__str__()<pydicom.valuerep.DA.__str__>`,
+  :meth:`DT.__str__()<pydicom.valuerep.DT.__str__>` and
+  :meth:`TM.__str__()<pydicom.valuerep.TM.__str__>` return valid DICOM
+  strings instead of the formatted date and time representations
+  (:issue:`1262`)
+* If comparing :class:`~pydicom.dataset.FileDataset` instances, the file
+  metadata is now ignored. This makes it possible to compare a
+  :class:`~pydicom.dataset.FileDataset` object with a
+  :class:`~pydicom.dataset.Dataset` object.
+* :func:`~pydicom.pixel_data_handlers.rle_handler.rle_encode_frame` is
+  deprecated and will be removed in v3.0, use
+  :meth:`~pydicom.dataset.Dataset.compress` or
+  :attr:`~pydicom.encoders.RLELosslessEncoder` instead.
+* :func:`~pydicom.filereader.read_file` is deprecated and will be removed in
+  v3.0, use :func:`~pydicom.filereader.dcmread` instead.
+* :func:`~pydicom.filewriter.write_file` is deprecated and will be removed in
+  v3.0, use :func:`~pydicom.filewriter.dcmwrite` instead.
+* Data dictionaries updated to version 2021b of the DICOM Standard
+* :class:`~pydicom.dataset.Dataset` no longer inherits from :class:`dict`
+
+Enhancements
+------------
+
+* Added a command-line interface for pydicom.  Current subcommands are:
+
+    * ``show``: display all or part of a DICOM file
+    * ``codify`` to produce Python code for writing files or sequence items
+      from scratch.
+
+  Please see the :ref:`cli_guide` for examples and details
+  of all the options for each command.
+* A field containing an invalid number of bytes will result in a warning
+  instead of an exception when
+  :attr:`~pydicom.config.convert_wrong_length_to_UN` is set to ``True``.
+* Private tags known via the private dictionary will now get the configured
+  VR if read from a dataset instead of **UN** (:issue:`1051`).
+* While reading explicit VR, a switch to implicit VR will be silently attempted
+  if the VR bytes are not valid VR characters, and config option
+  :attr:`~pydicom.config.assume_implicit_vr_switch` is ``True`` (default)
+* New functionality to help with correct formatting of decimal strings (**DS**)
+
+    * Added :func:`~pydicom.valuerep.is_valid_ds` to check whether a string is
+      valid as a DICOM decimal string and
+      :func:`~pydicom.valuerep.format_number_as_ds` to format a given ``float``
+      or ``Decimal`` as a DS while retaining the highest possible level of
+      precision
+    * If :attr:`~pydicom.config.enforce_valid_values` is set to ``True``, all
+      **DS** objects created will be checked for the validity of their string
+      representations.
+    * Added optional ``auto_format`` parameter to the init methods of
+      :class:`~pydicom.valuerep.DSfloat` and
+      :class:`~pydicom.valuerep.DSdecimal` and the :func:`~pydicom.valuerep.DS`
+      factory function to allow explicitly requesting automatic formatting of
+      the string representations of these objects when they are constructed.
+* Added methods to construct :class:`~pydicom.valuerep.PersonName` objects
+  from individual components of names (``family_name``, ``given_name``, etc.).
+  See :meth:`~pydicom.valuerep.PersonName.from_named_components` and
+  :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary`.
+* Added support for downloading the large test files with the `requests
+  <https://docs.python-requests.org/en/master/>`_ package in addition to
+  :mod:`urllib.request` (:pr:`1340`)
+* Ensured :func:`~pydicom.pixel_data_handlers.util.convert_color_space` uses
+  32-bit floats for calculation, added `per_frame` flag to allow frame-by-frame
+  processing and improved the speed by ~20-60% (:issue:`1348`)
+* Optimisations for RLE encoding using *pydicom* (~40% faster).
+* Added support for faster decoding (~4-5x) and encoding (~20x) of *RLE Lossless*
+  *Pixel Data* via the :gh:`pylibjpeg-rle <pylibjpeg-rle>` plugin
+  (:pr:`1361`, :pr:`1372`).
+* Added :func:`Dataset.compress()<pydicom.dataset.Dataset.compress>` function for
+  compressing uncompressed pixel data using a given encoding format as specified
+  by a UID. Only *RLE Lossless* is currently supported (:pr:`1372`)
+* Added :mod:`~pydicom.encoders` module and the following encoders:
+
+  * :attr:`~pydicom.encoders.RLELosslessEncoder` with 'pydicom', 'pylibjpeg'
+    and 'gdcm' plugins
+* Added `read` parameter to :func:`~pydicom.data.get_testdata_file`
+  to allow reading and returning the corresponding dataset (:pr:`1372`)
+* Handle decoded RLE segments with padding (:issue:`1438`)
+* Add option to JSON functions to suppress exception and continue (:pr:`1332`)
+* Allow searching :class:`~pydicom.fileset.FileSet` s for a list of elements (:pr:`1428`)
+* Added hash function to SR :class:`~pydicom.sr.Code` (:pr:`1434`)
+
+
+Fixes
+-----
+
+* Fixed pickling a :class:`~pydicom.dataset.Dataset` instance with sequences
+  after the sequence had been read (:issue:`1278`)
+* Fixed JSON export of numeric values
+* Fixed handling of sequences of unknown length that switch to implicit
+  encoding, and sequences with VR **UN** (:issue:`1312`)
+* Do not load external data sources until needed - fixes problems with
+  standard workflow if `setuptools` are not installed (:issue:`1341`)
+* Fixed empty **PN** elements read from file being :class:`str` rather than
+  :class:`~pydicom.valuerep.PersonName` (:issue:`1338`)
+* Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
+  rather than YBR with the Pillow pixel data handler (:pr:`878`)
+* Allow to deepcopy a `~pydicom.dataset.FileDataset` object (:issue:`1147`)
+* Fixed elements with a VR of **OL**, **OD** and **OV** not being set correctly
+  when an encoded backslash was part of the element value (:issue:`1412`)
+* Fixed expansion of linear segments with floating point steps in
+  segmented LUTs (:issue:`1415`)
+* Fixed handling of code extensions with person name component delimiter
+  (:pr:`1449`)
+* Fixed bug decoding RBG jpg with APP14 marker due to change in Pillow (:pr:`1444`)
+* Fixed decoding for `FloatPixelData` and `DoubleFloatPixelData` via
+  `pydicom.pixel_data_handlers.numpy_handler` (:issue:`1457`)

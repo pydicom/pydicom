@@ -1,0 +1,6 @@
+﻿pydicom.uid.IntravascularOpticalCoherenceTomographyImageStorageForPresentation
+==============================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: IntravascularOpticalCoherenceTomographyImageStorageForPresentation

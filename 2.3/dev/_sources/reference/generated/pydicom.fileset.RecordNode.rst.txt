@@ -1,0 +1,44 @@
+﻿pydicom.fileset.RecordNode
+==========================
+
+.. currentmodule:: pydicom.fileset
+
+.. autoclass:: RecordNode
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~RecordNode.__init__
+      ~RecordNode.add
+      ~RecordNode.prettify
+      ~RecordNode.remove
+      ~RecordNode.reverse
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~RecordNode.ancestors
+      ~RecordNode.component
+      ~RecordNode.depth
+      ~RecordNode.file_set
+      ~RecordNode.has_instance
+      ~RecordNode.index
+      ~RecordNode.is_root
+      ~RecordNode.key
+      ~RecordNode.next
+      ~RecordNode.parent
+      ~RecordNode.previous
+      ~RecordNode.record_type
+      ~RecordNode.root
+   
+   

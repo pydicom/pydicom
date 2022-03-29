@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPEGTransferSyntaxes
+================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPEGTransferSyntaxes

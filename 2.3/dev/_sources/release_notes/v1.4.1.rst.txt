@@ -1,0 +1,15 @@
+Version 1.4.1
+=================================
+
+Changelog
+---------
+
+Fixes
+.....
+* Fixed writing of empty sequences (regression, :issue:`1030`)
+
+Changes
+.......
+* In `Dataset.to_json` and `Dataset.to_json_dict`, the default of the
+  `bulk_data_threshold` argument has changed to 1024, and is now ignored if
+  no bulk data handler is set (see :issue:`1029`)

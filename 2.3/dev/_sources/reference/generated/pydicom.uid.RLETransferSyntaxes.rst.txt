@@ -1,0 +1,6 @@
+﻿pydicom.uid.RLETransferSyntaxes
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RLETransferSyntaxes

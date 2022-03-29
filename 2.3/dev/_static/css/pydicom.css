@@ -1,0 +1,105 @@
+@import url("theme.css");
+
+.highlight a {
+    text-decoration: underline;
+}
+
+.deprecated p {
+    padding: 10px 7px 10px 10px;
+    color: #b94a48;
+    background-color: #F3E5E5;
+    border: 1px solid #eed3d7;
+}
+
+
+/* Sidebar */
+
+.wy-menu-vertical a {
+    color: #333 !important;
+}
+
+.wy-menu-vertical a:hover,
+.wy-menu-vertical a:active,
+.wy-menu-vertical a:focus {
+    background-color: #ffdf5a;
+}
+
+.wy-nav-side {
+    background: #fcfcfc !important;
+}
+
+.wy-side-nav-search>a, .wy-side-nav-search .wy-dropdown>a {
+    color: #3f7cad !important
+}
+
+.version {
+    color: #3f7cad !important;
+}
+
+.wy-side-nav-search {
+   background-color: white !important;
+}
+
+.deprecated p span.versionmodified {
+    font-weight: bold;
+}
+
+.wy-nav-content {
+    max-width: 1200px !important;
+}
+
+
+/* Spinx Gallery */
+
+div.sphx-glr-download a {
+    background-image: none !important;
+    background-color: #ffdf5a !important;
+    border: 1px solid #cea455 !important;
+    min-width: 20em;
+}
+
+div.sphx-glr-download a:hover {
+    box-shadow: none !important;
+    background-color: #3f7cad !important;
+    color: white !important;
+    border: 1px solid #3f7cad !important;
+}
+
+.section {
+    padding-bottom:20px !important;
+}
+
+
+/* pydicom custom */
+
+a:hover {
+    text-decoration: underline;
+}
+
+div.rst-content a:hover {
+    color: #00b0e4 !important;
+}
+
+a.reference code.xref {
+    color: #2980B9 !important;
+    background: none;
+    font-size: 95%;
+}
+
+a.reference code.xref:hover {
+    color: #00b0e4 !important;
+    text-decoration: underline;
+}
+
+code.literal {
+    color: #000000 !important;
+    border: none !important;
+    background: #f2f2f2;
+    font-size: 90%;
+    font-weight: 500 !important;
+    padding: 2px 3px 2px 3px;
+}
+
+ul p {
+    margin-bottom: 0px !important;
+}

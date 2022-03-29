@@ -1,0 +1,6 @@
+﻿pydicom.valuerep.is\_valid\_ds
+==============================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autofunction:: is_valid_ds

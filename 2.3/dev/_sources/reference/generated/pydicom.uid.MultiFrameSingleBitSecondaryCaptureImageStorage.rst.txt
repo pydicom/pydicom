@@ -1,0 +1,6 @@
+﻿pydicom.uid.MultiFrameSingleBitSecondaryCaptureImageStorage
+===========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MultiFrameSingleBitSecondaryCaptureImageStorage

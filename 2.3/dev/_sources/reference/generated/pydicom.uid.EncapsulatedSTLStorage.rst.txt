@@ -1,0 +1,6 @@
+﻿pydicom.uid.EncapsulatedSTLStorage
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: EncapsulatedSTLStorage
