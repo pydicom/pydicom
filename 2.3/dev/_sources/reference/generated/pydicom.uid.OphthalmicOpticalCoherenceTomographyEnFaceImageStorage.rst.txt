@@ -1,6 +1,0 @@
-﻿pydicom.uid.OphthalmicOpticalCoherenceTomographyEnFaceImageStorage
-==================================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: OphthalmicOpticalCoherenceTomographyEnFaceImageStorage

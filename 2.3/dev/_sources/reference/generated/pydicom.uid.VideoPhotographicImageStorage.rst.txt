@@ -1,6 +1,0 @@
-﻿pydicom.uid.VideoPhotographicImageStorage
-=========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VideoPhotographicImageStorage

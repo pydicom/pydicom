@@ -1,6 +1,0 @@
-﻿pydicom.uid.ParametricMapStorage
-================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ParametricMapStorage

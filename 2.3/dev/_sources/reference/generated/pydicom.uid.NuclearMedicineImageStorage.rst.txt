@@ -1,6 +1,0 @@
-﻿pydicom.uid.NuclearMedicineImageStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: NuclearMedicineImageStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.EnhancedXAImageStorage
-==================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: EnhancedXAImageStorage

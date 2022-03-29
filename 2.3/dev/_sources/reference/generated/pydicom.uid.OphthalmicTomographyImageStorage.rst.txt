@@ -1,6 +1,0 @@
-﻿pydicom.uid.OphthalmicTomographyImageStorage
-============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: OphthalmicTomographyImageStorage

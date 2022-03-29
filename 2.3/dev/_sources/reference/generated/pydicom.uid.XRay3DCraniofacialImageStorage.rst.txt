@@ -1,6 +1,0 @@
-﻿pydicom.uid.XRay3DCraniofacialImageStorage
-==========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: XRay3DCraniofacialImageStorage

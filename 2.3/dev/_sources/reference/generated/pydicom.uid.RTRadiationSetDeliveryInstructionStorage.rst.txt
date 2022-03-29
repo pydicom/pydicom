@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTRadiationSetDeliveryInstructionStorage
-====================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTRadiationSetDeliveryInstructionStorage

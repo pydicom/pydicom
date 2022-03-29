@@ -1,6 +1,0 @@
-﻿pydicom.uid.DICOSQuadrupoleResonanceStorage
-===========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DICOSQuadrupoleResonanceStorage

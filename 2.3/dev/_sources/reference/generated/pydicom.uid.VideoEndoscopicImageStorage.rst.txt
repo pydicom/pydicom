@@ -1,6 +1,0 @@
-﻿pydicom.uid.VideoEndoscopicImageStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VideoEndoscopicImageStorage

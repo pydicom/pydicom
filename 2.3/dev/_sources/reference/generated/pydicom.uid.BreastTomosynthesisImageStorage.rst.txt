@@ -1,6 +1,0 @@
-﻿pydicom.uid.BreastTomosynthesisImageStorage
-===========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: BreastTomosynthesisImageStorage

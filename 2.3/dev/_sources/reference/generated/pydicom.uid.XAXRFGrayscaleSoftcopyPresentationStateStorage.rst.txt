@@ -1,6 +1,0 @@
-﻿pydicom.uid.XAXRFGrayscaleSoftcopyPresentationStateStorage
-==========================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: XAXRFGrayscaleSoftcopyPresentationStateStorage

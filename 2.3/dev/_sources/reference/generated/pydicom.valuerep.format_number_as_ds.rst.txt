@@ -1,6 +1,0 @@
-﻿pydicom.valuerep.format\_number\_as\_ds
-=======================================
-
-.. currentmodule:: pydicom.valuerep
-
-.. autofunction:: format_number_as_ds

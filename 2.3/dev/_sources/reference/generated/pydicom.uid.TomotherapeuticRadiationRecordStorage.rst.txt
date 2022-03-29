@@ -1,6 +1,0 @@
-﻿pydicom.uid.TomotherapeuticRadiationRecordStorage
-=================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: TomotherapeuticRadiationRecordStorage

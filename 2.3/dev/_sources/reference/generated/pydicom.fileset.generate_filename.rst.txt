@@ -1,6 +1,0 @@
-﻿pydicom.fileset.generate\_filename
-==================================
-
-.. currentmodule:: pydicom.fileset
-
-.. autofunction:: generate_filename

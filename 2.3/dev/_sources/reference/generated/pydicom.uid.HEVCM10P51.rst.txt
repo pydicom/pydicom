@@ -1,6 +1,0 @@
-﻿pydicom.uid.HEVCM10P51
-======================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: HEVCM10P51

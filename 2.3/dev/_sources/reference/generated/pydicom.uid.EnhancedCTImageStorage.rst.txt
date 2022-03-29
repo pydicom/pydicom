@@ -1,6 +1,0 @@
-﻿pydicom.uid.EnhancedCTImageStorage
-==================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: EnhancedCTImageStorage

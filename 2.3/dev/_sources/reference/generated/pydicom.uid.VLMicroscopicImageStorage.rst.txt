@@ -1,6 +1,0 @@
-﻿pydicom.uid.VLMicroscopicImageStorage
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VLMicroscopicImageStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.MultipleVolumeRenderingVolumetricPresentationStateStorage
-=====================================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MultipleVolumeRenderingVolumetricPresentationStateStorage

@@ -1,6 +1,0 @@
-﻿pydicom.config.DS\_decimal
-==========================
-
-.. currentmodule:: pydicom.config
-
-.. autofunction:: DS_decimal

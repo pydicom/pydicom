@@ -1,6 +1,0 @@
-﻿pydicom.uid.SpatialRegistrationStorage
-======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SpatialRegistrationStorage

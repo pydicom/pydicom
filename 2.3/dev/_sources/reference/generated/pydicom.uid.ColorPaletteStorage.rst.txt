@@ -1,6 +1,0 @@
-﻿pydicom.uid.ColorPaletteStorage
-===============================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ColorPaletteStorage

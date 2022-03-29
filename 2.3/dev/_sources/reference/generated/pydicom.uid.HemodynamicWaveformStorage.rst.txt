@@ -1,6 +1,0 @@
-﻿pydicom.uid.HemodynamicWaveformStorage
-======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: HemodynamicWaveformStorage

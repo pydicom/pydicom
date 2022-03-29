@@ -1,6 +1,0 @@
-﻿pydicom.uid.CTImageStorage
-==========================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: CTImageStorage

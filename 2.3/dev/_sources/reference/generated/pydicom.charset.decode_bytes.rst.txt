@@ -1,6 +1,0 @@
-﻿pydicom.charset.decode\_bytes
-=============================
-
-.. currentmodule:: pydicom.charset
-
-.. autofunction:: decode_bytes

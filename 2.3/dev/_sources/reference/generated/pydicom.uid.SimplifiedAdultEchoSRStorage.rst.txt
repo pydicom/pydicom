@@ -1,6 +1,0 @@
-﻿pydicom.uid.SimplifiedAdultEchoSRStorage
-========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SimplifiedAdultEchoSRStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.MultiFrameGrayscaleWordSecondaryCaptureImageStorage
-===============================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MultiFrameGrayscaleWordSecondaryCaptureImageStorage

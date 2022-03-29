@@ -1,6 +1,0 @@
-﻿pydicom.uid.JPEGLosslessSV1
-===========================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: JPEGLosslessSV1

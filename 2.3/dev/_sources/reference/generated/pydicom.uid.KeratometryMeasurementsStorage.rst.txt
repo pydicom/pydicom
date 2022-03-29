@@ -1,6 +1,0 @@
-﻿pydicom.uid.KeratometryMeasurementsStorage
-==========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: KeratometryMeasurementsStorage

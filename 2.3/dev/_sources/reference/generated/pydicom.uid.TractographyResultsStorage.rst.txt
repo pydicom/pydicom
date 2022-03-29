@@ -1,6 +1,0 @@
-﻿pydicom.uid.TractographyResultsStorage
-======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: TractographyResultsStorage

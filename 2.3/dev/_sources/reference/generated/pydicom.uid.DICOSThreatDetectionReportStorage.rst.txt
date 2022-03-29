@@ -1,6 +1,0 @@
-﻿pydicom.uid.DICOSThreatDetectionReportStorage
-=============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DICOSThreatDetectionReportStorage

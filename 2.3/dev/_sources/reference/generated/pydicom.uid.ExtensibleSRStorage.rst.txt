@@ -1,6 +1,0 @@
-﻿pydicom.uid.ExtensibleSRStorage
-===============================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ExtensibleSRStorage

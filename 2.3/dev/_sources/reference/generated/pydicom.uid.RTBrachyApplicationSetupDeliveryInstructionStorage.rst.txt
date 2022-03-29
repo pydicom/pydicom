@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTBrachyApplicationSetupDeliveryInstructionStorage
-==============================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTBrachyApplicationSetupDeliveryInstructionStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.SurfaceScanMeshStorage
-==================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SurfaceScanMeshStorage

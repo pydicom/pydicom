@@ -1,6 +1,0 @@
-﻿pydicom.uid.ElectrooculogramWaveformStorage
-===========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ElectrooculogramWaveformStorage

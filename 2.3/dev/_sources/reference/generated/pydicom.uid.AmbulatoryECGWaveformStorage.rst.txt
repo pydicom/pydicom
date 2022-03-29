@@ -1,6 +1,0 @@
-﻿pydicom.uid.AmbulatoryECGWaveformStorage
-========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: AmbulatoryECGWaveformStorage

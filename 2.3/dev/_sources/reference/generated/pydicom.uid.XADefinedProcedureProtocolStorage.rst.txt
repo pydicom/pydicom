@@ -1,6 +1,0 @@
-﻿pydicom.uid.XADefinedProcedureProtocolStorage
-=============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: XADefinedProcedureProtocolStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.ContentAssessmentResultsStorage
-===========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ContentAssessmentResultsStorage

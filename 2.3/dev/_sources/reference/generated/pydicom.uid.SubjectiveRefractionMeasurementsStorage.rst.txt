@@ -1,6 +1,0 @@
-﻿pydicom.uid.SubjectiveRefractionMeasurementsStorage
-===================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SubjectiveRefractionMeasurementsStorage

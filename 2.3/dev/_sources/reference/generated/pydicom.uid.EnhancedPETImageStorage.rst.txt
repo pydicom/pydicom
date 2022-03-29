@@ -1,6 +1,0 @@
-﻿pydicom.uid.EnhancedPETImageStorage
-===================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: EnhancedPETImageStorage

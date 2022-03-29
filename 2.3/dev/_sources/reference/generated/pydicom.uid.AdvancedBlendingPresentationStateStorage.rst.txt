@@ -1,6 +1,0 @@
-﻿pydicom.uid.AdvancedBlendingPresentationStateStorage
-====================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: AdvancedBlendingPresentationStateStorage

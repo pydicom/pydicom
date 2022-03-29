@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTSegmentAnnotationStorage
-======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTSegmentAnnotationStorage
