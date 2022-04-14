@@ -3,7 +3,9 @@ Version 2.4.0
 
 Enhancements
 ------------
-* Added :attr:`~pydicom.valuerep.PersonName.alphabetic` enum (:pr:`1634`)
+* Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
 
-
-
+Fixes
+-----
+* Fixed length validation of DS values with maximum length without a leading
+  zero (:issue:`1632`)

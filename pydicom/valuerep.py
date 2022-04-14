@@ -874,7 +874,7 @@ class DSfloat(float):
 
         if (validation_mode == config.RAISE and
                 not self.auto_format):
-            if len(repr(self)[1:-1]) > 16:
+            if len(str(self)) > 16:
                 raise OverflowError(
                     "Values for elements with a VR of 'DS' must be <= 16 "
                     "characters long, but the float provided requires > 16 "
@@ -884,7 +884,7 @@ class DSfloat(float):
                     "explicitly construct a DS object with 'auto_format' "
                     "set to True"
                 )
-            if not is_valid_ds(repr(self)[1:-1]):
+            if not is_valid_ds(str(self)):
                 # This will catch nan and inf
                 raise ValueError(
                     f'Value "{str(self)}" is not valid for elements with a VR '
