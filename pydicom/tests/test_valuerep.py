@@ -1092,6 +1092,8 @@ class TestPersonName:
         )
         assert ("Hong", "Gildong", "Andrews") == (pn.family_name, pn.given_name, pn.middle_name)
         assert "Hong^Gildong^Andrews" == pn.alphabetic
+        assert "\033$)C\373\363^\033$)C\321\316\324\327" == pn.ideographic
+        assert "\033$)C\310\253^\033$)C\261\346\265\277" == pn.phonetic
 
     def test_formatting(self):
         """PN: Formatting works..."""
