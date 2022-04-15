@@ -1051,7 +1051,9 @@ class TestDecimalString:
 class TestPersonName:
     def test_last_first(self):
         """PN: Simple Family-name^Given-name works..."""
-        pn = PersonName("Family^Given")
+        value = "Family^Given"
+        pn = PersonName(val=value)
+        assert value == pn.alphabetic
         assert "Family" == pn.family_name
         assert "Given" == pn.given_name
         assert "" == pn.name_suffix
@@ -1084,11 +1086,12 @@ class TestPersonName:
         phonetic characters) works..."""
         # Example name from PS3.5-2008 section I.2 p. 108
         pn = PersonName(
-            "Hong^Gildong="
+            "Hong^Gildong^Andrews="
             "\033$)C\373\363^\033$)C\321\316\324\327="
             "\033$)C\310\253^\033$)C\261\346\265\277"
         )
-        assert ("Hong", "Gildong") == (pn.family_name, pn.given_name)
+        assert ("Hong", "Gildong", "Andrews") == (pn.family_name, pn.given_name, pn.middle_name)
+        assert "Hong^Gildong^Andrews" == pn.alphabetic
 
     def test_formatting(self):
         """PN: Formatting works..."""
