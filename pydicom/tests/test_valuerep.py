@@ -1059,6 +1059,11 @@ class TestPersonName:
         assert "" == pn.name_suffix
         assert "" == pn.phonetic
 
+    def test_no_components(self):
+        """PN: Empty Person Name doesnt raise errors..."""
+        pn = PersonName(val="")
+        assert "" == pn.alphabetic == pn.phonetic == pn.ideographic
+
     def test_copy(self):
         """PN: Copy and deepcopy works..."""
         pn = PersonName(
