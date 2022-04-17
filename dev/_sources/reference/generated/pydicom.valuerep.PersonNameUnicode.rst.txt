@@ -29,6 +29,7 @@
 
    .. autosummary::
    
+      ~PersonNameUnicode.alphabetic
       ~PersonNameUnicode.components
       ~PersonNameUnicode.family_name
       ~PersonNameUnicode.given_name

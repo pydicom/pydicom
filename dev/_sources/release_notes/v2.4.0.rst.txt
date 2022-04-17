@@ -1,0 +1,9 @@
+Version 2.4.0
+=================================
+
+Enhancements
+------------
+* Added :attr:`~pydicom.valuerep.PersonName.alphabetic` enum (:pr:`1634`)
+
+
+

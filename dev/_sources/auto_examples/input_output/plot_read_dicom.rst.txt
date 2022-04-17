@@ -25,7 +25,7 @@ Read a Dataset and plot Pixel Data
 This example illustrates how to open a DICOM file, print some dataset
 information, and show it using matplotlib.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-42
+.. GENERATED FROM PYTHON SOURCE LINES 10-41
 
 
 
@@ -80,8 +80,7 @@ information, and show it using matplotlib.
     print()
 
     pat_name = ds.PatientName
-    display_name = pat_name.family_name + ", " + pat_name.given_name
-    print(f"Patient's Name...: {display_name}")
+    print(f"Patient's Name...: {pat_name.family_comma_given()}")
     print(f"Patient ID.......: {ds.PatientID}")
     print(f"Modality.........: {ds.Modality}")
     print(f"Study Date.......: {ds.StudyDate}")
@@ -98,7 +97,7 @@ information, and show it using matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.115 seconds)
+   **Total running time of the script:** ( 0 minutes  0.147 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:
