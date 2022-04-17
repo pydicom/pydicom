@@ -101,7 +101,7 @@ def download_with_progress(url: str, fpath: pathlib.Path) -> None:
             total_size_in_bytes = int(r.headers.get("content-length", 0))
             with open(fpath, "wb") as file:
                 for data in tqdm.tqdm(
-                    r.iter_content(), total=total_size_in_bytes,
+                    r.iter_content(chunk_size=4096), total=total_size_in_bytes,
                     unit="B", unit_scale=True, miniters=1,
                     desc=url.split("/")[-1]
                 ):
