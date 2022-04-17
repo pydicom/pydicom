@@ -1060,7 +1060,7 @@ class TestPersonName:
         assert "" == pn.phonetic
 
     def test_no_components(self):
-        """PN: Empty Person Name doesnt raise errors..."""
+        """PN: Empty Person Name does not raise errors..."""
         pn = PersonName(val="")
         assert "" == pn.alphabetic == pn.phonetic == pn.ideographic
 
