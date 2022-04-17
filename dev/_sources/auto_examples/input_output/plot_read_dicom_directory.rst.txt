@@ -42,7 +42,7 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 
  .. code-block:: none
 
-    Root directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests
+    Root directory: /root/project/pydicom/data/test_files/dicomdirtests
 
     PATIENT: PatientID=77654033, PatientName=Doe^Archibald
       STUDY: StudyID=2, StudyDate=20010101, StudyDescription=XR C Spine Comp Min 4 Views

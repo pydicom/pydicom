@@ -42,7 +42,7 @@ information, and show it using matplotlib.
  .. code-block:: none
 
 
-    File path........: /home/circleci/project/pydicom/data/test_files/CT_small.dcm
+    File path........: /root/project/pydicom/data/test_files/CT_small.dcm
     SOP Class........: 1.2.840.10008.5.1.4.1.1.2 (CT Image Storage)
 
     Patient's Name...: CompressedSamples, CT1
@@ -97,7 +97,7 @@ information, and show it using matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.147 seconds)
+   **Total running time of the script:** ( 0 minutes  0.095 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom.py:
