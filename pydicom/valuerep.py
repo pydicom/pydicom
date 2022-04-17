@@ -1449,6 +1449,16 @@ class PersonName:
         return self._name_part(4)
 
     @property
+    def alphabetic(self) -> str:
+        """Return the first (alphabetic) person name component as a
+        unicode string
+        """
+        try:
+            return self.components[0]
+        except IndexError:
+            return ''
+
+    @property
     def ideographic(self) -> str:
         """Return the second (ideographic) person name component as a
         unicode string
