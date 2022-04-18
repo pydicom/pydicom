@@ -603,6 +603,13 @@ class TestDSfloat:
             valuerep.DSfloat('3.141592653589793',
                              validation_mode=config.RAISE)
 
+    def test_handle_missing_leading_zero(self):
+        """Test that no error is raised with maximum length DS string
+        without leading zero."""
+        # Regression test for #1632
+        valuerep.DSfloat(".002006091181818",
+                         validation_mode=config.RAISE)
+
     def test_DSfloat_auto_format(self):
         """Test creating a value using DSfloat copies auto_format"""
         x = DSfloat(math.pi, auto_format=True)
