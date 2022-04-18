@@ -4,4 +4,10 @@ Version 2.4.0
 Enhancements
 ------------
 * Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
+
+Fixes
+-----
+* Fixed length validation of DS values with maximum length without a leading
+  zero (:issue:`1632`)
 * Increased download speed with progress bar for test data (:issue:`1611`)
+
