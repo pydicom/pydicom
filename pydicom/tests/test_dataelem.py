@@ -900,6 +900,36 @@ class TestDataElementValidation:
             DataElement(0x00410001, "PN", b"Jimmy" * 13,
                         validation_mode=config.RAISE)
 
+    @pytest.mark.parametrize("value, value_type", [
+        (42, "int"), (complex(1, 2), "complex"), (1.45, "float")])
+    @pytest.mark.parametrize(
+        "vr", ("AE", "AS", "CS", "DA", "DT", "LO", "LT",
+               "SH", "ST", "TM", "UR")
+    )
+    def test_invalid_string_value(self, value, value_type, vr):
+        msg = (f"A value of type '{value_type}' cannot be assigned"
+               f" to a tag with VR {vr}.")
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value, value_type", [
+        (42, "int"), (complex(1, 2), "complex"), (1.45, "float")])
+    def test_invalid_pn_value_type(self, value, value_type):
+        msg = (f"A value of type '{value_type}' cannot be assigned"
+               f" to a tag with VR PN.")
+        with pytest.warns(UserWarning, match=msg):
+            # will raise an exception as it cannot handle these types later
+            with pytest.raises(AttributeError):
+                DataElement(0x00410001, "PN", value,
+                            validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, "PN", value,
+                        validation_mode=config.RAISE)
+
     @pytest.mark.parametrize(
         "value", ("John^Doe", "Yamada^Tarou=山田^太郎", "", None)
     )

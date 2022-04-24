@@ -116,9 +116,6 @@ def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
     -------
         A tuple of a boolean validation result and the error message.
     """
-    valid, msg = validate_type(vr, value, (str, bytes))
-    if not valid:
-        return valid, msg
     max_length = MAX_VALUE_LEN.get(vr, 0)
     if max_length > 0:
         value_length = len(value)
@@ -128,6 +125,26 @@ def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
                 f"maximum length of {max_length} allowed for VR {vr}."
             )
     return True, ""
+
+
+def validate_type_and_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
+    """Validate the coorect type and the value length for a given VR.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : Any
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    valid, msg = validate_type(vr, value, (str, bytes))
+    if not valid:
+        return valid, msg
+    return validate_vr_length(vr, value)
 
 
 def validate_regex(vr: str, value: Any) -> Tuple[bool, str]:
@@ -218,6 +235,9 @@ def validate_length_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
     -------
         A tuple of a boolean validation result and the error message.
     """
+    valid, msg = validate_type(vr, value, (str, bytes))
+    if not valid:
+        return valid, msg
     is_valid_len, msg1 = validate_vr_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value)
     msg = " ".join([msg1, msg2]).strip()
@@ -266,7 +286,7 @@ def validate_pn(vr: str, value: Any) -> Tuple[bool, str]:
     -------
         A tuple of a boolean validation result and the error message.
     """
-    if not value:
+    if not value or isinstance(value, PersonName):
         return True, ""
     valid, msg = validate_type(vr, value, (str, bytes))
     if not valid:
@@ -343,14 +363,14 @@ VALIDATORS = {
     "FD": lambda vr, value: validate_type(vr, value, (float, int)),
     "FL": lambda vr, value: validate_type(vr, value, (float, int)),
     "IS": validate_length_and_regex,
-    "LO": validate_vr_length,
-    "LT": validate_vr_length,
+    "LO": validate_type_and_vr_length,
+    "LT": validate_type_and_vr_length,
     "PN": validate_pn,
-    "SH": validate_vr_length,
+    "SH": validate_type_and_vr_length,
     "SL": lambda vr, value: validate_number(
         vr, value, -0x80000000, 0x7fffffff),
     "SS": lambda vr, value: validate_number(vr, value, -0x8000, 0x7fff),
-    "ST": validate_vr_length,
+    "ST": validate_type_and_vr_length,
     "SV": lambda vr, value: validate_number(
         vr, value, -0x8000000000000000, 0x7fffffffffffffff),
     "TM": lambda vr, value: validate_date_time(vr, value, datetime.time),
