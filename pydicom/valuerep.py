@@ -77,20 +77,48 @@ BYTE_VR_REGEXES = {vr: re.compile(regex.encode())
                    for (vr, regex) in VR_REGEXES.items()}
 
 
-def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_type(vr: str, value: Any,
+                  types: Union[Type, Tuple[Type, Type]]) -> Tuple[bool, str]:
+    """Checks for valid types for a given VR.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : Any
+        The value to validate.
+    types: Type or Tuple[Type]
+        The type or tuple of types supported for the given VR.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    if value is not None and not isinstance(value, types):
+        return False, (
+            f"A value of type '{type(value).__name__}' cannot be "
+            f"assigned to a tag with VR {vr}."
+        )
+    return True, ""
+
+
+def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
     """Validate the value length for a given VR.
 
     Parameters
     ----------
     vr : str
         The value representation to validate against.
-    value : str or bytes
+    value : Any
         The value to validate.
 
     Returns
     -------
         A tuple of a boolean validation result and the error message.
     """
+    valid, msg = validate_type(vr, value, (str, bytes))
+    if not valid:
+        return valid, msg
     max_length = MAX_VALUE_LEN.get(vr, 0)
     if max_length > 0:
         value_length = len(value)
@@ -102,7 +130,7 @@ def validate_vr_length(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_regex(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_regex(vr: str, value: Any) -> Tuple[bool, str]:
     """Validate the value for a given VR for allowed characters
     using a regular expression.
 
@@ -110,7 +138,7 @@ def validate_regex(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     ----------
     vr : str
         The value representation to validate against.
-    value : str
+    value : Any
         The value to validate.
 
     Returns
@@ -131,8 +159,51 @@ def validate_regex(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_length_and_regex(
-        vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_type_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
+    """Validate that the value is of type :class:`str` or :class:`bytes`
+    and that the value matches the VR-specific regular expression.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : Any
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    valid, msg = validate_type(vr, value, (str, bytes))
+    if not valid:
+        return valid, msg
+    return validate_regex(vr, value)
+
+
+def validate_date_time(
+        vr: str, value: Any, date_time_type: Type) -> Tuple[bool, str]:
+    """Checks for valid values for date/time related VRs.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : Any
+        The value to validate.
+    date_time_type: type
+        The specific type supported for the given VR (additional to str/bytes).
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+
+    if value and isinstance(value, date_time_type):
+        return True, ""
+    return validate_type_and_regex(vr, value)
+
+
+def validate_length_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
     """Validate the value for a given VR both for maximum length and
     for allowed characters using a regular expression.
 
@@ -140,7 +211,7 @@ def validate_length_and_regex(
     ----------
     vr : str
         The value representation to validate against.
-    value : str
+    value : Any
         The value to validate.
 
     Returns
@@ -158,8 +229,7 @@ def validate_length_and_regex(
     return is_valid_len and is_valid_expr, msg
 
 
-def validate_pn_component_length(
-        vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_pn_component_length(vr: str, value: Any) -> Tuple[bool, str]:
     """Validate the PN component value for the maximum length.
 
     Parameters
@@ -181,7 +251,7 @@ def validate_pn_component_length(
     return True, ""
 
 
-def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
+def validate_pn(vr: str, value: Any) -> Tuple[bool, str]:
     """Validate the value for VR PN for the maximum number of components
     and for the maximum length of each component.
 
@@ -198,6 +268,9 @@ def validate_pn(vr: str, value: Union[str, bytes]) -> Tuple[bool, str]:
     """
     if not value:
         return True, ""
+    valid, msg = validate_type(vr, value, (str, bytes))
+    if not valid:
+        return valid, msg
     components: Sequence[Union[str, bytes]]
     if isinstance(value, bytes):
         components = value.split(b"=")
@@ -233,22 +306,59 @@ def validate_pn_component(value: Union[str, bytes]) -> None:
                    validate_pn_component_length)
 
 
+def validate_number(
+        vr: str, value: Any, min_value: int, max_value: int
+) -> Tuple[bool, str]:
+    """Validate the value for a numerical VR for type and allowed range.
+
+    Parameters
+    ----------
+    vr : str
+        The value representation to validate against.
+    value : Any
+        The value to validate.
+
+    Returns
+    -------
+        A tuple of a boolean validation result and the error message.
+    """
+    valid, msg = validate_type(vr, value, int)
+    if not valid:
+        return valid, msg
+    if value < min_value or value > max_value:
+        return False, (
+            f"Invalid value: a value for a tag with VR {vr} must be "
+            f"between {min_value} and {max_value}."
+        )
+    return True, ""
+
+
 VALIDATORS = {
     "AE": validate_length_and_regex,
-    "AS": validate_regex,
+    "AS": validate_type_and_regex,
     "CS": validate_length_and_regex,
-    "DA": validate_regex,
+    "DA": lambda vr, value: validate_date_time(vr, value, datetime.date),
     "DS": validate_length_and_regex,
-    "DT": validate_regex,
+    "DT": lambda vr, value: validate_date_time(vr, value, datetime.datetime),
+    "FD": lambda vr, value: validate_type(vr, value, (float, int)),
+    "FL": lambda vr, value: validate_type(vr, value, (float, int)),
     "IS": validate_length_and_regex,
     "LO": validate_vr_length,
     "LT": validate_vr_length,
     "PN": validate_pn,
     "SH": validate_vr_length,
+    "SL": lambda vr, value: validate_number(
+        vr, value, -0x80000000, 0x7fffffff),
+    "SS": lambda vr, value: validate_number(vr, value, -0x8000, 0x7fff),
     "ST": validate_vr_length,
-    "TM": validate_regex,
+    "SV": lambda vr, value: validate_number(
+        vr, value, -0x8000000000000000, 0x7fffffffffffffff),
+    "TM": lambda vr, value: validate_date_time(vr, value, datetime.time),
     "UI": validate_length_and_regex,
-    "UR": validate_regex,
+    "UL": lambda vr, value: validate_number(vr, value, 0, 0xffffffff),
+    "US": lambda vr, value: validate_number(vr, value, 0, 0xffff),
+    "UR": validate_type_and_regex,
+    "UV": lambda vr, value: validate_number(vr, value, 0, 0xffffffffffffffff),
 }
 
 
@@ -280,7 +390,7 @@ def validate_value(vr: str, value: Any,
     if validation_mode == config.IGNORE:
         return
 
-    if value is not None and isinstance(value, (str, bytes)):
+    if value is not None:
         validator = validator or VALIDATORS.get(vr)
         if validator is not None:
             is_valid, msg = validator(vr, value)

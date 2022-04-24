@@ -2332,7 +2332,7 @@ class TestWriteNumbers:
         """Test writing an empty value does nothing"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', '')
+        elem = DataElement(0x00100010, 'US', None)
         fmt = 'H'
         write_numbers(fp, elem, fmt)
         assert fp.getvalue() == b''
