@@ -1252,7 +1252,8 @@ class TestDataset:
         ds.add_new(0x00250011, "LO", "Valid Creator")
         ds.add_new(0x00251007, "UN", "foobar")
         ds.add_new(0x00251107, "UN", "foobaz")
-        msg = r"'\[13975, 13802]' is not a valid private creator"
+        msg = (r"\(0025, 0010\) '\[13975, 13802]' "
+               r"is not a valid private creator")
         with pytest.warns(UserWarning, match=msg):
             assert (str(ds[0x00251007]) == "(0025, 1007) Private tag data"
                                            "                    UN: 'foobar'")

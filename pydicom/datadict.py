@@ -554,7 +554,8 @@ def get_private_entry(
             "dictionary"
         ) from exc
     except TypeError as exc:
-        msg = f"'{private_creator}' is not a valid private creator"
+        msg = (f"{tag.private_creator} '{private_creator}' "
+               f"is not a valid private creator")
         warnings.warn(msg)
         raise KeyError(msg) from exc
 
