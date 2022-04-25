@@ -1102,7 +1102,7 @@ class TestDataElementValidation:
                "-9223372036854775808 and 9223372036854775807.")
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, "SV", value,
-                    validation_mode=config.WARN)
+                        validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, "SV", value,
                         validation_mode=config.RAISE)
