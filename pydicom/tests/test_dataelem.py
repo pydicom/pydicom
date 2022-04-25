@@ -1012,7 +1012,8 @@ class TestDataElementValidation:
     def test_valid_float_value(self, value, vr):
         DataElement(0x00410001, vr, value, validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", (0, 1, 65535))
+    @pytest.mark.parametrize("value", (0, 1, 65535, b"", b"\xf3\x42",
+                                       b"\x01\x00\x02\x00"))
     def test_valid_us_value(self, value):
         DataElement(0x00410001, "US", value, validation_mode=config.RAISE)
 
@@ -1030,7 +1031,8 @@ class TestDataElementValidation:
             ds = Dataset()
             ds.add_new(0x00410001, "US", value)
 
-    @pytest.mark.parametrize("value", (-32768, 0, 32767))
+    @pytest.mark.parametrize("value", (-32768, 0, 32767, b"\xff\xff",
+                                       b"\0\0\0\0"))
     def test_valid_ss_value(self, value):
         DataElement(0x00410001, "SS", value, validation_mode=config.RAISE)
 
@@ -1045,7 +1047,19 @@ class TestDataElementValidation:
             DataElement(0x00410001, "SS", value,
                         validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", (0, 1, 4294967295))
+    @pytest.mark.parametrize("vr", ("US", "SS"))
+    @pytest.mark.parametrize("value", (b"\x01", b"\x00\x00\x00"))
+    def test_invalid_short_value_length(self, vr, value):
+        msg = (f"Invalid value length {len(value)}: the value length for a "
+               f"tag with VR {vr} must be a multiple of 2.")
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (0, 1, 4294967295, b"\x00\x01\x02\x03"))
     def test_valid_ul_value(self, value):
         DataElement(0x00410001, "UL", value, validation_mode=config.RAISE)
 
@@ -1060,7 +1074,8 @@ class TestDataElementValidation:
             DataElement(0x00410001, "UL", value,
                         validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", (-2147483648, 0, 2147483647))
+    @pytest.mark.parametrize("value", (-2147483648, 0, 2147483647,
+                                       b"\x12\x34\x56\x78\x9a\xbc\xde\xf0"))
     def test_valid_sl_value(self, value):
         DataElement(0x00410001, "SL", value, validation_mode=config.RAISE)
 
@@ -1075,7 +1090,20 @@ class TestDataElementValidation:
             DataElement(0x00410001, "SL", value,
                         validation_mode=config.RAISE)
 
-    @pytest.mark.parametrize("value", (0, 1, 18446744073709551615))
+    @pytest.mark.parametrize("vr", ("UL", "SL"))
+    @pytest.mark.parametrize("value", (b"\x0b\x00", b"\x01\x34\x11",
+                                       b"\xff" * 5))
+    def test_invalid_long_value_length(self, vr, value):
+        msg = (f"Invalid value length {len(value)}: the value length for a "
+               f"tag with VR {vr} must be a multiple of 4.")
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("value", (0, 1, 18446744073709551615, b"01" * 8))
     def test_valid_uv_value(self, value):
         DataElement(0x00410001, "UV", value, validation_mode=config.RAISE)
 
@@ -1091,7 +1119,7 @@ class TestDataElementValidation:
                         validation_mode=config.RAISE)
 
     @pytest.mark.parametrize("value", (-9223372036854775808, 0,
-                                       9223372036854775807))
+                                       9223372036854775807, b"ff" * 24))
     def test_valid_sv_value(self, value):
         DataElement(0x00410001, "SV", value, validation_mode=config.RAISE)
 
@@ -1105,6 +1133,19 @@ class TestDataElementValidation:
                         validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):
             DataElement(0x00410001, "SV", value,
+                        validation_mode=config.RAISE)
+
+    @pytest.mark.parametrize("vr", ("UV", "SV"))
+    @pytest.mark.parametrize("value", (b"\x0b\x00", b"\x01\x34\x11\x00",
+                                       b"\xff" * 6, b"\x00" * 9, ))
+    def test_invalid_very_long_value_length(self, vr, value):
+        msg = (f"Invalid value length {len(value)}: the value length for a "
+               f"tag with VR {vr} must be a multiple of 8.")
+        with pytest.warns(UserWarning, match=msg):
+            DataElement(0x00410001, vr, value,
+                        validation_mode=config.WARN)
+        with pytest.raises(ValueError, match=msg):
+            DataElement(0x00410001, vr, value,
                         validation_mode=config.RAISE)
 
 

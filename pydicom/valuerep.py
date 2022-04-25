@@ -326,6 +326,18 @@ def validate_pn_component(value: Union[str, bytes]) -> None:
                    validate_pn_component_length)
 
 
+VALUE_LENGTH = {
+    "US": 2,
+    "SS": 2,
+    "UL": 4,
+    "SL": 4,
+    "UV": 8,
+    "SV": 8,
+    "FL": 4,
+    "FD": 8
+}
+
+
 def validate_number(
         vr: str, value: Any, min_value: int, max_value: int
 ) -> Tuple[bool, str]:
@@ -337,18 +349,28 @@ def validate_number(
         The value representation to validate against.
     value : Any
         The value to validate.
+    min_value : int
+        The minimum allowed value.
+    max_value : int
+        The maximum allowed value.
 
     Returns
     -------
         A tuple of a boolean validation result and the error message.
     """
-    valid, msg = validate_type(vr, value, int)
+    valid, msg = validate_type(vr, value, (int, bytes))
     if not valid:
         return valid, msg
-    if value < min_value or value > max_value:
+    if isinstance(value, int):
+        if value < min_value or value > max_value:
+            return False, (
+                f"Invalid value: a value for a tag with VR {vr} must be "
+                f"between {min_value} and {max_value}."
+            )
+    elif len(value) % VALUE_LENGTH[vr]:
         return False, (
-            f"Invalid value: a value for a tag with VR {vr} must be "
-            f"between {min_value} and {max_value}."
+            f"Invalid value length {len(value)}: the value length for a tag "
+            f"with VR {vr} must be a multiple of {VALUE_LENGTH[vr]}."
         )
     return True, ""
 
