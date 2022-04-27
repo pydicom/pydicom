@@ -1245,6 +1245,21 @@ class TestDataset:
         assert ds[tag2].value == b'\x03\x04'
         assert ds[tag2].VR == 'UN'
 
+    def test_invalid_private_creator(self):
+        # regression test for #1638
+        ds = Dataset()
+        ds.add_new(0x00250010, "SL", [13975, 13802])
+        ds.add_new(0x00250011, "LO", "Valid Creator")
+        ds.add_new(0x00251007, "UN", "foobar")
+        ds.add_new(0x00251107, "UN", "foobaz")
+        msg = (r"\(0025, 0010\) '\[13975, 13802]' "
+               r"is not a valid private creator")
+        with pytest.warns(UserWarning, match=msg):
+            assert (str(ds[0x00251007]) == "(0025, 1007) Private tag data"
+                                           "                    UN: 'foobar'")
+        assert (str(ds[0x00251107]) == "(0025, 1107) Private tag data"
+                                       "                    UN: 'foobaz'")
+
     def test_is_original_encoding(self):
         """Test Dataset.write_like_original"""
         ds = Dataset()
