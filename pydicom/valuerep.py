@@ -127,8 +127,8 @@ def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_type_and_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
-    """Validate the coorect type and the value length for a given VR.
+def validate_type_and_length(vr: str, value: Any) -> Tuple[bool, str]:
+    """Validate the correct type and the value length for a given VR.
 
     Parameters
     ----------
@@ -220,9 +220,10 @@ def validate_date_time(
     return validate_type_and_regex(vr, value)
 
 
-def validate_length_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
-    """Validate the value for a given VR both for maximum length and
-    for allowed characters using a regular expression.
+def validate_length_and_type_and_regex(
+        vr: str, value: Any) -> Tuple[bool, str]:
+    """Validate the value for a given VR for maximum length, for the correct
+    value type, and for allowed characters using a regular expression.
 
     Parameters
     ----------
@@ -376,27 +377,27 @@ def validate_number(
 
 
 VALIDATORS = {
-    "AE": validate_length_and_regex,
+    "AE": validate_length_and_type_and_regex,
     "AS": validate_type_and_regex,
-    "CS": validate_length_and_regex,
+    "CS": validate_length_and_type_and_regex,
     "DA": lambda vr, value: validate_date_time(vr, value, datetime.date),
-    "DS": validate_length_and_regex,
+    "DS": validate_length_and_type_and_regex,
     "DT": lambda vr, value: validate_date_time(vr, value, datetime.datetime),
     "FD": lambda vr, value: validate_type(vr, value, (float, int)),
     "FL": lambda vr, value: validate_type(vr, value, (float, int)),
-    "IS": validate_length_and_regex,
-    "LO": validate_type_and_vr_length,
-    "LT": validate_type_and_vr_length,
+    "IS": validate_length_and_type_and_regex,
+    "LO": validate_type_and_length,
+    "LT": validate_type_and_length,
     "PN": validate_pn,
-    "SH": validate_type_and_vr_length,
+    "SH": validate_type_and_length,
     "SL": lambda vr, value: validate_number(
         vr, value, -0x80000000, 0x7fffffff),
     "SS": lambda vr, value: validate_number(vr, value, -0x8000, 0x7fff),
-    "ST": validate_type_and_vr_length,
+    "ST": validate_type_and_length,
     "SV": lambda vr, value: validate_number(
         vr, value, -0x8000000000000000, 0x7fffffffffffffff),
     "TM": lambda vr, value: validate_date_time(vr, value, datetime.time),
-    "UI": validate_length_and_regex,
+    "UI": validate_length_and_type_and_regex,
     "UL": lambda vr, value: validate_number(vr, value, 0, 0xffffffff),
     "US": lambda vr, value: validate_number(vr, value, 0, 0xffff),
     "UR": validate_type_and_regex,
@@ -873,7 +874,7 @@ def is_valid_ds(s: str) -> bool:
     bool
         True if the string is a valid decimal string. Otherwise False.
     """
-    return validate_length_and_regex("DS", s)[0]
+    return validate_length_and_type_and_regex("DS", s)[0]
 
 
 def format_number_as_ds(val: Union[float, Decimal]) -> str:
