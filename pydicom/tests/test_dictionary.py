@@ -68,7 +68,7 @@ class TestDict:
         add_dict_entry(0x10021001, "UL", "TestOne", "Test One")
         add_dict_entry(0x10021002, "DS", "TestTwo", "Test Two", VM='3')
         ds = Dataset()
-        ds.TestOne = 'test'
+        ds.TestOne = 42
         ds.TestTwo = ['1', '2', '3']
 
     def test_add_entry_raises_for_private_tag(self):
@@ -85,7 +85,7 @@ class TestDict:
         }
         add_dict_entries(new_dict_items)
         ds = Dataset()
-        ds.TestOne = 'test'
+        ds.TestOne = 42
         ds.TestTwo = ['1', '2', '3']
 
     def test_add_entries_raises_for_private_tags(self):

@@ -4,6 +4,8 @@ Version 2.4.0
 Enhancements
 ------------
 * Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
+* Added value validation for numerical VRs, add type validation for all
+  validated VRs (:issue:`1414`)
 
 Fixes
 -----
