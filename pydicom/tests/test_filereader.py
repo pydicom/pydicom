@@ -460,6 +460,15 @@ class TestReader:
         assert len(seq_element.value) == 1
         assert len(seq_element.value[0].ReferencedSeriesSequence) == 1
 
+    def test_un_sequence_dont_infer(
+            self,
+            dont_replace_un_with_sq_vr,
+            dont_replace_un_with_known_vr
+    ):
+        ds = dcmread(get_testdata_file("UN_sequence.dcm"))
+        seq_element = ds[0x4453100c]
+        assert seq_element.VR == "UN"
+
     def test_no_meta_group_length(self, no_datetime_conversion):
         """Read file with no group length in file meta."""
         # Issue 108 -- iView example file with no group length (0002,0002)
@@ -1522,6 +1531,10 @@ class TestDeferredRead:
         filelike = io.BytesIO(data)
         dataset = pydicom.dcmread(filelike, defer_size=1024)
         assert 32768 == len(dataset.PixelData)
+        # The 'Histogram tables' private data element is also > 1024 bytes so
+        # pluck this out to confirm multiple deferred reads work (#1609).
+        private_block = dataset.private_block(0x43, 'GEMS_PARM_01')
+        assert 2068 == len(private_block[0x29].value)
 
 
 class TestReadTruncatedFile:

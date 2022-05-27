@@ -3,7 +3,7 @@ import re
 from typing import cast, Match
 
 
-__version__: str = '2.3.0.dev0'
+__version__: str = '2.4.0dev0'
 
 result = cast(Match[str], re.match(r'(\d+\.\d+\.\d+).*', __version__))
 __version_info__ = tuple(result.group(1).split('.'))
@@ -11,4 +11,4 @@ __version_info__ = tuple(result.group(1).split('.'))
 
 # DICOM Standard version used for:
 #   _dicom_dict.py, _uid_dict.py and uid.py
-__dicom_version__: str = '2021e'
+__dicom_version__: str = '2022a'

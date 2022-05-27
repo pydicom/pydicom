@@ -25,8 +25,7 @@ print(f"SOP Class........: {ds.SOPClassUID} ({ds.SOPClassUID.name})")
 print()
 
 pat_name = ds.PatientName
-display_name = pat_name.family_name + ", " + pat_name.given_name
-print(f"Patient's Name...: {display_name}")
+print(f"Patient's Name...: {pat_name.family_comma_given()}")
 print(f"Patient ID.......: {ds.PatientID}")
 print(f"Modality.........: {ds.Modality}")
 print(f"Study Date.......: {ds.StudyDate}")

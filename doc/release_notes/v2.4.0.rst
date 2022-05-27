@@ -1,0 +1,34 @@
+Version 2.4.0
+=================================
+
+Enhancements
+------------
+* Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
+* Added value validation for numerical VRs, add type validation for all
+  validated VRs (:issue:`1414`)
+
+Changes
+-------
+* The :doc:`pydicom.pixel_data_handlers<../reference/handlers.pixel_data>` module
+  is deprecated and will be removed in v4.0. The following functions should be
+  imported from the new :doc:`pydicom.pixels<../reference/pixels>` module instead:
+
+  * :func:`~pydicom.pixels.apply_color_lut`
+  * :func:`~pydicom.pixels.apply_modality_lut`
+  * :func:`~pydicom.pixels.apply_rescale`
+  * :func:`~pydicom.pixels.apply_voi`
+  * :func:`~pydicom.pixels.apply_voi_lut`
+  * :func:`~pydicom.pixels.apply_windowing`
+  * :func:`~pydicom.pixels.convert_color_space`
+  * :func:`~pydicom.pixels.pack_bits`
+  * :func:`~pydicom.pixels.unpack_bits`
+
+* The ``pydicom.encoders`` module has been moved to ``pydicom.pixels.encoders``,
+  the old import path will be removed in v3.0
+
+Fixes
+-----
+* Fixed length validation of DS values with maximum length without a leading
+  zero (:issue:`1632`)
+* Increased download speed with progress bar for test data (:issue:`1611`)
+* Fixed crash due to invalid private creator (:issue:`1638`)

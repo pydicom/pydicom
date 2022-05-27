@@ -226,6 +226,15 @@ class BaseTag(int):
         """
         return self.is_private and 0x0010 <= self.element < 0x0100
 
+    @property
+    def private_creator(self) -> "BaseTag":
+        """Return the private creator tag for the given tag.
+        The result is meaningless if this is not a private tag.
+
+        .. versionadded:: 2.4
+        """
+        return BaseTag((self & 0xffff0000) | self.element >> 8)
+
 
 def TupleTag(group_elem: Tuple[int, int]) -> BaseTag:
     """Fast factory for :class:`BaseTag` object with known safe (group, elem)

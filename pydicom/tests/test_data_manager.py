@@ -116,6 +116,7 @@ class TestGetData:
 @pytest.mark.skipif(not EXT_PYDICOM, reason="pydicom-data not installed")
 class TestExternalDataSource:
     """Tests for the external data sources."""
+
     def setup(self):
         self.dpath = external_data_sources()["pydicom-data"].data_path
 
@@ -255,6 +256,16 @@ class TestExternalDataSource:
 @pytest.mark.skipif(EXT_PYDICOM, reason="pydicom-data installed")
 class TestDownload:
     """Tests for the download module."""
+
+    def test_get_testdata_file_no_download(self, recwarn):
+        """
+        Test that `data_path_with_download`
+        is not called when `download=False`.
+        """
+        fname = "693_UNCI.dcm"
+        assert get_testdata_file(fname, download=False) is None
+        assert not recwarn.list
+
     def test_get_testdata_file_network_outage(self, download_failure):
         """Test a network outage when using get_testdata_file."""
         fname = "693_UNCI.dcm"

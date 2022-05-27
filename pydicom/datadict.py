@@ -1,7 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 # -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
-
+import warnings
 from typing import Tuple, Optional, Dict
 
 from pydicom.config import logger
@@ -553,6 +553,11 @@ def get_private_entry(
             f"Private creator '{private_creator}' not in the private "
             "dictionary"
         ) from exc
+    except TypeError as exc:
+        msg = (f"{tag.private_creator} '{private_creator}' "
+               f"is not a valid private creator")
+        warnings.warn(msg)
+        raise KeyError(msg) from exc
 
     # private elements are usually agnostic for
     # "block" (see PS3.5-2008 7.8.1 p44)
@@ -634,7 +639,7 @@ def private_dictionary_description(tag: TagType, private_creator: str) -> str:
         The tag for the element whose description is being retrieved, in any
         of the forms accepted by :func:`~pydicom.tag.Tag`.
     private_creator : str
-        The name of the private createor.
+        The name of the private creator.
 
     Returns
     -------
@@ -644,6 +649,7 @@ def private_dictionary_description(tag: TagType, private_creator: str) -> str:
     Raises
     ------
     KeyError
-        If the tag is not present in the private dictionary.
+        If the tag is not present in the private dictionary,
+        or if the private creator is not valid.
     """
     return get_private_entry(tag, private_creator)[2]

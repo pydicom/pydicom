@@ -904,6 +904,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00181200: ('DA', '1-n', "Date of Last Calibration", '', 'DateOfLastCalibration'),  # noqa
     0x00181201: ('TM', '1-n', "Time of Last Calibration", '', 'TimeOfLastCalibration'),  # noqa
     0x00181202: ('DT', '1', "DateTime of Last Calibration", '', 'DateTimeOfLastCalibration'),  # noqa
+    0x00181203: ('DT', '1', "Calibration DateTime", '', 'CalibrationDateTime'),  # noqa
     0x00181210: ('SH', '1-n', "Convolution Kernel", '', 'ConvolutionKernel'),  # noqa
     0x00181240: ('IS', '1-n', "Upper/Lower Pixel Values", 'Retired', 'UpperLowerPixelValues'),  # noqa
     0x00181242: ('IS', '1', "Actual Frame Duration", '', 'ActualFrameDuration'),  # noqa
@@ -2243,6 +2244,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00321055: ('CS', '1', "Study Component Status ID", 'Retired', 'StudyComponentStatusID'),  # noqa
     0x00321060: ('LO', '1', "Requested Procedure Description", '', 'RequestedProcedureDescription'),  # noqa
     0x00321064: ('SQ', '1', "Requested Procedure Code Sequence", '', 'RequestedProcedureCodeSequence'),  # noqa
+    0x00321065: ('SQ', '1', "Requested Laterality Code Sequence", '', 'RequestedLateralityCodeSequence'),  # noqa
     0x00321066: ('UT', '1', "Reason for Visit", '', 'ReasonForVisit'),  # noqa
     0x00321067: ('SQ', '1', "Reason for Visit Code Sequence", '', 'ReasonForVisitCodeSequence'),  # noqa
     0x00321070: ('LO', '1', "Requested Contrast Agent", '', 'RequestedContrastAgent'),  # noqa
@@ -3914,6 +3916,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300800B0: ('SQ', '1', "Recorded Wedge Sequence", '', 'RecordedWedgeSequence'),  # noqa
     0x300800C0: ('SQ', '1', "Recorded Compensator Sequence", '', 'RecordedCompensatorSequence'),  # noqa
     0x300800D0: ('SQ', '1', "Recorded Block Sequence", '', 'RecordedBlockSequence'),  # noqa
+    0x300800D1: ('SQ', '1', "Recorded Block Slab Sequence", '', 'RecordedBlockSlabSequence'),  # noqa
     0x300800E0: ('SQ', '1', "Treatment Summary Measured Dose Reference Sequence", '', 'TreatmentSummaryMeasuredDoseReferenceSequence'),  # noqa
     0x300800F0: ('SQ', '1', "Recorded Snout Sequence", '', 'RecordedSnoutSequence'),  # noqa
     0x300800F2: ('SQ', '1', "Recorded Range Shifter Sequence", '', 'RecordedRangeShifterSequence'),  # noqa
@@ -3960,7 +3963,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300A0007: ('TM', '1', "RT Plan Time", '', 'RTPlanTime'),  # noqa
     0x300A0009: ('LO', '1-n', "Treatment Protocols", '', 'TreatmentProtocols'),  # noqa
     0x300A000A: ('CS', '1', "Plan Intent", '', 'PlanIntent'),  # noqa
-    0x300A000B: ('LO', '1-n', "Treatment Sites", '', 'TreatmentSites'),  # noqa
+    0x300A000B: ('LO', '1-n', "Treatment Sites", 'Retired', 'TreatmentSites'),  # noqa
     0x300A000C: ('CS', '1', "RT Plan Geometry", '', 'RTPlanGeometry'),  # noqa
     0x300A000E: ('ST', '1', "Prescription Description", '', 'PrescriptionDescription'),  # noqa
     0x300A0010: ('SQ', '1', "Dose Reference Sequence", '', 'DoseReferenceSequence'),  # noqa
@@ -4597,6 +4600,21 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x300C0111: ('SQ', '1', "Omitted Beam Task Sequence", '', 'OmittedBeamTaskSequence'),  # noqa
     0x300C0112: ('CS', '1', "Reason for Omission", '', 'ReasonForOmission'),  # noqa
     0x300C0113: ('LO', '1', "Reason for Omission Description", '', 'ReasonForOmissionDescription'),  # noqa
+    0x300C0114: ('SQ', '1', "Prescription Overview Sequence", '', 'PrescriptionOverviewSequence'),  # noqa
+    0x300C0115: ('FL', '1', "Total Prescription Dose", '', 'TotalPrescriptionDose'),  # noqa
+    0x300C0116: ('SQ', '1', "Plan Overview Sequence", '', 'PlanOverviewSequence'),  # noqa
+    0x300C0117: ('US', '1', "Plan Overview Index", '', 'PlanOverviewIndex'),  # noqa
+    0x300C0118: ('US', '1', "Referenced Plan Overview Index", '', 'ReferencedPlanOverviewIndex'),  # noqa
+    0x300C0119: ('US', '1', "Number of Fractions Included", '', 'NumberOfFractionsIncluded'),  # noqa
+    0x300C0120: ('SQ', '1', "Dose Calibration Conditions Sequence", '', 'DoseCalibrationConditionsSequence'),  # noqa
+    0x300C0121: ('FD', '1', "Absorbed Dose to Meterset Ratio", '', 'AbsorbedDoseToMetersetRatio'),  # noqa
+    0x300C0122: ('FD', '2', "Delineated Radiation Field Size", '', 'DelineatedRadiationFieldSize'),  # noqa
+    0x300C0123: ('CS', '1', "Dose Calibration Conditions Verified Flag", '', 'DoseCalibrationConditionsVerifiedFlag'),  # noqa
+    0x300C0124: ('FD', '1', "Calibration Reference Point Depth", '', 'CalibrationReferencePointDepth'),  # noqa
+    0x300C0125: ('SQ', '1', "Gating Beam Hold Transition Sequence", '', 'GatingBeamHoldTransitionSequence'),  # noqa
+    0x300C0126: ('CS', '1', "Beam Hold Transition", '', 'BeamHoldTransition'),  # noqa
+    0x300C0127: ('DT', '1', "Beam Hold Transition DateTime", '', 'BeamHoldTransitionDateTime'),  # noqa
+    0x300C0128: ('SQ', '1', "Beam Hold Originating Device Sequence", '', 'BeamHoldOriginatingDeviceSequence'),  # noqa
     0x300E0002: ('CS', '1', "Approval Status", '', 'ApprovalStatus'),  # noqa
     0x300E0004: ('DA', '1', "Review Date", '', 'ReviewDate'),  # noqa
     0x300E0005: ('TM', '1', "Review Time", '', 'ReviewTime'),  # noqa

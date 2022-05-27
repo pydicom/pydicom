@@ -61,4 +61,4 @@ class Code(NamedTuple):
         return not (self == other)
 
 
-Code.__new__.__defaults__ = (None,)  # type: ignore[attr-defined]
+Code.__new__.__defaults__ = (None,)

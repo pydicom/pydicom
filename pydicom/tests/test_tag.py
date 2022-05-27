@@ -226,7 +226,7 @@ class TestBaseTag:
         # Group 0 not private
         assert not BaseTag(0x00000001).is_private
 
-    def test_private_creator(self):
+    def test_is_private_creator(self):
         """Test BaseTag.is_private_creator returns correct values."""
         # Non-private tag
         assert not BaseTag(0x00080010).is_private_creator
@@ -235,6 +235,10 @@ class TestBaseTag:
         assert BaseTag(0x00090010).is_private_creator
         assert BaseTag(0x000900FF).is_private_creator
         assert not BaseTag(0x00090100).is_private_creator
+
+    def test_private_creator(self):
+        assert BaseTag(0x00091000).private_creator == BaseTag(0x00090010)
+        assert BaseTag(0x00292526).private_creator == BaseTag(0x00290025)
 
 
 class TestTag:

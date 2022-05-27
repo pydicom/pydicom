@@ -9,7 +9,7 @@ from struct import (Struct, unpack)
 import sys
 from typing import (
     BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
-    Iterator, Dict
+    Iterator, Dict, Type
 )
 import warnings
 import zlib
@@ -236,7 +236,7 @@ def data_element_generator(
         else:
             # VR UN with undefined length shall be handled as SQ
             # see PS 3.5, section 6.2.2
-            if vr == VR_.UN:
+            if vr == VR_.UN and config.settings.infer_sq_for_un_vr:
                 vr = VR_.SQ
             # Try to look up type to see if is a SQ
             # if private tag, won't be able to look it up in dictionary,
@@ -777,7 +777,7 @@ def read_partial(
     # Read preamble (if present)
     preamble = read_preamble(fileobj, force)
     # Read any File Meta Information group (0002,eeee) elements (if present)
-    file_meta_dataset = _read_file_meta_info(fileobj)
+    file_meta = _read_file_meta_info(fileobj)
 
     # Read Dataset
 
@@ -795,7 +795,7 @@ def read_partial(
     # transfer syntax of implicit VR little endian and correct it as necessary
     is_implicit_VR = True
     is_little_endian = True
-    transfer_syntax = file_meta_dataset.get("TransferSyntaxUID")
+    transfer_syntax = file_meta.get("TransferSyntaxUID")
     if peek == b'':  # EOF
         pass
     elif transfer_syntax is None:  # issue 258
@@ -865,34 +865,28 @@ def read_partial(
     # Add the command set elements to the dataset (if any)
     dataset.update(command_set)
 
-    class_uid = cast(
-        pydicom.uid.UID, file_meta_dataset.get("MediaStorageSOPClassUID", None)
-    )
-    ds: Union[DicomDir, FileDataset]
-    if class_uid and class_uid.name == "Media Storage Directory Storage":
+    # (0002, 0002) Media Storage SOP Class UID
+    elem = file_meta.get(0x00020002, None)
+    sop_class = elem.value.name if (elem and elem.VM == 1) else ""
+    if sop_class == "Media Storage Directory Storage":
         warnings.warn(
             "The 'DicomDir' class is deprecated and will be removed in v3.0, "
             "after which 'dcmread()' will return a normal 'FileDataset' "
             "instance for 'Media Storage Directory' SOP Instances.",
             DeprecationWarning
         )
-        ds = DicomDir(
-            fileobj,
-            dataset,
-            preamble,
-            file_meta_dataset,
-            is_implicit_VR,
-            is_little_endian,
-        )
+        ds_class: Union[Type[FileDataset], Type[DicomDir]] = DicomDir
     else:
-        ds = FileDataset(
-            fileobj,
-            dataset,
-            preamble,
-            file_meta_dataset,
-            is_implicit_VR,
-            is_little_endian,
-        )
+        ds_class = FileDataset
+
+    ds = ds_class(
+        fileobj,
+        dataset,
+        preamble,
+        file_meta,
+        is_implicit_VR,
+        is_little_endian,
+    )
     # save the originally read transfer syntax properties in the dataset
     ds.set_original_encoding(
         is_implicit_VR, is_little_endian, dataset._character_set
@@ -1190,7 +1184,8 @@ def read_deferred_data_element(
     # The first element out of the iterator should be the same type as the
     #   the deferred element == RawDataElement
     elem = cast(RawDataElement, next(elem_gen))
-    fp.close()
+    if is_filename:
+        fp.close()
     if elem.VR != raw_data_elem.VR:
         raise ValueError(
             f"Deferred read VR {elem.VR} does not match original "

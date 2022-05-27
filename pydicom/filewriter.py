@@ -259,8 +259,8 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
     """
     endianChar = '><'[fp.is_little_endian]
     value = elem.value
-    if value == "":
-        return  # don't need to write anything for empty string
+    if value is None or value == "":
+        return  # don't need to write anything for no or empty value
 
     format_string = endianChar + struct_format
     try:

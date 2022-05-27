@@ -9,24 +9,9 @@ Changes
 * Updated the private dictionary
 * :attr:`~pydicom.config.enforce_valid_values` is deprecated in favor of
   :attr:`~pydicom.config.Settings.reading_validation_mode`
-* The :doc:`pydicom.pixel_data_handlers<../reference/handlers.pixel_data>` module is deprecated and will be removed in
-  v4.0. The following functions should be imported from the new :doc:`pydicom.pixels
-  <../reference/pixels>` module instead:
-
-  * :func:`~pydicom.pixels.apply_color_lut`
-  * :func:`~pydicom.pixels.apply_modality_lut`
-  * :func:`~pydicom.pixels.apply_rescale`
-  * :func:`~pydicom.pixels.apply_voi`
-  * :func:`~pydicom.pixels.apply_voi_lut`
-  * :func:`~pydicom.pixels.apply_windowing`
-  * :func:`~pydicom.pixels.convert_color_space`
-  * :func:`~pydicom.pixels.pack_bits`
-  * :func:`~pydicom.pixels.unpack_bits`
-
-* The ``pydicom.encoders`` module has been moved to ``pydicom.pixels.encoders``,
-  the old import path will be removed in v3.0
-
-
+  :attr:`~pydicom.config.settings.reading_validation_mode`
+* Added `download` parameter to :func:`~pydicom.data.get_testdata_file`
+  to allow skipping downloading the file if missed locally (:pr:`1617`)
 
 Enhancements
 ------------
@@ -34,7 +19,7 @@ Enhancements
   on reading and writing. Depending on the value of
   :attr:`~pydicom.config.Settings.reading_validation_mode`
   and :attr:`~pydicom.config.Settings.writing_validation_mode`
-  a warning is logged, an exception is raised, or the validation is skipped.
+  a warning is logged, an egit sxception is raised, or the validation is skipped.
 * Added :class:`~pydicom.valuerep.VR` enum (:pr:`1500`)
 * UIDs for all Storage SOP Classes have been added to the ``uid`` module
   (:issue:`1498`)
@@ -45,7 +30,10 @@ Enhancements
   :func:`~pydicom.pixels.unpack_bits` (:pr:`1594`)
 * Added :func:`~pydicom.pixels.expand_ybr422` for expanding
   uncompressed ``YBR_FULL_422`` data to ``YBR_FULL`` (:pr:`1593`)
-
+* Replacement of ``UN`` VR with ``SQ`` VR for undefined length data elements
+  (introduced in 2.2.2), can now be configured via
+  :attr:`~pydicom.config.settings.infer_sq_for_un_vr`
+* Updated dictionaries to DICOM 2022a
 
 Fixes
 -----
@@ -64,3 +52,7 @@ Fixes
 * Fixed bad DICOMDIR offsets when using :meth:`FileSet.write()
   <pydicom.fileset.FileSet.write>` with a *Directory Record Sequence* using
   undefined length items (:issue:`1596`)
+* Assigning a list of length one as tag value is now correctly handled as
+  assigning the single value (:issue:`1606`)
+* Fixed an exception with multiple deferred reads with file-like objects
+  (:issue:`1609`)

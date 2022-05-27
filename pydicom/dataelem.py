@@ -512,9 +512,10 @@ class DataElement:
             val.append
         except AttributeError:  # not a list
             return self._convert(val)
-        else:
-            return MultiValue(self._convert, val,
-                              validation_mode=self.validation_mode)
+        if len(val) == 1:
+            return self._convert(val[0])
+        return MultiValue(self._convert, val,
+                          validation_mode=self.validation_mode)
 
     def _convert(self, val: Any) -> Any:
         """Convert `val` to an appropriate type for the element's VR."""
@@ -649,9 +650,9 @@ class DataElement:
         if self.tag.is_private:
             if self.private_creator:
                 try:
-                    # If have name from private dictionary, use it, but
-                    #   but put in square brackets so is differentiated,
-                    #   and clear that cannot access it by name
+                    # If we have the name from the private dictionary, use it,
+                    # but put it in square brackets to make clear
+                    # that the tag cannot be accessed by that name
                     name = private_dictionary_description(
                         self.tag, self.private_creator
                     )

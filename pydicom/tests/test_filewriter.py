@@ -28,6 +28,7 @@ from pydicom.filewriter import (
 )
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
+from pydicom.tests.test_helpers import assert_no_warning
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
@@ -2331,7 +2332,7 @@ class TestWriteNumbers:
         """Test writing an empty value does nothing"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        elem = DataElement(0x00100010, 'US', '')
+        elem = DataElement(0x00100010, 'US', None)
         fmt = 'H'
         write_numbers(fp, elem, fmt)
         assert fp.getvalue() == b''
@@ -2435,9 +2436,8 @@ class TestWritePN:
         # PersonName value has not saved the default encoding
         fp = DicomBytesIO()
         fp.is_little_endian = True
-        with pytest.warns(None) as warnings:
+        with assert_no_warning():
             write_PN(fp, elem, encodings)
-        assert not warnings
         assert encoded == fp.getvalue()
 
         fp = DicomBytesIO()
