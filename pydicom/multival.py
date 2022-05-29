@@ -81,7 +81,7 @@ class MultiValue(MutableSequence[_ItemType]):
         """
         self._list.extend([self.type_constructor(x) for x in val])
 
-    def __iadd__(self, other: Iterable[_T]) -> MutableSequence[_ItemType]:
+    def __iadd__(self, other: Iterable[_T]) -> MultiValue[_ItemType]:
         """Implement MultiValue() += Iterable[Any]."""
         self._list += [self.type_constructor(x) for x in other]
         return self
