@@ -201,6 +201,10 @@ class BaseTag(int):
 
     __repr__ = __str__
 
+    def json_key(self) -> str:
+        """Return the tag value as a JSON key string 'ggggeeee'."""
+        return "{0:04X}{1:04X}".format(self.group, self.element)
+
     @property
     def group(self) -> int:
         """Return the tag's group number as :class:`int`."""
