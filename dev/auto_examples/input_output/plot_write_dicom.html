@@ -21,6 +21,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -115,39 +116,39 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="write-dicom-data">
-<span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-input-output-plot-write-dicom-py"></span><h1>Write DICOM data<a class="headerlink" href="#write-dicom-data" title="Permalink to this heading">¶</a></h1>
 <p>This example shows how to write a DICOM file from scratch using pydicom. This
 example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmpascmx05r.dcm
+Writing test file /tmp/tmpbgbqb6dg.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpl_hnar9l.dcm
-Load file /tmp/tmpascmx05r.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpvsvccrxj.dcm
+Load file /tmp/tmpbgbqb6dg.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20220429&#39;
-(0008, 0033) Content Time                        TM: &#39;205618.647303&#39;
+(0008, 0023) Content Date                        DA: &#39;20220603&#39;
+(0008, 0033) Content Time                        TM: &#39;170306.804395&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpascmx05r.dcm ...
-Load file /tmp/tmpl_hnar9l.dcm ...
+Remove file /tmp/tmpbgbqb6dg.dcm ...
+Load file /tmp/tmpvsvccrxj.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20220429&#39;
-(0008, 0033) Content Time                        TM: &#39;205618.647303&#39;
+(0008, 0023) Content Date                        DA: &#39;20220603&#39;
+(0008, 0033) Content Time                        TM: &#39;170306.804395&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpl_hnar9l.dcm ...
+Remove file /tmp/tmpvsvccrxj.dcm ...
 </pre></div>
 </div>
 <div class="line-block">

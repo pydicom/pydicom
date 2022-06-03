@@ -21,6 +21,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -136,10 +137,10 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-tag-basetag">
-<h1>pydicom.tag.BaseTag<a class="headerlink" href="#pydicom-tag-basetag" title="Permalink to this headline">¶</a></h1>
+<h1>pydicom.tag.BaseTag<a class="headerlink" href="#pydicom-tag-basetag" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.tag.BaseTag">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.tag.</span></span><span class="sig-name descname"><span class="pre">BaseTag</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1db21d627/pydicom/tag.py#L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.tag.</span></span><span class="sig-name descname"><span class="pre">BaseTag</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f059f230/pydicom/tag.py#L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.tag.BaseTag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a DICOM element (group, element) tag.</p>
 <p>Tags are represented as an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>.</p>
 <dl class="py method">
@@ -202,13 +203,16 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.is_private_creator" title="pydicom.tag.BaseTag.is_private_creator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_private_creator</span></code></a></p></td>
 <td><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if the tag is a private creator.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">numerator</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">json_key</span></code></a></p></td>
+<td><p>Return the tag value as a JSON key string 'GGGGEEEE'.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">numerator</span></code></p></td>
 <td><p>the numerator of a rational number in lowest terms</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.private_creator" title="pydicom.tag.BaseTag.private_creator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_creator</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pydicom.tag.BaseTag.private_creator" title="pydicom.tag.BaseTag.private_creator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">private_creator</span></code></a></p></td>
 <td><p>Return the private creator tag for the given tag.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">real</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">real</span></code></p></td>
 <td><p>the real part of a complex number</p></td>
 </tr>
 </tbody>
@@ -247,8 +251,14 @@
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="pydicom.tag.BaseTag.json_key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">json_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#pydicom.tag.BaseTag.json_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the tag value as a JSON key string ‘GGGGEEEE’.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="pydicom.tag.BaseTag.private_creator">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">private_creator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">pydicom.tag.BaseTag</span></a></em><a class="headerlink" href="#pydicom.tag.BaseTag.private_creator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">private_creator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#pydicom.tag.BaseTag" title="pydicom.tag.BaseTag"><span class="pre">BaseTag</span></a></em><a class="headerlink" href="#pydicom.tag.BaseTag.private_creator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the private creator tag for the given tag.
 The result is meaningless if this is not a private tag.</p>
 <div class="versionadded">

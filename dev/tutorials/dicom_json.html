@@ -21,6 +21,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -119,7 +120,7 @@
            <div itemprop="articleBody">
              
   <section id="introduction-to-json-support">
-<h1>Introduction to JSON support<a class="headerlink" href="#introduction-to-json-support" title="Permalink to this headline">¶</a></h1>
+<h1>Introduction to JSON support<a class="headerlink" href="#introduction-to-json-support" title="Permalink to this heading">¶</a></h1>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.3.</span></p>
 </div>
@@ -130,7 +131,7 @@ beta state, and the API is still subject to change.</p>
 Part 18 as the <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/chapter_F.html">DICOM JSON Model</a>. The standard
 describes how different DICOM value representations can be encoded in JSON.</p>
 <section id="converting-a-dataset-into-json-format">
-<h2>Converting a dataset into JSON format<a class="headerlink" href="#converting-a-dataset-into-json-format" title="Permalink to this headline">¶</a></h2>
+<h2>Converting a dataset into JSON format<a class="headerlink" href="#converting-a-dataset-into-json-format" title="Permalink to this heading">¶</a></h2>
 <p><em>pydicom</em> supports the conversion of a DICOM dataset both into a JSON string
 and into a deserialized JSON dictionary:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pydicom</span>
@@ -151,7 +152,7 @@ dictionaries deserialized from a JSON string instead, so
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> can be more convenient here.</p>
 </section>
 <section id="creating-a-dataset-from-json">
-<h2>Creating a dataset from JSON<a class="headerlink" href="#creating-a-dataset-from-json" title="Permalink to this headline">¶</a></h2>
+<h2>Creating a dataset from JSON<a class="headerlink" href="#creating-a-dataset-from-json" title="Permalink to this heading">¶</a></h2>
 <p>Similar, a dataset can be created both from a JSON string and from a JSON
 dictionary. There is only a single function to handle both cases:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -172,7 +173,7 @@ dictionary. There is only a single function to handle both cases:</p>
 </div>
 </section>
 <section id="working-with-large-binary-data">
-<h2>Working with large binary data<a class="headerlink" href="#working-with-large-binary-data" title="Permalink to this headline">¶</a></h2>
+<h2>Working with large binary data<a class="headerlink" href="#working-with-large-binary-data" title="Permalink to this heading">¶</a></h2>
 <p>Large binary data can be handled in two ways. It can be encoded
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.7.html">inline</a> as a base64-encoded string, or it can
 be accessed via a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.6.html">BulkDataURI</a> provided in the

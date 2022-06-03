@@ -21,6 +21,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -133,7 +134,7 @@
            <div itemprop="articleBody">
              
   <section id="creating-and-managing-virtual-environments">
-<h1>Creating and managing virtual environments<a class="headerlink" href="#creating-and-managing-virtual-environments" title="Permalink to this headline">¶</a></h1>
+<h1>Creating and managing virtual environments<a class="headerlink" href="#creating-and-managing-virtual-environments" title="Permalink to this heading">¶</a></h1>
 <p>When it comes to the management of third-party packages, Python
 has some complications:</p>
 <ul class="simple">
@@ -168,9 +169,9 @@ environment ready for installing <em>pydicom</em>.</p>
 <p>If you’re using pip as your package manager then continue reading. If you’re
 using conda then <a class="reference internal" href="#tut-venv-conda"><span class="std std-ref">start here</span></a></p>
 <section id="using-pip">
-<span id="tut-venv-pip"></span><h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
+<span id="tut-venv-pip"></span><h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this heading">¶</a></h2>
 <section id="install-packages">
-<h3>Install packages<a class="headerlink" href="#install-packages" title="Permalink to this headline">¶</a></h3>
+<h3>Install packages<a class="headerlink" href="#install-packages" title="Permalink to this heading">¶</a></h3>
 <p>First up, we’re going to install a couple of packages that make managing
 virtual environments a lot easier:
 <a class="reference external" href="https://pypi.org/project/virtualenv/">virtualenv</a> and
@@ -180,7 +181,7 @@ virtual environments a lot easier:
 </div>
 </section>
 <section id="create-new-virtual-environments">
-<h3>Create new virtual environments<a class="headerlink" href="#create-new-virtual-environments" title="Permalink to this headline">¶</a></h3>
+<h3>Create new virtual environments<a class="headerlink" href="#create-new-virtual-environments" title="Permalink to this heading">¶</a></h3>
 <p>To create a new environment run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkvirtualenv test-env
 </pre></div>
@@ -226,7 +227,7 @@ Python 3.7.5
 </div>
 </section>
 <section id="deleting-environments">
-<h3>Deleting environments<a class="headerlink" href="#deleting-environments" title="Permalink to this headline">¶</a></h3>
+<h3>Deleting environments<a class="headerlink" href="#deleting-environments" title="Permalink to this heading">¶</a></h3>
 <p>Environments can be deleted from the <code class="docutils literal notranslate"><span class="pre">WORKON_HOME</span></code> directory by using
 <code class="docutils literal notranslate"><span class="pre">rmvirtualenv</span> <span class="pre">[env</span> <span class="pre">name]</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ rmvirtualenv default-env
@@ -241,7 +242,7 @@ Either switch to another environment, or run &#39;deactivate&#39;.
 </div>
 </section>
 <section id="activating-and-deactivating">
-<h3>Activating and deactivating<a class="headerlink" href="#activating-and-deactivating" title="Permalink to this headline">¶</a></h3>
+<h3>Activating and deactivating<a class="headerlink" href="#activating-and-deactivating" title="Permalink to this heading">¶</a></h3>
 <p>Environments can be deactivated with the <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> command, which will
 return you to the system:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ deactivate
@@ -261,7 +262,7 @@ Python 2.7.17
 </div>
 </section>
 <section id="managing-packages">
-<h3>Managing packages<a class="headerlink" href="#managing-packages" title="Permalink to this headline">¶</a></h3>
+<h3>Managing packages<a class="headerlink" href="#managing-packages" title="Permalink to this heading">¶</a></h3>
 <p>Packages within the environment can be managed normally, just remember to
 activate the environment first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ pip install antigravity
@@ -283,7 +284,7 @@ same package installed:</p>
 </div>
 </section>
 <section id="final-steps">
-<h3>Final steps<a class="headerlink" href="#final-steps" title="Permalink to this headline">¶</a></h3>
+<h3>Final steps<a class="headerlink" href="#final-steps" title="Permalink to this heading">¶</a></h3>
 <p>Let’s clean up the environments we created. First we’ll take a look to
 see what environments are available, then we’ll delete them all:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(current) $ deactivate
@@ -312,9 +313,9 @@ the creation virtual environments, but without the need for extra packages.</p>
 </section>
 </section>
 <section id="using-conda">
-<span id="tut-venv-conda"></span><h2>Using conda<a class="headerlink" href="#using-conda" title="Permalink to this headline">¶</a></h2>
+<span id="tut-venv-conda"></span><h2>Using conda<a class="headerlink" href="#using-conda" title="Permalink to this heading">¶</a></h2>
 <section id="create-a-new-virtual-environment">
-<h3>Create a new virtual environment<a class="headerlink" href="#create-a-new-virtual-environment" title="Permalink to this headline">¶</a></h3>
+<h3>Create a new virtual environment<a class="headerlink" href="#create-a-new-virtual-environment" title="Permalink to this heading">¶</a></h3>
 <p>To create a new virtual environment we use the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">create</span></code> command with
 the <code class="docutils literal notranslate"><span class="pre">-n</span> <span class="pre">[env</span> <span class="pre">name]</span></code> flag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n test-env
@@ -329,7 +330,7 @@ version <code class="docutils literal notranslate"><span class="pre">X.Y</span><
 </div>
 </section>
 <section id="activating-and-deactivating-environments">
-<h3>Activating and deactivating environments<a class="headerlink" href="#activating-and-deactivating-environments" title="Permalink to this headline">¶</a></h3>
+<h3>Activating and deactivating environments<a class="headerlink" href="#activating-and-deactivating-environments" title="Permalink to this heading">¶</a></h3>
 <p>Environments must be activated before they can be used:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda activate py37-env
 (py37-env) $ python --version
@@ -357,7 +358,7 @@ $
 </div>
 </section>
 <section id="id1">
-<h3>Deleting environments<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<h3>Deleting environments<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <p>Environments can be deleted with the <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">remove</span></code> command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda remove -n test-env --all
 </pre></div>
@@ -369,7 +370,7 @@ CondaEnvironmentError: cannot remove current environment. deactivate and run con
 </div>
 </section>
 <section id="managing-installed-packages">
-<h3>Managing installed packages<a class="headerlink" href="#managing-installed-packages" title="Permalink to this headline">¶</a></h3>
+<h3>Managing installed packages<a class="headerlink" href="#managing-installed-packages" title="Permalink to this heading">¶</a></h3>
 <p>Packages within the environment can be managed normally, just remember to
 activate the environment first:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(py37-env) $ pip install antigravity
@@ -392,7 +393,7 @@ installed:</p>
 </div>
 </section>
 <section id="id2">
-<h3>Final steps<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3>Final steps<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>Let’s clean up the environments we created. First we’ll take a look to
 see what environments are available, then we’ll delete them all:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(current) $ conda activate

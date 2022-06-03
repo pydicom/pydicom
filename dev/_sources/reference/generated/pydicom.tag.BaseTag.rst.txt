@@ -35,6 +35,7 @@
       ~BaseTag.imag
       ~BaseTag.is_private
       ~BaseTag.is_private_creator
+      ~BaseTag.json_key
       ~BaseTag.numerator
       ~BaseTag.private_creator
       ~BaseTag.real

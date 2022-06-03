@@ -21,6 +21,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -99,10 +100,10 @@
            <div itemprop="articleBody">
              
   <section id="transition-to-pydicom-1-x">
-<span id="transition-to-pydicom1"></span><h1>Transition to pydicom 1.x<a class="headerlink" href="#transition-to-pydicom-1-x" title="Permalink to this headline">¶</a></h1>
+<span id="transition-to-pydicom1"></span><h1>Transition to pydicom 1.x<a class="headerlink" href="#transition-to-pydicom-1-x" title="Permalink to this heading">¶</a></h1>
 <p class="rubric">Important information on differences in pydicom post 1.0 vs pre-1.0</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>As is often the case for major software version number changes, pydicom 1.0
 breaks with the previous release of pydicom (0.9.9) in several ways.  These
 require changes to user code to target the pydicom &gt;= 1.0 package, or to check
@@ -134,7 +135,7 @@ GitHub issues list.  Having made the leap, the rest of this guide should help
 smooth the way…</p>
 </section>
 <section id="for-authors-of-packages-requiring-pydicom-1-0">
-<h2>For authors of packages requiring pydicom &lt; 1.0<a class="headerlink" href="#for-authors-of-packages-requiring-pydicom-1-0" title="Permalink to this headline">¶</a></h2>
+<h2>For authors of packages requiring pydicom &lt; 1.0<a class="headerlink" href="#for-authors-of-packages-requiring-pydicom-1-0" title="Permalink to this heading">¶</a></h2>
 <p>The old pydicom releases have been split off into their own package, called
 <code class="docutils literal notranslate"><span class="pre">dicom</span></code>, which is now hosted on PyPI. This allows the old library <code class="docutils literal notranslate"><span class="pre">dicom</span></code>
 to co-exist alongside the new library <code class="docutils literal notranslate"><span class="pre">pydicom</span></code>.</p>
@@ -152,7 +153,7 @@ existing pydicom installs</p></li>
 </div></blockquote>
 </section>
 <section id="error-messages-relating-to-the-pydicom-transition">
-<h2>Error messages relating to the pydicom transition<a class="headerlink" href="#error-messages-relating-to-the-pydicom-transition" title="Permalink to this headline">¶</a></h2>
+<h2>Error messages relating to the pydicom transition<a class="headerlink" href="#error-messages-relating-to-the-pydicom-transition" title="Permalink to this heading">¶</a></h2>
 <p>This section is here in the hopes of people getting directed to this page on
 searches. If that’s you, then welcome! Hopefully the information here can get
 things going quickly for you.</p>
@@ -186,11 +187,11 @@ you should:</p>
 </section>
 </section>
 <section id="api-changes-in-version-1-0">
-<h1>API Changes in version 1.0<a class="headerlink" href="#api-changes-in-version-1-0" title="Permalink to this headline">¶</a></h1>
+<h1>API Changes in version 1.0<a class="headerlink" href="#api-changes-in-version-1-0" title="Permalink to this heading">¶</a></h1>
 <p>Apart from the change of the package name, there are some changes in
 module names, class names, and behavior that may require some code changes.</p>
 <section id="changed-module-names">
-<h2>Changed module names<a class="headerlink" href="#changed-module-names" title="Permalink to this headline">¶</a></h2>
+<h2>Changed module names<a class="headerlink" href="#changed-module-names" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>module <code class="docutils literal notranslate"><span class="pre">UID</span></code> is now <code class="docutils literal notranslate"><span class="pre">uid</span></code></p></li>
@@ -198,7 +199,7 @@ module names, class names, and behavior that may require some code changes.</p>
 </div></blockquote>
 </section>
 <section id="changed-function-and-variable-names">
-<h2>Changed function and variable names<a class="headerlink" href="#changed-function-and-variable-names" title="Permalink to this headline">¶</a></h2>
+<h2>Changed function and variable names<a class="headerlink" href="#changed-function-and-variable-names" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code>:</p>
@@ -235,7 +236,7 @@ module names, class names, and behavior that may require some code changes.</p>
 </div></blockquote>
 </section>
 <section id="removed-functions-and-names">
-<h2>Removed functions and names<a class="headerlink" href="#removed-functions-and-names" title="Permalink to this headline">¶</a></h2>
+<h2>Removed functions and names<a class="headerlink" href="#removed-functions-and-names" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>support for old names (before DICOM keywords) in module <code class="docutils literal notranslate"><span class="pre">datadict</span></code> is
@@ -247,7 +248,7 @@ gone (<code class="docutils literal notranslate"><span class="pre">CleanName()</
 </div></blockquote>
 </section>
 <section id="changed-behavior">
-<h2>Changed behavior<a class="headerlink" href="#changed-behavior" title="Permalink to this headline">¶</a></h2>
+<h2>Changed behavior<a class="headerlink" href="#changed-behavior" title="Permalink to this heading">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">dataset.save_as()</span></code>:  <code class="docutils literal notranslate"><span class="pre">TransferSyntaxUID</span></code> not added automatically to

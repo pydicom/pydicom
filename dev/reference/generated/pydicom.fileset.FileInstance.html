@@ -21,6 +21,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -129,10 +130,10 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-fileset-fileinstance">
-<h1>pydicom.fileset.FileInstance<a class="headerlink" href="#pydicom-fileset-fileinstance" title="Permalink to this headline">¶</a></h1>
+<h1>pydicom.fileset.FileInstance<a class="headerlink" href="#pydicom-fileset-fileinstance" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">FileInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1db21d627/pydicom/fileset.py#L705"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">FileInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">RecordNode</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f059f230/pydicom/fileset.py#L705"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Representation of a File in the File-set.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.node">
@@ -147,7 +148,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">pydicom.fileset.RecordNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1db21d627/pydicom/fileset.py#L713"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.fileset.RecordNode.html#pydicom.fileset.RecordNode" title="pydicom.fileset.RecordNode"><span class="pre">RecordNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f059f230/pydicom/fileset.py#L713"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new FileInstance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,25 +222,25 @@
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.SOPClassUID">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SOPClassUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">pydicom.uid.UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.SOPClassUID" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SOPClassUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.SOPClassUID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>SOP Class UID</em> of the referenced instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.SOPInstanceUID">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SOPInstanceUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">pydicom.uid.UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.SOPInstanceUID" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SOPInstanceUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.SOPInstanceUID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>SOP Instance UID</em> of the referenced instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.TransferSyntaxUID">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TransferSyntaxUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">pydicom.uid.UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.TransferSyntaxUID" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TransferSyntaxUID</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.uid.UID.html#pydicom.uid.UID" title="pydicom.uid.UID"><span class="pre">UID</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.TransferSyntaxUID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <em>Transfer Syntax UID</em> of the referenced instance.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.file_set">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><span class="pre">pydicom.fileset.FileSet</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.file_set" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><span class="pre">FileSet</span></a></em><a class="headerlink" href="#pydicom.fileset.FileInstance.file_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <a class="reference internal" href="pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> this instance belongs
 to.</p>
 </dd></dl>
@@ -280,7 +281,7 @@ removal</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pydicom.fileset.FileInstance.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">pydicom.dataset.Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/1db21d627/pydicom/fileset.py#L910"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance.load" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/4f059f230/pydicom/fileset.py#L910"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.FileInstance.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the referenced instance as a
 <a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p>
 </dd></dl>

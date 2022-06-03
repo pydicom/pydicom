@@ -21,6 +21,7 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
@@ -115,7 +116,7 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="anonymize-dicom-data">
-<span id="sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"></span><h1>Anonymize DICOM data<a class="headerlink" href="#anonymize-dicom-data" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-metadata-processing-plot-anonymize-py"></span><h1>Anonymize DICOM data<a class="headerlink" href="#anonymize-dicom-data" title="Permalink to this heading">¶</a></h1>
 <p>This example is a starting point to anonymize DICOM data.</p>
 <p>It shows how to read data and replace tags: person names, patient id,
 optionally remove curves and private tags, and write the results in a new file.</p>
@@ -132,7 +133,7 @@ optionally remove curves and private tags, and write the results in a new file.<
 </pre></div>
 </div>
 <section id="anonymize-a-single-file">
-<h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this headline">¶</a></h2>
+<h2>Anonymize a single file<a class="headerlink" href="#anonymize-a-single-file" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 

@@ -21,6 +21,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
@@ -125,7 +126,7 @@
            <div itemprop="articleBody">
              
   <section id="contributing-a-source-code-change">
-<h1>Contributing a source code change<a class="headerlink" href="#contributing-a-source-code-change" title="Permalink to this headline">¶</a></h1>
+<h1>Contributing a source code change<a class="headerlink" href="#contributing-a-source-code-change" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial will take you through the process of:</p>
 <ul class="simple">
 <li><p>Downloading the current source code</p></li>
@@ -137,7 +138,7 @@
 <li><p>Committing the changes and making a pull request</p></li>
 </ul>
 <section id="download-the-current-source-code">
-<h2>Download the current source code<a class="headerlink" href="#download-the-current-source-code" title="Permalink to this headline">¶</a></h2>
+<h2>Download the current source code<a class="headerlink" href="#download-the-current-source-code" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and
 <a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
@@ -170,7 +171,7 @@ corresponding Python executable:</p>
 </ol>
 </section>
 <section id="optional-install-required-libraries">
-<h2>(Optional) Install required libraries<a class="headerlink" href="#optional-install-required-libraries" title="Permalink to this headline">¶</a></h2>
+<h2>(Optional) Install required libraries<a class="headerlink" href="#optional-install-required-libraries" title="Permalink to this heading">¶</a></h2>
 <p>If you’re making changes to one of the pixel data handlers you’ll need to
 install <a class="reference external" href="https://numpy.org/">NumPy</a> as well as the library the handler is
 based on.</p>
@@ -184,7 +185,7 @@ you’ll also need to install <a class="reference external" href="https://pillow
 the optional libraries.</p>
 </section>
 <section id="install-pytest-and-run-the-test-suite">
-<h2>Install pytest and run the test suite<a class="headerlink" href="#install-pytest-and-run-the-test-suite" title="Permalink to this headline">¶</a></h2>
+<h2>Install pytest and run the test suite<a class="headerlink" href="#install-pytest-and-run-the-test-suite" title="Permalink to this heading">¶</a></h2>
 <p>When making changes to <em>pydicom</em> it’s important that your changes don’t
 accidentally introduce bugs into other areas of the code. In order to
 check that everything still works afterwards, you should run our test suite,
@@ -206,7 +207,7 @@ or errors you should check the <a class="reference external" href="https://githu
 relevant issues or create a new one if there are none.</p>
 </section>
 <section id="create-a-new-branch">
-<h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h2>
+<h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this heading">¶</a></h2>
 <p>Create a new branch <code class="docutils literal notranslate"><span class="pre">new-uid</span></code> for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
 it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) of the code:</p>
@@ -215,7 +216,7 @@ it and won’t affect the main copy (the <code class="docutils literal notransla
 </div>
 </section>
 <section id="write-tests-for-your-changes">
-<h2>Write tests for your changes<a class="headerlink" href="#write-tests-for-your-changes" title="Permalink to this headline">¶</a></h2>
+<h2>Write tests for your changes<a class="headerlink" href="#write-tests-for-your-changes" title="Permalink to this heading">¶</a></h2>
 <p>If a change is to be accepted into <em>pydicom</em> it usually has to include tests.
 For bug fixes you should write a regression test that reproduces the bug.
 For new features you’ll need to include tests that ensure the features
@@ -271,7 +272,7 @@ run the tests we should get a failure:</p>
 file and that the test itself is written correctly.</p>
 </section>
 <section id="make-a-code-change-and-document-it">
-<h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Permalink to this headline">¶</a></h2>
+<h2>Make a code change and document it<a class="headerlink" href="#make-a-code-change-and-document-it" title="Permalink to this heading">¶</a></h2>
 <p>Next we’ll make changes to the actual source code. Open
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/uid.py">uid.py</a> in a text editor and around
 <a class="reference external" href="https://github.com/pydicom/pydicom/blob/73cffe3151915b53a18b521656680d819e7e1a18/pydicom/uid.py#L236">line 236</a>
@@ -310,7 +311,7 @@ should make sure the entire test suite passes:</p>
 </div>
 </section>
 <section id="preview-your-changes">
-<h2>Preview your changes<a class="headerlink" href="#preview-your-changes" title="Permalink to this headline">¶</a></h2>
+<h2>Preview your changes<a class="headerlink" href="#preview-your-changes" title="Permalink to this heading">¶</a></h2>
 <p>It’s a good idea to go through all the changes you’ve made by first staging
 and then displaying the difference between the current copy and the initial
 version we first checked out with:</p>
@@ -323,7 +324,7 @@ $ git diff --cached
 added. If everything looks good then it’s time to commit the changes.</p>
 </section>
 <section id="commit-your-changes-and-make-a-pull-request">
-<h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this heading">¶</a></h2>
 <p>To commit the changes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git commit
 </pre></div>
@@ -353,7 +354,7 @@ PR ready to be reviewed and merged into the main branch. You could also ask
 for a review or help at any point after creating the PR.</p>
 </section>
 <section id="what-happens-next">
-<h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this headline">¶</a></h2>
+<h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this heading">¶</a></h2>
 <p>One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the
