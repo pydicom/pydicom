@@ -204,7 +204,7 @@ class BaseTag(int):
     @property
     def json_key(self) -> str:
         """Return the tag value as a JSON key string 'GGGGEEEE'."""
-        return "{0:04X}{1:04X}".format(self.group, self.element)
+        return f"{self.group:04X}{self.element:04X}"
 
     @property
     def group(self) -> int:
