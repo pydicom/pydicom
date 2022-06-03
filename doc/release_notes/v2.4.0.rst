@@ -4,6 +4,7 @@ Version 2.4.0
 Enhancements
 ------------
 * Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
+* Added attribute :attr:`~pydicom.tag.BaseTag.json_key` (:pr:`1648`)
 * Added value validation for numerical VRs, add type validation for all
   validated VRs (:issue:`1414`)
 

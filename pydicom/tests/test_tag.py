@@ -207,10 +207,10 @@ class TestBaseTag:
 
     def test_json_key(self):
         """Test BaseTag.json_key() produces correct value."""
-        assert '00000000' == BaseTag(0x00000000).json_key()
-        assert '00010002' == BaseTag(0x00010002).json_key()
-        assert '10002000' == BaseTag(0x10002000).json_key()
-        assert 'FFFFFFFE' == BaseTag(0xFFFFFFFE).json_key()
+        assert '00000000' == BaseTag(0x00000000).json_key
+        assert '00010002' == BaseTag(0x00010002).json_key
+        assert '10002000' == BaseTag(0x10002000).json_key
+        assert 'FFFFFFFE' == BaseTag(0xFFFFFFFE).json_key
 
     def test_group(self):
         """Test BaseTag.group returns correct values."""

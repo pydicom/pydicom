@@ -201,8 +201,9 @@ class BaseTag(int):
 
     __repr__ = __str__
 
+    @property
     def json_key(self) -> str:
-        """Return the tag value as a JSON key string 'ggggeeee'."""
+        """Return the tag value as a JSON key string 'GGGGEEEE'."""
         return "{0:04X}{1:04X}".format(self.group, self.element)
 
     @property
