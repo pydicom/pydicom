@@ -57,9 +57,18 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     if number_type is None:
         return value
 
+    def _convert(to_type, value):
+        try:
+            if to_type == float:
+                if ',' in value:
+                    value = value.replace(',', '.')
+            return to_type(value)
+        except Exception as e:
+            return value
+
     if isinstance(value, (list, tuple)):
         return [
-            number_type(v) if v is not None
+            _convert(number_type, v) if v is not None
             else empty_value_for_VR(vr)
             for v in value
         ]
