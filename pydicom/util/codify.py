@@ -249,7 +249,6 @@ def code_sequence(
         lines.append(f"{seq_var}.append({ds_name})")
         lines.extend(code_split[1:])
 
-
     # Remove sequence variable name we've used
     var_names.pop()
 
