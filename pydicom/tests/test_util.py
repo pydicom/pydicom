@@ -134,8 +134,8 @@ class TestCodify:
             "\n"
             "# Control Point Sequence: Control Point 1\n"
             "cp1 = Dataset()\n"
-            "cp1.PatientID = '1234'\n"
-            "cp_sequence.append(cp1)"
+            "cp_sequence.append(cp1)\n"
+            "cp1.PatientID = '1234'"
         )
 
         assert out == code_dataelem(elem)

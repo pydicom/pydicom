@@ -19,6 +19,7 @@ import os.path
 import re
 import sys
 from typing import Optional, List, Callable
+from collections import deque
 
 import pydicom
 from pydicom.datadict import dictionary_keyword
@@ -80,7 +81,8 @@ def code_dataelem(
     dataelem: DataElement,
     dataset_name: str = "ds",
     exclude_size: Optional[int] = None,
-    include_private: bool = False
+    include_private: bool = False,
+    var_names: Optional[deque] = None
 ) -> str:
     """Code lines for a single DICOM data element
 
@@ -96,7 +98,8 @@ def code_dataelem(
         will only have a commented string for a value,
         causing a syntax error when the code is run,
         and thus prompting the user to remove or fix that line.
-
+    var_names: Union[deque, None]
+        Used internally to avoid repeat nested variable names
     Returns
     -------
     str
@@ -106,7 +109,8 @@ def code_dataelem(
 
     if dataelem.VR == VR.SQ:
         return code_sequence(
-            dataelem, dataset_name, exclude_size, include_private
+            dataelem, dataset_name, exclude_size, include_private,
+            var_names=var_names
         )
 
     # If in DICOM dictionary, set using the keyword
@@ -143,6 +147,7 @@ def code_sequence(
     exclude_size: Optional[int] = None,
     include_private: bool = False,
     name_filter: Callable[[str], str] = default_name_filter,
+    var_names: Optional[deque] = None,
 ) -> str:
     """Code lines for recreating a Sequence data element
 
@@ -162,12 +167,19 @@ def code_sequence(
     name_filter: Callable[[str], str]
         A callable taking a sequence name or sequence item name, and returning
         a shorter name for easier code reading
+    var_names: Union[deque, None]
+        Used internally to avoid repeat nested variable names
 
     Returns
     -------
     str
         A string containing code lines to recreate a DICOM sequence
     """
+
+    # Normally var_names is given from code_dataset, but for some tests need
+    #   to initialize it
+    if var_names is None:
+        var_names = deque()
 
     lines = []
     seq = dataelem.value
@@ -185,6 +197,12 @@ def code_sequence(
     # Code line to create a new Sequence object
     if name_filter:
         seq_var = name_filter(seq_keyword)
+
+    name_count = var_names.count(seq_var)
+    var_names.append(seq_var)
+    orig_seq_var = seq_var
+    if name_count > 0:
+        seq_var += f"_{name_count}"
     lines.append(seq_var + " = Sequence()")
 
     # Code line to add the sequence to its parent
@@ -208,14 +226,32 @@ def code_sequence(
         lines.append("# " + seq_name + ": " + seq_item_name + " " + index_str)
 
         # Determine the variable name to use for the sequence item (dataset)
-        ds_name = seq_var.replace("_sequence", "") + index_str
+        ds_name = orig_seq_var.replace("_sequence", "") + index_str
 
-        # Code the sequence item
-        code_item = code_dataset(ds, ds_name, exclude_size, include_private)
-        lines.append(code_item)
+        # Append "_#" if name already in use (in parent sequences)
+        name_count = var_names.count(ds_name)
+        var_names.append(ds_name)
+        if name_count > 0:
+            ds_name += f"_{name_count}"
 
-        # Code the line to append the item to its parent sequence
-        lines.append(seq_var + ".append(" + ds_name + ")")
+        # Code the sequence item dataset
+        code_item = code_dataset(
+            ds, ds_name, exclude_size, include_private, var_names=var_names
+        )
+
+        # Remove variable name from stored list, this dataset complete
+        var_names.pop()
+
+        # Code dataset creation and appending that to sequence, then the rest
+        # This keeps the logic close together, rather than after many items set
+        code_split = code_item.splitlines()
+        lines.append(code_split[0])  # "<ds_name> = Dataset()"
+        lines.append(f"{seq_var}.append({ds_name})")
+        lines.extend(code_split[1:])
+
+
+    # Remove sequence variable name we've used
+    var_names.pop()
 
     # Join the lines and return a single string
     return line_term.join(lines)
@@ -227,6 +263,7 @@ def code_dataset(
     exclude_size: Optional[int] = None,
     include_private: bool = False,
     is_file_meta: bool = False,
+    var_names: Optional[deque] = None
 ) -> str:
     """Return Python code for creating `ds`.
 
@@ -245,6 +282,8 @@ def code_dataset(
         data elements will be coded.
     is_file_meta : bool, optional
         ``True`` if `ds` contains file meta information elements.
+    var_names: deque, optional
+        Used internally to ensure nested variable names are not re-used.
 
     Returns
     -------
@@ -252,8 +291,12 @@ def code_dataset(
         The codified dataset.
     """
 
+    if var_names is None:
+        var_names = deque()
     lines = []
+
     ds_class = " = FileMetaDataset()" if is_file_meta else " = Dataset()"
+
     lines.append(dataset_name + ds_class)
     for dataelem in ds:
         # If a private data element and flag says so, skip it and go to next
@@ -261,7 +304,8 @@ def code_dataset(
             continue
         # Otherwise code the line and add it to the lines list
         code_line = code_dataelem(
-            dataelem, dataset_name, exclude_size, include_private
+            dataelem, dataset_name, exclude_size, include_private,
+            var_names=var_names
         )
         lines.append(code_line)
         # Add blank line if just coded a sequence
@@ -270,6 +314,7 @@ def code_dataset(
     # If sequence was end of this dataset, remove the extra blank line
     if len(lines) and lines[-1] == "":
         lines.pop()
+
     # Join all the code lines and return them
     return line_term.join(lines)
 
@@ -336,6 +381,7 @@ def code_file_from_dataset(
     filename = ds.get("filename")
     identifier = f"DICOM file '{filename}'" if filename else "non-file dataset"
 
+    lines.append("# -*- coding: utf-8 -*-")
     lines.append(f"# Coded version of {identifier}")
     lines.append("# Produced by pydicom codify utility script")
 
