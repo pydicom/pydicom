@@ -176,14 +176,14 @@ def code_sequence(
         A string containing code lines to recreate a DICOM sequence
     """
 
-    def unique_name(name: str) -> str:
-        name_count = var_names.count(name) - 1
-        return name if name_count == 0 else name + f"_{name_count}"
-
     # Normally var_names is given from code_dataset, but for some tests need
     #   to initialize it
     if var_names is None:
         var_names = deque()
+
+    def unique_name(name: str) -> str:
+        name_count = var_names.count(name) - 1
+        return name if name_count == 0 else name + f"_{name_count}"
 
     lines = []
     seq = dataelem.value
