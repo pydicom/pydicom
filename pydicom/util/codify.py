@@ -99,7 +99,7 @@ def code_dataelem(
         causing a syntax error when the code is run,
         and thus prompting the user to remove or fix that line.
     var_names: Union[deque, None]
-        Used internally to avoid repeat nested variable names
+        Used internally to ensure unique variable names in nested sequences.
     Returns
     -------
     str
@@ -168,13 +168,17 @@ def code_sequence(
         A callable taking a sequence name or sequence item name, and returning
         a shorter name for easier code reading
     var_names: Union[deque, None]
-        Used internally to avoid repeat nested variable names
+        Used internally to ensure unique variable names in nested sequences.
 
     Returns
     -------
     str
         A string containing code lines to recreate a DICOM sequence
     """
+
+    def unique_name(name: str) -> str:
+        name_count = var_names.count(name) - 1
+        return name if name_count == 0 else name + f"_{name_count}"
 
     # Normally var_names is given from code_dataset, but for some tests need
     #   to initialize it
@@ -198,11 +202,10 @@ def code_sequence(
     if name_filter:
         seq_var = name_filter(seq_keyword)
 
-    name_count = var_names.count(seq_var)
     var_names.append(seq_var)
     orig_seq_var = seq_var
-    if name_count > 0:
-        seq_var += f"_{name_count}"
+    seq_var = unique_name(seq_var)
+
     lines.append(seq_var + " = Sequence()")
 
     # Code line to add the sequence to its parent
@@ -229,10 +232,8 @@ def code_sequence(
         ds_name = orig_seq_var.replace("_sequence", "") + index_str
 
         # Append "_#" if name already in use (in parent sequences)
-        name_count = var_names.count(ds_name)
         var_names.append(ds_name)
-        if name_count > 0:
-            ds_name += f"_{name_count}"
+        ds_name = unique_name(ds_name)
 
         # Code the sequence item dataset
         code_item = code_dataset(
@@ -282,7 +283,7 @@ def code_dataset(
     is_file_meta : bool, optional
         ``True`` if `ds` contains file meta information elements.
     var_names: deque, optional
-        Used internally to ensure nested variable names are not re-used.
+        Used internally to ensure unique variable names in nested sequences.
 
     Returns
     -------
@@ -357,8 +358,8 @@ def code_file_from_dataset(
 
     Parameters
     ----------
-    filename : str
-        Complete path and filename of a DICOM file to convert
+    ds : Dataset
+        A pydicom Dataset to convert
     exclude_size : Union[int,None]
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
