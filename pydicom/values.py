@@ -389,7 +389,8 @@ def convert_numbers(
     if length % bytes_per_value != 0:
         raise BytesLengthException(
             "Expected total bytes to be an even multiple of bytes per value. "
-            f"Instead received {shorten(repr(byte_string), width=10_000)} with length {length} and "
+            f"Instead received {shorten(repr(byte_string), width=10_000)} "
+            f"with length {length} and "
             f"struct format '{struct_format}' which corresponds to bytes per "
             f"value of {bytes_per_value}."
         )
