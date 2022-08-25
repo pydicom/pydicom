@@ -74,8 +74,6 @@ Anonymize a single file
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     (0010, 0020) Patient ID                          LO: '4MR1'
@@ -218,8 +216,6 @@ Finally, this is possible to store the image
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     (0010, 0020) Patient ID                          LO: 'id'
@@ -236,23 +232,18 @@ Finally, this is possible to store the image
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_anonymize.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_anonymize.py <plot_anonymize.py>`
 
-     :download:`Download Python source code: plot_anonymize.py <plot_anonymize.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
+      :download:`Download Jupyter notebook: plot_anonymize.ipynb <plot_anonymize.ipynb>`
 
 
 .. only:: html

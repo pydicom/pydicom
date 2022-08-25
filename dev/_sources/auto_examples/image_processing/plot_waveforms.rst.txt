@@ -87,28 +87,23 @@ matplotlib.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.338 seconds)
+   **Total running time of the script:** ( 0 minutes  0.354 seconds)
 
 
 .. _sphx_glr_download_auto_examples_image_processing_plot_waveforms.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_waveforms.py <plot_waveforms.py>`
 
-     :download:`Download Python source code: plot_waveforms.py <plot_waveforms.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_waveforms.ipynb <plot_waveforms.ipynb>`
+      :download:`Download Jupyter notebook: plot_waveforms.ipynb <plot_waveforms.ipynb>`
 
 
 .. only:: html

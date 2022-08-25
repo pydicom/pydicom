@@ -38,8 +38,6 @@ dictionary dynamically.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -100,23 +98,18 @@ dictionary dynamically.
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_add_dict_entries.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_add_dict_entries.py <plot_add_dict_entries.py>`
 
-     :download:`Download Python source code: plot_add_dict_entries.py <plot_add_dict_entries.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_add_dict_entries.ipynb <plot_add_dict_entries.ipynb>`
+      :download:`Download Jupyter notebook: plot_add_dict_entries.ipynb <plot_add_dict_entries.ipynb>`
 
 
 .. only:: html

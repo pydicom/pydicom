@@ -72,23 +72,18 @@ Very simple app to display unicode person names.
 
 .. _sphx_glr_download_auto_examples_show_charset_name.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: show_charset_name.py <show_charset_name.py>`
 
-     :download:`Download Python source code: show_charset_name.py <show_charset_name.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: show_charset_name.ipynb <show_charset_name.ipynb>`
+      :download:`Download Jupyter notebook: show_charset_name.ipynb <show_charset_name.ipynb>`
 
 
 .. only:: html

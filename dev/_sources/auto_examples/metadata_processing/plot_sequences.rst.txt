@@ -31,8 +31,6 @@ This examples illustrates how to work with sequences.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Number of blocks: [(300a, 00f8) Block Type                          CS: 'APERTURE'
@@ -83,28 +81,23 @@ This examples illustrates how to work with sequences.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.002 seconds)
+   **Total running time of the script:** ( 0 minutes  0.001 seconds)
 
 
 .. _sphx_glr_download_auto_examples_metadata_processing_plot_sequences.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
 
-     :download:`Download Python source code: plot_sequences.py <plot_sequences.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_sequences.ipynb <plot_sequences.ipynb>`
+      :download:`Download Jupyter notebook: plot_sequences.ipynb <plot_sequences.ipynb>`
 
 
 .. only:: html

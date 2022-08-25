@@ -31,8 +31,6 @@ This example illustrates how to print the data set in your own format.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -170,23 +168,18 @@ This example illustrates how to print the data set in your own format.
 
 .. _sphx_glr_download_auto_examples_input_output_plot_printing_dataset.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_printing_dataset.py <plot_printing_dataset.py>`
 
-     :download:`Download Python source code: plot_printing_dataset.py <plot_printing_dataset.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_printing_dataset.ipynb <plot_printing_dataset.ipynb>`
+      :download:`Download Jupyter notebook: plot_printing_dataset.ipynb <plot_printing_dataset.ipynb>`
 
 
 .. only:: html

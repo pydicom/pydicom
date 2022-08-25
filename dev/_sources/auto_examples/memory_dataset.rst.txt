@@ -112,23 +112,18 @@ datasets saved as blobs in a database.
 
 .. _sphx_glr_download_auto_examples_memory_dataset.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
 
-     :download:`Download Python source code: memory_dataset.py <memory_dataset.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: memory_dataset.ipynb <memory_dataset.ipynb>`
+      :download:`Download Jupyter notebook: memory_dataset.ipynb <memory_dataset.ipynb>`
 
 
 .. only:: html

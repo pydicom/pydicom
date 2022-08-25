@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Decode and plot Waveform Data" href="plot_waveforms.html" />
-    <link rel="prev" title="Show a dicom file using hierarchical tree" href="../dicomtree.html" /> 
+    <link rel="prev" title="Image processing" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -67,14 +67,19 @@
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html#image-processing">Image processing</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Downsize MRI image using pydicom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_waveforms.html">Decode and plot Waveform Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reslice.html">Load CT slices and plot axial, sagittal and coronal images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#input-output">Input-output</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Image processing</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Downsize MRI image using pydicom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_waveforms.html">Decode and plot Waveform Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="reslice.html">Load CT slices and plot axial, sagittal and coronal images</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../index.html#input-output">Input-output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../input_output/index.html">Input-output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_processing/index.html">Metadata processing</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
@@ -98,6 +103,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../index.html">General examples</a> &raquo;</li>
+          <li><a href="index.html">Image processing</a> &raquo;</li>
       <li>Downsize MRI image using pydicom</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -121,7 +127,6 @@ instead of averagin the pixels. Finally, the image is store as a dicom image.</p
 <p class="admonition-title">Note</p>
 <p>This example requires the Numpy library to manipulate the pixel data.</p>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The image has 64 x 64 voxels
 The downsampled image has 8 x 8 voxels
 The information of the data set after downsampling:
@@ -244,8 +249,8 @@ Dataset.file_meta -------------------------------
 <span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.007 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-image-processing-plot-downsize-image-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/032a903dae32dc4e934f88d87905b561/plot_downsize_image.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_downsize_image.py</span></code></a></p>
 </div>
@@ -260,7 +265,7 @@ Dataset.file_meta -------------------------------
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../dicomtree.html" class="btn btn-neutral float-left" title="Show a dicom file using hierarchical tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Image processing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="plot_waveforms.html" class="btn btn-neutral float-right" title="Decode and plot Waveform Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
