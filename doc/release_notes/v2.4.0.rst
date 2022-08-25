@@ -14,3 +14,4 @@ Fixes
   zero (:issue:`1632`)
 * Increased download speed with progress bar for test data (:issue:`1611`)
 * Fixed crash due to invalid private creator (:issue:`1638`)
+* Fixed extremely long BytesLengthException error messages (:pr:`1683`)
