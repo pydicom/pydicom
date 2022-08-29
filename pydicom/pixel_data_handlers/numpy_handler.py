@@ -258,8 +258,19 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         )
     else:
         # Skip the trailing padding byte(s) if present
-        dtype = pixel_dtype(ds, as_float=('Float' in px_keyword[0]))
-        arr = np.frombuffer(pixel_data[:expected_len], dtype=dtype)
+        dtype = pixel_dtype(ds, as_float=("Float" in px_keyword[0]))
+        if (not ds.is_little_endian and dtype.itemsize == 1 and
+                px_keyword[0] == "PixelData" and ds[0x7FE00010].VR == "OW"):
+            # handle the rare case that 1 byte pixels are encoded as OW
+            # in Big Endian transfer syntax
+            # Note: the host Endianness does not matter here; to be read
+            # correctly for a 1 byte type the bytes must always be ordered
+            # as Little Endian
+            dtype16 = dtype.name[:-1] + "16"
+            b = np.frombuffer(pixel_data, dtype=dtype16).byteswap().tobytes()
+            arr = np.frombuffer(b[:expected_len], dtype=dtype)
+        else:
+            arr = np.frombuffer(pixel_data[:expected_len], dtype=dtype)
         if ds.PhotometricInterpretation == 'YBR_FULL_422':
             # PS3.3 C.7.6.3.1.2: YBR_FULL_422 data needs to be resampled
             # Y1 Y2 B1 R1 -> Y1 B1 R1 Y2 B1 R1
