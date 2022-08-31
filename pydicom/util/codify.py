@@ -199,9 +199,6 @@ def code_sequence(
     lines.append("# " + seq_name)
 
     # Code line to create a new Sequence object
-    if name_filter:
-        seq_var = name_filter(seq_keyword)
-
     var_names.append(seq_var)
     orig_seq_var = seq_var
     seq_var = unique_name(seq_var)
