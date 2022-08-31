@@ -18,7 +18,7 @@ import argparse
 import os.path
 import re
 import sys
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, cast
 from collections import deque
 
 import pydicom
@@ -182,7 +182,7 @@ def code_sequence(
         var_names = deque()
 
     def unique_name(name: str) -> str:
-        name_count = var_names.count(name) - 1
+        name_count = cast(deque, var_names).count(name) - 1
         return name if name_count == 0 else name + f"_{name_count}"
 
     lines = []
@@ -199,6 +199,7 @@ def code_sequence(
     lines.append("# " + seq_name)
 
     # Code line to create a new Sequence object
+    seq_var = name_filter(seq_keyword)
     var_names.append(seq_var)
     orig_seq_var = seq_var
     seq_var = unique_name(seq_var)

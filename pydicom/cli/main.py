@@ -135,9 +135,11 @@ def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
 
     # Check if is filename is in charset files
     if not pydicom_filename:
-        char_filenames = get_charset_files(filename)
-        if char_filenames:
+        try:
+            char_filenames = get_charset_files(filename)
             pydicom_filename = char_filenames[0]
+        except NotImplementedError:  # will get this if absolute path passed
+            pass
 
     if prefix == "pydicom":
         filename = pydicom_filename
