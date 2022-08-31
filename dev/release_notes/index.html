@@ -281,6 +281,8 @@
 <li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json_key</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1648">#1648</a>)</p></li>
 <li><p>Added value validation for numerical VRs, add type validation for all
 validated VRs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1414">#1414</a>)</p></li>
+<li><p>CLI commands now accept <em>pydicom</em> charset test files and CLI help shows
+Python Version (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1674">#1674</a>)</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -291,6 +293,8 @@ zero (<a class="reference external" href="https://github.com/pydicom/pydicom/iss
 <li><p>Increased download speed with progress bar for test data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1611">#1611</a>)</p></li>
 <li><p>Fixed crash due to invalid private creator (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1638">#1638</a>)</p></li>
 <li><p>Fixed extremely long BytesLengthException error messages (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1683">#1683</a>)</p></li>
+<li><p>In codify, ensure unique variable names for DICOM keywords repeated
+in sequences, and handle unicode characters correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1670">#1670</a>)</p></li>
 </ul>
 </section>
 </section>
