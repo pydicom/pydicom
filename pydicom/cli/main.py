@@ -10,10 +10,11 @@ attributes, and calls set_defaults(func=callback_function)
 import argparse
 import pkg_resources
 import re
+import sys
 from typing import Tuple, cast, List, Any, Dict, Optional, Callable
 
 from pydicom import dcmread
-from pydicom.data.data_manager import get_testdata_file
+from pydicom.data.data_manager import get_charset_files, get_testdata_file
 from pydicom.dataset import Dataset
 
 
@@ -132,6 +133,12 @@ def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
     except NotImplementedError:  # will get this if absolute path passed
         pydicom_filename = ""
 
+    # Check if is filename is in charset files
+    if not pydicom_filename:
+        char_filenames = get_charset_files(filename)
+        if char_filenames:
+            pydicom_filename = char_filenames[0]
+
     if prefix == "pydicom":
         filename = pydicom_filename
 
@@ -201,8 +208,11 @@ def main(args: Optional[List[str]] = None) -> None:
     """
     global subparsers
 
+    py_version = sys.version.split()[0]
+
     parser = argparse.ArgumentParser(
-        prog="pydicom", description="pydicom command line utilities"
+        prog="pydicom",
+        description=f"pydicom command line utilities (Python {py_version})"
     )
     subparsers = parser.add_subparsers(help="subcommand help")
 

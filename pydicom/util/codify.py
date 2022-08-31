@@ -431,7 +431,7 @@ def set_parser_arguments(
     parser.add_argument(
         "outfile",
         nargs="?",
-        type=argparse.FileType("w"),
+        type=argparse.FileType("w", encoding="UTF-8"),
         help=(
             "Filename to write Python code to, if not specified then code is "
             "written to stdout"
