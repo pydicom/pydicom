@@ -5,12 +5,11 @@ from contextlib import contextmanager
 
 import pytest
 
-from pydicom import config, dcmread
+from pydicom import config, dcmread, Dataset, Sequence
 from pydicom import filereader
 from pydicom._private_dict import private_dictionaries
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement
-from pydicom.dataset import Dataset
 from pydicom.tag import Tag
 from pydicom.uid import (
     ImplicitVRLittleEndian, ExplicitVRBigEndian, ExplicitVRLittleEndian
@@ -23,6 +22,7 @@ from pydicom.util.codify import (
     default_name_filter,
     code_imports,
     code_dataelem,
+    code_dataset,
     main as codify_main,
 )
 from pydicom.util.dump import *
@@ -134,15 +134,34 @@ class TestCodify:
             "\n"
             "# Control Point Sequence: Control Point 1\n"
             "cp1 = Dataset()\n"
-            "cp1.PatientID = '1234'\n"
-            "cp_sequence.append(cp1)"
+            "cp_sequence.append(cp1)\n"
+            "cp1.PatientID = '1234'"
         )
 
         assert out == code_dataelem(elem)
 
-    def test_code_dataset(self):
-        """Test utils.codify.code_dataset"""
-        pass
+    def test_codify_recurring_keyword(self):
+        """Test utils.codify.code_dataset with same keyword nested"""
+        # Create fake Dataset with repeated DICOM keyword nested
+        # (0040, a730)  Content Sequence  1 item(s) ----
+        #    (0040, a040) Value Type                          CS: 'CODE'
+        #    (0040, a730)  Content Sequence  1 item(s) ----
+        #       (0040, a040) Value Type                          CS: 'CODE'
+
+        ds = Dataset()
+        ds.ContentSequence = seq1 = Sequence()
+        seq1.append(Dataset())
+        seq1[0].ValueType = "CODE"
+        seq1[0].ContentSequence = seq2 = Sequence()
+        seq2.append(Dataset())
+        seq2[0].ValueType = "CODE_1"
+        ds_code = code_dataset(ds)
+
+        # normal 1st use of var name
+        assert "content1.ValueType = 'CODE'" in ds_code
+
+        # Nested item of same name should have subscript
+        assert "content1_1.ValueType = 'CODE_1'" in ds_code
 
     def test_code_file(self, capsys):
         """Test utils.codify.code_file"""

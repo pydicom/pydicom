@@ -7,6 +7,8 @@ Enhancements
 * Added attribute :attr:`~pydicom.tag.BaseTag.json_key` (:pr:`1648`)
 * Added value validation for numerical VRs, add type validation for all
   validated VRs (:issue:`1414`)
+* CLI commands now accept *pydicom* charset test files and CLI help shows
+  Python Version (:pr:`1674`)
 
 Fixes
 -----
@@ -15,3 +17,5 @@ Fixes
 * Increased download speed with progress bar for test data (:issue:`1611`)
 * Fixed crash due to invalid private creator (:issue:`1638`)
 * Fixed extremely long BytesLengthException error messages (:pr:`1683`)
+* In codify, ensure unique variable names for DICOM keywords repeated
+  in sequences, and handle unicode characters correctly (:issue:`1670`)

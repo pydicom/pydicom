@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2020 pydicom authors. See LICENSE file for details.
 """Tests for command-line interface"""
 
@@ -137,6 +138,13 @@ class TestCLIcall:
         """CLI `codify` command raises error if not a Dataset"""
         with pytest.raises(NotImplementedError):
             main("codify pydicom::rtplan.dcm::RTPlanLabel".split())
+
+    def test_codify_UTF8(self, capsys):
+        """CLI `codify` command creates code with utf-8 characters"""
+        main(f"codify pydicom::chrFren.dcm".split())
+        out, _ = capsys.readouterr()
+        assert out.startswith("# -*- coding: utf-8 -*-")
+        assert "Buc^Jérôme" in out
 
     def test_help(self, capsys):
         """CLI `help` command gives expected output"""
