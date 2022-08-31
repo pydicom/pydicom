@@ -133,7 +133,7 @@ def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
     except NotImplementedError:  # will get this if absolute path passed
         pydicom_filename = ""
 
-    # Check if is filename is in charset files
+    # Check if filename is in charset files
     if not pydicom_filename:
         try:
             char_filenames = get_charset_files(filename)
