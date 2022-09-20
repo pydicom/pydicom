@@ -1639,6 +1639,35 @@ class TestDataset:
         assert 'FIXED' == ds.BeamSequence[1].PatientID
         assert 'Other^Name' == ds.BeamSequence[1].PatientName
 
+    def test_tracewalk(self):
+        """Test Dataset.walk iterates through sequences with stack"""
+
+        def test_callback(dataset, elem, trace):
+            if elem.keyword == 'PatientID':
+                if trace:
+                    beam, item = trace[0]
+                    dataset.PatientID = f'{beam:08x}^{item}'
+                else:
+                    dataset.PatientID = 'BASE'
+
+        ds = Dataset()
+        ds.PatientName = 'CITIZEN^Jan'
+        ds.PatientID = 'JAN^Citizen^III'
+        ds.BeamSequence = [Dataset(), Dataset()]
+        ds.BeamSequence[0].PatientID = 'JAN^Citizen^Snr'
+        ds.BeamSequence[0].PatientName = 'Some^Name'
+        ds.BeamSequence[1].PatientID = 'JAN^Citizen^Jr'
+        ds.BeamSequence[1].PatientName = 'Other^Name'
+
+        ds.tracewalk(test_callback, recursive=True)
+
+        assert 'CITIZEN^Jan' == ds.PatientName
+        assert 'BASE' == ds.PatientID
+        assert '300a00b0^0' == ds.BeamSequence[0].PatientID
+        assert 'Some^Name' == ds.BeamSequence[0].PatientName
+        assert '300a00b0^1' == ds.BeamSequence[1].PatientID
+        assert 'Other^Name' == ds.BeamSequence[1].PatientName
+
     def test_update_with_dataset(self):
         """Regression test for #779"""
         ds = Dataset()

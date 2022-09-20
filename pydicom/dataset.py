@@ -2395,6 +2395,59 @@ class Dataset:
                     for dataset in sequence:
                         dataset.walk(callback)
 
+    def tracewalk(
+        self,
+        callback: Callable[["Dataset", DataElement, list], None],
+        recursive: bool = True,
+        trace: list = None
+    ) -> None:
+        """Iterate through the :class:`Dataset's<Dataset>` elements and run
+        `callback` on each.
+
+        Visit all elements in the :class:`Dataset`, possibly recursing into
+        sequences and their items. The `callback` function is called for each
+        :class:`~pydicom.dataelem.DataElement` (including elements
+        with a VR of 'SQ'). Can be used to perform an operation on certain
+        types of elements.
+
+        For example,
+        :meth:`~Dataset.remove_private_tags` finds all elements with private
+        tags and deletes them.
+
+        The elements will be returned in order of increasing tag number within
+        their current :class:`Dataset`.
+
+        Parameters
+        ----------
+        callback
+            A callable function that takes two arguments:
+
+            * a :class:`Dataset`
+            * a :class:`~pydicom.dataelem.DataElement` belonging
+              to that :class:`Dataset`
+
+        recursive : bool, optional
+            Flag to indicate whether to recurse into sequences (default
+            ``True``).
+        """
+        if trace is None:
+            trace = []
+
+        taglist = sorted(self._dict.keys())
+        for tag in taglist:
+
+            with tag_in_exception(tag):
+                data_element = self[tag]
+                callback(self, data_element, trace.copy())  # self = this Dataset
+                # 'tag in self' below needed in case callback deleted
+                # data_element
+                if recursive and tag in self and data_element.VR == VR_.SQ:
+                    sequence = data_element.value
+                    for item, dataset in enumerate(sequence):
+                        trace.append((tag, item))
+                        dataset.tracewalk(callback, trace=trace)
+                        trace.pop()
+
     @classmethod
     def from_json(
         cls: Type["Dataset"],
