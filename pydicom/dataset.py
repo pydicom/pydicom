@@ -2545,8 +2545,8 @@ class Dataset:
         json_dataset = {}
         for key in self.keys():
             json_key = '{:08X}'.format(key)
-            data_element = self[key]
             try:
+                data_element = self[key]
                 json_dataset[json_key] = data_element.to_json_dict(
                     bulk_data_element_handler=bulk_data_element_handler,
                     bulk_data_threshold=bulk_data_threshold
