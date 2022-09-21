@@ -122,6 +122,9 @@ zero (<a class="reference external" href="https://github.com/pydicom/pydicom/iss
 <li><p>Fixed extremely long BytesLengthException error messages (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1683">#1683</a>)</p></li>
 <li><p>In codify, ensure unique variable names for DICOM keywords repeated
 in sequences, and handle unicode characters correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1670">#1670</a>)</p></li>
+<li><p>Fixed handling of some invalid values in
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> if <cite>suppress_invalid_tags</cite> is
+set to <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1693">#1693</a>)</p></li>
 </ul>
 </section>
 </section>
