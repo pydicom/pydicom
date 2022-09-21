@@ -19,3 +19,6 @@ Fixes
 * Fixed extremely long BytesLengthException error messages (:pr:`1683`)
 * In codify, ensure unique variable names for DICOM keywords repeated
   in sequences, and handle unicode characters correctly (:issue:`1670`)
+* Fixed handling of some invalid values in
+  :meth:`~pydicom.dataset.Dataset.to_json_dict` if `suppress_invalid_tags` is
+  set to `True` (:issue:`1693`)
