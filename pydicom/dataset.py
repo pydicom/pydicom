@@ -2348,19 +2348,23 @@ class Dataset:
                 for ds in elem.value:
                     yield from ds.iterall()
 
+
     def walk(
         self,
-        callback: Callable[["Dataset", DataElement], None],
-        recursive: bool = True
+        callback: Union[Callable[["Dataset", DataElement], None],
+                        Callable[["Dataset", DataElement, tuple], None]],
+        recursive: bool = True,
+        trace: bool = False
     ) -> None:
         """Iterate through the :class:`Dataset's<Dataset>` elements and run
         `callback` on each.
 
-        Visit all elements in the :class:`Dataset`, possibly recursing into
-        sequences and their items. The `callback` function is called for each
+        Visit all elements in the :class:`Dataset`, possibly recursing
+        into sequences and their items and providing a trace. The
+        `callback` function is called for each
         :class:`~pydicom.dataelem.DataElement` (including elements
-        with a VR of 'SQ'). Can be used to perform an operation on certain
-        types of elements.
+        with a VR of 'SQ'). Can be used to perform an operation on
+        certain types of elements.
 
         For example,
         :meth:`~Dataset.remove_private_tags` finds all elements with private
@@ -2378,9 +2382,41 @@ class Dataset:
             * a :class:`~pydicom.dataelem.DataElement` belonging
               to that :class:`Dataset`
 
+            If the `trace` flag is ``True``, a third argument will will 
+            be present provides a trace through the sequences to reach
+            the element. Each element of the trace is itself a tuple 
+            of the form `(Dataset,DataElement,int)` which contains
+
+            * a parent :class:`Dataset` that contains the sequence element
+            * a parent 'SQ' :class:`~pydicom.dataelem.DataElement` belonging
+              to the parent :class:`Dataset`
+            * a :class:`int` identifying the item number within the parent 
+              sequence :class:`~pydicom.dataelem.DataElement`
+
         recursive : bool, optional
             Flag to indicate whether to recurse into sequences (default
             ``True``).
+
+        trace : bool, optional
+            Flag to indicate whether the callback receives a trace of
+            sequences and items leading to the element (default ``False``).
+
+        """
+        if trace:
+            callback = cast(Callable[["Dataset", DataElement, tuple], None], callback)
+            self._tracewalk(callback, recursive)
+        else:
+            callback = cast(Callable[["Dataset", DataElement], None], callback)
+            self._walk(callback, recursive)
+
+    def _walk(
+        self,
+        callback: Callable[["Dataset", DataElement], None],
+        recursive: bool = True
+    ) -> None:
+        """
+        Implementation of walk() without trace support. Callback receives
+        two parameters.
         """
         taglist = sorted(self._dict.keys())
         for tag in taglist:
@@ -2393,42 +2429,17 @@ class Dataset:
                 if recursive and tag in self and data_element.VR == VR_.SQ:
                     sequence = data_element.value
                     for dataset in sequence:
-                        dataset.walk(callback)
+                        dataset._walk(callback)
 
-    def tracewalk(
+    def _tracewalk(
         self,
-        callback: Callable[["Dataset", DataElement, list], None],
+        callback: Callable[["Dataset", DataElement, tuple], None],
         recursive: bool = True,
-        trace: list = None
+        trace: tuple = ()
     ) -> None:
-        """Iterate through the :class:`Dataset's<Dataset>` elements and run
-        `callback` on each.
-
-        Visit all elements in the :class:`Dataset`, possibly recursing into
-        sequences and their items. The `callback` function is called for each
-        :class:`~pydicom.dataelem.DataElement` (including elements
-        with a VR of 'SQ'). Can be used to perform an operation on certain
-        types of elements.
-
-        For example,
-        :meth:`~Dataset.remove_private_tags` finds all elements with private
-        tags and deletes them.
-
-        The elements will be returned in order of increasing tag number within
-        their current :class:`Dataset`.
-
-        Parameters
-        ----------
-        callback
-            A callable function that takes two arguments:
-
-            * a :class:`Dataset`
-            * a :class:`~pydicom.dataelem.DataElement` belonging
-              to that :class:`Dataset`
-
-        recursive : bool, optional
-            Flag to indicate whether to recurse into sequences (default
-            ``True``).
+        """
+        Implementation of walk() with trace support. Callback receives
+        three parameters.
         """
         if trace is None:
             trace = []
@@ -2438,15 +2449,13 @@ class Dataset:
 
             with tag_in_exception(tag):
                 data_element = self[tag]
-                callback(self, data_element, trace.copy())  # self = this Dataset
+                callback(self, data_element, trace)  # self = this Dataset
                 # 'tag in self' below needed in case callback deleted
                 # data_element
                 if recursive and tag in self and data_element.VR == VR_.SQ:
                     sequence = data_element.value
                     for item, dataset in enumerate(sequence):
-                        trace.append((tag, item))
-                        dataset.tracewalk(callback, trace=trace)
-                        trace.pop()
+                        dataset._tracewalk(callback, trace=(*trace,(self,data_element,item)))
 
     @classmethod
     def from_json(

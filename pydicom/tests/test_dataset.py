@@ -1645,8 +1645,8 @@ class TestDataset:
         def test_callback(dataset, elem, trace):
             if elem.keyword == 'PatientID':
                 if trace:
-                    beam, item = trace[0]
-                    dataset.PatientID = f'{beam:08x}^{item}'
+                    _, beam, item = trace[0]
+                    dataset.PatientID = f'{beam.tag:08x}^{item}'
                 else:
                     dataset.PatientID = 'BASE'
 
@@ -1659,7 +1659,7 @@ class TestDataset:
         ds.BeamSequence[1].PatientID = 'JAN^Citizen^Jr'
         ds.BeamSequence[1].PatientName = 'Other^Name'
 
-        ds.tracewalk(test_callback, recursive=True)
+        ds.walk(test_callback, recursive=True, trace=True)
 
         assert 'CITIZEN^Jan' == ds.PatientName
         assert 'BASE' == ds.PatientID
