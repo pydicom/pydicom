@@ -183,8 +183,7 @@ OBXXXX1A.dcm
   * used to check if to pixel_array is interpreted correctly for such a case
   * taken from https://github.com/pydicom/pydicom/issues/205#issuecomment-103329677
   * supposedly from a Philips machine
-  * Explicit VR big endian version created using DCMTK's dcmconv and the
-    pixel data corrected using script for PR #714
+  * Explicit VR big endian version created using DCMTK's dcmconv
   * 2 frame version created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
 
@@ -203,12 +202,16 @@ RG3_*.dcm
   * unsigned 16-bit/10-bit with windowing
   * From ftp://medical.nema.org/MEDICAL/Dicom/DataSets/WG04
 
-SC_rgb.dcm
+SC_rgb*.dcm
   * 16 and 32 bit versions created using a script for PR #714
   * Explicit VR big endian version created using DCMTK's dcmconv and the
     pixel data corrected using script for PR #714
   * 2 frame versions created using a script for PR #714
   * RLE encoded versions created using GDCM's gdcmconv for PR #708
+  
+SC_rgb_small_odd*.dcm
+  * 3x3 pixel version added for PR #601
+  * Big Endian version added for PR #1687
 
 SC_jpeg_no_color_transform.dcm
   * 8-bit baseline JPEG compressed in RGB color space without transformation

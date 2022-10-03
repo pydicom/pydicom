@@ -22,3 +22,5 @@ Fixes
 * Fixed handling of some invalid values in
   :meth:`~pydicom.dataset.Dataset.to_json_dict` if `suppress_invalid_tags` is
   set to `True` (:issue:`1693`)
+* Fixed reading of data with 8 bits allocated, encoded in Big Endian transfer
+  syntax using VR ``OW`` (:issue:`1680`)

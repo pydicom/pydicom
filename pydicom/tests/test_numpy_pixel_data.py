@@ -89,6 +89,7 @@ EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
 EXPB_8_3_1F = get_testdata_file("SC_rgb_expb.dcm")
 # 8/8, 3 samples/pixel, 1 frame, 3 x 3
 EXPL_8_3_1F_ODD = get_testdata_file('SC_rgb_small_odd.dcm')
+EXPL_8_3_1F_ODD_BIGE = get_testdata_file('SC_rgb_small_odd_big_endian.dcm')
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
 EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL
@@ -1307,3 +1308,13 @@ class TestNumpy_GetPixelData:
         ds.BitsAllocated = 64
         arr = get_pixeldata(ds)
         assert 'float64' == arr.dtype
+
+    def test_big_endian_rgb_data(self):
+        """RGB data encoded as OW in Big Endian transfer syntax shall
+        yield the same data as if encoded in Little Endian."""
+        ds1 = dcmread(EXPL_8_3_1F_ODD)
+        data1 = ds1.pixel_array
+        ds2 = dcmread(EXPL_8_3_1F_ODD_BIGE)
+        data2 = ds2.pixel_array
+        assert len(data1) == len(data2)
+        assert (data1 == data2).all()
