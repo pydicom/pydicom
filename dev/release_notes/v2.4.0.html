@@ -23,6 +23,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -125,6 +126,8 @@ in sequences, and handle unicode characters correctly (<a class="reference exter
 <li><p>Fixed handling of some invalid values in
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> if <cite>suppress_invalid_tags</cite> is
 set to <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1693">#1693</a>)</p></li>
+<li><p>Fixed reading of data with 8 bits allocated, encoded in Big Endian transfer
+syntax using VR <code class="docutils literal notranslate"><span class="pre">OW</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1680">#1680</a>)</p></li>
 </ul>
 </section>
 </section>

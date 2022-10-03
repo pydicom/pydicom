@@ -23,6 +23,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -65,6 +66,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pydicom.config.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.infer_sq_for_un_vr"><code class="docutils literal notranslate"><span class="pre">Settings.infer_sq_for_un_vr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.reading_validation_mode"><code class="docutils literal notranslate"><span class="pre">Settings.reading_validation_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.config.Settings.writing_validation_mode"><code class="docutils literal notranslate"><span class="pre">Settings.writing_validation_mode</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
@@ -152,7 +159,7 @@
 <p><em>pydicom</em> configuration options</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pydicom.config.Settings">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8b2a0b8a5/pydicom/config.py#L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/513509f51/pydicom/config.py#L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.config.Settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collection of several configuration values.
 Accessed via the singleton <a class="reference internal" href="generated/pydicom.config.settings.html#pydicom.config.settings" title="pydicom.config.settings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">settings</span></code></a>.</p>
 <div class="versionadded">

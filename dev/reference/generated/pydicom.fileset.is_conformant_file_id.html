@@ -23,6 +23,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -77,7 +78,10 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.FileInstance.html">pydicom.fileset.FileInstance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.FileSet.html">pydicom.fileset.FileSet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.generate_filename.html">pydicom.fileset.generate_filename</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.fileset.is_conformant_file_id</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.fileset.is_conformant_file_id</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.fileset.is_conformant_file_id"><code class="docutils literal notranslate"><span class="pre">is_conformant_file_id()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.fileset.DIRECTORY_RECORDERS.html">pydicom.fileset.DIRECTORY_RECORDERS</a></li>
 </ul>
 </li>
@@ -133,7 +137,7 @@
 <h1>pydicom.fileset.is_conformant_file_id<a class="headerlink" href="#pydicom-fileset-is-conformant-file-id" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.fileset.is_conformant_file_id">
-<span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">is_conformant_file_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/8b2a0b8a5/pydicom/fileset.py#L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.is_conformant_file_id" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.fileset.</span></span><span class="sig-name descname"><span class="pre">is_conformant_file_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/513509f51/pydicom/fileset.py#L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.fileset.is_conformant_file_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>path</cite> is a conformant File ID.</p>
 <p><strong>Conformance</strong></p>
 <ul class="simple">
