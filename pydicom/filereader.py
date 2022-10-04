@@ -875,7 +875,7 @@ def read_partial(
                 "not match the contents of the dataset - handling it"
                 "as a regular dataset instead of a DICOMDIR."
             )
-            ds_class = FileDataset
+            ds_class: Union[Type[FileDataset], Type[DicomDir]] = FileDataset
         else:
             warnings.warn(
                 "The 'DicomDir' class is deprecated and will be removed in"
@@ -884,7 +884,7 @@ def read_partial(
                 "SOP Instances.",
                 DeprecationWarning
             )
-            ds_class: Union[Type[FileDataset], Type[DicomDir]] = DicomDir
+            ds_class = DicomDir
     else:
         ds_class = FileDataset
 
