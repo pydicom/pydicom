@@ -869,13 +869,22 @@ def read_partial(
     elem = file_meta.get(0x00020002, None)
     sop_class = elem.value.name if (elem and elem.VM == 1) else ""
     if sop_class == "Media Storage Directory Storage":
-        warnings.warn(
-            "The 'DicomDir' class is deprecated and will be removed in v3.0, "
-            "after which 'dcmread()' will return a normal 'FileDataset' "
-            "instance for 'Media Storage Directory' SOP Instances.",
-            DeprecationWarning
-        )
-        ds_class: Union[Type[FileDataset], Type[DicomDir]] = DicomDir
+        if "DirectoryRecordSequence" not in dataset:
+            warnings.warn(
+                "The SOP Class 'Media Storage Directory Storage' does"
+                "not match the contents of the dataset - handling it"
+                "as a regular dataset instead of a DICOMDIR."
+            )
+            ds_class: Union[Type[FileDataset], Type[DicomDir]] = FileDataset
+        else:
+            warnings.warn(
+                "The 'DicomDir' class is deprecated and will be removed in"
+                " v3.0, after which 'dcmread()' will return a normal "
+                "'FileDataset' instance for 'Media Storage Directory' "
+                "SOP Instances.",
+                DeprecationWarning
+            )
+            ds_class = DicomDir
     else:
         ds_class = FileDataset
 
