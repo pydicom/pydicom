@@ -9,11 +9,23 @@
 
 # *pydicom*
 
-*pydicom* is a pure Python package for working with [DICOM](https://www.dicomstandard.org/) files. It lets you read, modify and write DICOM data in an easy "pythonic" way.
+*pydicom* is a pure Python package for working with [DICOM](https://www.dicomstandard.org/) files.
+It lets you read, modify and write DICOM data in an easy "pythonic" way. As a pure Python package,
+*pydicom* can run anywhere Python runs without any other requirements, although if you're working 
+with *Pixel Data* then we recommend you also install [NumPy](http://www.numpy.org).
 
-As a pure Python package, *pydicom* can run anywhere Python runs without any other requirements, although if you're working with *Pixel Data* then we recommend you also install [NumPy](http://www.numpy.org).
+Note that *pydicom* is a general-purpose DICOM framework concerned with 
+reading and writing DICOM datasets. In order to keep the 
+project manageable, it does not handle the specifics of individual SOP classes
+or other aspects of DICOM. Other libraries both inside and outside the
+[pydicom organization](https://github.com/pydicom) are based on *pydicom* 
+and provide support for other aspects of DICOM, and for more 
+specific applications.
 
-If you're looking for a Python library for DICOM networking then you might be interested in another of our projects: [pynetdicom](https://github.com/pydicom/pynetdicom).
+Examples are [pynetdicom](https://github.com/pydicom/pynetdicom), which 
+is a Python library for DICOM networking, and [deid](https://github.com/pydicom/deid),
+which supports the anonymization of DICOM files.
+
 
 ## Installation
 
@@ -110,7 +122,12 @@ plt.show()
 
 ## Contributing
 
-To contribute to *pydicom*, read our [contribution guide](https://github.com/pydicom/pydicom/blob/master/CONTRIBUTING.md).
+We are all volunteers working on *pydicom* in our free time. As our 
+resources are limited, we very much value your contributions, be it bug fixes, new 
+core features, or documentation improvements. For more information, please
+read our [contribution guide](https://github.com/pydicom/pydicom/blob/master/CONTRIBUTING.md).
 
-To contribute an example or extension of *pydicom* that doesn't belong with the core software, see our contribution repository:
+If you have examples or extensions of *pydicom* that don't belong with the 
+core software, but that you deem useful to others, you can add them to our 
+contribution repository:
 [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
