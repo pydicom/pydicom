@@ -15,10 +15,11 @@ It lets you read, modify and write DICOM data in an easy "pythonic" way. As a pu
 with *Pixel Data* then we recommend you also install [NumPy](http://www.numpy.org).
 
 Note that *pydicom* is a general-purpose DICOM framework concerned with 
-reading and writing DICOM datasets, and does not handle the specifics
-of individual SOP classes or other aspects of DICOM on purpose. Other 
-libraries both inside and outside the [pydicom organization](https://github.com/pydicom)
-are based on *pydicom* and provide support for other aspects of DICOM, and for more 
+reading and writing DICOM datasets. In order to keep the 
+project manageable, it does not handle the specifics of individual SOP classes
+or other aspects of DICOM. Other libraries both inside and outside the
+[pydicom organization](https://github.com/pydicom) are based on *pydicom* 
+and provide support for other aspects of DICOM, and for more 
 specific applications.
 
 Examples are [pynetdicom](https://github.com/pydicom/pynetdicom), which 
@@ -130,8 +131,3 @@ If you have examples or extensions of *pydicom* that don't belong with the
 core software, but that you deem useful to others, you can add them to our 
 contribution repository:
 [contrib-pydicom](https://www.github.com/pydicom/contrib-pydicom).
-
-If you have a software package based on *pydicom* that you want to be more 
-tightly integrated into the *pydicom* ecosystem, you may consider to apply
-for transferring it into the *pydicom* organization. You can do so by creating 
-a general discussion item with a short description of the module.
