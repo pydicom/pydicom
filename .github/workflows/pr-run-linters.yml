@@ -1,0 +1,41 @@
+name: Linter
+
+on: pull_request
+
+jobs:
+  flake8-lint:
+    runs-on: ubuntu-latest
+    name: flake8 linter
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: flake8 errors
+        uses: reviewdog/action-flake8@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          flake8_args: "--select=E901,E999,F821,F822,F823"
+          level: error
+          fail_on_error: true
+
+      - name: flake8 warnings
+        uses: reviewdog/action-flake8@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: warning
+
+  black-lint:
+    runs-on: ubuntu-latest
+    name: black formatter
+    steps:
+      - uses: actions/checkout@v2
+      - name: black
+        uses: reviewdog/action-black@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: warning
+          filter_mode: diff_context
