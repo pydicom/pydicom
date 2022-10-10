@@ -135,7 +135,7 @@ def generate_multiplex(
                 sensitivity = ch.get("ChannelSensitivity", 1.0)
                 correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
                 arr[..., jj] = (
-                    (arr[..., jj] + baseline) * sensitivity * correction
+                    arr[..., jj] * sensitivity * correction  + baseline
                 )
 
         yield arr
@@ -214,7 +214,7 @@ def multiplex_array(
             sensitivity = ch.get("ChannelSensitivity", 1.0)
             correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
             arr[..., jj] = (
-                (arr[..., jj] + baseline) * sensitivity * correction
+                arr[..., jj] * sensitivity * correction + baseline
             )
 
     return cast("np.ndarray", arr)
