@@ -23,7 +23,7 @@ from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
 from pydicom.filereader import read_dataset
 from pydicom.tag import Tag
 from pydicom.valuerep import (
-    DS, IS, DSfloat, DSdecimal, PersonName, VR, STANDARD_VR,
+    DS, IS, DSfloat, DSdecimal, ISfloat, PersonName, VR, STANDARD_VR,
     AMBIGUOUS_VR, STR_VR, BYTES_VR, FLOAT_VR, INT_VR, LIST_VR
 )
 from pydicom.values import convert_value
@@ -896,15 +896,19 @@ class TestIS:
         # from issue #1661
         # Create BytesIO with single data element for Exposure (0018,1152)
         #   length 4, value "14.5"
-        with BytesIO(b"\x18\x00\x52\x11\x04\x00\x00\x0014.5") as bio:
+        bin_elem = b"\x18\x00\x52\x11\x04\x00\x00\x0014.5"
+        with BytesIO(bin_elem) as bio:
             ds = read_dataset(bio, True, True)
-        assert ds.Exposure == "14.5"
+        assert isinstance(ds.Exposure, ISfloat)
+        assert ds.Exposure == 14.5
+
+        # Strict checking raises an error
+        with pytest.raises(ValueError):
+            _ = IS("14.5", validation_mode=config.RAISE)
+        with pytest.raises(TypeError):
+            _ = IS(14.5, validation_mode=config.RAISE)
 
     def test_invalid_value(self, disable_value_validation):
-        with pytest.raises(TypeError, match="Could not convert value"):
-            IS(0.9)
-        with pytest.raises(TypeError, match="Could not convert value"):
-            IS("0.9")
         with pytest.raises(ValueError, match="could not convert string"):
             IS("foo")
 
