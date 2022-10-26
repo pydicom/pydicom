@@ -908,6 +908,13 @@ class TestIS:
         with pytest.raises(TypeError):
             _ = IS(14.5, validation_mode=config.RAISE)
 
+    def test_float_init(self):
+        """New ISfloat created from another behaves correctly"""
+        is1 = IS("14.5", validation_mode=config.IGNORE)
+        is2 = IS(is1)
+        assert is1 == is2
+        assert is2.original_string == is1.original_string
+
     def test_invalid_value(self, disable_value_validation):
         with pytest.raises(ValueError, match="could not convert string"):
             IS("foo")
