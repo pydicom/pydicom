@@ -277,7 +277,7 @@ def strict_reading() -> Generator:
         settings.reading_validation_mode = RAISE
         yield
     finally:
-        settings.reading_validation_mode = original_reading_mode
+        settings._reading_validation_mode = original_reading_mode
 
 
 convert_wrong_length_to_UN = False

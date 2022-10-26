@@ -1309,14 +1309,14 @@ class IS(int):
             validate_value("IS", val, validation_mode)
 
         try:
-            newval = super().__new__(cls, val)
+            newval: Union[IS, ISfloat] = super().__new__(cls, val)
         except ValueError:
             # accept float strings when no integer loss, e.g. "1.0"
             newval = super().__new__(cls, float(val))
 
-        # check if a float or Decimal passed in, then could have lost info,
-        # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
-        #   IS('1.23') will raise ValueError
+        # If a float or Decimal was passed in, check for non-integer,
+        # i.e. could lose info if converted to int
+        # If so, create an ISfloat instead (if allowed by settings)
         if isinstance(val, (float, Decimal, str)) and newval != float(val):
             newval = ISfloat(val, validation_mode)
 
