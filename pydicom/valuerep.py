@@ -1257,6 +1257,11 @@ class ISfloat(float):
     Note: By the DICOM standard, IS can only be an :class:`int`,
     however, it is not uncommon to see float IS values.  This class
     is used if the config settings allow non-strict reading.
+
+    Generally, use :class:`~pydicom.valuerep.IS` to create IS values,
+    this is returned instead if the value cannot be represented as an
+    :class:`int`.  See :class:`~pydicom.valuerep.IS` for details of the
+    parameters and return values.
     """
     def __new__(  # type: ignore[misc]
             cls: Type["ISfloat"], val: Union[str, float, Decimal],
