@@ -268,6 +268,18 @@ def disable_value_validation() -> Generator:
         settings._writing_validation_mode = writing_mode
 
 
+@contextmanager
+def strict_reading() -> Generator:
+    """Context manager to temporarily enably strict value validation
+    for reading."""
+    original_reading_mode = settings._reading_validation_mode
+    try:
+        settings.reading_validation_mode = RAISE
+        yield
+    finally:
+        settings.reading_validation_mode = original_reading_mode
+
+
 convert_wrong_length_to_UN = False
 """Convert a field VR to "UN" and return bytes if bytes length is invalid.
 Default ``False``.
