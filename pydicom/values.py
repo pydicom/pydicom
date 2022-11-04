@@ -525,11 +525,11 @@ def convert_text(
     str or list of str
         The decoded value(s).
     """
-    values = byte_string.split(b'\\')
-    as_strings = [convert_single_string(value, encodings, vr)
-                  for value in values]
+    single_string = convert_single_string(byte_string, encodings, vr)
+    as_strings = single_string.split('\\')
     if len(as_strings) == 1:
         return as_strings[0]
+    as_strings = [value.rstrip('\0 ') for value in as_strings]
 
     return MultiValue(str, as_strings,
                       validation_mode=config.settings.reading_validation_mode)

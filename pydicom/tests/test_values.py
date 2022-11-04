@@ -80,6 +80,14 @@ class TestConvertText:
         assert 'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
 
+    def test_multi_value_with_backslash_in_multibyte_encoding(self):
+        """Test that backslash in multibyte encoding is not mishandled as
+           value separator
+        """
+        bytestring = b'\x1b$BG\\<\\\x1b-A\\\x1b$BK\\L\\\x1b-A'
+        encodings = ['latin_1', 'iso2022_jp']
+        assert ['倍尺', '本目'] == convert_text(bytestring, encodings)
+
     def test_single_value_with_unknown_encoding(self):
         bytestring = b'Buc^J\xe9r\xf4me'
         encodings = ['unknown']
