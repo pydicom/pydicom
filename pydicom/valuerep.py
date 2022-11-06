@@ -1440,7 +1440,6 @@ def _encode_personname(
             encode_string(group, encodings) for group in comp.split('^')
         ]
         encoded_comp = b'^'.join(groups)
-        validate_pn_component(encoded_comp)
         encoded_comps.append(encoded_comp)
 
     # Remove empty elements from the end
@@ -1791,10 +1790,7 @@ class PersonName:
         from pydicom.charset import encode_string, decode_bytes
 
         def enc(s: str) -> bytes:
-            b = encode_string(s, encodings or [default_encoding])
-            validate_value("PN", b, config.settings.writing_validation_mode,
-                           validate_pn_component_length)
-            return b
+            return encode_string(s, encodings or [default_encoding])
 
         def dec(s: bytes) -> str:
             return decode_bytes(s, encodings or [default_encoding], set())

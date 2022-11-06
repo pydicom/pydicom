@@ -525,7 +525,7 @@ def convert_text(
     str or list of str
         The decoded value(s).
     """
-    def handle_value(v):
+    def handle_value(v: str) -> str:
         if vr is not None:
             validate_value(
                 vr, v, config.settings.reading_validation_mode)

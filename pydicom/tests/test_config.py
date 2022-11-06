@@ -148,15 +148,6 @@ class TestFuture:
         with pytest.raises(ValueError):
             ds.bitsStored = 42
 
-    def test_write_invalid_values(self, future_setter):
-        ds = Dataset()
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
-        ds.SpecificCharacterSet = "ISO_IR 192"
-        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
-        with pytest.raises(ValueError):
-            ds.save_as(DicomBytesIO())
-
 
 class TestSettings:
     @pytest.fixture
@@ -177,22 +168,3 @@ class TestSettings:
                              0, True, True)
         with pytest.raises(KeyError):
             DataElement_from_raw(raw)
-
-    def test_default_for_writing_validation_mode(self):
-        ds = Dataset()
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
-        ds.SpecificCharacterSet = "ISO_IR 192"
-        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
-        with pytest.warns(UserWarning):
-            ds.save_as(DicomBytesIO())
-
-    def test_writing_validation_mode_with_enforce_valid_values(
-            self, enforce_valid_values):
-        ds = Dataset()
-        ds.is_implicit_VR = True
-        ds.is_little_endian = True
-        ds.SpecificCharacterSet = "ISO_IR 192"
-        ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
-        with pytest.raises(ValueError):
-            ds.save_as(DicomBytesIO())
