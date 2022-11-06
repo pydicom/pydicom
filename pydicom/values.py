@@ -525,12 +525,18 @@ def convert_text(
     str or list of str
         The decoded value(s).
     """
-    single_string = convert_single_string(byte_string, encodings, vr)
-    as_strings = single_string.split('\\')
+    def handle_value(v):
+        if vr is not None:
+            validate_value(
+                vr, v, config.settings.reading_validation_mode)
+        return v.rstrip('\0 ')
+
+    encodings = encodings or [default_encoding]
+    decoded_string = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
+    values = decoded_string.split("\\")
+    as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
-    as_strings = [value.rstrip('\0 ') for value in as_strings]
-
     return MultiValue(str, as_strings,
                       validation_mode=config.settings.reading_validation_mode)
 
@@ -555,11 +561,11 @@ def convert_single_string(
     str
         The decoded text.
     """
-    if vr is not None:
-        validate_value(
-            vr, byte_string, config.settings.reading_validation_mode)
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
+    if vr is not None:
+        validate_value(
+            vr, value, config.settings.reading_validation_mode)
     return value.rstrip('\0 ')
 
 
