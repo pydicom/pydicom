@@ -4,13 +4,20 @@
 from io import BytesIO
 from unittest import mock
 
-import numpy
 import pytest
+
+from pydicom import config
 from pydicom.data import get_testdata_files, get_testdata_file
 from pydicom import framereader, dcmread
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.filereader import data_element_offset_to_value
 from pydicom.tag import ItemDelimiterTag
+
+
+have_numpy = config.have_numpy
+if have_numpy:
+    import numpy  # NOQA
+
 
 encaps_paths = [
     get_testdata_file(name)
@@ -295,14 +302,15 @@ class TestFrameReader:
             assert test_frame_info.basic_offset_table == self.bot_list
 
     def test_frame_reader_liver(self):
-        with framereader.FrameReader(self.liver_path) as frame_reader:
-            assert frame_reader.basic_offset_table == self.bot_list
-            for i in range(frame_reader.dataset.NumberOfFrames):
-                expected_shape = (
-                    frame_reader.dataset.Rows,
-                    frame_reader.dataset.Columns,
-                )
-                assert frame_reader.read_frame(i).shape == expected_shape
+        if have_numpy:
+            with framereader.FrameReader(self.liver_path) as frame_reader:
+                assert frame_reader.basic_offset_table == self.bot_list
+                for i in range(frame_reader.dataset.NumberOfFrames):
+                    expected_shape = (
+                        frame_reader.dataset.Rows,
+                        frame_reader.dataset.Columns,
+                    )
+                    assert frame_reader.read_frame(i).shape == expected_shape
 
     def test_frame_reader_from_buffered_reader(self):
         with open(self.liver_path, "rb") as filereader:
@@ -323,18 +331,20 @@ class TestFrameReader:
                     assert frame_reader.open()
 
     def test_frame_reader_decode_non_encapsulated(self):
-        path = get_testdata_file("MR_small.dcm")
-        dcm = dcmread(path)
-        with framereader.FrameReader(path) as frame_reader:
-            result = frame_reader.read_frame(0)
-            assert numpy.array_equal(result, dcm.pixel_array)
+        if have_numpy:
+            path = get_testdata_file("MR_small.dcm")
+            dcm = dcmread(path)
+            with framereader.FrameReader(path) as frame_reader:
+                result = frame_reader.read_frame(0)
+                assert numpy.array_equal(result, dcm.pixel_array)
 
     def test_frame_reader_decode_encapsulated(self):
-        path = get_testdata_file("JPEG2000.dcm")
-        dcm = dcmread(path)
-        with framereader.FrameReader(path) as frame_reader:
-            result = frame_reader.read_frame(0)
-            assert numpy.array_equal(result, dcm.pixel_array)
+        if have_numpy:
+            path = get_testdata_file("JPEG2000.dcm")
+            dcm = dcmread(path)
+            with framereader.FrameReader(path) as frame_reader:
+                result = frame_reader.read_frame(0)
+                assert numpy.array_equal(result, dcm.pixel_array)
 
     @pytest.mark.parametrize("path", encaps_paths)
     def test_frame_reader_encaps_parity(self, path):
@@ -364,7 +374,7 @@ class TestFrameReader:
         with pytest.raises(IOError):
             with open(path, "rb") as filereader:
                 with framereader.FrameReader(path) as frame_reader:
-                    assert frame_reader.read_frame(0)
+                    assert frame_reader.read_frame_raw(0)
                 assert filereader.closed
 
     def test_frame_reader_raises_if_non_item_tag_found(self):
