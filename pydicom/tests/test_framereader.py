@@ -11,6 +11,7 @@ from pydicom.data import get_testdata_files, get_testdata_file
 from pydicom import framereader, dcmread
 from pydicom.encaps import generate_pixel_data_frame
 from pydicom.filereader import data_element_offset_to_value
+from pydicom.pixel_data_handlers import gdcm_handler
 from pydicom.tag import ItemDelimiterTag
 
 
@@ -18,6 +19,19 @@ have_numpy = config.have_numpy
 if have_numpy:
     import numpy  # NOQA
 
+have_gdcm_handler = gdcm_handler.is_available()
+try:
+    from PIL import Image as PILImg
+except ImportError:
+    # If that failed, try the alternate import syntax for PIL.
+    try:
+        import Image as PILImg
+    except ImportError:
+        # Neither worked, so it's likely not installed.
+        PILImg = None
+have_pillow = PILImg is not None
+
+can_decode = all([have_gdcm_handler, have_pillow, have_numpy])
 
 encaps_paths = [
     get_testdata_file(name)
@@ -59,30 +73,27 @@ encaps_paths = [
 ]
 
 cannot_read = [
-    get_testdata_file(f)
-    for f in [
-        "rtplan_truncated.dcm",  # missing PixelData
-        "no_meta_group_length.dcm",  # missing PixelData
-        "rtstruct.dcm",  # missing PixelData
-        "reportsi_with_empty_number_tags.dcm",  # missing PixelData
-        "meta_missing_tsyntax.dcm",  # Missing BitsAllocated and other attr
-        "waveform_ecg.dcm",  # missing PixelData
-        "nested_priv_SQ.dcm",  # Missing BitsAllocated and other attr
-        "no_meta.dcm",  # missing PixelData
-        "empty_charset_LEI.dcm",  # missing PixelData
-        "rtplan.dcm",  # missing PixelData
-        "ExplVR_LitEndNoMeta.dcm",  # missing PixelData
-        "UN_sequence.dcm",  # missing PixelData
-        "reportsi.dcm",  # missing PixelData
-        "priv_SQ.dcm",  # missing PixelData
-        "test-SR.dcm",  # missing PixelData
-        "image_dfl.dcm",  # missing PixelData
-        "ExplVR_BigEndNoMeta.dcm",  # missing PixelData
-        "emri_small_jpeg_2k_lossless_too_short.dcm",  # truncated
-    ]
+    "rtplan_truncated.dcm",  # missing PixelData
+    "no_meta_group_length.dcm",  # missing PixelData
+    "rtstruct.dcm",  # missing PixelData
+    "reportsi_with_empty_number_tags.dcm",  # missing PixelData
+    "meta_missing_tsyntax.dcm",  # Missing BitsAllocated and other attr
+    "waveform_ecg.dcm",  # missing PixelData
+    "nested_priv_SQ.dcm",  # Missing BitsAllocated and other attr
+    "no_meta.dcm",  # missing PixelData
+    "empty_charset_LEI.dcm",  # missing PixelData
+    "rtplan.dcm",  # missing PixelData
+    "ExplVR_LitEndNoMeta.dcm",  # missing PixelData
+    "UN_sequence.dcm",  # missing PixelData
+    "reportsi.dcm",  # missing PixelData
+    "priv_SQ.dcm",  # missing PixelData
+    "test-SR.dcm",  # missing PixelData
+    "image_dfl.dcm",  # missing PixelData
+    "ExplVR_BigEndNoMeta.dcm",  # missing PixelData
+    "emri_small_jpeg_2k_lossless_too_short.dcm",  # truncated
 ]
 
-can_read_paths = [f for f in get_testdata_files("*.dcm") if f not in cannot_read]
+can_read_paths = [f for f in get_testdata_files("*.dcm") if not any([f.endswith(x) for x in cannot_read])]
 
 
 class TestFrameReader:
@@ -302,7 +313,7 @@ class TestFrameReader:
             assert test_frame_info.basic_offset_table == self.bot_list
 
     def test_frame_reader_liver(self):
-        if have_numpy:
+        if can_decode:
             with framereader.FrameReader(self.liver_path) as frame_reader:
                 assert frame_reader.basic_offset_table == self.bot_list
                 for i in range(frame_reader.dataset.NumberOfFrames):
@@ -331,7 +342,7 @@ class TestFrameReader:
                     assert frame_reader.open()
 
     def test_frame_reader_decode_non_encapsulated(self):
-        if have_numpy:
+        if can_decode:
             path = get_testdata_file("MR_small.dcm")
             dcm = dcmread(path)
             with framereader.FrameReader(path) as frame_reader:
@@ -339,7 +350,7 @@ class TestFrameReader:
                 assert numpy.array_equal(result, dcm.pixel_array)
 
     def test_frame_reader_decode_encapsulated(self):
-        if have_numpy:
+        if can_decode:
             path = get_testdata_file("JPEG2000.dcm")
             dcm = dcmread(path)
             with framereader.FrameReader(path) as frame_reader:

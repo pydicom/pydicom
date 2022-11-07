@@ -11,6 +11,11 @@ from io import StringIO, BytesIO
 from pathlib import Path
 from typing import List, Tuple, Union, BinaryIO, Optional
 
+try:
+    import numpy
+except ImportError:
+    pass
+
 from pydicom import Dataset
 from pydicom.config import logger
 from pydicom.dataset import FileMetaDataset
