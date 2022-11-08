@@ -93,7 +93,11 @@ cannot_read = [
     "emri_small_jpeg_2k_lossless_too_short.dcm",  # truncated
 ]
 
-can_read_paths = [f for f in get_testdata_files("*.dcm") if not any([f.endswith(x) for x in cannot_read])]
+can_read_paths = [
+    f
+    for f in get_testdata_files("*.dcm")
+    if not any([f.endswith(x) for x in cannot_read])
+]
 
 
 class TestFrameReader:
@@ -130,7 +134,7 @@ class TestFrameReader:
             )
             assert result == self.rle_basic_offset_table
 
-    def test_build_encapsulated_basic_offset_table_raises_for_non_item_tag(self):
+    def test_build_encapsulated_bot_raises_for_non_item_tag(self):
         with pytest.raises(IOError):
             with open(self.rle_path, "rb") as fp:
                 file_like = framereader.DicomFileLike(fp)
@@ -140,7 +144,7 @@ class TestFrameReader:
                     file_like, self.rle_pixel_data_location, 2
                 )
 
-    def test_build_encapsulated_basic_offset_table_raises_if_bot_too_short(self):
+    def test_build_encapsulated_bot_raises_if_bot_too_short(self):
         with pytest.raises(ValueError):
             with open(self.rle_path, "rb") as fp:
                 file_like = framereader.DicomFileLike(fp)
@@ -150,13 +154,15 @@ class TestFrameReader:
                     file_like, self.rle_first_frame_location, 4
                 )
 
-    def test_build_encapsulated_basic_offset_table_raises_if_odd_item_length(self):
+    def test_build_encapsulated_bot_raises_if_odd_item_length(self):
         with pytest.raises(IOError):
             item_length_3 = b"\xfe\xff\x00\xe0\x03\x00\x00\x00"
             file_like = framereader.DicomFileLike(BytesIO(item_length_3))
             file_like.is_implicit_VR = False
             file_like.is_little_endian = True
-            assert framereader.build_encapsulated_basic_offset_table(file_like, 0, 2)
+            assert framereader.build_encapsulated_basic_offset_table(
+                file_like, 0, 2
+            )
 
     def test_build_encapsulated_basic_offset_table_raises_frame_length_0(self):
         with pytest.raises(IOError):
@@ -164,7 +170,9 @@ class TestFrameReader:
             file_like = framereader.DicomFileLike(BytesIO(item_length_0))
             file_like.is_implicit_VR = False
             file_like.is_little_endian = True
-            assert framereader.build_encapsulated_basic_offset_table(file_like, 0, 2)
+            assert framereader.build_encapsulated_basic_offset_table(
+                file_like, 0, 2
+            )
 
     def test_build_encapsulated_basic_offset_table_jpg(self):
         path = get_testdata_file("JPEG2000.dcm")
@@ -218,7 +226,8 @@ class TestFrameReader:
             # test get bot
             dcm_file_like = framereader.DicomFileLike(filereader)
             dcm_file_like.is_implicit_VR = test_frame_dataset.is_implicit_VR
-            dcm_file_like.is_little_endian = test_frame_dataset.is_little_endian
+            dcm_file_like.is_little_endian = \
+                test_frame_dataset.is_little_endian
             bot = test_frame_dataset.get_basic_offset_table(
                 dcm_file_like, self.pixel_data_location
             )
@@ -226,23 +235,31 @@ class TestFrameReader:
             assert bot.pixel_data_location == self.pixel_data_location
             assert bot.first_frame_location == self.first_frame_location
 
-    @pytest.mark.parametrize("exc", [framereader.InvalidDicomError(), Exception()])
+    @pytest.mark.parametrize(
+        "exc", [framereader.InvalidDicomError(), Exception()]
+    )
     def test_frame_dataset_read_dataset_raises_ioerror(self, exc):
-        with mock.patch("pydicom.framereader.read_partial") as mock_read_partial:
+        with mock.patch(
+                "pydicom.framereader.read_partial"
+        ) as mock_read_partial:
             mock_read_partial.side_effect = exc
             with pytest.raises(IOError):
                 with open(self.liver_path, "rb") as fp:
                     assert framereader.FrameDataset.read_dataset(fp)
 
-    def test_frame_dataset_read_dataset__get_encapsulated_basic_offset_table_raises_ioerror_on_exc(
+    def test_frame_dataset_read_dataset__get_encapsulated_bot_raises_on_exc(
         self,
     ):
         with pytest.raises(IOError):
             with open(self.liver_path, "rb") as filereader:
-                test_frame_dataset = framereader.FrameDataset.from_file(filereader)
+                test_frame_dataset = framereader.FrameDataset.from_file(
+                    filereader
+                )
                 dcm_file_like = framereader.DicomFileLike(filereader)
-                dcm_file_like.is_implicit_VR = test_frame_dataset.is_implicit_VR
-                dcm_file_like.is_little_endian = test_frame_dataset.is_little_endian
+                dcm_file_like.is_implicit_VR = \
+                    test_frame_dataset.is_implicit_VR
+                dcm_file_like.is_little_endian = \
+                    test_frame_dataset.is_little_endian
                 # should except with pixeldata location of 0
                 assert test_frame_dataset._get_encapsulated_basic_offset_table(
                     dcm_file_like, 0
@@ -256,10 +273,12 @@ class TestFrameReader:
             test_frame_dataset = framereader.FrameDataset.from_file(filereader)
             delattr(test_frame_dataset.file_meta, "TransferSyntaxUID")
             test_frame_dataset.validate_frame_dataset()
-            assert test_frame_dataset.file_meta.TransferSyntaxUID.is_little_endian
-            assert test_frame_dataset.file_meta.TransferSyntaxUID.is_implicit_VR
+            assert \
+                test_frame_dataset.file_meta.TransferSyntaxUID.is_little_endian
+            assert \
+                test_frame_dataset.file_meta.TransferSyntaxUID.is_implicit_VR
 
-    def test_frame_dataset_validate_raises_if_cannot_infer_transfer_syntax(self):
+    def test_frame_dataset_validate_raises_if_cannot_infer_tsyntax(self):
         with open(self.liver_path, "rb") as filereader:
             test_frame_dataset = framereader.FrameDataset.from_file(filereader)
             delattr(test_frame_dataset.file_meta, "TransferSyntaxUID")
@@ -279,7 +298,8 @@ class TestFrameReader:
             test_frame_dataset = framereader.FrameDataset.from_file(filereader)
             dcm_file_like = framereader.DicomFileLike(filereader)
             dcm_file_like.is_implicit_VR = test_frame_dataset.is_implicit_VR
-            dcm_file_like.is_little_endian = test_frame_dataset.is_little_endian
+            dcm_file_like.is_little_endian = \
+                test_frame_dataset.is_little_endian
             dcm_file_like.seek(0, 2)
             end_file = dcm_file_like.tell()
             with pytest.raises(IOError):
@@ -292,9 +312,12 @@ class TestFrameReader:
             test_frame_dataset = framereader.FrameDataset.from_file(filereader)
             dcm_file_like = framereader.DicomFileLike(filereader)
             dcm_file_like.is_implicit_VR = test_frame_dataset.is_implicit_VR
-            dcm_file_like.is_little_endian = test_frame_dataset.is_little_endian
+            dcm_file_like.is_little_endian = \
+                test_frame_dataset.is_little_endian
             with pytest.raises(ValueError):
-                assert framereader.FrameInfo.validate_pixel_data(dcm_file_like, 0)
+                assert framereader.FrameInfo.validate_pixel_data(
+                    dcm_file_like, 0
+                )
 
     @pytest.mark.parametrize("path", encaps_paths)
     def test_frame_info_to_from_dict(self, path):
@@ -362,7 +385,9 @@ class TestFrameReader:
             )
             frame_reader._fp.seek(frame_reader.pixel_data_location + ob_offset)
             pixel_bytes = frame_reader._fp.read()
-            encaps_frames = [*generate_pixel_data_frame(pixel_bytes, len(read_frames))]
+            encaps_frames = [
+                *generate_pixel_data_frame(pixel_bytes, len(read_frames))
+            ]
             assert encaps_frames == read_frames
 
     @pytest.mark.parametrize("path", can_read_paths)

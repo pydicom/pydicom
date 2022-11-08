@@ -18,10 +18,10 @@ except ImportError:
 
 from pydicom import Dataset
 from pydicom.config import logger
-from pydicom.dataset import FileMetaDataset, _DatasetType
+from pydicom.dataset import FileMetaDataset
 from pydicom.encaps import encapsulate, get_frame_offsets
 from pydicom.errors import InvalidDicomError
-from pydicom.filebase import DicomFile, DicomFileLike
+from pydicom.filebase import DicomFileLike
 from pydicom.filereader import (
     read_partial,
     _is_implicit_vr,
@@ -76,9 +76,9 @@ def read_encapsulated_basic_offset_table(
     Returns
     -------
     Tuple[int, List[int]]
-        A tuple of the first frame location and a list of relative offsets where
-        the offset of each Frame item in bytes from the first byte of the Pixel
-        Data element following the BOT item
+        A tuple of the first frame location and a list of relative offsets
+        where the offset of each Frame item in bytes from the first byte of the
+        PixelData element following the BOT item
 
     Note
     ----
@@ -134,8 +134,10 @@ def get_encapsulated_basic_offset_table(
     (the first byte of the first Frame item).
 
     """
-    logger.debug("Reading Basic Offset Table at position %i", pixel_data_location)
-    first_frame_location, basic_offset_table = read_encapsulated_basic_offset_table(
+    logger.debug(
+        "Reading Basic Offset Table at position %i", pixel_data_location
+    )
+    first_frame_location, bot = read_encapsulated_basic_offset_table(
         fp, pixel_data_location
     )
     tag = TupleTag(fp.read_tag())
@@ -145,9 +147,9 @@ def get_encapsulated_basic_offset_table(
             f"at location {pixel_data_location} but found tag {tag}"
         )
 
-    if len(basic_offset_table) < number_of_frames:
+    if len(bot) < number_of_frames:
         logger.debug("build Basic Offset Table item")
-        basic_offset_table = build_encapsulated_basic_offset_table(
+        bot = build_encapsulated_basic_offset_table(
             fp,
             first_frame_location=first_frame_location,
             number_of_frames=number_of_frames,
@@ -155,7 +157,7 @@ def get_encapsulated_basic_offset_table(
     else:
         fp.seek(first_frame_location, 0)
 
-    return basic_offset_table
+    return bot
 
 
 def build_encapsulated_basic_offset_table(
@@ -269,8 +271,12 @@ def get_dataset_copy_with_frame_attrs(original_dataset: Dataset) -> Dataset:
     """
     ds_copy = Dataset()
     ds_copy.file_meta = FileMetaDataset()
-    ds_copy.file_meta.TransferSyntaxUID = original_dataset.file_meta.TransferSyntaxUID
-    ds_copy.PlanarConfiguration = original_dataset.get("PlanarConfiguration", None)
+    ds_copy.file_meta.TransferSyntaxUID = getattr(
+        original_dataset.file_meta, "TransferSyntaxUID"
+    )
+    ds_copy.PlanarConfiguration = original_dataset.get(
+        "PlanarConfiguration", None
+    )
     required_attributes = (
         "Rows",
         "Columns",
@@ -288,7 +294,9 @@ def get_dataset_copy_with_frame_attrs(original_dataset: Dataset) -> Dataset:
     return ds_copy
 
 
-def decode_frame(frame_bytes: bytes, original_dataset: Dataset) -> "numpy.ndarray":
+def decode_frame(
+        frame_bytes: bytes, original_dataset: Dataset
+) -> "numpy.ndarray":
     """Decode the frame_bytes provided from original_dataset as a numpy ndarray
 
     Parameters
@@ -327,7 +335,11 @@ class BasicOffsetTable(List):
     Examples
     --------
     Create a basic offset table for liver.dcm
-    >>> bot = BasicOffsetTable([0, 32768, 65536], pixel_data_location=4314, first_frame_location=4326)
+    >>> bot = BasicOffsetTable(
+    ...    [0, 32768, 65536],
+    ...    pixel_data_location=4314,
+    ...    first_frame_location=4326
+    ...)
     """
 
     def __init__(self, *args: List[int], **kwargs: int) -> None:
@@ -366,11 +378,15 @@ class FrameDataset(Dataset):
         # These don't get copied over, need to manually set
         if hasattr(args[0], "file_meta"):
             setattr(self, "file_meta", getattr(args[0], "file_meta"))
-        self.is_implicit_VR: bool = args[0].is_implicit_VR  # type: ignore[assignment]
-        self.is_little_endian: bool = args[0].is_little_endian  # type: ignore[assignment]
+        self.is_implicit_VR: bool = \
+            args[0].is_implicit_VR  # type: ignore[assignment]
+        self.is_little_endian: bool = \
+            args[0].is_little_endian  # type: ignore[assignment]
 
         self.validate_frame_dataset()
-        self.pixels_per_frame = int(self.Rows * self.Columns * self.SamplesPerPixel)
+        self.pixels_per_frame = int(
+            self.Rows * self.Columns * self.SamplesPerPixel
+        )
         self._bytes_per_frame: Union[int, None] = None
 
     @property
@@ -379,11 +395,14 @@ class FrameDataset(Dataset):
         if not isinstance(self._bytes_per_frame, int):
             if self.BitsAllocated == 1:
                 # Determine the nearest whole number of bytes needed to contain
-                #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits, which
-                #   are packed into 12.5 -> 13 bytes
-                bytes_per_frame: int = self.pixels_per_frame // 8 + (self.pixels_per_frame % 8 > 0)
+                #   1-bit pixel data. e.g. 10 x 10 1-bit pixels is 100 bits,
+                #   which are packed into 12.5 -> 13 bytes
+                bytes_per_frame: int = self.pixels_per_frame // 8 + (
+                    self.pixels_per_frame % 8 > 0
+                )
             else:
-                bytes_per_frame = self.pixels_per_frame * self.BitsAllocated // 8
+                bytes_per_frame = self.pixels_per_frame * \
+                                  self.BitsAllocated // 8
             self._bytes_per_frame = bytes_per_frame
         else:
             bytes_per_frame = self._bytes_per_frame
@@ -482,9 +501,13 @@ class FrameDataset(Dataset):
             FrameDataset's NumberOfFrames
         """
         if self.file_meta.TransferSyntaxUID.is_encapsulated:
-            bot = self._get_encapsulated_basic_offset_table(fp, pixel_data_location)
+            bot = self._get_encapsulated_basic_offset_table(
+                fp, pixel_data_location
+            )
         else:
-            bot = self._get_uncompressed_basic_offset_table(pixel_data_location)
+            bot = self._get_uncompressed_basic_offset_table(
+                pixel_data_location
+            )
         return bot
 
     def validate_frame_dataset(self) -> None:
@@ -502,7 +525,9 @@ class FrameDataset(Dataset):
                 )
         number_of_frames = getattr(self, "NumberOfFrames", None)
         if not isinstance(number_of_frames, int):
-            warnings.warn("Dataset missing valid NumberOfFrames, inferring as 1")
+            warnings.warn(
+                "Dataset missing valid NumberOfFrames, inferring as 1"
+            )
             setattr(self, "NumberOfFrames", 1)
         missing = list()
         for keyword in _REQUIRED_DATASET_ATTRIBUTES:
@@ -547,7 +572,9 @@ class FrameDataset(Dataset):
         """
         stopped_at_pixel_data = False
 
-        def _pixel_data_stop_when(tag: BaseTag, vr: Optional[str], length: int) -> bool:
+        def _pixel_data_stop_when(
+                tag: BaseTag, vr: Optional[str], length: int
+        ) -> bool:
             nonlocal stopped_at_pixel_data
             stopped_at_pixel_data = tag in {0x7FE00010, 0x7FE00009, 0x7FE00008}
             return stopped_at_pixel_data
@@ -562,7 +589,10 @@ class FrameDataset(Dataset):
                 specific_tags=specific_tags,
             )
             file_pos = file_obj.tell()
-            true_stop = lambda x, y, z: True
+
+            def true_stop(*args: Any) -> bool:
+                return True
+
             implicit_vr = _is_implicit_vr(
                 file_obj,
                 dataset.is_implicit_VR,
@@ -575,7 +605,8 @@ class FrameDataset(Dataset):
                 setattr(dataset, "is_implicit_VR", implicit_vr)
         except InvalidDicomError as exc:
             logger.error(
-                "Exception raised when attempting to parse dataset", exc_info=True
+                "Exception raised when attempting to parse dataset",
+                exc_info=True
             )
             raise IOError(
                 f"Failed to read dataset for file due to exception ({exc}). "
@@ -583,7 +614,8 @@ class FrameDataset(Dataset):
             )
         except Exception as exc:
             logger.error(
-                "Exception raised when attempting to parse dataset", exc_info=True
+                "Exception raised when attempting to parse dataset",
+                exc_info=True
             )
             raise IOError(
                 f"Failed to read dataset for file due to exception ({exc}). "
@@ -644,7 +676,9 @@ class FrameDataset(Dataset):
         if not hasattr(new_dataset, "file_meta"):
             new_dataset.fix_meta_info(enforce_standard=False)
         setattr(
-            new_dataset.file_meta, "TransferSyntaxUID", info_dict["TransferSyntaxUID"]
+            new_dataset.file_meta,
+            "TransferSyntaxUID",
+            info_dict["TransferSyntaxUID"]
         )
         frame_dataset = cls(new_dataset)
         return frame_dataset
@@ -672,7 +706,9 @@ class FrameInfo:
         self.basic_offset_table = basic_offset_table
 
     @staticmethod
-    def validate_pixel_data(fp: DicomFileLike, pixel_data_location: int) -> None:
+    def validate_pixel_data(
+            fp: DicomFileLike, pixel_data_location: int
+    ) -> None:
         """Validate that pixel data is present and parsable at
         pixel_data_location
 
@@ -706,7 +742,8 @@ class FrameInfo:
         Returns
         -------
         dict
-            dictionary with keys `basic_offset_table`, `dataset`, `transfer_syntax_uid`
+            dictionary with keys `basic_offset_table`, `dataset`,
+            `transfer_syntax_uid`
         """
         return {
             "basic_offset_table": self.basic_offset_table.to_dict(),
@@ -741,7 +778,10 @@ class FrameInfo:
 
         """
         dataset = FrameDataset.from_file(
-            fp=fp, defer_size=defer_size, force=force, specific_tags=specific_tags,
+            fp=fp,
+            defer_size=defer_size,
+            force=force,
+            specific_tags=specific_tags,
         )
         pixel_data_location = fp.tell()
 
@@ -750,7 +790,9 @@ class FrameInfo:
         file_like.is_little_endian = dataset.is_little_endian
         file_like.is_implicit_VR = dataset.is_implicit_VR
         cls.validate_pixel_data(file_like, pixel_data_location)
-        basic_offset_table = dataset.get_basic_offset_table(file_like, pixel_data_location)
+        basic_offset_table = dataset.get_basic_offset_table(
+            file_like, pixel_data_location
+        )
         return cls(dataset=dataset, basic_offset_table=basic_offset_table)
 
     @classmethod
@@ -822,8 +864,8 @@ class FrameReader:
             the DICOM file from which to read frames
         frame_info: FrameInfo, optional
             if provided, parsing of the DICOM header can be circumvented,
-            empowering developers to store/cache metadata which are comparatively
-            much smaller than PixelData
+            empowering developers to store/cache metadata which are
+            comparatively much smaller than PixelData
         defer_size: int, str or float, optional
             setting to provide to `filereader.read_partial` if not initialized
             with frame_info
@@ -852,7 +894,9 @@ class FrameReader:
         self.open()
         return self
 
-    def __exit__(self, except_type: Any, except_value: Any, except_trace: Any) -> None:
+    def __exit__(
+            self, except_type: Any, except_value: Any, except_trace: Any
+    ) -> None:
         self.fp.close()
         if except_value:
             sys.stdout.write(
@@ -895,14 +939,16 @@ class FrameReader:
             except FileNotFoundError:
                 raise FileNotFoundError(f"File not found: {self._filename}")
             except Exception:
-                raise OSError(f"Could not open file for reading: {self._filename}")
-        return self._fp   # type: ignore[return-value]
+                raise OSError(
+                    f"Could not open file for reading: {self._filename}"
+                )
+        return self._fp  # type: ignore[return-value]
 
     @property
     def dicom_file_like(self) -> DicomFileLike:
         if self._dicom_file_like is None:
             dicom_file_like = DicomFileLike(self.fp)
-            # set endian-ness and VR type on the DicomFileLike from FrameDataset
+            # set endian-ness and VR type on DicomFileLike from FrameDataset
             dicom_file_like.is_little_endian = self.dataset.is_little_endian
             dicom_file_like.is_implicit_VR = self.dataset.is_implicit_VR
         else:
@@ -1078,7 +1124,7 @@ class FrameReader:
             rows, columns = self.dataset.Rows, self.dataset.Columns
             n_pixels = self.dataset.pixels_per_frame
             pixel_offset = int(((index * n_pixels / 8) % 1) * 8)
-            pixel_array = unpacked_frame[pixel_offset : pixel_offset + n_pixels]
+            pixel_array = unpacked_frame[pixel_offset: pixel_offset + n_pixels]
             if isinstance(pixel_array, numpy.ndarray):
                 return pixel_array.reshape(rows, columns)
 
