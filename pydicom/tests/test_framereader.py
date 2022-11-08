@@ -186,7 +186,7 @@ class TestFrameReader:
                 mock_tuple_tag.return_value = ItemDelimiterTag
                 with pytest.raises(ValueError):
                     assert framereader.get_encapsulated_basic_offset_table(
-                        file_like, self.rle_pixel_data_location
+                        file_like, self.rle_pixel_data_location, 1
                     )
 
     def test_basic_offset_table_raises_without_kwargs(self):
@@ -211,7 +211,7 @@ class TestFrameReader:
             assert not test_frame_dataset.is_implicit_VR
             assert test_frame_dataset.pixels_per_frame == 262144
             assert test_frame_dataset.bytes_per_frame == 32768
-
+            assert test_frame_dataset.bytes_per_frame == 32768
             # test validate
             assert test_frame_dataset.validate_frame_dataset() is None
 
@@ -333,14 +333,6 @@ class TestFrameReader:
             frame_reader = framereader.FrameReader("does_not_exist.dcm")
             assert frame_reader.open()
 
-    def test_frame_reader_open_raises_on_exc(self):
-        # should except if file is already open
-        with mock.patch("pydicom.framereader.DicomFile") as mock_dicom_file:
-            mock_dicom_file.side_effect = IOError()
-            with pytest.raises(OSError):
-                with framereader.FrameReader(self.liver_path) as frame_reader:
-                    assert frame_reader.open()
-
     def test_frame_reader_decode_non_encapsulated(self):
         if can_decode:
             path = get_testdata_file("MR_small.dcm")
@@ -393,7 +385,7 @@ class TestFrameReader:
             with open(self.rle_path, "rb") as filereader:
                 with framereader.FrameReader(filereader) as frame_reader:
                     frame_reader.basic_offset_table.append(674)
-                    setattr(frame_reader, "number_of_frames", 3)
+                    setattr(frame_reader, "_number_of_frames", 3)
                     assert frame_reader.read_frame_raw(2)
 
     def test_frame_reader_raises_if_index_greater_than_bot_length(self):
