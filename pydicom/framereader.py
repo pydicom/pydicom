@@ -972,9 +972,9 @@ class FrameReader:
         Builds a Basic Offset Table to speed up subsequent frame-level access.
 
         """
-        logger.debug("Reading File Meta Information...")
+        logger.debug("Initializing DicomFileLike for FrameReader...")
         try:
-            self.fp
+            self.dicom_file_like
         except Exception as exc:
             logger.error(
                 "Cannot read frames for file. Exception (%s) encountered "
