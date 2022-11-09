@@ -17,7 +17,9 @@ Enhancements
 * Added module :mod:`~pydicom.framereader` for reading frames from DICOM files
   without storing all PixelData in memory (:pr:`1725`)
 
-  * refer to :ref:`the guide <working_with_framereader>` for usage information
+  * refer to
+    :doc:`the guide <pydicom_user_guide/working_with_pixel_data#reading-pixel-data-with-framereader>`
+    for usage information
 Fixes
 -----
 * Fixed length validation of DS values with maximum length without a leading

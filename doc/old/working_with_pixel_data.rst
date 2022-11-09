@@ -226,6 +226,7 @@ that the modality LUT or rescale operation has already been applied.
     arr = ds.pixel_array
     out = apply_voi_lut(arr, ds, index=0)
 
+
 .. _working_with_framereader:
 Reading Pixel Data with ``framereader``
 ---------------------------------------
@@ -238,7 +239,7 @@ which may have pixel data that is several GigaBytes in size.
 The :class:`~pydicom.framereader.FrameReader` class can be used to read and
 decode individual frames. The
 :meth:`~pydicom.framereader.FrameReader.read_frame_raw` method can be used to
-retrieve the frame's bytes and `~pydicom.framereader.FrameReader.read_frame`
+retrieve frame bytes and :meth:`~pydicom.framereader.FrameReader.read_frame`
 can be used to retrieve the frame's pixel array if numpy is installed.
 
 .. warning::
