@@ -7,7 +7,7 @@ import pytest
 from pydicom.tag import Tag
 from pydicom.values import (
     convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
-    convert_text, convert_single_string, convert_AE_string
+    convert_text, convert_single_string, convert_AE_string, convert_PN
 )
 from pydicom.valuerep import VR
 
@@ -224,6 +224,26 @@ class TestConvertOValues:
         """Test converting OF."""
         fp = b'\x00\x01\x02\x03'
         assert b'\x00\x01\x02\x03' == converters['OF'](fp, True)
+
+
+class TestConvertPN:
+    def test_valid_PN(self):
+        bytestring = b'John^Doe'
+        assert 'John^Doe' == convert_PN(bytestring)
+
+        bytestring = b'Yamada^Tarou=\x1b$B;3ED\x1b(B^\x1b$BB@O:'
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Yamada^Tarou=山田^太郎' == converted_string
+
+        # 0x5c (\) in multibyte codes
+        bytestring = b'Baishaku^Honme=\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\'
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Baishaku^Honme=倍尺^本目' == converted_string
+
+        # 0x3d (=) in multibyte codes
+        bytestring = b'Sunatouge^Ayano=\x1b$B:=F=\x1b(B^\x1b$B0=G='
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Sunatouge^Ayano=砂峠^綾能' == converted_string
 
 
 def test_all_converters():

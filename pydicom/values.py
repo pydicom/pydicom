@@ -463,17 +463,14 @@ def convert_PN(
 
     Returns
     -------
-    valuerep.PersonName or MultiValue of PersonName
-        The decoded 'PN' value(s).
+    valuerep.PersonName
+        The decoded 'PN' value.
     """
-    def get_valtype(x: bytes) -> PersonName:
-        return PersonName(x, encodings).decode()
 
-    b_split = byte_string.rstrip(b'\x00 ').split(b'\\')
-    if len(b_split) == 1:
-        return get_valtype(b_split[0])
-
-    return MultiValue(get_valtype, b_split)
+    encodings = encodings or [default_encoding]
+    stripped_string = byte_string.rstrip(b'\x00 ')
+    decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS)
+    return PersonName(decoded_value, encodings, stripped_string).decode()
 
 
 def convert_string(
