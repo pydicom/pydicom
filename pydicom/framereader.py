@@ -1,4 +1,4 @@
-# Copyright 2008-2022 pydicom authors. See LICENSE file for details.
+# Copyright 2022 pydicom authors. See LICENSE file for details.
 """Utilities for parsing DICOM PixelData frames.
 
 Adapted from @hackermd's ImageFileReader PR (#1447)
@@ -9,7 +9,7 @@ import traceback
 import warnings
 from io import StringIO, BytesIO
 from pathlib import Path
-from typing import List, Tuple, Union, BinaryIO, Optional, Any
+from typing import Any, BinaryIO, List, Optional, Tuple, Union
 
 try:
     import numpy
@@ -36,10 +36,10 @@ _FLOAT_PIXEL_DATA_TAGS = {
     0x7FE00008,
     0x7FE00009,
 }
-_UINT_PIXEL_DATA_TAGS = {
+_INT_PIXEL_DATA_TAGS = {
     0x7FE00010,
 }
-_PIXEL_DATA_TAGS = _FLOAT_PIXEL_DATA_TAGS.union(_UINT_PIXEL_DATA_TAGS)
+_PIXEL_DATA_TAGS = _FLOAT_PIXEL_DATA_TAGS.union(_INT_PIXEL_DATA_TAGS)
 
 _JPEG_SOI_MARKER = b"\xFF\xD8"  # also JPEG-LS
 _JPEG_EOI_MARKER = b"\xFF\xD9"  # also JPEG-LS
@@ -57,6 +57,11 @@ _REQUIRED_DATASET_ATTRIBUTES = {
     "Rows",
     "SamplesPerPixel",
 }
+_OPTIONAL_DATASET_ATTRIBUTES = (
+    "PlanarConfiguration",
+    "FrameIncrementPointer",
+    "StereoPairsPresent"
+)
 
 
 def read_encapsulated_basic_offset_table(
@@ -91,9 +96,8 @@ def read_encapsulated_basic_offset_table(
         When file pointer is not positioned at first byte of Pixel Data element
 
     """
-    if fp.tell() != pixel_data_location:
-        fp.seek(pixel_data_location, 0)
-
+    # seek to pixel_data_location and validate PixelData is present
+    FrameInfo.validate_pixel_data(fp, pixel_data_location)
     # calculate and seek to first frame location
     ob_offset = data_element_offset_to_value(fp.is_implicit_VR, "OB")
     basic_offset_table_location = pixel_data_location + ob_offset
@@ -256,7 +260,10 @@ def build_encapsulated_basic_offset_table(
     return basic_offset_table
 
 
-def get_dataset_copy_with_frame_attrs(original_dataset: Dataset) -> Dataset:
+def get_dataset_copy_with_frame_attrs(
+        original_dataset: Dataset,
+        optional_attributes: Tuple[str, ...] = _OPTIONAL_DATASET_ATTRIBUTES
+) -> Dataset:
     """Create a copy of original_dataset with only the data elements needed
     to parse frames
 
@@ -264,33 +271,53 @@ def get_dataset_copy_with_frame_attrs(original_dataset: Dataset) -> Dataset:
     ----------
     original_dataset: Dataset
         the dataset for which to create a minimal copy
+    optional_attributes: Tuple[str]
+
     Returns
     -------
     Dataset
         the copy of original_dataset
+
+    Raises
+    ------
+    ValueError
+        When original_dataset is missing attributes required for frame reading
     """
     ds_copy = Dataset()
     ds_copy.file_meta = FileMetaDataset()
-    ds_copy.file_meta.TransferSyntaxUID = getattr(
-        original_dataset.file_meta, "TransferSyntaxUID"
-    )
-    ds_copy.PlanarConfiguration = original_dataset.get(
-        "PlanarConfiguration", None
-    )
-    required_attributes = (
-        "Rows",
-        "Columns",
-        "SamplesPerPixel",
-        "PhotometricInterpretation",
-        "PixelRepresentation",
-        "BitsAllocated",
-        "BitsStored",
-        "HighBit",
-    )
-    for r_attribute in required_attributes:
+    missing_attributes = list()
+    ds_copy.is_little_endian = original_dataset.is_little_endian
+    ds_copy.is_implicit_VR = original_dataset.is_implicit_VR
+    if not hasattr(original_dataset, "file_meta"):
+        transfer_syntax = None
+    else:
+        transfer_syntax = getattr(
+            original_dataset.file_meta, "TransferSyntaxUID", None
+        )
+    if transfer_syntax is None:
+        missing_attributes.append("file_meta.TransferSyntaxUID")
+    else:
+        ds_copy.file_meta.TransferSyntaxUID = transfer_syntax
+
+    for r_attribute in _REQUIRED_DATASET_ATTRIBUTES:
+        if not hasattr(original_dataset, r_attribute):
+            missing_attributes.append(r_attribute)
+        if missing_attributes:
+            continue
         original_value = getattr(original_dataset, r_attribute)
         setattr(ds_copy, r_attribute, original_value)
 
+    if missing_attributes:
+        del ds_copy
+        raise ValueError(
+            "Cannot make a copy of original_dataset as is missing the "
+            "following attributes required for frame reading: "
+            f"{missing_attributes}"
+        )
+    # not required, but need to copy if they exist
+    for attr in optional_attributes:
+        attr_value = original_dataset.get(attr)
+        setattr(ds_copy, attr, attr_value)
     return ds_copy
 
 
@@ -626,7 +653,17 @@ class FrameDataset(Dataset):
         return dataset
 
     def to_info_dict(self) -> dict:
-        ds_copy = get_dataset_copy_with_frame_attrs(self)
+        """create a dictionary representation of the FrameDataset instance for
+        convenient storage/caching
+
+        Returns
+        -------
+        dict
+            dictionary with keys `dicom_json`, `is_little_endian`,
+            `is_implicit_VR` and `TransferSyntaxUID`
+        """
+        copy_attributes = _OPTIONAL_DATASET_ATTRIBUTES + ("NumberOfFrames",)
+        ds_copy = get_dataset_copy_with_frame_attrs(self, copy_attributes)
         return {
             "dicom_json": ds_copy.to_json_dict(),
             "is_little_endian": ds_copy.is_little_endian,
@@ -670,6 +707,7 @@ class FrameDataset(Dataset):
 
     @classmethod
     def from_info_dict(cls, info_dict: dict) -> "FrameDataset":
+        """Instantiate class from info_dict generated by self.to_info_dict"""
         new_dataset = Dataset.from_json(info_dict["dicom_json"])
         for attr in ("is_little_endian", "is_implicit_VR"):
             setattr(new_dataset, attr, info_dict[attr])
@@ -817,10 +855,17 @@ class FrameReader:
 
     Attributes
     ----------
+    _dicom_file_like: DicomFileLike corresponding to _fp
     _filename: str
-        Path to the DICOM file (if path is provided rather than file-like
-    frame_info: FrameInfo
+        Path to the DICOM file (if path is provided rather than file-like)
+    _fp: BinaryIO, BytesIO, StringIO
+        file-like object (if file-like provided rather than path), otherwise
+        BufferedReader from open(_filename, "rb") after FrameReader.fp is
+        invoked
+    _frame_info: FrameInfo
         object containing the information required to parse frames
+    _number_of_frames: int
+        number of frames in the DICOM
     defer_size: int, str or float, optional
         setting to provide to `filereader.read_partial` if not initialized with
         frame_info
@@ -830,8 +875,6 @@ class FrameReader:
     specific_tags: list of (int or str or 2-tuple of int), optional
         setting to provide to `filereader.read_partial` if not initialized with
         frame_info
-    number_of_frames: int
-        number of frames in the DICOM
 
     Examples
     --------
@@ -882,7 +925,7 @@ class FrameReader:
         else:
             self._filename = None
             self._fp = file_like
-        self._dicom_file_like = None
+        self._dicom_file_like: Union[None, DicomFileLike] = None
         self._frame_info = frame_info
         self.defer_size = defer_size
         self.force = force
@@ -898,6 +941,8 @@ class FrameReader:
             self, except_type: Any, except_value: Any, except_trace: Any
     ) -> None:
         self.fp.close()
+        if isinstance(self._dicom_file_like, DicomFileLike):
+            self._dicom_file_like.close()
         if except_value:
             sys.stdout.write(
                 "Error while accessing file '{}':\n{}".format(
@@ -927,11 +972,19 @@ class FrameReader:
         Builds a Basic Offset Table to speed up subsequent frame-level access.
 
         """
-        logger.debug("read File Meta Information")
-        self.fp
+        logger.debug("Reading File Meta Information...")
+        try:
+            self.fp
+        except Exception as exc:
+            logger.error(
+                "Cannot read frames for file. Exception (%s) encountered "
+                "attempting to initialize file", exc
+            )
+            raise exc
 
     @property
     def fp(self) -> BinaryIO:
+        """file-like object from which frames can be read"""
         if self._fp is None:
             try:
                 # returns DicomFileLike
@@ -946,11 +999,13 @@ class FrameReader:
 
     @property
     def dicom_file_like(self) -> DicomFileLike:
+        """DicomFileLike for self.fp"""
         if self._dicom_file_like is None:
             dicom_file_like = DicomFileLike(self.fp)
             # set endian-ness and VR type on DicomFileLike from FrameDataset
             dicom_file_like.is_little_endian = self.dataset.is_little_endian
             dicom_file_like.is_implicit_VR = self.dataset.is_implicit_VR
+            self._dicom_file_like = dicom_file_like
         else:
             dicom_file_like = self._dicom_file_like
 
@@ -958,6 +1013,7 @@ class FrameReader:
 
     @property
     def frame_info(self) -> FrameInfo:
+        """FrameInfo corresponding to self.fp"""
         if self._frame_info is None:
             self._frame_info = FrameInfo.from_file(
                 self.fp,
@@ -969,26 +1025,32 @@ class FrameReader:
 
     @property
     def dataset(self) -> FrameDataset:
+        """FrameDataset corresponding to self.fp"""
         return self.frame_info.dataset
 
     @property
     def basic_offset_table(self) -> BasicOffsetTable:
+        """BasicOffsetTable corresponding to self.fp"""
         return self.frame_info.basic_offset_table
 
     @property
     def pixel_data_location(self) -> int:
+        """location of Pixel Data tag within self.fp"""
         return self.basic_offset_table.pixel_data_location
 
     @property
     def first_frame_location(self) -> int:
+        """location of first frame item in self.fp"""
         return self.basic_offset_table.first_frame_location
 
     @property
     def transfer_syntax_uid(self) -> UID:
+        """TransferSyntaxUID of self.fp"""
         return self.dataset.file_meta.TransferSyntaxUID
 
     @property
     def number_of_frames(self) -> int:
+        """number of frames in self.fp"""
         return len(self.basic_offset_table)
 
     def read_frame_raw(self, index: int) -> bytes:
@@ -1006,8 +1068,6 @@ class FrameReader:
 
         Raises
         ------
-        IOError
-            When frame could not be read
         ValueError
             When index > number of frames in file
 
@@ -1039,10 +1099,8 @@ class FrameReader:
 
         Raises
         ------
-        IOError
-            When frame could not be read
         ValueError
-            When index > number of frames in file
+            When non-item tag is encountered
 
         """
         frame_offset = self.basic_offset_table[index]
@@ -1082,14 +1140,6 @@ class FrameReader:
         -------
         bytes
             Pixel data of a given frame item encoded in the transfer syntax.
-
-        Raises
-        ------
-        IOError
-            When frame could not be read
-        ValueError
-            When index > number of frames in file
-
         """
         frame_offset = self.basic_offset_table[index]
         self.fp.seek(self.first_frame_location + frame_offset, 0)

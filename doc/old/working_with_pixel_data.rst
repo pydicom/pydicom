@@ -54,6 +54,8 @@ Because of the complexity in interpreting the pixel data, *pydicom* provides
 an easy way to get it in a convenient form:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
+If memory efficiency is a priority, refer to
+:ref:`Reading Pixel Data with framereader<_working_with_framereader>`
 
 ``Dataset.pixel_array``
 -----------------------
@@ -223,3 +225,140 @@ that the modality LUT or rescale operation has already been applied.
     ds = dcmread(fname)
     arr = ds.pixel_array
     out = apply_voi_lut(arr, ds, index=0)
+
+.. _working_with_framereader:
+Reading Pixel Data with ``framereader``
+---------------------------------------
+
+The :mod:`~pydicom.framereader` module provides several classes and functions
+for working with pixel data when it is not feasible to read the entire Pixel
+Data element into memory. This is especially the case for multi-frame DICOMs,
+which may have pixel data that is several GigaBytes in size.
+
+The :class:`~pydicom.framereader.FrameReader` class can be used to read and
+decode individual frames. The
+:meth:`~pydicom.framereader.FrameReader.read_frame_raw` method can be used to
+retrieve the frame's bytes and `~pydicom.framereader.FrameReader.read_frame`
+can be used to retrieve the frame's pixel array if numpy is installed.
+
+.. warning::
+
+    :meth:`~pydicom.framereader.FrameReader.read_frame`
+    requires `NumPy <http://numpy.org/>`_.
+
+.. code-block:: python
+
+    from pydicom import framereader
+
+    test_path = get_testdata_file("emri_small.dcm")
+
+    # Basic usage with path
+    with framereader.FrameReader(test_path) as frame_reader:
+        # index starts at 0, so 0 for the first frame
+        index = 0
+        # read_frame_raw for retrieving frame bytes
+        frame_bytes = frame_reader.read_frame_raw(index)
+        # read_frame for the pixel array (requires numpy)
+        frame_array = frame_reader.read_frame(index)
+
+
+:class:`~pydicom.framereader.FrameReader` can take either a path as above or a
+file-like object (has `read`, `tell`, `seek` methods) as below
+
+.. code-block:: python
+
+    # Basic usage with file-like object
+    with open(test_path, "rb") as file_like:
+        with framereader.FrameReader(file_like) as frame_reader:
+            # iterate over all frames
+            n_frames = frame_reader.number_of_frames
+            frame_bytes_list = [
+                frame_reader.read_frame_raw(i) for i in range(n_frames)
+            ]
+
+
+In cases the frames may be read several times for a given file, the
+:attr:`~pydicom.framereader.FrameReader.frame_info` can be stored as a
+dictionary (which could be saved as a json file or to a database) to improve
+performance of subsequent reads.
+
+
+
+  >>> with framereader.FrameReader(test_path) as frame_reader:
+  ...     # seek to pixel data
+  ...     frame_reader.fp.seek(frame_reader.pixel_data_location)
+  ...     # get the frame_info dictionary
+  ...     frame_info_dict = frame_reader.frame_info.to_dict()
+  >>> frame_info_dict
+  {'basic_offset_table': {'basic_offset_table': [0,
+                                                 8192,
+                                                 16384,
+                                                 24576,
+                                                 32768,
+                                                 40960,
+                                                 49152,
+                                                 57344,
+                                                 65536,
+                                                 73728],
+                          'first_frame_location': 2336,
+                          'pixel_data_location': 2324},
+   'dataset': {'TransferSyntaxUID': '1.2.840.10008.1.2.1',
+               'dicom_json': {'00280002': {'Value': [1], 'vr': 'US'},
+                              '00280004': {'Value': ['MONOCHROME2'], 'vr': 'CS'},
+                              '00280006': {'vr': 'US'},
+                              '00280010': {'Value': [64], 'vr': 'US'},
+                              '00280011': {'Value': [64], 'vr': 'US'},
+                              '00280100': {'Value': [16], 'vr': 'US'},
+                              '00280101': {'Value': [12], 'vr': 'US'},
+                              '00280102': {'Value': [11], 'vr': 'US'},
+                              '00280103': {'Value': [0], 'vr': 'US'}},
+               'is_implicit_VR': None,
+               'is_little_endian': None},
+   'transfer_syntax_uid': '1.2.840.10008.1.2.1'}
+
+To illustrate the benefit of storing frame info to a dictionary, suppose that
+it's necessary to store pixel data in separate files and do read frames from
+these separate files. One could do the following:
+
+.. code-block:: python
+
+    from io import BytesIO
+
+    # BytesIO for storing Pixel Data
+    with BytesIO() as bytes_io_file_like:
+        with framereader.FrameReader(test_path) as frame_reader:
+            # write pixel data to bytes_io_file_like
+            # get length of pixel data
+            frame_reader.dicom_file_like.seek(frame_reader.pixel_data_location)
+            frame_reader.dicom_file_like.read_tag()
+            pixel_data_length = frame_reader.dicom_file_like.read_UL()
+            # seek to pixel data
+            frame_reader.fp.seek(frame_reader.pixel_data_location)
+            # write pixel data to bytes_io_file_like
+            bytes_io_file_like.write(frame_reader.fp.read())
+
+
+            # get the frame_info dictionary
+            frame_info_dict = frame_reader.frame_info.to_dict()
+            # correct the pixel_data_location to match bytes_io_file_like
+            frame_info_dict["basic_offset_table"]["pixel_data_location"] = 0
+            # correct the first_frame_location to match bytes_io_file_like
+            ff = frame_reader.first_frame_location - frame_reader.pixel_data_location
+            frame_info_dict["basic_offset_table"]["first_frame_location"] = ff
+
+            # save frame bytes for comparison
+            n_frames = frame_reader.number_of_frames
+            original_frame_bytes = [
+                frame_reader.read_frame_raw(i) for i in range(n_frames)
+            ]
+        del frame_reader
+        # create FrameInfo object to provide as frame_info kwarg
+        frame_info = framereader.FrameInfo.from_dict(frame_info_dict)
+        with framereader.FrameReader(
+            bytes_io_file_like, frame_info=frame_info
+        ) as frame_reader:
+            new_frame_bytes = [
+                frame_reader.read_frame_raw(i) for i in range(n_frames)
+            ]
+            # compare to illustrate
+            assert new_frame_bytes == original_frame_bytes

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the pydicom.framereader module."""
 from io import BytesIO
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -13,7 +14,6 @@ from pydicom.encaps import generate_pixel_data_frame
 from pydicom.filereader import data_element_offset_to_value
 from pydicom.pixel_data_handlers import gdcm_handler
 from pydicom.tag import ItemDelimiterTag
-
 
 have_numpy = config.have_numpy
 if have_numpy:
@@ -72,7 +72,7 @@ encaps_paths = [
     ]
 ]
 
-cannot_read = [
+cannot_read_names = {
     "rtplan_truncated.dcm",  # missing PixelData
     "no_meta_group_length.dcm",  # missing PixelData
     "rtstruct.dcm",  # missing PixelData
@@ -91,13 +91,9 @@ cannot_read = [
     "image_dfl.dcm",  # missing PixelData
     "ExplVR_BigEndNoMeta.dcm",  # missing PixelData
     "emri_small_jpeg_2k_lossless_too_short.dcm",  # truncated
-]
-
-can_read_paths = [
-    f
-    for f in get_testdata_files("*.dcm")
-    if not any([f.endswith(x) for x in cannot_read])
-]
+}
+all_paths = (Path(f) for f in get_testdata_files("*.dcm"))
+can_read_paths = [p for p in all_paths if p.name not in cannot_read_names]
 
 
 class TestFrameReader:
@@ -191,11 +187,32 @@ class TestFrameReader:
             file_like.is_implicit_VR = False
             file_like.is_little_endian = True
             with mock.patch("pydicom.framereader.TupleTag") as mock_tuple_tag:
-                mock_tuple_tag.return_value = ItemDelimiterTag
+                mock_tuple_tag.side_effect = [
+                    0x7FE00010,
+                    ItemDelimiterTag
+                ]
                 with pytest.raises(ValueError):
                     assert framereader.get_encapsulated_basic_offset_table(
                         file_like, self.rle_pixel_data_location, 1
                     )
+
+    @pytest.mark.parametrize("attr", framereader._REQUIRED_DATASET_ATTRIBUTES)
+    def test_get_dataset_copy_with_frame_attrs_raises_if_missing_required_attr(
+            self, attr
+    ):
+        dataset = dcmread(self.liver_path)
+        delattr(dataset, attr)
+        with pytest.raises(ValueError):
+            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
+
+    def test_get_dataset_copy_with_frame_attrs_raises_if_missing_tsyntax(self):
+        dataset = dcmread(self.liver_path)
+        delattr(dataset.file_meta, "TransferSyntaxUID")
+        with pytest.raises(ValueError):
+            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
+        delattr(dataset, "file_meta")
+        with pytest.raises(ValueError):
+            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
 
     def test_basic_offset_table_raises_without_kwargs(self):
         with pytest.raises(KeyError):
@@ -248,7 +265,7 @@ class TestFrameReader:
                     assert framereader.FrameDataset.read_dataset(fp)
 
     def test_frame_dataset_read_dataset__get_encapsulated_bot_raises_on_exc(
-        self,
+            self,
     ):
         with pytest.raises(IOError):
             with open(self.liver_path, "rb") as filereader:
@@ -269,7 +286,6 @@ class TestFrameReader:
         # implicit vr, little endian
         path = get_testdata_file("MR_small_implicit.dcm")
         with open(path, "rb") as filereader:
-
             test_frame_dataset = framereader.FrameDataset.from_file(filereader)
             delattr(test_frame_dataset.file_meta, "TransferSyntaxUID")
             test_frame_dataset.validate_frame_dataset()
@@ -318,6 +334,13 @@ class TestFrameReader:
                 assert framereader.FrameInfo.validate_pixel_data(
                     dcm_file_like, 0
                 )
+
+    def test_frame_reader_open_raises_on_exc(self):
+        with mock.patch("pydicom.framereader.open") as mock_open:
+            mock_open.side_effect = IOError()
+            with pytest.raises(OSError):
+                with framereader.FrameReader(self.liver_path) as frame_reader:
+                    assert frame_reader.open()
 
     @pytest.mark.parametrize("path", encaps_paths)
     def test_frame_info_to_from_dict(self, path):
@@ -418,3 +441,27 @@ class TestFrameReader:
             with framereader.FrameReader(filereader) as frame_reader:
                 with pytest.raises(ValueError):
                     assert frame_reader.read_frame_raw(2)
+
+    def test_frame_reader_initialize_with_frame_info(self):
+        with BytesIO() as file_obj:
+            with framereader.FrameReader(self.liver_path) as frame_reader:
+                frame_reader.fp.seek(frame_reader.pixel_data_location)
+                file_obj.write(frame_reader.fp.read())
+                new_ff = frame_reader.first_frame_location - \
+                    frame_reader.pixel_data_location
+                new_bot = framereader.BasicOffsetTable(
+                    frame_reader.basic_offset_table,
+                    pixel_data_location=0,
+                    first_frame_location=new_ff
+                )
+
+                frame_info_dict = frame_reader.frame_info.to_dict()
+                frame_info_dict["basic_offset_table"] = new_bot.to_dict()
+                new_frame_info = framereader.FrameInfo.from_dict(
+                    frame_info_dict
+                )
+            with framereader.FrameReader(
+                    file_obj, frame_info=new_frame_info
+            ) as frame_reader:
+                for frame_i in range(frame_reader.number_of_frames):
+                    assert frame_reader.read_frame_raw(frame_i)

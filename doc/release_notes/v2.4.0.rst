@@ -14,7 +14,10 @@ Enhancements
 * CLI commands now accept *pydicom* charset test files and CLI help shows
   Python Version (:pr:`1674`)
 * Added support for Python 3.11 (:issue:`1658`)
+* Added module :mod:`~pydicom.framereader` for reading frames from DICOM files
+  without storing all PixelData in memory (:pr:`1725`)
 
+  * refer to :ref:`the guide <working_with_framereader>` for usage information
 Fixes
 -----
 * Fixed length validation of DS values with maximum length without a leading
