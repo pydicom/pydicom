@@ -245,6 +245,15 @@ class TestConvertPN:
         converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
         assert 'Sunatouge^Ayano=砂峠^綾能' == converted_string
 
+    def test_multi_value(self):
+        """Test that backslash is handled as value separator"""
+        bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                      b'\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\')
+        encodings = ['latin_1', 'iso2022_jp', 'iso_ir_126']
+        assert ['Buc^Jérôme', 'Διονυσιος', '倍尺^本目'] == convert_PN(
+            bytestring, encodings)
+
 
 def test_all_converters():
     """Test that the VR decoder functions are complete"""

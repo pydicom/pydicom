@@ -463,14 +463,25 @@ def convert_PN(
 
     Returns
     -------
-    valuerep.PersonName
-        The decoded 'PN' value.
+    valuerep.PersonName or MultiValue of PersonName
+        The decoded 'PN' value(s).
     """
 
     encodings = encodings or [default_encoding]
+
+    def get_valtype(x: str) -> PersonName:
+        person_name = PersonName(x, encodings)
+        # Using an already decoded string in PersonName constructor leaves
+        # the original string as undefined, let's set it through encode
+        person_name.encode()
+        return person_name.decode()
+
     stripped_string = byte_string.rstrip(b'\x00 ')
     decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS)
-    return PersonName(decoded_value, encodings, stripped_string).decode()
+    value_splitted = decoded_value.split('\\')
+    if len(value_splitted) == 1:
+        return get_valtype(value_splitted[0])
+    return MultiValue(get_valtype, value_splitted)
 
 
 def convert_string(
