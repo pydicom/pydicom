@@ -55,7 +55,7 @@ an easy way to get it in a convenient form:
 :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>`.
 
 If memory efficiency is a priority, refer to
-:ref:`Reading Pixel Data with framereader<_working_with_framereader>`
+:ref:`Reading Pixel Data with framereader <working_with_framereader>`
 
 ``Dataset.pixel_array``
 -----------------------
@@ -228,6 +228,7 @@ that the modality LUT or rescale operation has already been applied.
 
 
 .. _working_with_framereader:
+
 Reading Pixel Data with ``framereader``
 ---------------------------------------
 

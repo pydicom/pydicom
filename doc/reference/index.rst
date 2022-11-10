@@ -21,6 +21,7 @@ This API reference guide details the functions, modules and objects included in
    datadict
    elem
    dataset
+   framereader
    handlers
    encoders
    fileset
