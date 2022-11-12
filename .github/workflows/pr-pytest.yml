@@ -2,7 +2,9 @@ name: pr-unit-tests
 
 on:
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - 2.3.X
 
 jobs:
   test-pypy:
