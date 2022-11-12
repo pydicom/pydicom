@@ -1,3 +1,11 @@
+Version 2.3.1
+=================================
+
+Changes
+-------
+* updated for Python 3.11 compatibility
+
+
 Version 2.3.0
 =================================
 
