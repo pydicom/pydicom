@@ -31,8 +31,6 @@ This example shows how to read and interact with a DICOM File-set.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     DICOM File-set
@@ -105,7 +103,7 @@ This example shows how to read and interact with a DICOM File-set.
     Found 0 instances with PhotometricInterpretation='MONOCHROME1' without loading the stored instances and 3 instances with loading
 
     Original File-set still at /home/circleci/project/pydicom/data/test_files/dicomdirtests
-    File-set copied to /tmp/tmp8cnd2qhn and contains the following files:
+    File-set copied to /tmp/tmpzapdxjrj and contains the following files:
       DICOMDIR
       PT000000/ST000000/SE000000/IM000000
       PT000000/ST000000/SE000001/IM000000
@@ -274,23 +272,18 @@ This example shows how to read and interact with a DICOM File-set.
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_fileset.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_read_fileset.py <plot_read_fileset.py>`
 
-     :download:`Download Python source code: plot_read_fileset.py <plot_read_fileset.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_read_fileset.ipynb <plot_read_fileset.ipynb>`
+      :download:`Download Jupyter notebook: plot_read_fileset.ipynb <plot_read_fileset.ipynb>`
 
 
 .. only:: html

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.pixel_data_handlers.apply_voi_lut &mdash; pydicom 2.3.0 documentation</title>
+  <title>pydicom.pixel_data_handlers.apply_voi_lut &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -75,7 +77,10 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_rescale.html">pydicom.pixel_data_handlers.apply_rescale</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_windowing.html">pydicom.pixel_data_handlers.apply_windowing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.apply_voi.html">pydicom.pixel_data_handlers.apply_voi</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.apply_voi_lut</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.pixel_data_handlers.apply_voi_lut</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.pixel_data_handlers.apply_voi_lut"><code class="docutils literal notranslate"><span class="pre">apply_voi_lut()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.convert_color_space.html">pydicom.pixel_data_handlers.convert_color_space</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.pixel_data_handlers.util.html">pydicom.pixel_data_handlers.util</a></li>
 </ul>
@@ -118,10 +123,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-          <li><a href="../handlers.html">Bulk Data Handlers</a> &raquo;</li>
-      <li>pydicom.pixel_data_handlers.apply_voi_lut</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../handlers.html">Bulk Data Handlers</a></li>
+      <li class="breadcrumb-item active">pydicom.pixel_data_handlers.apply_voi_lut</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -131,10 +136,10 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-pixel-data-handlers-apply-voi-lut">
-<h1>pydicom.pixel_data_handlers.apply_voi_lut<a class="headerlink" href="#pydicom-pixel-data-handlers-apply-voi-lut" title="Permalink to this headline">¶</a></h1>
+<h1>pydicom.pixel_data_handlers.apply_voi_lut<a class="headerlink" href="#pydicom-pixel-data-handlers-apply-voi-lut" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.pixel_data_handlers.apply_voi_lut">
-<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.</span></span><span class="sig-name descname"><span class="pre">apply_voi_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_lut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef75019e8/pydicom/pixel_data_handlers/util.py#L291"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_voi_lut" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.pixel_data_handlers.</span></span><span class="sig-name descname"><span class="pre">apply_voi_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_lut</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">np.ndarray</span></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ce7424b42/pydicom/pixel_data_handlers/util.py#L291"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.pixel_data_handlers.apply_voi_lut" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a VOI lookup table or windowing operation to <cite>arr</cite>.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 1.4.</span></p>
@@ -145,7 +150,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to apply the VOI LUT or windowing operation
+<li><p><strong>arr</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – The <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to apply the VOI LUT or windowing operation
 to.</p></li>
 <li><p><strong>ds</strong> (<a class="reference internal" href="pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><em>dataset.Dataset</em></a>) – A dataset containing a <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.11.2.html">VOI LUT Module</a>.
 If (0028,3010) <em>VOI LUT Sequence</em> is present then returns an array
@@ -154,9 +159,9 @@ of <code class="docutils literal notranslate"><span class="pre">np.uint8</span><
 (0028,1051) <em>Window Width</em> are present then returns an array of
 <code class="docutils literal notranslate"><span class="pre">np.float64</span></code>. If neither are present then <cite>arr</cite> will be returned
 unchanged.</p></li>
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><em>optional</em>) – When the VOI LUT Module contains multiple alternative views, this is
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – When the VOI LUT Module contains multiple alternative views, this is
 the index of the view to return (default <code class="docutils literal notranslate"><span class="pre">0</span></code>).</p></li>
-<li><p><strong>prefer_lut</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – When the VOI LUT Module contains both <em>Window Width</em>/<em>Window Center</em>
+<li><p><strong>prefer_lut</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – When the VOI LUT Module contains both <em>Window Width</em>/<em>Window Center</em>
 and <em>VOI LUT Sequence</em>, if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then apply the VOI LUT,
 otherwise apply the windowing operation.</p></li>
 </ul>
@@ -165,7 +170,7 @@ otherwise apply the windowing operation.</p></li>
 <dd class="field-even"><p>An array with applied VOI LUT or windowing operation.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)">numpy.ndarray</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>

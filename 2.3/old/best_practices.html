@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Best Practices &mdash; pydicom 2.3.0 documentation</title>
+  <title>Best Practices &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -109,9 +111,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
-      <li>Best Practices</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="pydicom_user_guide.html">pydicom User Guide</a></li>
+      <li class="breadcrumb-item active">Best Practices</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -121,10 +123,10 @@
            <div itemprop="articleBody">
              
   <section id="best-practices">
-<span id="id1"></span><h1>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this heading">¶</a></h1>
 <p class="rubric">Future-proof your code, and help ensure valid DICOM</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>There are some features of <em>pydicom</em> that allow you to help check your code
 for more strict DICOM practices, and to future-proof against major
 <em>pydicom</em> version changes.</p>
@@ -132,7 +134,7 @@ for more strict DICOM practices, and to future-proof against major
 enforcement of valid DICOM, and a flag to enable “future” pydicom changes.</p>
 </section>
 <section id="enforcing-valid-dicom">
-<h2>Enforcing Valid DICOM<a class="headerlink" href="#enforcing-valid-dicom" title="Permalink to this headline">¶</a></h2>
+<h2>Enforcing Valid DICOM<a class="headerlink" href="#enforcing-valid-dicom" title="Permalink to this heading">¶</a></h2>
 <p><em>pydicom</em> has configuration options to help enforce valid DICOM:
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">reading_validation_mode</span></code> and
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">writing_validation_mode</span></code>.
@@ -166,7 +168,7 @@ That makes the <cite>reading_validation_mode</cite> variable local only to that 
 so <em>pydicom</em> would not see your change to its value.</p>
 </section>
 <section id="future-proofing-your-code">
-<h2>Future-proofing your code<a class="headerlink" href="#future-proofing-your-code" title="Permalink to this headline">¶</a></h2>
+<h2>Future-proofing your code<a class="headerlink" href="#future-proofing-your-code" title="Permalink to this heading">¶</a></h2>
 <p><em>pydicom</em>, like all software, must balance its evolution with not breaking
 existing code using the library. Sometimes, major changes are necessary
 to make significant improvements to the library.</p>
@@ -201,7 +203,7 @@ using the <a class="reference internal" href="../reference/generated/pydicom.con
 </div>
 </section>
 <section id="limiting-the-pydicom-major-version-in-your-package">
-<h2>Limiting the <em>pydicom</em> major version in your package<a class="headerlink" href="#limiting-the-pydicom-major-version-in-your-package" title="Permalink to this headline">¶</a></h2>
+<h2>Limiting the <em>pydicom</em> major version in your package<a class="headerlink" href="#limiting-the-pydicom-major-version-in-your-package" title="Permalink to this heading">¶</a></h2>
 <p>Another way to avoid breaking changes in future <em>pydicom</em> versions is to
 limit the version of <em>pydicom</em> that your code uses.</p>
 <p>If you follow standard Python packaging recommendations, you can add a line

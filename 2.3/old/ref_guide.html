@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reading and writing DICOM files &mdash; pydicom 2.3.0 documentation</title>
+  <title>Reading and writing DICOM files &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -94,8 +96,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Reading and writing DICOM files</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Reading and writing DICOM files</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -105,10 +107,10 @@
            <div itemprop="articleBody">
              
   <section id="reading-and-writing-dicom-files">
-<span id="api-filereader"></span><h1>Reading and writing DICOM files<a class="headerlink" href="#reading-and-writing-dicom-files" title="Permalink to this headline">¶</a></h1>
+<span id="api-filereader"></span><h1>Reading and writing DICOM files<a class="headerlink" href="#reading-and-writing-dicom-files" title="Permalink to this heading">¶</a></h1>
 <p class="rubric">Common pydicom functions called by user code</p>
 <section id="file-reading-parsing">
-<h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this headline">¶</a></h2>
+<h2>File Reading/Parsing<a class="headerlink" href="#file-reading-parsing" title="Permalink to this heading">¶</a></h2>
 <p>The main function to read and parse DICOM files using <em>pydicom</em> is
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>. It’s part of the
 <a class="reference internal" href="../reference/fileio.read.html#api-fileio-filereader"><span class="std std-ref">pydicom.filereader</span></a>
@@ -124,7 +126,7 @@ imported</p>
 <a class="reference internal" href="../reference/generated/pydicom.filereader.read_partial.html#pydicom.filereader.read_partial" title="pydicom.filereader.read_partial"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_partial()</span></code></a> or use <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>.</p>
 </section>
 <section id="file-writing">
-<h2>File Writing<a class="headerlink" href="#file-writing" title="Permalink to this headline">¶</a></h2>
+<h2>File Writing<a class="headerlink" href="#file-writing" title="Permalink to this heading">¶</a></h2>
 <p>DICOM files can also be written using <em>pydicom</em>. There are two ways to do this.</p>
 <ul class="simple">
 <li><p>The first is to use

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom codify command &mdash; pydicom 2.3.0 documentation</title>
+  <title>pydicom codify command &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +40,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -88,8 +90,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -99,7 +101,7 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-codify-command">
-<h1><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command<a class="headerlink" href="#pydicom-codify-command" title="Permalink to this headline">¶</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command<a class="headerlink" href="#pydicom-codify-command" title="Permalink to this heading">¶</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">codify</span></code> command takes a DICOM file and produces Python code to
 recreate that file, or, optionally a subset within that file.</p>
 <p>See <a class="reference internal" href="../../old/writing_files.html#writing-files-using-codify"><span class="std std-ref">Using Codify</span></a> for full details of writing a complete
@@ -113,7 +115,7 @@ file, which may include private health information or other sensitive
 information.</p>
 </div>
 <section id="a-simple-example">
-<h2>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h2>
+<h2>A simple example<a class="headerlink" href="#a-simple-example" title="Permalink to this heading">¶</a></h2>
 <p>A simple example of using the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command would be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pydicom codify pydicom::rtplan.dcm
 
@@ -140,7 +142,7 @@ ds.StudyTime = &#39;153557&#39;
 from the <em>pydicom</em> test data files rather than from the file system.</p>
 </section>
 <section id="command-options">
-<h2>Command options<a class="headerlink" href="#command-options" title="Permalink to this headline">¶</a></h2>
+<h2>Command options<a class="headerlink" href="#command-options" title="Permalink to this heading">¶</a></h2>
 <p>In the above example, the output was directed to screen, because no output file
 was specified. To see the available command options, use the <code class="docutils literal notranslate"><span class="pre">help</span></code> command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pydicom help codify
@@ -187,7 +189,7 @@ to code.  If you want to include them, use the <code class="docutils literal not
 </div>
 </section>
 <section id="codifying-a-part-of-a-dicom-file">
-<h2>Codifying a part of a DICOM file<a class="headerlink" href="#codifying-a-part-of-a-dicom-file" title="Permalink to this headline">¶</a></h2>
+<h2>Codifying a part of a DICOM file<a class="headerlink" href="#codifying-a-part-of-a-dicom-file" title="Permalink to this heading">¶</a></h2>
 <p>Note that the <code class="docutils literal notranslate"><span class="pre">filespec</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">codify</span></code> command, as for
 <a class="reference internal" href="cli_guide.html#cli-show"><span class="std std-ref">the show command</span></a>, allows you to specify a data element within the file,
 rather than the whole file:</p>

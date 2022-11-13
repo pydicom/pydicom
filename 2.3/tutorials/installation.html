@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to install pydicom &mdash; pydicom 2.3.0 documentation</title>
+  <title>How to install pydicom &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -134,8 +136,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>How to install pydicom</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">How to install pydicom</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -145,7 +147,7 @@
            <div itemprop="articleBody">
              
   <section id="how-to-install-pydicom">
-<h1>How to install pydicom<a class="headerlink" href="#how-to-install-pydicom" title="Permalink to this headline">¶</a></h1>
+<h1>How to install pydicom<a class="headerlink" href="#how-to-install-pydicom" title="Permalink to this heading">¶</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We recommend installing into a
@@ -156,11 +158,11 @@ packages without admin privileges. See the
 manage virtual environments.</p>
 </div>
 <section id="install-the-official-release">
-<span id="tut-install"></span><h2>Install the official release<a class="headerlink" href="#install-the-official-release" title="Permalink to this headline">¶</a></h2>
+<span id="tut-install"></span><h2>Install the official release<a class="headerlink" href="#install-the-official-release" title="Permalink to this heading">¶</a></h2>
 <p><em>pydicom</em>, being a Python library, requires <a class="reference external" href="https://www.python.org/">Python</a>. If you’re not sure whether or not your version of
 Python is supported, check <a class="reference internal" href="../faq/index.html#faq-install-version"><span class="std std-ref">this table</span></a>.</p>
 <section id="install-using-pip">
-<h3>Install using pip<a class="headerlink" href="#install-using-pip" title="Permalink to this headline">¶</a></h3>
+<h3>Install using pip<a class="headerlink" href="#install-using-pip" title="Permalink to this heading">¶</a></h3>
 <p><em>pydicom</em> is available on <a class="reference external" href="https://pypi.python.org/pypi/pydicom/">PyPI</a>, the
 official third-party Python software repository. The simplest way to install
 from PyPI is using <a class="reference external" href="https://pip.pypa.io/">pip</a> with the command:</p>
@@ -179,7 +181,7 @@ one of the release <code class="docutils literal notranslate"><span class="pre">
 </div>
 </section>
 <section id="install-using-conda">
-<h3>Install using conda<a class="headerlink" href="#install-using-conda" title="Permalink to this headline">¶</a></h3>
+<h3>Install using conda<a class="headerlink" href="#install-using-conda" title="Permalink to this heading">¶</a></h3>
 <p><em>pydicom</em> is also available for <a class="reference external" href="https://docs.conda.io/">conda</a> at
 <a class="reference external" href="https://anaconda.org/conda-forge/pydicom">conda-forge</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">pydicom</span>
@@ -187,7 +189,7 @@ one of the release <code class="docutils literal notranslate"><span class="pre">
 </div>
 </section>
 <section id="downloading-example-test-dicom-files">
-<h3>Downloading example/test DICOM files<a class="headerlink" href="#downloading-example-test-dicom-files" title="Permalink to this headline">¶</a></h3>
+<h3>Downloading example/test DICOM files<a class="headerlink" href="#downloading-example-test-dicom-files" title="Permalink to this heading">¶</a></h3>
 <p>To keep the package size small, a number of the larger DICOM files are not
 distributed with <em>pydicom</em> and are instead kept in the
 <a class="reference external" href="https://github.com/pydicom/pydicom-data">pydicom-data</a> repository. To get the complete set of
@@ -202,7 +204,7 @@ testing and example files you can either install the <em>pydicom-data</em> repos
 </section>
 </section>
 <section id="install-the-optional-libraries">
-<span id="tut-install-np"></span><span id="tut-install-libs"></span><h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this headline">¶</a></h2>
+<span id="tut-install-np"></span><span id="tut-install-libs"></span><h2>Install the optional libraries<a class="headerlink" href="#install-the-optional-libraries" title="Permalink to this heading">¶</a></h2>
 <p>If you’re going to be manipulating pixel data then
 <a class="reference external" href="https://numpy.org/">NumPy</a> is required.</p>
 <p>Using pip:</p>
@@ -218,7 +220,7 @@ need to be installed. See <a class="reference internal" href="../old/image_data_
 which library is needed to handle a given JPEG format, as specified by
 the dataset’s (0002,0010) <em>Transfer Syntax UID</em> value.</p>
 <section id="installing-pillow">
-<span id="tut-install-pil"></span><h3>Installing Pillow<a class="headerlink" href="#installing-pillow" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-pil"></span><h3>Installing Pillow<a class="headerlink" href="#installing-pillow" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference external" href="https://pillow.readthedocs.io/">Pillow</a> is a popular Python imaging library
 that can handle the decompression of some JPEG and JPEG 2000 images.</p>
 <p>Using pip; you may need to make sure that the
@@ -235,7 +237,7 @@ beforehand:</p>
 </div>
 </section>
 <section id="installing-charpyls">
-<h3>Installing CharPyLS<a class="headerlink" href="#installing-charpyls" title="Permalink to this headline">¶</a></h3>
+<h3>Installing CharPyLS<a class="headerlink" href="#installing-charpyls" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference external" href="https://github.com/Who8MyLunch/CharPyLS">CharPyLS</a> is a Python interface to
 the <a class="reference external" href="https://github.com/team-charls/charls">CharLS</a> C++ library and can
 decompress JPEG-LS images.</p>
@@ -251,7 +253,7 @@ decompress JPEG-LS images.</p>
 </div>
 </section>
 <section id="installing-gdcm">
-<span id="tut-install-gdcm"></span><h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-gdcm"></span><h3>Installing GDCM<a class="headerlink" href="#installing-gdcm" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference external" href="http://gdcm.sourceforge.net/">GDCM</a> is a C++ library for working with
 DICOM datasets that can decompress JPEG, JPEG-LS and JPEG 2000 images.</p>
 <p>The wheels on <a class="reference external" href="https://pypi.org/project/python-gdcm/">PyPI</a> are built by the
@@ -267,7 +269,7 @@ tend to be older versions and not as well supported. They’re available on cond
 </div>
 </section>
 <section id="installing-pylibjpeg">
-<span id="tut-install-pylj"></span><h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this headline">¶</a></h3>
+<span id="tut-install-pylj"></span><h3>Installing pylibjpeg<a class="headerlink" href="#installing-pylibjpeg" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference external" href="https://github.com/pydicom/pylibjpeg">pylibjpeg</a> is a Python framework for
 decompressing JPEG, JPEG-LS, JPEG 2000 images and compressing or decompressing
 RLE images provided a suitable plugin is installed.</p>
@@ -278,7 +280,7 @@ RLE images provided a suitable plugin is installed.</p>
 </section>
 </section>
 <section id="install-the-development-version">
-<span id="tut-install-dev"></span><h2>Install the development version<a class="headerlink" href="#install-the-development-version" title="Permalink to this headline">¶</a></h2>
+<span id="tut-install-dev"></span><h2>Install the development version<a class="headerlink" href="#install-the-development-version" title="Permalink to this heading">¶</a></h2>
 <p>To install a snapshot of the latest code (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) from
 <a class="reference external" href="https://github.com/pydicom/pydicom">GitHub</a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">pydicom</span><span class="o">/</span><span class="n">pydicom</span>

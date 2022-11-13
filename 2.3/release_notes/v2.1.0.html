@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 2.1.0 &mdash; pydicom 2.3.0 documentation</title>
+  <title>Version 2.1.0 &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -38,7 +40,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -88,8 +90,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Version 2.1.0</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Version 2.1.0</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -99,14 +101,14 @@
            <div itemprop="articleBody">
              
   <section id="version-2-1-0">
-<h1>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h1>
+<h1>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this heading">¶</a></h1>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Dropped support for Python 3.5 (only Python 3.6+ supported)</p></li>
 </ul>
 <section id="enhancements">
-<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
+<h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Large testing data is no longer distributed within the pydicom package
 with the aim to reduce the package download size. These test files
@@ -141,7 +143,7 @@ in <code class="xref py py-mod docutils literal notranslate"><span class="pre">p
 <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.generate_multiplex" title="pydicom.waveforms.numpy_handler.generate_multiplex"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_multiplex()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.waveforms.numpy_handler.html#pydicom.waveforms.numpy_handler.multiplex_array" title="pydicom.waveforms.numpy_handler.multiplex_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">multiplex_array()</span></code></a> functions.</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code></a> which returns an
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at <cite>index</cite> within a
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> for the multiplex group at <cite>index</cite> within a
 <em>Waveform Sequence</em> element.</p></li>
 </ul>
 </li>
@@ -156,7 +158,7 @@ customizing the behavior when a camel case variable name is used that isn’t
 a known element keyword (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1014">#1014</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.config.INVALID_KEY_BEHAVIOR.html#pydicom.config.INVALID_KEY_BEHAVIOR" title="pydicom.config.INVALID_KEY_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEY_BEHAVIOR</span></code></a> config option to allow
 customizing the behavior when an invalid key is used with the
-<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Implemented full support (loading, accessing, modifying, writing) of
 DICOM File-sets and their DICOMDIR files via the
@@ -180,7 +182,7 @@ an Extended Offset Table is required (<a class="reference external" href="https:
 </ul>
 </section>
 <section id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Reading and adding unknown non-private tags now does not raise an exception
 per default, only when <a class="reference internal" href="../reference/generated/pydicom.config.enforce_valid_values.html#pydicom.config.enforce_valid_values" title="pydicom.config.enforce_valid_values"><code class="xref py py-attr docutils literal notranslate"><span class="pre">enforce_valid_values</span></code></a> is set
@@ -232,7 +234,7 @@ deprecated, the default handler will always be used.</p></li>
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.copy" title="pydicom.dataset.Dataset.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.copy()</span></code></a> now works as expected
 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1146">#1146</a>)</p></li>
@@ -244,7 +246,7 @@ pixel data to avoid erroring out on embedded sequence delimiter
 connection is available (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1156">#1156</a>)</p></li>
 <li><p>Fixed GDCM &lt; v2.8.8 not returning the pixel array for datasets not read from
 a file-like (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1153">#1153</a>)</p></li>
-<li><p>Raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
+<li><p>Raise <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> is called with wrong argument</p></li>
 <li><p>Gracefully handle empty Specific Character Set (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1190">#1190</a>)</p></li>
 <li><p>Fixed empty ambiguous VR elements raising an exception (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1193">#1193</a>)</p></li>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compressing Pixel Data &mdash; pydicom 2.3.0 documentation</title>
+  <title>Compressing Pixel Data &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -107,9 +109,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Tutorials</a> &raquo;</li>
-      <li>Compressing <em>Pixel Data</em></li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Compressing <em>Pixel Data</em></li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -119,7 +121,7 @@
            <div itemprop="articleBody">
              
   <section id="compressing-pixel-data">
-<h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this headline">¶</a></h1>
+<h1>Compressing <em>Pixel Data</em><a class="headerlink" href="#compressing-pixel-data" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial is about compressing a dataset’s <em>Pixel Data</em> and covers</p>
 <ul class="simple">
 <li><p>An introduction to compression</p></li>
@@ -143,7 +145,7 @@ pip install pylibjpeg
 </pre></div>
 </div>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>DICOM conformant applications are usually required to support the
 <em>Little Endian Implicit VR</em> transfer syntax, which is an uncompressed (native)
 transfer syntax. This means that datasets using <em>Little Endian Implicit VR</em> have
@@ -178,7 +180,7 @@ then it’s recommended (but not required) that an <a class="reference external"
 in <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part05/PS3.5.html">Part 5 of the DICOM Standard</a>.</p>
 </section>
 <section id="encapsulating-data-compressed-by-third-party-packages">
-<h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Permalink to this headline">¶</a></h2>
+<h2>Encapsulating data compressed by third-party packages<a class="headerlink" href="#encapsulating-data-compressed-by-third-party-packages" title="Permalink to this heading">¶</a></h2>
 <p>Once you’ve used a third-party package to compress the <em>Pixel Data</em>,
 <em>pydicom</em> can be used to encapsulate and add it to the
 dataset, with either the <a class="reference internal" href="../../reference/generated/pydicom.encaps.encapsulate.html#pydicom.encaps.encapsulate" title="pydicom.encaps.encapsulate"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate()</span></code></a> or
@@ -215,7 +217,7 @@ dataset, with either the <a class="reference internal" href="../../reference/gen
 </div>
 </section>
 <section id="compressing-using-pydicom">
-<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this headline">¶</a></h2>
+<h2>Compressing using pydicom<a class="headerlink" href="#compressing-using-pydicom" title="Permalink to this heading">¶</a></h2>
 <p>Currently, only the <em>RLE Lossless</em> transfer syntax is supported for
 compressing <em>Pixel Data</em> natively using <em>pydicom</em>. The easiest method is to
 pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-func docutils literal notranslate"><span class="pre">Dataset.compress()</span></code></a>:</p>
@@ -231,13 +233,13 @@ pass the UID for <em>RLE Lossless</em> to <a class="reference internal" href="..
 <p>This will compress the existing <em>Pixel Data</em> and update the <em>Transfer Syntax
 UID</em> before saving the dataset to file as  <code class="docutils literal notranslate"><span class="pre">CT_small_rle.dcm</span></code>.</p>
 <p>If you’re creating a dataset from scratch you can instead pass a
-<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to be compressed and used as the <em>Pixel Data</em>:</p>
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> to be compressed and used as the <em>Pixel Data</em>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ds</span><span class="o">.</span><span class="n">Rows</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">Columns</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;i2&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">RLELossless</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Note that the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.22)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents
+<p>Note that the <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.shape.html#numpy.ndarray.shape" title="(in NumPy v1.23)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">shape</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.23)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a> and contents
 of <cite>arr</cite> must match the corresponding elements in the dataset, such as <em>Rows</em>,
 <em>Columns</em>, <em>Samples per Pixel</em>, etc. If they don’t match you’ll get an
 exception:</p>

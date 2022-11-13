@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Read a DICOMDIR dataset &mdash; pydicom 2.3.0 documentation</title>
+  <title>Read a DICOMDIR dataset &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -67,16 +69,21 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Read a DICOMDIR dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#input-output">Input-output</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../image_processing/index.html">Image processing</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Input-output</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_read_rtplan.html">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_processing/index.html">Metadata processing</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
@@ -98,9 +105,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">General examples</a> &raquo;</li>
-      <li>Read a DICOMDIR dataset</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">General examples</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Input-output</a></li>
+      <li class="breadcrumb-item active">Read a DICOMDIR dataset</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -115,7 +123,7 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="read-a-dicomdir-dataset">
-<span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read a DICOMDIR dataset<a class="headerlink" href="#read-a-dicomdir-dataset" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-input-output-plot-read-dicom-directory-py"></span><h1>Read a DICOMDIR dataset<a class="headerlink" href="#read-a-dicomdir-dataset" title="Permalink to this heading">¶</a></h1>
 <p>This example shows how to read a DICOM :File-set’s DICOMDIR dataset.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -124,7 +132,6 @@ with DICOM File-sets and allows creation and modification of DICOMDIR
 files. See the <a class="reference internal" href="plot_read_fileset.html"><span class="doc">DICOM File-set example</span></a> or the
 <a class="reference external" href="../../tutorials/filesets.html">File-set tutorial</a>.</p>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Root directory: /home/circleci/project/pydicom/data/test_files/dicomdirtests
 
 PATIENT: PatientID=77654033, PatientName=Doe^Archibald
@@ -252,7 +259,7 @@ PATIENT: PatientID=98890234, PatientName=Doe^Peter
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.015 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-dicom-directory-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/33b840573239ff057316729322f32358/plot_read_dicom_directory.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_dicom_directory.py</span></code></a></p>
 </div>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing a documentation change &mdash; pydicom 2.3.0 documentation</title>
+  <title>Contributing a documentation change &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -110,9 +112,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">Tutorials</a> &raquo;</li>
-      <li>Contributing a documentation change</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Contributing a documentation change</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -122,7 +124,7 @@
            <div itemprop="articleBody">
              
   <section id="contributing-a-documentation-change">
-<h1>Contributing a documentation change<a class="headerlink" href="#contributing-a-documentation-change" title="Permalink to this headline">¶</a></h1>
+<h1>Contributing a documentation change<a class="headerlink" href="#contributing-a-documentation-change" title="Permalink to this heading">¶</a></h1>
 <p>This tutorial will take you through the process of:</p>
 <ul class="simple">
 <li><p>Downloading the current documentation</p></li>
@@ -133,7 +135,7 @@
 <li><p>Committing the changes and making a pull request</p></li>
 </ul>
 <section id="download-the-documentation">
-<h2>Download the documentation<a class="headerlink" href="#download-the-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>Download the documentation<a class="headerlink" href="#download-the-documentation" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Sign up to <a class="reference external" href="https://github.com">GitHub</a> and <a class="reference external" href="https://github.com/pydicom/pydicom/fork">fork pydicom</a></p></li>
 <li><p>Install <a class="reference external" href="https://git-scm.com/downloads">Git</a>. If you’re new to Git,
@@ -161,7 +163,7 @@ building the documentation (using <code class="docutils literal notranslate"><sp
 </ol>
 </section>
 <section id="build-and-preview-the-documentation">
-<h2>Build and preview the documentation<a class="headerlink" href="#build-and-preview-the-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>Build and preview the documentation<a class="headerlink" href="#build-and-preview-the-documentation" title="Permalink to this heading">¶</a></h2>
 <p><em>pydicom’s</em> documentation consists of a series of <a class="reference external" href="https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html">reStructuredText</a> (reST) files
 located in the project’s <code class="docutils literal notranslate"><span class="pre">pydicom/doc</span></code> directory which are converted to
 HTML using <a class="reference external" href="http://www.sphinx-doc.org">Sphinx</a> during our build process.
@@ -185,7 +187,7 @@ gets applied:</p>
 <p>And then going to <a class="reference external" href="http://localhost:9999">http://localhost:9999</a></p>
 </section>
 <section id="create-a-new-branch">
-<h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this headline">¶</a></h2>
+<h2>Create a new branch<a class="headerlink" href="#create-a-new-branch" title="Permalink to this heading">¶</a></h2>
 <p>Create a new branch <code class="docutils literal notranslate"><span class="pre">doc-tut</span></code> for your changes (you can choose any name
 that you want instead). Any changes made in this branch will be specific to
 it and won’t affect the main copy (the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch) of
@@ -195,7 +197,7 @@ the documentation:</p>
 </div>
 </section>
 <section id="make-a-change-to-the-documentation">
-<h2>Make a change to the documentation<a class="headerlink" href="#make-a-change-to-the-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>Make a change to the documentation<a class="headerlink" href="#make-a-change-to-the-documentation" title="Permalink to this heading">¶</a></h2>
 <p>Let’s add a new guide on how to read a DICOM file. Create a new <code class="docutils literal notranslate"><span class="pre">reading.rst</span></code>
 file in <code class="docutils literal notranslate"><span class="pre">doc/tutorials</span></code>, open it in a text editor and add in a title and some
 text:</p>
@@ -310,7 +312,7 @@ these <a class="reference external" href="https://www.sphinx-doc.org/en/master/u
 happy with the results move on to the next section.</p>
 </section>
 <section id="commit-your-changes-and-make-a-pull-request">
-<h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this headline">¶</a></h2>
+<h2>Commit your changes and make a pull request<a class="headerlink" href="#commit-your-changes-and-make-a-pull-request" title="Permalink to this heading">¶</a></h2>
 <p>First we add our new file to git:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="n">tutorials</span><span class="o">/</span><span class="n">reading</span><span class="o">.</span><span class="n">rst</span>
 </pre></div>
@@ -343,7 +345,7 @@ the PR title prefix to <code class="docutils literal notranslate"><span class="p
 PR ready to be reviewed and merged into the main branch.</p>
 </section>
 <section id="what-happens-next">
-<h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this headline">¶</a></h2>
+<h2>What happens next?<a class="headerlink" href="#what-happens-next" title="Permalink to this heading">¶</a></h2>
 <p>One or more reviewers would look at your pull request and may make suggestions,
 ask for clarification or request changes. Once the reviewers were happy,
 the pull request would be approved and your changes merged into the

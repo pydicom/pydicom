@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dataset Reading (pydicom.filereader) &mdash; pydicom 2.3.0 documentation</title>
+  <title>Dataset Reading (pydicom.filereader) &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -127,10 +129,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">API Reference</a> &raquo;</li>
-          <li><a href="fileio.html">Dataset IO</a> &raquo;</li>
-      <li>Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="fileio.html">Dataset IO</a></li>
+      <li class="breadcrumb-item active">Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -140,7 +142,7 @@
            <div itemprop="articleBody">
              
   <section id="dataset-reading-pydicom-filereader">
-<span id="api-fileio-filereader"></span><h1>Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)<a class="headerlink" href="#dataset-reading-pydicom-filereader" title="Permalink to this headline">¶</a></h1>
+<span id="api-fileio-filereader"></span><h1>Dataset Reading (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.filereader</span></code>)<a class="headerlink" href="#dataset-reading-pydicom-filereader" title="Permalink to this heading">¶</a></h1>
 <p>Functions for reading DICOM datasets from file-likes.</p>
 <table class="autosummary longtable docutils align-default">
 <colgroup>
@@ -176,7 +178,7 @@
 <td><p>Return the 128-byte DICOM preamble in <cite>fp</cite> if present.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_sequence.html#pydicom.filereader.read_sequence" title="pydicom.filereader.read_sequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sequence</span></code></a>(fp, is_implicit_VR, ...[, offset])</p></td>
-<td><p>Read and return a <a class="reference internal" href="generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> -- i.e. a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>.</p></td>
+<td><p>Read and return a <a class="reference internal" href="generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> -- i.e. a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pydicom.filereader.read_sequence_item.html#pydicom.filereader.read_sequence_item" title="pydicom.filereader.read_sequence_item"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_sequence_item</span></code></a>(fp, is_implicit_VR, ...)</p></td>
 <td><p>Read and return a single <a class="reference internal" href="generated/pydicom.sequence.Sequence.html#pydicom.sequence.Sequence" title="pydicom.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a> item, i.e. a <a class="reference internal" href="generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a>.</p></td>

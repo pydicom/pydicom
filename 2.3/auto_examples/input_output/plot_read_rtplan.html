@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Read RTPLAN DICOM and list information &mdash; pydicom 2.3.0 documentation</title>
+  <title>Read RTPLAN DICOM and list information &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,14 +21,16 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Read a Dataset and plot Pixel Data" href="plot_read_dicom.html" />
-    <link rel="prev" title="Load CT slices and plot axial, sagittal and coronal images" href="../image_processing/reslice.html" /> 
+    <link rel="prev" title="Input-output" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -67,16 +69,21 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">General examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#image-processing">Image processing</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html#input-output">Input-output</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Read RTPLAN DICOM and list information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html#input-output">Input-output</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../image_processing/index.html">Image processing</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Input-output</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Read RTPLAN DICOM and list information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_read_dicom.html">Read a Dataset and plot Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_printing_dataset.html">Format the output of the data set printing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_write_dicom.html">Write DICOM data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_read_dicom_directory.html">Read a DICOMDIR dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_read_fileset.html">Read a DICOM File-set</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../index.html#metadata-processing">Metadata processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metadata_processing/index.html">Metadata processing</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
 <ul>
@@ -98,9 +105,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">General examples</a> &raquo;</li>
-      <li>Read RTPLAN DICOM and list information</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">General examples</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Input-output</a></li>
+      <li class="breadcrumb-item active">Read RTPLAN DICOM and list information</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -115,9 +123,8 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="read-rtplan-dicom-and-list-information">
-<span id="sphx-glr-auto-examples-input-output-plot-read-rtplan-py"></span><h1>Read RTPLAN DICOM and list information<a class="headerlink" href="#read-rtplan-dicom-and-list-information" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-input-output-plot-read-rtplan-py"></span><h1>Read RTPLAN DICOM and list information<a class="headerlink" href="#read-rtplan-dicom-and-list-information" title="Permalink to this heading">¶</a></h1>
 <p>Given an RTPLAN DICOM file, list basic info for the beams in it.</p>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Beam name    Number   Gantry   SSD (cm)
  Field 1           1      0.0     89.8
 </pre></div>
@@ -154,7 +161,7 @@ to download the full example code</p>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.003 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py">
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-read-rtplan-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c01783b47dfa1aa1100193cafc705c66/plot_read_rtplan.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_read_rtplan.py</span></code></a></p>
 </div>
@@ -169,7 +176,7 @@ to download the full example code</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../image_processing/reslice.html" class="btn btn-neutral float-left" title="Load CT slices and plot axial, sagittal and coronal images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Input-output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="plot_read_dicom.html" class="btn btn-neutral float-right" title="Read a Dataset and plot Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

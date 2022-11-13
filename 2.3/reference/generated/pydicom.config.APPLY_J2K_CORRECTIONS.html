@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.config.APPLY_J2K_CORRECTIONS &mdash; pydicom 2.3.0 documentation</title>
+  <title>pydicom.config.APPLY_J2K_CORRECTIONS &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -64,6 +66,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../charset.html">Character Encoding and Decoding (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.charset</span></code>)</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../config.html#pydicom.config.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.settings.html">pydicom.config.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.allow_DS_float.html">pydicom.config.allow_DS_float</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.assume_implicit_vr_switch.html">pydicom.config.assume_implicit_vr_switch</a></li>
@@ -83,7 +86,10 @@
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_decimal.html">pydicom.config.use_DS_decimal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_IS_numpy.html">pydicom.config.use_IS_numpy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.use_DS_numpy.html">pydicom.config.use_DS_numpy</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.APPLY_J2K_CORRECTIONS</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.config.APPLY_J2K_CORRECTIONS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.config.APPLY_J2K_CORRECTIONS"><code class="docutils literal notranslate"><span class="pre">APPLY_J2K_CORRECTIONS</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEY_BEHAVIOR.html">pydicom.config.INVALID_KEY_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.INVALID_KEYWORD_BEHAVIOR.html">pydicom.config.INVALID_KEYWORD_BEHAVIOR</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.config.IGNORE.html">pydicom.config.IGNORE</a></li>
@@ -135,10 +141,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-          <li><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a> &raquo;</li>
-      <li>pydicom.config.APPLY_J2K_CORRECTIONS</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../config.html">Configuration Options (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.config</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.config.APPLY_J2K_CORRECTIONS</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -148,7 +154,7 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-config-apply-j2k-corrections">
-<h1>pydicom.config.APPLY_J2K_CORRECTIONS<a class="headerlink" href="#pydicom-config-apply-j2k-corrections" title="Permalink to this headline">¶</a></h1>
+<h1>pydicom.config.APPLY_J2K_CORRECTIONS<a class="headerlink" href="#pydicom-config-apply-j2k-corrections" title="Permalink to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.config.APPLY_J2K_CORRECTIONS">
 <span class="sig-prename descclassname"><span class="pre">pydicom.config.</span></span><span class="sig-name descname"><span class="pre">APPLY_J2K_CORRECTIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pydicom.config.APPLY_J2K_CORRECTIONS" title="Permalink to this definition">¶</a></dt>

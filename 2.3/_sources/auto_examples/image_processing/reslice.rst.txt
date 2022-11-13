@@ -114,23 +114,18 @@ location, building a 3D image and reslicing it in different planes.
 
 .. _sphx_glr_download_auto_examples_image_processing_reslice.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: reslice.py <reslice.py>`
 
-     :download:`Download Python source code: reslice.py <reslice.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: reslice.ipynb <reslice.ipynb>`
+      :download:`Download Jupyter notebook: reslice.ipynb <reslice.ipynb>`
 
 
 .. only:: html

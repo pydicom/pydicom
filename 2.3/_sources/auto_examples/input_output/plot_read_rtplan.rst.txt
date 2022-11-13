@@ -31,8 +31,6 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
@@ -84,23 +82,18 @@ Given an RTPLAN DICOM file, list basic info for the beams in it.
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_rtplan.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_read_rtplan.py <plot_read_rtplan.py>`
 
-     :download:`Download Python source code: plot_read_rtplan.py <plot_read_rtplan.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_read_rtplan.ipynb <plot_read_rtplan.ipynb>`
+      :download:`Download Jupyter notebook: plot_read_rtplan.ipynb <plot_read_rtplan.ipynb>`
 
 
 .. only:: html

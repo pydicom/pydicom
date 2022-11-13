@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dataset basics: read, access, modify, write &mdash; pydicom 2.3.0 documentation</title>
+  <title>Dataset basics: read, access, modify, write &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -120,9 +122,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="index.html">Tutorials</a> &raquo;</li>
-      <li>Dataset basics: read, access, modify, write</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Dataset basics: read, access, modify, write</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -132,7 +134,7 @@
            <div itemprop="articleBody">
              
   <section id="dataset-basics-read-access-modify-write">
-<h1>Dataset basics: read, access, modify, write<a class="headerlink" href="#dataset-basics-read-access-modify-write" title="Permalink to this headline">¶</a></h1>
+<h1>Dataset basics: read, access, modify, write<a class="headerlink" href="#dataset-basics-read-access-modify-write" title="Permalink to this heading">¶</a></h1>
 <p>In this tutorial we’re going to cover the basics of using <em>pydicom</em>:</p>
 <ul class="simple">
 <li><p>Reading a DICOM dataset from file</p></li>
@@ -143,12 +145,12 @@
 <p>If you haven’t installed <em>pydicom</em> yet, follow the instructions in our
 <a class="reference internal" href="installation.html"><span class="doc">installation guide</span></a>.</p>
 <section id="getting-our-example-dataset">
-<h2>Getting our example dataset<a class="headerlink" href="#getting-our-example-dataset" title="Permalink to this headline">¶</a></h2>
+<h2>Getting our example dataset<a class="headerlink" href="#getting-our-example-dataset" title="Permalink to this heading">¶</a></h2>
 <p>In the tutorial we’re going to be using a DICOM dataset included with
 <em>pydicom</em>: <a class="reference external" href="https://github.com/pydicom/pydicom/blob/master/pydicom/data/test_files/CT_small.dcm">CT_small.dcm</a>.
 Starting with version 1.4 you can get the path to the file
 by using the <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_file()</span></code></a> function to return the
-path as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (your path may vary):</p>
+path as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> (your path may vary):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom.data</span> <span class="kn">import</span> <span class="n">get_testdata_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span>
@@ -172,7 +174,7 @@ containing matching paths:</p>
 </div>
 </section>
 <section id="reading">
-<h2>Reading<a class="headerlink" href="#reading" title="Permalink to this headline">¶</a></h2>
+<h2>Reading<a class="headerlink" href="#reading" title="Permalink to this heading">¶</a></h2>
 <p>To read the DICOM dataset at a given file path we use
 <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a>, which returns a
 <a class="reference internal" href="../reference/generated/pydicom.dataset.FileDataset.html#pydicom.dataset.FileDataset" title="pydicom.dataset.FileDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileDataset</span></code></a> instance:</p>
@@ -248,13 +250,13 @@ no matter what the contents of the file are:</p>
 </div>
 </section>
 <section id="viewing-and-accessing">
-<h2>Viewing and accessing<a class="headerlink" href="#viewing-and-accessing" title="Permalink to this headline">¶</a></h2>
+<h2>Viewing and accessing<a class="headerlink" href="#viewing-and-accessing" title="Permalink to this heading">¶</a></h2>
 <p>Let’s go back to our <code class="docutils literal notranslate"><span class="pre">CT_small.dcm</span></code> dataset:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fpath</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
+<p>You can view the contents of the entire dataset by using <a class="reference external" href="https://docs.python.org/3/library/functions.html#print" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">print()</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="go">(0002, 0000) File Meta Information Group Length  UL: 192</span>
@@ -297,7 +299,7 @@ if known</p></li>
 <li><p><strong>‘ISO_IR_100’</strong>: the element’s stored value</p></li>
 </ul>
 <section id="elements">
-<h3>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h3>
+<h3>Elements<a class="headerlink" href="#elements" title="Permalink to this heading">¶</a></h3>
 <p>There are three categories of elements:</p>
 <ul class="simple">
 <li><p><strong>Standard elements</strong> such as (0008,0016) <em>SOP Class UID</em>. These elements
@@ -373,14 +375,14 @@ on you’ll see how you can use the keyword to do more than accessing the value.
 </pre></div>
 </div>
 <p>The items for multi-valued elements can be accessed using the standard Python
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="go">&#39;PRIMARY&#39;</span>
 </pre></div>
 </div>
 </section>
 <section id="sequences">
-<h3>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h3>
+<h3>Sequences<a class="headerlink" href="#sequences" title="Permalink to this heading">¶</a></h3>
 <p>When viewing a dataset, you may see that some of the elements are indented:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 <span class="gp">...</span>
@@ -426,7 +428,7 @@ elements:</p>
 </div>
 <p>The main difference between sequence and non-sequence elements is that their
 value is a list of zero or more  <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> objects,
-which can be accessed using the standard Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+which can be accessed using the standard Python <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">)</span>
 <span class="go">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -441,7 +443,7 @@ which can be accessed using the standard Python <a class="reference external" hr
 </div>
 </section>
 <section id="file-meta">
-<h3>file_meta<a class="headerlink" href="#file-meta" title="Permalink to this headline">¶</a></h3>
+<h3>file_meta<a class="headerlink" href="#file-meta" title="Permalink to this heading">¶</a></h3>
 <p>Earlier we saw that by default <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> only reads
 files that are in the DICOM File Format. So what’s the difference between a
 DICOM dataset written to file and one written in the DICOM File Format?
@@ -486,9 +488,9 @@ that at some point you’ll need to know it:</p>
 </section>
 </section>
 <section id="modifying">
-<h2>Modifying<a class="headerlink" href="#modifying" title="Permalink to this headline">¶</a></h2>
+<h2>Modifying<a class="headerlink" href="#modifying" title="Permalink to this heading">¶</a></h2>
 <section id="modifying-elements">
-<h3>Modifying elements<a class="headerlink" href="#modifying-elements" title="Permalink to this headline">¶</a></h3>
+<h3>Modifying elements<a class="headerlink" href="#modifying-elements" title="Permalink to this heading">¶</a></h3>
 <p>We can modify the value of any element by retrieving it and setting the
 value:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0010</span><span class="p">,</span> <span class="mh">0x0010</span><span class="p">]</span>
@@ -505,8 +507,8 @@ value:</p>
 <span class="go">(0010, 0010) Patient&#39;s Name                      PN: &#39;Citizen^Snips&#39;</span>
 </pre></div>
 </div>
-<p>Multi-valued elements can be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> or modified using the
-<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
+<p>Multi-valued elements can be set using a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> or modified using the
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> methods:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ORIGINAL&#39;</span><span class="p">,</span> <span class="s1">&#39;PRIMARY&#39;</span><span class="p">,</span> <span class="s1">&#39;LOCALIZER&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">ImageType</span>
 <span class="go">[&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;LOCALIZER&#39;]</span>
@@ -553,15 +555,15 @@ will automatically be converted to an empty list when you do so):</p>
 written to file, but will have an empty value and zero length.</p>
 </section>
 <section id="adding-elements">
-<h3>Adding elements<a class="headerlink" href="#adding-elements" title="Permalink to this headline">¶</a></h3>
+<h3>Adding elements<a class="headerlink" href="#adding-elements" title="Permalink to this heading">¶</a></h3>
 <section id="any-category">
-<h4>Any category<a class="headerlink" href="#any-category" title="Permalink to this headline">¶</a></h4>
+<h4>Any category<a class="headerlink" href="#any-category" title="Permalink to this heading">¶</a></h4>
 <p>New elements of any category can be added to the dataset with the
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> method, which takes the tag, VR and
 value to use for the new element.</p>
 <p>Let’s say we wanted to add the (0028,1050) <em>Window Center</em> standard element. We
 already know the tag is (0028,1050), but how we get the VR and how do we
-know the Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> to use for the value?</p>
+know the Python <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> to use for the value?</p>
 <p>There are two ways to get an element’s VR:</p>
 <ul class="simple">
 <li><p>You can use <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part06/chapter_6.html">Part 6 of the DICOM Standard</a>
@@ -574,8 +576,8 @@ function to look it up</p></li>
 <span class="go">&#39;DS&#39;</span>
 </pre></div>
 </div>
-<p>The Python type to use for a given VR is given by <a class="reference internal" href="../guides/element_value_types.html"><span class="doc">this table</span></a>. For <strong>DS</strong> we can use a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>,
-<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, so to add the new element:</p>
+<p>The Python type to use for a given VR is given by <a class="reference internal" href="../guides/element_value_types.html"><span class="doc">this table</span></a>. For <strong>DS</strong> we can use a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, so to add the new element:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">add_new</span><span class="p">([</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">],</span> <span class="s1">&#39;DS&#39;</span><span class="p">,</span> <span class="s2">&quot;100.0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x1050</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">elem</span>
@@ -584,7 +586,7 @@ function to look it up</p></li>
 </div>
 </section>
 <section id="standard-elements">
-<h4>Standard elements<a class="headerlink" href="#standard-elements" title="Permalink to this headline">¶</a></h4>
+<h4>Standard elements<a class="headerlink" href="#standard-elements" title="Permalink to this heading">¶</a></h4>
 <p>Adding elements with <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.add_new" title="pydicom.dataset.Dataset.add_new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_new()</span></code></a> is a lot of
 work, so for standard elements you can just use the keyword
 and <em>pydicom</em> will do the lookup for you:</p>
@@ -596,7 +598,7 @@ and <em>pydicom</em> will do the lookup for you:</p>
 </pre></div>
 </div>
 <p>Notice how we can also use the element keyword with the Python
-<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator to see if a standard element is in
+<a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator to see if a standard element is in
 the dataset? This also works with element tags, so private and repeating group
 elements are also covered:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span>
@@ -605,7 +607,7 @@ elements are also covered:</p>
 </div>
 </section>
 <section id="id1">
-<h4>Sequences<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<h4>Sequences<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h4>
 <p>Because sequence items are also <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances,
 you can use the same methods on them as well.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span>
@@ -625,8 +627,8 @@ you can use the same methods on them as well.</p>
 </section>
 </section>
 <section id="deleting-elements">
-<h3>Deleting elements<a class="headerlink" href="#deleting-elements" title="Permalink to this headline">¶</a></h3>
-<p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.10)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
+<h3>Deleting elements<a class="headerlink" href="#deleting-elements" title="Permalink to this heading">¶</a></h3>
+<p>All elements can be deleted with the <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__delitem__" title="(in Python v3.11)"><code class="xref py py-func docutils literal notranslate"><span class="pre">del</span></code></a>
 operator in combination with the element tag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mh">0x0043</span><span class="p">,</span> <span class="mh">0x104E</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ds</span>
@@ -640,7 +642,7 @@ operator in combination with the element tag:</p>
 </pre></div>
 </div>
 <p>And you can remove items from sequences and multi-valued elements using your
-preferred <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> method:</p>
+preferred <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> method:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ds</span><span class="o">.</span><span class="n">OtherPatientIDsSequence</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
 <span class="go">2</span>
@@ -652,7 +654,7 @@ preferred <a class="reference external" href="https://docs.python.org/3/library/
 </section>
 </section>
 <section id="writing">
-<h2>Writing<a class="headerlink" href="#writing" title="Permalink to this headline">¶</a></h2>
+<h2>Writing<a class="headerlink" href="#writing" title="Permalink to this heading">¶</a></h2>
 <p>After changing the dataset, the final step is to write the modifications back
 to file. This can be done by using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_as()</span></code></a> to
 write the dataset to the supplied path:</p>
@@ -714,7 +716,7 @@ we need to add it back:</p>
 <p>And we’re done.</p>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">¶</a></h2>
 <p>Congratulations, you’re now familiar with the basics of using <em>pydicom</em> to
 read, access, modify and write DICOM datasets. Next up you may be interested
 in looking at our <a class="reference internal" href="../old/pydicom_user_guide.html"><span class="doc">User Guide</span></a> or some of our

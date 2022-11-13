@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Version 1.0.0 &mdash; pydicom 2.3.0 documentation</title>
+  <title>Version 1.0.0 &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -38,7 +40,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -88,8 +90,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Version 1.0.0</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Version 1.0.0</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -99,13 +101,13 @@
            <div itemprop="articleBody">
              
   <section id="version-1-0-0">
-<h1>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this headline">¶</a></h1>
+<h1>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this heading">¶</a></h1>
 <p>This is a major release, with major changes, including backwards-incompatible
 changes.</p>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
 <section id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">¶</a></h3>
+<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>full Python 3 compatibility - one code base for both Python 2 and Python 3</p></li>
 <li><p>package name and import name now match – use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">pydicom</span></code>
@@ -124,7 +126,7 @@ files</p></li>
 </ul>
 </section>
 <section id="other-enhancements">
-<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this headline">¶</a></h3>
+<h3>Other enhancements<a class="headerlink" href="#other-enhancements" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>added <code class="docutils literal notranslate"><span class="pre">util/fixer.py</span></code> callbacks available to fix non DICOM-compliant
 values before exceptions thrown</p></li>
@@ -155,7 +157,7 @@ greater clarity. Previous names still available for backwards compatibility.</p>
 </ul>
 </section>
 <section id="infrastructure">
-<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h3>
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>added <a class="reference external" href="https://travis-ci.org/pydicom/pydicom/">TravisCI</a> and
 <a class="reference external" href="https://ci.appveyor.com/project/pydicom/pydicom">AppVeyor</a> builds for
@@ -170,7 +172,7 @@ and <a class="reference external" href="https://pydicom.github.io/pydicom/stable
 </ul>
 </section>
 <section id="fixes">
-<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this headline">¶</a></h3>
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>correctly handle PlanarConfiguration==0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/151">#151</a>)</p></li>
 <li><p>updated uid generation to ensure uniqueness (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/125">#125</a>)</p></li>

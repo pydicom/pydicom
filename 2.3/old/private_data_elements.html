@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Private Data Elements &mdash; pydicom 2.3.0 documentation</title>
+  <title>Private Data Elements &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
         <script src="../_static/copybutton.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -109,9 +111,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="pydicom_user_guide.html">pydicom User Guide</a> &raquo;</li>
-      <li>Private Data Elements</li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="pydicom_user_guide.html">pydicom User Guide</a></li>
+      <li class="breadcrumb-item active">Private Data Elements</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -121,10 +123,10 @@
            <div itemprop="articleBody">
              
   <section id="private-data-elements">
-<span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Private Data Elements<a class="headerlink" href="#private-data-elements" title="Permalink to this heading">¶</a></h1>
 <p class="rubric">Accessing or creating private data elements</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
 <p>The DICOM standard allows DICOM file creators to use <cite>private data elements</cite>
 to store information that is not defined by the DICOM standard itself.</p>
 <p>Private data elements are stored in Datasets just like other data elements.
@@ -139,7 +141,7 @@ functions to make creating private blocks and data elements easier.</p>
 elements using pydicom.</p>
 </section>
 <section id="displaying-private-data-elements-in-pydicom">
-<h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Permalink to this headline">¶</a></h2>
+<h2>Displaying Private Data Elements in pydicom<a class="headerlink" href="#displaying-private-data-elements-in-pydicom" title="Permalink to this heading">¶</a></h2>
 <p>Here is an example of some private tags displayed for pydicom’s test file
 ‘CT_small.dcm’:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
@@ -196,7 +198,7 @@ through it:</p>
 private data elements, as shown in the next section.</p>
 </section>
 <section id="setting-private-data-elements-with-pydicom">
-<h2>Setting Private Data Elements with pydicom<a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Permalink to this headline">¶</a></h2>
+<h2>Setting Private Data Elements with pydicom<a class="headerlink" href="#setting-private-data-elements-with-pydicom" title="Permalink to this heading">¶</a></h2>
 <p>The DICOM standard requires a private creator data element to identify and
 reserve a section of private tags. That name should be unique, and usually
 has the company name as the first part to accomplish that.  Pydicom (since
@@ -223,7 +225,7 @@ with block object:</p>
 </div>
 </section>
 <section id="removing-all-private-data-elements">
-<h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Permalink to this headline">¶</a></h2>
+<h2>Removing All Private Data Elements<a class="headerlink" href="#removing-all-private-data-elements" title="Permalink to this heading">¶</a></h2>
 <p>One part of anonymizing a DICOM file is to ensure that private data elements
 have been removed, as there is no guarantee as to what kind of information
 might be contained in them.  Pydicom provides a convenient function

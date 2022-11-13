@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pydicom.encoders.RLELosslessEncoder &mdash; pydicom 2.3.0 documentation</title>
+  <title>pydicom.encoders.RLELosslessEncoder &mdash; pydicom 2.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -21,7 +21,9 @@
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
         <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -40,7 +42,7 @@
             <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.3.0
+                2.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -71,7 +73,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html">Bulk Data Handlers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../handlers.html#pixel-data-utilities">Pixel Data Utilities</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.encoders.RLELosslessEncoder</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pydicom.encoders.RLELosslessEncoder</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pydicom.encoders.RLELosslessEncoder"><code class="docutils literal notranslate"><span class="pre">RLELosslessEncoder</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.encoders.get_encoder.html">pydicom.encoders.get_encoder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pydicom.encoders.base.Encoder.html">pydicom.encoders.base.Encoder</a></li>
 </ul>
@@ -113,10 +118,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-          <li><a href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a> &raquo;</li>
-      <li>pydicom.encoders.RLELosslessEncoder</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../encoders.html">Pixel Data Encoders (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.encoders</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.encoders.RLELosslessEncoder</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -126,10 +131,10 @@
            <div itemprop="articleBody">
              
   <section id="pydicom-encoders-rlelosslessencoder">
-<h1>pydicom.encoders.RLELosslessEncoder<a class="headerlink" href="#pydicom-encoders-rlelosslessencoder" title="Permalink to this headline">¶</a></h1>
+<h1>pydicom.encoders.RLELosslessEncoder<a class="headerlink" href="#pydicom-encoders-rlelosslessencoder" title="Permalink to this heading">¶</a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="pydicom.encoders.RLELosslessEncoder">
-<span class="sig-prename descclassname"><span class="pre">pydicom.encoders.</span></span><span class="sig-name descname"><span class="pre">RLELosslessEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.encoders.base.Encoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ef75019e8/pydicom/encoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encoders.RLELosslessEncoder" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.encoders.</span></span><span class="sig-name descname"><span class="pre">RLELosslessEncoder</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydicom.encoders.base.Encoder</span> <span class="pre">object&gt;</span></em><a class="reference external" href="https://github.com/pydicom/pydicom/blob/ce7424b42/pydicom/encoders/base.py#L"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.encoders.RLELosslessEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <em>Pixel Data</em> encoder for <em>RLE Lossless</em> - <code class="docutils literal notranslate"><span class="pre">1.2.840.10008.1.2.5</span></code></p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.2.</span></p>
