@@ -184,7 +184,7 @@ def get_pixeldata(ds: "Dataset", read_only: bool = False) -> "np.ndarray":
         'SamplesPerPixel', 'PhotometricInterpretation'
     ]
     if px_keyword[0] == 'PixelData':
-        # Attributess required by Image Pixel Description Macro Attributes
+        # Attributes required by Image Pixel Description Macro Attributes
         required_elements.extend(['PixelRepresentation', 'BitsStored'])
     missing = [elem for elem in required_elements if elem not in ds]
     if missing:

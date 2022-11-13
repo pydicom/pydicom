@@ -1,5 +1,6 @@
 
 import os
+import sys
 from pathlib import Path
 import shutil
 from tempfile import TemporaryDirectory
@@ -1225,7 +1226,9 @@ class TestFileSet:
         """Test setting the File-set's path."""
         fs = FileSet()
         assert fs.path is None
-        with pytest.raises(AttributeError, match=r"can't set attribute"):
+        msg = (r"can't set attribute" if sys.version_info < (3, 11)
+               else r"property 'path' of 'FileSet' object has no setter")
+        with pytest.raises(AttributeError, match=msg):
             fs.path = tdir.name
 
         # Test with str
