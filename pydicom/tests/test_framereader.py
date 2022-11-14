@@ -203,16 +203,16 @@ class TestFrameReader:
         dataset = dcmread(self.liver_path)
         delattr(dataset, attr)
         with pytest.raises(ValueError):
-            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
+            assert framereader._get_dataset_copy_with_frame_attrs(dataset)
 
     def test_get_dataset_copy_with_frame_attrs_raises_if_missing_tsyntax(self):
         dataset = dcmread(self.liver_path)
         delattr(dataset.file_meta, "TransferSyntaxUID")
         with pytest.raises(ValueError):
-            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
+            assert framereader._get_dataset_copy_with_frame_attrs(dataset)
         delattr(dataset, "file_meta")
         with pytest.raises(ValueError):
-            assert framereader.get_dataset_copy_with_frame_attrs(dataset)
+            assert framereader._get_dataset_copy_with_frame_attrs(dataset)
 
     def test_basic_offset_table_raises_without_kwargs(self):
         with pytest.raises(KeyError):

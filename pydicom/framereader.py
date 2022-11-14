@@ -297,7 +297,7 @@ def build_encapsulated_basic_offset_table(
     return basic_offset_table
 
 
-def get_dataset_copy_with_frame_attrs(
+def _get_dataset_copy_with_frame_attrs(
         original_dataset: Dataset,
         optional_attributes: Tuple[str, ...] = _OPTIONAL_DATASET_ATTRIBUTES
 ) -> Dataset:
@@ -371,6 +371,7 @@ def decode_frame(
     planar_configuration: Optional[Union[PlanarConfigurationValues, int]] = None
 ) -> "numpy.ndarray":
     """Decode pixel data of an individual frame.
+
     Parameters
     ----------
     value: bytes
@@ -396,14 +397,18 @@ def decode_frame(
     planar_configuration: Union[highdicom.PlanarConfigurationValues, int, None], optional
         Whether color samples are encoded by pixel (``R1G1B1R2G2B2...``) or
         by plane (``R1R2...G1G2...B1B2...``).
+
     Returns
     -------
     numpy.ndarray
         Decoded pixel data
+        
+
     Raises
     ------
     ValueError
         When transfer syntax is not supported.
+
     Note
     ----
     In case of color image frames, the `photometric_interpretation` parameter
@@ -795,7 +800,7 @@ class FrameDataset(Dataset):
             `is_implicit_VR` and `TransferSyntaxUID`
         """
         copy_attributes = _OPTIONAL_DATASET_ATTRIBUTES + ("NumberOfFrames",)
-        ds_copy = get_dataset_copy_with_frame_attrs(self, copy_attributes)
+        ds_copy = _get_dataset_copy_with_frame_attrs(self, copy_attributes)
         return {
             "dicom_json": ds_copy.to_json_dict(),
             "is_little_endian": ds_copy.is_little_endian,
