@@ -7,12 +7,18 @@ import math
 import sys
 import traceback
 import warnings
+from enum import Enum
 from io import StringIO, BytesIO
 from pathlib import Path
 from typing import Any, BinaryIO, List, Optional, Tuple, Union
 
 try:
     import numpy
+except ImportError:
+    pass
+
+try:
+    from PIL import Image
 except ImportError:
     pass
 
@@ -30,7 +36,7 @@ from pydicom.filereader import (
 from pydicom.fileutil import PathType
 from pydicom.pixel_data_handlers import unpack_bits
 from pydicom.tag import TupleTag, ItemTag, SequenceDelimiterTag, BaseTag
-from pydicom.uid import UID
+from pydicom.uid import UID, JPEGBaseline8Bit
 
 _FLOAT_PIXEL_DATA_TAGS = {
     0x7FE00008,
@@ -62,6 +68,37 @@ _OPTIONAL_DATASET_ATTRIBUTES = (
     "FrameIncrementPointer",
     "StereoPairsPresent"
 )
+
+
+class PhotometricInterpretationValues(Enum):
+    """Enumerated values for Photometric Interpretation attribute.
+    See :dcm:`Section C.7.6.3.1.2<part03/sect_C.7.6.3.html#sect_C.7.6.3.1.2>`
+    for more information.
+    """
+
+    MONOCHROME1 = 'MONOCHROME1'
+    MONOCHROME2 = 'MONOCHROME2'
+    PALETTE_COLOR = 'PALETTE COLOR'
+    RGB = 'RGB'
+    YBR_FULL = 'YBR_FULL'
+    YBR_FULL_422 = 'YBR_FULL_422'
+    YBR_PARTIAL_420 = 'YBR_PARTIAL_420'
+    YBR_ICT = 'YBR_ICT'
+    YBR_RCT = 'YBR_RCT'
+
+
+class PlanarConfigurationValues(Enum):
+    """Enumerated values for Planar Representation attribute."""
+
+    COLOR_BY_PIXEL = 0
+    COLOR_BY_PLANE = 1
+
+
+class PixelRepresentationValues(Enum):
+    """Enumerated values for Planar Representation attribute."""
+
+    UNSIGNED_INTEGER = 0
+    COMPLEMENT = 1
 
 
 def read_encapsulated_basic_offset_table(
@@ -322,30 +359,125 @@ def get_dataset_copy_with_frame_attrs(
 
 
 def decode_frame(
-        frame_bytes: bytes, original_dataset: Dataset
+    value: bytes,
+    transfer_syntax_uid: str,
+    rows: int,
+    columns: int,
+    samples_per_pixel: int,
+    bits_allocated: int,
+    bits_stored: int,
+    photometric_interpretation: Union[PhotometricInterpretationValues, str],
+    pixel_representation: Union[PixelRepresentationValues, int] = 0,
+    planar_configuration: Optional[Union[PlanarConfigurationValues, int]] = None
 ) -> "numpy.ndarray":
-    """Decode the frame_bytes provided from original_dataset as a numpy ndarray
-
+    """Decode pixel data of an individual frame.
     Parameters
     ----------
-    frame_bytes: bytes
-        the bytes corresponding to a frame within DICOM PixelData
-    original_dataset: Dataset
-        the original_dataset representing the file from which frame_bytes were
-        retrieved
-
+    value: bytes
+        Pixel data of a frame (potentially compressed in case
+        of encapsulated format encoding, depending on the transfer syntax)
+    transfer_syntax_uid: str
+        Transfer Syntax UID
+    rows: int
+        Number of pixel rows in the frame
+    columns: int
+        Number of pixel columns in the frame
+    samples_per_pixel: int
+        Number of (color) samples per pixel
+    bits_allocated: int
+        Number of bits that need to be allocated per pixel sample
+    bits_stored: int
+        Number of bits that are required to store a pixel sample
+    photometric_interpretation: Union[str, highdicom.PhotometricInterpretationValues]
+        Photometric interpretation
+    pixel_representation: Union[highdicom.PixelRepresentationValues, int, None], optional
+        Whether pixel samples are represented as unsigned integers or
+        2's complements
+    planar_configuration: Union[highdicom.PlanarConfigurationValues, int, None], optional
+        Whether color samples are encoded by pixel (``R1G1B1R2G2B2...``) or
+        by plane (``R1R2...G1G2...B1B2...``).
     Returns
     -------
     numpy.ndarray
-        array representation of frame_bytes
-    """
-    ds_temp = get_dataset_copy_with_frame_attrs(original_dataset)
-    if ds_temp.file_meta.TransferSyntaxUID.is_encapsulated:
-        ds_temp.PixelData = encapsulate(frames=[frame_bytes])
-    else:
-        ds_temp.PixelData = frame_bytes
+        Decoded pixel data
+    Raises
+    ------
+    ValueError
+        When transfer syntax is not supported.
+    Note
+    ----
+    In case of color image frames, the `photometric_interpretation` parameter
+    describes the color space of the **encoded** pixel data and data may be
+    converted from the specified color space into RGB color space upon
+    decoding.  For example, the JPEG codec generally converts pixels from RGB into
+    YBR color space prior to compression to take advantage of the correlation
+    between RGB color bands and improve compression efficiency. In case of an
+    image data set with an encapsulated Pixel Data element containing JPEG
+    compressed image frames, the value of the Photometric Interpretation
+    element specifies the color space in which image frames were compressed.
+    If `photometric_interpretation` specifies a YBR color space, then this
+    function assumes that pixels were converted from RGB to YBR color space
+    during encoding prior to JPEG compression and need to be converted back
+    into RGB color space after JPEG decompression during decoding. If
+    `photometric_interpretation` specifies an RGB color space, then the
+    function assumes that no color space conversion was performed during
+    encoding and therefore no conversion needs to be performed during decoding
+    either. In both case, the function is supposed to return decoded pixel data
+    of color image frames in RGB color space.
+    """  # noqa: E501
+    # The pydicom library does currently not support reading individual frames.
+    # This hack creates a small dataset containing only a single frame, which
+    # can then be decoded using the pydicom API.
+    file_meta = FileMetaDataset()
+    file_meta.TransferSyntaxUID = UID(transfer_syntax_uid)
+    ds = Dataset()
+    ds.file_meta = file_meta
+    ds.Rows = rows
+    ds.Columns = columns
+    ds.SamplesPerPixel = samples_per_pixel
+    ds.BitsAllocated = bits_allocated
+    ds.BitsStored = bits_stored
+    ds.HighBit = bits_stored - 1
 
-    return ds_temp.pixel_array
+    pixel_representation = PixelRepresentationValues(
+        pixel_representation
+    ).value
+    ds.PixelRepresentation = pixel_representation
+    photometric_interpretation = PhotometricInterpretationValues(
+        photometric_interpretation
+    ).value
+    ds.PhotometricInterpretation = photometric_interpretation
+    if samples_per_pixel > 1:
+        if planar_configuration is None:
+            raise ValueError(
+                'Planar configuration needs to be specified for decoding of '
+                'color image frames.'
+            )
+        planar_configuration = PlanarConfigurationValues(
+            planar_configuration
+        ).value
+        ds.PlanarConfiguration = planar_configuration
+
+    if UID(file_meta.TransferSyntaxUID).is_encapsulated:
+        ds.PixelData = encapsulate(frames=[value])
+    else:
+        ds.PixelData = value
+
+    array = ds.pixel_array
+
+    # In case of the JPEG baseline transfer syntax, the pixel_array property
+    # does not convert the pixel data into the correct (or let's say expected)
+    # color space after decompression.
+    if (
+        'YBR' in ds.PhotometricInterpretation and
+        ds.SamplesPerPixel == 3 and
+        transfer_syntax_uid == JPEGBaseline8Bit
+    ):
+        image = Image.fromarray(array, mode='YCbCr')
+        image = image.convert(mode='RGB')
+        array = numpy.asarray(image)
+
+    return array
 
 
 class BasicOffsetTable(List):
@@ -1178,5 +1310,18 @@ class FrameReader:
             if isinstance(pixel_array, numpy.ndarray):
                 return pixel_array.reshape(rows, columns)
 
-        frame_array = decode_frame(frame_data, self.dataset)
+        frame_array = decode_frame(
+            frame_data,
+            rows=self.dataset.Rows,
+            columns=self.dataset.Columns,
+            samples_per_pixel=self.dataset.SamplesPerPixel,
+            transfer_syntax_uid=self.transfer_syntax_uid,
+            bits_allocated=self.dataset.BitsAllocated,
+            bits_stored=self.dataset.BitsStored,
+            photometric_interpretation=self.dataset.PhotometricInterpretation,
+            pixel_representation=self.dataset.PixelRepresentation,
+            planar_configuration=getattr(
+                self.dataset, 'PlanarConfiguration', None
+            )
+        )
         return frame_array
