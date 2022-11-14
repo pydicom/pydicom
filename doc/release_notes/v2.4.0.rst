@@ -14,6 +14,8 @@ Enhancements
 * CLI commands now accept *pydicom* charset test files and CLI help shows
   Python Version (:pr:`1674`)
 * Added support for Python 3.11 (:issue:`1658`)
+* Added :class:`~pydicom.valuerep.ISfloat` to allow non-strict reading of
+  existing files with float IS values (:issue:`1661`)
 
 Fixes
 -----
