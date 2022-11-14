@@ -105,10 +105,10 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">General examples</a> &raquo;</li>
-          <li><a href="index.html">Input-output</a> &raquo;</li>
-      <li>Write DICOM data</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">General examples</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Input-output</a></li>
+      <li class="breadcrumb-item active">Write DICOM data</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -129,32 +129,32 @@ example does not produce a DICOM standards compliant file as written, you will
 have to change UIDs to valid values and add all required DICOM data elements.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Setting file meta information...
 Setting dataset values...
-Writing test file /tmp/tmp4idtpbn2.dcm
+Writing test file /tmp/tmpfwettgcr.dcm
 File saved.
-Writing test file as Big Endian Explicit VR /tmp/tmpmjz1705s.dcm
-Load file /tmp/tmp4idtpbn2.dcm ...
+Writing test file as Big Endian Explicit VR /tmp/tmpw0xx37rf.dcm
+Load file /tmp/tmpfwettgcr.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20221012&#39;
-(0008, 0033) Content Time                        TM: &#39;195231.055948&#39;
+(0008, 0023) Content Date                        DA: &#39;20221114&#39;
+(0008, 0033) Content Time                        TM: &#39;194607.794844&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmp4idtpbn2.dcm ...
-Load file /tmp/tmpmjz1705s.dcm ...
+Remove file /tmp/tmpfwettgcr.dcm ...
+Load file /tmp/tmpw0xx37rf.dcm ...
 Dataset.file_meta -------------------------------
 (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
 (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
 (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
 (0002, 0012) Implementation Class UID            UI: 1.2.3.4
 -------------------------------------------------
-(0008, 0023) Content Date                        DA: &#39;20221012&#39;
-(0008, 0033) Content Time                        TM: &#39;195231.055948&#39;
+(0008, 0023) Content Date                        DA: &#39;20221114&#39;
+(0008, 0033) Content Time                        TM: &#39;194607.794844&#39;
 (0010, 0010) Patient&#39;s Name                      PN: &#39;Test^Firstname&#39;
 (0010, 0020) Patient ID                          LO: &#39;123456&#39;
-Remove file /tmp/tmpmjz1705s.dcm ...
+Remove file /tmp/tmpw0xx37rf.dcm ...
 </pre></div>
 </div>
 <div class="line-block">

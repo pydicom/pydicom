@@ -83,6 +83,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DSfloat.html">pydicom.valuerep.DSfloat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.DT.html">pydicom.valuerep.DT</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.IS.html">pydicom.valuerep.IS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.ISfloat.html">pydicom.valuerep.ISfloat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.MultiString.html">pydicom.valuerep.MultiString</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonName.html">pydicom.valuerep.PersonName</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pydicom.valuerep.PersonNameUnicode.html">pydicom.valuerep.PersonNameUnicode</a></li>
@@ -133,11 +134,11 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">API Reference</a> &raquo;</li>
-          <li><a href="../elem.html">Representation of Data Elements</a> &raquo;</li>
-          <li><a href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a> &raquo;</li>
-      <li>pydicom.valuerep.is_valid_ds</li>
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../elem.html">Representation of Data Elements</a></li>
+          <li class="breadcrumb-item"><a href="../elem.valuerep.html">Specialized Element Value Representation (<code class="xref py py-mod docutils literal notranslate"><span class="pre">pydicom.valuerep</span></code>)</a></li>
+      <li class="breadcrumb-item active">pydicom.valuerep.is_valid_ds</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -150,19 +151,19 @@
 <h1>pydicom.valuerep.is_valid_ds<a class="headerlink" href="#pydicom-valuerep-is-valid-ds" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pydicom.valuerep.is_valid_ds">
-<span class="sig-prename descclassname"><span class="pre">pydicom.valuerep.</span></span><span class="sig-name descname"><span class="pre">is_valid_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/a8be73841/pydicom/valuerep.py#L861"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.valuerep.is_valid_ds" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pydicom.valuerep.</span></span><span class="sig-name descname"><span class="pre">is_valid_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></span></span><a class="reference external" href="https://github.com/pydicom/pydicom/blob/01ae3fccf/pydicom/valuerep.py#L861"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pydicom.valuerep.is_valid_ds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether this string is a valid decimal string.</p>
 <p>Valid decimal strings must be 16 characters or fewer, and contain only
 characters from a limited set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – String to test.</p>
+<dd class="field-odd"><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – String to test.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if the string is a valid decimal string. Otherwise False.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
