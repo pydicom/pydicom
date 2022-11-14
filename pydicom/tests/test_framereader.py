@@ -98,7 +98,11 @@ can_read_paths = [p for p in all_paths if p.name not in cannot_read_names]
 
 class TestFrameReader:
     def setup(self):
-        self.bot_list = [0, 32768, 65536]
+        self.frame_offsets = framereader.FrameOffsets(
+            basic_offset_table=[0, 32768, 65536],
+            pixel_data_location=4314,
+            first_frame_location=4326
+        )
         self.pixel_data_location = 4314
         self.first_frame_location = 4326
         self.liver_path = get_testdata_file("liver.dcm")
@@ -214,18 +218,14 @@ class TestFrameReader:
         with pytest.raises(ValueError):
             assert framereader._get_dataset_copy_with_frame_attrs(dataset)
 
-    def test_basic_offset_table_raises_without_kwargs(self):
-        with pytest.raises(KeyError):
-            assert framereader.BasicOffsetTable(self.bot_list)
-
-    def test_basic_offset_table_with_kwargs(self):
-        test_bot = framereader.BasicOffsetTable(
-            self.bot_list,
+    def test_frame_offsets_with_kwargs(self):
+        test_offsets = framereader.FrameOffsets(
+            self.frame_offsets.basic_offset_table,
             pixel_data_location=self.pixel_data_location,
             first_frame_location=self.first_frame_location,
         )
-        assert test_bot.pixel_data_location == self.pixel_data_location
-        assert test_bot.first_frame_location == self.first_frame_location
+        assert test_offsets.pixel_data_location == self.pixel_data_location
+        assert test_offsets.first_frame_location == self.first_frame_location
 
     def test_frame_dataset_liver(self):
         with open(self.liver_path, "rb") as filereader:
@@ -245,10 +245,10 @@ class TestFrameReader:
             dcm_file_like.is_implicit_VR = test_frame_dataset.is_implicit_VR
             dcm_file_like.is_little_endian = \
                 test_frame_dataset.is_little_endian
-            bot = test_frame_dataset.get_basic_offset_table(
+            bot = test_frame_dataset.get_frame_offsets(
                 dcm_file_like, self.pixel_data_location
             )
-            assert bot == self.bot_list
+            assert bot == self.frame_offsets
             assert bot.pixel_data_location == self.pixel_data_location
             assert bot.first_frame_location == self.first_frame_location
 
@@ -348,7 +348,7 @@ class TestFrameReader:
             frame_info = framereader.FrameInfo.from_file(fp)
             frame_info_dict = frame_info.to_dict()
             result = framereader.FrameInfo.from_dict(frame_info_dict)
-            assert result.basic_offset_table == frame_info.basic_offset_table
+            assert result.frame_offsets == frame_info.frame_offsets
             assert result.transfer_syntax_uid == frame_info.transfer_syntax_uid
             for attr in framereader._REQUIRED_DATASET_ATTRIBUTES:
                 assert result.dataset.get(attr) == frame_info.dataset.get(attr)
@@ -356,12 +356,13 @@ class TestFrameReader:
     def test_frame_info_from_file(self):
         with open(self.liver_path, "rb") as filereader:
             test_frame_info = framereader.FrameInfo.from_file(filereader)
-            assert test_frame_info.basic_offset_table == self.bot_list
+            assert test_frame_info.frame_offsets == self.frame_offsets
 
     def test_frame_reader_liver(self):
         if can_decode:
             with framereader.FrameReader(self.liver_path) as frame_reader:
-                assert frame_reader.basic_offset_table == self.bot_list
+                assert frame_reader.basic_offset_table == \
+                       self.frame_offsets.basic_offset_table
                 for i in range(frame_reader.dataset.NumberOfFrames):
                     expected_shape = (
                         frame_reader.dataset.Rows,
@@ -372,7 +373,8 @@ class TestFrameReader:
     def test_frame_reader_from_buffered_reader(self):
         with open(self.liver_path, "rb") as filereader:
             with framereader.FrameReader(filereader) as frame_reader:
-                assert frame_reader.basic_offset_table == self.bot_list
+                assert frame_reader.basic_offset_table == \
+                       self.frame_offsets.basic_offset_table
 
     def test_frame_reader_open_raises_if_file_not_found(self):
         with pytest.raises(FileNotFoundError):
@@ -449,7 +451,7 @@ class TestFrameReader:
                 file_obj.write(frame_reader.fp.read())
                 new_ff = frame_reader.first_frame_location - \
                     frame_reader.pixel_data_location
-                new_bot = framereader.BasicOffsetTable(
+                new_bot = framereader.FrameOffsets(
                     frame_reader.basic_offset_table,
                     pixel_data_location=0,
                     first_frame_location=new_ff

@@ -3,6 +3,7 @@
 
 Adapted from @hackermd's ImageFileReader PR (#1447)
 """
+import dataclasses
 import math
 import sys
 import traceback
@@ -485,12 +486,15 @@ def decode_frame(
     return array
 
 
-class BasicOffsetTable(List):
+@dataclasses.dataclass
+class FrameOffsets:
     """A class for storing Basic Offset Table information needed to read
     multi-frame DICOMs
 
     Parameters
     ----------
+    basic_offset_table: List[int]
+        the locations of frame offsets relative to the first frame
     pixel_data_location: int
         the location within a file where the PixelData tag is located
     first_frame_location: int
@@ -499,29 +503,36 @@ class BasicOffsetTable(List):
     Examples
     --------
     Create a basic offset table for liver.dcm
-    >>> bot = BasicOffsetTable(
+    >>> offsets = FrameOffsets(
     ...    [0, 32768, 65536],
     ...    pixel_data_location=4314,
     ...    first_frame_location=4326
     ...)
     """
+    basic_offset_table: List[int]
+    pixel_data_location: int
+    first_frame_location: int
 
-    def __init__(self, *args: List[int], **kwargs: int) -> None:
-        self.first_frame_location: int = kwargs.pop("first_frame_location")
-        self.pixel_data_location: int = kwargs.pop("pixel_data_location")
-        super().__init__(*args, **kwargs)
+    def __len__(self):
+        return len(self.basic_offset_table)
+
+    def __getitem__(self, item: Union[int, str]) -> int:
+        if isinstance(item, int):
+            return self.basic_offset_table[item]
+        else:
+            return getattr(self, item)
 
     def to_dict(self) -> dict:
         return {
-            "basic_offset_table": self,
+            "basic_offset_table": self.basic_offset_table,
             "first_frame_location": self.first_frame_location,
             "pixel_data_location": self.pixel_data_location,
         }
 
     @classmethod
-    def from_dict(cls, info_dict: dict) -> "BasicOffsetTable":
+    def from_dict(cls, info_dict: dict) -> "FrameOffsets":
         return cls(
-            info_dict["basic_offset_table"],
+            basic_offset_table=info_dict["basic_offset_table"],
             first_frame_location=info_dict["first_frame_location"],
             pixel_data_location=info_dict["pixel_data_location"],
         )
@@ -574,7 +585,7 @@ class FrameDataset(Dataset):
 
     def _get_uncompressed_basic_offset_table(
         self, pixel_data_location: int
-    ) -> BasicOffsetTable:
+    ) -> FrameOffsets:
         """Get the locations of non-encapsulated PixelData frames relative to
         the first frame (which is always 0)
 
@@ -603,7 +614,7 @@ class FrameDataset(Dataset):
             basic_offset_table = [
                 i * self.bytes_per_frame for i in range(self.NumberOfFrames)
             ]
-        return BasicOffsetTable(
+        return FrameOffsets(
             basic_offset_table,
             pixel_data_location=pixel_data_location,
             first_frame_location=first_frame_location,
@@ -611,7 +622,7 @@ class FrameDataset(Dataset):
 
     def _get_encapsulated_basic_offset_table(
         self, fp: DicomFileLike, pixel_data_location: int
-    ) -> BasicOffsetTable:
+    ) -> FrameOffsets:
         """Get the locations of encapsulated PixelData frames relative to
         the first frame (which is always 0)
 
@@ -631,17 +642,17 @@ class FrameDataset(Dataset):
                 fp, pixel_data_location, number_of_frames=self.NumberOfFrames
             )
             first_frame_location = fp.tell()
-            return BasicOffsetTable(
-                basic_offset_table,
+            return FrameOffsets(
+                basic_offset_table=basic_offset_table,
                 pixel_data_location=pixel_data_location,
                 first_frame_location=first_frame_location,
             )
         except Exception as err:
             raise IOError(f'Failed to build Basic Offset Table: "{err}"')
 
-    def get_basic_offset_table(
+    def get_frame_offsets(
         self, fp: DicomFileLike, pixel_data_location: int
-    ) -> BasicOffsetTable:
+    ) -> FrameOffsets:
         """Get the locations of PixelData frames relative to the first frame
         (which is always 0)
 
@@ -867,18 +878,18 @@ class FrameInfo:
     ----------
     dataset: FrameDataset
         the dataset representing the DICOM instance
-    basic_offset_table: BasicOffsetTable
+    basic_offset_table: FrameOffsets
         list representing the Basic Offset Table for the DICOM instance
     transfer_syntax_uid: UID
         TransferSyntaxUID for the DICOM instance
     """
 
     def __init__(
-        self, dataset: FrameDataset, basic_offset_table: BasicOffsetTable,
+        self, dataset: FrameDataset, frame_offsets: FrameOffsets,
     ) -> None:
         self.dataset = dataset
         self.transfer_syntax_uid = dataset.file_meta.TransferSyntaxUID
-        self.basic_offset_table = basic_offset_table
+        self.frame_offsets = frame_offsets
 
     @staticmethod
     def validate_pixel_data(
@@ -921,7 +932,7 @@ class FrameInfo:
             `transfer_syntax_uid`
         """
         return {
-            "basic_offset_table": self.basic_offset_table.to_dict(),
+            "frame_offsets": self.frame_offsets.to_dict(),
             "dataset": self.dataset.to_info_dict(),
             "transfer_syntax_uid": self.transfer_syntax_uid,
         }
@@ -965,10 +976,10 @@ class FrameInfo:
         file_like.is_little_endian = dataset.is_little_endian
         file_like.is_implicit_VR = dataset.is_implicit_VR
         cls.validate_pixel_data(file_like, pixel_data_location)
-        basic_offset_table = dataset.get_basic_offset_table(
+        frame_offsets = dataset.get_frame_offsets(
             file_like, pixel_data_location
         )
-        return cls(dataset=dataset, basic_offset_table=basic_offset_table)
+        return cls(dataset=dataset, frame_offsets=frame_offsets)
 
     @classmethod
     def from_dict(cls, frame_info_dict: dict) -> "FrameInfo":
@@ -980,8 +991,10 @@ class FrameInfo:
             dictionary output from `FrameInfo.to_dict`
         """
         dataset = FrameDataset.from_info_dict(frame_info_dict["dataset"])
-        bot = BasicOffsetTable.from_dict(frame_info_dict["basic_offset_table"])
-        return cls(dataset=dataset, basic_offset_table=bot)
+        frame_offsets = FrameOffsets.from_dict(
+            frame_info_dict["frame_offsets"]
+        )
+        return cls(dataset=dataset, frame_offsets=frame_offsets)
 
 
 class FrameReader:
@@ -1166,19 +1179,23 @@ class FrameReader:
         return self.frame_info.dataset
 
     @property
-    def basic_offset_table(self) -> BasicOffsetTable:
+    def basic_offset_table(self) -> List[int]:
         """BasicOffsetTable corresponding to self.fp"""
-        return self.frame_info.basic_offset_table
+        return self.frame_info.frame_offsets.basic_offset_table
+
+    @property
+    def frame_offsets(self) -> FrameOffsets:
+        return self.frame_info.frame_offsets
 
     @property
     def pixel_data_location(self) -> int:
         """location of Pixel Data tag within self.fp"""
-        return self.basic_offset_table.pixel_data_location
+        return self.frame_offsets.pixel_data_location
 
     @property
     def first_frame_location(self) -> int:
         """location of first frame item in self.fp"""
-        return self.basic_offset_table.first_frame_location
+        return self.frame_offsets.first_frame_location
 
     @property
     def transfer_syntax_uid(self) -> UID:
