@@ -6,6 +6,7 @@ import copy
 from datetime import datetime, date, time, timedelta, timezone
 from decimal import Decimal
 from itertools import chain
+from io import BytesIO
 import pickle
 import math
 import sys
@@ -19,9 +20,10 @@ from pydicom.config import settings
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
+from pydicom.filereader import read_dataset
 from pydicom.tag import Tag
 from pydicom.valuerep import (
-    DS, IS, DSfloat, DSdecimal, PersonName, VR, STANDARD_VR,
+    DS, IS, DSfloat, DSdecimal, ISfloat, PersonName, VR, STANDARD_VR,
     AMBIGUOUS_VR, STR_VR, BYTES_VR, FLOAT_VR, INT_VR, LIST_VR
 )
 from pydicom.values import convert_value
@@ -889,11 +891,31 @@ class TestIS:
         assert 42 == IS("42.0")
         assert 42 == IS(42.0)
 
+    def test_float_value(self):
+        """Read binary value of IS that is actually a float"""
+        # from issue #1661
+        # Create BytesIO with single data element for Exposure (0018,1152)
+        #   length 4, value "14.5"
+        bin_elem = b"\x18\x00\x52\x11\x04\x00\x00\x0014.5"
+        with BytesIO(bin_elem) as bio:
+            ds = read_dataset(bio, True, True)
+        assert isinstance(ds.Exposure, ISfloat)
+        assert ds.Exposure == 14.5
+
+        # Strict checking raises an error
+        with pytest.raises(ValueError):
+            _ = IS("14.5", validation_mode=config.RAISE)
+        with pytest.raises(TypeError):
+            _ = IS(14.5, validation_mode=config.RAISE)
+
+    def test_float_init(self):
+        """New ISfloat created from another behaves correctly"""
+        is1 = IS("14.5", validation_mode=config.IGNORE)
+        is2 = IS(is1)
+        assert is1 == is2
+        assert is2.original_string == is1.original_string
+
     def test_invalid_value(self, disable_value_validation):
-        with pytest.raises(TypeError, match="Could not convert value"):
-            IS(0.9)
-        with pytest.raises(TypeError, match="Could not convert value"):
-            IS("0.9")
         with pytest.raises(ValueError, match="could not convert string"):
             IS("foo")
 

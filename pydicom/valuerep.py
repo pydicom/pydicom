@@ -1248,6 +1248,48 @@ def DS(
     return DSfloat(val, auto_format, validation_mode)
 
 
+class ISfloat(float):
+    """Store value for an element with VR **IS** as :class:`float`.
+
+    Stores original integer string for exact rewriting of the string
+    originally read or stored.
+
+    Note: By the DICOM standard, IS can only be an :class:`int`,
+    however, it is not uncommon to see float IS values.  This class
+    is used if the config settings allow non-strict reading.
+
+    Generally, use :class:`~pydicom.valuerep.IS` to create IS values,
+    this is returned instead if the value cannot be represented as an
+    :class:`int`.  See :class:`~pydicom.valuerep.IS` for details of the
+    parameters and return values.
+    """
+    def __new__(  # type: ignore[misc]
+            cls: Type["ISfloat"], val: Union[str, float, Decimal],
+            validation_mode: int = None
+    ) -> float:
+        return super().__new__(cls, val)
+
+    def __init__(self, val: Union[str, float, Decimal],
+                 validation_mode: int = None) -> None:
+        # If a string passed, then store it
+        if isinstance(val, str):
+            self.original_string = val.strip()
+        elif isinstance(val, (IS, ISfloat)) and hasattr(val, 'original_string'):
+            self.original_string = val.original_string
+        if validation_mode:
+            msg = (
+                f'Value "{str(self)}" is not valid for elements with a VR '
+                'of IS'
+            )
+            if validation_mode == config.WARN:
+                warnings.warn(msg)
+            elif validation_mode == config.RAISE:
+                msg += (
+                    "\nSet reading_validation_mode to WARN or IGNORE to bypass"
+                )
+                raise TypeError(msg)
+
+
 class IS(int):
     """Store value for an element with VR **IS** as :class:`int`.
 
@@ -1258,7 +1300,7 @@ class IS(int):
     def __new__(  # type: ignore[misc]
             cls: Type["IS"], val: Union[None, str, int, float, Decimal],
             validation_mode: int = None
-    ) -> Optional[Union[str, "IS"]]:
+    ) -> Optional[Union[str, "IS", "ISfloat"]]:
         """Create instance if new integer string"""
         if val is None:
             return val
@@ -1272,16 +1314,16 @@ class IS(int):
             validate_value("IS", val, validation_mode)
 
         try:
-            newval = super().__new__(cls, val)
+            newval: Union[IS, ISfloat] = super().__new__(cls, val)
         except ValueError:
             # accept float strings when no integer loss, e.g. "1.0"
             newval = super().__new__(cls, float(val))
 
-        # check if a float or Decimal passed in, then could have lost info,
-        # and will raise error. E.g. IS(Decimal('1')) is ok, but not IS(1.23)
-        #   IS('1.23') will raise ValueError
+        # If a float or Decimal was passed in, check for non-integer,
+        # i.e. could lose info if converted to int
+        # If so, create an ISfloat instead (if allowed by settings)
         if isinstance(val, (float, Decimal, str)) and newval != float(val):
-            raise TypeError("Could not convert value to integer without loss")
+            newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
         if (not -2**31 <= newval < 2**31 and

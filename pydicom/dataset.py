@@ -16,6 +16,7 @@ Dataset (dict subclass)
 """
 import copy
 from bisect import bisect_left
+from contextlib import nullcontext
 import io
 from importlib.util import find_spec as have_package
 import inspect  # for __dir__
@@ -2490,18 +2491,23 @@ class Dataset:
             :class:`Dataset` representation based on the DICOM JSON Model.
         """
         json_dataset = {}
-        for key in self.keys():
-            json_key = '{:08X}'.format(key)
-            try:
-                data_element = self[key]
-                json_dataset[json_key] = data_element.to_json_dict(
-                    bulk_data_element_handler=bulk_data_element_handler,
-                    bulk_data_threshold=bulk_data_threshold
-                )
-            except Exception as exc:
-                logger.error(f"Error while processing tag {json_key}")
-                if not suppress_invalid_tags:
-                    raise exc
+        context = (
+            config.strict_reading() if suppress_invalid_tags
+            else nullcontext()
+        )
+        with context:
+            for key in self.keys():
+                json_key = '{:08X}'.format(key)
+                try:
+                    data_element = self[key]
+                    json_dataset[json_key] = data_element.to_json_dict(
+                        bulk_data_element_handler=bulk_data_element_handler,
+                        bulk_data_threshold=bulk_data_threshold
+                    )
+                except Exception as exc:
+                    logger.error(f"Error while processing tag {json_key}")
+                    if not suppress_invalid_tags:
+                        raise exc
 
         return json_dataset
 

@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 
+from pydicom import config
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataelem import DataElement, RawDataElement
@@ -293,13 +294,10 @@ class TestDataSetToJson:
         # we have to add a RawDataElement as creating a DataElement would
         # already raise an exception
         ds[0x00082128] = RawDataElement(
-            Tag(0x00082128), 'IS', 4, b'5.25', 0, True, True)
-
-        with pytest.raises(TypeError):
-            ds.to_json_dict()
+            Tag(0x00082128), 'IS', 4, b'5.25', 0, True, True
+        )
 
         ds_json = ds.to_json_dict(suppress_invalid_tags=True)
-
         assert "00082128" not in ds_json
 
 

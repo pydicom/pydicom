@@ -1,0 +1,41 @@
+name: pr-type-lint-spell
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  check-typing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.7', '3.10' ]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install typing dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -U mypy
+        python -m pip install -U types-requests types-pkg_resources types-setuptools
+
+    - name: Run typing check with mypy
+      run: |
+        mypy
+
+  check-spelling:
+    name: Check for spelling errors
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codespell-project/actions-codespell@master
