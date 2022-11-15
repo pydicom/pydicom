@@ -184,12 +184,12 @@ REFERENCE_DATA_UNSUPPORTED = [
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NoRLEHandler:
     """Tests for handling datasets without numpy and the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -229,12 +229,12 @@ class TestNoNumpy_NoRLEHandler:
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_RLEHandler:
     """Tests for handling datasets without numpy and the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [RLE_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -287,12 +287,12 @@ class TestNoNumpy_RLEHandler:
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NoRLEHandler:
     """Tests for handling datasets with no handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -332,12 +332,12 @@ class TestNumpy_NoRLEHandler:
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_RLEHandler:
     """Tests for handling datasets with the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [RLE_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 

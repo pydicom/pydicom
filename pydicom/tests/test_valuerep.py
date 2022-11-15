@@ -1013,7 +1013,7 @@ class TestIS:
 class TestBadValueRead:
     """Unit tests for handling a bad value for a VR
        (a string in a number VR here)"""
-    def setup(self):
+    def setup_method(self):
         class TagLike:
             pass
 
@@ -1025,7 +1025,7 @@ class TestBadValueRead:
         self.tag.length = 2
         self.default_retry_order = pydicom.values.convert_retry_VR_order
 
-    def teardown(self):
+    def teardown_method(self):
         pydicom.values.convert_retry_VR_order = self.default_retry_order
 
     def test_read_bad_value_in_VR_default(self, disable_value_validation):
@@ -1425,10 +1425,10 @@ class TestPersonName:
 
 class TestDateTime:
     """Unit tests for DA, DT, TM conversion to datetime objects"""
-    def setup(self):
+    def setup_method(self):
         config.datetime_conversion = True
 
-    def teardown(self):
+    def teardown_method(self):
         config.datetime_conversion = False
 
     def test_date(self):

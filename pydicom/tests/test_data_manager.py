@@ -117,14 +117,14 @@ class TestGetData:
 class TestExternalDataSource:
     """Tests for the external data sources."""
 
-    def setup(self):
+    def setup_method(self):
         self.dpath = external_data_sources()["pydicom-data"].data_path
 
         # Backup the 693_UNCI.dcm file
         p = self.dpath / "693_UNCI.dcm"
         shutil.copy(p, self.dpath / "PYTEST_BACKUP")
 
-    def teardown(self):
+    def teardown_method(self):
         # Restore the backed-up file
         p = self.dpath / "693_UNCI.dcm"
         shutil.copy(self.dpath / "PYTEST_BACKUP", p)

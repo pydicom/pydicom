@@ -139,12 +139,12 @@ REFERENCE_DATA_UNSUPPORTED = [
 class TestNoNumpy_NoPillowHandler:
     """Tests for handling datasets without numpy and the handler."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -381,13 +381,13 @@ JPEG2K_MATCHING_DATASETS = [
 @pytest.mark.skipif(not HAVE_JPEG2K, reason='Pillow or JPEG2K not available')
 class TestPillowHandler_JPEG2K:
     """Tests for handling Pixel Data with the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         self.original_j2k = pydicom.config.APPLY_J2K_CORRECTIONS
         pydicom.config.pixel_data_handlers = [NP_HANDLER, PIL_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
         pydicom.config.APPLY_J2K_CORRECTIONS = self.original_j2k
@@ -514,12 +514,12 @@ class TestPillowHandler_JPEG2K:
 @pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
 class TestPillowHandler_JPEG:
     """Tests for handling Pixel Data with the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [NP_HANDLER, PIL_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 

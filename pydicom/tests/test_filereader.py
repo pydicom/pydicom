@@ -922,7 +922,7 @@ class TestReader:
 
 
 class TestIncorrectVR:
-    def setup(self):
+    def setup_method(self):
         self.ds_explicit = BytesIO(
             b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"  # SpecificCharacterSet
             b"\x08\x00\x20\x00DA\x08\x0020000101"  # StudyDate
@@ -1075,7 +1075,7 @@ class TestUnknownVR:
 
 
 class TestReadDataElement:
-    def setup(self):
+    def setup_method(self):
         ds = Dataset()
         ds.DoubleFloatPixelData = (
             b"\x00\x01\x02\x03\x04\x05\x06\x07"
@@ -1474,11 +1474,11 @@ class TestDeferredRead:
     """
 
     # Copy one of test files and use temporarily, then later remove.
-    def setup(self):
+    def setup_method(self):
         self.testfile_name = ct_name + ".tmp"
         shutil.copyfile(ct_name, self.testfile_name)
 
-    def teardown(self):
+    def teardown_method(self):
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
 

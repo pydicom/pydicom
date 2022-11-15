@@ -187,12 +187,12 @@ SUPPORTED_HANDLER_NAMES = (
 class TestNoNumpy_NoNumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = config.pixel_data_handlers
         config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         config.pixel_data_handlers = self.original_handlers
 
@@ -252,12 +252,12 @@ class TestNoNumpy_NoNumpyHandler:
 class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = config.pixel_data_handlers
         config.pixel_data_handlers = [NP_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         config.pixel_data_handlers = self.original_handlers
 
@@ -323,12 +323,12 @@ class TestNoNumpy_NumpyHandler:
 class TestNumpy_NoNumpyHandler:
     """Tests for handling datasets without the handler."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = config.pixel_data_handlers
         config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         config.pixel_data_handlers = self.original_handlers
 
@@ -421,12 +421,12 @@ REFERENCE_DATA_LITTLE = [
 class TestNumpy_NumpyHandler:
     """Tests for handling Pixel Data with the handler."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = config.pixel_data_handlers
         config.pixel_data_handlers = [NP_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         config.pixel_data_handlers = self.original_handlers
 

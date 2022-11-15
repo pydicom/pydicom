@@ -97,10 +97,10 @@ def as_assertable(dataset):
 
 
 class TestWriteFile:
-    def setup(self):
+    def setup_method(self):
         self.file_out = TemporaryFile('w+b')
 
-    def teardown(self):
+    def teardown_method(self):
         self.file_out.close()
 
     def compare(self, in_filename):
@@ -308,11 +308,11 @@ class TestWriteFile:
 class TestScratchWriteDateTime(TestWriteFile):
     """Write and reread simple or multi-value DA/DT/TM data elements"""
 
-    def setup(self):
+    def setup_method(self):
         config.datetime_conversion = True
         self.file_out = TemporaryFile('w+b')
 
-    def teardown(self):
+    def teardown_method(self):
         config.datetime_conversion = False
         self.file_out.close()
 
@@ -349,7 +349,7 @@ class TestScratchWriteDateTime(TestWriteFile):
 class TestWriteDataElement:
     """Attempt to write data elements has the expected behaviour"""
 
-    def setup(self):
+    def setup_method(self):
         # Create a dummy (in memory) file to write to
         self.f1 = DicomBytesIO()
         self.f1.is_little_endian = True
@@ -1147,7 +1147,7 @@ class TestCorrectAmbiguousVRElement:
 class TestWriteAmbiguousVR:
     """Attempt to write data elements with ambiguous VR."""
 
-    def setup(self):
+    def setup_method(self):
         # Create a dummy (in memory) file to write to
         self.fp = DicomBytesIO()
         self.fp.is_implicit_VR = False
@@ -1207,7 +1207,7 @@ class TestWriteAmbiguousVR:
 class TestScratchWrite:
     """Simple dataset from scratch, written in all endian/VR combinations"""
 
-    def setup(self):
+    def setup_method(self):
         # Create simple dataset for all tests
         ds = Dataset()
         ds.PatientName = "Name^Patient"
@@ -1866,7 +1866,7 @@ class TestWriteFileMetaInfoToStandard:
 class TestWriteNonStandard:
     """Unit tests for writing datasets not to the DICOM standard."""
 
-    def setup(self):
+    def setup_method(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
         self.fp.is_little_endian = True
@@ -2206,7 +2206,7 @@ class TestWriteNonStandard:
 class TestWriteFileMetaInfoNonStandard:
     """Unit tests for writing File Meta Info not to the DICOM standard."""
 
-    def setup(self):
+    def setup_method(self):
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
 
@@ -2626,7 +2626,7 @@ class TestWriteDT:
 class TestWriteUndefinedLengthPixelData:
     """Test write_data_element() for pixel data with undefined length."""
 
-    def setup(self):
+    def setup_method(self):
         self.fp = DicomBytesIO()
 
     def test_little_endian_correct_data(self):

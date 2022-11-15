@@ -97,7 +97,7 @@ save_dir = os.getcwd()
 
 
 class TestGDCM_JPEG_LS_no_gdcm:
-    def setup(self):
+    def setup_method(self):
         self.unicode_filename = os.path.join(
             tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
@@ -108,7 +108,7 @@ class TestGDCM_JPEG_LS_no_gdcm:
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
         os.remove(self.unicode_filename)
 
@@ -122,7 +122,7 @@ class TestGDCM_JPEG_LS_no_gdcm:
 
 
 class TestGDCM_JPEG2000_no_gdcm:
-    def setup(self):
+    def setup_method(self):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
@@ -132,7 +132,7 @@ class TestGDCM_JPEG2000_no_gdcm:
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEG2000(self):
@@ -160,13 +160,13 @@ class TestGDCM_JPEG2000_no_gdcm:
 
 
 class TestGDCM_JPEGlossy_no_gdcm:
-    def setup(self):
+    def setup_method(self):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
         self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def test_JPEGlossy(self):
@@ -185,12 +185,12 @@ class TestGDCM_JPEGlossy_no_gdcm:
 
 
 class TestGDCM_JPEGlossless_no_gdcm:
-    def setup(self):
+    def setup_method(self):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
 
-    def teardown(self):
+    def teardown_method(self):
         pydicom.config.pixel_data_handlers = self.original_handlers
 
     def testJPEGlossless(self):

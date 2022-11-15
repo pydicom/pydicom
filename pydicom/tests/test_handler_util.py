@@ -106,7 +106,7 @@ REFERENCE_DTYPE = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PixelDtype:
     """Tests for util.pixel_dtype."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test dataset."""
         self.ds = Dataset()
         self.ds.file_meta = FileMetaDataset()
@@ -294,7 +294,7 @@ if HAVE_NP:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ReshapePixelArray:
     """Tests for util.reshape_pixel_array."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test dataset."""
         self.ds = Dataset()
         self.ds.file_meta = FileMetaDataset()
@@ -940,12 +940,12 @@ class TestNumpy_ModalityLUT:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_PaletteColor:
     """Tests for util.apply_color_lut()."""
-    def setup(self):
+    def setup_method(self):
         """Setup the tests"""
         self.o_palette = get_palette_files('pet.dcm')[0]
         self.n_palette = get_palette_files('pet.dcm')[0][:-3] + 'tmp'
 
-    def teardown(self):
+    def teardown_method(self):
         """Teardown the tests"""
         if os.path.exists(self.n_palette):
             os.rename(self.n_palette, self.o_palette)

@@ -2153,10 +2153,10 @@ class TestFileSet_Load:
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Modify:
     """Tests for a modified File-set."""
-    def setup(self):
+    def setup_method(self):
         self.fn = FileSet.__len__
 
-    def teardown(self):
+    def teardown_method(self):
         FileSet.__len__ = self.fn
 
     def test_write_dicomdir_fs_changes(self, dicomdir_copy):
@@ -2472,10 +2472,10 @@ class TestFileSet_Modify:
 @pytest.mark.filterwarnings("ignore:The 'DicomDir'")
 class TestFileSet_Copy:
     """Tests for copying a File-set."""
-    def setup(self):
+    def setup_method(self):
         self.orig = FileSet.__len__
 
-    def teardown(self):
+    def teardown_method(self):
         FileSet.__len__ = self.orig
 
     def test_copy(self, dicomdir, tdir):
