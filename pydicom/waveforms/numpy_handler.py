@@ -135,7 +135,7 @@ def generate_multiplex(
                 sensitivity = ch.get("ChannelSensitivity", 1.0)
                 correction = ch.get("ChannelSensitivityCorrectionFactor", 1.0)
                 arr[..., jj] = (
-                    arr[..., jj] * sensitivity * correction  + baseline
+                    arr[..., jj] * sensitivity * correction + baseline
                 )
 
         yield arr
