@@ -4,6 +4,8 @@ Version 2.4.0
 Changes
 -------
 * Removed support for Python 3.6 (EOL since December 2021)
+* In test suite, renamed 'setup' and 'teardown' methods,
+  deprecated starting in pytest 7.2
 
 Enhancements
 ------------
