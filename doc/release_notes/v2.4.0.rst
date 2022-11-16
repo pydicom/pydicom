@@ -17,6 +17,10 @@ Enhancements
 * Added support for Python 3.11 (:issue:`1658`)
 * Added :class:`~pydicom.valuerep.ISfloat` to allow non-strict reading of
   existing files with float IS values (:issue:`1661`)
+* Added :ref:`pydicom.framereader<api_framereader>` module for reading frames
+  from DICOM files without storing all PixelData in memory (:pr:`1725`)
+
+  * refer to :ref:`the guide <working_with_framereader>` for usage information
 
 Fixes
 -----
