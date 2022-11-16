@@ -33,7 +33,7 @@ from pydicom.uid import (
 
 class TestEncoder:
     """Non-encoding tests for encoders.Encoder"""
-    def setup(self):
+    def setup_method(self):
         self.enc = Encoder(UID('1.2.3'))
 
     def test_init(self):
@@ -273,7 +273,7 @@ class TestEncoder:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Encode:
     """Tests for Encoder.encode() and related methods."""
-    def setup(self):
+    def setup_method(self):
         self.enc = RLELosslessEncoder
         self.ds = get_testdata_file("CT_small.dcm", read=True)
         self.ds_enc = get_testdata_file("MR_small_RLE.dcm", read=True)
@@ -524,7 +524,7 @@ class TestEncoder_Encode:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Preprocess:
     """Tests for Encoder._preprocess()."""
-    def setup(self):
+    def setup_method(self):
         self.e = Encoder(JPEG2000Lossless)
         self.ds = ds = Dataset()
         ds.Rows = 1

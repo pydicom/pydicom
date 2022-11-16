@@ -357,7 +357,7 @@ class TestHexUtil:
 
 
 class TestDataElementCallbackTests:
-    def setup(self):
+    def setup_method(self):
         # Set up a dataset with commas in one item instead of backslash
         namespace = {}
         exec(raw_hex_code, {}, namespace)
@@ -369,7 +369,7 @@ class TestDataElementCallbackTests:
 
         self.bytesio = BytesIO(ds_bytes)
 
-    def teardown(self):
+    def teardown_method(self):
         config.reset_data_element_callback()
 
     def test_bad_separator(self, enforce_valid_values):

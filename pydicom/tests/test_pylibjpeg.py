@@ -336,12 +336,12 @@ print(not HAVE_PYLIBJPEG, (HAVE_LJ or HAVE_OJ or HAVE_RLE))
 @pytest.mark.skipif(not HAVE_PYLIBJPEG, reason='pylibjpeg not available')
 class TestHandler:
     """Tests for handling Pixel Data with the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -400,12 +400,12 @@ class TestHandler:
 
 @pytest.mark.skipif(not TEST_JPEG, reason="no -libjpeg plugin")
 class TestJPEG:
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -498,12 +498,12 @@ class TestJPEG:
 
 @pytest.mark.skipif(not TEST_JPEGLS, reason="no -libjpeg plugin")
 class TestJPEGLS:
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 
@@ -537,12 +537,12 @@ class TestJPEGLS:
 
 @pytest.mark.skipif(not TEST_JPEG2K, reason="no -openjpeg plugin")
 class TestJPEG2K:
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [NP_HANDLER, LJ_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.pixel_data_handlers = self.original_handlers
 

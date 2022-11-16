@@ -68,12 +68,12 @@ EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
 @pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
 class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
         pydicom.config.overlay_data_handlers = [NP_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.overlay_data_handlers = self.original_handlers
 
@@ -118,12 +118,12 @@ REFERENCE_DATA_LITTLE = [
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_NumpyHandler:
     """Tests for handling Overlay Data with the handler."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
         pydicom.config.overlay_data_handlers = [NP_HANDLER]
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.overlay_data_handlers = self.original_handlers
 
@@ -325,7 +325,7 @@ if HAVE_NP:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ReshapeOverlayArray:
     """Tests for numpy_handler.reshape_overlay_array."""
-    def setup(self):
+    def setup_method(self):
         """Setup the test dataset."""
         self.elem = {
             'OverlayRows': 4,

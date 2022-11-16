@@ -50,7 +50,7 @@ class BadRepr:
 class TestDataset:
     """Tests for dataset.Dataset."""
 
-    def setup(self):
+    def setup_method(self):
         self.ds = Dataset()
         self.ds.TreatmentMachineName = "unit001"
 
@@ -1700,7 +1700,7 @@ class TestDataset:
 class TestDatasetElements:
     """Test valid assignments of data elements"""
 
-    def setup(self):
+    def setup_method(self):
         self.ds = Dataset()
         self.sub_ds1 = Dataset()
         self.sub_ds2 = Dataset()
@@ -1810,7 +1810,7 @@ class TestDatasetElements:
 
 
 class TestFileDataset:
-    def setup(self):
+    def setup_method(self):
         self.test_file = get_testdata_file('CT_small.dcm')
 
     def test_pickle_raw_data(self):
@@ -1975,7 +1975,7 @@ class TestFileDataset:
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""
 
-    def setup(self):
+    def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
         pydicom.config.overlay_data_handlers = [NP_HANDLER]
@@ -2007,7 +2007,7 @@ class TestDatasetOverlayArray:
 
         self.dummy = DummyHandler()
 
-    def teardown(self):
+    def teardown_method(self):
         """Restore the environment."""
         pydicom.config.overlay_data_handlers = self.original_handlers
 

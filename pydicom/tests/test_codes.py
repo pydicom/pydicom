@@ -19,7 +19,7 @@ def ambiguous_scheme():
 
 
 class TestCode:
-    def setup(self):
+    def setup_method(self):
         self._value = "373098007"
         self._meaning = "Mean Value of population"
         self._scheme_designator = "SCT"
