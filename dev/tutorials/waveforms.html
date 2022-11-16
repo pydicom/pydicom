@@ -239,8 +239,8 @@ function. The following decodes and returns the raw data from the multiplex at
 </div>
 <p>If (003A,0210) <em>Channel Sensitivity</em> is present within the multiplex’s <em>Channel
 Definition Sequence</em> then the raw sample data needs to be corrected before it’s
-in the quantity it represents. This correction is given by (sample + <em>Channel
-Baseline</em>) x <em>Channel Sensitivity</em> x <em>Channel Sensitivity Correction Factor</em>
+in the quantity it represents. This correction is given by sample x <em>Channel
+Sensitivity</em> x <em>Channel Sensitivity Correction Factor</em> + <em>Channel Baseline</em>
 and will be applied when <cite>as_raw</cite> is <code class="docutils literal notranslate"><span class="pre">False</span></code> or when using the
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.waveform_array" title="pydicom.dataset.Dataset.waveform_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.waveform_array()</span></code></a>
 function:</p>
