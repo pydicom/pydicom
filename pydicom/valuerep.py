@@ -1274,7 +1274,8 @@ class ISfloat(float):
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val.strip()
-        elif isinstance(val, (IS, ISfloat)) and hasattr(val, 'original_string'):
+        elif (isinstance(val, (IS, ISfloat))
+                and hasattr(val, 'original_string')):
             self.original_string = val.original_string
         if validation_mode:
             msg = (

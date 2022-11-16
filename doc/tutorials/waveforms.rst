@@ -141,8 +141,8 @@ function. The following decodes and returns the raw data from the multiplex at
 
 If (003A,0210) *Channel Sensitivity* is present within the multiplex's *Channel
 Definition Sequence* then the raw sample data needs to be corrected before it's
-in the quantity it represents. This correction is given by (sample + *Channel
-Baseline*) x *Channel Sensitivity* x *Channel Sensitivity Correction Factor*
+in the quantity it represents. This correction is given by sample x *Channel 
+Sensitivity* x *Channel Sensitivity Correction Factor* + *Channel Baseline*
 and will be applied when `as_raw` is ``False`` or when using the
 :meth:`Dataset.waveform_array()<pydicom.dataset.Dataset.waveform_array>`
 function:
