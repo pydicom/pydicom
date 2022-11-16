@@ -25,10 +25,10 @@ PYTEST = [int(x) for x in pytest.__version__.split(".")]
 class TestDebug:
     """Tests for config.debug()."""
 
-    def setup(self):
+    def setup_method(self):
         self.logger = logging.getLogger("pydicom")
 
-    def teardown(self):
+    def teardown_method(self):
         # Reset to just NullHandler
         self.logger.handlers = [self.logger.handlers[0]]
 

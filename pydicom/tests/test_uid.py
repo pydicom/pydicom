@@ -132,7 +132,7 @@ class TestGenerateUID:
 
 class TestUID:
     """Test DICOM UIDs"""
-    def setup(self):
+    def setup_method(self):
         """Set default UID"""
         self.uid = UID('1.2.840.10008.1.2')
 
@@ -348,7 +348,7 @@ class TestUID:
 
 class TestUIDPrivate:
     """Test private UIDs"""
-    def setup(self):
+    def setup_method(self):
         """Set default UID"""
         self.uid = UID('9.9.999.90009.1.2')
 

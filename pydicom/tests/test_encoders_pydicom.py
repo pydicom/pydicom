@@ -110,7 +110,7 @@ class TestEncodeRow:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncodeFrame:
     """Tests for rle_handler._encode_frame."""
-    def setup(self):
+    def setup_method(self):
         """Setup the tests."""
         # Create a dataset skeleton for use in the cycle tests
         ds = Dataset()
