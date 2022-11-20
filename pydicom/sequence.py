@@ -154,13 +154,15 @@ class Sequence(MultiValue[Dataset]):
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
-    def __getstate__(self) -> Dict[str, Any]:
-        # pickle cannot handle weakref - remove _parent
-        d = self.__dict__.copy()
-        del d['_parent']
-        return d
+    def __getstate__(self):
+        if self.parent is not None:
+            s = self.__dict__.copy()
+            s['_parent'] = s['_parent']()
+            return s
+        return self.__dict__
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    # If recovering from a pickle, turn back into weak ref
+    def __setstate__(self, state):
         self.__dict__.update(state)
-        # re-add _parent - it will be set to the parent dataset on demand
-        self.__dict__['_parent'] = None
+        if self.__dict__['_parent'] is not None:
+            self.__dict__['_parent'] = weakref.ref(self.__dict__['_parent'])

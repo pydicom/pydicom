@@ -913,12 +913,6 @@ class Dataset:
                 raise KeyError(f"'{key}'") from exc
 
         elem = self._dict[tag]
-        if isinstance(elem, DataElement):
-            if elem.VR == VR_.SQ and elem.value:
-                # let a sequence know its parent dataset, as sequence items
-                # may need parent dataset tags to resolve ambiguous tags
-                elem.value.parent = self
-            return elem
 
         if isinstance(elem, RawDataElement):
             # If a deferred read, then go get the value now
@@ -2239,6 +2233,13 @@ class Dataset:
 
         self._dict[elem_tag] = elem
 
+        if elem.VR == VR_.SQ and isinstance(elem, DataElement):
+            if elem.value:
+                # let a sequence know its parent dataset, as sequence items
+                # may need parent dataset tags to resolve ambiguous tags
+                elem.value.parent = self
+            return elem
+
     def _slice_dataset(
         self,
         start: Optional[TagType],
@@ -2574,17 +2575,20 @@ class Dataset:
             )
         )
 
-    def __getstate__(self) -> Dict[str, Any]:
-        # pickle cannot handle weakref - remove parent
-        d = self.__dict__.copy()
-        del d['parent']
-        return d
+    # For Pickle, need to make weakref a strong reference
+    # Adapted from https://stackoverflow.com/a/45588812/1987276
+    def __getstate__(self):
+        if self.parent is not None:
+            s = self.__dict__.copy()
+            s['parent'] = s['parent']()
+            return s
+        return self.__dict__
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    # If recovering from a pickle, turn back into weak ref
+    def __setstate__(self, state):
         self.__dict__.update(state)
-        # re-add parent - it will be set to the parent dataset on demand
-        # if the dataset is in a sequence
-        self.__dict__['parent'] = None
+        if self.__dict__['parent'] is not None:
+            self.__dict__['parent'] = weakref.ref(self.__dict__['parent'])
 
     __repr__ = __str__
 
