@@ -50,7 +50,7 @@ class Sequence(MultiValue[Dataset]):
             raise TypeError('The Sequence constructor requires an iterable')
 
         # the parent dataset
-        self._parent: "Optional[weakref.ReferenceType[Dataset]]" = None
+        self._parent_dataset: "Optional[weakref.ReferenceType[Dataset]]" = None
 
         # validate_dataset is used as a pseudo type_constructor
         self._list: List[Dataset] = []
@@ -62,7 +62,7 @@ class Sequence(MultiValue[Dataset]):
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)
-        val.parent = self._parent
+        val.parent_seq = weakref.ref(self)
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -73,7 +73,7 @@ class Sequence(MultiValue[Dataset]):
 
         super().extend(val)
         for ds in val:
-            ds.parent = self._parent
+            ds.parent_seq = weakref.ref(self)
 
     def __iadd__(    # type: ignore[override]
         self, other: Iterable[Dataset]
@@ -84,7 +84,7 @@ class Sequence(MultiValue[Dataset]):
 
         result = super().__iadd__(other)
         for ds in other:
-            ds.parent = self.parent
+            ds.parent_seq = weakref.ref(self)
 
         return result
 
@@ -93,10 +93,10 @@ class Sequence(MultiValue[Dataset]):
     ) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
-        val.parent = self._parent
+        val.parent_seq = weakref.ref(self)
 
     @property
-    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+    def parent_dataset(self) -> "Optional[weakref.ReferenceType[Dataset]]":
         """Return a weak reference to the parent
         :class:`~pydicom.dataset.Dataset`.
 
@@ -106,19 +106,16 @@ class Sequence(MultiValue[Dataset]):
 
             Returned value is a weak reference to the parent ``Dataset``.
         """
-        return self._parent
+        return self._parent_dataset
 
-    @parent.setter
-    def parent(self, value: Dataset) -> None:
-        """Set the parent :class:`~pydicom.dataset.Dataset` and pass it to all
-        :class:`Sequence` items.
+    @parent_dataset.setter
+    def parent_dataset(self, value: Dataset) -> None:
+        """Set the parent :class:`~pydicom.dataset.Dataset`
 
         .. versionadded:: 1.3
         """
-        if value != self._parent:
-            self._parent = weakref.ref(value)
-            for item in self._list:
-                item.parent = self._parent
+        if value != self._parent_dataset:
+            self._parent_dataset = weakref.ref(value)
 
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:
@@ -140,11 +137,11 @@ class Sequence(MultiValue[Dataset]):
 
             super().__setitem__(idx, val)
             for ds in val:
-                ds.parent = self._parent
+                ds.parent_seq = weakref.ref(self)
         else:
             val = cast(Dataset, val)
             super().__setitem__(idx, val)
-            val.parent = self._parent
+            val.parent_seq = weakref.ref(self)
 
     def __str__(self) -> str:
         """String description of the Sequence."""
@@ -155,14 +152,16 @@ class Sequence(MultiValue[Dataset]):
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
     def __getstate__(self):
-        if self.parent is not None:
+        if self.parent_dataset is not None:
             s = self.__dict__.copy()
-            s['_parent'] = s['_parent']()
+            s['_parent_dataset'] = s['_parent_dataset']()
             return s
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state):
         self.__dict__.update(state)
-        if self.__dict__['_parent'] is not None:
-            self.__dict__['_parent'] = weakref.ref(self.__dict__['_parent'])
+        if self.__dict__['_parent_dataset'] is not None:
+            self.__dict__['_parent_dataset'] = weakref.ref(
+                self.__dict__['_parent_dataset']
+            )

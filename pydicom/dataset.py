@@ -398,7 +398,7 @@ class Dataset:
         self.is_undefined_length_sequence_item = False
 
         # the parent data set, if this dataset is a sequence item
-        self.parent: "Optional[weakref.ReferenceType[Dataset]]" = None
+        self.parent_seq: "Optional[weakref.ReferenceType[Sequence]]" = None
 
         # known private creator blocks
         self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}
@@ -2578,17 +2578,19 @@ class Dataset:
     # For Pickle, need to make weakref a strong reference
     # Adapted from https://stackoverflow.com/a/45588812/1987276
     def __getstate__(self):
-        if self.parent is not None:
+        if self.parent_seq is not None:
             s = self.__dict__.copy()
-            s['parent'] = s['parent']()
+            s['parent_seq'] = s['parent_seq']()
             return s
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state):
         self.__dict__.update(state)
-        if self.__dict__['parent'] is not None:
-            self.__dict__['parent'] = weakref.ref(self.__dict__['parent'])
+        if self.__dict__['parent_seq'] is not None:
+            self.__dict__['parent_seq'] = weakref.ref(
+                self.__dict__['parent_seq']
+            )
 
     __repr__ = __str__
 

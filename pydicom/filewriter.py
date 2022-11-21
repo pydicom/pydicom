@@ -93,8 +93,13 @@ def _correct_ambiguous_vr_element(
         #   For references, see the list at
         #   https://github.com/darcymason/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
-        while 'PixelRepresentation' not in ds and ds.parent and ds.parent():
-            ds = cast(Dataset, ds.parent())
+        while (
+            'PixelRepresentation' not in ds
+            and ds.parent_seq
+            and ds.parent_seq.parent_dataset()
+        ):
+            # Make the weakref Dataset into a strong ref by calling it
+            ds = cast(Dataset, ds.parent_seq.parent_dataset())
         # if no pixel data is present, none if these tags is used,
         # so we can just ignore a missing PixelRepresentation in this case
         if (

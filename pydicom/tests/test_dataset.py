@@ -1822,13 +1822,13 @@ class TestFileDataset:
 
     def test_pickle_data_elements(self):
         ds = pydicom.dcmread(self.test_file)
-        assert ds.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         for e in ds:
             # make sure all data elements have been loaded
             pass
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
-        assert ds1.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds1.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         assert ds == ds1
 
     def test_pickle_nested_sequence(self):
