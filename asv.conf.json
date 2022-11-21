@@ -42,9 +42,9 @@
 
 
     // "benchmark_dir": "benchmarks",
-    // "env_dir": "env",
-    // "results_dir": "results",
-    // "html_dir": "html",
+    "env_dir": "asv/env",
+    "results_dir": "asv/results",
+    "html_dir": "asv/html",
 
     // The number of characters to retain in the commit hashes.
     // "hash_length": 8,

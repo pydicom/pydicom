@@ -58,3 +58,6 @@ env/
 
 # pytest
 .pytest_cache
+
+# airspeed velocity
+asv/*
