@@ -96,10 +96,10 @@ def _correct_ambiguous_vr_element(
         while (
             'PixelRepresentation' not in ds
             and ds.parent_seq
-            and ds.parent_seq.parent_dataset()
+            and ds.parent_seq().parent_dataset()
         ):
             # Make the weakref Dataset into a strong ref by calling it
-            ds = cast(Dataset, ds.parent_seq.parent_dataset())
+            ds = cast(Dataset, ds.parent_seq().parent_dataset())
         # if no pixel data is present, none if these tags is used,
         # so we can just ignore a missing PixelRepresentation in this case
         if (

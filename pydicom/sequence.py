@@ -3,6 +3,7 @@
 
 Sequence is a list of pydicom Dataset objects.
 """
+from copy import deepcopy
 from typing import (
     Iterable, Optional, List, cast, Union, overload, MutableSequence,
     Dict, Any)
@@ -56,13 +57,14 @@ class Sequence(MultiValue[Dataset]):
         self._list: List[Dataset] = []
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
-
+        for ds in self:
+            ds.parent_seq = self
         self.is_undefined_length: bool
 
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)
-        val.parent_seq = weakref.ref(self)
+        val.parent_seq = self
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -73,7 +75,15 @@ class Sequence(MultiValue[Dataset]):
 
         super().extend(val)
         for ds in val:
-            ds.parent_seq = weakref.ref(self)
+            ds.parent_seq = self
+
+    def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Sequence":
+        copied = Sequence()
+        memo[id(self)] = copied
+        copied.__dict__.update(deepcopy(self.__dict__, memo))
+        for ds in copied:
+            ds.parent_seq = copied
+        return copied
 
     def __iadd__(    # type: ignore[override]
         self, other: Iterable[Dataset]
@@ -84,7 +94,7 @@ class Sequence(MultiValue[Dataset]):
 
         result = super().__iadd__(other)
         for ds in other:
-            ds.parent_seq = weakref.ref(self)
+            ds.parent_seq = self
 
         return result
 
@@ -93,7 +103,7 @@ class Sequence(MultiValue[Dataset]):
     ) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
-        val.parent_seq = weakref.ref(self)
+        val.parent_seq = self
 
     @property
     def parent_dataset(self) -> "Optional[weakref.ReferenceType[Dataset]]":
@@ -137,11 +147,11 @@ class Sequence(MultiValue[Dataset]):
 
             super().__setitem__(idx, val)
             for ds in val:
-                ds.parent_seq = weakref.ref(self)
+                ds.parent_seq = self
         else:
             val = cast(Dataset, val)
             super().__setitem__(idx, val)
-            val.parent_seq = weakref.ref(self)
+            val.parent_seq = self
 
     def __str__(self) -> str:
         """String description of the Sequence."""

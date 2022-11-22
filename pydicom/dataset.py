@@ -398,7 +398,7 @@ class Dataset:
         self.is_undefined_length_sequence_item = False
 
         # the parent data set, if this dataset is a sequence item
-        self.parent_seq: "Optional[weakref.ReferenceType[Sequence]]" = None
+        self._parent_seq: "Optional[weakref.ReferenceType[Sequence]]" = None
 
         # known private creator blocks
         self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}
@@ -407,6 +407,37 @@ class Dataset:
         self._pixel_id: Dict[str, int] = {}
 
         self.file_meta: FileMetaDataset
+
+    @property
+    def parent_seq(self) -> "Optional[weakref.ReferenceType[Sequence]]":
+        """Return a weak reference to the parent
+        :class:`~pydicom.sequence.Sequence`.
+
+        .. versionadded:: 2.4
+
+            Returned value is a weak reference to the parent ``Sequence``.
+        """
+        return self._parent_seq
+
+    @parent_seq.setter
+    def parent_seq(self, value: "Sequence") -> None:
+        """Set the parent :class:`~pydicom.sequence.Sequence`
+
+        .. versionadded:: 2.4
+        """
+        if value != self._parent_seq:
+            self._parent_seq = weakref.ref(value)
+
+    def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
+        copied = Dataset()
+        memo[id(self)] = copied   # add the new class to the memo
+        # Insert a deepcopy of all instance attributes
+        copied.__dict__.update(copy.deepcopy(self.__dict__, memo))
+        # Manually update the weakref to be correct
+        for elem in copied:  # DICOM elements
+            if elem.VR == VR_.SQ:
+                elem.value.parent_dataset = copied  # setter does weakref
+        return copied
 
     def __enter__(self) -> "Dataset":
         """Method invoked on entry to a with statement."""
@@ -2237,7 +2268,7 @@ class Dataset:
             if elem.value:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
-                elem.value.parent = self
+                elem.value.parent_dataset = self
             return elem
 
     def _slice_dataset(
@@ -2580,16 +2611,16 @@ class Dataset:
     def __getstate__(self):
         if self.parent_seq is not None:
             s = self.__dict__.copy()
-            s['parent_seq'] = s['parent_seq']()
+            s['_parent_seq'] = s['_parent_seq']()
             return s
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state):
         self.__dict__.update(state)
-        if self.__dict__['parent_seq'] is not None:
-            self.__dict__['parent_seq'] = weakref.ref(
-                self.__dict__['parent_seq']
+        if self.__dict__['_parent_seq'] is not None:
+            self.__dict__['_parent_seq'] = weakref.ref(
+                self.__dict__['_parent_seq']
             )
 
     __repr__ = __str__
