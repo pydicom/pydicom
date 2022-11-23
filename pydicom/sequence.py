@@ -9,6 +9,7 @@ from typing import (
     Dict, Any)
 import weakref
 
+from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
 
@@ -126,6 +127,37 @@ class Sequence(MultiValue[Dataset]):
         """
         if value != self._parent_dataset:
             self._parent_dataset = weakref.ref(value)
+
+    @property
+    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+        """Return a weak reference to the parent Dataset
+
+        .. deprecated:: 2.4
+        """
+        if config._use_future:
+            raise AttributeError("Future: Sequence.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                DeprecationWarning,
+                "Sequence.parent will be removed in pydicom 3.0"
+            )
+            return self.parent_dataset
+
+
+    @parent.setter
+    def parent(self, value: "Dataset") -> None:
+        """Set the parent :class:`~pydicom.dataset.Dataset`
+
+        .. deprecated:: 2.4
+        """
+        if config._use_future:
+            raise AttributeError("Future: Sequence.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                DeprecationWarning,
+                "Sequence.parent will be removed in pydicom 3.0"
+            )
+            self.parent_dataset = value
 
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:

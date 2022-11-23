@@ -428,6 +428,36 @@ class Dataset:
         if value != self._parent_seq:
             self._parent_seq = weakref.ref(value)
 
+    @property
+    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+        """Return a weak reference to the parent Sequence's
+        parent Dataset.
+
+        .. deprecated:: 2.4
+        """
+        if config._use_future:
+            raise AttributeError("Future: Dataset.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                DeprecationWarning,
+                "Dataset.parent will be removed in pydicom 3.0"
+            )
+            return self.parent_seq().parent_dataset
+
+    @parent.setter
+    def parent(self, value: "Sequence") -> None:
+        """Set the parent :class:`~pydicom.sequence.Sequence`
+
+        .. deprecated:: 2.4
+        """
+        if config._use_future:
+            raise AttributeError("Future: Dataset.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                DeprecationWarning,
+                "Dataset.parent will be removed in pydicom 3.0"
+            )
+
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
         copied = Dataset()
         memo[id(self)] = copied   # add the new class to the memo

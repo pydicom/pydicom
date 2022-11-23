@@ -2207,7 +2207,7 @@ CAMEL_CASE = (
         "12LeadECG", "file_meta", "filename", "is_implicit_VR",
         "is_little_endian", "preamble", "timestamp", "fileobj_type",
         "patient_records", "_parent_encoding", "_dict", "is_decompressed",
-        "read_little_endian", "read_implicit_vr", "read_encoding", "parent",
+        "read_little_endian", "read_implicit_vr", "read_encoding",
         "_private_blocks", "default_element_format", "indent_chars",
         "default_sequence_element_format", "PatientName"
     ],
