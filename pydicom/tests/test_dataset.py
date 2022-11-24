@@ -2199,6 +2199,8 @@ def contains_warn():
     config.INVALID_KEY_BEHAVIOR = "WARN"
     yield
     config.INVALID_KEY_BEHAVIOR = original
+
+
 CAMEL_CASE = (
     [  # Shouldn't warn
         "Rows", "_Rows", "Rows_", "rows", "_rows", "__rows", "rows_", "ro_ws",

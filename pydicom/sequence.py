@@ -8,10 +8,12 @@ from typing import (
     Iterable, Optional, List, cast, Union, overload, MutableSequence,
     Dict, Any)
 import weakref
+import warnings
 
 from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
+from pydicom.tag import Tag, TagType, TagListType
 
 
 def validate_dataset(elem: object) -> Dataset:
@@ -59,13 +61,13 @@ class Sequence(MultiValue[Dataset]):
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
         for ds in self:
-            ds.parent_seq = self
+            ds.parent_seq = self  # type: ignore
         self.is_undefined_length: bool
 
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)
-        val.parent_seq = self
+        val.parent_seq = self  # type: ignore
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -76,14 +78,15 @@ class Sequence(MultiValue[Dataset]):
 
         super().extend(val)
         for ds in val:
-            ds.parent_seq = self
+            ds.parent_seq = self  # type: ignore
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Sequence":
         copied = Sequence()
-        memo[id(self)] = copied
+        if memo is not None:
+            memo[id(self)] = copied
         copied.__dict__.update(deepcopy(self.__dict__, memo))
         for ds in copied:
-            ds.parent_seq = copied
+            ds.parent_seq = copied  # type:ignore
         return copied
 
     def __iadd__(    # type: ignore[override]
@@ -95,7 +98,7 @@ class Sequence(MultiValue[Dataset]):
 
         result = super().__iadd__(other)
         for ds in other:
-            ds.parent_seq = self
+            ds.parent_seq = self  # type: ignore
 
         return result
 
@@ -104,16 +107,14 @@ class Sequence(MultiValue[Dataset]):
     ) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
-        val.parent_seq = self
+        val.parent_seq = self  # type: ignore
 
     @property
     def parent_dataset(self) -> "Optional[weakref.ReferenceType[Dataset]]":
         """Return a weak reference to the parent
         :class:`~pydicom.dataset.Dataset`.
 
-        .. versionadded:: 1.3
-
-        .. versionchanged:: 1.4
+        .. versionadded:: 2.4
 
             Returned value is a weak reference to the parent ``Dataset``.
         """
@@ -123,10 +124,10 @@ class Sequence(MultiValue[Dataset]):
     def parent_dataset(self, value: Dataset) -> None:
         """Set the parent :class:`~pydicom.dataset.Dataset`
 
-        .. versionadded:: 1.3
+        .. versionadded:: 2.4
         """
         if value != self._parent_dataset:
-            self._parent_dataset = weakref.ref(value)
+            self._parent_dataset = weakref.ref(value)  # type: ignore
 
     @property
     def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
@@ -138,11 +139,10 @@ class Sequence(MultiValue[Dataset]):
             raise AttributeError("Future: Sequence.parent is removed in v3.x")
         else:
             warnings.warn(
-                DeprecationWarning,
-                "Sequence.parent will be removed in pydicom 3.0"
+                "Sequence.parent will be removed in pydicom 3.0",
+                DeprecationWarning
             )
             return self.parent_dataset
-
 
     @parent.setter
     def parent(self, value: "Dataset") -> None:
@@ -154,10 +154,10 @@ class Sequence(MultiValue[Dataset]):
             raise AttributeError("Future: Sequence.parent is removed in v3.x")
         else:
             warnings.warn(
-                DeprecationWarning,
-                "Sequence.parent will be removed in pydicom 3.0"
+                "Sequence.parent will be removed in pydicom 3.0",
+                DeprecationWarning
             )
-            self.parent_dataset = value
+            self.parent_dataset = value  # type:ignore
 
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:
@@ -179,11 +179,11 @@ class Sequence(MultiValue[Dataset]):
 
             super().__setitem__(idx, val)
             for ds in val:
-                ds.parent_seq = self
+                ds.parent_seq = self  # type: ignore
         else:
             val = cast(Dataset, val)
             super().__setitem__(idx, val)
-            val.parent_seq = self
+            val.parent_seq = self  # type: ignore
 
     def __str__(self) -> str:
         """String description of the Sequence."""

@@ -29,7 +29,7 @@ from types import TracebackType
 from typing import (
     Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
     Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
-    MutableSequence, MutableMapping, AbstractSet
+    MutableSequence, MutableMapping, AbstractSet, TYPE_CHECKING
 )
 import warnings
 import weakref
@@ -62,6 +62,10 @@ from pydicom.uid import (
 )
 from pydicom.valuerep import VR as VR_, AMBIGUOUS_VR
 from pydicom.waveforms import numpy_handler as wave_handler
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pydicom.sequence import Sequence
 
 
 class PrivateBlock:
@@ -439,10 +443,15 @@ class Dataset:
             raise AttributeError("Future: Dataset.parent is removed in v3.x")
         else:
             warnings.warn(
-                DeprecationWarning,
-                "Dataset.parent will be removed in pydicom 3.0"
+                "Dataset.parent will be removed in pydicom 3.0",
+                DeprecationWarning
             )
-            return self.parent_seq().parent_dataset
+
+            parent_ref = self.parent_seq
+            if parent_ref is None:
+                return None
+
+            return cast("Sequence", parent_ref()).parent_dataset
 
     @parent.setter
     def parent(self, value: "Sequence") -> None:
@@ -454,13 +463,14 @@ class Dataset:
             raise AttributeError("Future: Dataset.parent is removed in v3.x")
         else:
             warnings.warn(
-                DeprecationWarning,
-                "Dataset.parent will be removed in pydicom 3.0"
+                "Dataset.parent will be removed in pydicom 3.0",
+                DeprecationWarning
             )
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
         copied = Dataset()
-        memo[id(self)] = copied   # add the new class to the memo
+        if memo:
+            memo[id(self)] = copied   # add the new class to the memo
         # Insert a deepcopy of all instance attributes
         copied.__dict__.update(copy.deepcopy(self.__dict__, memo))
         # Manually update the weakref to be correct
@@ -2295,11 +2305,10 @@ class Dataset:
         self._dict[elem_tag] = elem
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
-            if elem.value:
+            if elem.value is not None:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
-                elem.value.parent_dataset = self
-            return elem
+                elem.value.parent_dataset = self  # type:ignore
 
     def _slice_dataset(
         self,
