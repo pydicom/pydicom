@@ -200,7 +200,7 @@ class Sequence(MultiValue[Dataset]):
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state) -> None:
+    def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_dataset'] is not None:
             self.__dict__['_parent_dataset'] = weakref.ref(

@@ -894,9 +894,9 @@ class Dataset:
               value (if present).
         """
         tag = tag_for_keyword(name)
-        if tag is not None:  # `name` isn't a DICOM element keyword
+        if tag is not None:  # None means `name` isn't a DICOM element keyword
             tag = Tag(tag)
-            if tag in self._dict:  # DICOM DataElement not in the Dataset
+            if tag in self._dict:
                 return self[tag].value
 
         # no tag or tag not contained in the dataset
@@ -2186,6 +2186,16 @@ class Dataset:
         value
             The value for the attribute to be added/changed.
         """
+        # Save time for common Dataset attributes that are not DICOM keywords
+        # This check is fast if `name` is a DICOM keyword (first chr is upper)
+        # The startswith is needed for `is_implicit_VR`
+        if name.startswith("is_") or name.islower():
+            if name == "file_meta":
+                self._set_file_meta(value)
+            else:
+                object.__setattr__(self, name, value)
+            return
+
         tag = tag_for_keyword(name)
         if tag is not None:  # successfully mapped name to a tag
             if tag not in self:
@@ -2209,8 +2219,6 @@ class Dataset:
                 f"'{name}' is a DICOM repeating group element and must be "
                 "added using the add() or add_new() methods."
             )
-        elif name == "file_meta":
-            self._set_file_meta(value)
         else:
             # Warn if `name` is camel case but not a keyword
             if _RE_CAMEL_CASE.match(name):
@@ -2658,7 +2666,7 @@ class Dataset:
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state) -> None:
+    def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_seq'] is not None:
             self.__dict__['_parent_seq'] = weakref.ref(
