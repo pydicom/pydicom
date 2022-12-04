@@ -126,7 +126,7 @@ class Sequence(MultiValue[Dataset]):
         .. versionadded:: 2.4
         """
         if value != self._parent_dataset:
-            self._parent_dataset = weakref.ref(value)  # type: ignore
+            self._parent_dataset = weakref.ref(value)
 
     @property
     def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
@@ -192,7 +192,7 @@ class Sequence(MultiValue[Dataset]):
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, Any]:
         if self.parent_dataset is not None:
             s = self.__dict__.copy()
             s['_parent_dataset'] = s['_parent_dataset']()
@@ -200,7 +200,7 @@ class Sequence(MultiValue[Dataset]):
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state):
+    def __setstate__(self, state) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_dataset'] is not None:
             self.__dict__['_parent_dataset'] = weakref.ref(

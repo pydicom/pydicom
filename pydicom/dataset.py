@@ -2648,7 +2648,7 @@ class Dataset:
 
     # For Pickle, need to make weakref a strong reference
     # Adapted from https://stackoverflow.com/a/45588812/1987276
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, Any]:
         if self.parent_seq is not None:
             s = self.__dict__.copy()
             s['_parent_seq'] = s['_parent_seq']()
@@ -2656,7 +2656,7 @@ class Dataset:
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state):
+    def __setstate__(self, state) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_seq'] is not None:
             self.__dict__['_parent_seq'] = weakref.ref(
