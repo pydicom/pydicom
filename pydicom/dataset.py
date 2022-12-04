@@ -2306,6 +2306,8 @@ class Dataset:
         self._dict[elem_tag] = elem
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
+            if not isinstance(elem.value, pydicom.Sequence):
+                elem.value = pydicom.Sequence(elem.value)  # type: ignore
             if elem.value is not None:
                 # let a sequence know its parent dataset, as sequence items
                 # may need parent dataset tags to resolve ambiguous tags
