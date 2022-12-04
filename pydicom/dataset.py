@@ -454,7 +454,7 @@ class Dataset:
             return cast("Sequence", parent_ref()).parent_dataset
 
     @parent.setter
-    def parent(self, value: "Sequence") -> None:
+    def parent(self, value: "Dataset") -> None:
         """Set the parent :class:`~pydicom.sequence.Sequence`
 
         .. deprecated:: 2.4
@@ -466,6 +466,7 @@ class Dataset:
                 "Dataset.parent will be removed in pydicom 3.0",
                 DeprecationWarning
             )
+        self._parent = weakref.ref(value)
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
         copied = Dataset()

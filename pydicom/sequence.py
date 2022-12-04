@@ -13,7 +13,6 @@ import warnings
 from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
-from pydicom.tag import Tag, TagType, TagListType
 
 
 def validate_dataset(elem: object) -> Dataset:
