@@ -66,6 +66,8 @@
       ~Dataset.default_sequence_element_format
       ~Dataset.indent_chars
       ~Dataset.is_original_encoding
+      ~Dataset.parent
+      ~Dataset.parent_seq
       ~Dataset.pixel_array
    
    

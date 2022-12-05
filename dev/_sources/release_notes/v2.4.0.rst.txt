@@ -17,6 +17,8 @@ Enhancements
 * Added support for Python 3.11 (:issue:`1658`)
 * Added :class:`~pydicom.valuerep.ISfloat` to allow non-strict reading of
   existing files with float IS values (:issue:`1661`)
+* Improved speed of creating and accessing highly nested structures
+  (:issue:`1728`, :pr:`1734`)
 
 Fixes
 -----

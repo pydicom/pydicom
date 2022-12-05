@@ -34,5 +34,6 @@
    .. autosummary::
    
       ~Sequence.parent
+      ~Sequence.parent_dataset
    
    

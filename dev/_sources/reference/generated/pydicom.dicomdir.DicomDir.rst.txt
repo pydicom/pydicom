@@ -67,6 +67,8 @@
       ~DicomDir.default_sequence_element_format
       ~DicomDir.indent_chars
       ~DicomDir.is_original_encoding
+      ~DicomDir.parent
+      ~DicomDir.parent_seq
       ~DicomDir.pixel_array
    
    
