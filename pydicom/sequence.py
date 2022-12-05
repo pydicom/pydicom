@@ -3,11 +3,14 @@
 
 Sequence is a list of pydicom Dataset objects.
 """
+from copy import deepcopy
 from typing import (
     Iterable, Optional, List, cast, Union, overload, MutableSequence,
     Dict, Any)
 import weakref
+import warnings
 
+from pydicom import config
 from pydicom.dataset import Dataset
 from pydicom.multival import MultiValue
 
@@ -50,19 +53,20 @@ class Sequence(MultiValue[Dataset]):
             raise TypeError('The Sequence constructor requires an iterable')
 
         # the parent dataset
-        self._parent: "Optional[weakref.ReferenceType[Dataset]]" = None
+        self._parent_dataset: "Optional[weakref.ReferenceType[Dataset]]" = None
 
         # validate_dataset is used as a pseudo type_constructor
         self._list: List[Dataset] = []
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
-
+        for ds in self:
+            ds.parent_seq = self  # type: ignore
         self.is_undefined_length: bool
 
     def append(self, val: Dataset) -> None:  # type: ignore[override]
         """Append a :class:`~pydicom.dataset.Dataset` to the sequence."""
         super().append(val)
-        val.parent = self._parent
+        val.parent_seq = self  # type: ignore
 
     def extend(self, val: Iterable[Dataset]) -> None:  # type: ignore[override]
         """Extend the :class:`~pydicom.sequence.Sequence` using an iterable
@@ -73,7 +77,16 @@ class Sequence(MultiValue[Dataset]):
 
         super().extend(val)
         for ds in val:
-            ds.parent = self._parent
+            ds.parent_seq = self  # type: ignore
+
+    def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Sequence":
+        copied = Sequence()
+        if memo is not None:
+            memo[id(self)] = copied
+        copied.__dict__.update(deepcopy(self.__dict__, memo))
+        for ds in copied:
+            ds.parent_seq = copied  # type:ignore
+        return copied
 
     def __iadd__(    # type: ignore[override]
         self, other: Iterable[Dataset]
@@ -84,7 +97,7 @@ class Sequence(MultiValue[Dataset]):
 
         result = super().__iadd__(other)
         for ds in other:
-            ds.parent = self.parent
+            ds.parent_seq = self  # type: ignore
 
         return result
 
@@ -93,32 +106,57 @@ class Sequence(MultiValue[Dataset]):
     ) -> None:
         """Insert a :class:`~pydicom.dataset.Dataset` into the sequence."""
         super().insert(position, val)
-        val.parent = self._parent
+        val.parent_seq = self  # type: ignore
 
     @property
-    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+    def parent_dataset(self) -> "Optional[weakref.ReferenceType[Dataset]]":
         """Return a weak reference to the parent
         :class:`~pydicom.dataset.Dataset`.
 
-        .. versionadded:: 1.3
-
-        .. versionchanged:: 1.4
+        .. versionadded:: 2.4
 
             Returned value is a weak reference to the parent ``Dataset``.
         """
-        return self._parent
+        return self._parent_dataset
+
+    @parent_dataset.setter
+    def parent_dataset(self, value: Dataset) -> None:
+        """Set the parent :class:`~pydicom.dataset.Dataset`
+
+        .. versionadded:: 2.4
+        """
+        if value != self._parent_dataset:
+            self._parent_dataset = weakref.ref(value)
+
+    @property
+    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+        """Return a weak reference to the parent Dataset
+
+        .. deprecated:: 2.4
+        """
+        if config._use_future:
+            raise AttributeError("Future: Sequence.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                "Sequence.parent will be removed in pydicom 3.0",
+                DeprecationWarning
+            )
+            return self.parent_dataset
 
     @parent.setter
-    def parent(self, value: Dataset) -> None:
-        """Set the parent :class:`~pydicom.dataset.Dataset` and pass it to all
-        :class:`Sequence` items.
+    def parent(self, value: "Dataset") -> None:
+        """Set the parent :class:`~pydicom.dataset.Dataset`
 
-        .. versionadded:: 1.3
+        .. deprecated:: 2.4
         """
-        if value != self._parent:
-            self._parent = weakref.ref(value)
-            for item in self._list:
-                item.parent = self._parent
+        if config._use_future:
+            raise AttributeError("Future: Sequence.parent is removed in v3.x")
+        else:
+            warnings.warn(
+                "Sequence.parent will be removed in pydicom 3.0",
+                DeprecationWarning
+            )
+            self.parent_dataset = value  # type:ignore
 
     @overload  # type: ignore[override]
     def __setitem__(self, idx: int, val: Dataset) -> None:
@@ -140,11 +178,11 @@ class Sequence(MultiValue[Dataset]):
 
             super().__setitem__(idx, val)
             for ds in val:
-                ds.parent = self._parent
+                ds.parent_seq = self  # type: ignore
         else:
             val = cast(Dataset, val)
             super().__setitem__(idx, val)
-            val.parent = self._parent
+            val.parent_seq = self  # type: ignore
 
     def __str__(self) -> str:
         """String description of the Sequence."""
@@ -155,12 +193,16 @@ class Sequence(MultiValue[Dataset]):
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
     def __getstate__(self) -> Dict[str, Any]:
-        # pickle cannot handle weakref - remove _parent
-        d = self.__dict__.copy()
-        del d['_parent']
-        return d
+        if self.parent_dataset is not None:
+            s = self.__dict__.copy()
+            s['_parent_dataset'] = s['_parent_dataset']()
+            return s
+        return self.__dict__
 
+    # If recovering from a pickle, turn back into weak ref
     def __setstate__(self, state: Dict[str, Any]) -> None:
         self.__dict__.update(state)
-        # re-add _parent - it will be set to the parent dataset on demand
-        self.__dict__['_parent'] = None
+        if self.__dict__['_parent_dataset'] is not None:
+            self.__dict__['_parent_dataset'] = weakref.ref(
+                self.__dict__['_parent_dataset']
+            )

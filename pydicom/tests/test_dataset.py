@@ -1822,13 +1822,13 @@ class TestFileDataset:
 
     def test_pickle_data_elements(self):
         ds = pydicom.dcmread(self.test_file)
-        assert ds.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         for e in ds:
             # make sure all data elements have been loaded
             pass
         s = pickle.dumps({'ds': ds})
         ds1 = pickle.loads(s)['ds']
-        assert ds1.OtherPatientIDsSequence.parent == weakref.ref(ds)
+        assert ds1.OtherPatientIDsSequence.parent_dataset == weakref.ref(ds)
         assert ds == ds1
 
     def test_pickle_nested_sequence(self):
@@ -2160,6 +2160,12 @@ class TestFileMeta:
         assert ds_copy.BeamSequence[1].Manufacturer == "Linac and Sons, co."
         if copy_method == copy.deepcopy:
             assert id(ds_copy.BeamSequence[0]) != id(ds.BeamSequence[0])
+
+            # dereference weakrefs and check are pointing to correct objects
+            assert ds.BeamSequence is ds.BeamSequence[0].parent_seq()
+            assert ds is ds.BeamSequence.parent_dataset()
+            assert ds_copy.BeamSequence is ds_copy.BeamSequence[0].parent_seq()
+            assert ds_copy is ds_copy.BeamSequence.parent_dataset()
         else:
             # shallow copy
             assert id(ds_copy.BeamSequence[0]) == id(ds.BeamSequence[0])
@@ -2193,6 +2199,8 @@ def contains_warn():
     config.INVALID_KEY_BEHAVIOR = "WARN"
     yield
     config.INVALID_KEY_BEHAVIOR = original
+
+
 CAMEL_CASE = (
     [  # Shouldn't warn
         "Rows", "_Rows", "Rows_", "rows", "_rows", "__rows", "rows_", "ro_ws",
@@ -2201,7 +2209,7 @@ CAMEL_CASE = (
         "12LeadECG", "file_meta", "filename", "is_implicit_VR",
         "is_little_endian", "preamble", "timestamp", "fileobj_type",
         "patient_records", "_parent_encoding", "_dict", "is_decompressed",
-        "read_little_endian", "read_implicit_vr", "read_encoding", "parent",
+        "read_little_endian", "read_implicit_vr", "read_encoding",
         "_private_blocks", "default_element_format", "indent_chars",
         "default_sequence_element_format", "PatientName"
     ],

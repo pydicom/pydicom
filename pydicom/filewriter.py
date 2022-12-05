@@ -91,10 +91,15 @@ def _correct_ambiguous_vr_element(
     elif elem.tag in _us_ss_tags:
         # US if PixelRepresentation value is 0x0000, else SS
         #   For references, see the list at
-        #   https://github.com/darcymason/pydicom/pull/298
+        #   https://github.com/pydicom/pydicom/pull/298
         # PixelRepresentation is usually set in the root dataset
-        while 'PixelRepresentation' not in ds and ds.parent and ds.parent():
-            ds = cast(Dataset, ds.parent())
+        while (
+            'PixelRepresentation' not in ds
+            and ds.parent_seq is not None
+            and ds.parent_seq().parent_dataset()   # type: ignore
+        ):
+            # Make weakrefs into strong refs (locally here) by calling () them
+            ds = ds.parent_seq().parent_dataset()  # type: ignore
         # if no pixel data is present, none if these tags is used,
         # so we can just ignore a missing PixelRepresentation in this case
         if (
