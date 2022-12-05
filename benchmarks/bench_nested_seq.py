@@ -1,7 +1,7 @@
 from pydicom.dataset import Dataset
 from pydicom.sequence import Sequence
-import pydicom
 from pydicom.tag import Tag
+
 
 def create_nested_test_seq(num_items: int = 6280) -> Dataset:
     """Create a simplified version of sequence from issue #1728"""
@@ -53,10 +53,11 @@ class TimeNestedSeqAccess:
     def time_iterate_nested_elems(self):
         for func_gp in self.dataset.PerFrameFunctionalGroupsSequence:
             pps_item = func_gp.PlanePositionSequence[0]
-            pps_stuff = (
+            (
                 pps_item.RowPositionInTotalImagePixelMatrix,
                 pps_item.ColumnPositionInTotalImagePixelMatrix,
             )
+
     def time_index_to_nested_items(self):
         for i in range(len(self.dataset.PerFrameFunctionalGroupsSequence)):
             func_gp = self.dataset.PerFrameFunctionalGroupsSequence[i]
@@ -76,5 +77,6 @@ class TimeNestedSeqAccess:
                 pps_item[row_pos_tag].value,
                 pps_item[col_pos_tag].value,
             )
+
     def track_len_top_sequence(self):
         return self.len_top_sequence
