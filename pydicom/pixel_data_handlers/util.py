@@ -1,7 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Utility functions used in the pixel data handlers."""
 
-from struct import unpack, calcsize
+from struct import unpack, unpack_from
 from sys import byteorder
 from typing import (
     Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast, Iterable,
@@ -447,8 +447,7 @@ def apply_voi(
     if item['LUTData'].VR == VR.OW:
         endianness = '<' if ds.is_little_endian else '>'
         unpack_fmt = f'{endianness}{nr_entries}H'
-        size = calcsize(unpack_fmt)
-        unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData[:size]))
+        unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
     else:
         unc_data = cast(List[int], item.LUTData)
 
