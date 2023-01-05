@@ -100,7 +100,9 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00080014: ('UI', '1', "Instance Creator UID", '', 'InstanceCreatorUID'),  # noqa
     0x00080015: ('DT', '1', "Instance Coercion DateTime", '', 'InstanceCoercionDateTime'),  # noqa
     0x00080016: ('UI', '1', "SOP Class UID", '', 'SOPClassUID'),  # noqa
+    0x00080017: ('UI', '1', "Acquisition UID", '', 'AcquisitionUID'),  # noqa
     0x00080018: ('UI', '1', "SOP Instance UID", '', 'SOPInstanceUID'),  # noqa
+    0x00080019: ('UI', '1', "Pyramid UID", '', 'PyramidUID'),  # noqa
     0x0008001A: ('UI', '1-n', "Related General SOP Class UID", '', 'RelatedGeneralSOPClassUID'),  # noqa
     0x0008001B: ('UI', '1', "Original Specialized SOP Class UID", '', 'OriginalSpecializedSOPClassUID'),  # noqa
     0x00080020: ('DA', '1', "Study Date", '', 'StudyDate'),  # noqa
@@ -194,6 +196,48 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x0008030E: ('UT', '1', "Private Data Element Description", '', 'PrivateDataElementDescription'),  # noqa
     0x0008030F: ('UT', '1', "Private Data Element Encoding", '', 'PrivateDataElementEncoding'),  # noqa
     0x00080310: ('SQ', '1', "Private Data Element Definition Sequence", '', 'PrivateDataElementDefinitionSequence'),  # noqa
+    0x00080400: ('SQ', '1', "Scope of Inventory Sequence", '', 'ScopeOfInventorySequence'),  # noqa
+    0x00080401: ('LT', '1', "Inventory Purpose", '', 'InventoryPurpose'),  # noqa
+    0x00080402: ('LT', '1', "Inventory Instance Description", '', 'InventoryInstanceDescription'),  # noqa
+    0x00080403: ('CS', '1', "Inventory Level", '', 'InventoryLevel'),  # noqa
+    0x00080404: ('DT', '1', "Item Inventory DateTime", '', 'ItemInventoryDateTime'),  # noqa
+    0x00080405: ('CS', '1', "Removed from Operational Use", '', 'RemovedFromOperationalUse'),  # noqa
+    0x00080406: ('SQ', '1', "Reason for Removal Code Sequence", '', 'ReasonForRemovalCodeSequence'),  # noqa
+    0x00080407: ('UR', '1', "Stored Instance Base URI", '', 'StoredInstanceBaseURI'),  # noqa
+    0x00080408: ('UR', '1', "Folder Access URI", '', 'FolderAccessURI'),  # noqa
+    0x00080409: ('UR', '1', "File Access URI", '', 'FileAccessURI'),  # noqa
+    0x0008040A: ('CS', '1', "Container File Type", '', 'ContainerFileType'),  # noqa
+    0x0008040B: ('UR', '1', "Filename in Container", '', 'FilenameInContainer'),  # noqa
+    0x0008040C: ('UV', '1', "File Offset in Container", '', 'FileOffsetInContainer'),  # noqa
+    0x0008040D: ('UV', '1', "File Length in Container", '', 'FileLengthInContainer'),  # noqa
+    0x0008040E: ('UI', '1', "Stored Instance Transfer Syntax UID", '', 'StoredInstanceTransferSyntaxUID'),  # noqa
+    0x0008040F: ('CS', '1-n', "Extended Matching Mechanisms", '', 'ExtendedMatchingMechanisms'),  # noqa
+    0x00080410: ('SQ', '1', "Range Matching Sequence", '', 'RangeMatchingSequence'),  # noqa
+    0x00080411: ('SQ', '1', "List of UID Matching Sequence", '', 'ListOfUIDMatchingSequence'),  # noqa
+    0x00080412: ('SQ', '1', "Empty Value Matching Sequence", '', 'EmptyValueMatchingSequence'),  # noqa
+    0x00080413: ('SQ', '1', "General Matching Sequence", '', 'GeneralMatchingSequence'),  # noqa
+    0x00080414: ('US', '1', "Requested Status Interval", '', 'RequestedStatusInterval'),  # noqa
+    0x00080415: ('CS', '1', "Retain Instances", '', 'RetainInstances'),  # noqa
+    0x00080416: ('DT', '1', "Expiration DateTime", '', 'ExpirationDateTime'),  # noqa
+    0x00080417: ('CS', '1', "Transaction Status", '', 'TransactionStatus'),  # noqa
+    0x00080418: ('LT', '1', "Transaction Status Comment", '', 'TransactionStatusComment'),  # noqa
+    0x00080419: ('SQ', '1', "File Set Access Sequence", '', 'FileSetAccessSequence'),  # noqa
+    0x0008041A: ('SQ', '1', "File Access Sequence", '', 'FileAccessSequence'),  # noqa
+    0x0008041B: ('OB', '1', "Record Key", '', 'RecordKey'),  # noqa
+    0x0008041C: ('OB', '1', "Prior Record Key", '', 'PriorRecordKey'),  # noqa
+    0x0008041D: ('SQ', '1', "Metadata Sequence", '', 'MetadataSequence'),  # noqa
+    0x0008041E: ('SQ', '1', "Updated Metadata Sequence", '', 'UpdatedMetadataSequence'),  # noqa
+    0x0008041F: ('DT', '1', "Study Update DateTime", '', 'StudyUpdateDateTime'),  # noqa
+    0x00080420: ('SQ', '1', "Inventory Access End Points Sequence", '', 'InventoryAccessEndPointsSequence'),  # noqa
+    0x00080421: ('SQ', '1', "Study Access End Points Sequence", '', 'StudyAccessEndPointsSequence'),  # noqa
+    0x00080422: ('SQ', '1', "Incorporated Inventory Instance Sequence", '', 'IncorporatedInventoryInstanceSequence'),  # noqa
+    0x00080423: ('SQ', '1', "Inventoried Studies Sequence", '', 'InventoriedStudiesSequence'),  # noqa
+    0x00080424: ('SQ', '1', "Inventoried Series Sequence", '', 'InventoriedSeriesSequence'),  # noqa
+    0x00080425: ('SQ', '1', "Inventoried Instances Sequence", '', 'InventoriedInstancesSequence'),  # noqa
+    0x00080426: ('CS', '1', "Inventory Completion Status", '', 'InventoryCompletionStatus'),  # noqa
+    0x00080427: ('UL', '1', "Number of Study Records in Instance", '', 'NumberOfStudyRecordsInInstance'),  # noqa
+    0x00080428: ('UV', '1', "Total Number of Study Records", '', 'TotalNumberOfStudyRecords'),  # noqa
+    0x00080429: ('UV', '1', "Maximum Number of Records", '', 'MaximumNumberOfRecords'),  # noqa
     0x00081000: ('AE', '1', "Network ID", 'Retired', 'NetworkID'),  # noqa
     0x00081010: ('SH', '1', "Station Name", '', 'StationName'),  # noqa
     0x00081030: ('LO', '1', "Study Description", '', 'StudyDescription'),  # noqa
@@ -212,6 +256,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00081072: ('SQ', '1', "Operator Identification Sequence", '', 'OperatorIdentificationSequence'),  # noqa
     0x00081080: ('LO', '1-n', "Admitting Diagnoses Description", '', 'AdmittingDiagnosesDescription'),  # noqa
     0x00081084: ('SQ', '1', "Admitting Diagnoses Code Sequence", '', 'AdmittingDiagnosesCodeSequence'),  # noqa
+    0x00081088: ('LO', '1', "Pyramid Description", '', 'PyramidDescription'),  # noqa
     0x00081090: ('LO', '1', "Manufacturer's Model Name", '', 'ManufacturerModelName'),  # noqa
     0x00081100: ('SQ', '1', "Referenced Results Sequence", 'Retired', 'ReferencedResultsSequence'),  # noqa
     0x00081110: ('SQ', '1', "Referenced Study Sequence", '', 'ReferencedStudySequence'),  # noqa
@@ -290,7 +335,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00083011: ('SQ', '1', "Source Irradiation Event Sequence", '', 'SourceIrradiationEventSequence'),  # noqa
     0x00083012: ('UI', '1', "Radiopharmaceutical Administration Event UID", '', 'RadiopharmaceuticalAdministrationEventUID'),  # noqa
     0x00084000: ('LT', '1', "Identifying Comments", 'Retired', 'IdentifyingComments'),  # noqa
-    0x00089007: ('CS', '4', "Frame Type", '', 'FrameType'),  # noqa
+    0x00089007: ('CS', '4-5', "Frame Type", '', 'FrameType'),  # noqa
     0x00089092: ('SQ', '1', "Referenced Image Evidence Sequence", '', 'ReferencedImageEvidenceSequence'),  # noqa
     0x00089121: ('SQ', '1', "Referenced Raw Data Sequence", '', 'ReferencedRawDataSequence'),  # noqa
     0x00089123: ('UI', '1', "Creator-Version UID", '', 'CreatorVersionUID'),  # noqa
@@ -394,6 +439,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00120051: ('ST', '1', "Clinical Trial Time Point Description", '', 'ClinicalTrialTimePointDescription'),  # noqa
     0x00120052: ('FD', '1', "Longitudinal Temporal Offset from Event", '', 'LongitudinalTemporalOffsetFromEvent'),  # noqa
     0x00120053: ('CS', '1', "Longitudinal Temporal Event Type", '', 'LongitudinalTemporalEventType'),  # noqa
+    0x00120054: ('SQ', '1', "Clinical Trial Time Point Type Code Sequence", '', 'ClinicalTrialTimePointTypeCodeSequence'),  # noqa
     0x00120060: ('LO', '1', "Clinical Trial Coordinating Center Name", '', 'ClinicalTrialCoordinatingCenterName'),  # noqa
     0x00120062: ('CS', '1', "Patient Identity Removed", '', 'PatientIdentityRemoved'),  # noqa
     0x00120063: ('LO', '1-n', "De-identification Method", '', 'DeidentificationMethod'),  # noqa
@@ -431,6 +477,14 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00140106: ('SQ', '1', "Multiple Component Approval Sequence", '', 'MultipleComponentApprovalSequence'),  # noqa
     0x00140107: ('CS', '1-n', "Other Approval Status", '', 'OtherApprovalStatus'),  # noqa
     0x00140108: ('CS', '1-n', "Other Secondary Approval Status", '', 'OtherSecondaryApprovalStatus'),  # noqa
+    0x00140200: ('SQ', '1', "Data Element Label Sequence", '', 'DataElementLabelSequence'),  # noqa
+    0x00140201: ('SQ', '1', "Data Element Label Item Sequence", '', 'DataElementLabelItemSequence'),  # noqa
+    0x00140202: ('AT', '1', "Data Element", '', 'DataElement'),  # noqa
+    0x00140203: ('LO', '1', "Data Element Name", '', 'DataElementName'),  # noqa
+    0x00140204: ('LO', '1', "Data Element Description", '', 'DataElementDescription'),  # noqa
+    0x00140205: ('CS', '1', "Data Element Conditionality", '', 'DataElementConditionality'),  # noqa
+    0x00140206: ('IS', '1', "Data Element Minimum Characters", '', 'DataElementMinimumCharacters'),  # noqa
+    0x00140207: ('IS', '1', "Data Element Maximum Characters", '', 'DataElementMaximumCharacters'),  # noqa
     0x00141010: ('ST', '1', "Actual Environmental Conditions", '', 'ActualEnvironmentalConditions'),  # noqa
     0x00141020: ('DA', '1', "Expiry Date", '', 'ExpiryDate'),  # noqa
     0x00141040: ('ST', '1', "Environmental Conditions", '', 'EnvironmentalConditions'),  # noqa
@@ -1601,6 +1655,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00200022: ('IS', '1', "Overlay Number", 'Retired', 'OverlayNumber'),  # noqa
     0x00200024: ('IS', '1', "Curve Number", 'Retired', 'CurveNumber'),  # noqa
     0x00200026: ('IS', '1', "LUT Number", 'Retired', 'LUTNumber'),  # noqa
+    0x00200027: ('LO', '1', "Pyramid Label", '', 'PyramidLabel'),  # noqa
     0x00200030: ('DS', '3', "Image Position", 'Retired', 'ImagePosition'),  # noqa
     0x00200032: ('DS', '3', "Image Position (Patient)", '', 'ImagePositionPatient'),  # noqa
     0x00200035: ('DS', '6', "Image Orientation", 'Retired', 'ImageOrientation'),  # noqa
@@ -2336,6 +2391,24 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x003A0314: ('DT', '1', "Impedance Measurement DateTime", '', 'ImpedanceMeasurementDateTime'),  # noqa
     0x003A0315: ('DS', '1', "Impedance Measurement Frequency", '', 'ImpedanceMeasurementFrequency'),  # noqa
     0x003A0316: ('CS', '1', "Impedance Measurement Current Type", '', 'ImpedanceMeasurementCurrentType'),  # noqa
+    0x003A0317: ('CS', '1', "Waveform Amplifier Type", '', 'WaveformAmplifierType'),  # noqa
+    0x003A0318: ('SQ', '1', "Filter Low Frequency Characteristics Sequence", '', 'FilterLowFrequencyCharacteristicsSequence'),  # noqa
+    0x003A0319: ('SQ', '1', "Filter High Frequency Characteristics Sequence", '', 'FilterHighFrequencyCharacteristicsSequence'),  # noqa
+    0x003A0320: ('SQ', '1', "Summarized Filter Lookup Table Sequence", '', 'SummarizedFilterLookupTable'),  # noqa
+    0x003A0321: ('SQ', '1', "Notch Filter Characteristics Sequence", '', 'NotchFilterCharacteristicsSequence'),  # noqa
+    0x003A0322: ('CS', '1', "Waveform Filter Type", '', 'WaveformFilterType'),  # noqa
+    0x003A0323: ('SQ', '1', "Analog Filter Characteristics Sequence", '', 'AnalogFilterCharacteristicsSequence'),  # noqa
+    0x003A0324: ('DS', '1', "Analog Filter Roll Off", '', 'AnalogFilterRollOff'),  # noqa
+    0x003A0325: ('SQ', '1', "Analog Filter Type Code Sequence", '', 'AnalogFilterType'),  # noqa
+    0x003A0326: ('SQ', '1', "Digital Filter Characteristics Sequence", '', 'DigitalFilterCharacteristicsSequence'),  # noqa
+    0x003A0327: ('IS', '1', "Digital Filter Order", '', 'DigitalFilterOrder'),  # noqa
+    0x003A0328: ('SQ', '1', "Digital Filter Type Code Sequence", '', 'DigitalFilterTypeCodeSequence'),  # noqa
+    0x003A0329: ('ST', '1', "Waveform Filter Description", '', 'WaveformFilterDescription'),  # noqa
+    0x003A032A: ('SQ', '1', "Filter Lookup Table Sequence", '', 'FilterLookupTableSequence'),  # noqa
+    0x003A032B: ('ST', '1', "Filter Lookup Table Description", '', 'FilterLookupTableDescription'),  # noqa
+    0x003A032C: ('SQ', '1', "Frequency Encoding Code Sequence", '', 'FrequencyEncodingCodeSequence'),  # noqa
+    0x003A032D: ('SQ', '1', "Magnitude Encoding Code Sequence", '', 'MagnitudeEncodingCodeSequence'),  # noqa
+    0x003A032E: ('OD', '1', "Filter Lookup Table Data", '', 'FilterLookupTableData'),  # noqa
     0x00400001: ('AE', '1-n', "Scheduled Station AE Title", '', 'ScheduledStationAETitle'),  # noqa
     0x00400002: ('DA', '1', "Scheduled Procedure Step Start Date", '', 'ScheduledProcedureStepStartDate'),  # noqa
     0x00400003: ('TM', '1', "Scheduled Procedure Step Start Time", '', 'ScheduledProcedureStepStartTime'),  # noqa
@@ -3234,6 +3307,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00700311: ('SQ', '1', "Fiducial Identifier Code Sequence", '', 'FiducialIdentifierCodeSequence'),  # noqa
     0x00700312: ('FD', '1', "Contour Uncertainty Radius", '', 'ContourUncertaintyRadius'),  # noqa
     0x00700314: ('SQ', '1', "Used Fiducials Sequence", '', 'UsedFiducialsSequence'),  # noqa
+    0x00700315: ('SQ', '1', "Used RT Structure Set ROI Sequence", '', 'UsedRTStructureSetROISequence'),  # noqa
     0x00700318: ('SQ', '1', "Graphic Coordinates Data Sequence", '', 'GraphicCoordinatesDataSequence'),  # noqa
     0x0070031A: ('UI', '1', "Fiducial UID", '', 'FiducialUID'),  # noqa
     0x0070031B: ('UI', '1', "Referenced Fiducial UID", '', 'ReferencedFiducialUID'),  # noqa
@@ -3737,8 +3811,8 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x21300050: ('SQ', '1', "Annotation Content Sequence", 'Retired', 'AnnotationContentSequence'),  # noqa
     0x21300060: ('SQ', '1', "Image Overlay Box Content Sequence", 'Retired', 'ImageOverlayBoxContentSequence'),  # noqa
     0x21300080: ('SQ', '1', "Presentation LUT Content Sequence", 'Retired', 'PresentationLUTContentSequence'),  # noqa
-    0x213000A0: ('SQ', '1', "Proposed Study Sequence", 'Retired', 'ProposedStudySequence'),  # noqa
-    0x213000C0: ('SQ', '1', "Original Image Sequence", 'Retired', 'OriginalImageSequence'),  # noqa
+    0x213000A0: ('SQ', '1', "Proposed Study Sequence", '', 'ProposedStudySequence'),  # noqa
+    0x213000C0: ('SQ', '1', "Original Image Sequence", '', 'OriginalImageSequence'),  # noqa
     0x22000001: ('CS', '1', "Label Using Information Extracted From Instances", '', 'LabelUsingInformationExtractedFromInstances'),  # noqa
     0x22000002: ('UT', '1', "Label Text", '', 'LabelText'),  # noqa
     0x22000003: ('CS', '1', "Label Style Selection", '', 'LabelStyleSelection'),  # noqa
@@ -3780,6 +3854,60 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30020050: ('SQ', '1', "Primary Fluence Mode Sequence", '', 'PrimaryFluenceModeSequence'),  # noqa
     0x30020051: ('CS', '1', "Fluence Mode", '', 'FluenceMode'),  # noqa
     0x30020052: ('SH', '1', "Fluence Mode ID", '', 'FluenceModeID'),  # noqa
+    0x30020100: ('IS', '1', "Selected Frame Number", '', 'SelectedFrameNumber'),  # noqa
+    0x30020101: ('SQ', '1', "Selected Frame Functional Groups Sequence", '', 'SelectedFrameFunctionalGroupsSequence'),  # noqa
+    0x30020102: ('SQ', '1', "RT Image Frame General Content Sequence", '', 'RTImageFrameGeneralContentSequence'),  # noqa
+    0x30020103: ('SQ', '1', "RT Image Frame Context Sequence", '', 'RTImageFrameContextSequence'),  # noqa
+    0x30020104: ('SQ', '1', "RT Image Scope Sequence", '', 'RTImageScopeSequence'),  # noqa
+    0x30020105: ('CS', '1', "Beam Modifier Coordinates Presence Flag", '', 'BeamModifierCoordinatesPresenceFlag'),  # noqa
+    0x30020106: ('FD', '1', "Start Cumulative Meterset", '', 'StartCumulativeMeterset'),  # noqa
+    0x30020107: ('FD', '1', "Stop Cumulative Meterset", '', 'StopCumulativeMeterset'),  # noqa
+    0x30020108: ('SQ', '1', "RT Acquisition Patient Position Sequence", '', 'RTAcquisitionPatientPositionSequence'),  # noqa
+    0x30020109: ('SQ', '1', "RT Image Frame Imaging Device Position Sequence", '', 'RTImageFrameImagingDevicePositionSequence'),  # noqa
+    0x3002010A: ('SQ', '1', "RT Image Frame kV Radiation Acquisition Sequence", '', 'RTImageFramekVRadiationAcquisitionSequence'),  # noqa
+    0x3002010B: ('SQ', '1', "RT Image Frame MV Radiation Acquisition Sequence", '', 'RTImageFrameMVRadiationAcquisitionSequence'),  # noqa
+    0x3002010C: ('SQ', '1', "RT Image Frame Radiation Acquisition Sequence", '', 'RTImageFrameRadiationAcquisitionSequence'),  # noqa
+    0x3002010D: ('SQ', '1', "Imaging Source Position Sequence", '', 'ImagingSourcePositionSequence'),  # noqa
+    0x3002010E: ('SQ', '1', "Image Receptor Position Sequence", '', 'ImageReceptorPositionSequence'),  # noqa
+    0x3002010F: ('FD', '16', "Device Position to Equipment Mapping Matrix", '', 'DevicePositionToEquipmentMappingMatrix'),  # noqa
+    0x30020110: ('SQ', '1', "Device Position Parameter Sequence", '', 'DevicePositionParameterSequence'),  # noqa
+    0x30020111: ('CS', '1', "Imaging Source Location Specification Type", '', 'ImagingSourceLocationSpecificationType'),  # noqa
+    0x30020112: ('SQ', '1', "Imaging Device Location Matrix Sequence", '', 'ImagingDeviceLocationMatrixSequence'),  # noqa
+    0x30020113: ('SQ', '1', "Imaging Device Location Parameter Sequence", '', 'ImagingDeviceLocationParameterSequence'),  # noqa
+    0x30020114: ('SQ', '1', "Imaging Aperture Sequence", '', 'ImagingApertureSequence'),  # noqa
+    0x30020115: ('CS', '1', "Imaging Aperture Specification Type", '', 'ImagingApertureSpecificationType'),  # noqa
+    0x30020116: ('US', '1', "Number of Acquisition Devices", '', 'NumberOfAcquisitionDevices'),  # noqa
+    0x30020117: ('SQ', '1', "Acquisition Device Sequence", '', 'AcquisitionDeviceSequence'),  # noqa
+    0x30020118: ('SQ', '1', "Acquisition Task Sequence", '', 'AcquisitionTaskSequence'),  # noqa
+    0x30020119: ('SQ', '1', "Acquisition Task Workitem Code Sequence", '', 'AcquisitionTaskWorkitemCodeSequence'),  # noqa
+    0x3002011A: ('SQ', '1', "Acquisition Subtask Sequence", '', 'AcquisitionSubtaskSequence'),  # noqa
+    0x3002011B: ('SQ', '1', "Subtask Workitem Code Sequence", '', 'SubtaskWorkitemCodeSequence'),  # noqa
+    0x3002011C: ('US', '1', "Acquisition Task Index", '', 'AcquisitionTaskIndex'),  # noqa
+    0x3002011D: ('US', '1', "Acquisition Subtask Index", '', 'AcquisitionSubtaskIndex'),  # noqa
+    0x3002011E: ('SQ', '1', "Referenced Baseline Parameters RT Radiation Instance Sequence", '', 'ReferencedBaselineParametersRTRadiationInstanceSequence'),  # noqa
+    0x3002011F: ('SQ', '1', "Position Acquisition Template Identification Sequence", '', 'PositionAcquisitionTemplateIdentificationSequence'),  # noqa
+    0x30020120: ('ST', '1', "Position Acquisition Template ID", '', 'PositionAcquisitionTemplateID'),  # noqa
+    0x30020121: ('LO', '1', "Position Acquisition Template Name", '', 'PositionAcquisitionTemplateName'),  # noqa
+    0x30020122: ('SQ', '1', "Position Acquisition Template Code Sequence", '', 'PositionAcquisitionTemplateCodeSequence'),  # noqa
+    0x30020123: ('LT', '1', "Position Acquisition Template Description", '', 'PositionAcquisitionTemplateDescription'),  # noqa
+    0x30020124: ('SQ', '1', "Acquisition Task Applicability Sequence", '', 'AcquisitionTaskApplicabilitySequence'),  # noqa
+    0x30020125: ('SQ', '1', "Projection Imaging Acquisition Parameter Sequence", '', 'ProjectionImagingAcquisitionParameterSequence'),  # noqa
+    0x30020126: ('SQ', '1', "CT Imaging Acquisition Parameter Sequence", '', 'CTImagingAcquisitionParameterSequence'),  # noqa
+    0x30020127: ('SQ', '1', "KV Imaging Generation Parameters Sequence", '', 'KVImagingGenerationParametersSequence'),  # noqa
+    0x30020128: ('SQ', '1', "MV Imaging Generation Parameters Sequence", '', 'MVImagingGenerationParametersSequence'),  # noqa
+    0x30020129: ('CS', '1', "Acquisition Signal Type", '', 'AcquisitionSignalType'),  # noqa
+    0x3002012A: ('CS', '1', "Acquisition Method", '', 'AcquisitionMethod'),  # noqa
+    0x3002012B: ('SQ', '1', "Scan Start Position Sequence", '', 'ScanStartPositionSequence'),  # noqa
+    0x3002012C: ('SQ', '1', "Scan Stop Position Sequence", '', 'ScanStopPositionSequence'),  # noqa
+    0x3002012D: ('FD', '1', "Imaging Source to Beam Modifier Definition Plane Distance", '', 'ImagingSourceToBeamModifierDefinitionPlaneDistance'),  # noqa
+    0x3002012E: ('CS', '1', "Scan Arc Type", '', 'ScanArcType'),  # noqa
+    0x3002012F: ('CS', '1', "Detector Positioning Type", '', 'DetectorPositioningType'),  # noqa
+    0x30020130: ('SQ', '1', "Additional RT Accessory Device Sequence", '', 'AdditionalRTAccessoryDeviceSequence'),  # noqa
+    0x30020131: ('SQ', '1', "Device-Specific Acquisition Parameter Sequence", '', 'DeviceSpecificAcquisitionParameterSequence'),  # noqa
+    0x30020132: ('SQ', '1', "Referenced Position Reference Instance Sequence", '', 'ReferencedPositionReferenceInstanceSequence'),  # noqa
+    0x30020133: ('SQ', '1', "Energy Derivation Code Sequence", '', 'EnergyDerivationCodeSequence'),  # noqa
+    0x30020134: ('FD', '1', "Maximum Cumulative Meterset Exposure", '', 'MaximumCumulativeMetersetExposure'),  # noqa
+    0x30020135: ('SQ', '1', "Acquisition Initiation Sequence", '', 'AcquisitionInitiationSequence'),  # noqa
     0x30040001: ('CS', '1', "DVH Type", '', 'DVHType'),  # noqa
     0x30040002: ('CS', '1', "Dose Units", '', 'DoseUnits'),  # noqa
     0x30040004: ('CS', '1', "Dose Type", '', 'DoseType'),  # noqa
@@ -3789,8 +3917,8 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x3004000A: ('CS', '1', "Dose Summation Type", '', 'DoseSummationType'),  # noqa
     0x3004000C: ('DS', '2-n', "Grid Frame Offset Vector", '', 'GridFrameOffsetVector'),  # noqa
     0x3004000E: ('DS', '1', "Dose Grid Scaling", '', 'DoseGridScaling'),  # noqa
-    0x30040010: ('SQ', '1', "RT Dose ROI Sequence", '', 'RTDoseROISequence'),  # noqa
-    0x30040012: ('DS', '1', "Dose Value", '', 'DoseValue'),  # noqa
+    0x30040010: ('SQ', '1', "RT Dose ROI Sequence", 'Retired', 'RTDoseROISequence'),  # noqa
+    0x30040012: ('DS', '1', "Dose Value", 'Retired', 'DoseValue'),  # noqa
     0x30040014: ('CS', '1-3', "Tissue Heterogeneity Correction", '', 'TissueHeterogeneityCorrection'),  # noqa
     0x30040040: ('DS', '3', "DVH Normalization Point", '', 'DVHNormalizationPoint'),  # noqa
     0x30040042: ('DS', '1', "DVH Normalization Dose Value", '', 'DVHNormalizationDoseValue'),  # noqa
@@ -3839,9 +3967,9 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30060080: ('SQ', '1', "RT ROI Observations Sequence", '', 'RTROIObservationsSequence'),  # noqa
     0x30060082: ('IS', '1', "Observation Number", '', 'ObservationNumber'),  # noqa
     0x30060084: ('IS', '1', "Referenced ROI Number", '', 'ReferencedROINumber'),  # noqa
-    0x30060085: ('SH', '1', "ROI Observation Label", '', 'ROIObservationLabel'),  # noqa
+    0x30060085: ('SH', '1', "ROI Observation Label", 'Retired', 'ROIObservationLabel'),  # noqa
     0x30060086: ('SQ', '1', "RT ROI Identification Code Sequence", '', 'RTROIIdentificationCodeSequence'),  # noqa
-    0x30060088: ('ST', '1', "ROI Observation Description", '', 'ROIObservationDescription'),  # noqa
+    0x30060088: ('ST', '1', "ROI Observation Description", 'Retired', 'ROIObservationDescription'),  # noqa
     0x300600A0: ('SQ', '1', "Related RT ROI Observations Sequence", '', 'RelatedRTROIObservationsSequence'),  # noqa
     0x300600A4: ('CS', '1', "RT ROI Interpreted Type", '', 'RTROIInterpretedType'),  # noqa
     0x300600A6: ('PN', '1', "ROI Interpreter", '', 'ROIInterpreter'),  # noqa
@@ -3913,6 +4041,10 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30080090: ('SQ', '1', "Referenced Calculated Dose Reference Sequence", '', 'ReferencedCalculatedDoseReferenceSequence'),  # noqa
     0x30080092: ('IS', '1', "Referenced Calculated Dose Reference Number", '', 'ReferencedCalculatedDoseReferenceNumber'),  # noqa
     0x300800A0: ('SQ', '1', "Beam Limiting Device Leaf Pairs Sequence", '', 'BeamLimitingDeviceLeafPairsSequence'),  # noqa
+    0x300800A1: ('SQ', '1', "Enhanced RT Beam Limiting Device Sequence", '', 'EnhancedRTBeamLimitingDeviceSequence'),  # noqa
+    0x300800A2: ('SQ', '1', "Enhanced RT Beam Limiting Opening Sequence", '', 'EnhancedRTBeamLimitingOpeningSequence'),  # noqa
+    0x300800A3: ('CS', '1', "Enhanced RT Beam Limiting Device Definition Flag", '', 'EnhancedRTBeamLimitingDeviceDefinitionFlag'),  # noqa
+    0x300800A4: ('FD', '2-2n', "Parallel RT Beam Delimiter Opening Extents", '', 'ParallelRTBeamDelimiterOpeningExtents'),  # noqa
     0x300800B0: ('SQ', '1', "Recorded Wedge Sequence", '', 'RecordedWedgeSequence'),  # noqa
     0x300800C0: ('SQ', '1', "Recorded Compensator Sequence", '', 'RecordedCompensatorSequence'),  # noqa
     0x300800D0: ('SQ', '1', "Recorded Block Sequence", '', 'RecordedBlockSequence'),  # noqa
@@ -4766,6 +4898,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30100098: ('SQ', '1', "Tomotherapeutic Control Point Sequence", '', 'TomotherapeuticControlPointSequence'),  # noqa
     0x30100099: ('FD', '1-n', "Tomotherapeutic Leaf Open Durations", '', 'TomotherapeuticLeafOpenDurations'),  # noqa
     0x3010009A: ('FD', '1-n', "Tomotherapeutic Leaf Initial Closed Durations", '', 'TomotherapeuticLeafInitialClosedDurations'),  # noqa
+    0x301000A0: ('SQ', '1', "Conceptual Volume Identification Sequence", '', 'ConceptualVolumeIdentificationSequence'),  # noqa
     0x40000010: ('LT', '1', "Arbitrary", 'Retired', 'Arbitrary'),  # noqa
     0x40004000: ('LT', '1', "Text Comments", 'Retired', 'TextComments'),  # noqa
     0x40080040: ('SH', '1', "Results ID", 'Retired', 'ResultsID'),  # noqa
@@ -4896,6 +5029,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x56000020: ('OF', '1', "Spectroscopy Data", '', 'SpectroscopyData'),  # noqa
     0x7FE00001: ('OV', '1', "Extended Offset Table", '', 'ExtendedOffsetTable'),  # noqa
     0x7FE00002: ('OV', '1', "Extended Offset Table Lengths", '', 'ExtendedOffsetTableLengths'),  # noqa
+    0x7FE00003: ('UV', '1', "Encapsulated Pixel Data Value Total Length", '', 'EncapsulatedPixelDataValueTotalLength'),  # noqa
     0x7FE00008: ('OF', '1', "Float Pixel Data", '', 'FloatPixelData'),  # noqa
     0x7FE00009: ('OD', '1', "Double Float Pixel Data", '', 'DoubleFloatPixelData'),  # noqa
     0x7FE00010: ('OB or OW', '1', "Pixel Data", '', 'PixelData'),  # noqa
