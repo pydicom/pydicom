@@ -34,12 +34,19 @@ UID_dictionary = {
     '1.2.840.10008.1.2.4.94': ('JPIP Referenced', 'Transfer Syntax', '', '', 'JPIPReferenced'),  # noqa
     '1.2.840.10008.1.2.4.95': ('JPIP Referenced Deflate', 'Transfer Syntax', '', '', 'JPIPReferencedDeflate'),  # noqa
     '1.2.840.10008.1.2.4.100': ('MPEG2 Main Profile / Main Level', 'Transfer Syntax', '', '', 'MPEG2MPML'),  # noqa
+    '1.2.840.10008.1.2.4.100.1': ('Fragmentable MPEG2 Main Profile / Main Level', 'Transfer Syntax', '', '', 'MPEG2MPMLF'),  # noqa
     '1.2.840.10008.1.2.4.101': ('MPEG2 Main Profile / High Level', 'Transfer Syntax', '', '', 'MPEG2MPHL'),  # noqa
+    '1.2.840.10008.1.2.4.101.1': ('Fragmentable MPEG2 Main Profile / High Level', 'Transfer Syntax', '', '', 'MPEG2MPHLF'),  # noqa
     '1.2.840.10008.1.2.4.102': ('MPEG-4 AVC/H.264 High Profile / Level 4.1', 'Transfer Syntax', '', '', 'MPEG4HP41'),  # noqa
+    '1.2.840.10008.1.2.4.102.1': ('Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.1', 'Transfer Syntax', '', '', 'MPEG4HP41F'),  # noqa
     '1.2.840.10008.1.2.4.103': ('MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1', 'Transfer Syntax', '', '', 'MPEG4HP41BD'),  # noqa
+    '1.2.840.10008.1.2.4.103.1': ('Fragmentable MPEG-4 AVC/H.264 BD-compatible High Profile / Level 4.1', 'Transfer Syntax', '', '', 'MPEG4HP41BDF'),  # noqa
     '1.2.840.10008.1.2.4.104': ('MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video', 'Transfer Syntax', '', '', 'MPEG4HP422D'),  # noqa
+    '1.2.840.10008.1.2.4.104.1': ('Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 2D Video', 'Transfer Syntax', '', '', 'MPEG4HP422DF'),  # noqa
     '1.2.840.10008.1.2.4.105': ('MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video', 'Transfer Syntax', '', '', 'MPEG4HP423D'),  # noqa
+    '1.2.840.10008.1.2.4.105.1': ('Fragmentable MPEG-4 AVC/H.264 High Profile / Level 4.2 For 3D Video', 'Transfer Syntax', '', '', 'MPEG4HP423DF'),  # noqa
     '1.2.840.10008.1.2.4.106': ('MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2', 'Transfer Syntax', '', '', 'MPEG4HP42STEREO'),  # noqa
+    '1.2.840.10008.1.2.4.106.1': ('Fragmentable MPEG-4 AVC/H.264 Stereo High Profile / Level 4.2', 'Transfer Syntax', '', '', 'MPEG4HP42STEREOF'),  # noqa
     '1.2.840.10008.1.2.4.107': ('HEVC/H.265 Main Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCMP51'),  # noqa
     '1.2.840.10008.1.2.4.108': ('HEVC/H.265 Main 10 Profile / Level 5.1', 'Transfer Syntax', '', '', 'HEVCM10P51'),  # noqa
     '1.2.840.10008.1.2.5': ('RLE Lossless', 'Transfer Syntax', '', '', 'RLELossless'),  # noqa
@@ -108,15 +115,15 @@ UID_dictionary = {
     '1.2.840.10008.5.1.1.15': ('Basic Annotation Box SOP Class', 'SOP Class', '', '', 'BasicAnnotationBox'),  # noqa
     '1.2.840.10008.5.1.1.16': ('Printer SOP Class', 'SOP Class', '', '', 'Printer'),  # noqa
     '1.2.840.10008.5.1.1.16.376': ('Printer Configuration Retrieval SOP Class', 'SOP Class', '', '', 'PrinterConfigurationRetrieval'),  # noqa
-    '1.2.840.10008.5.1.1.17': ('Printer SOP Instance', 'Well-known Printer SOP Instance', '', '', 'PrinterInstance'),  # noqa
-    '1.2.840.10008.5.1.1.17.376': ('Printer Configuration Retrieval SOP Instance', 'Well-known Printer SOP Instance', '', '', 'PrinterConfigurationRetrievalInstance'),  # noqa
+    '1.2.840.10008.5.1.1.17': ('Printer SOP Instance', 'Well-known SOP Instance', '', '', 'PrinterInstance'),  # noqa
+    '1.2.840.10008.5.1.1.17.376': ('Printer Configuration Retrieval SOP Instance', 'Well-known SOP Instance', '', '', 'PrinterConfigurationRetrievalInstance'),  # noqa
     '1.2.840.10008.5.1.1.18': ('Basic Color Print Management Meta SOP Class', 'Meta SOP Class', '', '', 'BasicColorPrintManagementMeta'),  # noqa
     '1.2.840.10008.5.1.1.18.1': ('Referenced Color Print Management Meta SOP Class', 'Meta SOP Class', '', 'Retired', 'ReferencedColorPrintManagementMeta'),  # noqa
     '1.2.840.10008.5.1.1.22': ('VOI LUT Box SOP Class', 'SOP Class', '', '', 'VOILUTBox'),  # noqa
     '1.2.840.10008.5.1.1.23': ('Presentation LUT SOP Class', 'SOP Class', '', '', 'PresentationLUT'),  # noqa
     '1.2.840.10008.5.1.1.24': ('Image Overlay Box SOP Class', 'SOP Class', '', 'Retired', 'ImageOverlayBox'),  # noqa
     '1.2.840.10008.5.1.1.24.1': ('Basic Print Image Overlay Box SOP Class', 'SOP Class', '', 'Retired', 'BasicPrintImageOverlayBox'),  # noqa
-    '1.2.840.10008.5.1.1.25': ('Print Queue SOP Instance', 'Well-known Print Queue SOP Instance', '', 'Retired', 'PrintQueue'),  # noqa
+    '1.2.840.10008.5.1.1.25': ('Print Queue SOP Instance', 'Well-known SOP Instance', '', 'Retired', 'PrintQueueInstance'),  # noqa
     '1.2.840.10008.5.1.1.26': ('Print Queue Management SOP Class', 'SOP Class', '', 'Retired', 'PrintQueueManagement'),  # noqa
     '1.2.840.10008.5.1.1.27': ('Stored Print Storage SOP Class', 'SOP Class', '', 'Retired', 'StoredPrintStorage'),  # noqa
     '1.2.840.10008.5.1.1.29': ('Hardcopy Grayscale Image Storage SOP Class', 'SOP Class', '', 'Retired', 'HardcopyGrayscaleImageStorage'),  # noqa
@@ -283,6 +290,13 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.200.6': ('Protocol Approval Information Model - GET', 'SOP Class', '', '', 'ProtocolApprovalInformationModelGet'),  # noqa
     '1.2.840.10008.5.1.4.1.1.200.7': ('XA Defined Procedure Protocol Storage', 'SOP Class', '', '', 'XADefinedProcedureProtocolStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.200.8': ('XA Performed Procedure Protocol Storage', 'SOP Class', '', '', 'XAPerformedProcedureProtocolStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.1': ('Inventory Storage', 'SOP Class', '', '', 'InventoryStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.2': ('Inventory - FIND', 'SOP Class', '', '', 'InventoryFind'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.3': ('Inventory - MOVE', 'SOP Class', '', '', 'InventoryMove'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.4': ('Inventory - GET', 'SOP Class', '', '', 'InventoryGet'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.5': ('Inventory Creation', 'SOP Class', '', '', 'InventoryCreation'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.6': ('Repository Query', 'SOP Class', '', '', 'RepositoryQuery'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.201.1.1': ('Storage Management SOP Instance', 'Well-known SOP Instance', '', '', 'StorageManagementInstance'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.1': ('RT Image Storage', 'SOP Class', '', '', 'RTImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.2': ('RT Dose Storage', 'SOP Class', '', '', 'RTDoseStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.3': ('RT Structure Set Storage', 'SOP Class', '', '', 'RTStructureSetStorage'),  # noqa
@@ -305,6 +319,9 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.481.20': ('Robotic Radiation Record Storage', 'SOP Class', '', '', 'RoboticRadiationRecordStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.21': ('RT Radiation Set Delivery Instruction Storage', 'SOP Class', '', '', 'RTRadiationSetDeliveryInstructionStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.481.22': ('RT Treatment Preparation Storage', 'SOP Class', '', '', 'RTTreatmentPreparationStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.23': ('Enhanced RT Image Storage', 'SOP Class', '', '', 'EnhancedRTImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.24': ('Enhanced Continuous RT Image Storage', 'SOP Class', '', '', 'EnhancedContinuousRTImageStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.481.25': ('RT Patient Position Acquisition Instruction Storage', 'SOP Class', '', '', 'RTPatientPositionAcquisitionInstructionStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.1': ('DICOS CT Image Storage', 'SOP Class', 'DICOS', '', 'DICOSCTImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.1': ('DICOS Digital X-Ray Image Storage - For Presentation', 'SOP Class', 'DICOS', '', 'DICOSDigitalXRayImageStorageForPresentation'),  # noqa
     '1.2.840.10008.5.1.4.1.1.501.2.2': ('DICOS Digital X-Ray Image Storage - For Processing', 'SOP Class', 'DICOS', '', 'DICOSDigitalXRayImageStorageForProcessing'),  # noqa
