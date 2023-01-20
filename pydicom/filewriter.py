@@ -355,13 +355,6 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
         fp.write(val)  # type: ignore[arg-type]
 
 
-def _encode_and_validate_string(vr: str, value: str,
-                                encodings: Sequence[str]) -> bytes:
-    encoded = encode_string(value, encodings)
-    validate_value(vr, encoded, config.settings.writing_validation_mode)
-    return encoded
-
-
 def write_text(
     fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
 ) -> None:
@@ -374,8 +367,7 @@ def write_text(
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
                 val = b'\\'.join(
-                    [_encode_and_validate_string(elem.VR, val, encodings)
-                     for val in val]
+                    [encode_string(val, encodings) for val in val]
                 )
             else:
                 val = cast(Sequence[bytes], val)
@@ -383,7 +375,7 @@ def write_text(
         else:
             val = cast(Union[bytes, str], val)
             if isinstance(val, str):
-                val = _encode_and_validate_string(elem.VR, val, encodings)
+                val = encode_string(val, encodings)
 
         if len(val) % 2 != 0:
             val = val + b' '  # pad to even length

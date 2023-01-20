@@ -7,7 +7,7 @@ import pytest
 from pydicom.tag import Tag
 from pydicom.values import (
     convert_value, converters, convert_tag, convert_ATvalue, convert_DA_string,
-    convert_text, convert_single_string, convert_AE_string
+    convert_text, convert_single_string, convert_AE_string, convert_PN
 )
 from pydicom.valuerep import VR
 
@@ -79,6 +79,14 @@ class TestConvertText:
         encodings = ['latin_1', 'iso_ir_144', 'iso_ir_126']
         assert 'Buc^Jérôme\\Διονυσιος\\Люкceмбypг' == convert_single_string(
             bytestring, encodings)
+
+    def test_multi_value_with_backslash_in_multibyte_encoding(self):
+        """Test that backslash in multibyte encoding is not mishandled as
+           value separator
+        """
+        bytestring = b'\x1b$BG\\<\\\x1b-A\\\x1b$BK\\L\\\x1b-A'
+        encodings = ['latin_1', 'iso2022_jp']
+        assert ['倍尺', '本目'] == convert_text(bytestring, encodings)
 
     def test_single_value_with_unknown_encoding(self):
         bytestring = b'Buc^J\xe9r\xf4me'
@@ -216,6 +224,35 @@ class TestConvertOValues:
         """Test converting OF."""
         fp = b'\x00\x01\x02\x03'
         assert b'\x00\x01\x02\x03' == converters['OF'](fp, True)
+
+
+class TestConvertPN:
+    def test_valid_PN(self):
+        bytestring = b'John^Doe'
+        assert 'John^Doe' == convert_PN(bytestring)
+
+        bytestring = b'Yamada^Tarou=\x1b$B;3ED\x1b(B^\x1b$BB@O:'
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Yamada^Tarou=山田^太郎' == converted_string
+
+        # 0x5c (\) in multibyte codes
+        bytestring = b'Baishaku^Honme=\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\'
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Baishaku^Honme=倍尺^本目' == converted_string
+
+        # 0x3d (=) in multibyte codes
+        bytestring = b'Sunatouge^Ayano=\x1b$B:=F=\x1b(B^\x1b$B0=G='
+        converted_string = convert_PN(bytestring, ['latin_1', 'iso2022_jp'])
+        assert 'Sunatouge^Ayano=砂峠^綾能' == converted_string
+
+    def test_multi_value(self):
+        """Test that backslash is handled as value separator"""
+        bytestring = (b'Buc^J\xe9r\xf4me\\\x1b\x2d\x46'
+                      b'\xc4\xe9\xef\xed\xf5\xf3\xe9\xef\xf2\\'
+                      b'\x1b$BG\\<\\\x1b(B^\x1b$BK\\L\\')
+        encodings = ['latin_1', 'iso2022_jp', 'iso_ir_126']
+        assert ['Buc^Jérôme', 'Διονυσιος', '倍尺^本目'] == convert_PN(
+            bytestring, encodings)
 
 
 def test_all_converters():

@@ -466,14 +466,22 @@ def convert_PN(
     valuerep.PersonName or MultiValue of PersonName
         The decoded 'PN' value(s).
     """
-    def get_valtype(x: bytes) -> PersonName:
-        return PersonName(x, encodings).decode()
 
-    b_split = byte_string.rstrip(b'\x00 ').split(b'\\')
-    if len(b_split) == 1:
-        return get_valtype(b_split[0])
+    encodings = encodings or [default_encoding]
 
-    return MultiValue(get_valtype, b_split)
+    def get_valtype(x: str) -> PersonName:
+        person_name = PersonName(x, encodings)
+        # Using an already decoded string in PersonName constructor leaves
+        # the original string as undefined, let's set it through encode
+        person_name.encode()
+        return person_name.decode()
+
+    stripped_string = byte_string.rstrip(b'\x00 ')
+    decoded_value = decode_bytes(stripped_string, encodings, TEXT_VR_DELIMS)
+    value_splitted = decoded_value.split('\\')
+    if len(value_splitted) == 1:
+        return get_valtype(value_splitted[0])
+    return MultiValue(get_valtype, value_splitted)
 
 
 def convert_string(
@@ -525,12 +533,18 @@ def convert_text(
     str or list of str
         The decoded value(s).
     """
-    values = byte_string.split(b'\\')
-    as_strings = [convert_single_string(value, encodings, vr)
-                  for value in values]
+    def handle_value(v: str) -> str:
+        if vr is not None:
+            validate_value(
+                vr, v, config.settings.reading_validation_mode)
+        return v.rstrip('\0 ')
+
+    encodings = encodings or [default_encoding]
+    decoded_string = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
+    values = decoded_string.split("\\")
+    as_strings = [handle_value(value) for value in values]
     if len(as_strings) == 1:
         return as_strings[0]
-
     return MultiValue(str, as_strings,
                       validation_mode=config.settings.reading_validation_mode)
 
@@ -555,11 +569,11 @@ def convert_single_string(
     str
         The decoded text.
     """
-    if vr is not None:
-        validate_value(
-            vr, byte_string, config.settings.reading_validation_mode)
     encodings = encodings or [default_encoding]
     value = decode_bytes(byte_string, encodings, TEXT_VR_DELIMS)
+    if vr is not None:
+        validate_value(
+            vr, value, config.settings.reading_validation_mode)
     return value.rstrip('\0 ')
 
 

@@ -936,24 +936,19 @@ class TestDataElementValidation:
     def test_valid_pn(self, value):
         self.check_valid_vr("PN", value)
 
-    def test_write_invalid_length_non_ascii_text(
+    def test_write_valid_length_non_ascii_text(
             self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_implicit_VR = True
         ds.is_little_endian = True
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
-        # the string length is 9, so constructing the data element
-        # is possible
         ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
+        # shall not raise, as the number of characters is considered,
+        # not the number of bytes (which is > 16)
+        dcmread(fp, force=True)
 
-        # encoding the element during writing shall fail,
-        # as the encoded length is 21, while only 16 bytes are allowed for SH
-        msg = r"The value length \(21\) exceeds the maximum length of 16 *"
-        with pytest.raises(ValueError, match=msg):
-            ds.save_as(fp)
-
-    def test_write_invalid_non_ascii_pn(self, enforce_writing_invalid_values):
+    def test_write_valid_non_ascii_pn(self, enforce_writing_invalid_values):
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_implicit_VR = False
@@ -961,25 +956,21 @@ class TestDataElementValidation:
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
         # string length is 40
         ds.add(DataElement(0x00100010, "PN", "洪^吉洞" * 10))
+        # shall not raise, as the number of characters is considered,
+        # not the number of bytes (which is > 64)
+        ds.save_as(fp)
 
-        msg = r"The PN component length \(100\) exceeds the maximum allowed *"
-        with pytest.raises(ValueError, match=msg):
-            ds.save_as(fp)
-
-    def test_read_invalid_length_non_ascii_text(self):
+    def test_read_valid_length_non_ascii_text(self):
         fp = DicomBytesIO()
         ds = Dataset()
         ds.is_implicit_VR = True
         ds.is_little_endian = True
         ds.SpecificCharacterSet = "ISO_IR 192"  # UTF-8
         ds.add(DataElement(0x00080050, "SH", "洪^吉洞=홍^길동"))
-        # disable value validation to write an invalid value
-        with config.disable_value_validation():
-            ds.save_as(fp)
-
-        # no warning will be issued during reading, as only RawDataElement
-        # objects are read
-        ds = dcmread(fp, force=True)
+        # shall not raise, as the number of characters is considered,
+        # not the number of bytes (which is > 16)
+        ds.save_as(fp)
+        dcmread(fp, force=True)
 
     @pytest.mark.parametrize("value, value_type", [
         ("1", "str"), (1.5, "float"), (complex(1, 2), "complex")])
