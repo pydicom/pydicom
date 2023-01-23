@@ -5,7 +5,6 @@
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)
 [![PyPI version](https://badge.fury.io/py/pydicom.svg)](https://badge.fury.io/py/pydicom)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6394735.svg)](https://doi.org/10.5281/zenodo.6394735)
-[![Gitter](https://badges.gitter.im/pydicom/Lobby.svg)](https://gitter.im/pydicom/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # *pydicom*
 
