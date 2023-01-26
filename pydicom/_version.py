@@ -3,12 +3,12 @@ import re
 from typing import cast, Match
 
 
-__version__: str = '2.3.0'
+__version__: str = "2.3.0:GradientHealth"
 
-result = cast(Match[str], re.match(r'(\d+\.\d+\.\d+).*', __version__))
-__version_info__ = tuple(result.group(1).split('.'))
+result = cast(Match[str], re.match(r"(\d+\.\d+\.\d+).*", __version__))
+__version_info__ = tuple(result.group(1).split("."))
 
 
 # DICOM Standard version used for:
 #   _dicom_dict.py, _uid_dict.py and uid.py
-__dicom_version__: str = '2022a'
+__dicom_version__: str = "2022a"
