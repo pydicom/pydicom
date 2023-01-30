@@ -27,6 +27,7 @@ except ImportError:
     HAVE_GDCM_IN_MEMORY_SUPPORT = False
 
 from pydicom import config
+from pydicom.config import logger
 from pydicom.encaps import generate_pixel_data
 import pydicom.uid
 from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
@@ -153,6 +154,9 @@ def create_image(ds: "Dataset", data_element: "DataElement") -> "gdcm.Image":
     pi_type = gdcm.PhotometricInterpretation.GetPIType(
         ds.PhotometricInterpretation
     )
+
+    logger.debug(f"GDCM Photometric Interpretation: {gdcm.PhotometricInterpretation_GetPIString(pi_type)}")
+
     image.SetPhotometricInterpretation(
         gdcm.PhotometricInterpretation(pi_type)
     )
@@ -277,6 +281,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     numpy_dtype = pixel_dtype(ds)
     arr = numpy.frombuffer(pixel_bytearray, dtype=numpy_dtype)
+
 
     expected_length_pixels = get_expected_length(ds, 'pixels')
     if arr.size != expected_length_pixels:

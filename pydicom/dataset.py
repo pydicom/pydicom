@@ -1573,6 +1573,8 @@ class Dataset:
         # Some handler/transfer syntax combinations may need to
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
+
+            logger.debug(f"Handler {handler.HANDLER_NAME} is converting YCbCr to RGB")
             self._pixel_array = convert_color_space(
                 self._pixel_array, 'YBR_FULL', 'RGB'
             )
