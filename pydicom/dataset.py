@@ -1507,6 +1507,11 @@ class Dataset:
             if hh.is_available()
         ]
 
+        logger.debug(f"available_handlers: ")
+        for hh in available_handlers:
+            logger.debug(f"    {hh.HANDLER_NAME}")
+
+
         # There are handlers that support the transfer syntax but none of them
         #   can be used as missing dependencies
         if not available_handlers:
@@ -1530,10 +1535,12 @@ class Dataset:
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
 
+
         last_exception = None
         for handler in available_handlers:
             try:
                 self._do_pixel_data_conversion(handler)
+                logger.debug(f"Using {handler.HANDLER_NAME} for pixel_array conversion")
                 return
             except Exception as exc:
                 logger.debug(
