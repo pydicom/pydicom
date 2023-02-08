@@ -353,7 +353,7 @@ class DataElement:
                 else:
                     value = [self.value]
                 for v in value:
-                    comps = {'Alphabetic': v.components[0]}
+                    comps = {'Alphabetic': v.components[0] if v.components else ''}
                     if len(v.components) > 1:
                         comps['Ideographic'] = v.components[1]
                     if len(v.components) > 2:
