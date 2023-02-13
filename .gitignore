@@ -55,6 +55,8 @@ tests/test_pixel.py
 
 # virtualenv
 env/
+venv/
+.venv/
 
 # pytest
 .pytest_cache
