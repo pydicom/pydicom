@@ -262,16 +262,16 @@ This includes changes such as:
 
 * Adding SOP instances using the :meth:`FileSet.add()
   <pydicom.fileset.FileSet.add>` or :meth:`FileSet.add_custom()
-  <pydicom.fileset.FileSet.add_custom>` methods.
+  <pydicom.fileset.FileSet.add_custom>` methods
 * Removing SOP instances with :meth:`FileSet.remove()
-  <pydicom.fileset.FileSet.remove>`.
+  <pydicom.fileset.FileSet.remove>`
 * Changing one of the following properties:
   :attr:`~pydicom.fileset.FileSet.ID`, :attr:`~pydicom.fileset.FileSet.UID`,
   :attr:`~pydicom.fileset.FileSet.descriptor_file_id` and
-  :attr:`~pydicom.fileset.FileSet.descriptor_character_set`.
+  :attr:`~pydicom.fileset.FileSet.descriptor_character_set`
 * When the :class:`~pydicom.fileset.FileSet` class determines it needs to move
   SOP instances from an existing File-set's directory structure to the
-  structure used by *pydicom*.
+  structure used by *pydicom*
 
 You can tell if changes are staged with the
 :attr:`~pydicom.fileset.FileSet.is_staged` property:
