@@ -1476,6 +1476,7 @@ class Dataset:
                 "system. Please refer to the pydicom documentation for "
                 "information on installing needed packages."
             )
+        logger.debug(f"Using {handler.HANDLER_NAME} for pixel_array conversion")
         # if the conversion fails, the exception is propagated up
         self._do_pixel_data_conversion(handler)
 
