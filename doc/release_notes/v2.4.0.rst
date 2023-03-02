@@ -38,6 +38,7 @@ Fixes
   (:issue:`1702`)
 * Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (:issue:`1667`)
 * Fixed reading LUTData to expected size (:pr:`1747`)
+* Fixed handling of AT VRs when codifying data elements (:issue:`1738`)
 
 Pydicom Internals
 -----------------
