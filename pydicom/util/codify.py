@@ -121,7 +121,12 @@ def code_dataelem(
     except KeyError:
         have_keyword = False
 
-    valuerep = repr(dataelem.value)
+    # If the value representation of the data element is AT (Attribute Tag),
+    # then format it as a tag
+    if dataelem.VR == 'AT':
+        valuerep = tag_repr(dataelem.value)
+    else:
+        valuerep = repr(dataelem.value)
 
     if exclude_size:
         if (
