@@ -171,6 +171,12 @@ class TestCodify:
         out, err = capsys.readouterr()
         assert r"c:\temp\testout.dcm" in out
 
+    def test_code_dataelem_at(self):
+        """Test utils.codify.code_dataelem"""
+        elem = DataElement(0x00000901, 'AT', (0x1234, 0x5678))
+        out = 'ds.OffendingElement = (0x1234, 0x5678)'
+        assert out == code_dataelem(elem)
+
 
 class TestDump:
     """Test the utils.dump module"""
