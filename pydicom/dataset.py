@@ -1476,6 +1476,7 @@ class Dataset:
                 "system. Please refer to the pydicom documentation for "
                 "information on installing needed packages."
             )
+        logger.debug(f"Using {handler.HANDLER_NAME} for pixel_array conversion")
         # if the conversion fails, the exception is propagated up
         self._do_pixel_data_conversion(handler)
 
@@ -1507,6 +1508,11 @@ class Dataset:
             if hh.is_available()
         ]
 
+        logger.debug(f"available_handlers: ")
+        for hh in available_handlers:
+            logger.debug(f"    {hh.HANDLER_NAME}")
+
+
         # There are handlers that support the transfer syntax but none of them
         #   can be used as missing dependencies
         if not available_handlers:
@@ -1530,10 +1536,12 @@ class Dataset:
 
             raise RuntimeError(msg + ', '.join(pkg_msg))
 
+
         last_exception = None
         for handler in available_handlers:
             try:
                 self._do_pixel_data_conversion(handler)
+                logger.debug(f"Using {handler.HANDLER_NAME} for pixel_array conversion")
                 return
             except Exception as exc:
                 logger.debug(
@@ -1566,6 +1574,8 @@ class Dataset:
         # Some handler/transfer syntax combinations may need to
         #   convert the color space from YCbCr to RGB
         if handler.needs_to_convert_to_RGB(self):
+
+            logger.debug(f"Handler {handler.HANDLER_NAME} is converting YCbCr to RGB")
             self._pixel_array = convert_color_space(
                 self._pixel_array, 'YBR_FULL', 'RGB'
             )
