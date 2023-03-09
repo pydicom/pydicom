@@ -3,14 +3,14 @@
 # caution: testing won't work on windows
 
 test-code:
-	py.test pydicom
+	pytest pydicom
 
 test-doc:
 	pytest  doc/*.rst
 
 test-coverage:
 	rm -rf coverage .coverage
-	py.test pydicom --cov-report term-missing --cov=pydicom
+	pytest pydicom --cov-report term-missing --cov=pydicom
 
 test: test-code test-doc
 
@@ -30,5 +30,4 @@ clean:
 	rm -rf examples/.ipynb_checkpoints
 
 code-analysis:
-	flake8 pydicom | grep -v __init__ | grep -v external
-	pylint -E -i y pydicom/ -d E1103,E0611,E1101
+	ruff .

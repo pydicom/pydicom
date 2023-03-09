@@ -18,14 +18,14 @@ jpeg_ls_missing_message = ("jpeg_ls is not available "
 
 
 try:
-    import pydicom.pixel_data_handlers.numpy_handler as numpy_handler
+    from pydicom.pixel_data_handlers import numpy_handler
     HAVE_NP = numpy_handler.HAVE_NP
 except ImportError:
     HAVE_NP = False
     numpy_handler = None
 
 try:
-    import pydicom.pixel_data_handlers.pillow_handler as pillow_handler
+    from pydicom.pixel_data_handlers import pillow_handler
     HAVE_PIL = pillow_handler.HAVE_PIL
     HAVE_JPEG = pillow_handler.HAVE_JPEG
     HAVE_JPEG2K = pillow_handler.HAVE_JPEG2K
@@ -36,14 +36,14 @@ except ImportError:
     HAVE_JPEG2K = False
 
 try:
-    import pydicom.pixel_data_handlers.jpeg_ls_handler as jpeg_ls_handler
+    from pydicom.pixel_data_handlers import jpeg_ls_handler
     HAVE_JPEGLS = jpeg_ls_handler.HAVE_JPEGLS
 except ImportError:
     jpeg_ls_handler = None
     HAVE_JPEGLS = False
 
 try:
-    import pydicom.pixel_data_handlers.gdcm_handler as gdcm_handler
+    from pydicom.pixel_data_handlers import gdcm_handler
     HAVE_GDCM = gdcm_handler.HAVE_GDCM
 except ImportError:
     gdcm_handler = None
