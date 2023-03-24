@@ -3,21 +3,15 @@ name: Linter
 on: pull_request
 
 jobs:
-  ruff-lint:
+  lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - run: pip install --user ruff
     - run: ruff --format=github .
-
-  black-lint:
-    runs-on: ubuntu-latest
-    name: black formatter
-    steps:
-      - uses: actions/checkout@v2
-      - name: black
-        uses: reviewdog/action-black@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          level: warning
-          filter_mode: diff_context
+    - name: black
+      uses: reviewdog/action-black@v2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        level: warning
+        filter_mode: diff_context
