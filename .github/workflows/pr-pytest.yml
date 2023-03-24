@@ -13,21 +13,21 @@ jobs:
         os: [ubuntu-latest]
         python-version: [pypy-3.7]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Initial test environment setup
       run: |
-        python -m pip install -e .
-        python -m pip install -U wheel pytest
+        python -m pip install --editable .
+        python -m pip install --upgrade wheel pytest
     - name: Test with no external libraries
       run: |
         pytest
     - name: Install and test with numpy
       run: |
-        python -m pip install -U numpy
+        python -m pip install --upgrade numpy
         pytest
 
   test-core-only:
@@ -36,44 +36,44 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11-dev']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         include:
           - os: 'ubuntu-latest'
             pytest-args: --cov=pydicom --cov-append
             send-coverage: true
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Get pip cache dir
       id: pip-cache
       run: |
-        python -m pip install -U pip
+        python -m pip install --upgrade pip
         echo "::set-output name=dir::$(pip cache dir)"
 
     - name: pip cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
 
     - name: Cache pydicom test data
       id: cache-testdata
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ env.HOME }}/.pydicom
         key: pydicom-testdata
 
     - name: Initial test environment setup
       run: |
-        python -m pip install -e .
+        python -m pip install --editable .
         python -m pip install wheel pytest pytest-cov
 
     - name: Test core library
@@ -82,7 +82,7 @@ jobs:
 
     - name: Send coverage results
       if: ${{ success() && matrix.send-coverage }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
 
   test-core-extras:
     runs-on: ${{ matrix.os }}
@@ -97,37 +97,37 @@ jobs:
             pytest-args: --cov=pydicom --cov-append
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Get pip cache dir
       id: pip-cache
       run: |
-        python -m pip install -U pip
+        python -m pip install --upgrade pip
         echo "::set-output name=dir::$(pip cache dir)"
 
     - name: pip cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.pip-cache.outputs.dir }}
         key: py${{ matrix.python-version }}-${{ matrix.os }}-pip
 
     - name: Cache pydicom test data
       id: cache-testdata
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ env.HOME }}/.pydicom
         key: pydicom-testdata
 
     - name: Initial test environment setup
       run: |
-        python -m pip install -e .
+        python -m pip install --editable .
         python -m pip install wheel pytest pytest-cov
 
     # Core library tests
@@ -143,25 +143,25 @@ jobs:
     # Pixel data decoding and encoding
     - name: Install and test with numpy
       run: |
-        python -m pip install -U numpy
+        python -m pip install --upgrade numpy
         pytest ${{ matrix.pytest-args }}
 
     - name: Install and test Pillow
       run: |
-        python -m pip install -U pillow
+        python -m pip install --upgrade pillow
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
         python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
       run: |
-        python -m pip install -U cython
+        python -m pip install --upgrade cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py pydicom/tests/test_jpeg_ls_pixel_data.py
         python -m pip uninstall -y CharPyLS
 
     - name: Install and test GDCM
       run: |
-        python -m pip install -U python-gdcm
+        python -m pip install --upgrade python-gdcm
         python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_encoders_gdcm.py
@@ -169,18 +169,18 @@ jobs:
 
     - name: Install and test pylibjpeg
       run: |
-        python -m pip install -U pylibjpeg
+        python -m pip install --upgrade pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
-        python -m pip install -U pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
+        python -m pip install --upgrade pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test all pixel handling
       run: |
-        python -m pip install -U pillow python-gdcm
+        python -m pip install --upgrade pillow python-gdcm
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
         pytest ${{ matrix.pytest-args }}
 
     - name: Send coverage results
       if: ${{ success() && matrix.send-coverage }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
