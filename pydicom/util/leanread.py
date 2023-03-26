@@ -51,7 +51,7 @@ class dicomfile:
     ) -> Optional[bool]:
         self.fobj.close()
 
-        return None
+        return None  # noqa: PLR1711
 
     def __iter__(self) -> Iterator[_ElementType]:
         # Need the transfer_syntax later
