@@ -48,7 +48,7 @@ def RunTree(w, filename):
 
 def show_file(filename, tree):
     tree.hlist.add("root", text=filename)
-    ds = pydicom.dcmread(sys.argv[1])
+    ds = pydicom.dcmread(filename)
     ds.decode()  # change strings to unicode
     recurse_tree(tree, ds, "root", False)
     tree.autosetmode()
