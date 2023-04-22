@@ -51,8 +51,8 @@ handled by the given packages:
 
 +-------------------------------------------------------------+-------+-------------+----------+-----------------+-----------------+
 | Transfer Syntax                                             | NumPy | | NumPy +   | | NumPy +| | NumPy +       | | NumPy +       |
-+------------------------------------+------------------------+       | | JPEG-LS   | | GDCM   | | Pillow        | | pylibjpeg     |
-| Name                               | UID                    |       |             |          |                 |                 |
++------------------------------------+------------------------+       | | JPEG-LS\  | | GDCM   | | Pillow        | | pylibjpeg     |
+| Name                               | UID                    |       |  :sup:`7`   |          |                 |                 |
 +====================================+========================+=======+=============+==========+=================+=================+
 | Explicit VR Little Endian          | 1.2.840.10008.1.2.1    | |chk| | |chk|       | |chk|    |     |chk|       | |chk|           |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
@@ -92,6 +92,7 @@ handled by the given packages:
 | :sup:`4` *with the pylibjpeg-rle plugin and using the* :meth:`~pydicom.dataset.Dataset.decompress` *method, 4-5x faster than default*
 | :sup:`5` *with the pylibjpeg-libjpeg plugin*
 | :sup:`6` *with the pylibjpeg-openjpeg plugin*
+| :sup:`7` *only up to Python 3.10*
 
 Usage
 .....
