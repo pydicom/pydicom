@@ -76,7 +76,7 @@ jobs:
         python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
-      if: ${{ matrix.python-version != '3.12-dev' }}
+      if: ${{ matrix.python-version != '3.11' && matrix.python-version != '3.12-dev' }}
       run: |
         python -m pip install --upgrade cython
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS
@@ -101,7 +101,7 @@ jobs:
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
 
     - name: Test all pixel handling
-      if: ${{ matrix.python-version != '3.12-dev' }}
+      if: ${{ matrix.python-version != '3.11' && matrix.python-version != '3.12-dev' }}
       run: |
         python -m pip install pillow python-gdcm
         python -m pip install git+https://github.com/Who8MyLunch/CharPyLS

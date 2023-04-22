@@ -44,3 +44,4 @@ Pydicom Internals
 -----------------
 * In test suites, renamed 'setup' and 'teardown' methods, deprecated starting
   in pytest 7.2
+* Do not try to use `CharPyLS` with Python > 3.10 (:issue:`1788`)
