@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]  # , "setuptools-scm"]  for auto-version v3.0
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -64,8 +64,11 @@ codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
 
 
-# For pydicom v3.0, uncomment the following lines
-# [tool.setuptools_scm]
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
+# For pydicom v3.0, uncomment the following line
 # write_to = "pydicom/_version.py"
 
 
