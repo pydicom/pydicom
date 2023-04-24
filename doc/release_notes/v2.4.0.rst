@@ -19,6 +19,7 @@ Enhancements
   existing files with float IS values (:issue:`1661`)
 * Improved speed of creating and accessing highly nested structures
   (:issue:`1728`, :pr:`1734`)
+* Switched to a pyproject.toml build process (:pr:`1792`)
 
 Fixes
 -----
