@@ -1,3 +1,77 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+authors = [
+    {name = "Darcy Mason and contributors", email = "darcymason@gmail.com"}
+]
+classifiers=[
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries"
+]
+dependencies = []
+description = "A pure Python package for reading and writing DICOM data"
+#  dynamic = ["version"]  uncomment for pydicom v3.0
+keywords = ["dicom, python, medical, imaging"]
+license = {text = "MIT"}
+name = "pydicom"
+readme = "README.md"
+requires-python = ">=3.7"
+version = "2.4.0dev0" # remove for v3.0
+
+
+[project.optional-dependencies]
+docs = [
+        "numpy",
+        "numpydoc",
+        "matplotlib",
+        "pillow",
+        "sphinx",
+        "sphinx_rtd_theme",
+        "sphinx-gallery",
+        "sphinxcontrib-napoleon",
+        "sphinx-copybutton"
+]
+
+[project.urls]
+documentation = "https://pydicom.github.io/pydicom"
+download = "https://github.com/pydicom/pydicom/archive/master.zip"
+homepage = "https://github.com/pydicom/pydicom"
+repository = "https://github.com/pydicom/pydicom"
+
+
+
+[project.scripts]
+pydicom = "pydicom.cli.main:main"
+
+
+[project.entry-points.pydicom_subcommands]
+codify = "pydicom.cli.codify:add_subparser"
+show = "pydicom.cli.show:add_subparser"
+
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
+# For pydicom v3.0, uncomment the following line
+# write_to = "pydicom/_version.py"
+
+
 [tool.ruff]
 select = [
     "C9",

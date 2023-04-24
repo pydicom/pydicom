@@ -1,3 +1,4 @@
+# Remove setup.py in pydicom v3.0
 import os
 from pathlib import Path
 from setuptools import setup, find_packages
