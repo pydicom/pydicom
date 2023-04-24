@@ -1,0 +1,3 @@
+[codespell]
+skip = _private_dict.py,_concepts_dict.py,test1.json
+ignore-words = .github/codespell_ignore_words.txt
