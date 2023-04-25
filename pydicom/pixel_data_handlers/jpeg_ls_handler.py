@@ -1,6 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """
-Use the `jpeg_ls (CharPyLS) <https://github.com/Who8MyLunch/CharPyLS>`_ Python
+Use the `jpeg_ls (pyjpegls) <https://github.com/pydicom/pyjpegls>`_ Python
 package to decode *Pixel Data*.
 """
 from typing import TYPE_CHECKING, cast
@@ -29,7 +29,7 @@ HANDLER_NAME = 'JPEG-LS'
 
 DEPENDENCIES = {
     'numpy': ('http://www.numpy.org/', 'NumPy'),
-    'jpeg_ls': ('https://github.com/Who8MyLunch/CharPyLS', 'CharPyLS'),
+    'jpeg_ls': ('https://github.com/pydicom/pyjpegls', 'pyjpegls'),
 }
 
 SUPPORTED_TRANSFER_SYNTAXES = [

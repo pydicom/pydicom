@@ -94,8 +94,8 @@ extlinks = {
         'https://github.com/pydicom/%s',
         None
     ),
-    "issue": ("https://github.com/pydicom/pydicom/issues/%s", "#"),
-    "pr": ("https://github.com/pydicom/pydicom/pull/%s", "#"),
+    "issue": ("https://github.com/pydicom/pydicom/issues/%s", "#%s"),
+    "pr": ("https://github.com/pydicom/pydicom/pull/%s", "#%s"),
 }
 
 # intersphinx configuration
