@@ -2,6 +2,7 @@ numpy
 numpydoc
 matplotlib
 pillow
+pydicom
 sphinx
 sphinx_rtd_theme
 sphinx-gallery
