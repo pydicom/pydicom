@@ -26,7 +26,7 @@ Enhancements
   the slowest handler (:issue:`1487`)
 * Added, enhanced, or removed a number of Mitra private dictionary entries (:pr:`1588`)
 * Added support for unpacking bit-packed data without using NumPy to
-  :func:`~pydicom.pixel_data_handlers.utils.unpack_bits`(:pr:`1594`)
+  :func:`~pydicom.pixel_data_handlers.utils.unpack_bits` (:pr:`1594`)
 * Added :func:`~pydicom.pixel_data_handlers.util.expand_ybr422` for expanding
   uncompressed ``YBR_FULL_422`` data to ``YBR_FULL`` (:pr:`1593`)
 * Replacement of ``UN`` VR with ``SQ`` VR for undefined length data elements

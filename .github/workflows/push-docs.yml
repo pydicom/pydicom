@@ -1,0 +1,25 @@
+name: Docs build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build HTML
+      uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "doc/"
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: html-docs
+        path: doc/_build/html/
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      # If pushing into main branch, also deploy to github pages
+      if: github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: doc/_build/html

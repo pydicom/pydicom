@@ -1,0 +1,9 @@
+numpy
+numpydoc
+matplotlib
+pillow
+sphinx
+sphinx_rtd_theme
+sphinx-gallery
+sphinxcontrib-napoleon
+sphinx-copybutton
