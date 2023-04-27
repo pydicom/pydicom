@@ -1,7 +1,10 @@
 name: Docs build
 
-on: [push, pull_request]
-
+on:
+  pull_request
+    branches: master
+  push
+    branches: master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,20 +14,21 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: Build HTML
-      uses: ammaraskar/sphinx-action@master
-      with:
-        pre-build-command: "apt-get update -y && apt-get install -y git && pip install -U -r doc/requirements-docs.txt"
-        docs-folder: "doc/"
+    - name: Install sphinx and requirements
+      run: |
+        apt-get update -y 
+        # git needed by setuptools-scm in pyproject.toml
+        apt-get install -y git
+        pip install -e .
+        pip install -U -r doc/requirements-docs.txt
+    - name: Build Sphinx html
+      run: |
+        cd doc
+        make html
+        cd ..
     - name: Upload artifacts
+      if: success() && github.event_name == "push"
       uses: actions/upload-artifact@v3
       with:
         name: html-docs
         path: doc/_build/html/
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      # If pushing into main branch, also deploy to github pages
-      if: github.ref == 'refs/heads/master'
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: doc/_build/html
