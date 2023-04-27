@@ -15,7 +15,6 @@ jobs:
         python-version: '3.10'
     - name: Install sphinx and requirements
       run: |
-        apt-get update -y 
         # git needed by setuptools-scm in pyproject.toml
         apt-get install -y git
         pip install -e .
