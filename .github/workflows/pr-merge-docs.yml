@@ -16,7 +16,7 @@ jobs:
     - name: Install sphinx and requirements
       run: |
         # git needed by setuptools-scm in pyproject.toml
-        apt-get install -y git
+        sudo apt-get install -y git
         pip install -e .
         pip install -U -r doc/requirements-docs.txt
     - name: Build Sphinx html
