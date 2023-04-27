@@ -1,10 +1,9 @@
 name: Docs build
 
 on:
-  pull_request
+  - pull_request
     branches: master
-  push
-    branches: master
+
 jobs:
   build:
     runs-on: ubuntu-latest
