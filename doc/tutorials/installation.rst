@@ -109,22 +109,23 @@ Through conda::
   conda install pillow
 
 
-Installing CharPyLS
+Installing pyjpegls
 -------------------
 
-`CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_ is a Python interface to
+`pyjpegls <https://github.com/pydicom/pyjpegls>`_ is a Python interface to
 the `CharLS <https://github.com/team-charls/charls>`_ C++ library and can
-decompress JPEG-LS images.
+decompress JPEG-LS images. It is a fork of `CharPyLS <https://github.com/Who8MyLunch/CharPyLS>`_
+created to provide compatibility with the latest Python versions.
 
 Using pip::
 
   pip install cython
-  pip install git+https://github.com/Who8MyLunch/CharPyLS
+  pip install git+https://github.com/pydicom/pyjpegls
 
 Through conda::
 
   conda install cython
-  pip install git+https://github.com/Who8MyLunch/CharPyLS
+  pip install git+https://github.com/pydicom/pyjpegls
 
 
 .. _tut_install_gdcm:

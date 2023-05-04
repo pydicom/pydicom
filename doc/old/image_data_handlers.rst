@@ -22,7 +22,7 @@ The following packages can be used with *pydicom*:
   most compressed formats
 * `Pillow <http://pillow.readthedocs.io/en/latest/>`_, ideally with
   ``jpeg`` and ``jpeg2000`` plugins
-* `jpeg_ls <https://github.com/Who8MyLunch/CharPyLS>`_
+* `jpeg_ls <https://github.com/pydicom/pyjpegls>`_
 * :gh:`pylibjpeg <pylibjpeg>`, with the ``-libjpeg``, ``-openjpeg`` and
   ``-rle`` plugins
 
@@ -51,8 +51,8 @@ handled by the given packages:
 
 +-------------------------------------------------------------+-------+-------------+----------+-----------------+-----------------+
 | Transfer Syntax                                             | NumPy | | NumPy +   | | NumPy +| | NumPy +       | | NumPy +       |
-+------------------------------------+------------------------+       | | JPEG-LS\  | | GDCM   | | Pillow        | | pylibjpeg     |
-| Name                               | UID                    |       |  :sup:`7`   |          |                 |                 |
++------------------------------------+------------------------+       | | JPEG-LS   | | GDCM   | | Pillow        | | pylibjpeg     |
+| Name                               | UID                    |       |             |          |                 |                 |
 +====================================+========================+=======+=============+==========+=================+=================+
 | Explicit VR Little Endian          | 1.2.840.10008.1.2.1    | |chk| | |chk|       | |chk|    |     |chk|       | |chk|           |
 +------------------------------------+------------------------+-------+-------------+----------+-----------------+-----------------+
@@ -92,7 +92,6 @@ handled by the given packages:
 | :sup:`4` *with the pylibjpeg-rle plugin and using the* :meth:`~pydicom.dataset.Dataset.decompress` *method, 4-5x faster than default*
 | :sup:`5` *with the pylibjpeg-libjpeg plugin*
 | :sup:`6` *with the pylibjpeg-openjpeg plugin*
-| :sup:`7` *only up to Python 3.10*
 
 Usage
 .....
