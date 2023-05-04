@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DICOM File-sets and DICOMDIR &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
@@ -38,15 +35,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> pydicom
-            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydicom
+              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -118,7 +119,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
       <li class="breadcrumb-item active">DICOM File-sets and DICOMDIR</li>
       <li class="wy-breadcrumbs-aside">
@@ -131,7 +132,7 @@
              
   <section id="dicom-file-sets-and-dicomdir">
 <h1>DICOM File-sets and DICOMDIR<a class="headerlink" href="#dicom-file-sets-and-dicomdir" title="Permalink to this heading">¶</a></h1>
-<p>This tutorial is about DICOM File-sets and covers</p>
+<p>This tutorial is about DICOM File-sets and covers:</p>
 <ul class="simple">
 <li><p>An introduction to DICOM File-sets and the DICOMDIR file</p></li>
 <li><p>Loading a File-set using the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class and
@@ -160,7 +161,7 @@ Standard</a>.</p>
 <p class="admonition-title">Note</p>
 <p>Despite its name, a DICOMDIR file is not a file system directory and
 can be read using <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> like any other DICOM
-dataset</p>
+dataset.</p>
 </div>
 <p>Every File-set must contain a single file with the filename <code class="docutils literal notranslate"><span class="pre">DICOMDIR</span></code>, the
 location of which is dependent on the type of media used to store the File-set.
@@ -175,7 +176,7 @@ dataset directly unless you know what you’re doing. Even minor changes may
 require recalculating the offsets for each directory record. Use the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> methods (see below) instead.</p>
 </div>
-<p>The DICOMDIR file is used to summarize the contents of the File-set, and is a
+<p>The DICOMDIR file is used to summarize the contents of the File-set and is a
 <em>Media Storage Directory</em> instance that follows the
 <a class="reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/chapter_F.html">Basic Directory IOD</a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pydicom</span> <span class="kn">import</span> <span class="n">dcmread</span>
@@ -358,10 +359,10 @@ This includes changes such as:</p>
 <li><p>Changing one of the following properties:
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.ID" title="pydicom.fileset.FileSet.ID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ID</span></code></a>, <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID" title="pydicom.fileset.FileSet.UID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UID</span></code></a>,
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id" title="pydicom.fileset.FileSet.descriptor_file_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_file_id</span></code></a> and
-<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set" title="pydicom.fileset.FileSet.descriptor_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_character_set</span></code></a>.</p></li>
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set" title="pydicom.fileset.FileSet.descriptor_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_character_set</span></code></a></p></li>
 <li><p>When the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> class determines it needs to move
 SOP instances from an existing File-set’s directory structure to the
-structure used by <em>pydicom</em>.</p></li>
+structure used by <em>pydicom</em></p></li>
 </ul>
 <p>You can tell if changes are staged with the
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.is_staged" title="pydicom.fileset.FileSet.is_staged"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_staged</span></code></a> property:</p>
@@ -393,7 +394,7 @@ instance or the instance itself as a <a class="reference internal" href="../refe
 returns the addition as a <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a>.</p>
 <p>To reduce memory usage, instances staged for addition are written to a
 temporary directory and only copied to the File-set itself when
-<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> is called, however they can still be
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> is called. However, they can still be
 accessed and loaded:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;CT_small.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">instance</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -413,39 +414,39 @@ use the <a class="reference internal" href="../reference/generated/pydicom.files
 <p>The <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add" title="pydicom.fileset.FileSet.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> method uses <em>pydicom’s</em> default
 directory record creation functions to create the necessary records based on
 the SOP instance’s attributes, such as <em>SOP Class UID</em> and <em>Modality</em>.
-Occasionally they may fail when an element required by these functions
+Occasionally, they may fail when an element required by these functions
 is empty or missing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">path</span> <span class="o">=</span> <span class="n">get_testdata_file</span><span class="p">(</span><span class="s2">&quot;rtdose.dcm&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1858</span>, in <span class="n">_recordify</span>
-    <span class="n">record</span> <span class="o">=</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">[</span><span class="n">record_type</span><span class="p">](</span><span class="n">ds</span><span class="p">)</span>
+<span class="w">    </span><span class="n">record</span> <span class="o">=</span> <span class="n">DIRECTORY_RECORDERS</span><span class="p">[</span><span class="n">record_type</span><span class="p">](</span><span class="n">ds</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">2338</span>, in <span class="n">_define_rt_dose</span>
-    <span class="n">_check_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;InstanceNumber&quot;</span><span class="p">,</span> <span class="s2">&quot;DoseSummationType&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="n">_check_dataset</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;InstanceNumber&quot;</span><span class="p">,</span> <span class="s2">&quot;DoseSummationType&quot;</span><span class="p">])</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">2281</span>, in <span class="n">_check_dataset</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <span class="gr">ValueError</span>: <span class="n">The instance&#39;s (0020, 0013) &#39;Instance Number&#39; element cannot be empty</span>
 
-<span class="go">The above exception was the direct cause of the following exception:</span>
+<span class="gt">The above exception was the direct cause of the following exception:</span>
 
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1039</span>, in <span class="n">add</span>
-    <span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">record_gen</span><span class="p">)</span>
+<span class="w">    </span><span class="n">record</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">record_gen</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/fileset.py&quot;</span>, line <span class="m">1860</span>, in <span class="n">_recordify</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <span class="gr">ValueError</span>: <span class="n">Unable to use the default &#39;RT DOSE&#39; record creator as the instance is missing a required element or value. Either update the instance, define your own record creation function or use &#39;FileSet.add_custom()&#39; instead</span>
 </pre></div>
 </div>
-<p>When this occurs you have three choices:</p>
+<p>When this occurs, there are three options:</p>
 <ul class="simple">
 <li><p>Update the instance to include the required element and/or value</p></li>
 <li><p>Override the default record creation functions with your own by modifying
 <a class="reference internal" href="../reference/generated/pydicom.fileset.DIRECTORY_RECORDERS.html#pydicom.fileset.DIRECTORY_RECORDERS" title="pydicom.fileset.DIRECTORY_RECORDERS"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DIRECTORY_RECORDERS</span></code></a></p></li>
 <li><p>Use the <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.add_custom" title="pydicom.fileset.FileSet.add_custom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_custom()</span></code></a> method</p></li>
 </ul>
-<p>From the exception message above we’ve got an empty <em>Instance Number</em>, so
-let’s update the instance and try adding it again:</p>
+<p>According to the exception message above, the <em>Instance Number</em> element is empty.
+Let’s update the instance and try adding it again:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">dcmread</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span><span class="o">.</span><span class="n">InstanceNumber</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -478,7 +479,7 @@ let’s update the instance and try adding it again:</p>
 </pre></div>
 </div>
 <p>To apply the changes we’ve made to the File-set we use
-<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>. For new File-sets we have to supply the
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a>. For new File-sets, we have to supply the
 path where the File-set root directory will be located:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
@@ -518,11 +519,11 @@ as <a class="reference internal" href="../reference/generated/pydicom.fileset.Fi
 new structure. However, if the only modification you’ve made is to remove SOP
 instances or change <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.ID" title="pydicom.fileset.FileSet.ID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ID</span></code></a>,
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.UID" title="pydicom.fileset.FileSet.UID"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UID</span></code></a>,
-<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id" title="pydicom.fileset.FileSet.descriptor_file_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_file_id</span></code></a> or
+<a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_file_id" title="pydicom.fileset.FileSet.descriptor_file_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_file_id</span></code></a>, or
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.descriptor_character_set" title="pydicom.fileset.FileSet.descriptor_character_set"><code class="xref py py-attr docutils literal notranslate"><span class="pre">descriptor_character_set</span></code></a>, then you can pass
 the <em>use_existing</em> keyword parameter to keep the existing directory structure
 and update the DICOMDIR file.</p>
-<p>First we need to copy the existing example File-set to a temporary directory
+<p>First, we need to copy the existing example File-set to a temporary directory
 so we don’t accidentally modify it:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copytree</span><span class="p">,</span> <span class="n">copyfile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
@@ -555,7 +556,7 @@ structure:</p>
 </pre></div>
 </div>
 <p>If you’d just called <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet.write" title="pydicom.fileset.FileSet.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> without
-<em>use_existing</em> then it would’ve moved the SOP instances to the new
+<em>use_existing</em>, then it would’ve moved the SOP instances to the new
 directory structure:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fs</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">dst</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;**/*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]):</span>
@@ -592,7 +593,7 @@ to create new File-sets, and to load, search and modify existing ones.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

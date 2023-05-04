@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Waveforms &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
@@ -38,15 +35,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> pydicom
-            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydicom
+              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -109,7 +110,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
       <li class="breadcrumb-item active">Waveforms</li>
       <li class="wy-breadcrumbs-aside">
@@ -130,11 +131,11 @@
 </ul>
 <p>It’s assumed that you’re already familiar with the <a class="reference internal" href="dataset_basics.html"><span class="doc">dataset basics</span></a>.</p>
 <p><strong>Prerequisites</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install -U pydicom&gt;<span class="o">=</span><span class="m">2</span>.1 numpy matplotlib
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.1<span class="w"> </span>numpy<span class="w"> </span>matplotlib
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy matplotlib
-conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">2</span>.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>matplotlib
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.1
 </pre></div>
 </div>
 <p><strong>References</strong></p>
@@ -188,7 +189,7 @@ defining information for each channel is available in the (5400,0200)
 <span class="gp">... </span>    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
 <span class="gp">... </span>    <span class="k">if</span> <span class="s1">&#39;ChannelSensitivity&#39;</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">:</span>  <span class="c1"># Type 1C, may be absent</span>
 <span class="gp">... </span>        <span class="n">units</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">ChannelSensitivityUnitsSequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">CodeMeaning</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Channel </span><span class="si">{</span><span class="n">ii</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">units</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">Channel 1: Lead I (Einthoven) (microvolt)</span>
 <span class="go">Channel 2: Lead II (microvolt)</span>
@@ -358,7 +359,7 @@ Interpretation</em> element values to match our data representation type:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

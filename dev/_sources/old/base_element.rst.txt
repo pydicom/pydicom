@@ -178,13 +178,13 @@ elements) or tag number::
   >>> elem.VR, elem.value
   ('PN', 'Last^First^mid^pre')
 
-To see whether the :class:`~dataset.Dataset` contains a particular element use
+To see whether the :class:`~dataset.Dataset` contains a particular element, use
 the ``in`` operator with the element's keyword or tag::
 
   >>> "PatientName" in ds  # or (0x0010,0x0010) in ds
   True
 
-To remove an element from the :class:`~dataset.Dataset`  use the ``del``
+To remove an element from the :class:`~dataset.Dataset`, use the ``del``
 operator::
 
   >>> del ds.SoftwareVersions  # or del ds[0x0018, 0x1020]
@@ -222,10 +222,10 @@ code, but is used extensively by :class:`~dataset.Dataset`.
 things:
 
   * :attr:`~dataelem.DataElement.tag` -- the element's tag (as a
-    :class:`~pydicom.tag.BaseTag` object)
+    :class:`~pydicom.tag.BaseTag` object).
   * :attr:`~dataelem.DataElement.VR` -- the element's Value Representation
     -- a two letter :class:`str` that describes to the format of the stored
-    value
+    value.
   * :attr:`~dataelem.DataElement.VM` -- the element's Value Multiplicity as
     an :class:`int`. This is automatically determined from the contents of
     the :attr:`~dataelem.DataElement.value`.
@@ -244,7 +244,7 @@ The :class:`~tag.BaseTag` class is derived from :class:`int`,
 so in effect, it is just a number with some extra behavior:
 
   * :func:`~tag.Tag` is used to create instances of :class:`~tag.BaseTag` and
-    enforces that the DICOM tag fits in the expected 4-byte (group,element)
+    enforces the expected 4-byte (group,element) structure.
   * A :class:`~tag.BaseTag` instance can be created from an :class:`int` or a
     :class:`tuple` containing the (group,element), or from the DICOM keyword::
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Compressing Pixel Data &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
@@ -38,15 +35,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> pydicom
-            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -109,7 +110,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
       <li class="breadcrumb-item active">Compressing <em>Pixel Data</em></li>
       <li class="wy-breadcrumbs-aside">
@@ -135,13 +136,13 @@ by default, but are required for <em>RLE Lossless</em> compression of <em>Pixel 
 For more information on what packages are available to compress a given
 transfer syntax see the <a class="reference internal" href="../../old/image_data_compression.html#guide-compression-supported"><span class="std std-ref">image compression guide</span></a>.</p>
 <p>Installing using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install -U pydicom&gt;<span class="o">=</span><span class="m">2</span>.2 numpy pylibjpeg
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.2<span class="w"> </span>numpy<span class="w"> </span>pylibjpeg
 </pre></div>
 </div>
 <p>Installing on conda:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy
-conda install -c conda-forge pydicom&gt;<span class="o">=</span><span class="m">2</span>.2
-pip install pylibjpeg
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy
+conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom&gt;<span class="o">=</span><span class="m">2</span>.2
+pip<span class="w"> </span>install<span class="w"> </span>pylibjpeg
 </pre></div>
 </div>
 <section id="introduction">
@@ -248,15 +249,15 @@ exception:</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">compress</span>
-    <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
+<span class="w">    </span><span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1697</span>, in <span class="n">&lt;listcomp&gt;</span>
-    <span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
+<span class="w">    </span><span class="n">encoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">frame_iterator</span><span class="p">]</span>
   File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">382</span>, in <span class="n">iter_encode</span>
-    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_array</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="w">    </span><span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_array</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">encoding_plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">209</span>, in <span class="n">_encode_array</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="w">    </span><span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/encoders/base.py&quot;</span>, line <span class="m">533</span>, in <span class="n">_preprocess</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
 <span class="gr">ValueError</span>: <span class="n">Unable to encode as the shape of the ndarray (128, 129) doesn&#39;t match the values for the rows, columns and samples per pixel</span>
 </pre></div>
 </div>
@@ -299,7 +300,7 @@ will be the correct value after recompressing using <em>RLE Lossless</em>.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

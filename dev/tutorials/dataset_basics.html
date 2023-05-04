@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dataset basics: read, access, modify, write &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
@@ -38,15 +35,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> pydicom
-            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydicom
+              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -122,7 +123,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
       <li class="breadcrumb-item active">Dataset basics: read, access, modify, write</li>
       <li class="wy-breadcrumbs-aside">
@@ -205,11 +206,11 @@ exception:</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">887</span>, in <span class="n">dcmread</span>
-    <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="n">specific_tags</span><span class="p">)</span>
+<span class="w">    </span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">specific_tags</span><span class="o">=</span><span class="n">specific_tags</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">678</span>, in <span class="n">read_partial</span>
-    <span class="n">preamble</span> <span class="o">=</span> <span class="n">read_preamble</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+<span class="w">    </span><span class="n">preamble</span> <span class="o">=</span> <span class="n">read_preamble</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/filereader.py&quot;</span>, line <span class="m">631</span>, in <span class="n">read_preamble</span>
-    <span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="s2">&quot;File is missing DICOM File Meta Information &quot;</span>
+<span class="w">    </span><span class="k">raise</span> <span class="n">InvalidDicomError</span><span class="p">(</span><span class="s2">&quot;File is missing DICOM File Meta Information &quot;</span>
 <span class="gr">  pydicom.errors.InvalidDicomError</span>: <span class="n">File is missing DICOM File Meta Information header or the &#39;DICM&#39; prefix is missing from the header. Use force=True to force reading.</span>
 </pre></div>
 </div>
@@ -236,15 +237,15 @@ no matter what the contents of the file are:</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1703</span>, in <span class="n">__str__</span>
-      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">()</span>
+<span class="w">    </span>  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pretty_str</span><span class="p">()</span>
   File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1436</span>, in <span class="n">_pretty_str</span>
-      <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+<span class="w">    </span>  <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
   File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">1079</span>, in <span class="n">__iter__</span>
-      <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+<span class="w">    </span>  <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
   File <span class="nb">&quot;../pydicom/dataset.py&quot;</span>, line <span class="m">833</span>, in <span class="n">__getitem__</span>
-      <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="n">character_set</span><span class="p">)</span>
+<span class="w">    </span>  <span class="bp">self</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataElement_from_raw</span><span class="p">(</span><span class="n">data_elem</span><span class="p">,</span> <span class="n">character_set</span><span class="p">)</span>
   File <span class="nb">&quot;../pydicom/dataelem.py&quot;</span>, line <span class="m">581</span>, in <span class="n">DataElement_from_raw</span>
-      <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="w">    </span>  <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 <span class="gr">  KeyError</span>: <span class="n">&quot;Unknown DICOM tag (6854, 7369) can&#39;t look up VR&quot;</span>
 </pre></div>
 </div>
@@ -274,7 +275,7 @@ no matter what the contents of the file are:</p>
 <span class="go">(0008, 0013) Instance Creation Time              TM: &#39;072731&#39;</span>
 <span class="go">(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.3</span>
 <span class="go">(0008, 0016) SOP Class UID                       UI: CT Image Storage</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 <span class="go">(0010, 1002)  Other Patient IDs Sequence   2 item(s) ----</span>
 <span class="go">    (0010, 0020) Patient ID                          LO: &#39;ABCD1234&#39;</span>
 <span class="go">    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
@@ -282,7 +283,7 @@ no matter what the contents of the file are:</p>
 <span class="go">    (0010, 0020) Patient ID                          LO: &#39;1234ABCD&#39;</span>
 <span class="go">    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
 <span class="go">    ---------</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 <span class="go">(0043, 104e) [Duration of X-ray on]              FL: 10.60060977935791</span>
 <span class="go">(7fe0, 0010) Pixel Data                          OW: Array of 32768 elements</span>
 <span class="go">(fffc, fffc) Data Set Trailing Padding           OB: Array of 126 elements</span>
@@ -393,7 +394,7 @@ on you’ll see how you can use the keyword to do more than accessing the value.
 <span class="go">    (0010, 0020) Patient ID                          LO: &#39;1234ABCD&#39;</span>
 <span class="go">    (0010, 0022) Type of Patient ID                  CS: &#39;TEXT&#39;</span>
 <span class="go">    ---------</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 </pre></div>
 </div>
 <p>This indicates that those elements are part of a sequence, in this case
@@ -535,9 +536,9 @@ to a sequence you’ll get an exception:</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/multival.py&quot;</span>, line <span class="m">63</span>, in <span class="n">append</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_constructor</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_constructor</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
   File <span class="nb">&quot;.../pydicom/sequence.py&quot;</span>, line <span class="m">15</span>, in <span class="n">validate_dataset</span>
-    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Sequence contents must be Dataset instances.&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Sequence contents must be Dataset instances.&#39;</span><span class="p">)</span>
 <span class="gr">  TypeError</span>: <span class="n">Sequence contents must be Dataset instances.</span>
 </pre></div>
 </div>
@@ -689,13 +690,13 @@ required). If it’s unable to do so then an exception will be raised:</p>
 <span class="gt">Traceback (most recent call last):</span>
   File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">1794</span>, in <span class="n">save_as</span>
-    <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span>
+<span class="w">    </span><span class="n">pydicom</span><span class="o">.</span><span class="n">dcmwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">write_like_original</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">925</span>, in <span class="n">dcmwrite</span>
-    <span class="n">enforce_standard</span><span class="o">=</span><span class="ow">not</span> <span class="n">write_like_original</span><span class="p">)</span>
+<span class="w">    </span><span class="n">enforce_standard</span><span class="o">=</span><span class="ow">not</span> <span class="n">write_like_original</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/filewriter.py&quot;</span>, line <span class="m">712</span>, in <span class="n">write_file_meta_info</span>
-    <span class="n">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="p">)</span>
+<span class="w">    </span><span class="n">validate_file_meta</span><span class="p">(</span><span class="n">file_meta</span><span class="p">,</span> <span class="n">enforce_standard</span><span class="p">)</span>
   File <span class="nb">&quot;.../pydicom/dataset.py&quot;</span>, line <span class="m">2372</span>, in <span class="n">validate_file_meta</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Remove final newline</span>
+<span class="w">    </span><span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Remove final newline</span>
 <span class="gr">  ValueError</span>: <span class="n">Missing required File Meta Information elements from &#39;file_meta&#39;:</span>
 <span class="x">          (0002, 0010) TransferSyntaxUID</span>
 </pre></div>
@@ -735,7 +736,7 @@ in looking at our <a class="reference internal" href="../old/pydicom_user_guide.
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

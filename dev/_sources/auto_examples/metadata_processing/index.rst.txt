@@ -24,7 +24,7 @@ metadata of DICOM data.
 .. only:: html
 
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_add_dict_entries_thumb.png
-    :alt: Add dictionary items in the standard DICOM dictionary
+    :alt:
 
   :ref:`sphx_glr_auto_examples_metadata_processing_plot_add_dict_entries.py`
 
@@ -41,7 +41,7 @@ metadata of DICOM data.
 .. only:: html
 
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_sequences_thumb.png
-    :alt: Working with sequences
+    :alt:
 
   :ref:`sphx_glr_auto_examples_metadata_processing_plot_sequences.py`
 
@@ -58,7 +58,7 @@ metadata of DICOM data.
 .. only:: html
 
   .. image:: /auto_examples/metadata_processing/images/thumb/sphx_glr_plot_anonymize_thumb.png
-    :alt: Anonymize DICOM data
+    :alt:
 
   :ref:`sphx_glr_auto_examples_metadata_processing_plot_anonymize.py`
 

@@ -24,7 +24,7 @@ be applied to DICOM images.
 .. only:: html
 
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_downsize_image_thumb.png
-    :alt: Downsize MRI image using pydicom
+    :alt:
 
   :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py`
 
@@ -41,7 +41,7 @@ be applied to DICOM images.
 .. only:: html
 
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_waveforms_thumb.png
-    :alt: Decode and plot Waveform Data
+    :alt:
 
   :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py`
 
@@ -58,7 +58,7 @@ be applied to DICOM images.
 .. only:: html
 
   .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_reslice_thumb.png
-    :alt: Load CT slices and plot axial, sagittal and coronal images
+    :alt:
 
   :ref:`sphx_glr_auto_examples_image_processing_reslice.py`
 

@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_dicomtree.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_dicomtree.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -70,7 +70,7 @@ python3 dicomtree.py
 
     def show_file(filename, tree):
         tree.hlist.add("root", text=filename)
-        ds = pydicom.dcmread(sys.argv[1])
+        ds = pydicom.dcmread(filename)
         ds.decode()  # change strings to unicode
         recurse_tree(tree, ds, "root", False)
         tree.autosetmode()
@@ -123,6 +123,8 @@ python3 dicomtree.py
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

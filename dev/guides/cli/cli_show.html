@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pydicom show command &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
         <script src="../../_static/clipboard.min.js"></script>
@@ -36,15 +33,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> pydicom
-            <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pydicom
+              <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -90,7 +91,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span></code> command</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -108,7 +109,7 @@ from a command-line terminal.</p>
 show some additional options.</p>
 <p>To see the available options, in a command-line terminal, type <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">help</span> <span class="pre">show</span></code>
 or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <span class="pre">show</span> <span class="pre">-h</span></code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom <span class="nb">help</span> show
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span><span class="nb">help</span><span class="w"> </span>show
 <span class="go">usage: pydicom show [-h] [-x] [-t] [-q] filespec</span>
 
 <span class="go">Display all or part of a DICOM file</span>
@@ -129,7 +130,7 @@ or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <
 </pre></div>
 </div>
 <p>The basic command with no options shows all data elements and nested sequences:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>pydicom::CT_small.dcm
 <span class="go">Dataset.file_meta -------------------------------</span>
 <span class="gp gp-VirtualEnv">(0002, 0000)</span> <span class="go">File Meta Information Group Length  UL: 192</span>
 <span class="gp gp-VirtualEnv">(0002, 0001)</span> <span class="go">File Meta Information Version       OB: b&#39;\x00\x01&#39;</span>
@@ -163,10 +164,10 @@ or <code class="docutils literal notranslate"><span class="pre">pydicom</span> <
 from the <em>pydicom</em> test data files rather than from the file system.</p>
 <p>You can also show just parts of the DICOM file by specifying a data element
 using the usual pydicom keyword notation:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom show pydicom::CT_small.dcm::PatientName
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>pydicom::CT_small.dcm::PatientName
 <span class="go">CompressedSamples^CT1</span>
 
-<span class="gp">$ </span>pydicom show pydicom::rtplan.dcm::FractionGroupSequence
+<span class="gp">$ </span>pydicom<span class="w"> </span>show<span class="w"> </span>pydicom::rtplan.dcm::FractionGroupSequence
 <span class="go">[(300a, 0071) Fraction Group Number               IS: &quot;1&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0078)</span> <span class="go">Number of Fractions Planned         IS: &quot;30&quot;</span>
 <span class="gp gp-VirtualEnv">(300a, 0080)</span> <span class="go">Number of Beams                     IS: &quot;1&quot;</span>
@@ -231,7 +232,7 @@ issues list or a pull request to help us expand the list of custom
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

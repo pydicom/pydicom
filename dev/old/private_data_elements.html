@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Private Data Elements &mdash; pydicom 2.4.0dev0 documentation</title>
@@ -19,9 +19,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
         <script src="../_static/clipboard.min.js"></script>
@@ -38,15 +35,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> pydicom
-            <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydicom
+              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 2.4.0dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -111,7 +112,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="pydicom_user_guide.html">pydicom User Guide</a></li>
       <li class="breadcrumb-item active">Private Data Elements</li>
       <li class="wy-breadcrumbs-aside">
@@ -162,12 +163,12 @@ elements using pydicom.</p>
 <span class="go">(0008, 0005) Specific Character Set              CS: &#39;ISO_IR 100&#39;</span>
 <span class="go">(0008, 0008) Image Type                          CS: [&#39;ORIGINAL&#39;, &#39;PRIMARY&#39;, &#39;AX</span>
 <span class="go">IAL&#39;]</span>
-<span class="gp">...</span>
-<span class="gp">...</span>
+<span class="go">...</span>
+<span class="go">...</span>
 <span class="go">(0009, 0010) Private Creator                     LO: &#39;GEMS_IDEN_01&#39;</span>
 <span class="go">(0009, 1001) [Full fidelity]                     LO: &#39;GE_GENESIS_FF&#39;</span>
 <span class="go">(0009, 1002) [Suite id]                          SH: &#39;CT01&#39;</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 </pre></div>
 </div>
 <p>The last two lines in the example above show pydicom’s display of two private
@@ -209,7 +210,7 @@ v1.3) provides convenient functions to manage this:</p>
 <span class="gp">...</span>
 <span class="go">(000b, 0010) Private Creator                     LO: &#39;My company 001&#39;</span>
 <span class="go">(000b, 1001) Private tag data                    SH: &#39;my value&#39;</span>
-<span class="gp">...</span>
+<span class="go">...</span>
 </pre></div>
 </div>
 <p>Standard python operations like <cite>in</cite> and <cite>del</cite> can also be used when working
@@ -250,7 +251,7 @@ lines which may not provide useful information.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2008-2022, Darcy Mason and pydicom contributors.</p>
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

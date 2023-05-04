@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -174,7 +174,7 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.013 seconds)
+   **Total running time of the script:** ( 0 minutes  0.014 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_read_dicom_directory.py:
@@ -182,6 +182,8 @@ This example shows how to read a DICOM :File-set's DICOMDIR dataset.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

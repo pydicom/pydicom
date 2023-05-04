@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_memory_dataset.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_memory_dataset.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -115,6 +115,8 @@ datasets saved as blobs in a database.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

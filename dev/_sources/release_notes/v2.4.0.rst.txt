@@ -19,6 +19,7 @@ Enhancements
   existing files with float IS values (:issue:`1661`)
 * Improved speed of creating and accessing highly nested structures
   (:issue:`1728`, :pr:`1734`)
+* Switched to a pyproject.toml build process (:pr:`1792`)
 
 Fixes
 -----
@@ -38,8 +39,10 @@ Fixes
   (:issue:`1702`)
 * Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (:issue:`1667`)
 * Fixed reading LUTData to expected size (:pr:`1747`)
+* Fixed handling of AT VRs when codifying data elements (:issue:`1738`)
 
 Pydicom Internals
 -----------------
 * In test suites, renamed 'setup' and 'teardown' methods, deprecated starting
   in pytest 7.2
+* Use own fork of `CharPyLS` to handle builds with Python 3.11 (:issue:`1788`)

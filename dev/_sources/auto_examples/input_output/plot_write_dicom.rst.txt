@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_input_output_plot_write_dicom.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_input_output_plot_write_dicom.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -37,32 +37,32 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
     Setting file meta information...
     Setting dataset values...
-    Writing test file /tmp/tmpam1gf3_u.dcm
+    Writing test file /tmp/tmp6jbfkc15.dcm
     File saved.
-    Writing test file as Big Endian Explicit VR /tmp/tmpj50g4zxs.dcm
-    Load file /tmp/tmpam1gf3_u.dcm ...
+    Writing test file as Big Endian Explicit VR /tmp/tmp2kxdld9z.dcm
+    Load file /tmp/tmp6jbfkc15.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20221220'
-    (0008, 0033) Content Time                        TM: '193357.043675'
+    (0008, 0023) Content Date                        DA: '20230504'
+    (0008, 0033) Content Time                        TM: '153556.486030'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpam1gf3_u.dcm ...
-    Load file /tmp/tmpj50g4zxs.dcm ...
+    Remove file /tmp/tmp6jbfkc15.dcm ...
+    Load file /tmp/tmp2kxdld9z.dcm ...
     Dataset.file_meta -------------------------------
     (0002, 0002) Media Storage SOP Class UID         UI: CT Image Storage
     (0002, 0003) Media Storage SOP Instance UID      UI: 1.2.3
     (0002, 0010) Transfer Syntax UID                 UI: Explicit VR Big Endian
     (0002, 0012) Implementation Class UID            UI: 1.2.3.4
     -------------------------------------------------
-    (0008, 0023) Content Date                        DA: '20221220'
-    (0008, 0033) Content Time                        TM: '193357.043675'
+    (0008, 0023) Content Date                        DA: '20230504'
+    (0008, 0033) Content Time                        TM: '153556.486030'
     (0010, 0010) Patient's Name                      PN: 'Test^Firstname'
     (0010, 0020) Patient ID                          LO: '123456'
-    Remove file /tmp/tmpj50g4zxs.dcm ...
+    Remove file /tmp/tmp2kxdld9z.dcm ...
 
 
 
@@ -144,7 +144,7 @@ have to change UIDs to valid values and add all required DICOM data elements.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.005 seconds)
+   **Total running time of the script:** ( 0 minutes  0.006 seconds)
 
 
 .. _sphx_glr_download_auto_examples_input_output_plot_write_dicom.py:
@@ -152,6 +152,8 @@ have to change UIDs to valid values and add all required DICOM data elements.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python
