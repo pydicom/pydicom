@@ -77,8 +77,7 @@ jobs:
 
     - name: Install and test jpeg_ls
       run: |
-        python -m pip install --upgrade cython
-        python -m pip install git+https://github.com/pydicom/pyjpegls
+        python -m pip install pyjpegls
         
         pytest ${{ matrix.pytest-args }} pydicom/tests/test_jpeg_ls_pixel_data.py pydicom/tests/test_JPEG_LS_transfer_syntax.py
         python -m pip uninstall -y pyjpegls
@@ -101,8 +100,7 @@ jobs:
 
     - name: Test all pixel handling
       run: |
-        python -m pip install pillow python-gdcm
-        python -m pip install git+https://github.com/pydicom/pyjpegls
+        python -m pip install pillow python-gdcm pyjpegls
         pytest ${{ matrix.pytest-args }}
 
     - name: Send coverage results
