@@ -119,8 +119,7 @@ created to provide compatibility with the latest Python versions.
 
 Using pip::
 
-  pip install cython
-  pip install git+https://github.com/pydicom/pyjpegls
+  pip install pyjpegls
 
 Through conda::
 
