@@ -44,7 +44,6 @@ And lastly, `pattern` is a str used to filter files against when searching.
 For a real-life example of an external data source you can look at the
 `pydicom-data <https://github.com/pydicom/pydicom-data>`_ repository.
 """
-
 from enum import IntEnum
 import fnmatch
 import os
@@ -338,6 +337,14 @@ def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
     matches = [m for m in data_path.rglob(name)]
     if matches:
         return os.fspath(matches[0])
+
+    if os.getenv("NO_EXTERNAL_DATA") == "1":
+        try:
+            import pytest
+            pytest.skip("Not testing external data files")
+        except ImportError:
+            # ignore if not in test context
+            pass
 
     # Check external data sources
     fpath: Optional[str]

@@ -2,6 +2,8 @@
 
 import pytest
 
+from pydicom import dcmread
+
 try:
     import numpy as np
     HAVE_NP = True
@@ -237,9 +239,12 @@ class TestEncoder:
         """Test the required encoder being unavailable."""
         enc = RLELosslessEncoder
         s = enc.missing_dependencies
-        assert s[0] == "gdcm - requires gdcm"
+        index = 0
+        if not HAVE_GDCM:
+            assert s[index] == "gdcm - requires gdcm"
+            index += 1
         assert (
-            s[1] == "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
+            s[index] == "pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         )
 
     def test_invalid_profile_raises(self):
@@ -273,10 +278,11 @@ class TestEncoder:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestEncoder_Encode:
     """Tests for Encoder.encode() and related methods."""
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, ct_name, rle_mr_name):
         self.enc = RLELosslessEncoder
-        self.ds = get_testdata_file("CT_small.dcm", read=True)
-        self.ds_enc = get_testdata_file("MR_small_RLE.dcm", read=True)
+        self.ds = dcmread(ct_name)
+        self.ds_enc = dcmread(rle_mr_name)
         self.ds_enc_mf = get_testdata_file("emri_small_RLE.dcm", read=True)
         self.bytes = self.ds.PixelData
         self.arr = self.ds.pixel_array
@@ -1050,10 +1056,10 @@ class TestDatasetCompress:
         monkeypatch.delitem(RLELosslessEncoder._available, 'pydicom')
         msg = (
             r"The 'RLE Lossless' encoder is unavailable because its encoding "
-            r"plugins are missing dependencies:\n"
-            r"    gdcm - requires gdcm\n"
-            r"    pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
-        )
+            r"plugins are missing dependencies:\n")
+        if not HAVE_GDCM:
+            msg += r"    gdcm - requires gdcm\n"
+        msg += r"    pylibjpeg - requires numpy, pylibjpeg and pylibjpeg-rle"
         with pytest.raises(RuntimeError, match=msg):
             ds.compress(RLELossless)
 
@@ -1083,9 +1089,9 @@ class TestDatasetCompress:
         assert ds.ExtendedOffsetTableLengths == b'\x66\x53' + b'\x00' * 6
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy is unavailable")
-    def test_round_trip(self):
+    def test_round_trip(self, rle_mr_name):
         """Test an encoding round-trip"""
-        ds = get_testdata_file("MR_small_RLE.dcm", read=True)
+        ds = dcmread(rle_mr_name)
         original = ds.PixelData
         arr = ds.pixel_array
         del ds.PixelData

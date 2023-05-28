@@ -1,8 +1,8 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Benchmarks for the encaps module."""
+import pytest
 
 from pydicom import dcmread
-from pydicom.data import get_testdata_file
 from pydicom.encaps import (
     fragment_frame,
     itemise_frame,
@@ -11,14 +11,12 @@ from pydicom.encaps import (
 )
 
 
-JP2K_10FRAME = get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
-
-
 class TimeFragmentFrame:
     """Time tests for the encaps.fragment_frame function."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, emri_jpeg_2k_lossless_name):
         """Setup the test"""
-        ds = dcmread(JP2K_10FRAME)
+        ds = dcmread(emri_jpeg_2k_lossless_name)
         self.test_data = decode_data_sequence(ds.PixelData)
         assert len(self.test_data) == 10
         self.no_runs = 1000
@@ -38,9 +36,10 @@ class TimeFragmentFrame:
 
 class TimeItemiseFrame:
     """Time tests for the encaps.itemise_frame function."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, emri_jpeg_2k_lossless_name):
         """Setup the test"""
-        ds = dcmread(JP2K_10FRAME)
+        ds = dcmread(emri_jpeg_2k_lossless_name)
         self.test_data = decode_data_sequence(ds.PixelData)
         assert len(self.test_data) == 10
         self.no_runs = 1000
@@ -60,9 +59,10 @@ class TimeItemiseFrame:
 
 class TimeEncapsulate:
     """Time tests for the encaps.encapsulate function."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, emri_jpeg_2k_lossless_name):
         """Setup the test"""
-        ds = dcmread(JP2K_10FRAME)
+        ds = dcmread(emri_jpeg_2k_lossless_name)
         self.test_data = decode_data_sequence(ds.PixelData)
         assert len(self.test_data) == 10
         self.no_runs = 1000

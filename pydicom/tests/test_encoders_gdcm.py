@@ -21,21 +21,13 @@ except ImportError:
     HAVE_GDCM = False
     GDCM_VERSION = [0, 0, 0]
 
-# EXPL: Explicit VR Little Endian
-EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
-EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
-EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
-EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
-EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
-
 
 @pytest.mark.skipif(not HAVE_GDCM, reason='GDCM plugin is not available')
 class TestRLELossless:
     """Tests for encoding RLE Lossless."""
-    def test_cycle_u8_1s_1f(self):
+    def test_cycle_u8_1s_1f(self, mono_8bit_1frame_name):
         """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_8_1_1F)
+        ds = dcmread(mono_8bit_1frame_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
@@ -53,7 +45,7 @@ class TestRLELossless:
 
     def test_cycle_u8_3s_1f(self):
         """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_8_3_1F)
+        ds = dcmread(get_testdata_file("SC_rgb.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
@@ -75,7 +67,7 @@ class TestRLELossless:
 
     def test_cycle_i16_1s_1f(self):
         """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file("MR_small.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -95,7 +87,7 @@ class TestRLELossless:
 
     def test_cycle_u16_3s_1f(self):
         """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_16_3_1F)
+        ds = dcmread(get_testdata_file("SC_rgb_16bit.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
@@ -117,7 +109,7 @@ class TestRLELossless:
 
     def test_cycle_u32_1s_1f(self):
         """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_32_1_1F)
+        ds = dcmread(get_testdata_file("rtdose_1frame.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
@@ -136,9 +128,9 @@ class TestRLELossless:
         assert np.array_equal(ref, arr)
 
     @pytest.mark.skipif(GDCM_VERSION < [3, 0, 10], reason="GDCM bug")
-    def test_cycle_u32_3s_1f(self):
+    def test_cycle_u32_3s_1f(self, rgb_32bit_expl_name):
         """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_32_3_1F)
+        ds = dcmread(rgb_32bit_expl_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
@@ -160,9 +152,9 @@ class TestRLELossless:
         assert np.array_equal(ref, arr)
 
     @pytest.mark.skipif(GDCM_VERSION >= [3, 0, 10], reason="GDCM bug fixed")
-    def test_cycle_u32_3s_1f_raises(self):
+    def test_cycle_u32_3s_1f_raises(self, rgb_32bit_expl_name):
         """Test that 32-bit, 3 sample/px data raises exception."""
-        ds = dcmread(EXPL_32_3_1F)
+        ds = dcmread(rgb_32bit_expl_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
@@ -176,9 +168,9 @@ class TestRLELossless:
         with pytest.raises(RuntimeError, match=msg):
             gdcm_rle_encode(ds.PixelData, **kwargs)
 
-    def test_invalid_byteorder_raises(self):
+    def test_invalid_byteorder_raises(self, mono_8bit_1frame_name):
         """Test that big endian source raises exception."""
-        ds = dcmread(EXPL_8_1_1F)
+        ds = dcmread(mono_8bit_1frame_name)
         enc = RLELosslessEncoder
         kwargs = enc.kwargs_from_ds(ds)
 
@@ -191,9 +183,9 @@ class TestRLELossless:
                 ds.PixelData, encoding_plugin='gdcm', byteorder='>', **kwargs
             )
 
-    def test_above_32bit_raises(self):
+    def test_above_32bit_raises(self, mono_8bit_1frame_name):
         """Test that > 32-bit Bits Allocated raises exception."""
-        ds = dcmread(EXPL_8_1_1F)
+        ds = dcmread(mono_8bit_1frame_name)
         enc = RLELosslessEncoder
         kwargs = enc.kwargs_from_ds(ds)
         kwargs['bits_allocated'] = 64

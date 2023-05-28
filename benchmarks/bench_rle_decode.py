@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Decoding benchmarks for the rle_handler module."""
+import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
@@ -11,36 +12,37 @@ from pydicom.pixel_data_handlers.rle_handler import (
 
 
 # 8/8-bit, 1 sample/pixel, 1 frame
-OB_RLE_1F = get_testdata_file("OBXXXX1A_rle.dcm")
+OB_RLE_1F = "OBXXXX1A_rle.dcm"
 # 8/8-bit, 1 sample/pixel, 2 frame
-OB_RLE_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
+OB_RLE_2F = "OBXXXX1A_rle_2frame.dcm"
 # 8/8-bit, 3 sample/pixel, 1 frame
-SC_RLE_1F = get_testdata_file("SC_rgb_rle.dcm")
+SC_RLE_1F = "SC_rgb_rle.dcm"
 # 8/8-bit, 3 sample/pixel, 2 frame
-SC_RLE_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
+SC_RLE_2F = "SC_rgb_rle_2frame.dcm"
 # 16/16-bit, 1 sample/pixel, 1 frame
-MR_RLE_1F = get_testdata_file("MR_small_RLE.dcm")
+MR_RLE_1F = "MR_small_RLE.dcm"
 # 16/16-bit, 3 sample/pixel, 1 frame
-SC_RLE_16_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
+SC_RLE_16_1F = "SC_rgb_rle_16bit.dcm"
 # 16/16-bit, 3 sample/pixel, 2 frame
-SC_RLE_16_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
+SC_RLE_16_2F = "SC_rgb_rle_16bit_2frame.dcm"
 # 16/12-bit, 1 sample/pixel, 10 frame
-EMRI_RLE_10F = get_testdata_file("emri_small_RLE.dcm")
+EMRI_RLE_10F = "emri_small_RLE.dcm"
 # 32/32-bit, 1 sample/pixel, 1 frame
-RTDOSE_RLE_1F = get_testdata_file("rtdose_rle_1frame.dcm")
+RTDOSE_RLE_1F = "rtdose_rle_1frame.dcm"
 # 32/32-bit, 3 sample/pixel, 1 frame
-SC_RLE_32_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
+SC_RLE_32_1F = "SC_rgb_rle_32bit.dcm"
 # 32/32-bit, 3 sample/pixel, 2 frame
-SC_RLE_32_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
+SC_RLE_32_2F = "SC_rgb_rle_32bit_2frame.dcm"
 # 32/32-bit, 1 sample/pixel, 15 frame
-RTDOSE_RLE_15F = get_testdata_file("rtdose_rle.dcm")
+RTDOSE_RLE_15F = "rtdose_rle.dcm"
 
 
 class TimeRLEDecodeFrame:
     """Time tests for rle_handler._rle_decode_frame."""
+    @pytest.fixture(autouse=True)
     def setup(self):
         # MONOCHROME2, 64x64, 1 sample/pixel, 16 bits allocated, 12 bits stored
-        self.ds = dcmread(EMRI_RLE_10F)
+        self.ds = dcmread(get_testdata_file(EMRI_RLE_10F))
         self.frames = decode_data_sequence(self.ds.PixelData)
         assert len(self.frames) == 10
 
@@ -68,14 +70,15 @@ class TimeRLEDecodeFrame:
 
 class TimeGetPixelData:
     """Time tests for rle_handler.get_pixeldata."""
+    @pytest.fixture(autouse=True)
     def setup(self):
         """Setup the test"""
-        self.ds_8_1_1 = dcmread(OB_RLE_1F)
-        self.ds_8_3_1 = dcmread(SC_RLE_1F)
-        self.ds_16_1_1 = dcmread(MR_RLE_1F)
-        self.ds_16_3_1 = dcmread(SC_RLE_16_1F)
-        self.ds_32_1_1 = dcmread(RTDOSE_RLE_1F)
-        self.ds_32_3_1 = dcmread(SC_RLE_32_1F)
+        self.ds_8_1_1 = dcmread(get_testdata_file(OB_RLE_1F))
+        self.ds_8_3_1 = dcmread(get_testdata_file(SC_RLE_1F))
+        self.ds_16_1_1 = dcmread(get_testdata_file(MR_RLE_1F))
+        self.ds_16_3_1 = dcmread(get_testdata_file(SC_RLE_16_1F))
+        self.ds_32_1_1 = dcmread(get_testdata_file(RTDOSE_RLE_1F))
+        self.ds_32_3_1 = dcmread(get_testdata_file(SC_RLE_32_1F))
 
         self.no_runs = 100
 

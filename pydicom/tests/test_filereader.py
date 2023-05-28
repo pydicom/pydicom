@@ -59,50 +59,27 @@ except ImportError:
 have_jpeg_ls = jpeg_ls is not None
 have_pillow = PILImg is not None
 
-empty_number_tags_name = get_testdata_file(
-    "reportsi_with_empty_number_tags.dcm"
-)
-rtplan_name = get_testdata_file("rtplan.dcm")
-rtdose_name = get_testdata_file("rtdose.dcm")
-ct_name = get_testdata_file("CT_small.dcm")
-mr_name = get_testdata_file("MR_small.dcm")
-truncated_mr_name = get_testdata_file("MR_truncated.dcm")
-jpeg2000_name = get_testdata_file("JPEG2000.dcm")
-jpeg2000_embedded_sequence_delimeter_name = get_testdata_file(
-    "JPEG2000-embedded-sequence-delimiter.dcm"
-)
-jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
-jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
-jpeg_lossless_name = get_testdata_file("JPEG-LL.dcm")
-deflate_name = get_testdata_file("image_dfl.dcm")
-rtstruct_name = get_testdata_file("rtstruct.dcm")
-priv_SQ_name = get_testdata_file("priv_SQ.dcm")
-nested_priv_SQ_name = get_testdata_file("nested_priv_SQ.dcm")
-meta_missing_tsyntax_name = get_testdata_file("meta_missing_tsyntax.dcm")
-no_meta_group_length = get_testdata_file("no_meta_group_length.dcm")
-gzip_name = get_testdata_file("zipMR.gz")
-color_px_name = get_testdata_file("color-px.dcm")
-color_pl_name = get_testdata_file("color-pl.dcm")
-explicit_vr_le_no_meta = get_testdata_file("ExplVR_LitEndNoMeta.dcm")
-explicit_vr_be_no_meta = get_testdata_file("ExplVR_BigEndNoMeta.dcm")
-emri_name = get_testdata_file("emri_small.dcm")
-emri_big_endian_name = get_testdata_file("emri_small_big_endian.dcm")
-emri_jpeg_ls_lossless = get_testdata_file("emri_small_jpeg_ls_lossless.dcm")
-emri_jpeg_2k_lossless = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
-emri_jpeg_2k_lossless_too_short = get_testdata_file(
-    "emri_small_jpeg_2k_lossless_too_short.dcm"
-)
-color_3d_jpeg_baseline = get_testdata_file("color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
+
+
+@pytest.fixture(scope="module")
+def priv_sq_name():
+    yield get_testdata_file("priv_SQ.dcm")
+
+
+@pytest.fixture(scope="module")
+def emri_jpeg_2k_lossless_too_short_name():
+    yield get_testdata_file("emri_small_jpeg_2k_lossless_too_short.dcm")
 
 
 class TestReader:
     def test_empty_numbers_tag(self):
         """Test that an empty tag with a number VR (FL, UL, SL, US,
         SS, FL, FD, OF) reads as ``None``."""
-        empty_number_tags_ds = dcmread(empty_number_tags_name)
+        empty_number_tags_ds = dcmread(get_testdata_file(
+            "reportsi_with_empty_number_tags.dcm"
+        ))
         assert empty_number_tags_ds.ExaminedBodyThickness is None
         assert empty_number_tags_ds.SimpleFrameList is None
         assert empty_number_tags_ds.ReferencePixelX0 is None
@@ -111,22 +88,22 @@ class TestReader:
         assert empty_number_tags_ds.TagSpacingSecondDimension is None
         assert empty_number_tags_ds.VectorGridData is None
 
-    def test_UTF8_filename(self):
+    def test_UTF8_filename(self, rtdose_name):
         utf8_filename = os.path.join(tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(rtdose_name, utf8_filename)
         ds = dcmread(utf8_filename)
         os.remove(utf8_filename)
         assert ds is not None
 
-    def test_pathlib_path_filename(self):
+    def test_pathlib_path_filename(self, priv_sq_name):
         """Check that file can be read using pathlib.Path"""
-        dcmread(Path(priv_SQ_name))
+        dcmread(Path(priv_sq_name))
 
     def test_RTPlan(self):
         """Returns correct values for sample data elements in test
         RT Plan file.
         """
-        plan = dcmread(rtplan_name)
+        plan = dcmread(get_testdata_file("rtplan.dcm"))
         beam = plan.BeamSequence[0]
         # if not two controlpoints, then this would raise exception
         cp0, cp1 = beam.ControlPointSequence
@@ -148,7 +125,7 @@ class TestReader:
             expected = [DS("-100"), DS("100.0")]
             assert got == expected
 
-    def test_RTDose(self):
+    def test_RTDose(self, rtdose_name):
         """Returns correct values for sample data elements in test
         RT Dose file"""
         dose = dcmread(rtdose_name)
@@ -162,7 +139,7 @@ class TestReader:
         ].ReferencedFractionGroupSequence[0]
         assert 1 == fract.ReferencedBeamSequence[0].ReferencedBeamNumber
 
-    def test_CT(self):
+    def test_CT(self, ct_name):
         """Returns correct values for sample data elements in test CT file."""
         ct = dcmread(ct_name)
         assert "1.3.6.1.4.1.5962.2" == ct.file_meta.ImplementationClassUID
@@ -190,19 +167,19 @@ class TestReader:
         assert "[Duration of X-ray on]" == got
 
     @pytest.mark.skipif(not have_numpy, reason="Numpy not installed")
-    def test_CT_PixelData(self):
+    def test_CT_PixelData(self, ct_name):
         """Check that we can read pixel data.
         Tests that we get last one in array.
         """
         ct = dcmread(ct_name)
         assert 909 == ct.pixel_array[-1][-1]
 
-    def test_no_force(self):
+    def test_no_force(self, rtstruct_name):
         """Raises exception if missing DICOM header and force==False."""
         with pytest.raises(InvalidDicomError):
             dcmread(rtstruct_name)
 
-    def test_RTStruct(self):
+    def test_RTStruct(self, rtstruct_name):
         """Returns correct values for sample elements in test RTSTRUCT file."""
         # RTSTRUCT test file has complex nested sequences
         # -- see rtstruct.dump file
@@ -221,7 +198,7 @@ class TestReader:
         got = obs_seq0.ROIPhysicalPropertiesSequence[0].ROIPhysicalProperty
         assert "REL_ELEC_DENSITY" == got
 
-    def test_dir(self):
+    def test_dir(self, rtstruct_name):
         """Returns correct dir attributes for both Dataset and DICOM names
         (python >= 2.6).."""
         # Only python >= 2.6 calls __dir__ for dir() call
@@ -249,7 +226,7 @@ class TestReader:
         for name in expect_in_dir:
             assert name in got_dir
 
-    def test_MR(self):
+    def test_MR(self, mr_name):
         """Returns correct values for sample data elements in test MR file."""
         mr = dcmread(mr_name)
         # (0010, 0010) Patient's Name           'CompressedSamples^MR1'
@@ -265,7 +242,7 @@ class TestReader:
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
-    def test_deflate(self):
+    def test_deflate(self, deflate_name):
         """Returns correct values for sample data elements in test compressed
          (zlib deflate) file
          """
@@ -297,7 +274,7 @@ class TestReader:
         config.replace_un_with_known_vr = replace_un_with_known_vr
         config.assume_implicit_vr_switch = assume_implicit_vr_switch
 
-    def test_no_pixels_read(self):
+    def test_no_pixels_read(self, ct_name):
         """Returns all data elements before pixels using
         stop_before_pixels=False.
         """
@@ -329,7 +306,7 @@ class TestReader:
         test_ds_tags = sorted(test_ds.keys())
         assert ds_tags == test_ds_tags + [Tag(0x7FE0, 0x08)]
 
-    def test_specific_tags(self):
+    def test_specific_tags(self, ct_name):
         """Returns only tags specified by user."""
         ctspecific = dcmread(
             ct_name,
@@ -351,7 +328,7 @@ class TestReader:
         ]
         assert expected == ctspecific_tags
 
-    def test_specific_tags_with_other_unkonwn_length_tags(self):
+    def test_specific_tags_with_other_unkonwn_length_tags(self, rtstruct_name):
         rtstruct_specific = dcmread(
             rtstruct_name,
             force=True,
@@ -369,54 +346,54 @@ class TestReader:
         ]
         assert expected == rtstruct_specific_tags
 
-    def test_specific_tags_with_unknown_length_SQ(self):
+    def test_specific_tags_with_unknown_length_SQ(self, priv_sq_name):
         """Returns only tags specified by user."""
         unknown_len_sq_tag = Tag(0x3F03, 0x1001)
-        tags = dcmread(priv_SQ_name, specific_tags=[unknown_len_sq_tag])
+        tags = dcmread(priv_sq_name, specific_tags=[unknown_len_sq_tag])
         tags = sorted(tags.keys())
         assert [unknown_len_sq_tag] == tags
 
-        tags = dcmread(priv_SQ_name, specific_tags=["PatientName"])
+        tags = dcmread(priv_sq_name, specific_tags=["PatientName"])
         tags = sorted(tags.keys())
         assert [] == tags
 
-    def test_specific_tags_with_unknown_length_tag(self):
+    def test_specific_tags_with_unknown_length_tag(self, emri_jpeg_2k_lossless_name):
         """Returns only tags specified by user."""
         unknown_len_tag = Tag(0x7FE0, 0x0010)  # Pixel Data
-        tags = dcmread(emri_jpeg_2k_lossless, specific_tags=[unknown_len_tag])
+        tags = dcmread(emri_jpeg_2k_lossless_name, specific_tags=[unknown_len_tag])
         tags = sorted(tags.keys())
         # SpecificCharacterSet is always added
         assert [Tag(0x08, 0x05), unknown_len_tag] == tags
 
         tags = dcmread(
-            emri_jpeg_2k_lossless, specific_tags=["SpecificCharacterSet"]
+            emri_jpeg_2k_lossless_name, specific_tags=["SpecificCharacterSet"]
         )
         tags = sorted(tags.keys())
         assert [Tag(0x08, 0x05)] == tags
 
     def test_tag_with_unknown_length_tag_too_short(
-            self, allow_reading_invalid_values):
+            self, allow_reading_invalid_values, emri_jpeg_2k_lossless_too_short_name):
         """Tests handling of incomplete sequence value."""
         # the data set is the same as emri_jpeg_2k_lossless,
         # with the last 8 bytes removed to provoke the EOF error
         unknown_len_tag = Tag(0x7FE0, 0x0010)  # Pixel Data
         with pytest.warns(UserWarning, match="End of file reached*"):
             dcmread(
-                emri_jpeg_2k_lossless_too_short,
+                emri_jpeg_2k_lossless_too_short_name,
                 specific_tags=[unknown_len_tag],
             )
 
     def test_tag_with_unknown_length_tag_too_short_strict(
-            self, enforce_valid_values):
+            self, enforce_valid_values, emri_jpeg_2k_lossless_too_short_name):
         """Tests handling of incomplete sequence value in strict mode."""
         unknown_len_tag = Tag(0x7FE0, 0x0010)  # Pixel Data
         with pytest.raises(EOFError, match="End of file reached*"):
             dcmread(
-                emri_jpeg_2k_lossless_too_short,
+                emri_jpeg_2k_lossless_too_short_name,
                 specific_tags=[unknown_len_tag],
             )
 
-    def test_private_SQ(self):
+    def test_private_SQ(self, priv_sq_name):
         """Can read private undefined length SQ without error."""
         # From issues 91, 97, 98. Bug introduced by fast reading, due to
         #    VR=None in raw data elements, then an undefined length private
@@ -424,7 +401,7 @@ class TestReader:
         #    generating an exception
 
         # Simply read the file, in 0.9.5 this generated an exception
-        dcmread(priv_SQ_name)
+        dcmread(priv_sq_name)
 
     def test_nested_private_SQ(self):
         """Can successfully read a private SQ which contains additional SQs."""
@@ -434,7 +411,7 @@ class TestReader:
         #   Sequences, the first termination sequence encountered actually
         #   belongs to the nested Sequence not the parent, therefore the
         #   remainder of the file is not read in properly
-        ds = dcmread(nested_priv_SQ_name)
+        ds = dcmread(get_testdata_file("nested_priv_SQ.dcm"))
 
         # Make sure that the entire dataset was read in
         pixel_data_tag = TupleTag((0x7FE0, 0x10))
@@ -474,14 +451,14 @@ class TestReader:
         # Issue 108 -- iView example file with no group length (0002,0002)
         # Originally crashed, now check no exception, but also check one item
         #     in file_meta, and second one in followinsg dataset
-        ds = dcmread(no_meta_group_length)
+        ds = dcmread(get_testdata_file("no_meta_group_length.dcm"))
         assert "20111130" == ds.InstanceCreationDate
 
     def test_no_transfer_syntax_in_meta(self):
         """Read file with file_meta, but has no TransferSyntaxUID in it."""
         # From issue 258: if file has file_meta but no TransferSyntaxUID in it,
         #   should assume default transfer syntax
-        ds = dcmread(meta_missing_tsyntax_name)  # is default transfer syntax
+        ds = dcmread(get_testdata_file("meta_missing_tsyntax.dcm"))
 
         # Repeat one test from nested private sequence test to maker sure
         #    file was read correctly
@@ -493,18 +470,18 @@ class TestReader:
         """
         # Example file from CMS XiO 5.0 and above
         # Still need to force read data since there is no 'DICM' marker present
-        ds = dcmread(explicit_vr_le_no_meta, force=True)
+        ds = dcmread(get_testdata_file("ExplVR_LitEndNoMeta.dcm"), force=True)
         assert "20150529" == ds.InstanceCreationDate
 
     def test_explicit_VR_big_endian_no_meta(self, no_datetime_conversion):
         """Read file without file meta with Big Endian Explicit VR dataset."""
         # Example file from CMS XiO 5.0 and above
         # Still need to force read data since there is no 'DICM' marker present
-        ds = dcmread(explicit_vr_be_no_meta, force=True)
+        ds = dcmread(get_testdata_file("ExplVR_BigEndNoMeta.dcm"), force=True)
         assert "20150529" == ds.InstanceCreationDate
 
-    def test_planar_config(self):
-        px_data_ds = dcmread(color_px_name)
+    def test_planar_config(self, color_pl_name):
+        px_data_ds = dcmread(get_testdata_file("color-px.dcm"))
         pl_data_ds = dcmread(color_pl_name)
         assert px_data_ds.PlanarConfiguration != pl_data_ds.PlanarConfiguration
         if have_numpy:
@@ -546,7 +523,7 @@ class TestReader:
         assert "US" == ds[0x00280108].VR
         assert 10 == ds.SmallestPixelValueInSeries
 
-    def test_correct_ambiguous_vr_compressed(self):
+    def test_correct_ambiguous_vr_compressed(self, jpeg_lossless_name):
         """Test correcting compressed Pixel Data read from file"""
         # Create an implicit VR compressed dataset
         ds = dcmread(jpeg_lossless_name)
@@ -559,7 +536,8 @@ class TestReader:
         ds = dcmread(fp, force=True)
         assert "OB" == ds[0x7FE00010].VR
 
-    def test_read_encoded_pixel_data_without_embedded_sequence_delimiter(self):
+    def test_read_encoded_pixel_data_without_embedded_sequence_delimiter(
+            self, jpeg2000_name):
         ds = dcmread(jpeg2000_name)
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
@@ -568,7 +546,7 @@ class TestReader:
         """Test ignoring embedded sequence delimiter in encoded pixel
         data fragment. Reproduces #1140.
         """
-        ds = dcmread(jpeg2000_embedded_sequence_delimeter_name)
+        ds = dcmread(get_testdata_file("JPEG2000-embedded-sequence-delimiter.dcm"))
         assert "OB" == ds[0x7FE00010].VR
         assert 266 == len(ds[0x7FE00010].value)
 
@@ -833,7 +811,7 @@ class TestReader:
         ds = dcmread(get_testdata_file("empty_charset_LEI.dcm"))
         assert ds.read_encoding == ["iso8859"]
 
-    def test_dcmread_does_not_raise(self):
+    def test_dcmread_does_not_raise(self, mr_name):
         """Test that reading from DicomBytesIO does not raise on EOF.
         Regression test for #358."""
         ds = dcmread(mr_name)
@@ -1377,7 +1355,7 @@ class TestDSISnumpy:
         config.DS_numpy(orig_DS_numpy)
 
     @pytest.mark.skipif(have_numpy, reason="Testing import error")
-    def test_IS_numpy_import_error(self):
+    def test_IS_numpy_import_error(self, rtstruct_name):
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
@@ -1385,7 +1363,7 @@ class TestDSISnumpy:
             rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
-    def test_IS_numpy_class(self):
+    def test_IS_numpy_class(self, rtstruct_name):
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
@@ -1396,7 +1374,7 @@ class TestDSISnumpy:
         roi_num = rtss.ROIContourSequence[0].ReferencedROINumber
         assert isinstance(roi_num, numpy.int64)
 
-    def test_IS_not_numpy(self):
+    def test_IS_not_numpy(self, rtstruct_name):
         """Test class of the object matches the config,
         when the config is changed"""
         config.use_IS_numpy = False
@@ -1405,7 +1383,7 @@ class TestDSISnumpy:
         assert isinstance(col, MultiValue)
 
     @pytest.mark.skipif(have_numpy, reason="Testing import error")
-    def test_DS_numpy_import_error(self):
+    def test_DS_numpy_import_error(self, rtstruct_name):
         config.use_DS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         # no numpy, then trying to use numpy raises error
@@ -1413,7 +1391,7 @@ class TestDSISnumpy:
             rtss.ROIContourSequence[0].ContourSequence[0].ContourData
 
     @pytest.mark.skipif(not have_numpy, reason="Testing with numpy only")
-    def test_DS_numpy_class(self):
+    def test_DS_numpy_class(self, rtstruct_name):
         config.use_DS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
@@ -1425,7 +1403,7 @@ class TestDSISnumpy:
         roi_vol = rtss.StructureSetROISequence[0].ROIVolume
         assert isinstance(roi_vol, numpy.float64)
 
-    def test_DS_not_numpy(self):
+    def test_DS_not_numpy(self, rtstruct_name):
         """Test class of the object matches the config."""
         config.use_DS_numpy = False
         rtss = dcmread(rtstruct_name, force=True)
@@ -1472,13 +1450,12 @@ class TestDeferredRead:
     """Test that deferred data element reading (for large size)
     works as expected
     """
-
-    # Copy one of test files and use temporarily, then later remove.
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, ct_name):
+        # Copy one of test files and use temporarily, then later remove.
         self.testfile_name = ct_name + ".tmp"
         shutil.copyfile(ct_name, self.testfile_name)
-
-    def teardown_method(self):
+        yield
         if os.path.exists(self.testfile_name):
             os.remove(self.testfile_name)
 
@@ -1517,14 +1494,14 @@ class TestDeferredRead:
     def test_zipped_deferred(self):
         """Deferred values from a gzipped file works."""
         # Arose from issue 103 "Error for defer_size read of gzip file object"
-        fobj = gzip.open(gzip_name)
+        fobj = gzip.open(get_testdata_file("zipMR.gz"))
         ds = dcmread(fobj, defer_size=1)
         fobj.close()
         # before the fix, this threw an error as file reading was not in
         # the right place, it was re-opened as a normal file, not a zip file
         ds.InstanceNumber
 
-    def test_filelike_deferred(self):
+    def test_filelike_deferred(self, ct_name):
         """Deferred values work with file-like objects."""
         with open(ct_name, "rb") as fp:
             data = fp.read()
@@ -1538,7 +1515,7 @@ class TestDeferredRead:
 
 
 class TestReadTruncatedFile:
-    def testReadFileWithMissingPixelData(self):
+    def testReadFileWithMissingPixelData(self, truncated_mr_name):
         mr = dcmread(truncated_mr_name)
         mr.decode()
         assert "CompressedSamples^MR1" == mr.PatientName
@@ -1555,7 +1532,7 @@ class TestReadTruncatedFile:
         not have_numpy or have_gdcm_handler,
         reason="Missing numpy or GDCM present",
     )
-    def testReadFileWithMissingPixelDataArray(self):
+    def testReadFileWithMissingPixelDataArray(self, truncated_mr_name):
         mr = dcmread(truncated_mr_name)
         mr.decode()
         # Need to escape brackets
@@ -1574,7 +1551,7 @@ class TestFileLike:
     filename
     """
 
-    def test_read_file_given_file_object(self):
+    def test_read_file_given_file_object(self, ct_name):
         """filereader: can read using already opened file............"""
         f = open(ct_name, "rb")
         ct = dcmread(f)
@@ -1603,7 +1580,7 @@ class TestFileLike:
         # exception raised:
         f.close()
 
-    def test_read_file_given_file_like_object(self):
+    def test_read_file_given_file_like_object(self, ct_name):
         """filereader: can read using a file-like (BytesIO) file...."""
         with open(ct_name, "rb") as f:
             file_like = BytesIO(f.read())

@@ -2394,9 +2394,9 @@ class TestFileSet_Modify:
         assert "RT DOSE" == seq[3].DirectoryRecordType
         assert Dataset(ds) == dcmread(paths[0])
 
-    def test_add_rt_structure_set(self, tdir):
+    def test_add_rt_structure_set(self, tdir, rtstruct_name):
         """Test adding an RT Structure Set instance."""
-        ds = dcmread(get_testdata_file("rtstruct.dcm"), force=True)
+        ds = dcmread(rtstruct_name, force=True)
         ds.file_meta = FileMetaDataset()
         ds.file_meta.TransferSyntaxUID = ImplicitVRLittleEndian
         ds.StudyDate = "20201001"

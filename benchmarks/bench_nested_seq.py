@@ -47,9 +47,6 @@ class TimeNestedSeqAccess:
     len_top_sequence = 2000
     dataset = create_nested_test_seq(len_top_sequence)
 
-    def setup(self):
-        pass
-
     def time_iterate_nested_elems(self):
         for func_gp in self.dataset.PerFrameFunctionalGroupsSequence:
             pps_item = func_gp.PlanePositionSequence[0]

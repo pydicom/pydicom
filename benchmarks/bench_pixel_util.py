@@ -2,18 +2,16 @@
 """Benchmarks for the pixel data utilities."""
 
 import numpy as np
+import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.pixel_data_handlers.util import convert_color_space
 
 
-# 32/32, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
-
-
 class TimeConvertColorSpace:
     """Benchmarks for utils.convert_color_space()."""
+    @pytest.fixture(autouse=True)
     def setup(self):
         """Setup the benchmark."""
         self.no_runs = 1000
@@ -24,7 +22,7 @@ class TimeConvertColorSpace:
         self.ybr_full = ds.pixel_array
 
         self.arr_large = np.ones((10, 1024, 1024, 3), dtype=np.uint8)
-        self.arr_32_3_2f = dcmread(EXPL_32_3_2F).pixel_array
+        self.arr_32_3_2f = dcmread(get_testdata_file("SC_rgb_32bit_2frame.dcm")).pixel_array
 
     def time_rgb_ybr(self):
         """Time converting from RGB to YBR color space."""

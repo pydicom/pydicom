@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Encoding benchmarks for the rle_handler module."""
+import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
@@ -8,33 +9,34 @@ from pydicom.uid import RLELossless
 
 
 # 8/8-bit, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
+EXPL_8_1_1F = "OBXXXX1A.dcm"
 # 8/8-bit, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
+EXPL_8_3_1F = "SC_rgb.dcm"
 # 16/16-bit, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
+EXPL_16_1_1F = "MR_small.dcm"
 # 16/16-bit, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
+EXPL_16_3_1F = "SC_rgb_16bit.dcm"
 # 32/32-bit, 1 sample/pixel, 1 frame
-EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
+EXPL_32_1_1F = "rtdose_1frame.dcm"
 # 32/32-bit, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
+EXPL_32_3_1F = "SC_rgb_32bit.dcm"
 
 
 class TimeRLEEncodeFrame:
     """Time tests for rle_handler.rle_encode_frame."""
+    @pytest.fixture(autouse=True)
     def setup(self):
-        ds = dcmread(EXPL_8_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_8_1_1F))
         self.arr8_1 = ds.pixel_array
-        ds = dcmread(EXPL_8_3_1F)
+        ds = dcmread(get_testdata_file(EXPL_8_3_1F))
         self.arr8_3 = ds.pixel_array
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         self.arr16_1 = ds.pixel_array
-        ds = dcmread(EXPL_16_3_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_3_1F))
         self.arr16_3 = ds.pixel_array
-        ds = dcmread(EXPL_32_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_32_1_1F))
         self.arr32_1 = ds.pixel_array
-        ds = dcmread(EXPL_32_3_1F)
+        ds = dcmread(get_testdata_file(EXPL_32_3_1F))
         self.arr32_3 = ds.pixel_array
 
         self.no_runs = 100
@@ -73,9 +75,10 @@ class TimeRLEEncodeFrame:
 # Requires numpy, pylibjpeg, pylibjpeg-rle and python-gdcm
 class TimeDatasetCompress:
     """Test Dataset.compress()."""
+    @pytest.fixture(autouse=True)
     def setup(self):
         # More real-world like dataset
-        self.ds = dcmread(EXPL_8_1_1F)
+        self.ds = dcmread(get_testdata_file(EXPL_8_1_1F))
         self.arr8_1 = self.ds.pixel_array
 
         self.no_runs = 1000

@@ -55,51 +55,49 @@ TEST_JPEG2K = TEST_PIL and HAVE_JPEG2K
 # PI: PhotometricInterpretation
 # FMT_BA_BV_SPX_PR_FRAMESF_PI
 # JPGB: 1.2.840.10008.1.2.4.50 - JPEG Baseline (8-bit only)
-JPGB_08_08_3_0_1F_YBR_FULL = get_testdata_file("SC_rgb_small_odd_jpeg.dcm")
-JPGB_08_08_3_0_120F_YBR_FULL_422 = get_testdata_file("color3d_jpeg_baseline.dcm")  # noqa
+JPGB_08_08_3_0_120F_YBR_FULL_422 = "color3d_jpeg_baseline.dcm"
 # Different subsampling 411, 422, 444
-JPGB_08_08_3_0_1F_YBR_FULL_422_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+np.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_422_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s2.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_411 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n1.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_422 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+n2.dcm")  # noqa
-JPGB_08_08_3_0_1F_YBR_FULL_444 = get_testdata_file("SC_rgb_dcmtk_+eb+cy+s4.dcm")  # noqa
-JPGB_08_08_3_0_1F_RGB = get_testdata_file("SC_jpeg_no_color_transform.dcm")
-JPGB_08_08_3_0_1F_RGB_APP14 = get_testdata_file("SC_jpeg_no_color_transform_2.dcm")  # noqa
+JPGB_08_08_3_0_1F_YBR_FULL_422_411 = "SC_rgb_dcmtk_+eb+cy+np.dcm"
+JPGB_08_08_3_0_1F_YBR_FULL_422_422 = "SC_rgb_dcmtk_+eb+cy+s2.dcm"
+JPGB_08_08_3_0_1F_YBR_FULL_411 = "SC_rgb_dcmtk_+eb+cy+n1.dcm"
+JPGB_08_08_3_0_1F_YBR_FULL_422 = "SC_rgb_dcmtk_+eb+cy+n2.dcm"
+JPGB_08_08_3_0_1F_YBR_FULL_444 = "SC_rgb_dcmtk_+eb+cy+s4.dcm"
+JPGB_08_08_3_0_1F_RGB = "SC_jpeg_no_color_transform.dcm"
+JPGB_08_08_3_0_1F_RGB_APP14 = "SC_jpeg_no_color_transform_2.dcm"
 # JPGE: 1.2.840.10008.1.2.4.51 - JPEG Extended (Process 2 and 4) (8 and 12-bit)
 # No supported datasets available
 
 # JPEG 2000 - ISO/IEC 15444 Standard
 # J2KR: 1.2.840.100008.1.2.4.90 - JPEG 2000 Lossless
-J2KR_08_08_3_0_1F_YBR_ICT = get_testdata_file("US1_J2KR.dcm")
-J2KR_16_10_1_0_1F_M1 = get_testdata_file("RG3_J2KR.dcm")
-J2KR_16_12_1_0_1F_M2 = get_testdata_file("MR2_J2KR.dcm")
-J2KR_16_15_1_0_1F_M1 = get_testdata_file("RG1_J2KR.dcm")
-J2KR_16_16_1_0_10F_M2 = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
-J2KR_16_14_1_1_1F_M2 = get_testdata_file("693_J2KR.dcm")
-J2KR_16_16_1_1_1F_M2 = get_testdata_file("MR_small_jp2klossless.dcm")
-J2KR_16_13_1_1_1F_M2_MISMATCH = get_testdata_file("J2K_pixelrep_mismatch.dcm")
+J2KR_08_08_3_0_1F_YBR_ICT = "US1_J2KR.dcm"
+J2KR_16_10_1_0_1F_M1 = "RG3_J2KR.dcm"
+J2KR_16_12_1_0_1F_M2 = "MR2_J2KR.dcm"
+J2KR_16_15_1_0_1F_M1 = "RG1_J2KR.dcm"
+J2KR_16_16_1_0_10F_M2 = "emri_small_jpeg_2k_lossless.dcm"
+J2KR_16_14_1_1_1F_M2 = "693_J2KR.dcm"
+J2KR_16_16_1_1_1F_M2 = "MR_small_jp2klossless.dcm"
+J2KR_16_13_1_1_1F_M2_MISMATCH = "J2K_pixelrep_mismatch.dcm"
 # J2KI: 1.2.840.10008.1.2.4.91 - JPEG 2000
-J2KI_08_08_3_0_1F_RGB = get_testdata_file("SC_rgb_gdcm_KY.dcm")
-J2KI_08_08_3_0_1F_YBR_ICT = get_testdata_file("US1_J2KI.dcm")
-J2KI_16_10_1_0_1F_M1 = get_testdata_file("RG3_J2KI.dcm")
-J2KI_16_12_1_0_1F_M2 = get_testdata_file("MR2_J2KI.dcm")
-J2KI_16_15_1_0_1F_M1 = get_testdata_file("RG1_J2KI.dcm")
-J2KI_16_14_1_1_1F_M2 = get_testdata_file("693_J2KI.dcm")
-J2KI_16_16_1_1_1F_M2 = get_testdata_file("JPEG2000.dcm")
+J2KI_08_08_3_0_1F_RGB = "SC_rgb_gdcm_KY.dcm"
+J2KI_08_08_3_0_1F_YBR_ICT = "US1_J2KI.dcm"
+J2KI_16_10_1_0_1F_M1 = "RG3_J2KI.dcm"
+J2KI_16_12_1_0_1F_M2 = "MR2_J2KI.dcm"
+J2KI_16_15_1_0_1F_M1 = "RG1_J2KI.dcm"
+J2KI_16_14_1_1_1F_M2 = "693_J2KI.dcm"
+J2KI_16_16_1_1_1F_M2 = "JPEG2000.dcm"
 
 # Transfer syntaxes supported by other handlers
-IMPL = get_testdata_file("MR_small_implicit.dcm")
-EXPL = get_testdata_file("OBXXXX1A.dcm")
-EXPB = get_testdata_file("OBXXXX1A_expb.dcm")
-DEFL = get_testdata_file("image_dfl.dcm")
-JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-RLE = get_testdata_file("MR_small_RLE.dcm")
-JPGE_16_12_1_0_1F_M2 = get_testdata_file("JPEG-lossy.dcm")
-JPGL_16_16_1_1_1F_M2 = get_testdata_file("JPEG-LL.dcm")
+IMPL = "MR_small_implicit.dcm"
+EXPL = "OBXXXX1A.dcm"
+EXPB = "OBXXXX1A_expb.dcm"
+DEFL = "image_dfl.dcm"
+JPEG_LS_LOSSLESS = "MR_small_jpeg_ls_lossless.dcm"
+RLE = "MR_small_RLE.dcm"
+JPGE_16_12_1_0_1F_M2 = "JPEG-lossy.dcm"
 # JPGL14: 1.2.840.10008.1.2.4.57 - JPEG Lossless P14
 # No datasets available
 # JPGL: 1.2.840.10008.1.2.4.70 - JPEG Lossless, Non-hierarchical, 1st Order
-JPGL_08_08_1_0_1F = get_testdata_file("JPGLosslessP14SV1_1s_1f_8b.dcm")
+JPGL_08_08_1_0_1F = "JPGLosslessP14SV1_1s_1f_8b.dcm"
 
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
@@ -153,43 +151,44 @@ class TestNoNumpy_NoPillowHandler:
         assert not HAVE_NP
         assert PIL_HANDLER is not None
 
-    def test_can_access_supported_dataset(self):
+    def test_can_access_supported_dataset(
+            self, jpeg_lossless_name, color_3d_jpeg_baseline_name, jpeg_lossy_name):
         """Test that we can read and access elements in dataset."""
         # JPEG Baseline
-        ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
+        ds = dcmread(color_3d_jpeg_baseline_name)
         assert 'PLA' == ds.PatientName
         assert 6108928 == len(ds.PixelData)
 
         # JPEG Extended
-        ds = dcmread(JPGE_16_12_1_0_1F_M2)
+        ds = dcmread(jpeg_lossy_name)
         assert 'CompressedSamples^NM1' == ds.PatientName
         assert 6846 == len(ds.PixelData)
 
         # JPEG Lossless
-        ds = dcmread(JPGL_16_16_1_1_1F_M2)
+        ds = dcmread(jpeg_lossless_name)
         assert 'CompressedSamples^NM1' == ds.PatientName
         assert 116076 == len(ds.PixelData)
 
         # JPEG 2000
-        ds = dcmread(J2KR_16_10_1_0_1F_M1)
+        ds = dcmread(get_testdata_file(J2KR_16_10_1_0_1F_M1))
         assert 'CompressedSamples^RG3' == ds.PatientName
         assert 830542 == len(ds.PixelData)
 
         # JPEG 2000 Lossless
-        ds = dcmread(J2KI_08_08_3_0_1F_RGB)
+        ds = dcmread(get_testdata_file(J2KI_08_08_3_0_1F_RGB))
         assert 'Lestrade^G' == ds.PatientName
         assert 1286 == len(ds.PixelData)
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
-        ds = dcmread(IMPL)
+        ds = dcmread(get_testdata_file(IMPL))
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
@@ -197,7 +196,7 @@ class TestNoNumpy_NoPillowHandler:
                 ds.pixel_array
 
     def test_using_pillow_handler_raises(self):
-        ds = dcmread(J2KI_08_08_3_0_1F_RGB)
+        ds = dcmread(get_testdata_file(J2KI_08_08_3_0_1F_RGB))
         msg = ("The pixel data handler 'pillow' is not available on your "
                "system. Please refer to the pydicom documentation*")
         with pytest.raises(RuntimeError, match=msg):
@@ -239,7 +238,7 @@ JPEG_MATCHING_DATASETS = [
     # (compressed, reference, hard coded check values)
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_411,
-        get_testdata_file("SC_rgb_dcmtk_ebcynp_dcmd.dcm"),
+        "SC_rgb_dcmtk_ebcynp_dcmd.dcm",
         [
             (253, 1, 0), (253, 128, 132), (0, 255, 5), (127, 255, 127),
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
@@ -249,7 +248,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422_422,
-        get_testdata_file("SC_rgb_dcmtk_ebcys2_dcmd.dcm"),
+        "SC_rgb_dcmtk_ebcys2_dcmd.dcm",
         [
             (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
             (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
@@ -258,7 +257,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_411,
-        get_testdata_file("SC_rgb_dcmtk_ebcyn1_dcmd.dcm"),
+        "SC_rgb_dcmtk_ebcyn1_dcmd.dcm",
         [
             (253, 1, 0), (253, 128, 132), (0, 255, 5), (127, 255, 127),
             (1, 0, 254), (127, 128, 255), (0, 0, 0), (64, 64, 64),
@@ -268,7 +267,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_422,
-        get_testdata_file("SC_rgb_dcmtk_ebcyn2_dcmd.dcm"),
+        "SC_rgb_dcmtk_ebcyn2_dcmd.dcm",
         [
             (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
             (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
@@ -277,7 +276,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_YBR_FULL_444,
-        get_testdata_file("SC_rgb_dcmtk_ebcys4_dcmd.dcm"),
+        "SC_rgb_dcmtk_ebcys4_dcmd.dcm",
         [
             (254, 0, 0), (255, 127, 127), (0, 255, 5), (129, 255, 129),
             (0, 0, 254), (128, 127, 255), (0, 0, 0), (64, 64, 64),
@@ -286,7 +285,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB,
-        get_testdata_file("SC_rgb_jpeg_dcmd.dcm"),
+        "SC_rgb_jpeg_dcmd.dcm",
         [
             (244, 244, 244), (244, 244, 244), (244, 244, 244), (244, 244, 244),
             (236, 237, 234), (244, 244, 244), (244, 244, 244), (244, 244, 244),
@@ -295,7 +294,7 @@ JPEG_MATCHING_DATASETS = [
     ),
     pytest.param(
         JPGB_08_08_3_0_1F_RGB_APP14,
-        get_testdata_file("SC_rgb_jpeg_app14_dcmd.dcm"),
+        "SC_rgb_jpeg_app14_dcmd.dcm",
         [
             (246, 246, 246), (246, 246, 246), (246, 246, 246), (246, 246, 246),
             (246, 246, 246), (244, 244, 246), (246, 246, 246), (246, 246, 246),
@@ -307,78 +306,78 @@ JPEG2K_MATCHING_DATASETS = [
     # (compressed, reference, fixes)
     pytest.param(
         J2KR_08_08_3_0_1F_YBR_ICT,
-        get_testdata_file("US1_UNCR.dcm"),
+        "US1_UNCR.dcm",
         {},
     ),
     pytest.param(
         J2KR_16_10_1_0_1F_M1,
-        get_testdata_file("RG3_UNCR.dcm"),
+        "RG3_UNCR.dcm",
         {},
     ),
     pytest.param(
         J2KR_16_12_1_0_1F_M2,
-        get_testdata_file("MR2_UNCR.dcm"),
+        "MR2_UNCR.dcm",
         {},
     ),
     pytest.param(
         J2KR_16_15_1_0_1F_M1,
-        get_testdata_file("RG1_UNCR.dcm"),
+        "RG1_UNCR.dcm",
         {},
     ),
     pytest.param(
         J2KR_16_16_1_0_10F_M2,
-        get_testdata_file("emri_small.dcm"),
+        "emri_small.dcm",
         {'BitsStored': 16},
     ),
     pytest.param(
         J2KR_16_14_1_1_1F_M2,
-        get_testdata_file("693_UNCR.dcm"),
+        "693_UNCR.dcm",
         {'BitsStored': 14},
     ),
     pytest.param(
         J2KR_16_16_1_1_1F_M2,
-        get_testdata_file("MR_small.dcm"),
+        "MR_small.dcm",
         {},
     ),
     pytest.param(
         J2KI_08_08_3_0_1F_RGB,
-        get_testdata_file("SC_rgb_gdcm2k_uncompressed.dcm"),
+        "SC_rgb_gdcm2k_uncompressed.dcm",
         {},
     ),
     pytest.param(
         J2KI_08_08_3_0_1F_YBR_ICT,
-        get_testdata_file("US1_UNCI.dcm"),
+        "US1_UNCI.dcm",
         {},
     ),
     pytest.param(
         J2KI_16_10_1_0_1F_M1,
-        get_testdata_file("RG3_UNCI.dcm"),
+        "RG3_UNCI.dcm",
         {},
     ),
     pytest.param(
         J2KI_16_12_1_0_1F_M2,
-        get_testdata_file("MR2_UNCI.dcm"),
+        "MR2_UNCI.dcm",
         {},
     ),
     pytest.param(
         J2KI_16_15_1_0_1F_M1,
-        get_testdata_file("RG1_UNCI.dcm"),
+        "RG1_UNCI.dcm",
         {},
     ),
     pytest.param(
         J2KI_16_14_1_1_1F_M2,
-        get_testdata_file("693_UNCI.dcm"),
+        "693_UNCI.dcm",
         {'BitsStored': 16},
     ),
     pytest.param(
         J2KI_16_16_1_1_1F_M2,
-        get_testdata_file("JPEG2000_UNC.dcm"),
+        "JPEG2000_UNC.dcm",
         {},
     ),
 ]
 
 
-@pytest.mark.skipif(not HAVE_JPEG2K, reason='Pillow or JPEG2K not available')
+@pytest.mark.skipif(not TEST_JPEG2K, reason='Pillow or JPEG2K not available')
 class TestPillowHandler_JPEG2K:
     """Tests for handling Pixel Data with the handler."""
     def setup_method(self):
@@ -402,7 +401,7 @@ class TestPillowHandler_JPEG2K:
         """Test pixel_array raises exception for unsupported syntaxes."""
         pydicom.config.pixel_data_handlers = [PIL_HANDLER]
 
-        ds = dcmread(EXPL)
+        ds = dcmread(get_testdata_file(EXPL))
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -411,7 +410,7 @@ class TestPillowHandler_JPEG2K:
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
 
@@ -421,7 +420,7 @@ class TestPillowHandler_JPEG2K:
         if data[0] not in JPEG2K_SUPPORTED_SYNTAXES:
             return
 
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -442,7 +441,7 @@ class TestPillowHandler_JPEG2K:
     @pytest.mark.parametrize('fpath, rpath, fixes', JPEG2K_MATCHING_DATASETS)
     def test_array(self, fpath, rpath, fixes):
         """Test pixel_array returns correct values."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         # May need to correct some element values
         for kw, val in fixes.items():
             setattr(ds, kw, val)
@@ -450,12 +449,12 @@ class TestPillowHandler_JPEG2K:
         if 'YBR_FULL' in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
-        ref = dcmread(rpath).pixel_array
+        ref = dcmread(get_testdata_file(rpath)).pixel_array
         assert np.array_equal(arr, ref)
 
     def test_warning(self):
         """Test that the precision warning works OK."""
-        ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds = dcmread(get_testdata_file(J2KR_16_14_1_1_1F_M2))
         msg = (
             r"The \(0028,0101\) 'Bits Stored' value \(16-bit\) doesn't match "
             r"the JPEG 2000 data \(14-bit\). It's recommended that you "
@@ -466,7 +465,7 @@ class TestPillowHandler_JPEG2K:
 
     def test_decompress_using_pillow(self):
         """Test decompressing JPEG2K with pillow handler succeeds."""
-        ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds = dcmread(get_testdata_file(J2KR_16_14_1_1_1F_M2))
         ds.BitsStored = 14
         ds.decompress(handler_name='pillow')
         arr = ds.pixel_array
@@ -477,7 +476,7 @@ class TestPillowHandler_JPEG2K:
     def test_changing_bits_stored(self):
         """Test changing BitsStored affects the pixel data."""
         pydicom.config.APPLY_J2K_CORRECTIONS = False
-        ds = dcmread(J2KR_16_14_1_1_1F_M2)
+        ds = dcmread(get_testdata_file(J2KR_16_14_1_1_1F_M2))
         assert 16 == ds.BitsStored
         with pytest.warns(UserWarning):
             arr = ds.pixel_array
@@ -488,7 +487,7 @@ class TestPillowHandler_JPEG2K:
 
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
-        ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        ds = dcmread(get_testdata_file(J2KR_16_13_1_1_1F_M2_MISMATCH))
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
@@ -511,7 +510,7 @@ class TestPillowHandler_JPEG2K:
         )
 
 
-@pytest.mark.skipif(not HAVE_JPEG, reason='Pillow or JPEG not available')
+@pytest.mark.skipif(not TEST_JPEG, reason='Pillow or JPEG not available')
 class TestPillowHandler_JPEG:
     """Tests for handling Pixel Data with the handler."""
     def setup_method(self):
@@ -533,7 +532,7 @@ class TestPillowHandler_JPEG:
         """Test pixel_array raises exception for unsupported syntaxes."""
         pydicom.config.pixel_data_handlers = [PIL_HANDLER]
 
-        ds = dcmread(EXPL)
+        ds = dcmread(get_testdata_file(EXPL))
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises((NotImplementedError, RuntimeError)):
@@ -542,7 +541,7 @@ class TestPillowHandler_JPEG:
     @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
 
@@ -552,7 +551,7 @@ class TestPillowHandler_JPEG:
         if data[0] not in JPEG_SUPPORTED_SYNTAXES:
             return
 
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.BitsAllocated == data[1]
         assert ds.SamplesPerPixel == data[2]
@@ -567,12 +566,12 @@ class TestPillowHandler_JPEG:
     @pytest.mark.parametrize('fpath, rpath, values', JPEG_MATCHING_DATASETS)
     def test_array(self, fpath, rpath, values):
         """Test pixel_array returns correct values."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         arr = ds.pixel_array
         if 'YBR' in ds.PhotometricInterpretation:
             arr = convert_color_space(arr, ds.PhotometricInterpretation, 'RGB')
 
-        ref = dcmread(rpath).pixel_array
+        ref = dcmread(get_testdata_file(rpath)).pixel_array
 
         if values:
             assert tuple(arr[5, 50, :]) == values[0]
@@ -590,7 +589,7 @@ class TestPillowHandler_JPEG:
 
     def test_color_3d(self):
         """Test decoding JPEG with pillow handler succeeds."""
-        ds = dcmread(JPGB_08_08_3_0_120F_YBR_FULL_422)
+        ds = dcmread(get_testdata_file("color3d_jpeg_baseline.dcm"))
         assert "YBR_FULL_422" == ds.PhotometricInterpretation
         arr = ds.pixel_array
         assert arr.flags.writeable
@@ -604,7 +603,7 @@ class TestPillowHandler_JPEG:
 
     def test_JPGE_16bit_raises(self):
         """Test decoding JPEG lossy with pillow handler fails."""
-        ds = dcmread(JPGE_16_12_1_0_1F_M2)
+        ds = dcmread(get_testdata_file(JPGE_16_12_1_0_1F_M2))
         msg = (
             r"1.2.840.10008.1.2.4.51 - JPEG Extended \(Process 2 and 4\) only "
             r"supported by Pillow if Bits Allocated = 8"
@@ -612,16 +611,16 @@ class TestPillowHandler_JPEG:
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
-    def test_JPGL_raises(self):
+    def test_JPGL_raises(self, jpeg_lossless_name):
         """Test decoding JPEG Lossless with pillow handler fails."""
-        ds = dcmread(JPGL_16_16_1_1_1F_M2)
+        ds = dcmread(jpeg_lossless_name)
         msg = r"as there are no pixel data handlers available that support it"
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
     def test_JPGB_odd_data_size(self):
         """Test decoding JPEG Baseline with pillow handler succeeds."""
-        ds = dcmread(JPGB_08_08_3_0_1F_YBR_FULL)
+        ds = dcmread(get_testdata_file("SC_rgb_small_odd_jpeg.dcm"))
         pixel_data = ds.pixel_array
         assert pixel_data.nbytes == 27
         assert pixel_data.shape == (3, 3, 3)

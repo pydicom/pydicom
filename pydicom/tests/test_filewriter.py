@@ -41,23 +41,22 @@ from pydicom.valuerep import DA, DT, TM, VR
 from pydicom.values import convert_text
 from ._write_stds import impl_LE_deflen_std_hex
 
-rtplan_name = get_testdata_file("rtplan.dcm")
-rtdose_name = get_testdata_file("rtdose.dcm")
-ct_name = get_testdata_file("CT_small.dcm")
-mr_name = get_testdata_file("MR_small.dcm")
-mr_implicit_name = get_testdata_file("MR_small_implicit.dcm")
-mr_bigendian_name = get_testdata_file("MR_small_bigendian.dcm")
-jpeg_name = get_testdata_file("JPEG2000.dcm")
-no_ts = get_testdata_file("meta_missing_tsyntax.dcm")
-color_pl_name = get_testdata_file("color-pl.dcm")
-sc_rgb_name = get_testdata_file("SC_rgb.dcm")
-datetime_name = mr_name
+# datetime_name = mr_name
 
 unicode_name = get_charset_files("chrH31.dcm")[0]
 multiPN_name = get_charset_files("chrFrenMulti.dcm")[0]
-deflate_name = get_testdata_file("image_dfl.dcm")
 
 base_version = '.'.join(str(i) for i in __version_info__)
+
+
+@pytest.fixture(scope="module")
+def mr_bigendian_name():
+    yield get_testdata_file("MR_small_bigendian.dcm")
+
+
+@pytest.fixture(scope="module")
+def no_ts_name():
+    yield get_testdata_file("meta_missing_tsyntax.dcm")
 
 
 def files_identical(a, b):
@@ -123,22 +122,22 @@ class TestWriteFile:
         same, pos = bytes_identical(bytes_in, bytes_out)
         assert same
 
-    def testRTPlan(self):
+    def testRTPlan(self, rtplan_name):
         """Input file, write back and verify
            them identical (RT Plan file)"""
         self.compare(rtplan_name)
 
-    def testRTDose(self):
+    def testRTDose(self, rtdose_name):
         """Input file, write back and
            verify them identical (RT Dose file)"""
         self.compare(rtdose_name)
 
-    def testCT(self):
+    def testCT(self, ct_name):
         """Input file, write back and
            verify them identical (CT file)....."""
         self.compare(ct_name)
 
-    def testMR(self):
+    def testMR(self, mr_name):
         """Input file, write back and verify
            them identical (MR file)....."""
         self.compare(mr_name)
@@ -153,12 +152,12 @@ class TestWriteFile:
            to the file correctly."""
         self.compare(multiPN_name)
 
-    def testJPEG2000(self):
+    def testJPEG2000(self, jpeg2000_name):
         """Input file, write back and verify
            them identical (JPEG2K file)."""
-        self.compare(jpeg_name)
+        self.compare(jpeg2000_name)
 
-    def test_pathlib_path_filename(self):
+    def test_pathlib_path_filename(self, ct_name):
         """Check that file can be written using pathlib.Path"""
         ds = dcmread(Path(ct_name))
         ds.save_as(self.file_out, write_like_original=True)
@@ -166,7 +165,7 @@ class TestWriteFile:
         ds1 = dcmread(self.file_out)
         assert ds.PatientName == ds1.PatientName
 
-    def testListItemWriteBack(self):
+    def testListItemWriteBack(self, ct_name):
         """Change item in a list and confirm
           it is written to file"""
         DS_expected = 0
@@ -184,7 +183,7 @@ class TestWriteFile:
         assert SS_expected == ds[0x00431012].value[0]
         assert DS_expected == ds.ImagePositionPatient[2]
 
-    def testwrite_short_uid(self):
+    def testwrite_short_uid(self, rtplan_name):
         ds = dcmread(rtplan_name)
         ds.SOPInstanceUID = "1.2"
         ds.save_as(self.file_out, write_like_original=True)
@@ -192,17 +191,17 @@ class TestWriteFile:
         ds = dcmread(self.file_out)
         assert "1.2" == ds.SOPInstanceUID
 
-    def test_write_no_ts(self):
+    def test_write_no_ts(self, no_ts_name):
         """Test reading a file with no ts and writing it out identically."""
-        ds = dcmread(no_ts)
+        ds = dcmread(no_ts_name)
         ds.save_as(self.file_out, write_like_original=True)
         self.file_out.seek(0)
-        with open(no_ts, 'rb') as ref_file:
+        with open(no_ts_name, 'rb') as ref_file:
             written_bytes = self.file_out.read()
             read_bytes = ref_file.read()
             self.compare_bytes(read_bytes, written_bytes)
 
-    def test_write_double_filemeta(self):
+    def test_write_double_filemeta(self, ct_name):
         """Test writing file meta from Dataset doesn't work"""
         ds = dcmread(ct_name)
         ds.TransferSyntaxUID = '1.1'
@@ -223,7 +222,7 @@ class TestWriteFile:
         ds = dcmread(fp, force=True)
         assert ds[0xFFFFFFFF].value == b'123456'
 
-    def test_write_removes_grouplength(self):
+    def test_write_removes_grouplength(self, color_pl_name):
         ds = dcmread(color_pl_name)
         assert 0x00080000 in ds
         ds.save_as(self.file_out, write_like_original=True)
@@ -241,7 +240,7 @@ class TestWriteFile:
         ds = dcmread(self.file_out)
         assert ds.PerformedProcedureCodeSequence == []
 
-    def test_write_deflated_retains_elements(self):
+    def test_write_deflated_retains_elements(self, deflate_name):
         """Read a Deflated Explicit VR Little Endian file, write it,
            and then read the output, to verify that the written file
            contains the same data.
@@ -254,7 +253,7 @@ class TestWriteFile:
 
         assert as_assertable(rewritten) == as_assertable(original)
 
-    def test_write_deflated_deflates_post_file_meta(self):
+    def test_write_deflated_deflates_post_file_meta(self, deflate_name):
         """Read a Deflated Explicit VR Little Endian file, write it,
            and then check the bytes in the output, to verify that the
            written file is deflated past the file meta information.
@@ -316,7 +315,7 @@ class TestScratchWriteDateTime(TestWriteFile):
         config.datetime_conversion = False
         self.file_out.close()
 
-    def test_multivalue_DA(self):
+    def test_multivalue_DA(self, mr_name):
         """Write DA/DT/TM data elements.........."""
         multi_DA_expected = (date(1961, 8, 4), date(1963, 11, 22))
         DA_expected = date(1961, 8, 4)
@@ -325,7 +324,7 @@ class TestScratchWriteDateTime(TestWriteFile):
             1963, 11, 22, 12, 30, 0, 0, tzinfo))
         multi_TM_expected = (time(1, 23, 45), time(11, 11, 11))
         TM_expected = time(11, 11, 11, 1)
-        ds = dcmread(datetime_name)
+        ds = dcmread(mr_name)
         # Add date/time data elements
         ds.CalibrationDate = MultiValue(DA, multi_DA_expected)
         ds.DateOfLastCalibration = DA(DA_expected)
@@ -1259,7 +1258,7 @@ class TestScratchWrite:
 class TestWriteToStandard:
     """Unit tests for writing datasets to the DICOM standard"""
 
-    def test_preamble_default(self):
+    def test_preamble_default(self, ct_name):
         """Test that the default preamble is written correctly when present."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1268,7 +1267,7 @@ class TestWriteToStandard:
         fp.seek(0)
         assert fp.read(128) == b'\x00' * 128
 
-    def test_preamble_custom(self):
+    def test_preamble_custom(self, ct_name):
         """Test that a custom preamble is written correctly when present."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1277,7 +1276,7 @@ class TestWriteToStandard:
         fp.seek(0)
         assert fp.read(128) == b'\x01\x02\x03\x04' + b'\x00' * 124
 
-    def test_no_preamble(self):
+    def test_no_preamble(self, ct_name):
         """Test that a default preamble is written when absent."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1286,7 +1285,7 @@ class TestWriteToStandard:
         fp.seek(0)
         assert fp.read(128) == b'\x00' * 128
 
-    def test_none_preamble(self):
+    def test_none_preamble(self, ct_name):
         """Test that a default preamble is written when None."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1295,7 +1294,7 @@ class TestWriteToStandard:
         fp.seek(0)
         assert fp.read(128) == b'\x00' * 128
 
-    def test_bad_preamble(self):
+    def test_bad_preamble(self, ct_name):
         """Test that ValueError is raised when preamble is bad."""
         ds = dcmread(ct_name)
         ds.preamble = b'\x00' * 127
@@ -1305,7 +1304,7 @@ class TestWriteToStandard:
         with pytest.raises(ValueError):
             ds.save_as(DicomBytesIO(), write_like_original=False)
 
-    def test_bad_filename(self):
+    def test_bad_filename(self, ct_name):
         """Test that TypeError is raised for a bad filename."""
         ds = dcmread(ct_name)
         with pytest.raises(TypeError, match="dcmwrite: Expected a file path "
@@ -1315,7 +1314,7 @@ class TestWriteToStandard:
                                             "or a file-like, but got int"):
             ds.save_as(42)
 
-    def test_prefix(self):
+    def test_prefix(self, ct_name):
         """Test that the 'DICM' prefix
            is written with preamble."""
         # Has preamble
@@ -1326,7 +1325,7 @@ class TestWriteToStandard:
         fp.seek(128)
         assert fp.read(4) == b'DICM'
 
-    def test_prefix_none(self):
+    def test_prefix_none(self, ct_name):
         """Test the 'DICM' prefix is written when preamble is None"""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1335,7 +1334,7 @@ class TestWriteToStandard:
         fp.seek(128)
         assert fp.read(4) == b'DICM'
 
-    def test_ds_changed(self):
+    def test_ds_changed(self, rtplan_name):
         """Test writing the dataset changes its file_meta."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
@@ -1354,7 +1353,7 @@ class TestWriteToStandard:
             pass
         assert ref_ds == ds
 
-    def test_raw_elements_preserved_implicit_vr(self):
+    def test_raw_elements_preserved_implicit_vr(self, rtplan_name):
         """Test writing the dataset preserves raw elements."""
         ds = dcmread(rtplan_name)
 
@@ -1372,7 +1371,7 @@ class TestWriteToStandard:
         assert ds.get_item(0x300A0006).is_raw  # RT Plan Date
         assert ds.get_item(0x300A0010).is_raw  # Dose Reference Sequence
 
-    def test_raw_elements_preserved_explicit_vr(self):
+    def test_raw_elements_preserved_explicit_vr(self, color_pl_name):
         """Test writing the dataset preserves raw elements."""
         ds = dcmread(color_pl_name)
 
@@ -1390,7 +1389,7 @@ class TestWriteToStandard:
         assert ds.get_item(0x00080030).is_raw  # Study Time
         assert ds.get_item(0x00089215).is_raw  # Derivation Code Sequence
 
-    def test_convert_implicit_to_explicit_vr(self):
+    def test_convert_implicit_to_explicit_vr(self, mr_name, mr_implicit_name):
         # make sure conversion from implicit to explicit VR works
         # without private tags
         ds = dcmread(mr_implicit_name)
@@ -1405,7 +1404,7 @@ class TestWriteToStandard:
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
-    def test_write_dataset(self):
+    def test_write_dataset(self, mr_implicit_name):
         # make sure writing and reading back a dataset works correctly
         ds = dcmread(mr_implicit_name)
         fp = DicomBytesIO()
@@ -1415,7 +1414,7 @@ class TestWriteToStandard:
         for elem_orig, elem_read in zip(ds_read, ds):
             assert elem_orig == elem_read
 
-    def test_write_dataset_with_explicit_vr(self):
+    def test_write_dataset_with_explicit_vr(self, mr_implicit_name):
         # make sure conversion from implicit to explicit VR does not
         # raise (regression test for #632)
         ds = dcmread(mr_implicit_name)
@@ -1428,7 +1427,8 @@ class TestWriteToStandard:
         for elem_orig, elem_read in zip(ds_read, ds):
             assert elem_orig == elem_read
 
-    def test_convert_implicit_to_explicit_vr_using_destination(self):
+    def test_convert_implicit_to_explicit_vr_using_destination(
+            self, mr_name, mr_implicit_name):
         # make sure conversion from implicit to explicit VR works
         # if setting the property in the destination
         ds = dcmread(mr_implicit_name)
@@ -1445,7 +1445,7 @@ class TestWriteToStandard:
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
-    def test_convert_explicit_to_implicit_vr(self):
+    def test_convert_explicit_to_implicit_vr(self, mr_name, mr_implicit_name):
         # make sure conversion from explicit to implicit VR works
         # without private tags
         ds = dcmread(mr_name)
@@ -1460,7 +1460,7 @@ class TestWriteToStandard:
         for elem_in, elem_out in zip(ds_implicit, ds_out):
             assert elem_in == elem_out
 
-    def test_convert_big_to_little_endian(self):
+    def test_convert_big_to_little_endian(self, mr_name, mr_bigendian_name):
         # make sure conversion from big to little endian works
         # except for pixel data
         ds = dcmread(mr_bigendian_name)
@@ -1479,7 +1479,7 @@ class TestWriteToStandard:
         for elem_in, elem_out in zip(ds_explicit, ds_out):
             assert elem_in == elem_out
 
-    def test_convert_little_to_big_endian(self):
+    def test_convert_little_to_big_endian(self, mr_name, mr_bigendian_name):
         # make sure conversion from little to big endian works
         # except for pixel data
         ds = dcmread(mr_name)
@@ -1517,7 +1517,7 @@ class TestWriteToStandard:
         for elem_in, elem_out in zip(ds, ds_out):
             assert elem_in == elem_out
 
-    def test_transfer_syntax_added(self):
+    def test_transfer_syntax_added(self, rtplan_name):
         """Test TransferSyntaxUID is added/updated if possible."""
         # Only done for ImplVR LE and ExplVR BE
         # Added
@@ -1533,7 +1533,7 @@ class TestWriteToStandard:
         ds.save_as(DicomBytesIO(), write_like_original=False)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRBigEndian
 
-    def test_private_tag_vr_from_implicit_data(self):
+    def test_private_tag_vr_from_implicit_data(self, ct_name):
         """Test that private tags have the correct VR if converting
         a dataset from implicit to explicit VR.
         """
@@ -1560,7 +1560,7 @@ class TestWriteToStandard:
         assert ds_expl[(0x0009, 0x10e7)].VR == 'UL'
         assert ds_expl[(0x0043, 0x1010)].VR == 'US'
 
-    def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use):
+    def test_convert_rgb_from_implicit_to_explicit_vr(self, no_numpy_use, sc_rgb_name):
         """Test converting an RGB dataset from implicit to explicit VR
         and vice verse."""
         ds_orig = dcmread(sc_rgb_name)
@@ -1585,7 +1585,7 @@ class TestWriteToStandard:
         for elem_orig, elem_conv in zip(ds_orig, ds_expl):
             assert elem_orig.value == elem_conv.value
 
-    def test_transfer_syntax_not_added(self):
+    def test_transfer_syntax_not_added(self, rtplan_name):
         """Test TransferSyntaxUID is not added if ExplVRLE."""
         ds = dcmread(rtplan_name)
         del ds.file_meta.TransferSyntaxUID
@@ -1595,7 +1595,7 @@ class TestWriteToStandard:
             ds.save_as(DicomBytesIO(), write_like_original=False)
         assert 'TransferSyntaxUID' not in ds.file_meta
 
-    def test_transfer_syntax_raises(self):
+    def test_transfer_syntax_raises(self, rtplan_name):
         """Test TransferSyntaxUID is raises
            NotImplementedError if ImplVRBE."""
         ds = dcmread(rtplan_name)
@@ -1616,7 +1616,7 @@ class TestWriteToStandard:
         assert ds.file_meta.MediaStorageSOPClassUID == CTImageStorage
         assert ds.file_meta.MediaStorageSOPInstanceUID == '1.2.3'
 
-    def test_write_no_file_meta(self):
+    def test_write_no_file_meta(self, rtplan_name):
         """Test writing a dataset with no file_meta"""
         fp = DicomBytesIO()
         version = 'PYDICOM ' + base_version
@@ -1645,7 +1645,7 @@ class TestWriteToStandard:
         assert out.file_meta.ImplementationVersionName == version
         assert out.file_meta.TransferSyntaxUID == transfer_syntax
 
-    def test_raise_no_file_meta(self):
+    def test_raise_no_file_meta(self, rtplan_name):
         """Test exception is raised if trying to write with no file_meta."""
         ds = dcmread(rtplan_name)
         del ds.SOPInstanceUID
@@ -1667,7 +1667,7 @@ class TestWriteToStandard:
         ds.save_as(fp, write_like_original=False)
         assert isinstance(ds.file_meta, Dataset)
 
-    def test_standard(self):
+    def test_standard(self, ct_name):
         """Test preamble + file_meta + dataset written OK."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1683,7 +1683,7 @@ class TestWriteToStandard:
         assert 'PatientID' in ds_out
         assert 'TransferSyntaxUID' in ds_out.file_meta
 
-    def test_commandset_no_written(self):
+    def test_commandset_no_written(self, ct_name):
         """Test that Command Set elements aren't written."""
         fp = DicomBytesIO()
         ds = dcmread(ct_name)
@@ -1883,7 +1883,7 @@ class TestWriteNonStandard:
         for _ in ds:
             pass
 
-    def test_preamble_default(self):
+    def test_preamble_default(self, ct_name):
         """Test that the default preamble is written correctly when present."""
         ds = dcmread(ct_name)
         ds.preamble = b'\x00' * 128
@@ -1891,7 +1891,7 @@ class TestWriteNonStandard:
         self.fp.seek(0)
         assert b'\x00' * 128 == self.fp.read(128)
 
-    def test_preamble_custom(self):
+    def test_preamble_custom(self, ct_name):
         """Test that a custom preamble is written correctly when present."""
         ds = dcmread(ct_name)
         ds.preamble = b'\x01\x02\x03\x04' + b'\x00' * 124
@@ -1900,7 +1900,7 @@ class TestWriteNonStandard:
         self.fp.seek(0)
         assert b'\x01\x02\x03\x04' + b'\x00' * 124 == self.fp.read(128)
 
-    def test_no_preamble(self):
+    def test_no_preamble(self, ct_name):
         """Test no preamble or prefix is written if preamble absent."""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -1913,7 +1913,7 @@ class TestWriteNonStandard:
         self.fp.seek(0)
         assert b'DICM' != self.fp.read(4)
 
-    def test_ds_unchanged(self):
+    def test_ds_unchanged(self, rtplan_name):
         """Test writing the dataset doesn't change it."""
         ds = dcmread(rtplan_name)
         ref_ds = dcmread(rtplan_name)
@@ -1923,14 +1923,14 @@ class TestWriteNonStandard:
         self.ensure_no_raw_data_elements(ref_ds)
         assert ref_ds == ds
 
-    def test_file_meta_unchanged(self):
+    def test_file_meta_unchanged(self, rtplan_name):
         """Test no file_meta elements are added if missing."""
         ds = dcmread(rtplan_name)
         ds.file_meta = FileMetaDataset()
         ds.save_as(self.fp, write_like_original=True)
         assert Dataset() == ds.file_meta
 
-    def test_dataset(self):
+    def test_dataset(self, ct_name):
         """Test dataset written OK with no preamble or file meta"""
         ds = dcmread(ct_name)
         del ds.preamble
@@ -1947,7 +1947,7 @@ class TestWriteNonStandard:
         assert Dataset() == ds_out.file_meta
         assert 'PatientID' in ds_out
 
-    def test_preamble_dataset(self):
+    def test_preamble_dataset(self, ct_name):
         """Test dataset written OK with no file meta"""
         ds = dcmread(ct_name)
         del ds.file_meta
@@ -1962,7 +1962,7 @@ class TestWriteNonStandard:
         assert Dataset() == ds_out.file_meta
         assert 'PatientID' in ds_out
 
-    def test_filemeta_dataset(self):
+    def test_filemeta_dataset(self, ct_name):
         """Test file meta written OK if preamble absent."""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -1981,7 +1981,7 @@ class TestWriteNonStandard:
         assert ds_out.preamble is None
         assert 'PatientID' in ds_out
 
-    def test_preamble_filemeta_dataset(self):
+    def test_preamble_filemeta_dataset(self, ct_name):
         """Test non-standard file meta written with preamble OK"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2000,7 +2000,7 @@ class TestWriteNonStandard:
         assert preamble == ds_out.preamble
         assert 'PatientID' in ds_out
 
-    def test_commandset_dataset(self):
+    def test_commandset_dataset(self, ct_name):
         """Test written OK with command set/dataset"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2030,7 +2030,7 @@ class TestWriteNonStandard:
         assert 'Status' in ds_out
         assert 'PatientID' in ds_out
 
-    def test_preamble_commandset_dataset(self):
+    def test_preamble_commandset_dataset(self, ct_name):
         """Test written OK with preamble/command set/dataset"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2053,7 +2053,7 @@ class TestWriteNonStandard:
         assert 'Status' in ds_out
         assert 'PatientID' in ds_out
 
-    def test_preamble_commandset_filemeta_dataset(self):
+    def test_preamble_commandset_filemeta_dataset(self, ct_name):
         """Test written OK with preamble/command set/file meta/dataset"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2072,7 +2072,7 @@ class TestWriteNonStandard:
         assert 'Status' in ds_out
         assert 'PatientID' in ds_out
 
-    def test_commandset_filemeta_dataset(self):
+    def test_commandset_filemeta_dataset(self, ct_name):
         """Test written OK with command set/file meta/dataset"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2096,7 +2096,7 @@ class TestWriteNonStandard:
         assert 'Status' in ds_out
         assert 'PatientID' in ds_out
 
-    def test_commandset(self):
+    def test_commandset(self, ct_name):
         """Test written OK with command set"""
         ds = dcmread(ct_name)
         del ds[:]
@@ -2122,7 +2122,7 @@ class TestWriteNonStandard:
         assert 'PatientID' not in ds_out
         assert Dataset() == ds_out[0x00010000:]
 
-    def test_commandset_filemeta(self):
+    def test_commandset_filemeta(self, ct_name):
         """Test dataset written OK with command set/file meta"""
         ds = dcmread(ct_name)
         preamble = ds.preamble[:]
@@ -2147,7 +2147,7 @@ class TestWriteNonStandard:
         assert 'PatientID' not in ds_out
         assert Dataset() == ds_out[0x00010000:]
 
-    def test_preamble_commandset(self):
+    def test_preamble_commandset(self, ct_name):
         """Test written OK with preamble/command set"""
         ds = dcmread(ct_name)
         del ds[:]
@@ -2171,7 +2171,7 @@ class TestWriteNonStandard:
         assert 'PatientID' not in ds_out
         assert Dataset() == ds_out[0x00010000:]
 
-    def test_preamble_commandset_filemeta(self):
+    def test_preamble_commandset_filemeta(self, ct_name):
         """Test written OK with preamble/command set/file meta"""
         ds = dcmread(ct_name)
         del ds[:]
@@ -2191,10 +2191,11 @@ class TestWriteNonStandard:
         assert 'PatientID' not in ds_out
         assert Dataset() == ds_out[0x00010000:]
 
-    def test_read_write_identical(self):
+    def test_read_write_identical(self,
+                                          rtplan_name, rtdose_name, ct_name, mr_name, jpeg2000_name, no_ts_name):
         """Test the written bytes matches the read bytes."""
-        for dcm_in in [rtplan_name, rtdose_name, ct_name, mr_name, jpeg_name,
-                       no_ts, unicode_name, multiPN_name]:
+        for dcm_in in [rtplan_name, rtdose_name, ct_name, mr_name, jpeg2000_name,
+                       no_ts_name, unicode_name, multiPN_name]:
             with open(dcm_in, 'rb') as f:
                 bytes_in = BytesIO(f.read())
                 ds_in = dcmread(bytes_in)
@@ -2210,9 +2211,9 @@ class TestWriteFileMetaInfoNonStandard:
         """Create an empty file-like for use in testing."""
         self.fp = DicomBytesIO()
 
-    def test_transfer_syntax_not_added(self):
+    def test_transfer_syntax_not_added(self, no_ts_name):
         """Test that the TransferSyntaxUID isn't added if missing"""
-        ds = dcmread(no_ts)
+        ds = dcmread(no_ts_name)
         write_file_meta_info(self.fp, ds.file_meta, enforce_standard=False)
         assert 'TransferSyntaxUID' not in ds.file_meta
         assert 'ImplementationClassUID' in ds.file_meta
@@ -2696,7 +2697,7 @@ class TestWriteUndefinedLengthPixelData:
         with pytest.raises(ValueError, match=msg):
             write_data_element(self.fp, pixel_data)
 
-    def test_writing_to_gzip(self):
+    def test_writing_to_gzip(self, rtplan_name):
         file_path = tempfile.NamedTemporaryFile(suffix='.dcm').name
         ds = dcmread(rtplan_name)
         import gzip

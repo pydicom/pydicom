@@ -8,6 +8,7 @@ from platform import python_implementation
 from tempfile import TemporaryFile
 
 import numpy as np
+import pytest
 
 from pydicom import dcmread
 from pydicom.data import get_testdata_file
@@ -18,35 +19,33 @@ from pydicom.pixel_data_handlers.numpy_handler import (
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
 # 1/1, 1 sample/pixel, 1 frame
-EXPL_1_1_1F = get_testdata_file("liver_1frame.dcm")
+EXPL_1_1_1F = "liver_1frame.dcm"
 # 1/1, 1 sample/pixel, 3 frame
-EXPL_1_1_3F = get_testdata_file("liver.dcm")
+EXPL_1_1_3F = "liver.dcm"
 # 8/8, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
+EXPL_8_1_1F = "OBXXXX1A.dcm"
 # 8/8, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
+EXPL_8_1_2F = "OBXXXX1A_2frame.dcm"
 # 8/8, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
+EXPL_8_3_1F = "SC_rgb.dcm"
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
-EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
-# 8/8, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
+EXPL_8_3_1F_YBR422 = 'SC_ybr_full_422_uncompressed.dcm'
 # 16/16, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
+EXPL_16_1_1F = "MR_small.dcm"
 # 16/12, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_file("emri_small.dcm")
+EXPL_16_1_10F = "emri_small.dcm"
 # 16/16, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
+EXPL_16_3_1F = "SC_rgb_16bit.dcm"
 # 16/16, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_file("SC_rgb_16bit_2frame.dcm")
+EXPL_16_3_2F = "SC_rgb_16bit_2frame.dcm"
 # 32/32, 1 sample/pixel, 1 frame
-IMPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
+IMPL_32_1_1F = "rtdose_1frame.dcm"
 # 32/32, 1 sample/pixel, 15 frame
-IMPL_32_1_15F = get_testdata_file("rtdose.dcm")
+IMPL_32_1_15F = "rtdose.dcm"
 # 32/32, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
+EXPL_32_3_1F = "SC_rgb_32bit.dcm"
 # 32/32, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
+EXPL_32_3_2F = "SC_rgb_32bit_2frame.dcm"
 
 
 def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
@@ -98,6 +97,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
 
 class TimeGetPixelData_LargeDataset:
     """Time tests for numpy_handler.get_pixeldata with large datasets."""
+    @pytest.fixture(autouse=True)
     def setup(self):
         """Setup the tests."""
         self.no_runs = 100
@@ -112,25 +112,26 @@ class TimeGetPixelData_LargeDataset:
 
 class TimeGetPixelData:
     """Time tests for numpy_handler.get_pixeldata."""
-    def setup(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, rgb_8bit_2frames_name):
         """Setup the tests."""
         self.no_runs = 100
 
-        self.ds_1_1_1 = dcmread(EXPL_1_1_1F)
-        self.ds_1_1_3 = dcmread(EXPL_1_1_3F)
-        self.ds_8_1_1 = dcmread(EXPL_8_1_1F)
-        self.ds_8_1_2 = dcmread(EXPL_8_1_2F)
-        self.ds_8_3_1 = dcmread(EXPL_8_3_1F)
-        self.ds_8_3_2 = dcmread(EXPL_8_3_2F)
-        self.ds_16_1_1 = dcmread(EXPL_16_1_1F)
-        self.ds_16_1_10 = dcmread(EXPL_16_1_10F)
-        self.ds_16_3_1 = dcmread(EXPL_16_3_1F)
-        self.ds_16_3_2 = dcmread(EXPL_16_3_2F)
-        self.ds_32_1_1 = dcmread(IMPL_32_1_1F)
-        self.ds_32_1_15 = dcmread(IMPL_32_1_15F)
-        self.ds_32_3_1 = dcmread(EXPL_32_3_1F)
-        self.ds_32_3_2 = dcmread(EXPL_32_3_2F)
-        self.ds_ybr_422 = dcmread(EXPL_8_3_1F_YBR422)
+        self.ds_1_1_1 = dcmread(get_testdata_file(EXPL_1_1_1F))
+        self.ds_1_1_3 = dcmread(get_testdata_file(EXPL_1_1_3F))
+        self.ds_8_1_1 = dcmread(get_testdata_file(EXPL_8_1_1F))
+        self.ds_8_1_2 = dcmread(get_testdata_file(EXPL_8_1_2F))
+        self.ds_8_3_1 = dcmread(get_testdata_file(EXPL_8_3_1F))
+        self.ds_8_3_2 = dcmread(rgb_8bit_2frames_name)
+        self.ds_16_1_1 = dcmread(get_testdata_file(EXPL_16_1_1F))
+        self.ds_16_1_10 = dcmread(get_testdata_file(EXPL_16_1_10F))
+        self.ds_16_3_1 = dcmread(get_testdata_file(EXPL_16_3_1F))
+        self.ds_16_3_2 = dcmread(get_testdata_file(EXPL_16_3_2F))
+        self.ds_32_1_1 = dcmread(get_testdata_file(IMPL_32_1_1F))
+        self.ds_32_1_15 = dcmread(get_testdata_file(IMPL_32_1_15F))
+        self.ds_32_3_1 = dcmread(get_testdata_file(EXPL_32_3_1F))
+        self.ds_32_3_2 = dcmread(get_testdata_file(EXPL_32_3_2F))
+        self.ds_ybr_422 = dcmread(get_testdata_file(EXPL_8_3_1F_YBR422))
 
     def time_1bit_1sample_1frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 1 frame."""
@@ -217,10 +218,11 @@ class TimeGetPixelData:
 
 
 class TimePackUnpack:
+    @pytest.fixture(autouse=True)
     def setup(self):
         """Setup the tests."""
         self.no_runs = 100
-        self.ds_1_1_1 = dcmread(EXPL_1_1_1F)
+        self.ds_1_1_1 = dcmread(get_testdata_file(EXPL_1_1_1F))
         self.unpacked = unpack_bits(self.ds_1_1_1.PixelData)
 
     def time_unpack(self):

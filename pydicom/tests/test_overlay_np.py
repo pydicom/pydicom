@@ -52,16 +52,9 @@ except ImportError:
     NP_HANDLER = None
 
 
-# Paths to the test datasets
-# EXPL: Explicit VR Little Endian
-# Overlay Data
-# 1/1, 1 sample/pixel, 1 frame
-EXPL_1_1_1F = get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
-# 1/1, 1 sample/pixel, N frame
-EXPL_1_1_3F = None
-# No Overlay Data
-# 16/16, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
+@pytest.fixture(scope="module")
+def mr_with_overlay_name():
+    return get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm")
 
 
 # Numpy unavailable and the numpy handler is available
@@ -82,16 +75,16 @@ class TestNoNumpy_NumpyHandler:
         assert not HAVE_NP
         assert NP_HANDLER is not None
 
-    def test_overlay_array_raises(self):
+    def test_overlay_array_raises(self, mr_with_overlay_name):
         """Test overlay_array raises exception"""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         msg = r"The following handlers are available to decode"
         with pytest.raises(RuntimeError, match=msg):
             ds.overlay_array(0x6000)
 
-    def test_get_overlay_array_raises(self):
+    def test_get_overlay_array_raises(self, mr_with_overlay_name):
         """Test get_overlay_array raises exception"""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         msg = r"The overlay data handler requires numpy"
         with pytest.raises(ImportError, match=msg):
             get_overlay_array(ds, 0x6000)
@@ -110,7 +103,8 @@ IMPL = ImplicitVRLittleEndian
 REFERENCE_DATA_LITTLE = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype,
     #   group)
-    (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (484, 484), 'uint8', 0x6000)),
+    ("MR-SIEMENS-DICOM-WithOverlays.dcm",
+     (EXPL, 1, 1, 0, 1, (484, 484), 'uint8', 0x6000)),
     # (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8', 0x6000)),
 ]
 
@@ -136,7 +130,7 @@ class TestNumpy_NumpyHandler:
     @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
     def test_properties(self, fpath, data):
         """Test dataset and overlay array properties are as expected."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         group = data[7]
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds[group, 0x0100].value == data[1]  # OverlayBitsAllocated
@@ -156,7 +150,7 @@ class TestNumpy_NumpyHandler:
 
     def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(get_testdata_file("MR-SIEMENS-DICOM-WithOverlays.dcm"))
         arr = ds.overlay_array(0x6000)
 
         assert arr.flags.writeable
@@ -165,23 +159,23 @@ class TestNumpy_NumpyHandler:
         assert 29 == sum(arr[422, 393:422])
 
     @pytest.mark.skip(reason='No dataset available')
-    def test_little_1bit_1sample_3frame(self):
+    def test_little_1bit_1sample_3frame(self, mr_with_overlay_name):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
-        ds = dcmread(EXPL_1_1_3F)
+        ds = dcmread(mr_with_overlay_name)
         arr = ds.overlay_array(0x6000)
 
-    def test_read_only(self):
+    def test_read_only(self, mr_with_overlay_name):
         """Test for #717, returned array read-only."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         arr = ds.overlay_array(0x6000)
         assert 0 == arr[0, 0]
         arr[0, 0] = 1
         assert 1 == arr[0, 0]
         assert arr.flags.writeable
 
-    def test_bad_group_raises(self):
+    def test_bad_group_raises(self, mr_with_overlay_name):
         """Test that using a bad group raises exception."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         msg = (
             r"The group part of the 'Overlay Data' element tag must be "
             r"between 0x6000 and 0x60FF \(inclusive\)"
@@ -191,9 +185,9 @@ class TestNumpy_NumpyHandler:
         with pytest.raises(ValueError, match=msg):
             ds.overlay_array(0x6100)
 
-    def test_no_frames(self):
+    def test_no_frames(self, mr_with_overlay_name):
         """Test handler with no NumberOfFramesInOverlay element."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         del ds[0x6000, 0x0015]
         arr = ds.overlay_array(0x6000)
 
@@ -206,17 +200,17 @@ class TestNumpy_NumpyHandler:
 @pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
 class TestNumpy_GetOverlayArray:
     """Tests for numpy_handler.get_overlay_array with numpy."""
-    def test_no_overlay_data_raises(self):
+    def test_no_overlay_data_raises(self, mr_with_overlay_name):
         """Test get_overlay_array raises if dataset has no OverlayData."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         del ds[0x6000, 0x3000]
         assert (0x6000, 0x3000) not in ds
         with pytest.raises(AttributeError, match=r' dataset: OverlayData'):
             get_overlay_array(ds, 0x6000)
 
-    def test_bad_length_raises(self):
+    def test_bad_length_raises(self, mr_with_overlay_name):
         """Test bad pixel data length raises exception."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         # Too short
         ds[0x6000, 0x3000].value = ds[0x6000, 0x3000][:-1]
         msg = (
@@ -228,9 +222,9 @@ class TestNumpy_GetOverlayArray:
         with pytest.raises(ValueError, match=msg):
             get_overlay_array(ds, 0x6000)
 
-    def test_missing_padding_warns(self):
+    def test_missing_padding_warns(self, mr_with_overlay_name):
         """A warning shall be issued if the padding for odd data is missing."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         # Edit shape
         ds[0x6000, 0x0010].value = 15  # OverlayRows
         ds[0x6000, 0x0011].value = 14  # OverlayColumns
@@ -239,9 +233,9 @@ class TestNumpy_GetOverlayArray:
         with pytest.warns(UserWarning, match=msg):
             get_overlay_array(ds, 0x6000)
 
-    def test_excess_padding(self):
+    def test_excess_padding(self, mr_with_overlay_name):
         """A warning shall be issued excess padding present."""
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         # Edit shape
         ds[0x6000, 0x0010].value = 15  # OverlayRows
         ds[0x6000, 0x0011].value = 14  # OverlayColumns
@@ -254,10 +248,10 @@ class TestNumpy_GetOverlayArray:
         with pytest.warns(UserWarning, match=msg):
             get_overlay_array(ds, 0x6000)
 
-    def test_old_import(self):
+    def test_old_import(self, mr_with_overlay_name):
         """Test that can import using the old path."""
         from pydicom.overlay_data_handlers import numpy_handler as np_old
-        ds = dcmread(EXPL_1_1_1F)
+        ds = dcmread(mr_with_overlay_name)
         arr = np_old.get_overlay_array(ds, 0x6000)
         assert 0 == arr[0, 0]
 

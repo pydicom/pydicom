@@ -1883,9 +1883,9 @@ class TestFileDataset:
         assert '/some/path/to/test' == fds.filename
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-    def test_with_array(self):
+    def test_with_array(self, ct_name):
         """Test Dataset within a numpy array"""
-        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds = dcmread(ct_name)
         arr = numpy.array([ds])
         assert arr[0].PatientName == ds.PatientName
         assert arr.dtype == object

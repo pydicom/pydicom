@@ -1,9 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Tests for the 'pydicom' encoder plugin."""
 
-from struct import pack, unpack
-import sys
-
 import pytest
 
 try:
@@ -25,26 +22,6 @@ from pydicom.pixel_data_handlers.rle_handler import (
 )
 from pydicom.pixel_data_handlers.rle_handler import rle_encode_frame
 from pydicom.pixel_data_handlers.util import reshape_pixel_array
-from pydicom.uid import RLELossless
-
-
-# EXPL: Explicit VR Little Endian
-# RLE: RLE Lossless
-# 8/8-bit, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
-RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
-# 8/8-bit, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
-# 8/8-bit, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
-# 16/16-bit, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
-# 16/16-bit, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
-# 32/32-bit, 1 sample/pixel, 1 frame
-EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
-# 32/32-bit, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
 
 
 # Tests for RLE encoding
@@ -99,6 +76,18 @@ REFERENCE_ENCODE_ROW = [
 ]
 
 
+@pytest.fixture(scope="module")
+def monochrome_8bit_rle_name():
+    # RLE lossless, 8/8-bit, 1 sample/pixel, 1 frame
+    return get_testdata_file("OBXXXX1A_rle.dcm")
+
+
+@pytest.fixture(scope="module")
+def rgb_16bit_name():
+    # Explicit VR Little Endian, 16/16-bit, 3 sample/pixel, 1 frame
+    return get_testdata_file("SC_rgb_16bit.dcm")
+
+
 class TestEncodeRow:
     """Tests for rle_handler._encode_row."""
     @pytest.mark.parametrize('src, output', REFERENCE_ENCODE_ROW)
@@ -122,9 +111,9 @@ class TestEncodeFrame:
         ds.PlanarConfiguration = 1
         self.ds = ds
 
-    def test_cycle_8bit_1sample(self):
+    def test_cycle_8bit_1sample(self, mono_8bit_1frame_name):
         """Test an encode/decode cycle for 8-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_8_1_1F)
+        ds = dcmread(mono_8bit_1frame_name)
         ref = ds.pixel_array
         assert 8 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
@@ -141,7 +130,7 @@ class TestEncodeFrame:
 
     def test_cycle_8bit_3sample(self):
         """Test an encode/decode cycle for 8-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_8_3_1F)
+        ds = dcmread(get_testdata_file("SC_rgb.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
@@ -161,7 +150,7 @@ class TestEncodeFrame:
 
     def test_cycle_16bit_1sample(self):
         """Test an encode/decode cycle for 16-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file("MR_small.dcm"))
         ref = ds.pixel_array
         assert 16 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
@@ -176,9 +165,9 @@ class TestEncodeFrame:
 
         assert np.array_equal(ref, arr)
 
-    def test_cycle_16bit_3sample(self):
+    def test_cycle_16bit_3sample(self, rgb_16bit_name):
         """Test an encode/decode cycle for 16-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_16_3_1F)
+        ds = dcmread(rgb_16bit_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
@@ -198,7 +187,7 @@ class TestEncodeFrame:
 
     def test_cycle_32bit_1sample(self):
         """Test an encode/decode cycle for 32-bit 1 sample/pixel."""
-        ds = dcmread(EXPL_32_1_1F)
+        ds = dcmread(get_testdata_file("rtdose_1frame.dcm"))
         ref = ds.pixel_array
         assert 32 == ds.BitsAllocated
         assert 1 == ds.SamplesPerPixel
@@ -215,7 +204,7 @@ class TestEncodeFrame:
 
     def test_cycle_32bit_3sample(self):
         """Test an encode/decode cycle for 32-bit 3 sample/pixel."""
-        ds = dcmread(EXPL_32_3_1F)
+        ds = dcmread(get_testdata_file("SC_rgb_32bit.dcm"))
         ref = ds.pixel_array
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
@@ -352,9 +341,9 @@ class TestEncodeFrame:
 class TestEncodeSegment:
     """Tests for rle_handler._encode_segment."""
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
-    def test_one_row(self):
+    def test_one_row(self, monochrome_8bit_rle_name):
         """Test encoding data that contains only a single row."""
-        ds = dcmread(RLE_8_1_1F)
+        ds = dcmread(monochrome_8bit_rle_name)
         pixel_data = defragment_data(ds.PixelData)
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
@@ -372,9 +361,9 @@ class TestEncodeSegment:
         assert ds.Columns == len(redecoded)
         assert decoded[:ds.Columns] == redecoded
 
-    def test_cycle(self):
+    def test_cycle(self, monochrome_8bit_rle_name):
         """Test the decoded data remains the same after encoding/decoding."""
-        ds = dcmread(RLE_8_1_1F)
+        ds = dcmread(monochrome_8bit_rle_name)
         pixel_data = defragment_data(ds.PixelData)
         decoded = _rle_decode_segment(pixel_data[64:])
         assert ds.Rows * ds.Columns == len(decoded)
@@ -404,10 +393,11 @@ class TestRLEEncodeFrame:
         with pytest.raises(ValueError, match=msg):
             rle_encode_frame(arr)
 
-    def test_encoding_multiple_frames_raises(self):
+    def test_encoding_multiple_frames_raises(self, rgb_8bit_2frames_name):
         """Test encoding multiple framed pixel data raises exception."""
         # Note: only works with multi-sample data
-        ds = dcmread(EXPL_8_3_2F)
+        # data is Explicit VR Little Endian, 8/8-bit, 3 sample/pixel, 2 frame
+        ds = dcmread(rgb_8bit_2frames_name)
         assert ds.NumberOfFrames > 1
         kwargs = RLELosslessEncoder.kwargs_from_ds(ds)
 
@@ -418,9 +408,9 @@ class TestRLEEncodeFrame:
         with pytest.raises(ValueError, match=msg):
             rle_encode_frame(ds.pixel_array)
 
-    def test_functional(self):
+    def test_functional(self, rgb_16bit_name):
         """Test function works OK."""
-        ds = dcmread(EXPL_16_3_1F)
+        ds = dcmread(rgb_16bit_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
@@ -436,9 +426,9 @@ class TestRLEEncodeFrame:
 
         assert np.array_equal(ref, arr)
 
-    def test_big_endian_arr(self):
+    def test_big_endian_arr(self, rgb_16bit_name):
         """Test using a big endian array works."""
-        ds = dcmread(EXPL_16_3_1F)
+        ds = dcmread(rgb_16bit_name)
         ref = ds.pixel_array
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3

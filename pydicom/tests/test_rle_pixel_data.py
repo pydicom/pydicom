@@ -59,67 +59,62 @@ except ImportError:
 # EXPL: Explicit VR Little Endian
 # RLE: RLE Lossless
 # 8/8-bit, 1 sample/pixel, 1 frame
-EXPL_8_1_1F = get_testdata_file("OBXXXX1A.dcm")
-RLE_8_1_1F = get_testdata_file("OBXXXX1A_rle.dcm")
+RLE_8_1_1F = "OBXXXX1A_rle.dcm"
 # 8/8-bit, 1 sample/pixel, 2 frame
-EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
-RLE_8_1_2F = get_testdata_file("OBXXXX1A_rle_2frame.dcm")
+RLE_8_1_2F = "OBXXXX1A_rle_2frame.dcm"
 # 8/8-bit, 3 sample/pixel, 1 frame
-EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
-RLE_8_3_1F = get_testdata_file("SC_rgb_rle.dcm")
+EXPL_8_3_1F = "SC_rgb.dcm"
+RLE_8_3_1F = "SC_rgb_rle.dcm"
 # 8/8-bit, 3 sample/pixel, 2 frame
-EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
-RLE_8_3_2F = get_testdata_file("SC_rgb_rle_2frame.dcm")
+RLE_8_3_2F = "SC_rgb_rle_2frame.dcm"
 # 16/16-bit, 1 sample/pixel, 1 frame
-EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
-RLE_16_1_1F = get_testdata_file("MR_small_RLE.dcm")
+EXPL_16_1_1F = "MR_small.dcm"
+RLE_16_1_1F = "MR_small_RLE.dcm"
 # 16/12-bit, 1 sample/pixel, 10 frame
-EXPL_16_1_10F = get_testdata_file("emri_small.dcm")
-RLE_16_1_10F = get_testdata_file("emri_small_RLE.dcm")
+EXPL_16_1_10F = "emri_small.dcm"
+RLE_16_1_10F = "emri_small_RLE.dcm"
 # 16/16-bit, 3 sample/pixel, 1 frame
-EXPL_16_3_1F = get_testdata_file("SC_rgb_16bit.dcm")
-RLE_16_3_1F = get_testdata_file("SC_rgb_rle_16bit.dcm")
+EXPL_16_3_1F = "SC_rgb_16bit.dcm"
+RLE_16_3_1F = "SC_rgb_rle_16bit.dcm"
 # 16/16-bit, 3 sample/pixel, 2 frame
-EXPL_16_3_2F = get_testdata_file("SC_rgb_16bit_2frame.dcm")
-RLE_16_3_2F = get_testdata_file("SC_rgb_rle_16bit_2frame.dcm")
+EXPL_16_3_2F = "SC_rgb_16bit_2frame.dcm"
+RLE_16_3_2F = "SC_rgb_rle_16bit_2frame.dcm"
 # 32/32-bit, 1 sample/pixel, 1 frame
-EXPL_32_1_1F = get_testdata_file("rtdose_1frame.dcm")
-RLE_32_1_1F = get_testdata_file("rtdose_rle_1frame.dcm")
+EXPL_32_1_1F = "rtdose_1frame.dcm"
+RLE_32_1_1F = "rtdose_rle_1frame.dcm"
 # 32/32-bit, 1 sample/pixel, 15 frame
-EXPL_32_1_15F = get_testdata_file("rtdose.dcm")
-RLE_32_1_15F = get_testdata_file("rtdose_rle.dcm")
+EXPL_32_1_15F = "rtdose.dcm"
+RLE_32_1_15F = "rtdose_rle.dcm"
 # 32/32-bit, 3 sample/pixel, 1 frame
-EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
-RLE_32_3_1F = get_testdata_file("SC_rgb_rle_32bit.dcm")
+EXPL_32_3_1F = "SC_rgb_32bit.dcm"
+RLE_32_3_1F = "SC_rgb_rle_32bit.dcm"
 # 32/32-bit, 3 sample/pixel, 2 frame
-EXPL_32_3_2F = get_testdata_file("SC_rgb_32bit_2frame.dcm")
-RLE_32_3_2F = get_testdata_file("SC_rgb_rle_32bit_2frame.dcm")
+EXPL_32_3_2F = "SC_rgb_32bit_2frame.dcm"
+RLE_32_3_2F = "SC_rgb_rle_32bit_2frame.dcm"
 
 # Transfer syntaxes supported by other handlers
 # Implicit VR Little Endian
-IMPL = get_testdata_file("rtdose_1frame.dcm")
+IMPL = "rtdose_1frame.dcm"
 # Deflated Explicit VR Little Endian
-DELF = get_testdata_file("image_dfl.dcm")
+DELF = "image_dfl.dcm"
 # Explicit VR Big Endian
-EXPB = get_testdata_file("SC_rgb_expb_2frame.dcm")
+EXPB = "SC_rgb_expb_2frame.dcm"
 # JPEG Baseline (Process 1)
-JPEG_BASELINE_1 = get_testdata_file("SC_rgb_jpeg_dcmtk.dcm")
+JPEG_BASELINE_1 = "SC_rgb_jpeg_dcmtk.dcm"
 # JPEG Baseline (Process 2 and 4)
-JPEG_EXTENDED_2 = get_testdata_file("JPEG-lossy.dcm")
+JPEG_EXTENDED_2 = "JPEG-lossy.dcm"
 # JPEG Lossless (Process 14)
 JPEG_LOSSLESS_14 = None
 # JPEG Lossless (Process 14, Selection Value 1)
-JPEG_LOSSLESS_14_1 = get_testdata_file("SC_rgb_jpeg_gdcm.dcm")
+JPEG_LOSSLESS_14_1 = "SC_rgb_jpeg_gdcm.dcm"
 # JPEG-LS Lossless
-JPEG_LS_LOSSLESS = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
+JPEG_LS_LOSSLESS = "MR_small_jpeg_ls_lossless.dcm"
 # JPEG-LS Lossy
 JPEG_LS_LOSSY = None
 # JPEG2k Lossless
-JPEG_2K_LOSSLESS = get_testdata_file("emri_small_jpeg_2k_lossless.dcm")
+JPEG_2K_LOSSLESS = "emri_small_jpeg_2k_lossless.dcm"
 # JPEG2k
-JPEG_2K = get_testdata_file("JPEG2000.dcm")
-# RLE Lossless
-RLE = get_testdata_file("MR_small_RLE.dcm")
+JPEG_2K = "JPEG2000.dcm"
 
 # Transfer Syntaxes (non-retired + Explicit VR Big Endian)
 SUPPORTED_SYNTAXES = [RLELossless]
@@ -201,20 +196,20 @@ class TestNoNumpy_NoRLEHandler:
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.PatientName == 'CompressedSamples^MR1'
         assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.PatientName == data[1]
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -246,20 +241,20 @@ class TestNoNumpy_RLEHandler:
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.PatientName == 'CompressedSamples^MR1'
         assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.PatientName == data[1]
 
     def test_unsupported_pixel_array_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -271,7 +266,7 @@ class TestNoNumpy_RLEHandler:
 
     def test_supported_pixel_array_raises(self):
         """Test pixel_array raises exception for supported syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         for uid in SUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -304,20 +299,20 @@ class TestNumpy_NoRLEHandler:
 
     def test_can_access_supported_dataset(self):
         """Test that we can read and access elements in an RLE dataset."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.PatientName == 'CompressedSamples^MR1'
         assert len(ds.PixelData) == 6128
 
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert data[0] == ds.file_meta.TransferSyntaxUID
         assert data[1] == ds.PatientName
 
     def test_pixel_array_raises(self):
         """Test pixel_array raises exception for all syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             exc_msg = (
@@ -348,7 +343,7 @@ class TestNumpy_RLEHandler:
 
     def test_unsupported_syntax_raises(self):
         """Test pixel_array raises exception for unsupported syntaxes."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             msg = (
@@ -363,18 +358,18 @@ class TestNumpy_RLEHandler:
     @pytest.mark.parametrize("fpath,data", REFERENCE_DATA_UNSUPPORTED)
     def test_can_access_unsupported_dataset(self, fpath, data):
         """Test can read and access elements in unsupported datasets."""
-        ds = dcmread(fpath)
+        ds = dcmread(get_testdata_file(fpath))
         assert ds.file_meta.TransferSyntaxUID == data[0]
         assert ds.PatientName == data[1]
         assert len(ds.PixelData)
 
-    def test_pixel_array_signed(self):
+    def test_pixel_array_signed(self, mono_8bit_1frame_name):
         """Test pixel_array for unsigned -> signed data."""
-        ds = dcmread(RLE_8_1_1F)
+        ds = dcmread(get_testdata_file(RLE_8_1_1F))
         # 0 is unsigned int, 1 is 2's complement
         assert ds.PixelRepresentation == 0
         ds.PixelRepresentation = 1
-        ref = _get_pixel_array(EXPL_8_1_1F)
+        ref = _get_pixel_array(mono_8bit_1frame_name)
         arr = ds.pixel_array
 
         assert not np.array_equal(arr, ref)
@@ -385,21 +380,21 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_1bit_raises(self):
         """Test pixel_array for 1-bit raises exception."""
-        ds = dcmread(RLE_8_3_1F)
+        ds = dcmread(get_testdata_file(RLE_8_3_1F))
         ds.BitsAllocated = 1
         msg = r"Bits Allocated' value of 1"
         with pytest.raises(NotImplementedError, match=msg):
             ds.pixel_array
 
-    def test_pixel_array_8bit_1sample_1f(self):
+    def test_pixel_array_8bit_1sample_1f(self, mono_8bit_1frame_name):
         """Test pixel_array for 8-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_8_1_1F)
+        ds = dcmread(get_testdata_file(RLE_8_1_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(EXPL_8_1_1F)
+        ref = _get_pixel_array(mono_8bit_1frame_name)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -411,7 +406,7 @@ class TestNumpy_RLEHandler:
 
     def test_decompress_with_handler(self):
         """Test that decompress works with the correct handler."""
-        ds = dcmread(RLE_8_1_1F)
+        ds = dcmread(get_testdata_file(RLE_8_1_1F))
         msg = r"'zip' is not a known handler name"
         with pytest.raises(ValueError, match=msg):
             ds.decompress(handler_name='zip')
@@ -428,13 +423,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_8bit_1sample_2f(self):
         """Test pixel_array for 8-bit, 1 sample/pixel, 2 frame."""
-        ds = dcmread(RLE_8_1_2F)
+        ds = dcmread(get_testdata_file(RLE_8_1_2F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 2
         assert ds.PixelRepresentation == 0
-        ref = _get_pixel_array(EXPL_8_1_2F)
+        ref = _get_pixel_array(get_testdata_file("OBXXXX1A_2frame.dcm"))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -449,13 +444,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_8bit_3sample_1f(self):
         """Test pixel_array for 8-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_8_3_1F)
+        ds = dcmread(get_testdata_file(RLE_8_3_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(EXPL_8_3_1F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_8_3_1F))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -472,15 +467,15 @@ class TestNumpy_RLEHandler:
         assert tuple(arr[85, 50, :]) == (192, 192, 192)
         assert tuple(arr[95, 50, :]) == (255, 255, 255)
 
-    def test_pixel_array_8bit_3sample_2f(self):
+    def test_pixel_array_8bit_3sample_2f(self, rgb_8bit_2frames_name):
         """Test pixel_array for 8-bit, 3 sample/pixel, 2 frame."""
-        ds = dcmread(RLE_8_3_2F)
+        ds = dcmread(get_testdata_file(RLE_8_3_2F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 8
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
         assert ds.PixelRepresentation == 0
-        ref = _get_pixel_array(EXPL_8_3_2F)
+        ref = _get_pixel_array(rgb_8bit_2frames_name)
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -504,13 +499,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_16bit_1sample_1f(self):
         """Test pixel_array for 16-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert 'NumberOfFrames' not in ds
         assert ds.PixelRepresentation == 1
-        ref = _get_pixel_array(EXPL_16_1_1F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_16_1_1F))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -523,13 +518,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_16bit_1sample_10f(self):
         """Test pixel_array for 16-bit, 1, sample/pixel, 10 frame."""
-        ds = dcmread(RLE_16_1_10F)
+        ds = dcmread(get_testdata_file(RLE_16_1_10F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 10
         assert ds.PixelRepresentation == 0
-        ref = _get_pixel_array(EXPL_16_1_10F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_16_1_10F))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -554,14 +549,14 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_16bit_3sample_1f(self):
         """Test pixel_array for 16-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_16_3_1F)
+        ds = dcmread(get_testdata_file(RLE_16_3_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
-        ref = _get_pixel_array(EXPL_16_3_1F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_16_3_1F))
 
         assert arr.flags.writeable
         assert arr.dtype == '<u2'
@@ -580,14 +575,14 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_16bit_3sample_2f(self):
         """Test pixel_array for 16-bit, 3, sample/pixel, 10 frame."""
-        ds = dcmread(RLE_16_3_2F)
+        ds = dcmread(get_testdata_file(RLE_16_3_2F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
         assert ds.PixelRepresentation == 0
         arr = ds.pixel_array
-        ref = _get_pixel_array(EXPL_16_3_2F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_16_3_2F))
 
         assert arr.flags.writeable
         assert arr.dtype == '<u2'
@@ -611,13 +606,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_32bit_1sample_1f(self):
         """Test pixel_array for 32-bit, 1 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_32_1_1F)
+        ds = dcmread(get_testdata_file(RLE_32_1_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
-        ref = _get_pixel_array(EXPL_32_1_1F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_32_1_1F))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -631,13 +626,13 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_32bit_1sample_15f(self):
         """Test pixel_array for 32-bit, 1, sample/pixel, 15 frame."""
-        ds = dcmread(RLE_32_1_15F)
+        ds = dcmread(get_testdata_file(RLE_32_1_15F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 1
         assert ds.NumberOfFrames == 15
         assert ds.PixelRepresentation == 0
-        ref = _get_pixel_array(EXPL_32_1_15F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_32_1_15F))
         arr = ds.pixel_array
 
         assert arr.flags.writeable
@@ -662,14 +657,14 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_32bit_3sample_1f(self):
         """Test pixel_array for 32-bit, 3 sample/pixel, 1 frame."""
-        ds = dcmread(RLE_32_3_1F)
+        ds = dcmread(get_testdata_file(RLE_32_3_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
         assert ds.PixelRepresentation == 0
         assert 'NumberOfFrames' not in ds
         arr = ds.pixel_array
-        ref = _get_pixel_array(EXPL_32_3_1F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_32_3_1F))
 
         assert arr.flags.writeable
         assert arr.dtype == '<u4'
@@ -688,14 +683,14 @@ class TestNumpy_RLEHandler:
 
     def test_pixel_array_32bit_3sample_2f(self):
         """Test pixel_array for 32-bit, 3, sample/pixel, 2 frame."""
-        ds = dcmread(RLE_32_3_2F)
+        ds = dcmread(get_testdata_file(RLE_32_3_2F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 32
         assert ds.SamplesPerPixel == 3
         assert ds.NumberOfFrames == 2
         assert ds.PixelRepresentation == 0
         arr = ds.pixel_array
-        ref = _get_pixel_array(EXPL_32_3_2F)
+        ref = _get_pixel_array(get_testdata_file(EXPL_32_3_2F))
 
         assert arr.flags.writeable
         assert arr.dtype == '<u4'
@@ -723,7 +718,7 @@ class TestNumpy_GetPixelData:
     """Tests for rle_handler.get_pixeldata with numpy."""
     def test_no_pixel_data_raises(self):
         """Test get_pixeldata raises if dataset has no PixelData."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         del ds.PixelData
         assert 'PixelData' not in ds
         with pytest.raises(AttributeError, match=' dataset: PixelData'):
@@ -731,14 +726,14 @@ class TestNumpy_GetPixelData:
 
     def test_unknown_pixel_representation_raises(self):
         """Test get_pixeldata raises if invalid PixelRepresentation."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         ds.PixelRepresentation = 2
         with pytest.raises(ValueError, match=r"value of '2' for '\(0028,0103"):
             get_pixeldata(ds)
 
     def test_unsupported_syntaxes_raises(self):
         """Test get_pixeldata raises if unsupported Transfer Syntax."""
-        ds = dcmread(EXPL_16_1_1F)
+        ds = dcmread(get_testdata_file(EXPL_16_1_1F))
         msg = r'syntax is not supported by the RLE pixel'
         with pytest.raises(NotImplementedError, match=msg):
             get_pixeldata(ds)
@@ -750,7 +745,7 @@ class TestNumpy_GetPixelData:
             return True
 
         # Test default
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.PhotometricInterpretation == 'MONOCHROME2'
 
         get_pixeldata(ds)
@@ -767,7 +762,7 @@ class TestNumpy_GetPixelData:
 
     def test_little_endian_segment_order(self):
         """Test interpreting segment order as little endian."""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         assert ds.file_meta.TransferSyntaxUID == RLELossless
         assert ds.BitsAllocated == 16
         assert ds.SamplesPerPixel == 1
@@ -883,7 +878,7 @@ class TestNumpy_RLEDecodeFrame:
 
     def test_invalid_segment_data_raises(self):
         """Test invalid segment data raises exception"""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         pixel_data = defragment_data(ds.PixelData)
         msg = r"amount \(4095 vs. 4096 bytes\)"
         with pytest.raises(ValueError, match=msg):
@@ -897,7 +892,7 @@ class TestNumpy_RLEDecodeFrame:
 
     def test_nonconf_segment_padding_warns(self):
         """Test non-conformant segment padding warns"""
-        ds = dcmread(RLE_16_1_1F)
+        ds = dcmread(get_testdata_file(RLE_16_1_1F))
         pixel_data = defragment_data(ds.PixelData)
         msg = (
             r"The decoded RLE segment contains non-conformant padding - 4097 "

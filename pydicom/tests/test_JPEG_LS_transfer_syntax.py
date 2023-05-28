@@ -49,25 +49,24 @@ except ImportError:
     gdcm_handler = None
     HAVE_GDCM = False
 
-mr_name = get_testdata_file("MR_small.dcm")
-jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-emri_name = get_testdata_file("emri_small.dcm")
-emri_jpeg_ls_lossless = get_testdata_file(
-    "emri_small_jpeg_ls_lossless.dcm")
+
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
-class Test_JPEG_LS_Lossless_transfer_syntax():
-    def setup_method(self, method):
-        self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
-        self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
-        self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+class Test_JPEG_LS_Lossless_transfer_syntax:
 
-    def teardown_method(self, method):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, emri_jpeg_ls_lossless_name):
+        self.jpeg_ls_lossless = dcmread(get_testdata_file(
+            "MR_small_jpeg_ls_lossless.dcm")
+        )
+        self.mr_small = dcmread(mr_name)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless_name)
+        self.emri_small = dcmread(get_testdata_file("emri_small.dcm"))
+        original_handlers = pydicom.config.pixel_data_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     @pytest.mark.skipif(not HAVE_NP, reason=numpy_missing_message)
     def test_read_mr_with_numpy(self):

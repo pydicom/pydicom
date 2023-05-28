@@ -24,7 +24,9 @@ from pydicom.encaps import (
 from pydicom.filebase import DicomBytesIO
 
 
-JP2K_10FRAME_NOBOT = get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
+@pytest.fixture
+def jp2k_10frame_nobot_name():
+    return get_testdata_file('emri_small_jpeg_2k_lossless.dcm')
 
 
 class TestGetFrameOffsets:
@@ -472,10 +474,10 @@ class TestGeneratePixelDataFrames:
         assert next(frames) == b'\x03\x00\x00\x00\x02\x04'
         pytest.raises(StopIteration, next, frames)
 
-    def test_empty_bot_multi_fragments_per_frame(self):
+    def test_empty_bot_multi_fragments_per_frame(self, jp2k_10frame_nobot_name):
         """Test multi-frame where multiple frags per frame and no BOT."""
         # Regression test for #685
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+        ds = dcmread(jp2k_10frame_nobot_name)
         assert 10 == ds.NumberOfFrames
         frame_gen = generate_pixel_data_frame(ds.PixelData, ds.NumberOfFrames)
         for ii in range(10):
@@ -541,9 +543,9 @@ class TestGeneratePixelData:
         with pytest.raises(ValueError, match=msg):
             next(generate_pixel_data(bytestream))
 
-    def test_empty_bot_too_few_fragments(self):
+    def test_empty_bot_too_few_fragments(self, jp2k_10frame_nobot_name):
         """Test parsing with too few fragments."""
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+        ds = dcmread(jp2k_10frame_nobot_name)
         assert 10 == ds.NumberOfFrames
 
         msg = (
@@ -1137,9 +1139,10 @@ class TestEncapsulateFrame:
 
 class TestEncapsulate:
     """Test encaps.encapsulate."""
-    def test_encapsulate_single_fragment_per_frame_no_bot(self):
+    def test_encapsulate_single_fragment_per_frame_no_bot(
+            self, jp2k_10frame_nobot_name):
         """Test encapsulating single fragment per frame with no BOT values."""
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+        ds = dcmread(jp2k_10frame_nobot_name)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 
@@ -1151,9 +1154,9 @@ class TestEncapsulate:
         # Original data has no BOT values
         assert data == ds.PixelData
 
-    def test_encapsulate_single_fragment_per_frame_bot(self):
+    def test_encapsulate_single_fragment_per_frame_bot(self, jp2k_10frame_nobot_name):
         """Test encapsulating single fragment per frame with BOT values."""
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+        ds = dcmread(jp2k_10frame_nobot_name)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 
@@ -1178,9 +1181,9 @@ class TestEncapsulate:
             0x8594  # 34196
         ]
 
-    def test_encapsulate_bot(self):
+    def test_encapsulate_bot(self, jp2k_10frame_nobot_name):
         """Test the Basic Offset Table is correct."""
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+        ds = dcmread(jp2k_10frame_nobot_name)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 
@@ -1231,8 +1234,8 @@ class TestEncapsulate:
 
 class TestEncapsulateExtended:
     """Tests for encaps.encapsulate_extended."""
-    def test_encapsulate(self):
-        ds = dcmread(JP2K_10FRAME_NOBOT)
+    def test_encapsulate(self, jp2k_10frame_nobot_name):
+        ds = dcmread(jp2k_10frame_nobot_name)
         frames = decode_data_sequence(ds.PixelData)
         assert len(frames) == 10
 

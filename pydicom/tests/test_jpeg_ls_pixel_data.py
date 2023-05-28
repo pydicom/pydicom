@@ -22,44 +22,6 @@ have_jpeg_ls_handler = jpeg_ls_handler.is_available()
 
 test_jpeg_ls_decoder = have_numpy_handler and have_jpeg_ls_handler
 
-empty_number_tags_name = get_testdata_file(
-    "reportsi_with_empty_number_tags.dcm")
-rtplan_name = get_testdata_file("rtplan.dcm")
-rtdose_name = get_testdata_file("rtdose.dcm")
-ct_name = get_testdata_file("CT_small.dcm")
-mr_name = get_testdata_file("MR_small.dcm")
-truncated_mr_name = get_testdata_file("MR_truncated.dcm")
-jpeg2000_name = get_testdata_file("JPEG2000.dcm")
-jpeg2000_lossless_name = get_testdata_file(
-    "MR_small_jp2klossless.dcm")
-jpeg_ls_lossless_name = get_testdata_file(
-    "MR_small_jpeg_ls_lossless.dcm")
-jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
-jpeg_lossless_name = get_testdata_file("JPEG-LL.dcm")
-deflate_name = get_testdata_file("image_dfl.dcm")
-rtstruct_name = get_testdata_file("rtstruct.dcm")
-priv_SQ_name = get_testdata_file("priv_SQ.dcm")
-nested_priv_SQ_name = get_testdata_file("nested_priv_SQ.dcm")
-meta_missing_tsyntax_name = get_testdata_file(
-    "meta_missing_tsyntax.dcm")
-no_meta_group_length = get_testdata_file(
-    "no_meta_group_length.dcm")
-gzip_name = get_testdata_file("zipMR.gz")
-color_px_name = get_testdata_file("color-px.dcm")
-color_pl_name = get_testdata_file("color-pl.dcm")
-explicit_vr_le_no_meta = get_testdata_file(
-    "ExplVR_LitEndNoMeta.dcm")
-explicit_vr_be_no_meta = get_testdata_file(
-    "ExplVR_BigEndNoMeta.dcm")
-emri_name = get_testdata_file("emri_small.dcm")
-emri_big_endian_name = get_testdata_file(
-    "emri_small_big_endian.dcm")
-emri_jpeg_ls_lossless = get_testdata_file(
-    "emri_small_jpeg_ls_lossless.dcm")
-emri_jpeg_2k_lossless = get_testdata_file(
-    "emri_small_jpeg_2k_lossless.dcm")
-color_3d_jpeg_baseline = get_testdata_file(
-    "color3d_jpeg_baseline.dcm")
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
@@ -68,16 +30,17 @@ SUPPORTED_HANDLER_NAMES = (
 )
 
 class TestJPEGLS_no_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg_ls_lossless_name, emri_name,
+              emri_jpeg_ls_lossless_name):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless_name)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         with pytest.raises((RuntimeError, NotImplementedError)):
@@ -85,17 +48,18 @@ class TestJPEGLS_no_jpeg_ls:
 
 
 class TestJPEGLS_JPEG2000_no_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg2000_name, jpeg2000_lossless_name, emri_name,
+              emri_jpeg_2k_lossless_name):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless_name)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEG2000PixelArray(self):
         """JPEG2000: Now works"""
@@ -109,14 +73,14 @@ class TestJPEGLS_JPEG2000_no_jpeg_ls:
 
 
 class TestJPEGLS_JPEGlossy_no_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossy_name, color_3d_jpeg_baseline_name):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
-        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline_name)
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
@@ -134,13 +98,13 @@ class TestJPEGLS_JPEGlossy_no_jpeg_ls:
 
 
 class TestJPEGLS_JPEGlossless_no_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossless_name):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements"""
@@ -158,16 +122,17 @@ class TestJPEGLS_JPEGlossless_no_jpeg_ls:
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class TestJPEGLS_JPEG_LS_with_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg_ls_lossless_name,
+              emri_jpeg_ls_lossless_name, emri_name):
         self.jpeg_ls_lossless = dcmread(jpeg_ls_lossless_name)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless_name)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEG_LS_PixelArray(self):
         a = self.jpeg_ls_lossless.pixel_array
@@ -191,17 +156,18 @@ class TestJPEGLS_JPEG_LS_with_jpeg_ls:
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class TestJPEGLS_JPEG2000_with_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg2000_name, jpeg2000_lossless_name, emri_name,
+              emri_jpeg_2k_lossless_name):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless_name)
         self.emri_small = dcmread(emri_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEG2000PixelArray(self):
         with pytest.raises(NotImplementedError):
@@ -214,14 +180,14 @@ class TestJPEGLS_JPEG2000_with_jpeg_ls:
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class TestJPEGLS_JPEGlossy_with_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossy_name, color_3d_jpeg_baseline_name):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
-        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline_name)
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def testJPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
@@ -239,13 +205,13 @@ class TestJPEGLS_JPEGlossy_with_jpeg_ls:
 
 @pytest.mark.skipif(not test_jpeg_ls_decoder, reason=jpeg_ls_missing_message)
 class TestJPEGLS_JPEGlossless_with_jpeg_ls:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossless_name):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = [jpeg_ls_handler, numpy_handler]
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements"""

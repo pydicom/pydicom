@@ -191,10 +191,9 @@ class TestDump:
         assert print_character(0x7A) == 'z'
         assert print_character(0x00) == '.'
 
-    def test_filedump(self):
+    def test_filedump(self, ct_name):
         """Test utils.dump.filedump"""
-        p = get_testdata_file("CT_small.dcm")
-        s = filedump(p, start_address=500, stop_address=1000)
+        s = filedump(ct_name, start_address=500, stop_address=1000)
 
         assert (
             "000  49 49 2A 00 54 18 08 00 00 00 00 00 00 00 00 00  "
@@ -277,9 +276,9 @@ class TestDump:
             ".1.1.1.1.2004011"
         ) in s
 
-    def test_pretty_print(self, capsys):
+    def test_pretty_print(self, capsys, ct_name):
         """Test utils.dump.pretty_print"""
-        ds = get_testdata_file("CT_small.dcm", read=True)
+        ds = dcmread(ct_name)
         pretty_print(ds)
 
         s = capsys.readouterr().out
@@ -458,11 +457,10 @@ class TestDataElementCallbackTests:
 
 
 class TestLeanRead:
-    def test_explicit_little(self):
-        p = get_testdata_file("CT_small.dcm")
-        ds = dcmread(p)
+    def test_explicit_little(self, ct_name):
+        ds = dcmread(ct_name)
         assert ds.file_meta.TransferSyntaxUID == ExplicitVRLittleEndian
-        with dicomfile(p) as ds:
+        with dicomfile(ct_name) as ds:
             assert ds.preamble is not None
             for elem in ds:
                 if elem[0] == (0x7fe0, 0x0010):

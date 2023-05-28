@@ -43,72 +43,29 @@ gdcm_im_missing_message = (
 )
 
 
-empty_number_tags_name = get_testdata_file(
-    "reportsi_with_empty_number_tags.dcm")
-rtplan_name = get_testdata_file("rtplan.dcm")
-rtdose_name = get_testdata_file("rtdose.dcm")
-ct_name = get_testdata_file("CT_small.dcm")
-mr_name = get_testdata_file("MR_small.dcm")
-truncated_mr_name = get_testdata_file("MR_truncated.dcm")
-jpeg2000_name = get_testdata_file("JPEG2000.dcm")
-jpeg2000_lossless_name = get_testdata_file("MR_small_jp2klossless.dcm")
-jpeg_ls_lossless_name = get_testdata_file("MR_small_jpeg_ls_lossless.dcm")
-jpeg_lossy_name = get_testdata_file("JPEG-lossy.dcm")
-jpeg_lossless_name = get_testdata_file("JPEG-LL.dcm")
-jpeg_lossless_odd_data_size_name = get_testdata_file(
-    'SC_rgb_small_odd_jpeg.dcm')
-deflate_name = get_testdata_file("image_dfl.dcm")
-rtstruct_name = get_testdata_file("rtstruct.dcm")
-priv_SQ_name = get_testdata_file("priv_SQ.dcm")
-nested_priv_SQ_name = get_testdata_file("nested_priv_SQ.dcm")
-meta_missing_tsyntax_name = get_testdata_file("meta_missing_tsyntax.dcm")
-no_meta_group_length = get_testdata_file("no_meta_group_length.dcm")
-gzip_name = get_testdata_file("zipMR.gz")
-color_px_name = get_testdata_file("color-px.dcm")
-color_pl_name = get_testdata_file("color-pl.dcm")
-explicit_vr_le_no_meta = get_testdata_file("ExplVR_LitEndNoMeta.dcm")
-explicit_vr_be_no_meta = get_testdata_file("ExplVR_BigEndNoMeta.dcm")
-emri_name = get_testdata_file("emri_small.dcm")
-emri_big_endian_name = get_testdata_file("emri_small_big_endian.dcm")
-emri_jpeg_ls_lossless = get_testdata_file(
-    "emri_small_jpeg_ls_lossless.dcm")
-emri_jpeg_2k_lossless = get_testdata_file(
-    "emri_small_jpeg_2k_lossless.dcm")
-color_3d_jpeg_baseline = get_testdata_file("color3d_jpeg_baseline.dcm")
-sc_rgb_jpeg_dcmtk_411_YBR_FULL_422 = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+np.dcm")
-sc_rgb_jpeg_dcmtk_411_YBR_FULL = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+n1.dcm")
-sc_rgb_jpeg_dcmtk_422_YBR_FULL = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+n2.dcm")
-sc_rgb_jpeg_dcmtk_444_YBR_FULL = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+s4.dcm")
-sc_rgb_jpeg_dcmtk_422_YBR_FULL_422 = get_testdata_file(
-    "SC_rgb_dcmtk_+eb+cy+s2.dcm")
-sc_rgb_jpeg_dcmtk_RGB = get_testdata_file("SC_rgb_dcmtk_+eb+cr.dcm")
-sc_rgb_jpeg2k_gdcm_KY = get_testdata_file("SC_rgb_gdcm_KY.dcm")
-ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm = get_testdata_file(
-    "SC_rgb_gdcm2k_uncompressed.dcm"
-)
-J2KR_16_13_1_1_1F_M2_MISMATCH = get_testdata_file("J2K_pixelrep_mismatch.dcm")
-
 dir_name = os.path.dirname(sys.argv[0])
 save_dir = os.getcwd()
 
 
+@pytest.fixture(scope="module")
+def sc_rgb_jpeg2k_gdcm_ky_name():
+    return get_testdata_file("SC_rgb_gdcm_KY.dcm")
+
+
 class TestGDCM_JPEG_LS_no_gdcm:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg_ls_lossless_name, emri_name,
+              emri_jpeg_ls_lossless_name):
         self.unicode_filename = os.path.join(
             tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(jpeg_ls_lossless_name, self.unicode_filename)
         self.jpeg_ls_lossless = dcmread(self.unicode_filename)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless)
+        self.emri_jpeg_ls_lossless = dcmread(emri_jpeg_ls_lossless_name)
         self.emri_small = dcmread(emri_name)
         self.original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
-
-    def teardown_method(self):
+        yield
         pydicom.config.pixel_data_handlers = self.original_handlers
         os.remove(self.unicode_filename)
 
@@ -122,18 +79,19 @@ class TestGDCM_JPEG_LS_no_gdcm:
 
 
 class TestGDCM_JPEG2000_no_gdcm:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, mr_name, jpeg2000_name, jpeg2000_lossless_name,
+              emri_name, emri_jpeg_2k_lossless_name, sc_rgb_jpeg2k_gdcm_ky_name):
         self.jpeg_2k = dcmread(jpeg2000_name)
         self.jpeg_2k_lossless = dcmread(jpeg2000_lossless_name)
         self.mr_small = dcmread(mr_name)
-        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless)
+        self.emri_jpeg_2k_lossless = dcmread(emri_jpeg_2k_lossless_name)
         self.emri_small = dcmread(emri_name)
-        self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_KY)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        self.sc_rgb_jpeg2k_gdcm_KY = dcmread(sc_rgb_jpeg2k_gdcm_ky_name)
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEG2000(self):
         """JPEG2000: Returns correct values for sample data elements"""
@@ -160,14 +118,14 @@ class TestGDCM_JPEG2000_no_gdcm:
 
 
 class TestGDCM_JPEGlossy_no_gdcm:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossy_name, color_3d_jpeg_baseline_name):
         self.jpeg_lossy = dcmread(jpeg_lossy_name)
-        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        self.color_3d_jpeg = dcmread(color_3d_jpeg_baseline_name)
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def test_JPEGlossy(self):
         """JPEG-lossy: Returns correct values for sample data elements"""
@@ -185,13 +143,13 @@ class TestGDCM_JPEGlossy_no_gdcm:
 
 
 class TestGDCM_JPEGlossless_no_gdcm:
-    def setup_method(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, jpeg_lossless_name):
         self.jpeg_lossless = dcmread(jpeg_lossless_name)
-        self.original_handlers = pydicom.config.pixel_data_handlers
+        original_handlers = pydicom.config.pixel_data_handlers
         pydicom.config.pixel_data_handlers = []
-
-    def teardown_method(self):
-        pydicom.config.pixel_data_handlers = self.original_handlers
+        yield
+        pydicom.config.pixel_data_handlers = original_handlers
 
     def testJPEGlossless(self):
         """JPEGlossless: Returns correct values for sample data elements"""
@@ -218,7 +176,7 @@ pi_rgb_test_ids = [
 
 pi_rgb_testdata = [
     pytest.param(
-        sc_rgb_jpeg_dcmtk_411_YBR_FULL,
+        "SC_rgb_dcmtk_+eb+cy+n1.dcm",
         "YBR_FULL",
         [
             (253, 1, 0),
@@ -235,7 +193,7 @@ pi_rgb_testdata = [
         True,
     ),
     pytest.param(
-        sc_rgb_jpeg_dcmtk_411_YBR_FULL_422,
+        "SC_rgb_dcmtk_+eb+cy+np.dcm",
         "YBR_FULL_422",
         [
             (253, 1, 0),
@@ -252,7 +210,7 @@ pi_rgb_testdata = [
         True,
     ),
     pytest.param(
-        sc_rgb_jpeg_dcmtk_422_YBR_FULL,
+        "SC_rgb_dcmtk_+eb+cy+n2.dcm",
         "YBR_FULL",
         [
             (254, 0, 0),
@@ -269,7 +227,7 @@ pi_rgb_testdata = [
         True,
     ),
     pytest.param(
-        sc_rgb_jpeg_dcmtk_422_YBR_FULL_422,
+        "SC_rgb_dcmtk_+eb+cy+s2.dcm",
         "YBR_FULL_422",
         [
             (254, 0, 0),
@@ -286,7 +244,7 @@ pi_rgb_testdata = [
         True,
     ),
     pytest.param(
-        sc_rgb_jpeg_dcmtk_444_YBR_FULL,
+        "SC_rgb_dcmtk_+eb+cy+s4.dcm",
         "YBR_FULL",
         [
             (254, 0, 0),
@@ -331,65 +289,66 @@ class TestsWithGDCM:
         pydicom.config.pixel_data_handlers = original_handlers
 
     @pytest.fixture(scope='class')
-    def unicode_filename(self):
+    def unicode_filename(self, jpeg_ls_lossless_name):
         unicode_filename = os.path.join(
             tempfile.gettempdir(), "ДИКОМ.dcm")
         shutil.copyfile(jpeg_ls_lossless_name, unicode_filename)
         yield unicode_filename
         os.remove(unicode_filename)
 
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def jpeg_ls_lossless(self, unicode_filename):
         return dcmread(unicode_filename)
 
-    @pytest.fixture
-    def sc_rgb_jpeg2k_gdcm_KY(self):
-        return dcmread(sc_rgb_jpeg2k_gdcm_KY)
+    @pytest.fixture(scope="class")
+    def sc_rgb_jpeg2k_gdcm_KY(self, sc_rgb_jpeg2k_gdcm_ky_name):
+        return dcmread(sc_rgb_jpeg2k_gdcm_ky_name)
 
     @pytest.fixture(scope='class')
     def ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm(self):
-        return dcmread(ground_truth_sc_rgb_jpeg2k_gdcm_KY_gdcm)
+        return dcmread(get_testdata_file("SC_rgb_gdcm2k_uncompressed.dcm"))
 
-    @pytest.fixture
-    def jpeg_2k(self):
+    @pytest.fixture(scope="class")
+    def jpeg_2k(self, jpeg2000_name):
         return dcmread(jpeg2000_name)
 
-    @pytest.fixture
-    def jpeg_2k_lossless(self):
+    @pytest.fixture(scope="class")
+    def jpeg_2k_lossless(self, jpeg2000_lossless_name):
         return dcmread(jpeg2000_lossless_name)
 
     @pytest.fixture(scope='class')
-    def mr_small(self):
+    def mr_small(self, mr_name):
         return dcmread(mr_name)
 
     @pytest.fixture(scope='class')
-    def emri_small(self):
+    def emri_small(self, emri_name):
         return dcmread(emri_name)
 
     @pytest.fixture
-    def emri_jpeg_ls_lossless(self):
-        return dcmread(emri_jpeg_ls_lossless)
+    def emri_jpeg_ls_lossless(self, emri_jpeg_ls_lossless_name):
+        return dcmread(emri_jpeg_ls_lossless_name)
 
     @pytest.fixture
-    def emri_jpeg_2k_lossless(self):
-        return dcmread(emri_jpeg_2k_lossless)
+    def emri_jpeg_2k_lossless(self, emri_jpeg_2k_lossless_name):
+        return dcmread(emri_jpeg_2k_lossless_name)
 
     @pytest.fixture
-    def color_3d_jpeg(self):
-        return dcmread(color_3d_jpeg_baseline)
+    def color_3d_jpeg(self, color_3d_jpeg_baseline_name):
+        return dcmread(color_3d_jpeg_baseline_name)
 
     @pytest.fixture
-    def jpeg_lossy(self):
+    def jpeg_lossy(self, jpeg_lossy_name):
         return dcmread(jpeg_lossy_name)
 
     @pytest.fixture
-    def jpeg_lossless(self):
+    def jpeg_lossless(self, jpeg_lossless_name):
         return dcmread(jpeg_lossless_name)
 
     @pytest.fixture
     def jpeg_lossless_odd_data_size(self):
-        return dcmread(jpeg_lossless_odd_data_size_name)
+        return dcmread(get_testdata_file("SC_rgb_small_odd_jpeg.dcm"))
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_JPEG_LS_PixelArray(self, jpeg_ls_lossless, mr_small):
         a = jpeg_ls_lossless.pixel_array
         b = mr_small.pixel_array
@@ -413,12 +372,14 @@ class TestsWithGDCM:
         got = jpeg_2k.DerivationCodeSequence[0].CodeMeaning
         assert 'Lossy Compression' == got
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_JPEG2000PixelArray(self, jpeg_2k_lossless, mr_small):
         a = jpeg_2k_lossless.pixel_array
         b = mr_small.pixel_array
         assert a.mean() == b.mean()
         assert a.flags.writeable
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_decompress_using_gdcm(self, jpeg_2k_lossless, mr_small):
         jpeg_2k_lossless.decompress(handler_name='gdcm')
         a = jpeg_2k_lossless.pixel_array
@@ -451,6 +412,7 @@ class TestsWithGDCM:
         assert 105 == a[230, 120]
         assert a.flags.writeable
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_JPEGlossless_odd_data_size(self, jpeg_lossless_odd_data_size):
         pixel_data = jpeg_lossless_odd_data_size.pixel_array
         assert 27 == pixel_data.nbytes
@@ -461,6 +423,7 @@ class TestsWithGDCM:
         got = jpeg_lossy.DerivationCodeSequence[0].CodeMeaning
         assert 'Lossy Compression' == got
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_JPEGlossyPixelArray(self, jpeg_lossy):
         a = jpeg_lossy.pixel_array
         assert (1024, 256) == a.shape
@@ -481,11 +444,12 @@ class TestsWithGDCM:
         assert (57, 57, 57) == tuple(a[3, 169, 290, :])
         assert "YBR_FULL_422" == color_3d_jpeg.PhotometricInterpretation
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     @pytest.mark.parametrize(
         "image,pi,results,convert_yuv_to_rgb",
         pi_rgb_testdata, ids=pi_rgb_test_ids)
     def test_PI_RGB(self, image, pi, results, convert_yuv_to_rgb):
-        t = dcmread(image)
+        t = dcmread(get_testdata_file(image))
         assert t.PhotometricInterpretation == pi
         a = t.pixel_array
 
@@ -507,7 +471,8 @@ class TestsWithGDCM:
         assert results[9] == tuple(a[95, 50, :])
         assert pi == t.PhotometricInterpretation
 
-    def test_bytes_io(self):
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
+    def test_bytes_io(self, jpeg2000_name):
         """Test using a BytesIO as the dataset source."""
         with open(jpeg2000_name, 'rb') as f:
             bs = BytesIO(f.read())
@@ -517,9 +482,10 @@ class TestsWithGDCM:
         assert (1024, 256) == arr.shape
         assert arr.flags.writeable
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Test needs installed NumPy")
     def test_pixel_rep_mismatch(self):
         """Test mismatched j2k sign and Pixel Representation."""
-        ds = dcmread(J2KR_16_13_1_1_1F_M2_MISMATCH)
+        ds = dcmread(get_testdata_file("J2K_pixelrep_mismatch.dcm"))
         assert 1 == ds.PixelRepresentation
         assert 13 == ds.BitsStored
 
@@ -544,16 +510,16 @@ class TestsWithGDCM:
 
 class TestSupportFunctions:
     @pytest.fixture(scope='class')
-    def dataset_2d(self):
+    def dataset_2d(self, mr_name):
         return dcmread(mr_name)
 
     @pytest.fixture(scope='class')
-    def dataset_2d_compressed(self):
+    def dataset_2d_compressed(self, jpeg2000_name):
         return dcmread(jpeg2000_name)
 
     @pytest.fixture(scope='class')
-    def dataset_3d(self):
-        return dcmread(color_3d_jpeg_baseline)
+    def dataset_3d(self, color_3d_jpeg_baseline_name):
+        return dcmread(color_3d_jpeg_baseline_name)
 
     @pytest.mark.skipif(not HAVE_GDCM_IN_MEMORY_SUPPORT,
                         reason=gdcm_im_missing_message)
