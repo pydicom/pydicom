@@ -20,6 +20,7 @@ Enhancements
 * Improved speed of creating and accessing highly nested structures
   (:issue:`1728`, :pr:`1734`)
 * Switched to a pyproject.toml build process (:pr:`1792`)
+* Updated DICOM and UID dicts to DICOM 2023b (:pr:`1803`)
 
 Fixes
 -----
