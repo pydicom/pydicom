@@ -190,6 +190,7 @@ UID_dictionary = {
     '1.2.840.10008.5.1.4.1.1.11.9': ('Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'VolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.10': ('Segmented Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'SegmentedVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.11.11': ('Multiple Volume Rendering Volumetric Presentation State Storage', 'SOP Class', '', '', 'MultipleVolumeRenderingVolumetricPresentationStateStorage'),  # noqa
+    '1.2.840.10008.5.1.4.1.1.11.12': ('Variable Modality LUT Softcopy Presentation State Storage', 'SOP Class', '', '', 'VariableModalityLUTPresentationStateStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1': ('X-Ray Angiographic Image Storage', 'SOP Class', '', '', 'XRayAngiographicImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.1.1': ('Enhanced XA Image Storage', 'SOP Class', '', '', 'EnhancedXAImageStorage'),  # noqa
     '1.2.840.10008.5.1.4.1.1.12.2': ('X-Ray Radiofluoroscopic Image Storage', 'SOP Class', '', '', 'XRayRadiofluoroscopicImageStorage'),  # noqa

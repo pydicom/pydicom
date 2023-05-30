@@ -2176,6 +2176,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x00282112: ('DS', '1-n', "Lossy Image Compression Ratio", '', 'LossyImageCompressionRatio'),  # noqa
     0x00282114: ('CS', '1-n', "Lossy Image Compression Method", '', 'LossyImageCompressionMethod'),  # noqa
     0x00283000: ('SQ', '1', "Modality LUT Sequence", '', 'ModalityLUTSequence'),  # noqa
+    0x00283001: ('SQ', '1', "Variable Modality LUT Sequence", '', 'VariableModalityLUTSequence'),  # noqa
     0x00283002: ('US or SS', '3', "LUT Descriptor", '', 'LUTDescriptor'),  # noqa
     0x00283003: ('LO', '1', "LUT Explanation", '', 'LUTExplanation'),  # noqa
     0x00283004: ('LO', '1', "Modality LUT Type", '', 'ModalityLUTType'),  # noqa
@@ -3998,7 +3999,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30080024: ('DA', '1', "Treatment Control Point Date", '', 'TreatmentControlPointDate'),  # noqa
     0x30080025: ('TM', '1', "Treatment Control Point Time", '', 'TreatmentControlPointTime'),  # noqa
     0x3008002A: ('CS', '1', "Treatment Termination Status", '', 'TreatmentTerminationStatus'),  # noqa
-    0x3008002B: ('SH', '1', "Treatment Termination Code", '', 'TreatmentTerminationCode'),  # noqa
+    0x3008002B: ('SH', '1', "Treatment Termination Code", 'Retired', 'TreatmentTerminationCode'),  # noqa
     0x3008002C: ('CS', '1', "Treatment Verification Status", '', 'TreatmentVerificationStatus'),  # noqa
     0x30080030: ('SQ', '1', "Referenced Treatment Record Sequence", '', 'ReferencedTreatmentRecordSequence'),  # noqa
     0x30080032: ('DS', '1', "Specified Primary Meterset", '', 'SpecifiedPrimaryMeterset'),  # noqa
@@ -4887,7 +4888,7 @@ DicomDictionary: Dict[int, Tuple[str, str, str, str, str]] = {
     0x30100087: ('SQ', '1', "Weekday Fraction Pattern Sequence", '', 'WeekdayFractionPatternSequence'),  # noqa
     0x30100088: ('SQ', '1', "Delivery Time Structure Code Sequence", '', 'DeliveryTimeStructureCodeSequence'),  # noqa
     0x30100089: ('SQ', '1', "Treatment Site Modifier Code Sequence", '', 'TreatmentSiteModifierCodeSequence'),  # noqa
-    0x30100090: ('CS', '1', "Robotic Base Location Indicator", '', 'RoboticBaseLocationIndicator'),  # noqa
+    0x30100090: ('CS', '1', "Robotic Base Location Indicator", 'Retired', 'RoboticBaseLocationIndicator'),  # noqa
     0x30100091: ('SQ', '1', "Robotic Path Node Set Code Sequence", '', 'RoboticPathNodeSetCodeSequence'),  # noqa
     0x30100092: ('UL', '1', "Robotic Node Identifier", '', 'RoboticNodeIdentifier'),  # noqa
     0x30100093: ('FD', '3', "RT Treatment Source Coordinates", '', 'RTTreatmentSourceCoordinates'),  # noqa
