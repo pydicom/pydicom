@@ -64,8 +64,8 @@ codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
 
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+exclude = ["pydicom.tests*"]
 
 [tool.setuptools_scm]
 # For pydicom v3.0, uncomment the following line
