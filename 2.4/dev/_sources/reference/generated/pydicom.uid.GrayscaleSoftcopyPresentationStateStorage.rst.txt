@@ -1,0 +1,6 @@
+﻿pydicom.uid.GrayscaleSoftcopyPresentationStateStorage
+=====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: GrayscaleSoftcopyPresentationStateStorage

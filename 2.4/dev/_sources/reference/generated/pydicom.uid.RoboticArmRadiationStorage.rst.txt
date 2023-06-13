@@ -1,0 +1,6 @@
+﻿pydicom.uid.RoboticArmRadiationStorage
+======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RoboticArmRadiationStorage

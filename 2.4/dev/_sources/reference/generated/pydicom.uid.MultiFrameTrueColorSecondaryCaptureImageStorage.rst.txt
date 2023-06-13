@@ -1,0 +1,6 @@
+﻿pydicom.uid.MultiFrameTrueColorSecondaryCaptureImageStorage
+===========================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MultiFrameTrueColorSecondaryCaptureImageStorage

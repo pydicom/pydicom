@@ -1,0 +1,6 @@
+﻿pydicom.uid.ColonCADSRStorage
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ColonCADSRStorage

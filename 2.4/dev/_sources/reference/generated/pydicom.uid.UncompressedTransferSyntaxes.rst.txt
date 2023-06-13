@@ -1,0 +1,6 @@
+﻿pydicom.uid.UncompressedTransferSyntaxes
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: UncompressedTransferSyntaxes

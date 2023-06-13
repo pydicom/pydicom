@@ -1,0 +1,42 @@
+﻿pydicom.fileset.FileSet
+=======================
+
+.. currentmodule:: pydicom.fileset
+
+.. autoclass:: FileSet
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FileSet.__init__
+      ~FileSet.add
+      ~FileSet.add_custom
+      ~FileSet.clear
+      ~FileSet.copy
+      ~FileSet.find
+      ~FileSet.find_values
+      ~FileSet.load
+      ~FileSet.remove
+      ~FileSet.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FileSet.ID
+      ~FileSet.UID
+      ~FileSet.descriptor_character_set
+      ~FileSet.descriptor_file_id
+      ~FileSet.is_staged
+      ~FileSet.path
+   
+   

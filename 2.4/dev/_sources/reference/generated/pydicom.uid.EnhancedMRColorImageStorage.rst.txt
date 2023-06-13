@@ -1,0 +1,6 @@
+﻿pydicom.uid.EnhancedMRColorImageStorage
+=======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: EnhancedMRColorImageStorage

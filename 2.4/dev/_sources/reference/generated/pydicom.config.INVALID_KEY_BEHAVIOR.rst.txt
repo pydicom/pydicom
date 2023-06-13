@@ -1,0 +1,6 @@
+﻿pydicom.config.INVALID\_KEY\_BEHAVIOR
+=====================================
+
+.. currentmodule:: pydicom.config
+
+.. autodata:: INVALID_KEY_BEHAVIOR

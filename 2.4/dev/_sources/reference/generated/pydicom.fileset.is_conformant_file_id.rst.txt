@@ -1,0 +1,6 @@
+﻿pydicom.fileset.is\_conformant\_file\_id
+========================================
+
+.. currentmodule:: pydicom.fileset
+
+.. autofunction:: is_conformant_file_id

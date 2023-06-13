@@ -1,0 +1,6 @@
+﻿pydicom.uid.VideoMicroscopicImageStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: VideoMicroscopicImageStorage

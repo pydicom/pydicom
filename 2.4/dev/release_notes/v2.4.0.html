@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Version 2.4.0 &mdash; pydicom 2.4.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pydicom
+              <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                2.4.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">How to install pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/getting_started.html">Introduction to pydicom</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../old/pydicom_user_guide.html">pydicom User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../old/ref_guide.html">Reading and writing DICOM files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Guides</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">General examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#image-processing">Image processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#input-output">Input-output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html#metadata-processing">Metadata processing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/contributing.html">Contributing to pydicom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/index.html">Frequently asked questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pydicom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Version 2.4.0</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="version-2-4-0">
+<h1>Version 2.4.0<a class="headerlink" href="#version-2-4-0" title="Permalink to this heading">¶</a></h1>
+<section id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Removed support for Python 3.6 (EOL since December 2021)</p></li>
+</ul>
+</section>
+<section id="enhancements">
+<h2>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.alphabetic" title="pydicom.valuerep.PersonName.alphabetic"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alphabetic</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1634">#1634</a>)</p></li>
+<li><p>Added attribute <a class="reference internal" href="../reference/generated/pydicom.tag.BaseTag.html#pydicom.tag.BaseTag.json_key" title="pydicom.tag.BaseTag.json_key"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json_key</span></code></a> (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1648">#1648</a>)</p></li>
+<li><p>Added value validation for numerical VRs, add type validation for all
+validated VRs (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1414">#1414</a>)</p></li>
+<li><p>CLI commands now accept <em>pydicom</em> charset test files and CLI help shows
+Python Version (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1674">#1674</a>)</p></li>
+<li><p>Added support for Python 3.11 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1658">#1658</a>)</p></li>
+<li><p>Added <a class="reference internal" href="../reference/generated/pydicom.valuerep.ISfloat.html#pydicom.valuerep.ISfloat" title="pydicom.valuerep.ISfloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ISfloat</span></code></a> to allow non-strict reading of
+existing files with float IS values (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1661">#1661</a>)</p></li>
+<li><p>Improved speed of creating and accessing highly nested structures
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1728">#1728</a>, <a class="reference external" href="https://github.com/pydicom/pydicom/pull/1734">#1734</a>)</p></li>
+<li><p>Switched to a pyproject.toml build process (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1792">#1792</a>)</p></li>
+<li><p>Updated DICOM and UID dicts to DICOM 2023b (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1803">#1803</a>)</p></li>
+</ul>
+</section>
+<section id="fixes">
+<h2>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed length validation of DS values with maximum length without a leading
+zero (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1632">#1632</a>)</p></li>
+<li><p>Increased download speed with progress bar for test data (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1611">#1611</a>)</p></li>
+<li><p>Fixed crash due to invalid private creator (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1638">#1638</a>)</p></li>
+<li><p>Fixed extremely long BytesLengthException error messages (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1683">#1683</a>)</p></li>
+<li><p>In codify, ensure unique variable names for DICOM keywords repeated
+in sequences, and handle unicode characters correctly (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1670">#1670</a>)</p></li>
+<li><p>Fixed handling of some invalid values in
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json_dict" title="pydicom.dataset.Dataset.to_json_dict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json_dict()</span></code></a> if <cite>suppress_invalid_tags</cite> is
+set to <cite>True</cite> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1693">#1693</a>)</p></li>
+<li><p>Fixed reading of data with 8 bits allocated, encoded in Big Endian transfer
+syntax using VR <code class="docutils literal notranslate"><span class="pre">OW</span></code> (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1680">#1680</a>)</p></li>
+<li><p>Fixed crash if reading regular dataset that has the SOP Class of a DICOMDIR
+(<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1702">#1702</a>)</p></li>
+<li><p>Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1667">#1667</a>)</p></li>
+<li><p>Fixed reading LUTData to expected size (<a class="reference external" href="https://github.com/pydicom/pydicom/pull/1747">#1747</a>)</p></li>
+<li><p>Fixed handling of AT VRs when codifying data elements (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1738">#1738</a>)</p></li>
+</ul>
+</section>
+<section id="pydicom-internals">
+<h2>Pydicom Internals<a class="headerlink" href="#pydicom-internals" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>In test suites, renamed ‘setup’ and ‘teardown’ methods, deprecated starting
+in pytest 7.2</p></li>
+<li><p>Use own fork of <cite>CharPyLS</cite> to handle builds with Python 3.11 (<a class="reference external" href="https://github.com/pydicom/pydicom/issues/1788">#1788</a>)</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2008-2023, Darcy Mason and pydicom contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

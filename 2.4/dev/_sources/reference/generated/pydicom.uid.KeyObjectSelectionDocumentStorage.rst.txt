@@ -1,0 +1,6 @@
+﻿pydicom.uid.KeyObjectSelectionDocumentStorage
+=============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: KeyObjectSelectionDocumentStorage

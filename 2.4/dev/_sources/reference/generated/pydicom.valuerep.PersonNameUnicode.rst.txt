@@ -1,0 +1,42 @@
+﻿pydicom.valuerep.PersonNameUnicode
+==================================
+
+.. currentmodule:: pydicom.valuerep
+
+.. autoclass:: PersonNameUnicode
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PersonNameUnicode.__init__
+      ~PersonNameUnicode.decode
+      ~PersonNameUnicode.encode
+      ~PersonNameUnicode.family_comma_given
+      ~PersonNameUnicode.formatted
+      ~PersonNameUnicode.from_named_components
+      ~PersonNameUnicode.from_named_components_veterinary
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PersonNameUnicode.alphabetic
+      ~PersonNameUnicode.components
+      ~PersonNameUnicode.family_name
+      ~PersonNameUnicode.given_name
+      ~PersonNameUnicode.ideographic
+      ~PersonNameUnicode.middle_name
+      ~PersonNameUnicode.name_prefix
+      ~PersonNameUnicode.name_suffix
+      ~PersonNameUnicode.phonetic
+   
+   

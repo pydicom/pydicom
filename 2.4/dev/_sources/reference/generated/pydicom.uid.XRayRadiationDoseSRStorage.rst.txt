@@ -1,0 +1,6 @@
+﻿pydicom.uid.XRayRadiationDoseSRStorage
+======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: XRayRadiationDoseSRStorage
