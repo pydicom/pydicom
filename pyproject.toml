@@ -19,7 +19,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "Topic :: Scientific/Engineering :: Physics",
@@ -27,12 +26,13 @@ classifiers=[
 ]
 dependencies = []
 description = "A pure Python package for reading and writing DICOM data"
-dynamic = ["version"]
+# dynamic = ["version"]
 keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
 name = "pydicom"
 readme = "README.md"
 requires-python = ">=3.7"
+version = "3.0.0.dev0"
 
 
 [project.optional-dependencies]
