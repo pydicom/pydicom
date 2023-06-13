@@ -1,0 +1,82 @@
+
+
+.. _sphx_glr_auto_examples_image_processing:
+
+.. _image_processing_examples:
+
+Image processing
+----------------
+
+These examples illustrate the image processing available in pydicom which can
+be applied to DICOM images.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to downsize an MR image from 512  imes 512 to 64       imes 64. The down...">
+
+.. only:: html
+
+  .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_downsize_image_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_image_processing_plot_downsize_image.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Downsize MRI image using pydicom</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates how to plot waveforms from a Waveform Sequence using matplotlib.">
+
+.. only:: html
+
+  .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_plot_waveforms_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_image_processing_plot_waveforms.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Decode and plot Waveform Data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example illustrates loading multiple files, sorting them by slice location, building a 3D ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/image_processing/images/thumb/sphx_glr_reslice_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_image_processing_reslice.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Load CT slices and plot axial, sagittal and coronal images</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/image_processing/plot_downsize_image
+   /auto_examples/image_processing/plot_waveforms
+   /auto_examples/image_processing/reslice
+

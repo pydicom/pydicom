@@ -1,0 +1,49 @@
+Version 2.4.0
+=================================
+
+Changes
+-------
+* Removed support for Python 3.6 (EOL since December 2021)
+
+
+Enhancements
+------------
+* Added attribute :attr:`~pydicom.valuerep.PersonName.alphabetic` (:pr:`1634`)
+* Added attribute :attr:`~pydicom.tag.BaseTag.json_key` (:pr:`1648`)
+* Added value validation for numerical VRs, add type validation for all
+  validated VRs (:issue:`1414`)
+* CLI commands now accept *pydicom* charset test files and CLI help shows
+  Python Version (:pr:`1674`)
+* Added support for Python 3.11 (:issue:`1658`)
+* Added :class:`~pydicom.valuerep.ISfloat` to allow non-strict reading of
+  existing files with float IS values (:issue:`1661`)
+* Improved speed of creating and accessing highly nested structures
+  (:issue:`1728`, :pr:`1734`)
+* Switched to a pyproject.toml build process (:pr:`1792`)
+* Updated DICOM and UID dicts to DICOM 2023b (:pr:`1803`)
+
+Fixes
+-----
+* Fixed length validation of DS values with maximum length without a leading
+  zero (:issue:`1632`)
+* Increased download speed with progress bar for test data (:issue:`1611`)
+* Fixed crash due to invalid private creator (:issue:`1638`)
+* Fixed extremely long BytesLengthException error messages (:pr:`1683`)
+* In codify, ensure unique variable names for DICOM keywords repeated
+  in sequences, and handle unicode characters correctly (:issue:`1670`)
+* Fixed handling of some invalid values in
+  :meth:`~pydicom.dataset.Dataset.to_json_dict` if `suppress_invalid_tags` is
+  set to `True` (:issue:`1693`)
+* Fixed reading of data with 8 bits allocated, encoded in Big Endian transfer
+  syntax using VR ``OW`` (:issue:`1680`)
+* Fixed crash if reading regular dataset that has the SOP Class of a DICOMDIR
+  (:issue:`1702`)
+* Fixed wrong waveform data calculation when as_raw=False and baseline!=0 (:issue:`1667`)
+* Fixed reading LUTData to expected size (:pr:`1747`)
+* Fixed handling of AT VRs when codifying data elements (:issue:`1738`)
+
+Pydicom Internals
+-----------------
+* In test suites, renamed 'setup' and 'teardown' methods, deprecated starting
+  in pytest 7.2
+* Use own fork of `CharPyLS` to handle builds with Python 3.11 (:issue:`1788`)

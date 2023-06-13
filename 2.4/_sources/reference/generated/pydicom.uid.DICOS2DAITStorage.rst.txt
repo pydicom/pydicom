@@ -1,0 +1,6 @@
+﻿pydicom.uid.DICOS2DAITStorage
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DICOS2DAITStorage

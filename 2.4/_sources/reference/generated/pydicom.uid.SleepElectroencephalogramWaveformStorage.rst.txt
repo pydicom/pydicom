@@ -1,0 +1,6 @@
+﻿pydicom.uid.SleepElectroencephalogramWaveformStorage
+====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SleepElectroencephalogramWaveformStorage

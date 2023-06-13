@@ -1,0 +1,6 @@
+﻿pydicom.uid.GrayscalePlanarMPRVolumetricPresentationStateStorage
+================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: GrayscalePlanarMPRVolumetricPresentationStateStorage

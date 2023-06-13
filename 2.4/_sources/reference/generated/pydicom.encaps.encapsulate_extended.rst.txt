@@ -1,0 +1,6 @@
+﻿pydicom.encaps.encapsulate\_extended
+====================================
+
+.. currentmodule:: pydicom.encaps
+
+.. autofunction:: encapsulate_extended

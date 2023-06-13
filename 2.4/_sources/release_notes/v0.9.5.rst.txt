@@ -1,0 +1,43 @@
+Version 0.9.5
+=============
+
+Changelog
+---------
+
+pydicom 0.9.5 is primarily a bug-fix release but includes some contrib files
+also.
+
+Major fixes in this release
+...........................
+
+* fix for incorrect pixel integer types which could lead to numeric errors
+  (issue 79)
+* By default an InvalidDicomError will be raised when trying to read a
+  non-DICOM file (unless read_file keyword arg {{{force}}} is True) (revision
+  fc790f01f5)
+* fix recursion error on private data elements (issue 81, issue 84)
+
+Other fixes in this release
+...........................
+
+* Fix for unicode decode failing with VM > 1 (issue 78)
+* fix for fail of DicomIter on files with Explicit VR Transfer Syntax UID
+  (issue 82)
+* Fix for Python 2.5 and 'with' statement (revision 1c32791bf0)
+* Handle 'OB/OW' VR as well as 'OW/OB' (revision e3ee934bbc)
+* Fix dataset.get(tag) so returns same as dataset[tag] (issue 88)
+
+New 'Contrib' files
+...................
+
+* dicom_dao.py by Mike Wallace -- CouchDB storage of DICOM info and binary data
+* pydicom_series.py by Almar Klein -- Reads files and separates into distinct
+  series.
+
+Other
+.....
+
+* switch to Distribute for packaging
+* preliminary work on Python 3 compatibility
+* preliminary work on using sphinx for documentation
+* preliminary work on better writing of files from scratch

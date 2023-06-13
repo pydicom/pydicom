@@ -1,0 +1,84 @@
+
+Version 1.0.0
+=============
+
+This is a major release, with major changes, including backwards-incompatible
+changes.
+
+
+Changelog
+---------
+
+Major changes
+.............
+
+* full Python 3 compatibility - one code base for both Python 2 and Python 3
+* package name and import name now match -- use ``import pydicom``
+  rather than ``import dicom``.
+* added handlers for converting (7fe0,0010) *Pixel Data* to a `numpy.ndarray`
+
+  * optional GDCM support for reading files with compressed pixel data
+    (:issue:`18`)
+  * optional Pillow and jpeg_ls support for reading some compressed pixel data
+    files
+  * support for decompressing a compressed dataset in-place
+* DICOM dictionary updated to 2017c
+* cleaned up DICOM dictionary code, old non-DICOM-keyword code removed
+
+Other enhancements
+..................
+
+* added ``util/fixer.py`` callbacks available to fix non DICOM-compliant
+  values before exceptions thrown
+* added context management methods to ``Dataset``
+* added ``misc.is_dicom()`` function to check for DICOM file format
+* added date/time converters (:issue:`143`)
+* added option to attempt other VRs if translate fails (:issue:`197`)
+* added heuristics to read files that have no preamble or file meta
+  information
+* support for multi-valued DA, DT, TM data elements (:issue:`212`)
+* ``DataElement``: added ``keyword`` and ``is_retired`` properties
+* ``datadict``: added ``dictionary_is_retired()``
+* ``datadict``: added ability to add custom DICOM dictionary items via
+  ``add_dict_entry()`` and ``add_dict_entries()``
+* added some support for pickle
+* added support for VRs ``OD``, ``OL`` and ``UC``
+* added support for Thai, Japanese and Chinese encodings (#346, #353)
+* added support for slicing to Dataset
+* add/update TransferSyntaxUID when writing standard
+* renamed ``UID`` package to ``uid`` (conforms to Python standard)
+* added property ``uid.is_private``
+* added definitions for storage SOP Class UIDs (:issue:`172`)
+* added possibility to read only specific tags (:issue:`95`)
+* added missing meta elements when writing DICOM file
+* added ``encaps`` generator functions to access compressed frames
+* ``read_file`` changed to ``dcmread``, ``write_file`` to ``dcmwrite`` for
+  greater clarity. Previous names still available for backwards compatibility.
+
+Infrastructure
+..............
+
+* added `TravisCI <https://travis-ci.org/pydicom/pydicom/>`_ and
+  `AppVeyor <https://ci.appveyor.com/project/pydicom/pydicom>`_ builds for
+  automatic tests under Linux and Windows
+* added automatic `code coverage builds <https://codecov.io/gh/pydicom/pydicom>`_
+  and PEP-8 checks
+* added automatic `documentation builds <https://circleci.com/gh/pydicom/pydicom>`_
+  on GitHub Pages for `development <https://pydicom.github.io/pydicom/dev>`_
+  and `release <https://pydicom.github.io/pydicom/stable/>`_ builds
+* added PyPy support
+* removed support for Python 2.6, added support for Python 3.6
+
+Fixes
+.....
+
+* correctly handle PlanarConfiguration==0 (:issue:`151`)
+* updated uid generation to ensure uniqueness (:issue:`125`)
+* handle missing patient data in ``show_dicomdir``
+* assume default transfer syntax if none in file meta  (:issue:`258`)
+* fixed reading/writing of empty tags and tags with bad VR
+* fixed reading AE elements with leading or trailing spaces
+* fixed handling of ambiguous VR elements
+* fixed handling for several error conditions
+* fixed Latin5 (Turkish) character set handling
+* a lot of other small fixes...

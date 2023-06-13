@@ -1,0 +1,6 @@
+﻿pydicom.uid.Comprehensive3DSRStorage
+====================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: Comprehensive3DSRStorage

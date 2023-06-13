@@ -1,0 +1,6 @@
+﻿pydicom.uid.MultichannelRespiratoryWaveformStorage
+==================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: MultichannelRespiratoryWaveformStorage

@@ -1,0 +1,6 @@
+﻿pydicom.encoders.RLELosslessEncoder
+===================================
+
+.. currentmodule:: pydicom.encoders
+
+.. autodata:: RLELosslessEncoder

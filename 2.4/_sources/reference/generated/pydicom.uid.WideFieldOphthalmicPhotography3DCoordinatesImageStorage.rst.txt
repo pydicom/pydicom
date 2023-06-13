@@ -1,0 +1,6 @@
+﻿pydicom.uid.WideFieldOphthalmicPhotography3DCoordinatesImageStorage
+===================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: WideFieldOphthalmicPhotography3DCoordinatesImageStorage

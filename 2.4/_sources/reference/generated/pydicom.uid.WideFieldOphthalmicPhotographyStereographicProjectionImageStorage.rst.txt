@@ -1,0 +1,6 @@
+﻿pydicom.uid.WideFieldOphthalmicPhotographyStereographicProjectionImageStorage
+=============================================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: WideFieldOphthalmicPhotographyStereographicProjectionImageStorage

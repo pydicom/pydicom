@@ -1,0 +1,6 @@
+﻿pydicom.uid.DICOS3DAITStorage
+=============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DICOS3DAITStorage

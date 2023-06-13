@@ -1,0 +1,6 @@
+﻿pydicom.uid.RadiopharmaceuticalRadiationDoseSRStorage
+=====================================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: RadiopharmaceuticalRadiationDoseSRStorage

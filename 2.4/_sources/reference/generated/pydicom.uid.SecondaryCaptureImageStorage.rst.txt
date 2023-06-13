@@ -1,0 +1,6 @@
+﻿pydicom.uid.SecondaryCaptureImageStorage
+========================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SecondaryCaptureImageStorage

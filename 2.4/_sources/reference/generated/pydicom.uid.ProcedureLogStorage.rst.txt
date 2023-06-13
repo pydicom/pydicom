@@ -1,0 +1,6 @@
+﻿pydicom.uid.ProcedureLogStorage
+===============================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: ProcedureLogStorage

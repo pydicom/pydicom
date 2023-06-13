@@ -1,0 +1,6 @@
+﻿pydicom.uid.XAPerformedProcedureProtocolStorage
+===============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: XAPerformedProcedureProtocolStorage

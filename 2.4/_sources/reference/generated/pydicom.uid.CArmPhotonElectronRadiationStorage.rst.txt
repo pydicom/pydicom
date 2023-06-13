@@ -1,0 +1,6 @@
+﻿pydicom.uid.CArmPhotonElectronRadiationStorage
+==============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: CArmPhotonElectronRadiationStorage

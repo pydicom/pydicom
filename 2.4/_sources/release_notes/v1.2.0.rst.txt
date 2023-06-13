@@ -1,0 +1,76 @@
+Version 1.2.0
+=================================
+
+Changelog
+---------
+
+Changes
+.......
+
+* PIL removed as a fallback if Pillow is not available in the pillow pixel data
+  handler (:issue:`722`)
+* ``uid.JPEGBaseLineLossy8bit`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEGBaseline`` instead. (:issue:`726`)
+* ``uid.JPEGBaseLineLossy12bit`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEGExtended`` instead. (:issue:`726`)
+* ``uid.JPEG2000Lossy`` deprecated and will be removed in v1.3. Use
+  ``uid.JPEG2000`` instead. (:issue:`726`)
+* Equality and inequality operator overrides removed from ``UID``.
+* ``config.image_handlers`` deprecated and will be removed in v1.3. - use
+  ``config.pixel_data_handlers`` instead. There is also a change in behavior
+  in that ``image_handlers`` previously used to only contain the pixel data
+  handlers that had their dependencies met. Now ``pixel_data_handlers``
+  contains all handlers no matter whether or not their dependencies are met. To check
+  if a handler is available for use (it has its dependency met) use the
+  handler's ``is_available`` method.
+* ``DeferredDataElement`` class deprecated and will be removed in v1.3
+  (:issue:`291`)
+* The use of NumPyPy with PyPy is no longer supported, use NumPy instead.
+
+
+Enhancements
+............
+
+* Updated DICOM dictionary for 2018c edition (:issue:`677`)
+* Added possibility to set byte strings as value for VRs that use only the
+  default character set (:issue:`624`)
+* Functions for encapsulating frames added to ``encaps`` module (:pr:`696`)
+* Added ``Dataset.fix_meta_info()`` (:issue:`584`)
+* Added new function for bit packing ``pack_bits`` for use with BitsAllocated
+  = 1 (:pr:`715`)
+* Added/corrected encoding and decoding of text and person name VRs using
+  character sets with code extensions, added handling of encoding/decoding
+  errors (:issue:`716`)
+* Handle common spelling errors in Specific Character Set values
+  (:pr:`695,737`)
+* Added ``uid.JPEGLosslessP14`` for UID 1.2.840.10008.1.2.4.57
+* Added ``uid.JPEG2000MultiComponentLossless`` for UID 1.2.840.10008.1.2.4.92
+* Added ``uid.JPEG2000MultiComponent`` for UID 1.2.840.10008.1.2.4.93
+* Added full support for Planar Configuration (:issue:`713`)
+* Added support for single frame pixel data where BitsAllocated > 8 and
+  SamplesPerPixel > 1 (:issue:`713`)
+* Small improvement in RLE decoding speed (~10%)
+* Added support for non-conformant RLE segment ordering (:pr:`729`)
+
+
+Fixes
+.....
+
+* Removed unused ``original_string`` attribute from the ``DataElement`` class
+  (:pr:`660`)
+* Improve performance for Python 3 when dealing with compressed multi-frame
+  Pixel Data with pillow and jpeg-ls (:issue:`682`)
+* Fixed handling of private tags in repeater range (:issue:`689`)
+* Fixed Pillow pixel data handler for non-JPEG2k transfer syntax (:issue:`663`)
+* Fixed handling of elements with ambiguous VR (:pr:`700, 728`)
+* Adapted pixel handlers where endianness is explicitly adapted (:issue:`704`)
+* Improve performance of bit unpacking (:pr:`715`)
+* First character set no longer removed (:issue:`707`)
+* Fixed RLE decoded data having the wrong byte order (:pr:`729`)
+* Fixed RLE decoded data having the wrong planar configuration
+  (:pr:`729`)
+* Fixed numpy arrays returned by the pixel data handlers sometimes being
+  read-only. Read-only arrays are still available for uncompressed transfer
+  syntaxes via a keyword argument for the numpy pixel data handler and should
+  help reduce memory consumption if required. (:issue:`717`)
+* Fixed deprecation warning in Python 3.7 (:issue:`740`)

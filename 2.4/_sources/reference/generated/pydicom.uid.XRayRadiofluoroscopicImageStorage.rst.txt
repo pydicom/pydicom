@@ -1,0 +1,6 @@
+﻿pydicom.uid.XRayRadiofluoroscopicImageStorage
+=============================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: XRayRadiofluoroscopicImageStorage

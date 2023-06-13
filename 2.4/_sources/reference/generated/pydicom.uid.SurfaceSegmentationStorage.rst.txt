@@ -1,0 +1,6 @@
+﻿pydicom.uid.SurfaceSegmentationStorage
+======================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: SurfaceSegmentationStorage

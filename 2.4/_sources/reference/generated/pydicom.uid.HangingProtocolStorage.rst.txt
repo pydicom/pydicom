@@ -1,0 +1,6 @@
+﻿pydicom.uid.HangingProtocolStorage
+==================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: HangingProtocolStorage
