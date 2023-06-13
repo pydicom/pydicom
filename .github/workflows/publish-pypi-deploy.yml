@@ -1,9 +1,9 @@
 name: publish-pypi-deploy
 
 on:
-  - release:
+  release:
     types: [ published ]
-  - workflow_dispatch 
+  workflow_dispatch:
 
 jobs:
 
