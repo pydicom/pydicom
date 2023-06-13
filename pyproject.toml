@@ -1,7 +1,3 @@
-# [build-system]
-# requires = ["setuptools"] # , "setuptools-scm"]
-# build-backend = "setuptools.build_meta"
-
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
@@ -65,21 +61,6 @@ codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
 
 
-[tool.flit.sdist]
-# include = ["pydicom/"]
-exclude = ["pydicom/tests"]
-
-
-[tool.setuptools]
-packages.find.include = ['pydicom*']
-packages.find.exclude = ['pydicom*tests']
-include-package-data = false
-
-[tool.setuptools_scm]
-# For pydicom v3.0, uncomment the following line
-# write_to = "pydicom/_version.py"
-
-
 [tool.ruff]
 select = [
     "C9",
@@ -117,4 +98,18 @@ max-statements = 106
 
 [tool.ruff.per-file-ignores]
 "*/__init__.py" = ["F401"]
-"pydicom/config.py" = ["PLW0602"]
+"src/pydicom/config.py" = ["PLW0602"]
+
+[mypy]
+python_version = 3.10
+exclude = src/pydicom/(tests|benchmarks)
+files = src/pydicom/
+show_error_codes = True
+warn_redundant_casts = True
+warn_unused_ignores = True
+warn_return_any = True
+warn_unreachable = False
+ignore_missing_imports = True
+disallow_untyped_calls = True
+disallow_untyped_defs = True
+disallow_incomplete_defs = True
