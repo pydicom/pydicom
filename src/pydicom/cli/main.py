@@ -8,7 +8,7 @@ attributes, and calls set_defaults(func=callback_function)
 """
 
 import argparse
-import pkg_resources
+from importlib.metadata import entry_points
 import re
 import sys
 from typing import Tuple, cast, List, Any, Dict, Optional, Callable
@@ -193,7 +193,7 @@ SubCommandType = Dict[str, Callable[[argparse._SubParsersAction], None]]
 
 def get_subcommand_entry_points() -> SubCommandType:
     subcommands = {}
-    for entry_point in pkg_resources.iter_entry_points("pydicom_subcommands"):
+    for entry_point in entry_points(group="pydicom_subcommands"):
         subcommands[entry_point.name] = entry_point.load()
 
     return subcommands

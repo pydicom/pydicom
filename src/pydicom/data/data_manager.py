@@ -109,7 +109,7 @@ def get_external_sources() -> Dict:
         A dict of ``{'source name': <interface class instance>}``.
     """
 
-    from pkg_resources import iter_entry_points
+    from importlib.metadata import entry_points
 
     # Prefer pydicom-data as the source
     entry_point = "pydicom.data.external_sources"
