@@ -27,13 +27,12 @@ classifiers=[
 ]
 dependencies = []
 description = "A pure Python package for reading and writing DICOM data"
-#  dynamic = ["version"]  uncomment for pydicom v3.0
+dynamic = ["version"]
 keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
 name = "pydicom"
 readme = "README.md"
 requires-python = ">=3.7"
-version = "2.4.0" # remove for v3.0
 
 
 [project.optional-dependencies]
