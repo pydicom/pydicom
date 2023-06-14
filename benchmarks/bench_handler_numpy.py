@@ -83,7 +83,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     elif shape[3] == 3:
         ds.PhotometricInterpretation = 'RGB'
 
-    arr = np.zeros(shape, dtype='uint{}'.format(bit_depth))
+    arr = np.zeros(shape, dtype=f'uint{bit_depth}')
     ds.PixelData = arr.tobytes()
 
     if len(ds.PixelData) % 2:
