@@ -29,7 +29,7 @@ plan_ds.BeamSequence[0].BlockSequence = Sequence([block_ds1, block_ds2])
 plan_ds.BeamSequence[0].NumberOfBlocks = 2
 
 beam0 = plan_ds.BeamSequence[0]
-print('Number of blocks: {}'.format(beam0.BlockSequence))
+print(f'Number of blocks: {beam0.BlockSequence}')
 
 # create a new data set
 block_ds3 = Dataset()

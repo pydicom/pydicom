@@ -30,12 +30,12 @@ import glob
 
 # load the DICOM files
 files = []
-print('glob: {}'.format(sys.argv[1]))
+print(f'glob: {sys.argv[1]}')
 for fname in glob.glob(sys.argv[1], recursive=False):
-    print("loading: {}".format(fname))
+    print(f"loading: {fname}")
     files.append(pydicom.dcmread(fname))
 
-print("file count: {}".format(len(files)))
+print(f"file count: {len(files)}")
 
 # skip files with no SliceLocation (eg scout views)
 slices = []
@@ -46,7 +46,7 @@ for f in files:
     else:
         skipcount = skipcount + 1
 
-print("skipped, no SliceLocation: {}".format(skipcount))
+print(f"skipped, no SliceLocation: {skipcount}")
 
 # ensure they are in the correct order
 slices = sorted(slices, key=lambda s: s.SliceLocation)
