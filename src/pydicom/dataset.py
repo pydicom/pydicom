@@ -2770,7 +2770,7 @@ class FileDataset(Dataset):
                 filename = filename_or_obj.name
             elif hasattr(filename_or_obj, "filename"):
                 filename = (
-                    filename_or_obj.filename  # type: ignore[attr-defined]
+                    filename_or_obj.filename
                 )
             else:
                 # e.g. came from BytesIO or something file-like

@@ -280,7 +280,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         # IVs > number of entries get set to last entry
         np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
 
-        return cast("np.ndarray", lut_data[clipped_iv])
+        return lut_data[clipped_iv]
     elif 'RescaleSlope' in ds and 'RescaleIntercept' in ds:
         arr = arr.astype(np.float64) * cast(float, ds.RescaleSlope)
         arr += cast(float, ds.RescaleIntercept)
