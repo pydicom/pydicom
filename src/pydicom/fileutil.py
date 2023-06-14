@@ -199,8 +199,7 @@ def read_undefined_length_value(
                 logger.error(msg.format(fp.tell() - 4))
         elif eof:
             fp.seek(data_start)
-            raise EOFError("End of file reached before delimiter {0!r} found".
-                           format(delimiter_tag))
+            raise EOFError(f"End of file reached before delimiter {delimiter_tag!r} found")
         else:
             # rewind a bit in case delimiter crossed read_size boundary
             fp.seek(fp.tell() - search_rewind)
