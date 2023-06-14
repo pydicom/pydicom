@@ -748,7 +748,7 @@ def convert_value(
         char_range = list(range(65, 91)) + list(range(97, 123))
         # If the VR characters are outside that range then print hex values
         if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
-            VR = ' '.join(['0x{:02x}'.format(ord(ch)) for ch in VR])
+            VR = ' '.join([f'0x{ord(ch):02x}' for ch in VR])
         raise NotImplementedError(f"Unknown Value Representation '{VR}'")
 
     if raw_data_element.length == 0:

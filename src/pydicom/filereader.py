@@ -513,7 +513,7 @@ def read_sequence_item(
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
     except BaseException:
-        raise IOError(
+        raise OSError(
             f"No tag to read at file position {fp.tell() + offset:X}"
         )
 
@@ -998,7 +998,7 @@ def dcmread(
     if isinstance(fp, str):
         # caller provided a file name; we own the file handle
         caller_owns_file = False
-        logger.debug("Reading file '{0}'".format(fp))
+        logger.debug(f"Reading file '{fp}'")
         fp = open(fp, 'rb')
     elif fp is None or not hasattr(fp, "read") or not hasattr(fp, "seek"):
         raise TypeError("dcmread: Expected a file path or a file-like, "
@@ -1155,7 +1155,7 @@ def read_deferred_data_element(
     logger.debug("Reading deferred element %r" % str(raw_data_elem.tag))
     # If it wasn't read from a file, then return an error
     if filename_or_obj is None:
-        raise IOError(
+        raise OSError(
             "Deferred read -- original filename not stored. Cannot re-open"
         )
 
@@ -1163,7 +1163,7 @@ def read_deferred_data_element(
     is_filename = isinstance(filename_or_obj, str)
     if isinstance(filename_or_obj, str):
         if not os.path.exists(filename_or_obj):
-            raise IOError(
+            raise OSError(
                 f"Deferred read -- original file {filename_or_obj} is missing"
             )
 

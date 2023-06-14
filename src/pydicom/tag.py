@@ -197,7 +197,7 @@ class BaseTag(int):
 
     def __str__(self) -> str:
         """Return the tag value as a hex string '(gggg, eeee)'."""
-        return "({0:04x}, {1:04x})".format(self.group, self.element)
+        return f"({self.group:04x}, {self.element:04x})"
 
     __repr__ = __str__
 

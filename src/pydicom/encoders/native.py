@@ -73,7 +73,7 @@ def _encode_frame(src: bytes, **kwargs: Any) -> bytes:
     offsets = [64]
     for ii, length in enumerate(seg_lengths[:-1]):
         offsets.append(offsets[ii] + length)
-    rle_header.extend(pack('<{}L'.format(len(offsets)), *offsets))
+    rle_header.extend(pack(f'<{len(offsets)}L', *offsets))
 
     # Add trailing padding to make up the rest of the header (if required)
     rle_header.extend(b'\x00' * (64 - len(rle_header)))
@@ -172,4 +172,4 @@ def _encode_row(src: bytes) -> bytes:
         out_append(len(_run) - 1)
         out_extend(_run)
 
-    return pack('{}B'.format(len(out)), *out)
+    return pack(f'{len(out)}B', *out)

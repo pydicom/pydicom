@@ -1085,7 +1085,7 @@ class Dataset:
         if not create:
             # not found and shall not be created - raise
             raise KeyError(
-                "Private creator '{}' not found".format(private_creator))
+                f"Private creator '{private_creator}' not found")
 
         # private creator not existing - find first unused private block
         # and add the private creator
@@ -2579,7 +2579,7 @@ class Dataset:
         )
         with context:
             for key in self.keys():
-                json_key = '{:08X}'.format(key)
+                json_key = f'{key:08X}'
                 try:
                     data_element = self[key]
                     json_dataset[json_key] = data_element.to_json_dict(
@@ -2892,7 +2892,7 @@ def validate_file_meta(
             msg = ("Missing required File Meta Information elements from "
                    "'file_meta':\n")
             for tag in missing:
-                msg += '\t{0} {1}\n'.format(tag, keyword_for_tag(tag))
+                msg += f'\t{tag} {keyword_for_tag(tag)}\n'
             raise ValueError(msg[:-1])  # Remove final newline
 
 

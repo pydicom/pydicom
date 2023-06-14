@@ -1,5 +1,4 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
-# -*- coding: utf-8 -*-
 """Access dicom dictionary information"""
 import warnings
 from typing import Tuple, Optional, Dict

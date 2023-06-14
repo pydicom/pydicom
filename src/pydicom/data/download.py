@@ -134,7 +134,7 @@ def get_data_dir() -> pathlib.Path:
 @functools.lru_cache()
 def get_url_map() -> Dict[str, str]:
     """Return a dict containing the URL mappings from ``urls.json```."""
-    with open(HERE / "urls.json", "r") as url_file:
+    with open(HERE / "urls.json") as url_file:
         return cast(Dict[str, str], json.load(url_file))
 
 
@@ -251,7 +251,7 @@ def get_cached_filehash(filename: str) -> str:
     str
         The SHA256 checksum of the cached file.
     """
-    with open(HERE / "hashes.json", "r") as hash_file:
+    with open(HERE / "hashes.json") as hash_file:
         hashes = cast(Dict[str, str], json.load(hash_file))
         # Convert filenames to lowercase because windows filenames are
         #   case-insensitive
@@ -285,7 +285,7 @@ def data_file_hash_check(filename: str) -> bool:
         cached_filehash = get_cached_filehash(filename)
     except NoHashFound:
         warnings.warn("Hash not found in hashes.json. File will be updated.")
-        with open(HERE / "hashes.json", "r") as hash_file:
+        with open(HERE / "hashes.json") as hash_file:
             hashes = json.load(hash_file)
 
         hashes[filename] = calculated_filehash

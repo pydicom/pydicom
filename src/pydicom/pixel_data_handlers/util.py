@@ -113,14 +113,14 @@ def apply_color_lut(
                 }
                 palette = uids[palette]
             except KeyError:
-                raise ValueError("Unknown palette '{}'".format(palette))
+                raise ValueError(f"Unknown palette '{palette}'")
 
         try:
             from pydicom import dcmread
             fname = datasets[palette]
             ds = dcmread(get_palette_files(fname)[0])
         except KeyError:
-            raise ValueError("Unknown palette '{}'".format(palette))
+            raise ValueError(f"Unknown palette '{palette}'")
 
     ds = cast("Dataset", ds)
 
@@ -144,7 +144,7 @@ def apply_color_lut(
     first_map = lut_desc[1]
     # Actual bit depth may be larger (8 bit entries in 16 bits allocated)
     nominal_depth = lut_desc[2]
-    dtype = np.dtype('uint{:.0f}'.format(nominal_depth))
+    dtype = np.dtype(f'uint{nominal_depth:.0f}')
 
     luts = []
     if 'RedPaletteColorLookupTableData' in ds:
@@ -158,7 +158,7 @@ def apply_color_lut(
         )
 
         actual_depth = len(r_lut) / nr_entries * 8
-        dtype = np.dtype('uint{:.0f}'.format(actual_depth))
+        dtype = np.dtype(f'uint{actual_depth:.0f}')
 
         for lut_bytes in [ii for ii in [r_lut, g_lut, b_lut, a_lut] if ii]:
             luts.append(np.frombuffer(lut_bytes, dtype=dtype))
@@ -258,13 +258,13 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         first_map = cast(List[int], item.LUTDescriptor)[1]
         nominal_depth = cast(List[int], item.LUTDescriptor)[2]
 
-        dtype = 'uint{}'.format(nominal_depth)
+        dtype = f'uint{nominal_depth}'
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
         if item['LUTData'].VR == VR.OW:
             endianness = '<' if ds.is_little_endian else '>'
-            unpack_fmt = '{}{}H'.format(endianness, nr_entries)
+            unpack_fmt = f'{endianness}{nr_entries}H'
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
             unc_data = cast(List[int], item.LUTData)
@@ -1195,7 +1195,7 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     :dcm:`Annex D<part05/chapter_D.html>`
     """
     if arr.shape == (0,):
-        return bytes()
+        return b""
 
     # Test array
     if not np.array_equal(arr, arr.astype(bool)):

@@ -1,5 +1,4 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
-# -*- coding: utf-8 -*-
 """Access code dictionary information"""
 
 from itertools import chain

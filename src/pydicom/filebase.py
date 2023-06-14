@@ -184,15 +184,15 @@ class DicomFileLike(DicomIO):
 
     def no_write(self, bytes_read: bytes) -> int:
         """Used for file-like objects where no write is available"""
-        raise IOError("This DicomFileLike object has no write() method")
+        raise OSError("This DicomFileLike object has no write() method")
 
     def no_read(self, size: int = -1) -> bytes:
         """Used for file-like objects where no read is available"""
-        raise IOError("This DicomFileLike object has no read() method")
+        raise OSError("This DicomFileLike object has no read() method")
 
     def no_seek(self, offset: int, whence: int = 0) -> int:
         """Used for file-like objects where no seek is available"""
-        raise IOError("This DicomFileLike object has no seek() method")
+        raise OSError("This DicomFileLike object has no seek() method")
 
     def __enter__(self) -> "DicomFileLike":
         return self

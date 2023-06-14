@@ -63,6 +63,7 @@ show = "pydicom.cli.show:add_subparser"
 
 [tool.ruff]
 select = [
+    "UP",
     "C9",
     "E",
     "F",

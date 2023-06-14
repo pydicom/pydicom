@@ -242,7 +242,7 @@ def _parse_rle_header(header: bytes) -> List[int]:
             .format(nr_segments)
         )
 
-    offsets = unpack('<{}L'.format(nr_segments),
+    offsets = unpack(f'<{nr_segments}L',
                      header[4:4 * (nr_segments + 1)])
 
     return list(offsets)

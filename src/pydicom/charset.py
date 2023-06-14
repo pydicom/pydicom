@@ -166,7 +166,7 @@ def _encode_to_jis_x_0201(value: str, errors: str = 'strict') -> bytes:
             raise e
         if len(b) != 1 or ((ord(b) & 0x80) ^ msb) != 0:
             character_set = 'ISO IR 14' if msb == 0 else 'ISO IR 13'
-            msg = 'Given character is out of {}'.format(character_set)
+            msg = f'Given character is out of {character_set}'
             raise UnicodeEncodeError('shift_jis', value, i, len(value), msg)
         encoded += b
 
@@ -229,7 +229,7 @@ def _encode_to_given_charset(
     if not encoded.startswith(ENCODINGS_TO_CODES[encoding]):
         raise UnicodeEncodeError(
             encoding, value, 0, len(value),
-            'Given character is out of {}'.format(character_set))
+            f'Given character is out of {character_set}')
 
     for i, c in enumerate(value[1:], 1):
         try:
@@ -241,7 +241,7 @@ def _encode_to_given_charset(
         if b[:1] == ESC:
             raise UnicodeEncodeError(
                 encoding, value, i, len(value),
-                'Given character is out of {}'.format(character_set))
+                f'Given character is out of {character_set}')
         encoded += b
     return encoded
 
