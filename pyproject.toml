@@ -27,7 +27,7 @@ keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
 name = "pydicom"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 version = "3.0.0.dev0"
 
 

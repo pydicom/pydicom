@@ -9,13 +9,6 @@ Frequently asked questions
 General
 =======
 
-What happened to import dicom?
-------------------------------
-Starting in version 1.0, *pydicom* changed the library import from
-``import dicom`` to ``import pydicom``. If you're used to using the earlier
-versions of *pydicom* see the :doc:`transitioning guide
-<../old/transition_to_pydicom1>` on how to make the change.
-
 How do I cite pydicom?
 ----------------------
 
@@ -76,12 +69,8 @@ What version of Python can I use?
 +-----------------+------------------+---------------------------+
 | 2.3             | March 2022       | 3.6, 3.7, 3.8, 3.9, 3.10  |
 +-----------------+------------------+---------------------------+
-| 2.4             | ~September 2022  | 3.7, 3.8, 3.9, 3.10, 3.11 |
+| 2.4             | June 2023        | 3.7, 3.8, 3.9, 3.10, 3.11 |
++-----------------+------------------+---------------------------+
+| 3.0             | ~Nov 2023        | 3.10, 3.11                |
 +-----------------+------------------+---------------------------+
 
-What about support for Python 2.7?
-----------------------------------
-
-Python 2.7 reached `end of life <https://www.python.org/doc/sunset-python-2/>`_
-on 1st January, 2020 and is no longer supported by *pydicom*. More information
-is available :doc:`here</old/python2_support>`.
