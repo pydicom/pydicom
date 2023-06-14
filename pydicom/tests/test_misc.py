@@ -25,7 +25,7 @@ class TestMisc:
         assert not is_dicom(notdicom_file)
 
         # test invalid path
-        with pytest.raises(IOError):
+        with pytest.raises(OSError):
             is_dicom('xxxx.dcm')
 
         # Test no meta prefix/preamble fails

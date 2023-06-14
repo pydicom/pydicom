@@ -278,7 +278,7 @@ def write_numbers(fp: DicomIO, elem: DataElement, struct_format: str) -> None:
             for val in cast(Iterable[Any], value):
                 fp.write(pack(format_string, val))
     except Exception as e:
-        raise IOError(
+        raise OSError(
             f"{str(e)}\nfor data_element:\n{str(elem)}"
         )
 
