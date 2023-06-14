@@ -114,3 +114,9 @@ ignore_missing_imports = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+
+[[tool.mypy.overrides]]
+# 2023-06: mypy complains for a line in this file if ignore used or not.
+# Override unused ignores for that one file
+module = "pydicom.encoders.base"
+warn_unused_ignores = false
