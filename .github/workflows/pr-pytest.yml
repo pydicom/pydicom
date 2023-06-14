@@ -138,7 +138,7 @@ jobs:
     - name: Test external sources using pydicom-data
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
-        pytest ${{ matrix.pytest-args}} src/pydicom/tests/test_data_manager.py
+        pytest ${{ matrix.pytest-args}} tests/test_data_manager.py
 
     # Pixel data decoding and encoding
     - name: Install and test with numpy
@@ -149,13 +149,13 @@ jobs:
     - name: Install and test Pillow
       run: |
         python -m pip install --upgrade pillow
-        pytest ${{ matrix.pytest-args }} src/pydicom/tests/test_pillow_pixel_data.py
+        pytest ${{ matrix.pytest-args }} tests/test_pillow_pixel_data.py
         python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
       run: |
         python -m pip install pyjpegls
-        pytest ${{ matrix.pytest-args }} src/pydicom/tests/test_JPEG_LS_transfer_syntax.py src/pydicom/teststest_jpeg_ls_pixel_data.py
+        pytest ${{ matrix.pytest-args }} tests/test_JPEG_LS_transfer_syntax.py src/pydicom/teststest_jpeg_ls_pixel_data.py
         python -m pip uninstall -y pyjpegls
 
     - name: Install and test GDCM
