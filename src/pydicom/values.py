@@ -513,7 +513,7 @@ def convert_string(
 
 def convert_text(
     byte_string: bytes, encodings: Optional[List[str]] = None,
-    vr: str = None
+    vr: Optional[str] = None
 ) -> Union[str, MutableSequence[str]]:
     """Return a decoded text VR value.
 
@@ -551,7 +551,7 @@ def convert_text(
 
 def convert_single_string(
     byte_string: bytes, encodings: Optional[List[str]] = None,
-    vr: str = None,
+    vr: Optional[str] = None,
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
 

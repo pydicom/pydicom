@@ -68,7 +68,7 @@ class UID(str):
     """
 
     def __new__(
-        cls: Type["UID"], val: str, validation_mode: int = None
+        cls: Type["UID"], val: str, validation_mode: Optional[int] = None
     ) -> "UID":
         """Setup new instance of the class.
 

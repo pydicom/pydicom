@@ -4,7 +4,7 @@ or any list of items that must all be the same type.
 """
 
 from typing import (
-    Iterable, Union, List, overload, Callable, Any, cast,
+    Optional, Iterable, Union, List, overload, Callable, Any, cast,
     TypeVar, MutableSequence, Iterator
 )
 
@@ -32,7 +32,7 @@ class MultiValue(MutableSequence[_ItemType]):
         self,
         type_constructor: Callable[[_T], _ItemType],
         iterable: Iterable[_T],
-        validation_mode: int = None
+        validation_mode: Optional[int] = None
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.

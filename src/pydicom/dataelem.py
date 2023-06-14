@@ -158,7 +158,7 @@ class DataElement:
         file_value_tell: Optional[int] = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: int = None
+        validation_mode: Optional[int] = None
     ) -> None:
         """Create a new :class:`DataElement`.
 
