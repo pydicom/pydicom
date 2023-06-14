@@ -9,7 +9,7 @@ import sys
 import weakref
 
 import pytest
-from pydicom.tests.test_helpers import assert_no_warning
+from .test_helpers import assert_no_warning
 
 try:
     import numpy

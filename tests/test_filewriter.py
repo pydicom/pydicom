@@ -28,7 +28,7 @@ from pydicom.filewriter import (
 )
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pydicom.tests.test_helpers import assert_no_warning
+from .test_helpers import assert_no_warning
 from pydicom.uid import (
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,

@@ -22,7 +22,7 @@ from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag
-from pydicom.tests.test_util import save_private_dict
+from .test_util import save_private_dict
 from pydicom.uid import UID
 from pydicom.valuerep import DSfloat, validate_value
 

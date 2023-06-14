@@ -12,7 +12,7 @@ from pydicom.datadict import (keyword_for_tag, dictionary_description,
                               private_dictionary_VM, add_private_dict_entries,
                               add_private_dict_entry)
 from pydicom.datadict import add_dict_entry, add_dict_entries
-from pydicom.tests.test_util import save_private_dict
+from .test_util import save_private_dict
 
 
 class TestDict:

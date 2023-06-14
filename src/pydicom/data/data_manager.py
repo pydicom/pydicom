@@ -53,8 +53,11 @@ from typing import Dict, List, Union, Optional, TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (
-    data_path_with_download, calculate_file_hash, get_cached_filehash,
-    get_url_map, get_data_dir
+    data_path_with_download,
+    calculate_file_hash,
+    get_cached_filehash,
+    get_url_map,
+    get_data_dir,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -67,6 +70,7 @@ DATA_ROOT = os.fspath(Path(__file__).parent.resolve())
 
 class DataTypes(IntEnum):
     """Constants for data types."""
+
     DATASET = 0
     CHARSET = 1
     PALETTE = 2
@@ -112,8 +116,9 @@ def get_external_sources() -> Dict:
     from importlib.metadata import entry_points
 
     # Prefer pydicom-data as the source
-    entry_point = "pydicom.data.external_sources"
-    sources = {vv.name: vv.load()() for vv in iter_entry_points(entry_point)}
+    sources = {
+        vv.name: vv.load()() for vv in entry_points(group="pydicom.data.external_sources")
+    }
     out = {}
     if "pydicom-data" in sources:
         out["pydicom-data"] = sources["pydicom-data"]
@@ -144,11 +149,10 @@ def online_test_file_dummy_paths() -> Dict[str, str]:
     """
     filenames = list(get_url_map().keys())
 
-    test_files_root = os.path.join(DATA_ROOT, 'test_files')
+    test_files_root = os.path.join(DATA_ROOT, "test_files")
 
     dummy_path_map = {
-        os.path.join(test_files_root, filename): filename
-        for filename in filenames
+        os.path.join(test_files_root, filename): filename for filename in filenames
     }
 
     return dummy_path_map
@@ -169,15 +173,12 @@ def fetch_data_files() -> None:
 
     if error:
         raise RuntimeError(
-            "An error occurred downloading the following files: "
-            f"{', '.join(error)}"
+            "An error occurred downloading the following files: " f"{', '.join(error)}"
         )
 
 
 def get_files(
-        base: Union[str, os.PathLike],
-        pattern: str = "**/*",
-        dtype: int = DataTypes.DATASET
+    base: Union[str, os.PathLike], pattern: str = "**/*", dtype: int = DataTypes.DATASET
 ) -> List[str]:
     """Return all matching file paths from the available data sources.
 
@@ -241,9 +242,7 @@ def get_files(
     download_error = False
     for filename in download_names:
         try:
-            real_online_file_paths.append(
-                os.fspath(data_path_with_download(filename))
-            )
+            real_online_file_paths.append(os.fspath(data_path_with_download(filename)))
         except Exception:
             download_error = True
 
@@ -275,16 +274,18 @@ def get_palette_files(pattern: str = "**/*") -> List[str]:
     list of str
         A list of absolute paths to matching files.
     """
-    data_path = Path(DATA_ROOT) / 'palettes'
+    data_path = Path(DATA_ROOT) / "palettes"
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.PALETTE)
-    files = [filename for filename in files if not filename.endswith('.py')]
+    files = [filename for filename in files if not filename.endswith(".py")]
 
     return files
 
 
 def get_testdata_file(
-    name: str, read: bool = False, download: bool = True,
+    name: str,
+    read: bool = False,
+    download: bool = True,
 ) -> Union[str, "Dataset", None]:
     """Return an absolute path to the first matching dataset with filename
     `name`.
@@ -328,13 +329,14 @@ def get_testdata_file(
     path = _get_testdata_file(name=name, download=download)
     if read and path is not None:
         from pydicom.filereader import dcmread
+
         return dcmread(path, force=True)
     return path
 
 
 def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
     # Check pydicom local
-    data_path = Path(DATA_ROOT) / 'test_files'
+    data_path = Path(DATA_ROOT) / "test_files"
     matches = [m for m in data_path.rglob(name)]
     if matches:
         return os.fspath(matches[0])
@@ -385,10 +387,10 @@ def get_testdata_files(pattern: str = "**/*") -> List[str]:
     list of str
         A list of absolute paths to matching files.
     """
-    data_path = Path(DATA_ROOT) / 'test_files'
+    data_path = Path(DATA_ROOT) / "test_files"
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.DATASET)
-    files = [filename for filename in files if not filename.endswith('.py')]
+    files = [filename for filename in files if not filename.endswith(".py")]
 
     return files
 
@@ -408,9 +410,9 @@ def get_charset_files(pattern: str = "**/*") -> List[str]:
     list of str
         A list of absolute paths to matching files.
     """
-    data_path = Path(DATA_ROOT) / 'charset_files'
+    data_path = Path(DATA_ROOT) / "charset_files"
 
     files = get_files(base=data_path, pattern=pattern, dtype=DataTypes.CHARSET)
-    files = [filename for filename in files if not filename.endswith('.py')]
+    files = [filename for filename in files if not filename.endswith(".py")]
 
     return files

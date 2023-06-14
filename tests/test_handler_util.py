@@ -7,7 +7,7 @@ from struct import unpack, pack
 from sys import byteorder
 
 import pytest
-from pydicom.tests.test_helpers import assert_no_warning
+from .test_helpers import assert_no_warning
 
 try:
     import numpy as np
