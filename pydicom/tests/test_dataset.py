@@ -949,7 +949,7 @@ class TestDataset:
         ds = dcmread(test_file, force=True, defer_size='0.8 kB')
         ds_ref = dcmread(test_file, force=True)
         # get_item will follow the deferred read branch
-        assert ds_ref.PixelData == ds.get_item((0x7fe00010)).value
+        assert ds_ref.PixelData == ds.get_item(0x7fe00010).value
 
     def test_get_item_slice(self):
         """Test Dataset.get_item with slice argument"""

@@ -391,10 +391,8 @@ def write_number_string(fp: DicomIO, elem: DataElement) -> None:
     if _is_multi_value(val):
         val = cast(Union[Sequence[IS], Sequence[DSclass]], val)
         val = "\\".join(
-            (
-                x.original_string if hasattr(x, 'original_string')
-                else str(x) for x in val
-            )
+            x.original_string if hasattr(x, 'original_string')
+            else str(x) for x in val
         )
     else:
         val = cast(Union[IS, DSclass], val)
@@ -429,7 +427,7 @@ def write_DA(fp: DicomIO, elem: DataElement) -> None:
         if _is_multi_value(val):
             val = cast(Sequence[DA], val)
             val = "\\".join(
-                (x if isinstance(x, str) else _format_DA(x) for x in val)
+                x if isinstance(x, str) else _format_DA(x) for x in val
             )
         else:
             val = _format_DA(cast(DA, val))
@@ -464,7 +462,7 @@ def write_DT(fp: DicomIO, elem: DataElement) -> None:
         if _is_multi_value(val):
             val = cast(Sequence[DT], val)
             val = "\\".join(
-                (x if isinstance(x, str) else _format_DT(x) for x in val)
+                x if isinstance(x, str) else _format_DT(x) for x in val
             )
         else:
             val = _format_DT(cast(DT, val))
@@ -499,7 +497,7 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
         if _is_multi_value(val):
             val = cast(Sequence[TM], val)
             val = "\\".join(
-                (x if isinstance(x, str) else _format_TM(x) for x in val)
+                x if isinstance(x, str) else _format_TM(x) for x in val
             )
         else:
             val = _format_TM(cast(TM, val))
