@@ -84,7 +84,7 @@ if __name__ == '__main__':
         print(usage)
         sys.exit(-1)
     root = tkinter_tix.Tk()
-    root.geometry(f"{1200:d}x{900:d}+{0:d}+{0:d}")
+    root.geometry("1200x900+0+0")
     root.title("DICOM tree viewer - " + sys.argv[1])
 
     RunTree(root, sys.argv[1])

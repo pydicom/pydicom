@@ -13,7 +13,9 @@ from pydicom import dcmread
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset, FileMetaDataset
 from pydicom.pixel_data_handlers.numpy_handler import (
-    get_pixeldata, unpack_bits, pack_bits
+    get_pixeldata,
+    unpack_bits,
+    pack_bits,
 )
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 
@@ -28,7 +30,7 @@ EXPL_8_1_2F = get_testdata_file("OBXXXX1A_2frame.dcm")
 # 8/8, 3 sample/pixel, 1 frame
 EXPL_8_3_1F = get_testdata_file("SC_rgb.dcm")
 # 8/8, 3 sample/pixel, 1 frame, YBR_FULL_422
-EXPL_8_3_1F_YBR422 = get_testdata_file('SC_ybr_full_422_uncompressed.dcm')
+EXPL_8_3_1F_YBR422 = get_testdata_file("SC_ybr_full_422_uncompressed.dcm")
 # 8/8, 3 sample/pixel, 2 frame
 EXPL_8_3_2F = get_testdata_file("SC_rgb_2frame.dcm")
 # 16/16, 1 sample/pixel, 1 frame
@@ -69,7 +71,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     ds.is_implicit_VR = False
     ds.file_meta = FileMetaDataset()
     ds.file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
-    ds.SOPClassUID = '1.2.3.4'
+    ds.SOPClassUID = "1.2.3.4"
     ds.SOPInstanceUID = generate_uid()
     ds.BitsAllocated = bit_depth
     ds.PixelRepresentation = 0
@@ -79,17 +81,17 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
     ds.NumberOfFrames = shape[0]
     ds.SamplesPerPixel = shape[3]
     if shape[3] == 1:
-        ds.PhotometricInterpretation = 'MONOCHROME2'
+        ds.PhotometricInterpretation = "MONOCHROME2"
     elif shape[3] == 3:
-        ds.PhotometricInterpretation = 'RGB'
+        ds.PhotometricInterpretation = "RGB"
 
-    arr = np.zeros(shape, dtype=f'uint{bit_depth}')
+    arr = np.zeros(shape, dtype=f"uint{bit_depth}")
     ds.PixelData = arr.tobytes()
 
     if len(ds.PixelData) % 2:
-        ds.PixelData += b'\x00'
+        ds.PixelData += b"\x00"
 
-    tfile = TemporaryFile(mode='w+b')
+    tfile = TemporaryFile(mode="w+b")
     ds.save_as(tfile, write_like_original=False)
     tfile.seek(0)
 
@@ -98,6 +100,7 @@ def _create_temporary_dataset(shape=(100, 1024, 1024, 3), bit_depth=16):
 
 class TimeGetPixelData_LargeDataset:
     """Time tests for numpy_handler.get_pixeldata with large datasets."""
+
     def setup(self):
         """Setup the tests."""
         self.no_runs = 100
@@ -112,6 +115,7 @@ class TimeGetPixelData_LargeDataset:
 
 class TimeGetPixelData:
     """Time tests for numpy_handler.get_pixeldata."""
+
     def setup(self):
         """Setup the tests."""
         self.no_runs = 100
@@ -135,7 +139,7 @@ class TimeGetPixelData:
     def time_1bit_1sample_1frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 1 frame."""
         no_runs = self.no_runs
-        if 'PyPy' in python_implementation():
+        if "PyPy" in python_implementation():
             no_runs = 1
 
         for ii in range(no_runs):
@@ -144,7 +148,7 @@ class TimeGetPixelData:
     def time_1bit_1sample_3frame(self):
         """Time retrieval of 1-bit, 1 sample/pixel, 3 frame."""
         no_runs = self.no_runs
-        if 'PyPy' in python_implementation():
+        if "PyPy" in python_implementation():
             no_runs = 1
 
         for ii in range(no_runs):
