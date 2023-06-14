@@ -100,10 +100,10 @@ max-statements = 106
 "*/__init__.py" = ["F401"]
 "src/pydicom/config.py" = ["PLW0602"]
 
-[mypy]
+[tool.mypy]
 python_version = "3.10"
-exclude = "src/pydicom/(tests|benchmarks)"
-files = "src/pydicom/"
+files = "src/"
+exclude = ["src/pydicom/benchmarks/"]
 show_error_codes = true
 warn_redundant_casts = true
 warn_unused_ignores = true

@@ -29,7 +29,7 @@ jobs:
         mypy --install-types
     - name: Run typing check with mypy
       run: |
-        mypy src
+        mypy
 
   check-spelling:
     name: Check for spelling errors
