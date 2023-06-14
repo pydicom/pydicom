@@ -70,7 +70,7 @@ which is based on `pytest <https://docs.pytest.org/>`_.
 Install and run pytest::
 
   $ pip install pytest
-  $ cd pydicom/pydicom/tests
+  $ cd pydicom/tests
   $ pytest
 
 While the tests are running you'll see a filename followed by a stream of
