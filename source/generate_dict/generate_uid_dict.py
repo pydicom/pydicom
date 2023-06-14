@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Reformat the UID list (tables A-1 and A-2) from the PS3.6 docbook file to

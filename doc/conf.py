@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # pydicom documentation build configuration file
 #
 # This file is execfile()d with the current

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2020 pydicom authors. See LICENSE file for details.
 """Tests for command-line interface"""
 
@@ -143,7 +142,6 @@ class TestCLIcall:
         """CLI `codify` command creates code with utf-8 characters"""
         main(f"codify pydicom::chrFren.dcm".split())
         out, _ = capsys.readouterr()
-        assert out.startswith("# -*- coding: utf-8 -*-")
         assert "Buc^Jérôme" in out
 
     def test_help(self, capsys):

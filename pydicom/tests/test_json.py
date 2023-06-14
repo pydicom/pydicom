@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
 from unittest import mock

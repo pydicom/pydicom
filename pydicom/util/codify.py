@@ -384,7 +384,6 @@ def code_file_from_dataset(
     filename = ds.get("filename")
     identifier = f"DICOM file '{filename}'" if filename else "non-file dataset"
 
-    lines.append("# -*- coding: utf-8 -*-")
     lines.append(f"# Coded version of {identifier}")
     lines.append("# Produced by pydicom codify utility script")
 
