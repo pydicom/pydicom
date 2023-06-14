@@ -1195,7 +1195,7 @@ def pack_bits(arr: "np.ndarray", pad: bool = True) -> bytes:
     :dcm:`Annex D<part05/chapter_D.html>`
     """
     if arr.shape == (0,):
-        return bytes()
+        return b''
 
     # Test array
     if not np.array_equal(arr, arr.astype(bool)):
