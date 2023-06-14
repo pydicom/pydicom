@@ -42,6 +42,7 @@ import warnings
 
 try:
     import numpy as np
+    import numpy
     HAVE_RLE = True
 except ImportError:
     HAVE_RLE = False
@@ -52,7 +53,6 @@ from pydicom.encoders.native import _encode_frame
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
-    import numpy
     from pydicom.dataset import Dataset, FileMetaDataset
 
 
