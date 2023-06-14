@@ -1915,7 +1915,7 @@ class TestFileDataset:
             "__class_getitem__",
         }
         if "PyPy" in python_implementation():
-            expected_diff.remove["__ror__"]
+            expected_diff.remove("__ror__")
         assert expected_diff == set(dir(di)) - set(dir(ds))
 
     def test_copy_filedataset(self):
