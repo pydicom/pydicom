@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Test suite for valuerep.py"""
 
@@ -1438,14 +1437,14 @@ class TestDateTime:
         # Assert `da` equals to correct `date`
         assert date(1961, 8, 4) == da
         # Assert `da.__repr__` holds original string
-        assert '"{0}"'.format(dicom_date) == repr(da)
+        assert f'"{dicom_date}"' == repr(da)
 
         dicom_date = "1961.08.04"  # ACR-NEMA Standard 300
         da = valuerep.DA(dicom_date)
         # Assert `da` equals to correct `date`
         assert date(1961, 8, 4) == da
         # Assert `da.__repr__` holds original string
-        assert '"{0}"'.format(dicom_date) == repr(da)
+        assert f'"{dicom_date}"' == repr(da)
 
         dicom_date = ""
         da = valuerep.DA(dicom_date)
@@ -1459,21 +1458,21 @@ class TestDateTime:
         # Assert `dt` equals to correct `datetime`
         assert datetime(1961, 1, 1) == dt
         # Assert `dt.__repr__` holds original string
-        assert '"{0}"'.format(dicom_datetime) == repr(dt)
+        assert f'"{dicom_datetime}"' == repr(dt)
 
         dicom_datetime = "19610804"
         dt = valuerep.DT(dicom_datetime)
         # Assert `dt` equals to correct `datetime`
         assert datetime(1961, 8, 4) == dt
         # Assert `dt.__repr__` holds original string
-        assert '"{0}"'.format(dicom_datetime) == repr(dt)
+        assert f'"{dicom_datetime}"' == repr(dt)
 
         dicom_datetime = "19610804192430.123"
         dt = valuerep.DT(dicom_datetime)
         # Assert `dt` equals to correct `datetime`
         assert datetime(1961, 8, 4, 19, 24, 30, 123000) == dt
         # Assert `dt.__repr__` holds original string
-        assert '"{0}"'.format(dicom_datetime) == repr(dt)
+        assert f'"{dicom_datetime}"' == repr(dt)
 
         dicom_datetime = "196108041924-1000"
         dt = valuerep.DT(dicom_datetime)
@@ -1485,7 +1484,7 @@ class TestDateTime:
         assert timedelta(0, 0, 0, 0, 0, -10) == dt.utcoffset()
 
         # Assert `dt.__repr__` holds original string
-        assert '"{0}"'.format(dicom_datetime) == repr(dt)
+        assert f'"{dicom_datetime}"' == repr(dt)
 
     def test_time(self):
         """TM conversion to datetime.time..."""
@@ -1494,14 +1493,14 @@ class TestDateTime:
         # Assert `tm` equals to correct `time`
         assert time(23, 59) == tm
         # Assert `tm.__repr__` holds original string
-        assert '"{0}"'.format(dicom_time) == repr(tm)
+        assert f'"{dicom_time}"' == repr(tm)
 
         dicom_time = "235900.123"
         tm = valuerep.TM(dicom_time)
         # Assert `tm` equals to correct `time`
         assert time(23, 59, 00, 123000) == tm
         # Assert `tm.__repr__` holds original string
-        assert '"{0}"'.format(dicom_time) == repr(tm)
+        assert f'"{dicom_time}"' == repr(tm)
 
         # Assert `tm` equals to no `time`
         tm = valuerep.TM("")

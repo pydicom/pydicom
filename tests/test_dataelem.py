@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.dataelem module."""
 
@@ -777,7 +776,7 @@ class TestDataElementValidation:
         self.check_valid_vr("AS", value)
 
     @pytest.mark.parametrize("value", (
-            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode("utf-8"), "ABC\n"))
+            "abcd", b"ABC+D", "ABCD-Z", "ÄÖÜ", "ÄÖÜ".encode(), "ABC\n"))
     def test_invalid_cs(self, value):
         self.check_invalid_vr("CS", value)
 

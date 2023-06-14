@@ -1,5 +1,4 @@
 # Copyright 2020 pydicom authors. See LICENSE file for details.
-# -*- coding: utf-8 -*-
 """Unit tests for the env_info module."""
 
 import pydicom.env_info

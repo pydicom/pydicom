@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
 import tempfile
@@ -383,10 +382,10 @@ class TestWriteDataElement:
         """Write empty AT correctly.........."""
         # Was issue 74
         data_elem = DataElement(0x00280009, "AT", [])
-        expected = hex2bytes((
+        expected = hex2bytes(
             " 28 00 09 00"  # (0028,0009) Frame Increment Pointer
             " 00 00 00 00"  # length 0
-        ))
+        )
         write_data_element(self.f1, data_elem)
         assert expected == self.f1.getvalue()
 

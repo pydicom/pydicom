@@ -193,7 +193,7 @@ class TestNoNumpy_NoPillowHandler:
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
-                               match="UID of '{}'".format(uid)):
+                               match=f"UID of '{uid}'"):
                 ds.pixel_array
 
     def test_using_pillow_handler_raises(self):

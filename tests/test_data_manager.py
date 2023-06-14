@@ -310,7 +310,7 @@ def test_hashes():
     """Test for duplicates in hashes.json."""
     # We can't have case mixes because windows filenames are case insensitive
     root = Path(DATA_ROOT)
-    with open(root / "hashes.json", "r") as f:
+    with open(root / "hashes.json") as f:
         filenames = json.load(f).keys()
         filenames = [name.lower() for name in filenames]
         assert len(set(filenames)) == len(filenames)
@@ -320,7 +320,7 @@ def test_urls():
     """Test for duplicates in urls.json."""
     # We can't have case mixes because windows filenames are case insensitive
     root = Path(DATA_ROOT)
-    with open(root / "urls.json", "r") as f:
+    with open(root / "urls.json") as f:
         filenames = json.load(f).keys()
         filenames = [name.lower() for name in filenames]
         assert len(set(filenames)) == len(filenames)

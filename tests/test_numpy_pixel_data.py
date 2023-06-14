@@ -236,7 +236,7 @@ class TestNoNumpy_NoNumpyHandler:
         for uid in AllTransferSyntaxes:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
-                               match="UID of '{}'".format(uid)):
+                               match=f"UID of '{uid}'"):
                 ds.pixel_array
 
     def test_using_numpy_handler_raises(self):
@@ -301,7 +301,7 @@ class TestNoNumpy_NumpyHandler:
         for uid in UNSUPPORTED_SYNTAXES:
             ds.file_meta.TransferSyntaxUID = uid
             with pytest.raises(NotImplementedError,
-                               match="UID of '{}'".format(uid)):
+                               match=f"UID of '{uid}'"):
                 ds.pixel_array
 
     def test_supported_pixel_array_raises(self):

@@ -1345,19 +1345,19 @@ class TestNumpy_ExpandSegmentedLUT:
         ds = dcmread(get_palette_files('spring.dcm')[0])
 
         bs = ds.SegmentedRedPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [255] * 256 == out
 
         bs = ds.SegmentedGreenPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert list(range(0, 256)) == out
 
         bs = ds.SegmentedBluePaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert list(range(255, -1, -1)) == out
@@ -1367,20 +1367,20 @@ class TestNumpy_ExpandSegmentedLUT:
         ds = dcmread(get_palette_files('summer.dcm')[0])
 
         bs = ds.SegmentedRedPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [0] * 256 == out
 
         bs = ds.SegmentedGreenPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [255, 255, 254, 254, 253] == out[:5]
         assert [130, 129, 129, 128, 128] == out[-5:]
 
         bs = ds.SegmentedBluePaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [0] * 128 == out[:128]
@@ -1391,19 +1391,19 @@ class TestNumpy_ExpandSegmentedLUT:
         ds = dcmread(get_palette_files('fall.dcm')[0])
 
         bs = ds.SegmentedRedPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [255] * 256 == out
 
         bs = ds.SegmentedGreenPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert list(range(255, -1, -1)) == out
 
         bs = ds.SegmentedBluePaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [0] * 256 == out
@@ -1413,20 +1413,20 @@ class TestNumpy_ExpandSegmentedLUT:
         ds = dcmread(get_palette_files('winter.dcm')[0])
 
         bs = ds.SegmentedRedPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [0] * 128 == out[:128]
         assert [123, 124, 125, 126, 127] == out[-5:]
 
         bs = ds.SegmentedGreenPaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert list(range(0, 256)) == out
 
         bs = ds.SegmentedBluePaletteColorLookupTableData
-        fmt = '<{}B'.format(len(bs))
+        fmt = f'<{len(bs)}B'
         data = unpack(fmt, bs)
         out = _expand_segmented_lut(data, fmt)
         assert [255, 255, 254, 254, 253] == out[:5]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Fixtures used in different tests."""
 

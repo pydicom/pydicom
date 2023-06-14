@@ -846,7 +846,7 @@ class TestNumpy_RLEParseHeader:
         # Encode the header
         header = bytearray()
         header.extend(pack('<L', nr_segments))
-        header.extend(pack('<{}L'.format(len(offsets)), *offsets))
+        header.extend(pack(f'<{len(offsets)}L', *offsets))
         # Add padding
         header.extend(b'\x00' * (64 - len(header)))
 
@@ -874,7 +874,7 @@ class TestNumpy_RLEDecodeFrame:
         actual = unpack('<L', header)[0]
         header += b'\x00' * (64 - len(header))
         msg = (
-            r"expected amount \({} vs. {} segments\)".format(actual, expected)
+            fr"expected amount \({actual} vs. {expected} segments\)"
         )
         with pytest.raises(ValueError, match=msg):
             _rle_decode_frame(

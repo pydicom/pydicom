@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2020 pydicom authors. See LICENSE file for details.
 """Tests for command-line interface"""
 
