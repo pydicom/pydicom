@@ -1,0 +1,18 @@
+Version 3.0.0
+=================================
+
+Changes
+-------
+* Removed support for Python <= 3.9
+* compat module removed
+
+
+Enhancements
+------------
+
+Fixes
+-----
+
+Pydicom Internals
+-----------------
+* repository folder structure refactored
