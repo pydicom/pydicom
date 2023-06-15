@@ -16,3 +16,4 @@ Fixes
 Pydicom Internals
 -----------------
 * repository folder structure refactored
+* renamed top level "source" folder to "util"
