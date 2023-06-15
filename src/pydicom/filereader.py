@@ -1144,9 +1144,9 @@ def read_deferred_data_element(
 
     Raises
     ------
-    IOError
+    OSError
         If `filename_or_obj` is ``None``.
-    IOError
+    OSError
         If `filename_or_obj` is a filename and the corresponding file does
         not exist.
     ValueError

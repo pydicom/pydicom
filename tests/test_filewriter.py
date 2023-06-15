@@ -2355,12 +2355,12 @@ class TestWriteNumbers:
         assert fp.getvalue() == b'\x01\x00'
 
     def test_exception(self):
-        """Test exceptions raise IOError"""
+        """Test exceptions raise OSError"""
         fp = DicomBytesIO()
         fp.is_little_endian = True
         elem = DataElement(0x00100010, 'US', b'\x00')
         fmt = 'H'
-        with pytest.raises(IOError,
+        with pytest.raises(OSError,
                            match=r"for data_element:\n\(0010, 0010\)"):
             write_numbers(fp, elem, fmt)
 
