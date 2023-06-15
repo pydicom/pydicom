@@ -11,13 +11,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [pypy-3.7]
+        python-version: [pypy3.10]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
     - name: Initial test environment setup
       run: |
         python -m pip install --editable .
@@ -36,7 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11']
         include:
           - os: 'ubuntu-latest'
             pytest-args: --cov=pydicom --cov-append
@@ -138,7 +139,7 @@ jobs:
     - name: Test external sources using pydicom-data
       run: |
         python -m pip install git+https://github.com/pydicom/pydicom-data
-        pytest ${{ matrix.pytest-args}} pydicom/tests/test_data_manager.py
+        pytest ${{ matrix.pytest-args}} tests/test_data_manager.py
 
     # Pixel data decoding and encoding
     - name: Install and test with numpy
@@ -149,30 +150,30 @@ jobs:
     - name: Install and test Pillow
       run: |
         python -m pip install --upgrade pillow
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pillow_pixel_data.py
+        pytest ${{ matrix.pytest-args }} tests/test_pillow_pixel_data.py
         python -m pip uninstall -y pillow
 
     - name: Install and test jpeg_ls
       run: |
         python -m pip install pyjpegls
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_JPEG_LS_transfer_syntax.py pydicom/tests/test_jpeg_ls_pixel_data.py
+        pytest ${{ matrix.pytest-args }} tests/test_JPEG_LS_transfer_syntax.py tests/test_jpeg_ls_pixel_data.py
         python -m pip uninstall -y pyjpegls
 
     - name: Install and test GDCM
       run: |
         python -m pip install --upgrade python-gdcm
         python -c 'import gdcm; print(gdcm.GDCM_VERSION)'
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_gdcm_pixel_data.py
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_encoders_gdcm.py
+        pytest ${{ matrix.pytest-args }} tests/test_gdcm_pixel_data.py
+        pytest ${{ matrix.pytest-args }} tests/test_encoders_gdcm.py
         python -m pip uninstall -y python-gdcm
 
     - name: Install and test pylibjpeg
       run: |
         python -m pip install --upgrade pylibjpeg
         python -m pip uninstall -y pylibjpeg-openjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} tests/test_pylibjpeg.py
         python -m pip install --upgrade pylibjpeg-openjpeg pylibjpeg-libjpeg pylibjpeg-rle
-        pytest ${{ matrix.pytest-args }} pydicom/tests/test_pylibjpeg.py
+        pytest ${{ matrix.pytest-args }} tests/test_pylibjpeg.py
 
     - name: Test all pixel handling
       run: |

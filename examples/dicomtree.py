@@ -69,7 +69,7 @@ def recurse_tree(tree, dataset, parent, hide=False):
                 item_id = node_id + "." + str(i + 1)
                 sq_item_description = data_element.name.replace(
                     " Sequence", "")  # XXX not i18n
-                item_text = "{0:s} {1:d}".format(sq_item_description, i + 1)
+                item_text = f"{sq_item_description:s} {i + 1:d}"
                 tree.hlist.add(item_id, text=item_text)
                 tree.hlist.hide_entry(item_id)
                 recurse_tree(tree, dataset, item_id, hide=True)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         print(usage)
         sys.exit(-1)
     root = tkinter_tix.Tk()
-    root.geometry("{0:d}x{1:d}+{2:d}+{3:d}".format(1200, 900, 0, 0))
+    root.geometry("1200x900+0+0")
     root.title("DICOM tree viewer - " + sys.argv[1])
 
     RunTree(root, sys.argv[1])

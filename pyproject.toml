@@ -1,7 +1,3 @@
-# [build-system]
-# requires = ["setuptools"] # , "setuptools-scm"]
-# build-backend = "setuptools.build_meta"
-
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
@@ -17,9 +13,6 @@ classifiers=[
     "Intended Audience :: Science/Research",
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",
@@ -29,13 +22,13 @@ classifiers=[
 ]
 dependencies = []
 description = "A pure Python package for reading and writing DICOM data"
-#  dynamic = ["version"]  uncomment for pydicom v3.0
+# dynamic = ["version"]
 keywords = ["dicom, python, medical, imaging"]
 license = {text = "MIT"}
 name = "pydicom"
 readme = "README.md"
-requires-python = ">=3.7"
-version = "2.4.0" # remove for v3.0
+requires-python = ">=3.10"
+version = "3.0.0.dev0"
 
 
 [project.optional-dependencies]
@@ -68,23 +61,9 @@ codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
 
 
-[tool.flit.sdist]
-# include = ["pydicom/"]
-exclude = ["pydicom/tests"]
-
-
-[tool.setuptools]
-packages.find.include = ['pydicom*']
-packages.find.exclude = ['pydicom*tests']
-include-package-data = false
-
-[tool.setuptools_scm]
-# For pydicom v3.0, uncomment the following line
-# write_to = "pydicom/_version.py"
-
-
 [tool.ruff]
 select = [
+    "UP",
     "C9",
     "E",
     "F",
@@ -120,4 +99,24 @@ max-statements = 106
 
 [tool.ruff.per-file-ignores]
 "*/__init__.py" = ["F401"]
-"pydicom/config.py" = ["PLW0602"]
+"src/pydicom/config.py" = ["PLW0602"]
+
+[tool.mypy]
+python_version = "3.10"
+files = "src/"
+exclude = ["src/pydicom/benchmarks/", "src/pydicom/pixel_data_handlers/pillow_handler.py"]
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = false
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[[tool.mypy.overrides]]
+# 2023-06: mypy complains for a line in this file if ignore used or not.
+# Override unused ignores for that one file
+module = "pydicom.encoders.base"
+warn_unused_ignores = false

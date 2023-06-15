@@ -33,7 +33,7 @@ def uid_line(uid, keyword):
 def update_uids(path: Path) -> None:
     """Update pydicom.uid with Storage SOP Class UID definitions."""
     retained_lines = []
-    with open(path, "r") as f:
+    with open(path) as f:
         for line in f:
             retained_lines.append(line)
             if line.startswith(AUTOGEN_COMMENT):
@@ -54,7 +54,7 @@ def update_uids(path: Path) -> None:
 def update_api_reference(path: Path) -> None:
     """Update the API reference with the Storage SOP Class UIDs"""
     retained_lines = []
-    with open(path, "r") as f:
+    with open(path) as f:
         for line in f:
             retained_lines.append(line)
             if line.startswith(API_DOC_HEADING):

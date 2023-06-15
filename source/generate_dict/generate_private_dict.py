@@ -83,9 +83,9 @@ def write_dict(fp, dict_name, dict_entries):
     attributes : list of str
         List of attributes of the dict entries.
     """
-    fp.write("\n{0} = {{\n".format(dict_name))
+    fp.write(f"\n{dict_name} = {{\n")
     for owner in sorted(dict_entries):
-        fp.write("    '{0}': {{\n".format(owner))
+        fp.write(f"    '{owner}': {{\n")
         for entry in sorted(dict_entries[owner]):
             if "'" in dict_entries[owner][entry][2]:
                 format_str = "        '{0}': ('{1}', '{2}', \"{3}\", '{4}'),  # noqa\n"
