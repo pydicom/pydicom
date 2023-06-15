@@ -1,4 +1,4 @@
-# Copyright 2008-2018 pydicom authors. See LICENSE file for details.
+# Copyright 2008-2023 pydicom authors. See LICENSE file for details.
 """Pydicom configuration options."""
 
 # doc strings following items are picked up by sphinx for documentation

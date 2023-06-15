@@ -132,11 +132,6 @@ class TestFuture:
         importlib.reload(config)
         assert not config._use_future
 
-    def test_compat_import(self, future_setter):
-        """Import error if pydicom future behavior is set"""
-        with pytest.raises(ImportError):
-            import pydicom.compat
-
     def test_file_meta_class(self, future_setter):
         """FileMetaDataset required type in pydicom future behavior"""
         ds = Dataset()
