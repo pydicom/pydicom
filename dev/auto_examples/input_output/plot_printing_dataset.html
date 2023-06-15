@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Format the output of the data set printing &mdash; pydicom 2.4.0 documentation</title>
+  <title>Format the output of the data set printing &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -43,7 +43,7 @@
               <img src="../../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.4.0
+                3.0.0.dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -218,13 +218,13 @@ to download the full example code</p>
 
 <span class="sd">    Modelled after Dataset._pretty_str()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dont_print</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Pixel Data&#39;</span><span class="p">,</span> <span class="s1">&#39;File Meta Information Version&#39;</span><span class="p">]</span>
+    <span class="n">dont_print</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Pixel Data&quot;</span><span class="p">,</span> <span class="s2">&quot;File Meta Information Version&quot;</span><span class="p">]</span>
 
     <span class="n">indent_string</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span> <span class="o">*</span> <span class="n">indent</span>
     <span class="n">next_indent_string</span> <span class="o">=</span> <span class="s2">&quot;   &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">data_element</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>   <span class="c1"># a sequence</span>
+        <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>  <span class="c1"># a sequence</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">sequence_item</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                 <span class="n">myprint</span><span class="p">(</span><span class="n">sequence_item</span><span class="p">,</span> <span class="n">indent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -236,18 +236,16 @@ to download the full example code</p>
                 <span class="n">repr_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repr_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
                     <span class="n">repr_value</span> <span class="o">=</span> <span class="n">repr_value</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:s}</span><span class="s2"> </span><span class="si">{1:s}</span><span class="s2"> = </span><span class="si">{2:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indent_string</span><span class="p">,</span>
-                                                   <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                                   <span class="n">repr_value</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent_string</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">repr_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s1">&#39;MR_small.dcm&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a> <span class="o">=</span> <a href="../../reference/generated/pydicom.data.get_testdata_file.html#pydicom.data.get_testdata_file" title="pydicom.data.get_testdata_file" class="sphx-glr-backref-module-pydicom-data sphx-glr-backref-type-py-function"><span class="n">get_testdata_file</span></a><span class="p">(</span><span class="s2">&quot;MR_small.dcm&quot;</span><span class="p">)</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">pydicom</span><span class="o">.</span><span class="n">dcmread</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filename</span></a><span class="p">)</span>
 
 <span class="n">myprint</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.006 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.005 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-input-output-plot-printing-dataset-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7d5fde14cbfb9e9d3e3df4c27eff8500/plot_printing_dataset.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_printing_dataset.py</span></code></a></p>

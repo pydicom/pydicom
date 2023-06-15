@@ -15,6 +15,7 @@
    
       ~BaseTag.__init__
       ~BaseTag.as_integer_ratio
+      ~BaseTag.bit_count
       ~BaseTag.bit_length
       ~BaseTag.conjugate
       ~BaseTag.from_bytes

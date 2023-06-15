@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Show a dicom file using hierarchical tree &mdash; pydicom 2.4.0 documentation</title>
+  <title>Show a dicom file using hierarchical tree &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -43,7 +43,7 @@
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.4.0
+                3.0.0.dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -179,7 +179,7 @@ python3 dicomtree.py</p>
                 <span class="n">item_id</span> <span class="o">=</span> <span class="n">node_id</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="n">sq_item_description</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
                     <span class="s2">&quot; Sequence&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>  <span class="c1"># XXX not i18n</span>
-                <span class="n">item_text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:s}</span><span class="s2"> </span><span class="si">{1:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sq_item_description</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">item_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sq_item_description</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item_id</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">item_text</span><span class="p">)</span>
                 <span class="n">tree</span><span class="o">.</span><span class="n">hlist</span><span class="o">.</span><span class="n">hide_entry</span><span class="p">(</span><span class="n">item_id</span><span class="p">)</span>
                 <span class="n">recurse_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -194,7 +194,7 @@ python3 dicomtree.py</p>
         <span class="nb">print</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
         <a href="https://docs.python.org/3/library/sys.html#sys.exit" title="sys.exit" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-function"><span class="n">sys</span><span class="o">.</span><span class="n">exit</span></a><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.tix.html#tkinter.tix.Tk" title="tkinter.tix.Tk" class="sphx-glr-backref-module-tkinter-tix sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter_tix</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
-    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0:d}</span><span class="s2">x</span><span class="si">{1:d}</span><span class="s2">+</span><span class="si">{2:d}</span><span class="s2">+</span><span class="si">{3:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;1200x900+0+0&quot;</span><span class="p">)</span>
     <span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;DICOM tree viewer - &quot;</span> <span class="o">+</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="n">RunTree</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <a href="https://docs.python.org/3/library/sys.html#sys.argv" title="sys.argv" class="sphx-glr-backref-module-sys sphx-glr-backref-type-py-data"><span class="n">sys</span><span class="o">.</span><span class="n">argv</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span>

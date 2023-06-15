@@ -68,10 +68,10 @@ ds.save_as(filename_big_endian)
 
 # reopen the data just for checking
 for filename in (filename_little_endian, filename_big_endian):
-    print('Load file {} ...'.format(filename))
+    print(f'Load file {filename} ...')
     ds = pydicom.dcmread(filename)
     print(ds)
 
     # remove the created file
-    print('Remove file {} ...'.format(filename))
+    print(f'Remove file {filename} ...')
     os.remove(filename)

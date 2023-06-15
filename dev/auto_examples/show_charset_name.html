@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Display unicode person names &mdash; pydicom 2.4.0 documentation</title>
+  <title>Display unicode person names &mdash; pydicom 3.0.0.dev0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/pydicom.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -43,7 +43,7 @@
               <img src="../_static/pydicom_flat_black.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                2.4.0
+                3.0.0.dev0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -127,26 +127,33 @@ to download the full example code</p>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
-<span class="n">default_encoding</span> <span class="o">=</span> <span class="s1">&#39;iso8859&#39;</span>
+<span class="n">default_encoding</span> <span class="o">=</span> <span class="s2">&quot;iso8859&quot;</span>
 
 <span class="n">root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/tkinter.html#tkinter.Tk" title="tkinter.Tk" class="sphx-glr-backref-module-tkinter sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span></a><span class="p">()</span>
-<span class="c1"># root.geometry(&quot;%dx%d%+d%+d&quot; % (800, 600, 0, 0))</span>
+
 
 <span class="n">person_names</span> <span class="o">=</span> <span class="p">[</span>
     <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
+        <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
         <span class="sa">b</span><span class="s2">&quot;Yamada^Tarou=</span><span class="se">\033</span><span class="s2">$B;3ED</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$BB@O:&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">(B=</span><span class="se">\033</span><span class="s2">$B$d$^$@</span><span class="se">\033</span><span class="s2">(B^</span><span class="se">\033</span><span class="s2">$B$?$m$&amp;</span><span class="se">\033</span><span class="s2">(B&quot;</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;iso2022_jp&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 H.3 p98</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;iso2022_jp&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
     <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
-        <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">=&quot;</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;GB18030&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.3 p 105</span>
+        <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xcd\xf5\x5e\xd0\xa1\xb6\xab</span><span class="s2">=&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;GB18030&quot;</span><span class="p">]</span>
+    <span class="p">),</span>
+    <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
     <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Wang^XiaoDong=</span><span class="se">\xe7\x8e\x8b\x5e\xe5\xb0\x8f\xe6\x9d\xb1</span><span class="s2">=&quot;</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 J.1 p 104</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
     <a href="../reference/generated/pydicom.valuerep.PersonNameUnicode.html#pydicom.valuerep.PersonNameUnicode" title="pydicom.valuerep.PersonNameUnicode" class="sphx-glr-backref-module-pydicom-valuerep sphx-glr-backref-type-py-attribute"><span class="n">PersonNameUnicode</span></a><span class="p">(</span>
         <span class="sa">b</span><span class="s2">&quot;Hong^Gildong=</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\373\363</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\321\316\324\327</span><span class="s2">=&quot;</span>
         <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\310\253</span><span class="s2">^</span><span class="se">\033</span><span class="s2">$)C</span><span class="se">\261\346\265\277</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s1">&#39;euc_kr&#39;</span><span class="p">]),</span>  <span class="c1"># DICOM standard 2008-PS3.5 I.2 p 101</span>
+        <span class="p">[</span><span class="n">default_encoding</span><span class="p">,</span> <span class="s2">&quot;euc_kr&quot;</span><span class="p">],</span>
+    <span class="p">),</span>
 <span class="p">]</span>
 <span class="k">for</span> <span class="n">person_name</span> <span class="ow">in</span> <span class="n">person_names</span><span class="p">:</span>
     <span class="n">label</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">person_name</span><span class="p">)</span>

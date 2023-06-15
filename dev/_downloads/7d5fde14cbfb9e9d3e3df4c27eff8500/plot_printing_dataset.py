@@ -21,13 +21,13 @@ def myprint(dataset, indent=0):
 
     Modelled after Dataset._pretty_str()
     """
-    dont_print = ['Pixel Data', 'File Meta Information Version']
+    dont_print = ["Pixel Data", "File Meta Information Version"]
 
     indent_string = "   " * indent
     next_indent_string = "   " * (indent + 1)
 
     for data_element in dataset:
-        if data_element.VR == "SQ":   # a sequence
+        if data_element.VR == "SQ":  # a sequence
             print(indent_string, data_element.name)
             for sequence_item in data_element.value:
                 myprint(sequence_item, indent + 1)
@@ -39,12 +39,10 @@ def myprint(dataset, indent=0):
                 repr_value = repr(data_element.value)
                 if len(repr_value) > 50:
                     repr_value = repr_value[:50] + "..."
-                print("{0:s} {1:s} = {2:s}".format(indent_string,
-                                                   data_element.name,
-                                                   repr_value))
+                print(f"{indent_string} {data_element.name} = {repr_value}")
 
 
-filename = get_testdata_file('MR_small.dcm')
+filename = get_testdata_file("MR_small.dcm")
 ds = pydicom.dcmread(filename)
 
 myprint(ds)

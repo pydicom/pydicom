@@ -43,6 +43,8 @@
       ~UID.lstrip
       ~UID.maketrans
       ~UID.partition
+      ~UID.removeprefix
+      ~UID.removesuffix
       ~UID.replace
       ~UID.rfind
       ~UID.rindex

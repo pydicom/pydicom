@@ -15,6 +15,7 @@
    
       ~IS.__init__
       ~IS.as_integer_ratio
+      ~IS.bit_count
       ~IS.bit_length
       ~IS.conjugate
       ~IS.from_bytes
