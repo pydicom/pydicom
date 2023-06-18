@@ -1,6 +1,7 @@
 # Copyright 2008-2020 pydicom authors. See LICENSE file for details.
 """Unit tests for the pydicom.sequence module."""
 
+import copy
 import weakref
 
 import pytest
@@ -174,3 +175,13 @@ class TestSequence:
 
         for ds in seq:
             assert isinstance(ds.parent_seq, weakref.ReferenceType)
+
+    def test_deepcopy_sequence_subclass(self):
+        """Regression test for #1813."""
+        class MySequenceSubclass(Sequence):
+            pass
+
+        my_sequence_subclass = MySequenceSubclass()
+
+        seq2 = copy.deepcopy(my_sequence_subclass)
+        assert seq2.__class__ is MySequenceSubclass

@@ -1972,6 +1972,16 @@ class TestFileDataset:
         ds2 = copy.deepcopy(ds)
         assert ds2.filename == ""
 
+    def test_deepcopy_dataset_subclass(self):
+        """Regression test for #1813."""
+        class MyDatasetSubclass(pydicom.Dataset):
+            pass
+
+        my_dataset_subclass = MyDatasetSubclass()
+
+        ds2 = copy.deepcopy(my_dataset_subclass)
+        assert ds2.__class__ is MyDatasetSubclass
+
 
 class TestDatasetOverlayArray:
     """Tests for Dataset.overlay_array()."""
