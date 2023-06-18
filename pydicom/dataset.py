@@ -469,7 +469,8 @@ class Dataset:
         self._parent = weakref.ref(value)
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
-        copied = Dataset()
+        cls = self.__class__
+        copied = cls.__new__(cls)
         if memo:
             memo[id(self)] = copied   # add the new class to the memo
         # Insert a deepcopy of all instance attributes

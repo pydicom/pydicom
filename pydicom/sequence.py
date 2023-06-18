@@ -80,7 +80,8 @@ class Sequence(MultiValue[Dataset]):
             ds.parent_seq = self  # type: ignore
 
     def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Sequence":
-        copied = Sequence()
+        cls = self.__class__
+        copied = cls.__new__(cls)
         if memo is not None:
             memo[id(self)] = copied
         copied.__dict__.update(deepcopy(self.__dict__, memo))
