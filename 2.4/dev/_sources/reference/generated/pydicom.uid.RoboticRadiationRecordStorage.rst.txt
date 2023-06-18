@@ -1,6 +1,0 @@
-﻿pydicom.uid.RoboticRadiationRecordStorage
-=========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RoboticRadiationRecordStorage

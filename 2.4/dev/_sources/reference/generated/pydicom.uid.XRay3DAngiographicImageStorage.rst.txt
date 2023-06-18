@@ -1,6 +1,0 @@
-﻿pydicom.uid.XRay3DAngiographicImageStorage
-==========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: XRay3DAngiographicImageStorage

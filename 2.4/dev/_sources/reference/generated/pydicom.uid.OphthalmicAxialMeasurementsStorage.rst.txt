@@ -1,6 +1,0 @@
-﻿pydicom.uid.OphthalmicAxialMeasurementsStorage
-==============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: OphthalmicAxialMeasurementsStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.VLPhotographicImageStorage
-======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VLPhotographicImageStorage

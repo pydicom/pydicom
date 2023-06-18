@@ -1,6 +1,0 @@
-﻿pydicom.uid.DigitalIntraOralXRayImageStorageForPresentation
-===========================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DigitalIntraOralXRayImageStorageForPresentation

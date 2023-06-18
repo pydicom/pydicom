@@ -1,6 +1,0 @@
-﻿pydicom.uid.RoutineScalpElectroencephalogramWaveformStorage
-===========================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RoutineScalpElectroencephalogramWaveformStorage

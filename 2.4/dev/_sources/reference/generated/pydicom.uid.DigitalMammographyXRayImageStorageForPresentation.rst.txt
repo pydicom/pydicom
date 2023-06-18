@@ -1,6 +1,0 @@
-﻿pydicom.uid.DigitalMammographyXRayImageStorageForPresentation
-=============================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DigitalMammographyXRayImageStorageForPresentation

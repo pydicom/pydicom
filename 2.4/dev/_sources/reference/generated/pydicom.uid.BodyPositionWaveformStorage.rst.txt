@@ -1,6 +1,0 @@
-﻿pydicom.uid.BodyPositionWaveformStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: BodyPositionWaveformStorage

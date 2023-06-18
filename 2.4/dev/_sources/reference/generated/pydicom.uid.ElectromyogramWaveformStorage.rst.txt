@@ -1,6 +1,0 @@
-﻿pydicom.uid.ElectromyogramWaveformStorage
-=========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ElectromyogramWaveformStorage

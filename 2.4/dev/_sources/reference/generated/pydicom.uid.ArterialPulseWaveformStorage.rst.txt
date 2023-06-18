@@ -1,6 +1,0 @@
-﻿pydicom.uid.ArterialPulseWaveformStorage
-========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ArterialPulseWaveformStorage

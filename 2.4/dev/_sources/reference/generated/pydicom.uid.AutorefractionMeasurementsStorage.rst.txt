@@ -1,6 +1,0 @@
-﻿pydicom.uid.AutorefractionMeasurementsStorage
-=============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: AutorefractionMeasurementsStorage

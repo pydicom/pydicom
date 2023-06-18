@@ -1,6 +1,0 @@
-﻿pydicom.uid.GeneralECGWaveformStorage
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: GeneralECGWaveformStorage

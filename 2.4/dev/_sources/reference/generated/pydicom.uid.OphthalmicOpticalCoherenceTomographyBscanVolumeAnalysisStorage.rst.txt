@@ -1,6 +1,0 @@
-﻿pydicom.uid.OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage
-==========================================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage

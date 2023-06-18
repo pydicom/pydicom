@@ -1,6 +1,0 @@
-﻿pydicom.uid.VolumeRenderingVolumetricPresentationStateStorage
-=============================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VolumeRenderingVolumetricPresentationStateStorage

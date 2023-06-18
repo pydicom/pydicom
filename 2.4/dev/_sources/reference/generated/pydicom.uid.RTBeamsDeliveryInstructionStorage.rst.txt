@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTBeamsDeliveryInstructionStorage
-=============================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTBeamsDeliveryInstructionStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.PerformedImagingAgentAdministrationSRStorage
-========================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: PerformedImagingAgentAdministrationSRStorage

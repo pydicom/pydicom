@@ -1,6 +1,0 @@
-﻿pydicom.uid.VLEndoscopicImageStorage
-====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: VLEndoscopicImageStorage

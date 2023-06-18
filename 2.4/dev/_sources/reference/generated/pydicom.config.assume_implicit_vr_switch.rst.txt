@@ -1,6 +1,0 @@
-﻿pydicom.config.assume\_implicit\_vr\_switch
-===========================================
-
-.. currentmodule:: pydicom.config
-
-.. autodata:: assume_implicit_vr_switch

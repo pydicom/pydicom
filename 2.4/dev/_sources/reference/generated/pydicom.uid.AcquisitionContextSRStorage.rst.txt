@@ -1,6 +1,0 @@
-﻿pydicom.uid.AcquisitionContextSRStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: AcquisitionContextSRStorage

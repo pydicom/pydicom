@@ -1,6 +1,0 @@
-﻿pydicom.uid.ImplantationPlanSRStorage
-=====================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ImplantationPlanSRStorage

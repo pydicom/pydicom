@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTPlanStorage
-=========================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTPlanStorage

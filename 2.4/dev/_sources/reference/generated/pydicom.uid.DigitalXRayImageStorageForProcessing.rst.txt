@@ -1,6 +1,0 @@
-﻿pydicom.uid.DigitalXRayImageStorageForProcessing
-================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DigitalXRayImageStorageForProcessing

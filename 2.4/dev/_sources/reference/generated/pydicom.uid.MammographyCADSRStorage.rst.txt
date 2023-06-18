@@ -1,6 +1,0 @@
-﻿pydicom.uid.MammographyCADSRStorage
-===================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: MammographyCADSRStorage

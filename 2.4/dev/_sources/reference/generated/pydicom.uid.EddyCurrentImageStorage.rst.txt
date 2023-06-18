@@ -1,6 +1,0 @@
-﻿pydicom.uid.EddyCurrentImageStorage
-===================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: EddyCurrentImageStorage

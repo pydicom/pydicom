@@ -1,6 +1,0 @@
-﻿pydicom.uid.DICOSCTImageStorage
-===============================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: DICOSCTImageStorage

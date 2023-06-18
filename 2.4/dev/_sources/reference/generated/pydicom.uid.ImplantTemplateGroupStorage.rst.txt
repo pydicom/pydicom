@@ -1,6 +1,0 @@
-﻿pydicom.uid.ImplantTemplateGroupStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: ImplantTemplateGroupStorage

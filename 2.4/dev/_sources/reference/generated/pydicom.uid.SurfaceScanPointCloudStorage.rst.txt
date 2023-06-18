@@ -1,6 +1,0 @@
-﻿pydicom.uid.SurfaceScanPointCloudStorage
-========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SurfaceScanPointCloudStorage

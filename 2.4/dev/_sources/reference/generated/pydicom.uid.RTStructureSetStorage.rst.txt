@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTStructureSetStorage
-=================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTStructureSetStorage

@@ -1,6 +1,0 @@
-﻿pydicom.uid.PlannedImagingAgentAdministrationSRStorage
-======================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: PlannedImagingAgentAdministrationSRStorage

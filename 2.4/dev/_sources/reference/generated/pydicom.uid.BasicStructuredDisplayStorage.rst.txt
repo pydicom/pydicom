@@ -1,6 +1,0 @@
-﻿pydicom.uid.BasicStructuredDisplayStorage
-=========================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: BasicStructuredDisplayStorage

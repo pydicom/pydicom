@@ -1,6 +1,0 @@
-﻿pydicom.uid.PositronEmissionTomographyImageStorage
-==================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: PositronEmissionTomographyImageStorage

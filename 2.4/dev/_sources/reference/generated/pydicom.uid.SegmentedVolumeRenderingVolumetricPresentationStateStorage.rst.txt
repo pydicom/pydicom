@@ -1,6 +1,0 @@
-﻿pydicom.uid.SegmentedVolumeRenderingVolumetricPresentationStateStorage
-======================================================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: SegmentedVolumeRenderingVolumetricPresentationStateStorage

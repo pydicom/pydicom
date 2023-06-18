@@ -1,6 +1,0 @@
-﻿pydicom.uid.RTRadiationRecordSetStorage
-=======================================
-
-.. currentmodule:: pydicom.uid
-
-.. autodata:: RTRadiationRecordSetStorage
