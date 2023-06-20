@@ -2,7 +2,7 @@ name: pr-type-lint-spell
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 
@@ -37,4 +37,4 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: codespell-project/actions-codespell@master
+      - uses: codespell-project/actions-codespell@main

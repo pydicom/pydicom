@@ -2,7 +2,7 @@ name: type-hints
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 
