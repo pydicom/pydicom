@@ -10,9 +10,11 @@ except ImportError:
     import urllib.request as urllib2
     # python3
 
-GDCM_PRIVATE_DICT = "https://raw.githubusercontent.com/malaterre/GDCM"
-GDCM_PRIVATE_DICT = '%s/master/Source/DataDictionary' % (GDCM_PRIVATE_DICT)
-GDCM_PRIVATE_DICT = "%s/privatedicts.xml" % (GDCM_PRIVATE_DICT)
+
+GDCM_PRIVATE_DICT = (
+    r"https://raw.githubusercontent.com/malaterre/GDCM/"
+    r"master/Source/DataDictionary/privatedicts.xml"
+)
 PYDICOM_DICT_NAME = (
     'private_dictionaries: Dict[str, Dict[str, Tuple[str, str, str, str]]]'
 )

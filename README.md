@@ -1,7 +1,7 @@
 [![unit-tests](https://github.com/pydicom/pydicom/workflows/unit-tests/badge.svg)](https://github.com/pydicom/pydicom/actions?query=workflow%3Aunit-tests)
 [![type-hints](https://github.com/pydicom/pydicom/workflows/type-hints/badge.svg)](https://github.com/pydicom/pydicom/actions?query=workflow%3Atype-hints)
-[![doc-build](https://circleci.com/gh/pydicom/pydicom/tree/master.svg?style=shield)](https://circleci.com/gh/pydicom/pydicom/tree/master)
-[![test-coverage](https://codecov.io/gh/pydicom/pydicom/branch/master/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
+[![doc-build](https://circleci.com/gh/pydicom/pydicom/tree/main.svg?style=shield)](https://circleci.com/gh/pydicom/pydicom/tree/main)
+[![test-coverage](https://codecov.io/gh/pydicom/pydicom/branch/main/graph/badge.svg)](https://codecov.io/gh/pydicom/pydicom)
 [![Python version](https://img.shields.io/pypi/pyversions/pydicom.svg)](https://img.shields.io/pypi/pyversions/pydicom.svg)
 [![PyPI version](https://badge.fury.io/py/pydicom.svg)](https://badge.fury.io/py/pydicom)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8034250.svg)](https://doi.org/10.5281/zenodo.8034250)
@@ -124,7 +124,7 @@ plt.show()
 We are all volunteers working on *pydicom* in our free time. As our 
 resources are limited, we very much value your contributions, be it bug fixes, new 
 core features, or documentation improvements. For more information, please
-read our [contribution guide](https://github.com/pydicom/pydicom/blob/master/CONTRIBUTING.md).
+read our [contribution guide](https://github.com/pydicom/pydicom/blob/main/CONTRIBUTING.md).
 
 If you have examples or extensions of *pydicom* that don't belong with the 
 core software, but that you deem useful to others, you can add them to our 

@@ -46,7 +46,7 @@ docs = [
 
 [project.urls]
 documentation = "https://pydicom.github.io/pydicom"
-download = "https://github.com/pydicom/pydicom/archive/master.zip"
+download = "https://github.com/pydicom/pydicom/archive/main.zip"
 homepage = "https://github.com/pydicom/pydicom"
 repository = "https://github.com/pydicom/pydicom"
 
