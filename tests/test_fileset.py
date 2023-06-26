@@ -1390,9 +1390,10 @@ class TestFileSet:
         ct.PatientID = None
         fs = FileSet()
         msg = (
-            r"Unable to use the default 'PATIENT' record creator "
-            r"as the instance is missing a required element or value. Either "
-            r"update the instance, define your own record creation function "
+            r"Unable to use the default 'PATIENT' record creator: "
+            r"The instance's \(0010, 0020\) 'Patient ID' element cannot be empty. "
+            r"See DICOM PS3.3 Section F.5. Either update the instance, "
+            r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
         )
         with pytest.raises(ValueError, match=msg):
@@ -2355,9 +2356,10 @@ class TestFileSet_Modify:
         ds = dcmread(get_testdata_file("rtdose.dcm"))
         del ds.InstanceNumber
         msg = (
-            r"Unable to use the default 'RT DOSE' record creator "
-            r"as the instance is missing a required element or value. Either "
-            r"update the instance, define your own record creation function "
+            r"Unable to use the default 'RT DOSE' record creator: "
+            r"The instance's \(0020, 0013\) 'Instance Number' element is missing. "
+            r"See DICOM PS3.3 Section F.5. Either update the instance, "
+            r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
         )
         with pytest.raises(ValueError, match=msg):
@@ -2369,9 +2371,10 @@ class TestFileSet_Modify:
         ds = dcmread(get_testdata_file("rtdose.dcm"))
         ds.InstanceNumber = None
         msg = (
-            r"Unable to use the default 'RT DOSE' record creator "
-            r"as the instance is missing a required element or value. Either "
-            r"update the instance, define your own record creation function "
+            r"Unable to use the default 'RT DOSE' record creator: "
+            r"The instance's \(0020, 0013\) 'Instance Number' element cannot be empty. "
+            r"See DICOM PS3.3 Section F.5. Either update the instance, "
+            r"define your own record creation function "
             r"or use 'FileSet.add_custom\(\)' instead"
         )
         with pytest.raises(ValueError, match=msg):
@@ -2445,10 +2448,11 @@ class TestFileSet_Modify:
         del ds.HangingProtocolCreator
         fs = FileSet()
         msg = (
-            r"Unable to use the default 'HANGING PROTOCOL' record creator "
-            r"as the instance is missing a required element or value. Either "
-            r"update the instance, define your own record creation function "
-            r"or use 'FileSet.add_custom\(\)' instead"
+            r"Unable to use the default 'HANGING PROTOCOL' record creator: "
+            r"The instance's \(0072, 0008\) 'Hanging Protocol Creator' element "
+            r"is missing. See DICOM PS3.3 Section F.5. Either update the "
+            r"instance, define your own record creation function or use "
+            r"'FileSet.add_custom\(\)' instead"
         )
         with pytest.raises(ValueError, match=msg):
             fs.add(ds)
