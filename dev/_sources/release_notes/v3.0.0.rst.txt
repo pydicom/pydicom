@@ -9,6 +9,7 @@ Changes
 
 Enhancements
 ------------
+* Added details of missing required tag information when adding Dataset to Fileset
 
 Fixes
 -----
