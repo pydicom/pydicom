@@ -1869,8 +1869,8 @@ class FileSet:
             except ValueError as exc:
                 raise ValueError(
                     f"Unable to use the default '{record_type}' "
-                    "record creator as the instance is missing a "
-                    "required element or value. Either update the instance, "
+                    f"record creator: {exc}. See DICOM PS3.3 Section F.5. "
+                    "Either update the instance, "
                     "define your own record creation function or use "
                     "'FileSet.add_custom()' instead"
                 ) from exc
@@ -1898,8 +1898,8 @@ class FileSet:
             except ValueError as exc:
                 raise ValueError(
                     f"Unable to use the default '{record_type}' "
-                    "record creator as the instance is missing a "
-                    "required element or value. Either update the instance, "
+                    f"record creator: {exc}. See DICOM PS3.3 Section F.5. "
+                    "Either update the instance, "
                     "define your own record creation function or use "
                     "'FileSet.add_custom()' instead"
                 ) from exc
