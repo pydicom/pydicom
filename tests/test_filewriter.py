@@ -2354,7 +2354,6 @@ class TestWriteNumbers:
         write_numbers(fp, elem, fmt)
         assert fp.getvalue() == b'\x01\x00'
 
-    @pytest.mark.filterwarnings("ignore:Invalid value length 1")
     def test_exception(self):
         """Test exceptions raise OSError"""
         fp = DicomBytesIO()

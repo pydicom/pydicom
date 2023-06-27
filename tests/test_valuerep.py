@@ -890,7 +890,6 @@ class TestIS:
         assert 42 == IS("42.0")
         assert 42 == IS(42.0)
 
-    @pytest.mark.filterwarnings("ignore:Invalid value for VR IS", "ignore:Value")
     def test_float_value(self):
         """Read binary value of IS that is actually a float"""
         # from issue #1661
@@ -908,7 +907,6 @@ class TestIS:
         with pytest.raises(TypeError):
             _ = IS(14.5, validation_mode=config.RAISE)
 
-    @pytest.mark.filterwarnings("ignore:Value")
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""
         is1 = IS("14.5", validation_mode=config.IGNORE)
