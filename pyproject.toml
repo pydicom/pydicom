@@ -43,6 +43,12 @@ docs = [
         "sphinxcontrib-napoleon",
         "sphinx-copybutton"
 ]
+dev = [
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
 
 [project.urls]
 documentation = "https://pydicom.github.io/pydicom"

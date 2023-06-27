@@ -158,7 +158,7 @@ class TestDataElement:
     def test_equality_standard_element(self):
         """DataElement: equality returns correct value for simple elements"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        assert dd == dd
+        assert dd == dd # noqa: PLR0124 Need to check equality with self
         ee = DataElement(0x00100010, 'PN', 'ANON')
         assert dd == ee
 
@@ -184,7 +184,7 @@ class TestDataElement:
     def test_equality_private_element(self):
         """DataElement: equality returns correct value for private elements"""
         dd = DataElement(0x01110001, 'PN', 'ANON')
-        assert dd == dd
+        assert dd == dd # noqa: PLR0124 Need to check equality with self
         ee = DataElement(0x01110001, 'PN', 'ANON')
         assert dd == ee
 
@@ -203,7 +203,7 @@ class TestDataElement:
     def test_equality_sequence_element(self):
         """DataElement: equality returns correct value for sequence elements"""
         dd = DataElement(0x300A00B0, 'SQ', [])
-        assert dd == dd
+        assert dd == dd # noqa: PLR0124 Need to check equality with self
         ee = DataElement(0x300A00B0, 'SQ', [])
         assert dd == ee
 
@@ -254,7 +254,7 @@ class TestDataElement:
 
         dd = DataElement(0x00100010, 'PN', 'ANON')
         ee = DataElementPlus(0x00100010, 'PN', 'ANON')
-        assert ee == ee
+        assert ee == ee # noqa: PLR0124 Need to check equality with self
         assert dd == ee
         assert ee == dd
 
@@ -274,7 +274,7 @@ class TestDataElement:
     def test_inequality_standard(self):
         """Test DataElement.__ne__ for standard element"""
         dd = DataElement(0x00100010, 'PN', 'ANON')
-        assert not dd != dd
+        assert not dd != dd # noqa: PLR0124 Need to check inequality with self
         assert DataElement(0x00100010, 'PN', 'ANONA') != dd
 
         # Check tag
@@ -286,7 +286,7 @@ class TestDataElement:
     def test_inequality_sequence(self):
         """Test DataElement.__ne__ for sequence element"""
         dd = DataElement(0x300A00B0, 'SQ', [])
-        assert not dd != dd
+        assert not dd != dd # noqa: PLR0124 Need to check inequality with self
         assert not DataElement(0x300A00B0, 'SQ', []) != dd
         ee = DataElement(0x300A00B0, 'SQ', [Dataset()])
         assert ee != dd
