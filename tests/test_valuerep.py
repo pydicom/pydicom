@@ -136,7 +136,7 @@ class TestTM:
     def test_comparison(self):
         tm = pydicom.valuerep.TM("010203.123456")
         tm_object = time(1, 2, 3, 123456)
-        assert tm == tm
+        assert tm == tm # noqa: PLR0124 Need to check equality with self
         assert tm != 1
         assert tm == tm_object
         assert tm_object == tm
@@ -260,7 +260,7 @@ class TestDT:
     def test_comparison(self):
         dt = pydicom.valuerep.DT("19111213212123")
         dt_object = datetime(1911, 12, 13, 21, 21, 23)
-        assert dt == dt
+        assert dt == dt # noqa: PLR0124 Need to check equality with self
         assert dt != 1
         assert dt == dt_object
         assert dt_object == dt
@@ -336,7 +336,7 @@ class TestDA:
     def test_comparison(self):
         da = pydicom.valuerep.DA("19111213")
         da_object = date(1911, 12, 13)
-        assert da == da
+        assert da == da # noqa: PLR0124 Need to check equality with self
         assert da != 1
         assert da == da_object
         assert hash(da) == hash(da_object)
@@ -890,6 +890,7 @@ class TestIS:
         assert 42 == IS("42.0")
         assert 42 == IS(42.0)
 
+    @pytest.mark.filterwarnings("ignore:Invalid value for VR IS", "ignore:Value")
     def test_float_value(self):
         """Read binary value of IS that is actually a float"""
         # from issue #1661
@@ -907,6 +908,7 @@ class TestIS:
         with pytest.raises(TypeError):
             _ = IS(14.5, validation_mode=config.RAISE)
 
+    @pytest.mark.filterwarnings("ignore:Value")
     def test_float_init(self):
         """New ISfloat created from another behaves correctly"""
         is1 = IS("14.5", validation_mode=config.IGNORE)
