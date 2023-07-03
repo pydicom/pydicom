@@ -1815,7 +1815,7 @@ class PersonName:
             List of components for the ideographic group.
         phonetic_group: Sequence[str | bytes]
             List of components for the phonetic group.
-        encodings: Optional[List[str]]
+        encodings: list[str] | None
             A list of encodings used for the other input parameters.
 
         Returns
@@ -1973,7 +1973,7 @@ class PersonName:
             Name prefix in phonetic form.
         name_suffix_phonetic: str | bytes
             Name suffix in phonetic form.
-        encodings: Optional[List[str]]
+        encodings: list[str] | None
             A list of encodings used for the other input parameters.
 
         Returns
@@ -2076,7 +2076,7 @@ class PersonName:
             Name of the responsible party in phonetic form.
         patient_name_phonetic: str | bytes
             Patient name in phonetic form.
-        encodings: Optional[List[str]]
+        encodings: list[str] | None
             A list of encodings used for the other input parameters
 
         Returns

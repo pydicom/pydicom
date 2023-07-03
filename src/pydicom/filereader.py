@@ -130,7 +130,7 @@ def data_element_generator(
         tag_set.add(Tag(0x00080005))  # Specific Character Set
 
     while True:
-        # VR: Optional[str]
+        # VR: str | None
         # Read tag, VR, length, get ready to read value
         bytes_read = fp_read(8)
         if len(bytes_read) < 8:
