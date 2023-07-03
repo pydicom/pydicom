@@ -4,7 +4,7 @@
 from struct import unpack, unpack_from
 from sys import byteorder
 from typing import (
-    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast
+    Optional, Union, TYPE_CHECKING, cast
 )
 from collections.abc import Iterable, ByteString
 import warnings
@@ -20,7 +20,7 @@ from pydicom.uid import UID
 from pydicom.valuerep import VR
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset
 
 
 # Lookup table for unpacking bit-packed data

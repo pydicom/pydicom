@@ -37,7 +37,7 @@ in the table below.
 
 from struct import unpack
 import sys
-from typing import List, TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, cast
 import warnings
 
 try:
@@ -53,7 +53,7 @@ from pydicom.encoders.native import _encode_frame
 import pydicom.uid
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset
 
 
 HANDLER_NAME = 'RLE Lossless'

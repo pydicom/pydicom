@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset
 
 
 try:

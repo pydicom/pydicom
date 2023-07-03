@@ -52,7 +52,7 @@ from typing import TYPE_CHECKING, cast
 from collections.abc import Iterable
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset
+    from pydicom.dataset import Dataset
 
 try:
     import numpy as np

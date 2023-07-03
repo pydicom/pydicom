@@ -55,7 +55,6 @@ try:
     from pydicom.pixel_data_handlers.numpy_handler import (
         get_pixeldata,
         unpack_bits,
-        pack_bits,
     )
 except ImportError:
     NP_HANDLER = None
