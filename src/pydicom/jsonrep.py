@@ -69,7 +69,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
 
 OtherValueType = None | str | int | float
 PNValueType = None | str | dict[str, str]
-SQValueType = Optional[dict[str, Any]]  # Recursive
+SQValueType = dict[str, Any] | None  # Recursive
 
 ValueType: TypeAlias = PNValueType | SQValueType | OtherValueType
 InlineBinaryType: TypeAlias = str | list[str]
@@ -78,7 +78,7 @@ BulkDataURIType: TypeAlias = str | list[str]
 JSONValueType = list[ValueType] | InlineBinaryType | BulkDataURIType
 
 BulkDataType = None | str | int | float | bytes
-BulkDataHandlerType = Optional[Callable[[str, str, str], BulkDataType]]
+BulkDataHandlerType = Callable[[str, str, str], BulkDataType] | None
 
 
 class JsonDataElementConverter:

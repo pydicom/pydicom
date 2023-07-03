@@ -35,9 +35,7 @@ def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
 
 # Type that can be used where a parameter is a tag or keyword
 TagType: TypeAlias = "int | str | tuple[int, int] | BaseTag"
-TagListType = Union[
-    list[int], list[str], list[tuple[int, int]], list["BaseTag"]
-]
+TagListType = list[int] | list[str] | list[tuple[int, int]] | list["BaseTag"]
 
 
 def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
