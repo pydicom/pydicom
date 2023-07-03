@@ -5,7 +5,6 @@ Data generated from GDCM project's private dictionary.
 The outer dictionary key is the Private Creator name ("owner"), while the inner
 dictionary key is a map of DICOM tag to (VR, VM, name, is_retired).
 """
-from typing import Dict, Tuple
 
 
 private_dictionaries: dict[str, dict[str, tuple[str, str, str, str]]] = {

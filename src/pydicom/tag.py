@@ -9,7 +9,7 @@ stored as a single number and separated to (group, element) as required.
 #       element
 from contextlib import contextmanager
 import traceback
-from typing import Tuple, Optional, Union, Any, List
+from typing import Union, Any
 from collections.abc import Iterator
 
 

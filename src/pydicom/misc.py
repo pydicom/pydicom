@@ -3,7 +3,6 @@
 
 from itertools import groupby
 from pathlib import Path
-from typing import Optional, Union
 
 
 _size_factors = {

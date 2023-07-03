@@ -5,8 +5,8 @@ from io import BytesIO
 from struct import unpack, pack
 from types import TracebackType
 from typing import (
-    Tuple, Optional, BinaryIO, Type, Union, cast, TextIO,
-    TYPE_CHECKING, Any
+    BinaryIO, cast, TextIO,
+    Any
 )
 from collections.abc import Callable
 

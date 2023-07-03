@@ -6,7 +6,7 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Any, TYPE_CHECKING
 from collections.abc import Generator
 
 have_numpy = True

@@ -1,9 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Access dicom dictionary information"""
 import warnings
-from typing import Tuple, Optional, Dict
 
-from pydicom.config import logger
 from pydicom.tag import Tag, BaseTag, TagType
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}

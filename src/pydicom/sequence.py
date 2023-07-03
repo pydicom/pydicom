@@ -5,8 +5,8 @@ Sequence is a list of pydicom Dataset objects.
 """
 from copy import deepcopy
 from typing import (
-    Optional, List, cast, Union, overload,
-    Dict, Any)
+    cast, overload,
+    Any)
 from collections.abc import Iterable, MutableSequence
 import weakref
 import warnings

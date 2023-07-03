@@ -2,7 +2,6 @@
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from struct import pack
-from typing import List, Optional, Tuple
 from collections.abc import Generator
 import warnings
 

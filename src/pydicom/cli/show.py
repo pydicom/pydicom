@@ -2,7 +2,6 @@
 """Pydicom command line interface program for `pydicom show`"""
 
 import argparse
-from typing import Optional, List, Union
 from collections.abc import Callable
 
 from pydicom.dataset import Dataset

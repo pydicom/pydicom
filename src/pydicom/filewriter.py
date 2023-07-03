@@ -4,14 +4,12 @@
 from struct import pack
 import sys
 from typing import (
-    Union, BinaryIO, Any, cast, Optional,
-    List
+    BinaryIO, Any, cast
 )
 from collections.abc import Sequence, MutableSequence, Iterable
 import warnings
 import zlib
 
-from pydicom import config
 from pydicom.charset import default_encoding, convert_encodings, encode_string
 from pydicom.config import have_numpy
 from pydicom.dataelem import DataElement_from_raw, DataElement, RawDataElement
@@ -24,7 +22,7 @@ from pydicom.tag import (Tag, ItemTag, ItemDelimiterTag, SequenceDelimiterTag,
 from pydicom.uid import DeflatedExplicitVRLittleEndian, UID
 from pydicom.valuerep import (
     PersonName, IS, DSclass, DA, DT, TM, EXPLICIT_VR_LENGTH_32, VR,
-    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR, validate_value
+    AMBIGUOUS_VR, CUSTOMIZABLE_CHARSET_VR
 )
 from pydicom.values import convert_numbers
 

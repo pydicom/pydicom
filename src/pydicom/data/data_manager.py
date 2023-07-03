@@ -49,7 +49,7 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from typing import Dict, List, Union, Optional, TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (

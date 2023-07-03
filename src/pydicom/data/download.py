@@ -8,7 +8,7 @@ import hashlib
 import json
 import os
 import pathlib
-from typing import Dict, Optional, cast
+from typing import cast
 import urllib.request
 import urllib.error
 import warnings

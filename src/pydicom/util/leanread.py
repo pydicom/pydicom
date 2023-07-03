@@ -5,7 +5,7 @@ import os
 from struct import Struct, unpack
 from types import TracebackType
 from typing import (
-    Tuple, Optional, Union, Type, cast, BinaryIO
+    cast, BinaryIO
 )
 from collections.abc import Iterator, Callable
 

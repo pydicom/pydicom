@@ -2,7 +2,7 @@
 """Code to fix non-standard dicom issues in files
 """
 
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any
 
 from pydicom import config
 from pydicom import datadict

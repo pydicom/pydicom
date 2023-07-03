@@ -4,7 +4,7 @@
 from importlib import import_module
 import sys
 from typing import (
-    Tuple, List, Optional, Dict, Union, cast,
+    Union, cast,
     TYPE_CHECKING, Any
 )
 from collections.abc import Callable, Iterator, Iterable
@@ -15,7 +15,7 @@ from pydicom.uid import (
 )
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset
 
 try:
     import numpy

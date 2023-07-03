@@ -8,7 +8,7 @@ import re
 import shutil
 from tempfile import TemporaryDirectory
 from typing import (
-    Optional, Union, Any, List, cast, Dict
+    Optional, Union, Any, cast
 )
 from collections.abc import Iterator, Iterable, Callable
 import warnings

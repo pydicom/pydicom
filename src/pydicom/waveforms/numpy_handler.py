@@ -28,7 +28,7 @@ given in the table below.
 
 """
 
-from typing import TYPE_CHECKING, cast, List
+from typing import TYPE_CHECKING, cast
 from collections.abc import Generator
 
 try:

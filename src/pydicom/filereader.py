@@ -8,7 +8,7 @@ import os
 from struct import (Struct, unpack)
 import sys
 from typing import (
-    BinaryIO, Union, Optional, List, Any, cast, Dict, Type
+    BinaryIO, Any, cast
 )
 from collections.abc import Callable, MutableSequence, Iterator
 import warnings

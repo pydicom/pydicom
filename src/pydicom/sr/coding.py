@@ -1,6 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 
-from typing import NamedTuple, Any, Optional
+from typing import NamedTuple, Any
 
 from pydicom.sr._snomed_dict import mapping as snomed_mapping
 

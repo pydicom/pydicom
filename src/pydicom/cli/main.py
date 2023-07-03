@@ -11,7 +11,7 @@ import argparse
 from importlib.metadata import entry_points
 import re
 import sys
-from typing import Tuple, cast, List, Any, Dict, Optional
+from typing import cast, Any
 from collections.abc import Callable
 
 from pydicom import dcmread

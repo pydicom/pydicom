@@ -8,7 +8,7 @@ import re
 import sys
 import uuid
 import warnings
-from typing import Any, List, Optional, Type, TypeVar, Union
+from typing import Any
 
 from pydicom import config
 from pydicom._uid_dict import UID_dictionary

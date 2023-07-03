@@ -2,7 +2,7 @@
 """Functions for reading to certain bytes, e.g. delimiters."""
 import os
 from struct import pack, unpack
-from typing import Union, BinaryIO, Optional, Tuple, cast
+from typing import Union, BinaryIO, cast
 
 from pydicom.misc import size_in_bytes
 from pydicom.tag import TupleTag, Tag, SequenceDelimiterTag, ItemTag, BaseTag

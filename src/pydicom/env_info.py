@@ -14,7 +14,7 @@ import importlib
 import platform
 import sys
 from types import ModuleType
-from typing import Optional, Tuple, List, cast
+from typing import cast
 
 
 def main() -> None:

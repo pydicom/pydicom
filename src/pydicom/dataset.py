@@ -19,7 +19,6 @@ from bisect import bisect_left
 from contextlib import nullcontext
 import io
 from importlib.util import find_spec as have_package
-import inspect  # for __dir__
 from itertools import takewhile
 import json
 import os
@@ -27,7 +26,7 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    Optional, Tuple, Union, List, Any, cast, Dict, BinaryIO, AnyStr, TypeVar, Type, overload, AbstractSet, TYPE_CHECKING
+    Optional, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, AbstractSet, TYPE_CHECKING
 )
 from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping
 import warnings

@@ -4,7 +4,7 @@ or any list of items that must all be the same type.
 """
 
 from typing import (
-    Optional, Union, List, overload, Any, cast,
+    overload, Any, cast,
     TypeVar
 )
 from collections.abc import Iterable, Callable, MutableSequence, Iterator

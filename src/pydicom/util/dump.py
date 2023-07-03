@@ -4,7 +4,7 @@
 from io import BytesIO
 import os
 import sys
-from typing import Union, Optional, BinaryIO, TYPE_CHECKING
+from typing import BinaryIO, TYPE_CHECKING
 
 from pydicom.valuerep import VR
 

@@ -7,7 +7,7 @@ import re
 from io import BytesIO
 from struct import (unpack, calcsize)
 from typing import (
-    Optional, Union, List, Tuple, cast, Any
+    Union, cast, Any
 )
 from collections.abc import MutableSequence
 

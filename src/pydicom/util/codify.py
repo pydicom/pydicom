@@ -18,7 +18,7 @@ import argparse
 import os.path
 import re
 import sys
-from typing import Optional, List, cast
+from typing import cast
 from collections.abc import Callable
 from collections import deque
 

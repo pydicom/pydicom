@@ -10,8 +10,7 @@ A DataElement has a tag,
 import base64
 import json
 from typing import (
-    Optional, Any, Tuple, Union, TYPE_CHECKING, Dict, Type,
-    List, NamedTuple
+    Optional, Any, TYPE_CHECKING, NamedTuple
 )
 from collections.abc import Callable, MutableSequence
 import warnings

@@ -2,7 +2,6 @@
 """Miscellaneous utility routines relating to hex and byte strings"""
 
 from binascii import a2b_hex, b2a_hex
-from typing import Union
 
 from pydicom.charset import default_encoding
 

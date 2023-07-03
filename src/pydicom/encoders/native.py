@@ -3,7 +3,7 @@
 
 from itertools import groupby
 from struct import pack
-from typing import List, Any
+from typing import Any
 
 from pydicom.uid import RLELossless
 
