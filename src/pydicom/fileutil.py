@@ -49,7 +49,7 @@ def find_bytes(
     bytes_to_find: bytes,
     read_size: int = 128,
     rewind: bool = True
-) -> Optional[int]:
+) -> int | None:
     """Read in the file until a specific byte sequence found.
 
     Parameters
@@ -108,9 +108,9 @@ def read_undefined_length_value(
     fp: BinaryIO,
     is_little_endian: bool,
     delimiter_tag: BaseTag,
-    defer_size: Optional[Union[int, float]] = None,
+    defer_size: int | float | None = None,
     read_size: int = 1024 * 8
-) -> Optional[bytes]:
+) -> bytes | None:
     """Read until `delimiter_tag` and return the value up to that point.
 
     On completion, the file will be set to the first byte after the delimiter
@@ -218,8 +218,8 @@ def read_undefined_length_value(
 def _try_read_encapsulated_pixel_data(
     fp: BinaryIO,
     is_little_endian: bool,
-    defer_size: Optional[Union[float, int]] = None,
-) -> Tuple[bool, Optional[bytes]]:
+    defer_size: float | int | None = None,
+) -> tuple[bool, bytes | None]:
     """Attempt to read an undefined length value item as if it were
     encapsulated pixel data as defined in PS3.5 section A.4.
 
@@ -335,7 +335,7 @@ def find_delimiter(
     is_little_endian: bool,
     read_size: int = 128,
     rewind: bool = True
-) -> Optional[int]:
+) -> int | None:
     """Return file position where 4-byte delimiter is located.
 
     Parameters
@@ -373,7 +373,7 @@ def length_of_undefined_length(
     is_little_endian: bool,
     read_size: int = 128,
     rewind: bool = True
-) -> Optional[int]:
+) -> int | None:
     """Search through the file to find the delimiter and return the length
     of the data element.
 
@@ -411,8 +411,8 @@ def length_of_undefined_length(
 
 
 def path_from_pathlike(
-    file_object: Union[PathType, BinaryIO, DicomFileLike]
-) -> Union[str, BinaryIO]:
+    file_object: PathType | BinaryIO | DicomFileLike
+) -> str | BinaryIO:
     """Returns the path if `file_object` is a path-like object, otherwise the
     original `file_object`.
 
@@ -433,4 +433,4 @@ def path_from_pathlike(
 
 
 def _unpack_tag(b: bytes, endianness: str) -> BaseTag:
-    return TupleTag(cast(Tuple[int, int], unpack(f"{endianness}HH", b)))
+    return TupleTag(cast(tuple[int, int], unpack(f"{endianness}HH", b)))

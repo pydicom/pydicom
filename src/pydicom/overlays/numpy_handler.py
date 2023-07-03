@@ -56,7 +56,7 @@ def is_available() -> bool:
     return HAVE_NP
 
 
-def get_expected_length(elem: Dict[str, Any], unit: str = 'bytes') -> int:
+def get_expected_length(elem: dict[str, Any], unit: str = 'bytes') -> int:
     """Return the expected length (in terms of bytes or pixels) of the *Overlay
     Data*.
 
@@ -105,7 +105,7 @@ def get_expected_length(elem: Dict[str, Any], unit: str = 'bytes') -> int:
 
 
 def reshape_overlay_array(
-    elem: Dict[str, Any], arr: "np.ndarray"
+    elem: dict[str, Any], arr: "np.ndarray"
 ) -> "np.ndarray":
     """Return a reshaped :class:`numpy.ndarray` `arr`.
 

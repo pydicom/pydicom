@@ -11,14 +11,15 @@ import argparse
 from importlib.metadata import entry_points
 import re
 import sys
-from typing import Tuple, cast, List, Any, Dict, Optional, Callable
+from typing import Tuple, cast, List, Any, Dict, Optional
+from collections.abc import Callable
 
 from pydicom import dcmread
 from pydicom.data.data_manager import get_charset_files, get_testdata_file
 from pydicom.dataset import Dataset
 
 
-subparsers: Optional[argparse._SubParsersAction] = None
+subparsers: argparse._SubParsersAction | None = None
 
 
 # Restrict the allowed syntax tightly, since use Python `eval`
@@ -58,7 +59,7 @@ def eval_element(ds: Dataset, element: str) -> Any:
         )
 
 
-def filespec_parts(filespec: str) -> Tuple[str, str, str]:
+def filespec_parts(filespec: str) -> tuple[str, str, str]:
     """Parse the filespec format into prefix, filename, element
 
     Format is [prefix::filename::element]
@@ -82,7 +83,7 @@ def filespec_parts(filespec: str) -> Tuple[str, str, str]:
     return prefix, "".join(prefix_file), last
 
 
-def filespec_parser(filespec: str) -> List[Tuple[Dataset, Any]]:
+def filespec_parser(filespec: str) -> list[tuple[Dataset, Any]]:
     """Utility to return a dataset and an optional data element value within it
 
     Note: this is used as an argparse 'type' for adding parsing arguments.
@@ -179,7 +180,7 @@ def help_command(args: argparse.Namespace) -> None:
         print("No subcommands are available")
         return
 
-    subcommands: List[str] = list(subparsers.choices.keys())
+    subcommands: list[str] = list(subparsers.choices.keys())
     if args.subcommand and args.subcommand in subcommands:
         subparsers.choices[args.subcommand].print_help()
     else:
@@ -188,7 +189,7 @@ def help_command(args: argparse.Namespace) -> None:
         print(f"Available subcommands: {', '.join(subcommands)}")
 
 
-SubCommandType = Dict[str, Callable[[argparse._SubParsersAction], None]]
+SubCommandType = dict[str, Callable[[argparse._SubParsersAction], None]]
 
 
 def get_subcommand_entry_points() -> SubCommandType:
@@ -199,7 +200,7 @@ def get_subcommand_entry_points() -> SubCommandType:
     return subcommands
 
 
-def main(args: Optional[List[str]] = None) -> None:
+def main(args: list[str] | None = None) -> None:
     """Entry point for 'pydicom' command line interface
 
     Parameters

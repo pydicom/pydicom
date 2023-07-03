@@ -92,7 +92,7 @@ ignore = [
     "PLW2901",
 ]
 line-length = 214
-target-version = "py37"
+target-version = "py310"
 
 [tool.ruff.mccabe]
 max-complexity = 32

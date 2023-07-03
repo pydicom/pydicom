@@ -9,7 +9,8 @@ stored as a single number and separated to (group, element) as required.
 #       element
 from contextlib import contextmanager
 import traceback
-from typing import Tuple, Optional, Union, Any, Iterator, List
+from typing import Tuple, Optional, Union, Any, List
+from collections.abc import Iterator
 
 
 @contextmanager
@@ -33,13 +34,13 @@ def tag_in_exception(tag: "BaseTag") -> Iterator[None]:
 
 
 # Type that can be used where a parameter is a tag or keyword
-TagType = Union[int, str, Tuple[int, int], "BaseTag"]
+TagType = Union[int, str, tuple[int, int], "BaseTag"]
 TagListType = Union[
-    List[int], List[str], List[Tuple[int, int]], List["BaseTag"]
+    list[int], list[str], list[tuple[int, int]], list["BaseTag"]
 ]
 
 
-def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
+def Tag(arg: TagType, arg2: int | None = None) -> "BaseTag":
     """Create a :class:`BaseTag`.
 
     General function for creating a :class:`BaseTag` in any of the standard
@@ -78,8 +79,8 @@ def Tag(arg: TagType, arg2: Optional[int] = None) -> "BaseTag":
         # act as if was passed a single tuple
         arg = (arg, arg2)  # type: ignore[assignment]
 
-    long_value: Optional[int]
-    if isinstance(arg, (tuple, list)):
+    long_value: int | None
+    if isinstance(arg, tuple | list):
         if len(arg) != 2:
             raise ValueError("Tag must be an int or a 2-tuple")
 
@@ -241,7 +242,7 @@ class BaseTag(int):
         return BaseTag((self & 0xffff0000) | self.element >> 8)
 
 
-def TupleTag(group_elem: Tuple[int, int]) -> BaseTag:
+def TupleTag(group_elem: tuple[int, int]) -> BaseTag:
     """Fast factory for :class:`BaseTag` object with known safe (group, elem)
     :class:`tuple`
     """

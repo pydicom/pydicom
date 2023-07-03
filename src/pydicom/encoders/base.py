@@ -4,9 +4,10 @@
 from importlib import import_module
 import sys
 from typing import (
-    Callable, Iterator, Tuple, List, Optional, Dict, Union, cast, Iterable,
+    Tuple, List, Optional, Dict, Union, cast,
     TYPE_CHECKING, Any
 )
+from collections.abc import Callable, Iterator, Iterable
 
 from pydicom.uid import (
     UID, JPEGBaseline8Bit, JPEGExtended12Bit, JPEGLosslessP14, JPEGLosslessSV1,
@@ -45,16 +46,16 @@ class Encoder:
         # The *Transfer Syntax UID* data will be encoded to
         self._uid = uid
         # Available encoding plugins
-        self._available: Dict[str, Callable] = {}
+        self._available: dict[str, Callable] = {}
         # Unavailable encoding plugins - missing dependencies or other reason
-        self._unavailable: Dict[str, Tuple[str, ...]] = {}
+        self._unavailable: dict[str, tuple[str, ...]] = {}
         # Default encoding options
         self._defaults = {
             'transfer_syntax_uid': self.UID,  # Intended transfer syntax
             'byteorder': '<',  # Byte ordering of `src` passed to plugins
         }
 
-    def add_plugin(self, label: str, import_path: Tuple[str, str]) -> None:
+    def add_plugin(self, label: str, import_path: tuple[str, str]) -> None:
         """Add an encoding plugin to the encoder.
 
         The requirements for encoding plugins are available
@@ -92,7 +93,7 @@ class Encoder:
             self._unavailable[label] = deps[self.UID]
 
     @staticmethod
-    def _check_kwargs(kwargs: Dict[str, Union[int, str]]) -> None:
+    def _check_kwargs(kwargs: dict[str, int | str]) -> None:
         """Raise TypeError if `kwargs` is missing required keys."""
         required_keys = [
             'rows', 'columns', 'samples_per_pixel', 'bits_allocated',
@@ -108,7 +109,7 @@ class Encoder:
     def encode(
         self,
         src: Union[bytes, "numpy.ndarray", "Dataset"],
-        idx: Optional[int] = None,
+        idx: int | None = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs: Any,
@@ -200,7 +201,7 @@ class Encoder:
     def _encode_array(
         self,
         arr: "numpy.ndarray",
-        idx: Optional[int] = None,
+        idx: int | None = None,
         encoding_plugin: str = '',
         **kwargs: Any,
     ) -> bytes:
@@ -224,7 +225,7 @@ class Encoder:
     def _encode_bytes(
         self,
         src: bytes,
-        idx: Optional[int] = None,
+        idx: int | None = None,
         encoding_plugin: str = '',
         **kwargs: Any,
     ) -> bytes:
@@ -276,7 +277,7 @@ class Encoder:
     def _encode_dataset(
         self,
         ds: "Dataset",
-        idx: Optional[int] = None,
+        idx: int | None = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs: Any,
@@ -398,7 +399,7 @@ class Encoder:
         from pydicom.dataset import Dataset
 
         if isinstance(src, Dataset):
-            nr_frames = cast(Optional[str], src.get('NumberOfFrames', 1))
+            nr_frames = cast(str | None, src.get('NumberOfFrames', 1))
             for idx in range(int(nr_frames or 1)):
                 yield self._encode_dataset(
                     src, idx, encoding_plugin, decoding_plugin, **kwargs
@@ -416,7 +417,7 @@ class Encoder:
             )
 
     @staticmethod
-    def kwargs_from_ds(ds: "Dataset") -> Dict[str, Union[int, str]]:
+    def kwargs_from_ds(ds: "Dataset") -> dict[str, int | str]:
         """Return a *kwargs* dict from `ds`.
 
         Parameters
@@ -467,7 +468,7 @@ class Encoder:
         photometric_interpretation = cast(str, ds.PhotometricInterpretation)
 
         # IS, may be missing, None or "1", "2", ...
-        nr_frames = cast(Optional[str], ds.get('NumberOfFrames', 1))
+        nr_frames = cast(str | None, ds.get('NumberOfFrames', 1))
 
         return {
             'rows': rows,
@@ -481,7 +482,7 @@ class Encoder:
         }
 
     @property
-    def missing_dependencies(self) -> List[str]:
+    def missing_dependencies(self) -> list[str]:
         """Return nice strings for plugins with missing dependencies as
         List[str].
         """
@@ -712,7 +713,7 @@ class Encoder:
                 ) from exc
 
         # Try all available encoders
-        failure_messages: List[str] = []
+        failure_messages: list[str] = []
         for name, func in self._available.items():
             try:
                 return cast(bytes, func(src, **kwargs))
@@ -789,8 +790,8 @@ class Encoder:
 #   Bits Allocated,
 #   Bits Stored,
 # ]
-ProfileType = Tuple[str, int, Iterable[int], Iterable[int], Iterable[int]]
-ENCODING_PROFILES: Dict[UID, List[ProfileType]] = {
+ProfileType = tuple[str, int, Iterable[int], Iterable[int], Iterable[int]]
+ENCODING_PROFILES: dict[UID, list[ProfileType]] = {
     JPEGBaseline8Bit: [  # 1.2.840.10008.1.2.4.50: Table 8.2.1-1 in PS3.5
         ("MONOCHROME1", 1, (0, ), (8, ), (8, )),
         ("MONOCHROME2", 1, (0, ), (8, ), (8, )),

@@ -4,9 +4,10 @@
 from struct import pack
 import sys
 from typing import (
-    Union, BinaryIO, Any, cast, Sequence, MutableSequence, Iterable, Optional,
+    Union, BinaryIO, Any, cast, Optional,
     List
 )
+from collections.abc import Sequence, MutableSequence, Iterable
 import warnings
 import zlib
 
@@ -312,10 +313,10 @@ def _is_multi_value(val: Any) -> bool:
     if have_numpy and isinstance(val, numpy.ndarray):
         return True
 
-    return isinstance(val, (MultiValue, list, tuple))
+    return isinstance(val, MultiValue | list | tuple)
 
 
-def multi_string(val: Union[str, Iterable[str]]) -> str:
+def multi_string(val: str | Iterable[str]) -> str:
     """Put a string together with delimiter if has more than one value"""
     if _is_multi_value(val):
         return "\\".join(val)
@@ -324,16 +325,16 @@ def multi_string(val: Union[str, Iterable[str]]) -> str:
 
 
 def write_PN(
-    fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None
 ) -> None:
     if not encodings:
         encodings = [default_encoding]
 
-    val: List[PersonName]
+    val: list[PersonName]
     if elem.VM == 1:
         val = [cast(PersonName, elem.value)]
     else:
-        val = cast(List[PersonName], elem.value)
+        val = cast(list[PersonName], elem.value)
 
     enc = b'\\'.join([elem.encode(encodings) for elem in val])
     if len(enc) % 2 != 0:
@@ -344,7 +345,7 @@ def write_PN(
 
 def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
     """Write a single or multivalued ASCII string."""
-    val = multi_string(cast(Union[str, Iterable[str]], elem.value))
+    val = multi_string(cast(str | Iterable[str], elem.value))
     if val is not None:
         if len(val) % 2 != 0:
             val += padding  # pad to even length
@@ -356,14 +357,14 @@ def write_string(fp: DicomIO, elem: DataElement, padding: str = ' ') -> None:
 
 
 def write_text(
-    fp: DicomIO, elem: DataElement, encodings: Optional[List[str]] = None
+    fp: DicomIO, elem: DataElement, encodings: list[str] | None = None
 ) -> None:
     """Write a single or multivalued text string."""
     encodings = encodings or [default_encoding]
     val = elem.value
     if val is not None:
         if _is_multi_value(val):
-            val = cast(Union[Sequence[bytes], Sequence[str]], val)
+            val = cast(Sequence[bytes] | Sequence[str], val)
             if isinstance(val[0], str):
                 val = cast(Sequence[str], val)
                 val = b'\\'.join(
@@ -373,7 +374,7 @@ def write_text(
                 val = cast(Sequence[bytes], val)
                 val = b'\\'.join([val for val in val])
         else:
-            val = cast(Union[bytes, str], val)
+            val = cast(bytes | str, val)
             if isinstance(val, str):
                 val = encode_string(val, encodings)
 
@@ -389,7 +390,7 @@ def write_number_string(fp: DicomIO, elem: DataElement) -> None:
     # file
     val = elem.value
     if _is_multi_value(val):
-        val = cast(Union[Sequence[IS], Sequence[DSclass]], val)
+        val = cast(Sequence[IS] | Sequence[DSclass], val)
         val = "\\".join(
 
                 x.original_string if hasattr(x, 'original_string')
@@ -397,7 +398,7 @@ def write_number_string(fp: DicomIO, elem: DataElement) -> None:
 
         )
     else:
-        val = cast(Union[IS, DSclass], val)
+        val = cast(IS | DSclass, val)
         if hasattr(val, 'original_string'):
             val = val.original_string
         else:
@@ -411,7 +412,7 @@ def write_number_string(fp: DicomIO, elem: DataElement) -> None:
     fp.write(val)
 
 
-def _format_DA(val: Optional[DA]) -> str:
+def _format_DA(val: DA | None) -> str:
     if val is None:
         return ''
 
@@ -443,7 +444,7 @@ def write_DA(fp: DicomIO, elem: DataElement) -> None:
         fp.write(val)
 
 
-def _format_DT(val: Optional[DT]) -> str:
+def _format_DT(val: DT | None) -> str:
     if val is None:
         return ''
 
@@ -478,7 +479,7 @@ def write_DT(fp: DicomIO, elem: DataElement) -> None:
         fp.write(val)
 
 
-def _format_TM(val: Optional[TM]) -> str:
+def _format_TM(val: TM | None) -> str:
     if val is None:
         return ''
 
@@ -515,8 +516,8 @@ def write_TM(fp: DicomIO, elem: DataElement) -> None:
 
 def write_data_element(
     fp: DicomIO,
-    elem: Union[DataElement, RawDataElement],
-    encodings: Optional[Union[str, List[str]]] = None
+    elem: DataElement | RawDataElement,
+    encodings: str | list[str] | None = None
 ) -> None:
     """Write the data_element to file fp according to
     dicom media storage rules.
@@ -529,7 +530,7 @@ def write_data_element(
     buffer.is_little_endian = fp.is_little_endian
     buffer.is_implicit_VR = fp.is_implicit_VR
 
-    vr: Optional[str] = elem.VR
+    vr: str | None = elem.VR
     if not fp.is_implicit_VR and vr and len(vr) != 2:
         msg = (
             f"Cannot write ambiguous VR of '{vr}' for data element with "
@@ -625,7 +626,7 @@ def write_data_element(
 def write_dataset(
     fp: DicomIO,
     dataset: Dataset,
-    parent_encoding: Union[str, List[str]] = default_encoding
+    parent_encoding: str | list[str] = default_encoding
 ) -> int:
     """Write a Dataset dictionary to the file. Return the total length written.
     """
@@ -642,7 +643,7 @@ def write_dataset(
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
 
     dataset_encoding = cast(
-        Union[None, str, List[str]],
+        None | str | list[str],
         dataset.get('SpecificCharacterSet', parent_encoding)
     )
 
@@ -678,7 +679,7 @@ def _harmonize_properties(ds: Dataset, fp: DicomIO) -> None:
 
 
 def write_sequence(
-    fp: DicomIO, elem: DataElement, encodings: List[str]
+    fp: DicomIO, elem: DataElement, encodings: list[str]
 ) -> None:
     """Write a sequence contained in `data_element` to the file-like `fp`.
 
@@ -698,7 +699,7 @@ def write_sequence(
 
 
 def write_sequence_item(
-    fp: DicomIO, dataset: Dataset, encodings: List[str]
+    fp: DicomIO, dataset: Dataset, encodings: list[str]
 ) -> None:
     """Write a `dataset` in a sequence to the file-like `fp`.
 
@@ -887,7 +888,7 @@ def _write_dataset(
 
 
 def dcmwrite(
-    filename: Union[PathType, BinaryIO],
+    filename: PathType | BinaryIO,
     dataset: Dataset,
     write_like_original: bool = True
 ) -> None:
@@ -1020,7 +1021,7 @@ def dcmwrite(
         Write a DICOM file from a dataset that was read in with ``dcmread()``.
         ``save_as()`` wraps ``dcmwrite()``.
     """
-    tsyntax: Optional[UID]
+    tsyntax: UID | None
     try:
         tsyntax = dataset.file_meta.TransferSyntaxUID
     except AttributeError:

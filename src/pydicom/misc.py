@@ -13,15 +13,15 @@ _size_factors = {
 
 
 def size_in_bytes(
-    expr: Optional[Union[int, float, str]]
-) -> Union[None, float, int]:
+    expr: int | float | str | None
+) -> None | float | int:
     """Return the number of bytes for `defer_size` argument in
     :func:`~pydicom.filereader.dcmread`.
     """
     if expr is None or expr == float('inf'):
         return None
 
-    if isinstance(expr, (int, float)):
+    if isinstance(expr, int | float):
         return expr
 
     try:
@@ -36,7 +36,7 @@ def size_in_bytes(
     raise ValueError(f"Unable to parse length with unit '{unit}'")
 
 
-def is_dicom(file_path: Union[str, Path]) -> bool:
+def is_dicom(file_path: str | Path) -> bool:
     """Return ``True`` if the file at `file_path` is a DICOM file.
 
     This function is a pared down version of

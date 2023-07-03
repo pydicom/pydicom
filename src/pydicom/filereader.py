@@ -8,9 +8,9 @@ import os
 from struct import (Struct, unpack)
 import sys
 from typing import (
-    BinaryIO, Union, Optional, List, Any, Callable, cast, MutableSequence,
-    Iterator, Dict, Type
+    BinaryIO, Union, Optional, List, Any, cast, Dict, Type
 )
+from collections.abc import Callable, MutableSequence, Iterator
 import warnings
 import zlib
 
@@ -42,11 +42,11 @@ def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, str, float]] = None,
-    encoding: Union[str, MutableSequence[str]] = default_encoding,
-    specific_tags: Optional[List[BaseTag]] = None
-) -> Iterator[Union[RawDataElement, DataElement]]:
+    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    defer_size: int | str | float | None = None,
+    encoding: str | MutableSequence[str] = default_encoding,
+    specific_tags: list[BaseTag] | None = None
+) -> Iterator[RawDataElement | DataElement]:
     """Create a generator to efficiently return the raw data elements.
 
     .. note::
@@ -206,7 +206,7 @@ def data_element_generator(
                 value = (
                     fp_read(length) if length > 0
                     else cast(
-                        Optional[bytes], empty_value_for_VR(vr, raw=True)
+                        bytes | None, empty_value_for_VR(vr, raw=True)
                     )
                 )
                 if debugging:
@@ -288,7 +288,7 @@ def _is_implicit_vr(
     fp: BinaryIO,
     implicit_vr_is_assumed: bool,
     is_little_endian: bool,
-    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]],
+    stop_when: Callable[[BaseTag, str | None, int], bool] | None,
     is_sequence: bool
 ) -> bool:
     """Check if the real VR is explicit or implicit.
@@ -359,11 +359,11 @@ def read_dataset(
     fp: BinaryIO,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    bytelength: Optional[int] = None,
-    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[str, int, float]] = None,
-    parent_encoding: Union[str, MutableSequence[str]] = default_encoding,
-    specific_tags: Optional[List[BaseTag]] = None,
+    bytelength: int | None = None,
+    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    defer_size: str | int | float | None = None,
+    parent_encoding: str | MutableSequence[str] = default_encoding,
+    specific_tags: list[BaseTag] | None = None,
     at_top_level: bool = True
 ) -> Dataset:
     """Return a :class:`~pydicom.dataset.Dataset` instance containing the next
@@ -406,7 +406,7 @@ def read_dataset(
         A collection (dictionary) of DICOM
         :class:`~pydicom.dataelem.DataElement` instances.
     """
-    raw_data_elements: Dict[BaseTag, Union[RawDataElement, DataElement]] = {}
+    raw_data_elements: dict[BaseTag, RawDataElement | DataElement] = {}
     fp_start = fp.tell()
     is_implicit_VR = _is_implicit_vr(
         fp, is_implicit_VR, is_little_endian, stop_when,
@@ -443,11 +443,11 @@ def read_dataset(
 
     ds = Dataset(raw_data_elements)
 
-    encoding: Union[str, MutableSequence[str]]
+    encoding: str | MutableSequence[str]
     if 0x00080005 in raw_data_elements:
         elem = cast(RawDataElement, raw_data_elements[BaseTag(0x00080005)])
         char_set = cast(
-            Optional[Union[str, MutableSequence[str]]],
+            str | MutableSequence[str] | None,
             DataElement_from_raw(elem).value
         )
         encoding = convert_encodings(char_set)  # -> List[str]
@@ -463,7 +463,7 @@ def read_sequence(
     is_implicit_VR: bool,
     is_little_endian: bool,
     bytelength: int,
-    encoding: Union[str, MutableSequence[str]],
+    encoding: str | MutableSequence[str],
     offset: int = 0
 ) -> Sequence:
     """Read and return a :class:`~pydicom.sequence.Sequence` -- i.e. a
@@ -498,9 +498,9 @@ def read_sequence_item(
     fp: BinaryIO,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    encoding: Union[str, MutableSequence[str]],
+    encoding: str | MutableSequence[str],
     offset: int = 0
-) -> Optional[Dataset]:
+) -> Dataset | None:
     """Read and return a single :class:`~pydicom.sequence.Sequence` item, i.e.
     a :class:`~pydicom.dataset.Dataset`.
     """
@@ -578,7 +578,7 @@ def _read_command_set_elements(fp: BinaryIO) -> Dataset:
         command set elements are present.
     """
 
-    def _not_group_0000(tag: BaseTag, vr: Optional[str], length: int) -> bool:
+    def _not_group_0000(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0000, False otherwise."""
         return tag.group != 0
 
@@ -611,7 +611,7 @@ def _read_file_meta_info(fp: BinaryIO) -> FileMetaDataset:
         File Meta are present.
     """
 
-    def _not_group_0002(tag: BaseTag, vr: Optional[str], length: int) -> bool:
+    def _not_group_0002(tag: BaseTag, vr: str | None, length: int) -> bool:
         """Return True if the tag is not in group 0x0002, False otherwise."""
         return tag.group != 2
 
@@ -668,7 +668,7 @@ def read_file_meta_info(filename: PathType) -> FileMetaDataset:
         return _read_file_meta_info(fp)
 
 
-def read_preamble(fp: BinaryIO, force: bool) -> Optional[bytes]:
+def read_preamble(fp: BinaryIO, force: bool) -> bytes | None:
     """Return the 128-byte DICOM preamble in `fp` if present.
 
     `fp` should be positioned at the start of the file-like. If the preamble
@@ -731,17 +731,17 @@ def read_preamble(fp: BinaryIO, force: bool) -> Optional[bytes]:
     return preamble
 
 
-def _at_pixel_data(tag: BaseTag, vr: Optional[str], length: int) -> bool:
+def _at_pixel_data(tag: BaseTag, vr: str | None, length: int) -> bool:
     return tag in {0x7fe00010, 0x7fe00009, 0x7fe00008}
 
 
 def read_partial(
     fileobj: BinaryIO,
-    stop_when: Optional[Callable[[BaseTag, Optional[str], int], bool]] = None,
-    defer_size: Optional[Union[int, str, float]] = None,
+    stop_when: Callable[[BaseTag, str | None, int], bool] | None = None,
+    defer_size: int | str | float | None = None,
     force: bool = False,
-    specific_tags: Optional[List[BaseTag]] = None
-) -> Union[FileDataset, DicomDir]:
+    specific_tags: list[BaseTag] | None = None
+) -> FileDataset | DicomDir:
     """Parse a DICOM file until a condition is met.
 
     Parameters
@@ -875,7 +875,7 @@ def read_partial(
                 "not match the contents of the dataset - handling it"
                 "as a regular dataset instead of a DICOMDIR."
             )
-            ds_class: Union[Type[FileDataset], Type[DicomDir]] = FileDataset
+            ds_class: type[FileDataset] | type[DicomDir] = FileDataset
         else:
             warnings.warn(
                 "The 'DicomDir' class is deprecated and will be removed in"
@@ -904,12 +904,12 @@ def read_partial(
 
 
 def dcmread(
-    fp: Union[PathType, BinaryIO, DicomFileLike],
-    defer_size: Optional[Union[str, int, float]] = None,
+    fp: PathType | BinaryIO | DicomFileLike,
+    defer_size: str | int | float | None = None,
     stop_before_pixels: bool = False,
     force: bool = False,
-    specific_tags: Optional[TagListType] = None
-) -> Union[FileDataset, DicomDir]:
+    specific_tags: TagListType | None = None
+) -> FileDataset | DicomDir:
     """Read and parse a DICOM dataset stored in the DICOM File Format.
 
     Read a DICOM dataset stored in accordance with the :dcm:`DICOM File
@@ -1020,7 +1020,7 @@ def dcmread(
     if specific_tags:
         specific_tags = [Tag(t) for t in specific_tags]
 
-    specific_tags = cast(Optional[List[BaseTag]], specific_tags)
+    specific_tags = cast(list[BaseTag] | None, specific_tags)
 
     # Iterate through all items and store them --include file meta if present
     stop_when = None
@@ -1098,7 +1098,7 @@ def read_dicomdir(filename: PathType = "DICOMDIR") -> DicomDir:
 
 
 def data_element_offset_to_value(
-    is_implicit_VR: bool, VR: Optional[str]
+    is_implicit_VR: bool, VR: str | None
 ) -> int:
     """Return number of bytes from start of data element to start of value"""
     if is_implicit_VR:
@@ -1112,8 +1112,8 @@ def data_element_offset_to_value(
 
 def read_deferred_data_element(
     fileobj_type: Any,
-    filename_or_obj: Union[PathType, BinaryIO],
-    timestamp: Optional[float],
+    filename_or_obj: PathType | BinaryIO,
+    timestamp: float | None,
     raw_data_elem: RawDataElement
 ) -> RawDataElement:
     """Read the previously deferred value from the file into memory

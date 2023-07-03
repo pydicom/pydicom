@@ -7,7 +7,7 @@ from typing import Union
 from pydicom.charset import default_encoding
 
 
-def hex2bytes(hexstring: Union[str, bytes]) -> bytes:
+def hex2bytes(hexstring: str | bytes) -> bytes:
     """Return bytestring for a string of hex bytes separated by whitespace
 
     This is useful for creating specific byte sequences for testing, using

@@ -5,9 +5,10 @@ from io import BytesIO
 from struct import unpack, pack
 from types import TracebackType
 from typing import (
-    Tuple, Optional, BinaryIO, Callable, Type, Union, cast, TextIO,
+    Tuple, Optional, BinaryIO, Type, Union, cast, TextIO,
     TYPE_CHECKING, Any
 )
+from collections.abc import Callable
 
 try:
     from typing import Protocol  # added in 3.8
@@ -44,16 +45,16 @@ class DicomIO:
         self.seek: Seeker
         self.tell: Callable[[], int]
 
-    def read_le_tag(self) -> Tuple[int, int]:
+    def read_le_tag(self) -> tuple[int, int]:
         """Read and return two unsigned shorts (little endian) from the file.
         """
         bytes_read = self.read(4, need_exact_length=True)
-        return cast(Tuple[int, int], unpack(b"<HH", bytes_read))
+        return cast(tuple[int, int], unpack(b"<HH", bytes_read))
 
-    def read_be_tag(self) -> Tuple[int, int]:
+    def read_be_tag(self) -> tuple[int, int]:
         """Read and return two unsigned shorts (big endian) from the file."""
         bytes_read = self.read(4, need_exact_length=True)
-        return cast(Tuple[int, int], unpack(b">HH", bytes_read))
+        return cast(tuple[int, int], unpack(b">HH", bytes_read))
 
     def write_tag(self, tag: TagType) -> None:
         """Write a dicom tag (two unsigned shorts) to the file."""
@@ -66,21 +67,21 @@ class DicomIO:
     def read_leUS(self) -> int:
         """Return an unsigned short from the file with little endian byte order
         """
-        val: Tuple[int, ...] = unpack(b"<H", self.read(2))
+        val: tuple[int, ...] = unpack(b"<H", self.read(2))
         return val[0]
 
     def read_beUS(self) -> int:
         """Return an unsigned short from the file with big endian byte order"""
-        val: Tuple[int, ...] = unpack(b">H", self.read(2))
+        val: tuple[int, ...] = unpack(b">H", self.read(2))
         return val[0]
 
     def read_leUL(self) -> int:
         """Return an unsigned long read with little endian byte order"""
-        val: Tuple[int, ...] = unpack(b"<L", self.read(4))
+        val: tuple[int, ...] = unpack(b"<L", self.read(4))
         return val[0]
 
     def read(
-        self, length: Optional[int] = None, need_exact_length: bool = False
+        self, length: int | None = None, need_exact_length: bool = False
     ) -> bytes:
         """Reads the required length, returns EOFError if gets less
 
@@ -131,7 +132,7 @@ class DicomIO:
 
     def read_beUL(self) -> int:
         """Return an unsigned long read with big endian byte order"""
-        val: Tuple[int, ...] = unpack(b">L", self.read(4))
+        val: tuple[int, ...] = unpack(b">L", self.read(4))
         return val[0]
 
     # Set up properties is_little_endian and is_implicit_VR
@@ -169,7 +170,7 @@ class DicomIO:
 class DicomFileLike(DicomIO):
     def __init__(
         self,
-        file_like_obj: Union[TextIO, BinaryIO, BytesIO],
+        file_like_obj: TextIO | BinaryIO | BytesIO,
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -199,10 +200,10 @@ class DicomFileLike(DicomIO):
 
     def __exit__(
         self,
-        *exc_info: Tuple[
-            Optional[Type[BaseException]],
-            Optional[BaseException],
-            Optional[TracebackType]
+        *exc_info: tuple[
+            type[BaseException] | None,
+            BaseException | None,
+            TracebackType | None
         ]
     ) -> None:
         self.close()

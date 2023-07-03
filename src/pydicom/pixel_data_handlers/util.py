@@ -4,9 +4,9 @@
 from struct import unpack, unpack_from
 from sys import byteorder
 from typing import (
-    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast, Iterable,
-    ByteString
+    Dict, Optional, Union, List, Tuple, TYPE_CHECKING, cast
 )
+from collections.abc import Iterable, ByteString
 import warnings
 
 try:
@@ -24,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 # Lookup table for unpacking bit-packed data
-_UNPACK_LUT: Dict[int, bytes] = {
+_UNPACK_LUT: dict[int, bytes] = {
     k: bytes(int(s) for s in reversed(f"{k:08b}")) for k in range(256)
 }
 
@@ -32,7 +32,7 @@ _UNPACK_LUT: Dict[int, bytes] = {
 def apply_color_lut(
     arr: "np.ndarray",
     ds: Optional["Dataset"] = None,
-    palette: Optional[Union[str, UID]] = None
+    palette: str | UID | None = None
 ) -> "np.ndarray":
     """Apply a color palette lookup table to `arr`.
 
@@ -136,7 +136,7 @@ def apply_color_lut(
         raise ValueError("No suitable Palette Color Lookup Table Module found")
 
     # All channels are supposed to be identical
-    lut_desc = cast(List[int], ds.RedPaletteColorLookupTableDescriptor)
+    lut_desc = cast(list[int], ds.RedPaletteColorLookupTableDescriptor)
     # A value of 0 = 2^16 entries
     nr_entries = lut_desc[0] or 2**16
 
@@ -153,7 +153,7 @@ def apply_color_lut(
         g_lut = cast(bytes, ds.GreenPaletteColorLookupTableData)
         b_lut = cast(bytes, ds.BluePaletteColorLookupTableData)
         a_lut = cast(
-            Optional[bytes],
+            bytes | None,
             getattr(ds, 'AlphaPaletteColorLookupTableData', None)
         )
 
@@ -168,7 +168,7 @@ def apply_color_lut(
         g_lut = cast(bytes, ds.SegmentedGreenPaletteColorLookupTableData)
         b_lut = cast(bytes, ds.SegmentedBluePaletteColorLookupTableData)
         a_lut = cast(
-            Optional[bytes],
+            bytes | None,
             getattr(ds, 'SegmentedAlphaPaletteColorLookupTableData', None)
         )
 
@@ -253,10 +253,10 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
       <part04/sect_N.2.html#sect_N.2.1.1>`
     """
     if ds.get("ModalityLUTSequence"):
-        item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
-        nr_entries = cast(List[int], item.LUTDescriptor)[0] or 2**16
-        first_map = cast(List[int], item.LUTDescriptor)[1]
-        nominal_depth = cast(List[int], item.LUTDescriptor)[2]
+        item = cast(list["Dataset"], ds.ModalityLUTSequence)[0]
+        nr_entries = cast(list[int], item.LUTDescriptor)[0] or 2**16
+        first_map = cast(list[int], item.LUTDescriptor)[1]
+        nominal_depth = cast(list[int], item.LUTDescriptor)[2]
 
         dtype = f'uint{nominal_depth}'
 
@@ -267,7 +267,7 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
             unpack_fmt = f'{endianness}{nr_entries}H'
             unc_data = unpack(unpack_fmt, cast(bytes, item.LUTData))
         else:
-            unc_data = cast(List[int], item.LUTData)
+            unc_data = cast(list[int], item.LUTData)
 
         lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
 
@@ -351,7 +351,7 @@ def apply_voi_lut(
     """
     valid_voi = False
     if ds.get('VOILUTSequence'):
-        ds.VOILUTSequence = cast(List["Dataset"], ds.VOILUTSequence)
+        ds.VOILUTSequence = cast(list["Dataset"], ds.VOILUTSequence)
         valid_voi = None not in [
             ds.VOILUTSequence[0].get('LUTDescriptor', None),
             ds.VOILUTSequence[0].get('LUTData', None)
@@ -426,8 +426,8 @@ def apply_voi(
         )
 
     # VOI LUT Sequence contains one or more items
-    item = cast(List["Dataset"], ds.VOILUTSequence)[index]
-    lut_descriptor = cast(List[int], item.LUTDescriptor)
+    item = cast(list["Dataset"], ds.VOILUTSequence)[index]
+    lut_descriptor = cast(list[int], item.LUTDescriptor)
     nr_entries = lut_descriptor[0] or 2**16
     first_map = lut_descriptor[1]
 
@@ -449,7 +449,7 @@ def apply_voi(
         unpack_fmt = f'{endianness}{nr_entries}H'
         unc_data = unpack_from(unpack_fmt, cast(bytes, item.LUTData))
     else:
-        unc_data = cast(List[int], item.LUTData)
+        unc_data = cast(list[int], item.LUTData)
 
     lut_data: "np.ndarray" = np.asarray(unc_data, dtype=dtype)
 
@@ -525,11 +525,11 @@ def apply_windowing(
     # VR DS, VM 1-n
     elem = ds['WindowCenter']
     center = (
-        cast(List[float], elem.value)[index] if elem.VM > 1 else elem.value
+        cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     )
     center = cast(float, center)
     elem = ds['WindowWidth']
-    width = cast(List[float], elem.value)[index] if elem.VM > 1 else elem.value
+    width = cast(list[float], elem.value)[index] if elem.VM > 1 else elem.value
     width = cast(float, width)
 
     # The output range depends on whether or not a modality LUT or rescale
@@ -540,8 +540,8 @@ def apply_windowing(
     if ds.get('ModalityLUTSequence'):
         # Unsigned - see PS3.3 C.11.1.1.1
         y_min = 0
-        item = cast(List["Dataset"], ds.ModalityLUTSequence)[0]
-        bit_depth = cast(List[int], item.LUTDescriptor)[2]
+        item = cast(list["Dataset"], ds.ModalityLUTSequence)[0]
+        bit_depth = cast(list[int], item.LUTDescriptor)[2]
         y_max = 2**bit_depth - 1
     elif ds.PixelRepresentation == 0:
         # Unsigned
@@ -853,11 +853,11 @@ def expand_ybr422(src: ByteString, bits_allocated: int) -> bytes:
 
 
 def _expand_segmented_lut(
-    data: Tuple[int, ...],
+    data: tuple[int, ...],
     fmt: str,
-    nr_segments: Optional[int] = None,
-    last_value: Optional[int] = None
-) -> List[int]:
+    nr_segments: int | None = None,
+    last_value: int | None = None
+) -> list[int]:
     """Return a list containing the expanded lookup table data.
 
     Parameters
@@ -891,7 +891,7 @@ def _expand_segmented_lut(
     # Little endian: e.g. 0x0302 0x0100, big endian, e.g. 0x0203 0x0001
     indirect_ii = [3, 2, 1, 0] if '<' in fmt else [2, 3, 0, 1]
 
-    lut: List[int] = []
+    lut: list[int] = []
     offset = 0
     segments_read = 0
     # Use `offset + 1` to account for possible trailing null
@@ -1031,7 +1031,7 @@ def get_expected_length(ds: "Dataset", unit: str = 'bytes') -> int:
     return length
 
 
-def get_image_pixel_ids(ds: "Dataset") -> Dict[str, int]:
+def get_image_pixel_ids(ds: "Dataset") -> dict[str, int]:
     """Return a dict of the pixel data affecting element's :func:`id` values.
 
     .. versionadded:: 1.4
@@ -1088,7 +1088,7 @@ def get_image_pixel_ids(ds: "Dataset") -> Dict[str, int]:
     return {kw: id(getattr(ds, kw, None)) for kw in keywords}
 
 
-def get_j2k_parameters(codestream: bytes) -> Dict[str, object]:
+def get_j2k_parameters(codestream: bytes) -> dict[str, object]:
     """Return a dict containing JPEG 2000 component parameters.
 
     .. versionadded:: 2.1
@@ -1140,7 +1140,7 @@ def get_nr_frames(ds: "Dataset") -> int:
     int
         An integer for the NumberOfFrames or 1 if NumberOfFrames is None
     """
-    nr_frames: Optional[int] = getattr(ds, 'NumberOfFrames', 1)
+    nr_frames: int | None = getattr(ds, 'NumberOfFrames', 1)
     # 'NumberOfFrames' may exist in the DICOM file but have value equal to None
     if nr_frames is None:
         warnings.warn("A value of None for (0028,0008) 'Number of Frames' is "

@@ -1,16 +1,17 @@
 from functools import wraps
 import logging
 import time
-from typing import Union, Tuple, Optional, Callable, Any, Type
+from typing import Union, Tuple, Optional, Any, Type
+from collections.abc import Callable
 
 
 def retry(
-    exc: Union[Type[Exception], Tuple[Type[Exception], ...]],
-    exc_msg: Optional[str] = None,
+    exc: type[Exception] | tuple[type[Exception], ...],
+    exc_msg: str | None = None,
     tries: int = 4,
     delay: int = 3,
     backoff: int = 2,
-    logger: Optional[logging.Logger] = None
+    logger: logging.Logger | None = None
 ) -> Callable[[Callable], Any]:
     """Retry calling the decorated function using an exponential backoff.
 

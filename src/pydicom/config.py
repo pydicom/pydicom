@@ -6,7 +6,8 @@
 import logging
 import os
 from contextlib import contextmanager
-from typing import Optional, Dict, Any, TYPE_CHECKING, Generator
+from typing import Optional, Dict, Any, TYPE_CHECKING
+from collections.abc import Generator
 
 have_numpy = True
 try:
@@ -48,7 +49,7 @@ before it is added to the :class:`~pydicom.dataset.Dataset`.
 Default ``None``.
 """
 
-data_element_callback_kwargs: Dict[str, Any] = {}
+data_element_callback_kwargs: dict[str, Any] = {}
 """Set the keyword arguments passed to :func:`data_element_callback`.
 
 Default ``{}``.
@@ -188,10 +189,10 @@ class Settings:
     """
 
     def __init__(self) -> None:
-        self._reading_validation_mode: Optional[int] = None
+        self._reading_validation_mode: int | None = None
         # in future version, writing invalid values will raise by default,
         # currently the default value depends on enforce_valid_values
-        self._writing_validation_mode: Optional[int] = (
+        self._writing_validation_mode: int | None = (
             RAISE if _use_future else None
         )
         self._infer_sq_for_un_vr: bool = True

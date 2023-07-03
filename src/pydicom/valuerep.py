@@ -8,9 +8,9 @@ import re
 import sys
 from math import floor, isfinite, log10
 from typing import (
-    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, Callable,
-    MutableSequence, Sequence, cast, Iterator
+    TypeVar, Type, Tuple, Optional, List, Dict, Union, Any, cast
 )
+from collections.abc import Callable, MutableSequence, Sequence, Iterator
 import warnings
 
 # don't import datetime_conversion directly
@@ -78,7 +78,7 @@ BYTE_VR_REGEXES = {vr: re.compile(regex.encode())
 
 
 def validate_type(vr: str, value: Any,
-                  types: Union[Type, Tuple[Type, Type]]) -> Tuple[bool, str]:
+                  types: type | tuple[type, type]) -> tuple[bool, str]:
     """Checks for valid types for a given VR.
 
     Parameters
@@ -102,7 +102,7 @@ def validate_type(vr: str, value: Any,
     return True, ""
 
 
-def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_vr_length(vr: str, value: Any) -> tuple[bool, str]:
     """Validate the value length for a given VR.
 
     Parameters
@@ -127,7 +127,7 @@ def validate_vr_length(vr: str, value: Any) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_type_and_length(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_type_and_length(vr: str, value: Any) -> tuple[bool, str]:
     """Validate the correct type and the value length for a given VR.
 
     Parameters
@@ -147,7 +147,7 @@ def validate_type_and_length(vr: str, value: Any) -> Tuple[bool, str]:
     return validate_vr_length(vr, value)
 
 
-def validate_regex(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_regex(vr: str, value: Any) -> tuple[bool, str]:
     """Validate the value for a given VR for allowed characters
     using a regular expression.
 
@@ -164,7 +164,7 @@ def validate_regex(vr: str, value: Any) -> Tuple[bool, str]:
     """
     if value:
         regex: Any
-        newline: Union[str, int]
+        newline: str | int
         if isinstance(value, str):
             regex = STR_VR_REGEXES[vr]
             newline = "\n"
@@ -176,7 +176,7 @@ def validate_regex(vr: str, value: Any) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_type_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_type_and_regex(vr: str, value: Any) -> tuple[bool, str]:
     """Validate that the value is of type :class:`str` or :class:`bytes`
     and that the value matches the VR-specific regular expression.
 
@@ -198,7 +198,7 @@ def validate_type_and_regex(vr: str, value: Any) -> Tuple[bool, str]:
 
 
 def validate_date_time(
-        vr: str, value: Any, date_time_type: Type) -> Tuple[bool, str]:
+        vr: str, value: Any, date_time_type: type) -> tuple[bool, str]:
     """Checks for valid values for date/time related VRs.
 
     Parameters
@@ -221,7 +221,7 @@ def validate_date_time(
 
 
 def validate_length_and_type_and_regex(
-        vr: str, value: Any) -> Tuple[bool, str]:
+        vr: str, value: Any) -> tuple[bool, str]:
     """Validate the value for a given VR for maximum length, for the correct
     value type, and for allowed characters using a regular expression.
 
@@ -250,7 +250,7 @@ def validate_length_and_type_and_regex(
     return is_valid_len and is_valid_expr, msg
 
 
-def validate_pn_component_length(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_pn_component_length(vr: str, value: Any) -> tuple[bool, str]:
     """Validate the PN component value for the maximum length.
 
     Parameters
@@ -272,7 +272,7 @@ def validate_pn_component_length(vr: str, value: Any) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_pn(vr: str, value: Any) -> Tuple[bool, str]:
+def validate_pn(vr: str, value: Any) -> tuple[bool, str]:
     """Validate the value for VR PN for the maximum number of components
     and for the maximum length of each component.
 
@@ -292,7 +292,7 @@ def validate_pn(vr: str, value: Any) -> Tuple[bool, str]:
     valid, msg = validate_type(vr, value, (str, bytes))
     if not valid:
         return valid, msg
-    components: Sequence[Union[str, bytes]]
+    components: Sequence[str | bytes]
     if isinstance(value, bytes):
         components = value.split(b"=")
     else:
@@ -309,7 +309,7 @@ def validate_pn(vr: str, value: Any) -> Tuple[bool, str]:
     return True, ""
 
 
-def validate_pn_component(value: Union[str, bytes]) -> None:
+def validate_pn_component(value: str | bytes) -> None:
     """Validate the value of a single component of VR PN for maximum length.
 
     Parameters
@@ -341,7 +341,7 @@ VALUE_LENGTH = {
 
 def validate_number(
         vr: str, value: Any, min_value: int, max_value: int
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """Validate the value for a numerical VR for type and allowed range.
 
     Parameters
@@ -407,8 +407,7 @@ VALIDATORS = {
 
 def validate_value(vr: str, value: Any,
                    validation_mode: int,
-                   validator: Optional[Callable[[str, Any],
-                                       Tuple[bool, str]]] = None) -> None:
+                   validator: Callable[[str, Any], tuple[bool, str]] | None = None) -> None:
     """Validate the given value against the DICOM standard.
 
     Parameters
@@ -546,19 +545,19 @@ class _DateTimeBase:
     original_string: str
 
     # Add pickling support for the mutable additions
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> dict[str, Any]:
         return self.__dict__.copy()
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
 
     def __reduce_ex__(  # type: ignore[override]
         self, protocol: int
-    ) -> Tuple[Any, ...]:
+    ) -> tuple[Any, ...]:
         # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
-        reduce_ex = cast(Tuple[Any, ...], super().__reduce_ex__(protocol))
+        reduce_ex = cast(tuple[Any, ...], super().__reduce_ex__(protocol))
         return reduce_ex + (self.__getstate__(),)
 
     def __str__(self) -> str:
@@ -577,7 +576,7 @@ class DA(_DateTimeBase, datetime.date):
     Note that the :class:`datetime.date` base class is immutable.
     """
     def __new__(  # type: ignore[misc]
-        cls: Type["DA"], *args: Any, **kwargs: Any
+        cls: type["DA"], *args: Any, **kwargs: Any
     ) -> Optional["DA"]:
         """Create an instance of DA object.
 
@@ -667,7 +666,7 @@ class DT(_DateTimeBase, datetime.datetime):
         )
 
     def __new__(  # type: ignore[misc]
-        cls: Type["DT"], *args: Any, **kwargs: Any
+        cls: type["DT"], *args: Any, **kwargs: Any
     ) -> Optional["DT"]:
         """Create an instance of DT object.
 
@@ -780,7 +779,7 @@ class TM(_DateTimeBase, datetime.time):
     )
 
     def __new__(  # type: ignore[misc]
-        cls: Type["TM"], *args: Any, **kwargs: Any
+        cls: type["TM"], *args: Any, **kwargs: Any
     ) -> Optional["TM"]:
         """Create an instance of TM object from a string.
 
@@ -877,7 +876,7 @@ def is_valid_ds(s: str) -> bool:
     return validate_length_and_type_and_regex("DS", s)[0]
 
 
-def format_number_as_ds(val: Union[float, Decimal]) -> str:
+def format_number_as_ds(val: float | Decimal) -> str:
     """Truncate a float's representation to give a valid Decimal String (DS).
 
     DICOM's decimal string (DS) representation is limited to strings with 16
@@ -908,7 +907,7 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
         If val does not represent a finite value
 
     """
-    if not isinstance(val, (float, Decimal)):
+    if not isinstance(val, float | Decimal):
         raise TypeError("'val' must be of type float or decimal.Decimal")
     if not isfinite(val):
         raise ValueError(
@@ -924,7 +923,7 @@ def format_number_as_ds(val: Union[float, Decimal]) -> str:
         return valstr
 
     # Decide whether to use scientific notation
-    logval = log10(cast(Union[float, Decimal], abs(val)))
+    logval = log10(cast(float | Decimal, abs(val)))
 
     # Characters needed for '-' at start
     sign_chars = 1 if val < 0.0 else 0
@@ -976,11 +975,11 @@ class DSfloat(float):
     auto_format: bool
 
     def __new__(  # type: ignore[misc]
-        cls: Type["DSfloat"],
-        val: Union[None, str, int, float, Decimal],
+        cls: type["DSfloat"],
+        val: None | str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: Optional[int] = None
-    ) -> Optional[Union[str, "DSfloat"]]:
+        validation_mode: int | None = None
+    ) -> Union[str, "DSfloat"] | None:
         if val is None:
             return val
 
@@ -990,9 +989,9 @@ class DSfloat(float):
         return super().__new__(cls, val)
 
     def __init__(
-        self, val: Union[str, int, float, Decimal],
+        self, val: str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: Optional[int] = None
+        validation_mode: int | None = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later.
@@ -1006,7 +1005,7 @@ class DSfloat(float):
         pre_checked = False
         if isinstance(val, str):
             self.original_string = val.strip()
-        elif isinstance(val, (DSfloat, DSdecimal)):
+        elif isinstance(val, DSfloat | DSdecimal):
             if val.auto_format:
                 auto_format = True  # override input parameter
                 pre_checked = True
@@ -1092,11 +1091,11 @@ class DSdecimal(Decimal):
     auto_format: bool
 
     def __new__(  # type: ignore[misc]
-        cls: Type["DSdecimal"],
-        val: Union[None, str, int, float, Decimal],
+        cls: type["DSdecimal"],
+        val: None | str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: Optional[int] = None
-    ) -> Optional[Union[str, "DSdecimal"]]:
+        validation_mode: int | None = None
+    ) -> Union[str, "DSdecimal"] | None:
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
 
@@ -1123,9 +1122,9 @@ class DSdecimal(Decimal):
 
     def __init__(
         self,
-        val: Union[str, int, float, Decimal],
+        val: str | int | float | Decimal,
         auto_format: bool = False,
-        validation_mode: Optional[int] = None
+        validation_mode: int | None = None
     ) -> None:
         """Store the original string if one given, for exact write-out of same
         value later. E.g. if set ``'1.23e2'``, :class:`~decimal.Decimal` would
@@ -1139,7 +1138,7 @@ class DSdecimal(Decimal):
         pre_checked = False
         if isinstance(val, str):
             self.original_string = val.strip()
-        elif isinstance(val, (DSfloat, DSdecimal)):
+        elif isinstance(val, DSfloat | DSdecimal):
             if val.auto_format:
                 auto_format = True  # override input parameter
                 pre_checked = True
@@ -1218,9 +1217,9 @@ else:
 
 
 def DS(
-    val: Union[None, str, int, float, Decimal], auto_format: bool = False,
-    validation_mode: Optional[int] = None
-) -> Union[None, str, DSfloat, DSdecimal]:
+    val: None | str | int | float | Decimal, auto_format: bool = False,
+    validation_mode: int | None = None
+) -> None | str | DSfloat | DSdecimal:
     """Factory function for creating DS class instances.
 
     Checks for blank string; if so, returns that, else calls :class:`DSfloat`
@@ -1264,17 +1263,17 @@ class ISfloat(float):
     parameters and return values.
     """
     def __new__(  # type: ignore[misc]
-            cls: Type["ISfloat"], val: Union[str, float, Decimal],
-            validation_mode: Optional[int] = None
+            cls: type["ISfloat"], val: str | float | Decimal,
+            validation_mode: int | None = None
     ) -> float:
         return super().__new__(cls, val)
 
-    def __init__(self, val: Union[str, float, Decimal],
-                 validation_mode: Optional[int] = None) -> None:
+    def __init__(self, val: str | float | Decimal,
+                 validation_mode: int | None = None) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val.strip()
-        elif (isinstance(val, (IS, ISfloat))
+        elif (isinstance(val, IS | ISfloat)
                 and hasattr(val, 'original_string')):
             self.original_string = val.original_string
         if validation_mode:
@@ -1299,9 +1298,9 @@ class IS(int):
     """
 
     def __new__(  # type: ignore[misc]
-            cls: Type["IS"], val: Union[None, str, int, float, Decimal],
-            validation_mode: Optional[int] = None
-    ) -> Optional[Union[str, "IS", "ISfloat"]]:
+            cls: type["IS"], val: None | str | int | float | Decimal,
+            validation_mode: int | None = None
+    ) -> Union[str, "IS", "ISfloat"] | None:
         """Create instance if new integer string"""
         if val is None:
             return val
@@ -1315,7 +1314,7 @@ class IS(int):
             validate_value("IS", val, validation_mode)
 
         try:
-            newval: Union[IS, ISfloat] = super().__new__(cls, val)
+            newval: IS | ISfloat = super().__new__(cls, val)
         except ValueError:
             # accept float strings when no integer loss, e.g. "1.0"
             newval = super().__new__(cls, float(val))
@@ -1323,7 +1322,7 @@ class IS(int):
         # If a float or Decimal was passed in, check for non-integer,
         # i.e. could lose info if converted to int
         # If so, create an ISfloat instead (if allowed by settings)
-        if isinstance(val, (float, Decimal, str)) and newval != float(val):
+        if isinstance(val, float | Decimal | str) and newval != float(val):
             newval = ISfloat(val, validation_mode)
 
         # Checks in case underlying int is >32 bits, DICOM does not allow this
@@ -1338,8 +1337,8 @@ class IS(int):
 
         return newval
 
-    def __init__(self, val: Union[str, int, float, Decimal],
-                 validation_mode: Optional[int] = None) -> None:
+    def __init__(self, val: str | int | float | Decimal,
+                 validation_mode: int | None = None) -> None:
         # If a string passed, then store it
         if isinstance(val, str):
             self.original_string = val.strip()
@@ -1374,9 +1373,9 @@ _T = TypeVar('_T')
 
 
 def MultiString(
-        val: str, valtype: Optional[Callable[[str], _T]] = None,
-        validation_mode: Optional[int] = None
-) -> Union[_T, MutableSequence[_T]]:
+        val: str, valtype: Callable[[str], _T] | None = None,
+        validation_mode: int | None = None
+) -> _T | MutableSequence[_T]:
     """Split a string by delimiters if there are any
 
     Parameters
@@ -1404,7 +1403,7 @@ def MultiString(
     while val and val.endswith((' ', '\x00')):
         val = val[:-1]
 
-    splitup: List[str] = val.split("\\")
+    splitup: list[str] = val.split("\\")
     if len(splitup) == 1:
         return valtype(splitup[0])
 
@@ -1412,8 +1411,8 @@ def MultiString(
 
 
 def _verify_encodings(
-    encodings: Optional[Union[str, Sequence[str]]]
-) -> Optional[Tuple[str, ...]]:
+    encodings: str | Sequence[str] | None
+) -> tuple[str, ...] | None:
     """Checks the encoding to ensure proper format"""
     if encodings is None:
         return None
@@ -1426,7 +1425,7 @@ def _verify_encodings(
 
 def _decode_personname(
     components: Sequence[bytes], encodings: Sequence[str]
-) -> Tuple[str, ...]:
+) -> tuple[str, ...]:
     """Return a list of decoded person name components.
 
     Parameters
@@ -1494,7 +1493,7 @@ def _encode_personname(
 class PersonName:
     """Representation of the value for an element with VR **PN**."""
     def __new__(  # type: ignore[misc]
-        cls: Type["PersonName"], *args: Any, **kwargs: Any
+        cls: type["PersonName"], *args: Any, **kwargs: Any
     ) -> Optional["PersonName"]:
         if len(args) and args[0] is None:
             return None
@@ -1504,9 +1503,9 @@ class PersonName:
     def __init__(
         self,
         val: Union[bytes, str, "PersonName"],
-        encodings: Optional[Sequence[str]] = None,
-        original_string: Optional[bytes] = None,
-        validation_mode: Optional[int] = None
+        encodings: Sequence[str] | None = None,
+        original_string: bytes | None = None,
+        validation_mode: int | None = None
     ) -> None:
         """Create a new ``PersonName``.
 
@@ -1527,8 +1526,8 @@ class PersonName:
         :meth:`from_named_components_veterinary` class methods.
         """
         self.original_string: bytes
-        self._components: Optional[Tuple[str, ...]] = None
-        self.encodings: Optional[Tuple[str, ...]]
+        self._components: tuple[str, ...] | None = None
+        self.encodings: tuple[str, ...] | None
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
         self.validation_mode = validation_mode
@@ -1560,7 +1559,7 @@ class PersonName:
             # if the encoding is not given, leave it as undefined (None)
         self.encodings = _verify_encodings(encodings)
 
-    def _create_dict(self) -> Dict[str, str]:
+    def _create_dict(self) -> dict[str, str]:
         """Creates a dictionary of person name group and component names.
 
         Used exclusively for `formatted` for backwards compatibility.
@@ -1572,7 +1571,7 @@ class PersonName:
         return {c: getattr(self, c, '') for c in parts}
 
     @property
-    def components(self) -> Tuple[str, ...]:
+    def components(self) -> tuple[str, ...]:
         """Returns up to three decoded person name components as a
         :class:`tuple` of :class:`str`.
 
@@ -1710,7 +1709,7 @@ class PersonName:
         return hash(self.components)
 
     def decode(
-        self, encodings: Optional[Sequence[str]] = None
+        self, encodings: Sequence[str] | None = None
     ) -> "PersonName":
         """Return the patient name decoded by the given `encodings`.
 
@@ -1744,7 +1743,7 @@ class PersonName:
 
         return PersonName(self.original_string, encodings)
 
-    def encode(self, encodings: Optional[Sequence[str]] = None) -> bytes:
+    def encode(self, encodings: Sequence[str] | None = None) -> bytes:
         """Return the patient name decoded by the given `encodings`.
 
         Parameters
@@ -1798,10 +1797,10 @@ class PersonName:
 
     @staticmethod
     def _encode_component_groups(
-        alphabetic_group: Sequence[Union[str, bytes]],
-        ideographic_group: Sequence[Union[str, bytes]],
-        phonetic_group: Sequence[Union[str, bytes]],
-        encodings: Optional[List[str]] = None,
+        alphabetic_group: Sequence[str | bytes],
+        ideographic_group: Sequence[str | bytes],
+        phonetic_group: Sequence[str | bytes],
+        encodings: list[str] | None = None,
     ) -> bytes:
         """Creates a byte string for a person name from lists of parts.
 
@@ -1843,7 +1842,7 @@ class PersonName:
 
         disallowed_chars = ['\\', '=', '^']
 
-        def standardize_encoding(val: Union[str, bytes]) -> bytes:
+        def standardize_encoding(val: str | bytes) -> bytes:
             # Return a byte encoded string regardless of the input type
             # This allows the user to supply a mixture of str and bytes
             # for different parts of the input
@@ -1865,13 +1864,13 @@ class PersonName:
             return val_enc
 
         def make_component_group(
-            components: Sequence[Union[str, bytes]]
+            components: Sequence[str | bytes]
         ) -> bytes:
             encoded_components = [standardize_encoding(c) for c in components]
             joined_components = encoded_component_sep.join(encoded_components)
             return joined_components.rstrip(encoded_component_sep)
 
-        component_groups: List[bytes] = [
+        component_groups: list[bytes] = [
             make_component_group(alphabetic_group),
             make_component_group(ideographic_group),
             make_component_group(phonetic_group)
@@ -1883,22 +1882,22 @@ class PersonName:
     @classmethod
     def from_named_components(
         cls,
-        family_name: Union[str, bytes] = '',
-        given_name: Union[str, bytes] = '',
-        middle_name: Union[str, bytes] = '',
-        name_prefix: Union[str, bytes] = '',
-        name_suffix: Union[str, bytes] = '',
-        family_name_ideographic: Union[str, bytes] = '',
-        given_name_ideographic: Union[str, bytes] = '',
-        middle_name_ideographic: Union[str, bytes] = '',
-        name_prefix_ideographic: Union[str, bytes] = '',
-        name_suffix_ideographic: Union[str, bytes] = '',
-        family_name_phonetic: Union[str, bytes] = '',
-        given_name_phonetic: Union[str, bytes] = '',
-        middle_name_phonetic: Union[str, bytes] = '',
-        name_prefix_phonetic: Union[str, bytes] = '',
-        name_suffix_phonetic: Union[str, bytes] = '',
-        encodings: Optional[List[str]] = None,
+        family_name: str | bytes = '',
+        given_name: str | bytes = '',
+        middle_name: str | bytes = '',
+        name_prefix: str | bytes = '',
+        name_suffix: str | bytes = '',
+        family_name_ideographic: str | bytes = '',
+        given_name_ideographic: str | bytes = '',
+        middle_name_ideographic: str | bytes = '',
+        name_prefix_ideographic: str | bytes = '',
+        name_suffix_ideographic: str | bytes = '',
+        family_name_phonetic: str | bytes = '',
+        given_name_phonetic: str | bytes = '',
+        middle_name_phonetic: str | bytes = '',
+        name_prefix_phonetic: str | bytes = '',
+        name_suffix_phonetic: str | bytes = '',
+        encodings: list[str] | None = None,
     ) -> 'PersonName':
         """Construct a PersonName from explicit named components.
 
@@ -1987,7 +1986,7 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        alphabetic_group: List[Union[str, bytes]] = [
+        alphabetic_group: list[str | bytes] = [
             family_name,
             given_name,
             middle_name,
@@ -1996,7 +1995,7 @@ class PersonName:
         ]
 
         # Ideographic component group
-        ideographic_group: List[Union[str, bytes]] = [
+        ideographic_group: list[str | bytes] = [
             family_name_ideographic,
             given_name_ideographic,
             middle_name_ideographic,
@@ -2005,7 +2004,7 @@ class PersonName:
         ]
 
         # Phonetic component group
-        phonetic_group: List[Union[str, bytes]] = [
+        phonetic_group: list[str | bytes] = [
             family_name_phonetic,
             given_name_phonetic,
             middle_name_phonetic,
@@ -2025,13 +2024,13 @@ class PersonName:
     @classmethod
     def from_named_components_veterinary(
         cls,
-        responsible_party_name: Union[str, bytes] = '',
-        patient_name: Union[str, bytes] = '',
-        responsible_party_name_ideographic: Union[str, bytes] = '',
-        patient_name_ideographic: Union[str, bytes] = '',
-        responsible_party_name_phonetic: Union[str, bytes] = '',
-        patient_name_phonetic: Union[str, bytes] = '',
-        encodings: Optional[List[str]] = None,
+        responsible_party_name: str | bytes = '',
+        patient_name: str | bytes = '',
+        responsible_party_name_ideographic: str | bytes = '',
+        patient_name_ideographic: str | bytes = '',
+        responsible_party_name_phonetic: str | bytes = '',
+        patient_name_phonetic: str | bytes = '',
+        encodings: list[str] | None = None,
     ) -> 'PersonName':
         """Construct a PersonName from explicit named components following the
         veterinary usage convention.
@@ -2090,17 +2089,17 @@ class PersonName:
         Strings may not contain the following characters: '^', '=',
         or the backslash character.
         """
-        alphabetic_group: List[Union[str, bytes]] = [
+        alphabetic_group: list[str | bytes] = [
             responsible_party_name,
             patient_name,
         ]
 
-        ideographic_group: List[Union[str, bytes]] = [
+        ideographic_group: list[str | bytes] = [
             responsible_party_name_ideographic,
             patient_name_ideographic,
         ]
 
-        phonetic_group: List[Union[str, bytes]] = [
+        phonetic_group: list[str | bytes] = [
             responsible_party_name_phonetic,
             patient_name_phonetic,
         ]

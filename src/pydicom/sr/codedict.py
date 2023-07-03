@@ -3,7 +3,8 @@
 
 from itertools import chain
 import inspect
-from typing import List, Optional, Tuple, KeysView, Iterable, Dict, cast, Union
+from typing import List, Optional, Tuple, Dict, cast, Union
+from collections.abc import KeysView, Iterable
 
 from pydicom.sr.coding import Code
 from pydicom.sr._concepts_dict import concepts as CONCEPTS
@@ -14,7 +15,7 @@ from pydicom.sr._cid_dict import name_for_cid, cid_concepts as CID_CONCEPTS
 cid_for_name = {v: k for k, v in name_for_cid.items()}
 
 
-def _filtered(source: Iterable[str], filters: Iterable[str]) -> List[str]:
+def _filtered(source: Iterable[str], filters: Iterable[str]) -> list[str]:
     """Return a sorted list of filtered str.
 
     Parameters
@@ -45,8 +46,8 @@ def _filtered(source: Iterable[str], filters: Iterable[str]) -> List[str]:
     )
 
 
-ConceptsType = Dict[str, Dict[str, Dict[str, Tuple[str, List[int]]]]]
-SnomedMappingType = Dict[str, Dict[str, str]]
+ConceptsType = dict[str, dict[str, dict[str, tuple[str, list[int]]]]]
+SnomedMappingType = dict[str, dict[str, str]]
 
 
 class _CID_Dict:
@@ -55,9 +56,9 @@ class _CID_Dict:
 
     def __init__(self, cid: int) -> None:
         self.cid = cid
-        self._concepts: Dict[str, Code] = {}
+        self._concepts: dict[str, Code] = {}
 
-    def __dir__(self) -> List[str]:
+    def __dir__(self) -> list[str]:
         """Gives a list of available SR identifiers.
 
         List of attributes is used, for example, in auto-completion in editors
@@ -96,7 +97,7 @@ class _CID_Dict:
 
         scheme = matches[0]
         identifiers = cast(
-            Dict[str, Tuple[str, List[int]]], CONCEPTS[scheme][name]
+            dict[str, tuple[str, list[int]]], CONCEPTS[scheme][name]
         )
         # Almost always only one code per identifier
         if len(identifiers) == 1:
@@ -120,7 +121,7 @@ class _CID_Dict:
         return Code(value=code, meaning=val[0], scheme_designator=scheme)
 
     @property
-    def concepts(self) -> Dict[str, Code]:
+    def concepts(self) -> dict[str, Code]:
         """Return a dict of {SR identifiers: codes}"""
         if not self._concepts:
             self._concepts = {name: getattr(self, name) for name in self.dir()}
@@ -157,7 +158,7 @@ class _CID_Dict:
 
         return "\n".join(s)
 
-    def dir(self, *filters: str) -> List[str]:
+    def dir(self, *filters: str) -> list[str]:
         """Return an sorted list of SR identifiers based on a partial
         match.
 
@@ -194,7 +195,7 @@ class _CID_Dict:
         """
         return any([concept == code for concept in self.concepts.values()])
 
-    def trait_names(self) -> List[str]:
+    def trait_names(self) -> list[str]:
         """Returns a list of valid names for auto-completion code.
         Used in IPython, so that data element names can be found and offered
         for autocompletion on the IPython command line.
@@ -221,7 +222,7 @@ class _CodesDict:
     >>> code.meaning
     'Fontanel of skull'
     """
-    def __init__(self, scheme: Optional[str] = None) -> None:
+    def __init__(self, scheme: str | None = None) -> None:
         """Create a new CodesDict.
 
         Parameters
@@ -233,7 +234,7 @@ class _CodesDict:
         self.scheme = scheme
         self._dict = {scheme: CONCEPTS[scheme]} if scheme else CONCEPTS
 
-    def __dir__(self) -> List[str]:
+    def __dir__(self) -> list[str]:
         """Gives a list of available SR identifiers.
 
         List of attributes is used, for example, in auto-completion in editors
@@ -296,7 +297,7 @@ class _CodesDict:
         # else try to find in this scheme
         try:
             val = cast(
-                Dict[str, Tuple[str, List[int]]],
+                dict[str, tuple[str, list[int]]],
                 self._dict[self.scheme][name]
             )
         except KeyError:
@@ -316,7 +317,7 @@ class _CodesDict:
 
         return Code(value=code, meaning=meaning, scheme_designator=self.scheme)
 
-    def dir(self, *filters: str) -> List[str]:
+    def dir(self, *filters: str) -> list[str]:
         """Returns an alphabetical list of SR identifiers based on a partial
         match.
 
@@ -340,7 +341,7 @@ class _CodesDict:
     def schemes(self) -> KeysView[str]:
         return self._dict.keys()
 
-    def trait_names(self) -> List[str]:
+    def trait_names(self) -> list[str]:
         """Returns a list of valid names for auto-completion code.
 
         Used in IPython, so that data element names can be found and offered

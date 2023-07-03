@@ -26,7 +26,7 @@ try:
     if HAVE_REQUESTS is False:
         class DownloadProgressBar(tqdm.tqdm):
             def update_to(
-                self, b: int = 1, bsize: int = 1, tsize: Optional[int] = None
+                self, b: int = 1, bsize: int = 1, tsize: int | None = None
             ) -> None:
                 if tsize is not None:
                     self.total = tsize
@@ -131,11 +131,11 @@ def get_data_dir() -> pathlib.Path:
     return data_dir
 
 
-@functools.lru_cache()
-def get_url_map() -> Dict[str, str]:
+@functools.lru_cache
+def get_url_map() -> dict[str, str]:
     """Return a dict containing the URL mappings from ``urls.json```."""
     with open(HERE / "urls.json") as url_file:
-        return cast(Dict[str, str], json.load(url_file))
+        return cast(dict[str, str], json.load(url_file))
 
 
 def get_url(filename: str) -> str:
@@ -173,7 +173,7 @@ def data_path_with_download(
     filename: str,
     check_hash: bool = True,
     redownload_on_hash_mismatch: bool = True,
-    url: Optional[str] = None,
+    url: str | None = None,
     quiet: bool = True
 ) -> pathlib.Path:
     """Return the absolute path to the cached file with `filename`.
@@ -252,7 +252,7 @@ def get_cached_filehash(filename: str) -> str:
         The SHA256 checksum of the cached file.
     """
     with open(HERE / "hashes.json") as hash_file:
-        hashes = cast(Dict[str, str], json.load(hash_file))
+        hashes = cast(dict[str, str], json.load(hash_file))
         # Convert filenames to lowercase because windows filenames are
         #   case-insensitive
         hashes = {k.lower(): v for k, v in hashes.items()}

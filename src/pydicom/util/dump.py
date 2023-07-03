@@ -21,9 +21,9 @@ def print_character(ordchr: int) -> str:
 
 
 def filedump(
-    filename: Union[str, bytes, os.PathLike],
+    filename: str | bytes | os.PathLike,
     start_address: int = 0,
-    stop_address: Optional[int] = None,
+    stop_address: int | None = None,
 ) -> str:
     """Dump out the contents of a file to a standard hex dump 16 bytes wide"""
 
@@ -32,7 +32,7 @@ def filedump(
 
 
 def datadump(
-    data: bytes, start_address: int = 0, stop_address: Optional[int] = None
+    data: bytes, start_address: int = 0, stop_address: int | None = None
 ) -> str:
     """Return a hex string representation of `data`."""
     return hexdump(BytesIO(data), start_address, stop_address)
@@ -41,7 +41,7 @@ def datadump(
 def hexdump(
     f: BinaryIO,
     start_address: int = 0,
-    stop_address: Optional[int] = None,
+    stop_address: int | None = None,
     show_address: bool = True,
 ) -> str:
     """Return a formatted string of hex bytes and characters in data.

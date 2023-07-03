@@ -37,7 +37,7 @@ def main() -> None:
     print_table(version_rows)
 
 
-def print_table(version_rows: List[Tuple[str, str]]) -> None:
+def print_table(version_rows: list[tuple[str, str]]) -> None:
     row_format = "{:12} | {}"
     print(row_format.format("module", "version"))
     print(row_format.format("------", "-------"))
@@ -46,11 +46,11 @@ def print_table(version_rows: List[Tuple[str, str]]) -> None:
         print(row_format.format(module, version.replace("\n", " ")))
 
 
-def extract_version(module: ModuleType) -> Optional[str]:
+def extract_version(module: ModuleType) -> str | None:
     if module.__name__ == "gdcm":
-        return cast(Optional[str], getattr(module, "GDCM_VERSION", None))
+        return cast(str | None, getattr(module, "GDCM_VERSION", None))
 
-    return cast(Optional[str], getattr(module, "__version__", None))
+    return cast(str | None, getattr(module, "__version__", None))
 
 
 if __name__ == "__main__":

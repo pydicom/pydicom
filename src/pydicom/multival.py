@@ -4,9 +4,10 @@ or any list of items that must all be the same type.
 """
 
 from typing import (
-    Optional, Iterable, Union, List, overload, Callable, Any, cast,
-    TypeVar, MutableSequence, Iterator
+    Optional, Union, List, overload, Any, cast,
+    TypeVar
 )
+from collections.abc import Iterable, Callable, MutableSequence, Iterator
 
 from pydicom import config
 
@@ -32,7 +33,7 @@ class MultiValue(MutableSequence[_ItemType]):
         self,
         type_constructor: Callable[[_T], _ItemType],
         iterable: Iterable[_T],
-        validation_mode: Optional[int] = None
+        validation_mode: int | None = None
     ) -> None:
         """Create a new :class:`MultiValue` from an iterable and ensure each
         item in the :class:`MultiValue` has the same type.
@@ -61,7 +62,7 @@ class MultiValue(MutableSequence[_ItemType]):
 
         if validation_mode is None:
             validation_mode = config.settings.reading_validation_mode
-        self._list: List[_ItemType] = list()
+        self._list: list[_ItemType] = list()
         self.type_constructor = type_constructor
         if type_constructor in (DSfloat, IS, DSdecimal):
             type_constructor = DS_IS_constructor
@@ -72,7 +73,7 @@ class MultiValue(MutableSequence[_ItemType]):
     def append(self, val: _T) -> None:
         self._list.append(self.type_constructor(val))
 
-    def __delitem__(self, index: Union[slice, int]) -> None:
+    def __delitem__(self, index: slice | int) -> None:
         del self._list[index]
 
     def extend(self, val: Iterable[_T]) -> None:
@@ -99,8 +100,8 @@ class MultiValue(MutableSequence[_ItemType]):
         pass  # pragma: no cover
 
     def __getitem__(
-        self, index: Union[slice, int]
-    ) -> Union[MutableSequence[_ItemType], _ItemType]:
+        self, index: slice | int
+    ) -> MutableSequence[_ItemType] | _ItemType:
         return self._list[index]
 
     def insert(self, position: int, val: _T) -> None:
@@ -123,7 +124,7 @@ class MultiValue(MutableSequence[_ItemType]):
         pass  # pragma: no cover
 
     def __setitem__(  # type: ignore[misc]
-        self, idx: Union[int, slice], val: Union[_T, Iterable[_T]]
+        self, idx: int | slice, val: _T | Iterable[_T]
     ) -> None:
         """Set an item of the list, making sure it is of the right VR type"""
         if isinstance(idx, slice):
@@ -141,7 +142,7 @@ class MultiValue(MutableSequence[_ItemType]):
         if not self:
             return ''
         lines = (
-            f"{x!r}" if isinstance(x, (str, bytes)) else str(x) for x in self
+            f"{x!r}" if isinstance(x, str | bytes) else str(x) for x in self
         )
         return f"[{', '.join(lines)}]"
 

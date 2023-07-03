@@ -68,7 +68,7 @@ class UID(str):
     """
 
     def __new__(
-        cls: Type["UID"], val: str, validation_mode: Optional[int] = None
+        cls: type["UID"], val: str, validation_mode: int | None = None
     ) -> "UID":
         """Setup new instance of the class.
 
@@ -398,8 +398,8 @@ UncompressedPixelTransferSyntaxes = UncompressedTransferSyntaxes
 
 
 def generate_uid(
-    prefix: Union[str, None] = PYDICOM_ROOT_UID,
-    entropy_srcs: Optional[List[str]] = None,
+    prefix: str | None = PYDICOM_ROOT_UID,
+    entropy_srcs: list[str] | None = None,
 ) -> UID:
     """Return a 64 character UID which starts with `prefix`.
 

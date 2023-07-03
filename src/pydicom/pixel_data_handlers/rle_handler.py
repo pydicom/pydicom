@@ -179,7 +179,7 @@ def get_pixeldata(ds: "Dataset", rle_segment_order: str = '>') -> "np.ndarray":
     return cast("np.ndarray", arr)
 
 
-def _parse_rle_header(header: bytes) -> List[int]:
+def _parse_rle_header(header: bytes) -> list[int]:
     """Return a list of byte offsets for the segments in RLE data.
 
     **RLE Header Format**

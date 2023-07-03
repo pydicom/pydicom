@@ -4,9 +4,9 @@
 import codecs
 import re
 from typing import (
-    List, Set, Optional, Union, TYPE_CHECKING, MutableSequence, cast,
-    Sequence,
+    List, Set, Optional, Union, TYPE_CHECKING, cast,
 )
+from collections.abc import MutableSequence, Sequence
 import warnings
 
 from pydicom import config
@@ -247,7 +247,7 @@ def _encode_to_given_charset(
 
 
 def _get_escape_sequence_for_encoding(
-    encoding: str, encoded: Optional[bytes] = None
+    encoding: str, encoded: bytes | None = None
 ) -> bytes:
     """ Return an escape sequence corresponding to the given encoding. If
     encoding is 'shift_jis', return 'ESC)I' or 'ESC(J' depending on the first
@@ -294,7 +294,7 @@ custom_encoders = {
 
 
 def decode_bytes(
-    value: bytes, encodings: Sequence[str], delimiters: Set[int]
+    value: bytes, encodings: Sequence[str], delimiters: set[int]
 ) -> str:
     """Decode an encoded byte `value` into a unicode string using `encodings`.
 
@@ -367,7 +367,7 @@ def decode_bytes(
     # the substring until the first escape character, and subsequent
     # substrings starting with an escape character.
     regex = b'(^[^\x1b]+|[\x1b][^\x1b]*)'
-    fragments: List[bytes] = re.findall(regex, value)
+    fragments: list[bytes] = re.findall(regex, value)
 
     # decode each byte string fragment with it's corresponding encoding
     # and join them all together
@@ -381,7 +381,7 @@ decode_string = decode_bytes
 
 
 def _decode_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: Set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: set[int]
 ) -> str:
     """Decode a byte string encoded with a single encoding.
 
@@ -443,7 +443,7 @@ def _decode_fragment(
 
 
 def _decode_escaped_fragment(
-    byte_str: bytes, encodings: Sequence[str], delimiters: Set[int]
+    byte_str: bytes, encodings: Sequence[str], delimiters: set[int]
 ) -> str:
     """Decodes a byte string starting with an escape sequence.
 
@@ -651,8 +651,8 @@ def _encode_string_impl(
 
 
 def convert_encodings(
-    encodings: Union[None, str, MutableSequence[str]]
-) -> List[str]:
+    encodings: None | str | MutableSequence[str]
+) -> list[str]:
     """Convert DICOM `encodings` into corresponding Python encodings.
 
     Handles some common spelling mistakes and issues a warning in this case.
@@ -756,7 +756,7 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
 
 
 def _warn_about_invalid_encoding(
-    encoding: str, patched_encoding: Optional[str] = None
+    encoding: str, patched_encoding: str | None = None
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
@@ -779,8 +779,8 @@ def _warn_about_invalid_encoding(
 
 
 def _handle_illegal_standalone_encodings(
-    encodings: MutableSequence[str], py_encodings: List[str]
-) -> List[str]:
+    encodings: MutableSequence[str], py_encodings: list[str]
+) -> list[str]:
     """Check for stand-alone encodings in multi-valued encodings.
     If the first encoding is a stand-alone encoding, the rest of the
     encodings is removed. If any other encoding is a stand-alone encoding,
@@ -811,7 +811,7 @@ def _handle_illegal_standalone_encodings(
 
 
 def decode_element(
-    elem: "DataElement", dicom_character_set: Optional[Union[str, List[str]]]
+    elem: "DataElement", dicom_character_set: str | list[str] | None
 ) -> None:
     """Apply the DICOM character encoding to a data element
 
