@@ -952,7 +952,7 @@ class FileInstance:
         return cast(UID, self.ReferencedTransferSyntaxUIDInFile)
 
 
-DSPathType = Union[Dataset, str, os.PathLike]
+DSPathType = Dataset | str | os.PathLike
 
 
 class FileSet:

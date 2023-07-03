@@ -26,9 +26,9 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    Optional, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, AbstractSet, TYPE_CHECKING
+    Optional, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, TYPE_CHECKING
 )
-from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping
+from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping, Set
 import warnings
 import weakref
 
@@ -220,7 +220,7 @@ def _dict_equal(
             )
 
 
-_DatasetValue = Union[DataElement, RawDataElement]
+_DatasetValue = DataElement | RawDataElement
 _DatasetType = Union["Dataset", MutableMapping[BaseTag, _DatasetValue]]
 
 
@@ -840,7 +840,7 @@ class Dataset:
         except KeyError:
             return default
 
-    def items(self) -> AbstractSet[tuple[BaseTag, _DatasetValue]]:
+    def items(self) -> Set[tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -852,7 +852,7 @@ class Dataset:
         """
         return self._dict.items()
 
-    def keys(self) -> AbstractSet[BaseTag]:
+    def keys(self) -> Set[BaseTag]:
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns

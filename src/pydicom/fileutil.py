@@ -12,7 +12,7 @@ from pydicom.filebase import DicomFileLike
 from pydicom.config import logger
 
 
-PathType = Union[str, bytes, os.PathLike]
+PathType = str | bytes | os.PathLike
 
 
 def absorb_delimiter_item(
