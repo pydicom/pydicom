@@ -94,12 +94,12 @@ def code_dataelem(
         The DataElement instance to turn into code
     dataset_name : str
         The variable name of the Dataset containing `dataelem`
-    exclude_size : Union[int, None]
+    exclude_size : int | None
         If specified, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,
         and thus prompting the user to remove or fix that line.
-    var_names: Union[deque, None]
+    var_names: deque | None
         Used internally to ensure unique variable names in nested sequences.
     Returns
     -------
@@ -173,7 +173,7 @@ def code_sequence(
     name_filter: Callable[[str], str]
         A callable taking a sequence name or sequence item name, and returning
         a shorter name for easier code reading
-    var_names: Union[deque, None]
+    var_names: deque | None
         Used internally to ensure unique variable names in nested sequences.
 
     Returns
@@ -334,7 +334,7 @@ def code_file(
     ----------
     filename : str
         Complete path and filename of a DICOM file to convert
-    exclude_size : Union[int,None]
+    exclude_size : int |None
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,
@@ -364,7 +364,7 @@ def code_file_from_dataset(
     ----------
     ds : Dataset
         A pydicom Dataset to convert
-    exclude_size : Union[int,None]
+    exclude_size : int |None
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,

@@ -892,7 +892,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
 
     Parameters
     ----------
-    val: Union[float, Decimal]
+    val: float | Decimal
         The floating point value whose representation is required.
 
     Returns
@@ -964,7 +964,7 @@ class DSfloat(float):
 
     Parameters
     ----------
-    val: Union[str, int, float, Decimal]
+    val: str | int | float | Decimal
         Value to store as a DS.
     auto_format: bool
         If True, automatically format the string representation of this
@@ -979,7 +979,7 @@ class DSfloat(float):
         val: None | str | int | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None
-    ) -> Union[str, "DSfloat"] | None:
+    ) -> "str | DSfloat | None":
         if val is None:
             return val
 
@@ -1075,7 +1075,7 @@ class DSdecimal(Decimal):
 
     Parameters
     ----------
-    val: Union[str, int, float, Decimal]
+    val: str | int | float | Decimal
         Value to store as a DS.
     auto_format: bool
         If True, automatically format the string representation of this
@@ -1095,7 +1095,7 @@ class DSdecimal(Decimal):
         val: None | str | int | float | Decimal,
         auto_format: bool = False,
         validation_mode: int | None = None
-    ) -> Union[str, "DSdecimal"] | None:
+    ) -> "str | DSdecimal | None":
         """Create an instance of DS object, or return a blank string if one is
         passed in, e.g. from a type 2 DICOM blank value.
 
@@ -1300,7 +1300,7 @@ class IS(int):
     def __new__(  # type: ignore[misc]
             cls: type["IS"], val: None | str | int | float | Decimal,
             validation_mode: int | None = None
-    ) -> Union[str, "IS", "ISfloat"] | None:
+    ) -> "str | IS | ISfloat | None":
         """Create instance if new integer string"""
         if val is None:
             return val
@@ -1502,7 +1502,7 @@ class PersonName:
 
     def __init__(
         self,
-        val: Union[bytes, str, "PersonName"],
+        val: "bytes | str | PersonName",
         encodings: Sequence[str] | None = None,
         original_string: bytes | None = None,
         validation_mode: int | None = None
@@ -1809,11 +1809,11 @@ class PersonName:
 
         Parameters
         ----------
-        alphabetic_group: Sequence[Union[str, bytes]]
+        alphabetic_group: Sequence[str | bytes]
             List of components for the alphabetic group.
-        ideographic_group: Sequence[Union[str, bytes]]
+        ideographic_group: Sequence[str | bytes]
             List of components for the ideographic group.
-        phonetic_group: Sequence[Union[str, bytes]]
+        phonetic_group: Sequence[str | bytes]
             List of components for the phonetic group.
         encodings: Optional[List[str]]
             A list of encodings used for the other input parameters.
@@ -1942,36 +1942,36 @@ class PersonName:
 
         Parameters
         ----------
-        family_name: Union[str, bytes]
+        family_name: str | bytes
             Family name in alphabetic form.
-        given_name: Union[str, bytes]
+        given_name: str | bytes
             Given name in alphabetic form.
-        middle_name: Union[str, bytes]
+        middle_name: str | bytes
             Middle name in alphabetic form.
-        name_prefix: Union[str, bytes]
+        name_prefix: str | bytes
             Name prefix in alphabetic form, e.g. 'Mrs.', 'Dr.', 'Sr.', 'Rev.'.
-        name_suffix: Union[str, bytes]
+        name_suffix: str | bytes
             Name prefix in alphabetic form, e.g. 'M.D.', 'B.A., M.Div.',
             'Chief Executive Officer'.
-        family_name_ideographic: Union[str, bytes]
+        family_name_ideographic: str | bytes
             Family name in ideographic form.
-        given_name_ideographic: Union[str, bytes]
+        given_name_ideographic: str | bytes
             Given name in ideographic form.
-        middle_name_ideographic: Union[str, bytes]
+        middle_name_ideographic: str | bytes
             Middle name in ideographic form.
-        name_prefix_ideographic: Union[str, bytes]
+        name_prefix_ideographic: str | bytes
             Name prefix in ideographic form.
-        name_suffix_ideographic: Union[str, bytes]
+        name_suffix_ideographic: str | bytes
             Name suffix in ideographic form.
-        family_name_phonetic: Union[str, bytes]
+        family_name_phonetic: str | bytes
             Family name in phonetic form.
-        given_name_phonetic: Union[str, bytes]
+        given_name_phonetic: str | bytes
             Given name in phonetic form.
-        middle_name_phonetic: Union[str, bytes]
+        middle_name_phonetic: str | bytes
             Middle name in phonetic form.
-        name_prefix_phonetic: Union[str, bytes]
+        name_prefix_phonetic: str | bytes
             Name prefix in phonetic form.
-        name_suffix_phonetic: Union[str, bytes]
+        name_suffix_phonetic: str | bytes
             Name suffix in phonetic form.
         encodings: Optional[List[str]]
             A list of encodings used for the other input parameters.
@@ -2062,19 +2062,19 @@ class PersonName:
 
         Parameters
         ----------
-        responsible_party_name: Union[str, bytes]
+        responsible_party_name: str | bytes
             Name of the responsible party in alphabetic form. This may be
             either the family name of the responsible party, or the
             name of the responsible organization.
-        patient_name: Union[str, bytes]
+        patient_name: str | bytes
             Patient name in alphabetic form.
-        responsible_party_name_ideographic: Union[str, bytes]
+        responsible_party_name_ideographic: str | bytes
             Name of the responsible party in ideographic form.
-        patient_name_ideographic: Union[str, bytes]
+        patient_name_ideographic: str | bytes
             Patient name in ideographic form.
-        responsible_party_name_phonetic: Union[str, bytes]
+        responsible_party_name_phonetic: str | bytes
             Name of the responsible party in phonetic form.
-        patient_name_phonetic: Union[str, bytes]
+        patient_name_phonetic: str | bytes
             Patient name in phonetic form.
         encodings: Optional[List[str]]
             A list of encodings used for the other input parameters

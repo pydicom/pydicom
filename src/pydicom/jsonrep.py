@@ -4,7 +4,7 @@
 import base64
 from inspect import signature
 from typing import (
-    Optional, Union, Any, cast, TYPE_CHECKING
+    Optional, TypeAlias, Union, Any, cast, TYPE_CHECKING
 )
 from collections.abc import Callable
 import warnings
@@ -67,17 +67,17 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     return number_type(value)
 
 
-OtherValueType = Union[None, str, int, float]
-PNValueType = Union[None, str, dict[str, str]]
+OtherValueType = None | str | int | float
+PNValueType = None | str | dict[str, str]
 SQValueType = Optional[dict[str, Any]]  # Recursive
 
-ValueType = Union[PNValueType, SQValueType, OtherValueType]
-InlineBinaryType = Union[str, list[str]]
-BulkDataURIType = Union[str, list[str]]
+ValueType: TypeAlias = PNValueType | SQValueType | OtherValueType
+InlineBinaryType: TypeAlias = str | list[str]
+BulkDataURIType: TypeAlias = str | list[str]
 
-JSONValueType = Union[list[ValueType], InlineBinaryType, BulkDataURIType]
+JSONValueType = list[ValueType] | InlineBinaryType | BulkDataURIType
 
-BulkDataType = Union[None, str, int, float, bytes]
+BulkDataType = None | str | int | float | bytes
 BulkDataHandlerType = Optional[Callable[[str, str, str], BulkDataType]]
 
 
@@ -113,7 +113,7 @@ class JsonDataElementConverter:
             The data element's tag in uppercase hex format like ``"7FE00010"``.
         vr : str
             The data element value representation.
-        value : str or List[Union[None, str, int, float, dict]]
+        value : str or List[None | str | int | float | dict]
             The attribute value for the JSON object's "Value", "InlineBinary"
             or "BulkDataURI" field. If there's no such attribute then `value`
             will be ``[""]``.

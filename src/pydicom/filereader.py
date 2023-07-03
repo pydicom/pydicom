@@ -69,7 +69,7 @@ def data_element_generator(
         returns ``True``, ``read_data_element`` will just return.
     defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
-    encoding : Union[str, MutableSequence[str]]
+    encoding : str | MutableSequence[str]
         Encoding scheme
     specific_tags : list or None
         See :func:`dcmread` for parameter info.
@@ -452,7 +452,7 @@ def read_dataset(
         )
         encoding = convert_encodings(char_set)  # -> List[str]
     else:
-        encoding = parent_encoding  # -> Union[str, MutableSequence[str]]
+        encoding = parent_encoding  # -> str | MutableSequence[str]
 
     ds.set_original_encoding(is_implicit_VR, is_little_endian, encoding)
     return ds

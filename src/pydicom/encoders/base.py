@@ -108,7 +108,7 @@ class Encoder:
 
     def encode(
         self,
-        src: Union[bytes, "numpy.ndarray", "Dataset"],
+        src: "bytes | numpy.ndarray | Dataset",
         idx: int | None = None,
         encoding_plugin: str = '',
         decoding_plugin: str = '',
@@ -325,7 +325,7 @@ class Encoder:
 
     def iter_encode(
         self,
-        src: Union[bytes, "numpy.ndarray", "Dataset"],
+        src: "bytes | numpy.ndarray | Dataset",
         encoding_plugin: str = '',
         decoding_plugin: str = '',
         **kwargs: Any,
@@ -427,7 +427,7 @@ class Encoder:
 
         Returns
         -------
-        Dict[str, Union[int, str]]
+        Dict[str, int | str]
             A dict with the following keys, with values from the corresponding
             dataset elements:
 

@@ -26,7 +26,7 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    Optional, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, TYPE_CHECKING
+    Optional, TypeAlias, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, TYPE_CHECKING
 )
 from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping, Set
 import warnings
@@ -221,7 +221,7 @@ def _dict_equal(
 
 
 _DatasetValue = DataElement | RawDataElement
-_DatasetType = Union["Dataset", MutableMapping[BaseTag, _DatasetValue]]
+_DatasetType: TypeAlias = "Dataset | MutableMapping[BaseTag, _DatasetValue]"
 
 
 class Dataset:
@@ -666,7 +666,7 @@ class Dataset:
         else:
             raise AttributeError(name)
 
-    def __delitem__(self, key: slice | BaseTag | TagType) -> None:
+    def __delitem__(self, key: "slice | BaseTag | TagType") -> None:
         """Intercept requests to delete an attribute by key.
 
         Examples
@@ -923,8 +923,8 @@ class Dataset:
         pass  # pragma: no cover
 
     def __getitem__(
-        self, key: slice | TagType
-    ) -> Union["Dataset", DataElement]:
+        self, key: "slice | TagType"
+    ) -> "Dataset | DataElement":
         """Operator for ``Dataset[key]`` request.
 
         Any deferred data elements will be read in and an attempt will be made
@@ -1178,8 +1178,8 @@ class Dataset:
         pass  # pragma: no cover
 
     def get_item(
-        self, key: slice | TagType
-    ) -> Union["Dataset", DataElement, RawDataElement, None]:
+        self, key: "slice | TagType"
+    ) -> "Dataset | DataElement | RawDataElement | None":
         """Return the raw data element if possible.
 
         It will be raw if the user has never accessed the value, or set their
@@ -1341,7 +1341,7 @@ class Dataset:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
 
-    def pop(self, key: BaseTag | TagType, *args: Any) -> _DatasetValue:
+    def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
 
         Removes the element for `key` if it exists and returns it,
@@ -2111,7 +2111,7 @@ class Dataset:
 
     def save_as(
         self,
-        filename: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename: "str | os.PathLike[AnyStr] | BinaryIO",
         write_like_original: bool = True
     ) -> None:
         """Write the :class:`Dataset` to `filename`.
@@ -2253,7 +2253,7 @@ class Dataset:
         self.__dict__["file_meta"] = value
 
     def __setitem__(
-        self, key: slice | TagType, elem: _DatasetValue
+        self, key: "slice | TagType", elem: _DatasetValue
     ) -> None:
         """Operator for ``Dataset[key] = elem``.
 
@@ -2322,8 +2322,8 @@ class Dataset:
 
     def _slice_dataset(
         self,
-        start: TagType | None,
-        stop: TagType | None,
+        start: "TagType | None",
+        stop: "TagType | None",
         step: int | None
     ) -> list[BaseTag]:
         """Return the element tags in the Dataset that match the slice.
@@ -2965,7 +2965,7 @@ class FileMetaDataset(Dataset):
             raise ValueError(msg.format(non_group2))
 
     def __setitem__(
-        self, key: slice | TagType, value: _DatasetValue
+        self, key: "slice | TagType", value: _DatasetValue
     ) -> None:
         """Override parent class to only allow setting of group 2 elements.
 

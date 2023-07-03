@@ -837,10 +837,10 @@ def decode_element(
     # PN is special case as may have 3 components with different chr sets
     if elem.VR == VR.PN:
         if elem.VM == 1:
-            # elem.value: Union[PersonName, bytes]
+            # elem.value: PersonName |  bytes
             elem.value = cast(PersonName, elem.value).decode(encodings)
         else:
-            # elem.value: Iterable[Union[PersonName, bytes]]
+            # elem.value: Iterable[PersonName |  bytes]
             elem.value = [
                 cast(PersonName, vv).decode(encodings) for vv in elem.value
             ]

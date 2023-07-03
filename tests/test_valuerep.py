@@ -630,7 +630,7 @@ class TestDSfloat:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[float, str]
+        self, val: float | str
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):
@@ -801,7 +801,7 @@ class TestDSdecimal:
         ]
     )
     def test_enforce_valid_values_value(
-        self, val: Union[Decimal, str]
+        self, val: Decimal | str
     ):
         """Test that errors are raised when value is invalid."""
         with pytest.raises(ValueError):

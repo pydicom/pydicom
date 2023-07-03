@@ -251,7 +251,7 @@ class DataElement:
             The data element's tag as uppercase hex.
         vr : str
             The data element's value representation (VR).
-        value : str or List[Union[None, str, int, float, bytes, dict]]
+        value : str or List[None | str | int | float | bytes | dict]
             The data element's value(s).
         value_key : str or None
             The attribute name for `value`, should be one of:

@@ -185,7 +185,7 @@ class _CID_Dict:
 
         Parameters
         ----------
-        code: Union[pydicom.sr.coding.Code, pydicom.sr.coding.CodedConcept]
+        code: pydicom.sr.coding.Code | pydicom.sr.coding.CodedConcept
             coded concept
 
         Returns

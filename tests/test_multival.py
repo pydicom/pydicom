@@ -18,7 +18,7 @@ class TestMultiValue:
         """MultiValue: Multi-valued data elements can be created........"""
         multival = MultiValue(DS, ['11.1', '22.2', '33.3'])
         for val in multival:
-            assert isinstance(val, (DSfloat, DSdecimal))
+            assert isinstance(val, DSfloat | DSdecimal)
 
     def testEmptyElements(self):
         """MultiValue: Empty number string elements are not converted..."""

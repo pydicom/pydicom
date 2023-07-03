@@ -1473,7 +1473,7 @@ def reshape_pixel_array(ds: "Dataset", arr: "np.ndarray") -> "np.ndarray":
 
 def unpack_bits(
     src: bytes, as_array: bool = True
-) -> Union["np.ndarray", bytes]:
+) -> "np.ndarray | bytes":
     """Unpack the bit-packed data in `src`.
 
     Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay

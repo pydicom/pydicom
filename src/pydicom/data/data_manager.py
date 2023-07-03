@@ -286,7 +286,7 @@ def get_testdata_file(
     name: str,
     read: bool = False,
     download: bool = True,
-) -> Union[str, "Dataset", None]:
+) -> "str | Dataset | None":
     """Return an absolute path to the first matching dataset with filename
     `name`.
 
