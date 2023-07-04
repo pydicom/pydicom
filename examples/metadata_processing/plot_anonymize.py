@@ -10,7 +10,8 @@ optionally remove curves and private tags, and write the results in a new file.
 
 """
 
-# authors : Guillaume Lemaitre <g.lemaitre58@gmail.com>
+# authors : Darcy Mason
+#           Guillaume Lemaitre <g.lemaitre58@gmail.com>
 # license : MIT
 
 
@@ -25,11 +26,10 @@ print(__doc__)
 # Anonymize a single file
 ###############################################################################
 
-filename = get_testdata_file('MR_small.dcm')
+filename = get_testdata_file("MR_small.dcm")
 dataset = pydicom.dcmread(filename)
 
-data_elements = ['PatientID',
-                 'PatientBirthDate']
+data_elements = ["PatientID", "PatientBirthDate"]
 for de in data_elements:
     print(dataset.data_element(de))
 
@@ -66,25 +66,24 @@ dataset.remove_private_tags()
 # Data elements of type 3 (optional) can be easily deleted using ``del`` or
 # ``delattr``.
 
-if 'OtherPatientIDs' in dataset:
-    delattr(dataset, 'OtherPatientIDs')
+if "OtherPatientIDs" in dataset:
+    delattr(dataset, "OtherPatientIDs")
 
-if 'OtherPatientIDsSequence' in dataset:
+if "OtherPatientIDsSequence" in dataset:
     del dataset.OtherPatientIDsSequence
 
 ###############################################################################
 # For data elements of type 2, this is possible to blank it by assigning a
 # blank string.
 
-tag = 'PatientBirthDate'
+tag = "PatientBirthDate"
 if tag in dataset:
-    dataset.data_element(tag).value = '19000101'
+    dataset.data_element(tag).value = "19000101"
 
 ##############################################################################
 # Finally, this is possible to store the image
 
-data_elements = ['PatientID',
-                 'PatientBirthDate']
+data_elements = ["PatientID", "PatientBirthDate"]
 for de in data_elements:
     print(dataset.data_element(de))
 
