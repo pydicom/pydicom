@@ -152,14 +152,13 @@ class TestSettings:
         config.enforce_valid_values = False
 
     def test_default_for_reading_validation_mode(self):
-        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
-                             0, True, True)
+        raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
         with pytest.warns(UserWarning):
             DataElement_from_raw(raw)
 
     def test_reading_validation_mode_with_enforce_valid_values(
-            self, enforce_valid_values):
-        raw = RawDataElement(Tag(0x88880002), None, 4, b'unknown',
-                             0, True, True)
+        self, enforce_valid_values
+    ):
+        raw = RawDataElement(Tag(0x88880002), None, 4, b"unknown", 0, True, True)
         with pytest.raises(KeyError):
             DataElement_from_raw(raw)

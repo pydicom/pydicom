@@ -37,6 +37,7 @@ from pydicom.uid import ImplicitVRLittleEndian, ExplicitVRLittleEndian
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
@@ -65,9 +66,10 @@ EXPL_16_1_1F = get_testdata_file("MR_small.dcm")
 
 
 # Numpy unavailable and the numpy handler is available
-@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
+@pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
 class TestNoNumpy_NumpyHandler:
     """Tests for handling datasets without numpy and the handler."""
+
     def setup_method(self):
         """Setup the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
@@ -97,7 +99,7 @@ class TestNoNumpy_NumpyHandler:
             get_overlay_array(ds, 0x6000)
 
 
-@pytest.mark.skipif(HAVE_NP, reason='Numpy is available')
+@pytest.mark.skipif(HAVE_NP, reason="Numpy is available")
 def test_reshape_pixel_array_raises():
     """Test that reshape_overlay_array raises exception without numpy."""
     with pytest.raises(ImportError, match="Numpy is required to reshape"):
@@ -110,14 +112,15 @@ IMPL = ImplicitVRLittleEndian
 REFERENCE_DATA_LITTLE = [
     # fpath, (syntax, bits, nr samples, pixel repr, nr frames, shape, dtype,
     #   group)
-    (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (484, 484), 'uint8', 0x6000)),
+    (EXPL_1_1_1F, (EXPL, 1, 1, 0, 1, (484, 484), "uint8", 0x6000)),
     # (EXPL_1_1_3F, (EXPL, 1, 1, 0, 3, (3, 512, 512), 'uint8', 0x6000)),
 ]
 
 
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_NumpyHandler:
     """Tests for handling Overlay Data with the handler."""
+
     def setup_method(self):
         """Setup the test datasets and the environment."""
         self.original_handlers = pydicom.config.overlay_data_handlers
@@ -133,7 +136,7 @@ class TestNumpy_NumpyHandler:
         assert NP_HANDLER is not None
 
     # Little endian datasets
-    @pytest.mark.parametrize('fpath, data', REFERENCE_DATA_LITTLE)
+    @pytest.mark.parametrize("fpath, data", REFERENCE_DATA_LITTLE)
     def test_properties(self, fpath, data):
         """Test dataset and overlay array properties are as expected."""
         ds = dcmread(fpath)
@@ -152,7 +155,7 @@ class TestNumpy_NumpyHandler:
         size = rows * columns * nr_frames / 8 * data[2]
         assert len(ds[group, 0x3000].value) == size + size % 2
         if size % 2:
-            assert ds[group, 0x3000].value[-1] == b'\x00'[0]
+            assert ds[group, 0x3000].value[-1] == b"\x00"[0]
 
     def test_little_1bit_1sample_1frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 1 frame."""
@@ -164,7 +167,7 @@ class TestNumpy_NumpyHandler:
         assert arr.min() == 0
         assert 29 == sum(arr[422, 393:422])
 
-    @pytest.mark.skip(reason='No dataset available')
+    @pytest.mark.skip(reason="No dataset available")
     def test_little_1bit_1sample_3frame(self):
         """Test pixel_array for little 1-bit, 1 sample/pixel, 3 frame."""
         ds = dcmread(EXPL_1_1_3F)
@@ -203,15 +206,16 @@ class TestNumpy_NumpyHandler:
 
 
 # Tests for numpy_handler module with Numpy available
-@pytest.mark.skipif(not HAVE_NP, reason='Numpy is not available')
+@pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_GetOverlayArray:
     """Tests for numpy_handler.get_overlay_array with numpy."""
+
     def test_no_overlay_data_raises(self):
         """Test get_overlay_array raises if dataset has no OverlayData."""
         ds = dcmread(EXPL_1_1_1F)
         del ds[0x6000, 0x3000]
         assert (0x6000, 0x3000) not in ds
-        with pytest.raises(AttributeError, match=r' dataset: OverlayData'):
+        with pytest.raises(AttributeError, match=r" dataset: OverlayData"):
             get_overlay_array(ds, 0x6000)
 
     def test_bad_length_raises(self):
@@ -245,7 +249,7 @@ class TestNumpy_GetOverlayArray:
         # Edit shape
         ds[0x6000, 0x0010].value = 15  # OverlayRows
         ds[0x6000, 0x0011].value = 14  # OverlayColumns
-        overlay_data = ds[0x6000, 0x3000].value[:27] + b'\x00\x00\x00'
+        overlay_data = ds[0x6000, 0x3000].value[:27] + b"\x00\x00\x00"
         ds[0x6000, 0x3000].value = overlay_data
         msg = (
             r"overlay data in the dataset \(30 bytes\) indicates it contains "
@@ -257,6 +261,7 @@ class TestNumpy_GetOverlayArray:
     def test_old_import(self):
         """Test that can import using the old path."""
         from pydicom.overlay_data_handlers import numpy_handler as np_old
+
         ds = dcmread(EXPL_1_1_1F)
         arr = np_old.get_overlay_array(ds, 0x6000)
         assert 0 == arr[0, 0]
@@ -264,60 +269,92 @@ class TestNumpy_GetOverlayArray:
 
 if HAVE_NP:
     RESHAPE_ARRAYS = {
-        'reference': np.asarray([
-            [  # Frame 1
-                [[1,  9, 17],
-                 [2, 10, 18],
-                 [3, 11, 19],
-                 [4, 12, 20],
-                 [5, 13, 21]],
-                [[2, 10, 18],
-                 [3, 11, 19],
-                 [4, 12, 20],
-                 [5, 13, 21],
-                 [6, 14, 22]],
-                [[3, 11, 19],
-                 [4, 12, 20],
-                 [5, 13, 21],
-                 [6, 14, 22],
-                 [7, 15, 23]],
-                [[4, 12, 20],
-                 [5, 13, 21],
-                 [6, 14, 22],
-                 [7, 15, 23],
-                 [8, 16, 24]],
-            ],
-            [  # Frame 2
-                [[25, 33, 41],
-                 [26, 34, 42],
-                 [27, 35, 43],
-                 [28, 36, 44],
-                 [29, 37, 45]],
-                [[26, 34, 42],
-                 [27, 35, 43],
-                 [28, 36, 44],
-                 [29, 37, 45],
-                 [30, 38, 46]],
-                [[27, 35, 43],
-                 [28, 36, 44],
-                 [29, 37, 45],
-                 [30, 38, 46],
-                 [31, 39, 47]],
-                [[28, 36, 44],
-                 [29, 37, 45],
-                 [30, 38, 46],
-                 [31, 39, 47],
-                 [32, 40, 48]],
+        "reference": np.asarray(
+            [
+                [  # Frame 1
+                    [[1, 9, 17], [2, 10, 18], [3, 11, 19], [4, 12, 20], [5, 13, 21]],
+                    [[2, 10, 18], [3, 11, 19], [4, 12, 20], [5, 13, 21], [6, 14, 22]],
+                    [[3, 11, 19], [4, 12, 20], [5, 13, 21], [6, 14, 22], [7, 15, 23]],
+                    [[4, 12, 20], [5, 13, 21], [6, 14, 22], [7, 15, 23], [8, 16, 24]],
+                ],
+                [  # Frame 2
+                    [
+                        [25, 33, 41],
+                        [26, 34, 42],
+                        [27, 35, 43],
+                        [28, 36, 44],
+                        [29, 37, 45],
+                    ],
+                    [
+                        [26, 34, 42],
+                        [27, 35, 43],
+                        [28, 36, 44],
+                        [29, 37, 45],
+                        [30, 38, 46],
+                    ],
+                    [
+                        [27, 35, 43],
+                        [28, 36, 44],
+                        [29, 37, 45],
+                        [30, 38, 46],
+                        [31, 39, 47],
+                    ],
+                    [
+                        [28, 36, 44],
+                        [29, 37, 45],
+                        [30, 38, 46],
+                        [31, 39, 47],
+                        [32, 40, 48],
+                    ],
+                ],
             ]
-        ]),
-        '1frame_1sample': np.asarray(
+        ),
+        "1frame_1sample": np.asarray(
             [1, 2, 3, 4, 5, 2, 3, 4, 5, 6, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8]
         ),
-        '2frame_1sample': np.asarray(
-            [1,   2,  3,  4,  5,  2,  3,  4,  5,  6,  # Frame 1
-             3,   4,  5,  6,  7,  4,  5,  6,  7,  8,
-             25, 26, 27, 28, 29, 26, 27, 28, 29, 30,  # Frame 2
-             27, 28, 29, 30, 31, 28, 29, 30, 31, 32]
+        "2frame_1sample": np.asarray(
+            [
+                1,
+                2,
+                3,
+                4,
+                5,
+                2,
+                3,
+                4,
+                5,
+                6,  # Frame 1
+                3,
+                4,
+                5,
+                6,
+                7,
+                4,
+                5,
+                6,
+                7,
+                8,
+                25,
+                26,
+                27,
+                28,
+                29,
+                26,
+                27,
+                28,
+                29,
+                30,  # Frame 2
+                27,
+                28,
+                29,
+                30,
+                31,
+                28,
+                29,
+                30,
+                31,
+                32,
+            ]
         ),
     }
 
@@ -325,16 +362,17 @@ if HAVE_NP:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_ReshapeOverlayArray:
     """Tests for numpy_handler.reshape_overlay_array."""
+
     def setup_method(self):
         """Setup the test dataset."""
         self.elem = {
-            'OverlayRows': 4,
-            'OverlayColumns': 5,
+            "OverlayRows": 4,
+            "OverlayColumns": 5,
         }
 
         # Expected output ref_#frames_#samples
-        self.ref_1_1 = RESHAPE_ARRAYS['reference'][0, :, :, 0]
-        self.ref_2_1 = RESHAPE_ARRAYS['reference'][:, :, :, 0]
+        self.ref_1_1 = RESHAPE_ARRAYS["reference"][0, :, :, 0]
+        self.ref_2_1 = RESHAPE_ARRAYS["reference"][:, :, :, 0]
 
     def test_reference_1frame_1sample(self):
         """Test the 1 frame 1 sample/pixel reference array is as expected."""
@@ -343,11 +381,8 @@ class TestNumpy_ReshapeOverlayArray:
         assert np.array_equal(
             self.ref_1_1,
             np.asarray(
-                [[1, 2, 3, 4, 5],
-                 [2, 3, 4, 5, 6],
-                 [3, 4, 5, 6, 7],
-                 [4, 5, 6, 7, 8]]
-            )
+                [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8]]
+            ),
         )
 
     def test_reference_2frame_1sample(self):
@@ -359,47 +394,42 @@ class TestNumpy_ReshapeOverlayArray:
         assert np.array_equal(
             self.ref_2_1[0, :, :],
             np.asarray(
-                [[1, 2, 3, 4, 5],
-                 [2, 3, 4, 5, 6],
-                 [3, 4, 5, 6, 7],
-                 [4, 5, 6, 7, 8]]
-            )
+                [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 4, 5, 6, 7], [4, 5, 6, 7, 8]]
+            ),
         )
         # Frame 2
         assert np.array_equal(
             self.ref_2_1[1, :, :],
             np.asarray(
-                [[25, 26, 27, 28, 29],
-                 [26, 27, 28, 29, 30],
-                 [27, 28, 29, 30, 31],
-                 [28, 29, 30, 31, 32]]
-            )
+                [
+                    [25, 26, 27, 28, 29],
+                    [26, 27, 28, 29, 30],
+                    [27, 28, 29, 30, 31],
+                    [28, 29, 30, 31, 32],
+                ]
+            ),
         )
 
     def test_1frame(self):
         """Test reshaping 1 frame, 1 sample/pixel."""
-        self.elem['NumberOfFramesInOverlay'] = 1
-        arr = reshape_overlay_array(
-            self.elem, RESHAPE_ARRAYS['1frame_1sample']
-        )
+        self.elem["NumberOfFramesInOverlay"] = 1
+        arr = reshape_overlay_array(self.elem, RESHAPE_ARRAYS["1frame_1sample"])
         assert (4, 5) == arr.shape
         assert np.array_equal(arr, self.ref_1_1)
 
     def test_2frame_1sample(self):
         """Test reshaping 2 frame, 1 sample/pixel."""
-        self.elem['NumberOfFramesInOverlay'] = 2
-        arr = reshape_overlay_array(
-            self.elem, RESHAPE_ARRAYS['2frame_1sample']
-        )
+        self.elem["NumberOfFramesInOverlay"] = 2
+        arr = reshape_overlay_array(self.elem, RESHAPE_ARRAYS["2frame_1sample"])
         assert (2, 4, 5) == arr.shape
         assert np.array_equal(arr, self.ref_2_1)
 
     def test_invalid_nr_frames_raises(self):
         """Test an invalid Number of Frames value raises exception."""
-        self.elem['NumberOfFramesInOverlay'] = 0
+        self.elem["NumberOfFramesInOverlay"] = 0
         # Need to escape brackets
         with pytest.raises(ValueError, match=r"value of 0 for \(60xx,0015\)"):
-            reshape_overlay_array(self.elem, RESHAPE_ARRAYS['1frame_1sample'])
+            reshape_overlay_array(self.elem, RESHAPE_ARRAYS["1frame_1sample"])
 
 
 REFERENCE_LENGTH = [
@@ -430,26 +460,27 @@ REFERENCE_LENGTH = [
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
 class TestNumpy_GetExpectedLength:
     """Tests for numpy_handler.get_expected_length."""
-    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+
+    @pytest.mark.parametrize("shape, bits, length", REFERENCE_LENGTH)
     def test_length_in_bytes(self, shape, bits, length):
         """Test get_expected_length(ds, unit='bytes')."""
         elem = {
-            'OverlayRows': shape[1],
-            'OverlayColumns': shape[2],
-            'OverlayBitsAllocated': bits,
-            'NumberOfFramesInOverlay': shape[0],
+            "OverlayRows": shape[1],
+            "OverlayColumns": shape[2],
+            "OverlayBitsAllocated": bits,
+            "NumberOfFramesInOverlay": shape[0],
         }
 
-        assert length[0] == get_expected_length(elem, unit='bytes')
+        assert length[0] == get_expected_length(elem, unit="bytes")
 
-    @pytest.mark.parametrize('shape, bits, length', REFERENCE_LENGTH)
+    @pytest.mark.parametrize("shape, bits, length", REFERENCE_LENGTH)
     def test_length_in_pixels(self, shape, bits, length):
         """Test get_expected_length(ds, unit='pixels')."""
         elem = {
-            'OverlayRows': shape[1],
-            'OverlayColumns': shape[2],
-            'OverlayBitsAllocated': bits,
-            'NumberOfFramesInOverlay': shape[0],
+            "OverlayRows": shape[1],
+            "OverlayColumns": shape[2],
+            "OverlayBitsAllocated": bits,
+            "NumberOfFramesInOverlay": shape[0],
         }
 
-        assert length[1] == get_expected_length(elem, unit='pixels')
+        assert length[1] == get_expected_length(elem, unit="pixels")

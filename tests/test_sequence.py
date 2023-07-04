@@ -18,9 +18,11 @@ class TestSequence:
 
     def testValidInitialization(self):
         """Sequence: Ensure valid creation of Sequences using Dataset inputs"""
-        inputs = {'PatientPosition': 'HFS',
-                  'PatientSetupNumber': '1',
-                  'SetupTechniqueDescription': ''}
+        inputs = {
+            "PatientPosition": "HFS",
+            "PatientSetupNumber": "1",
+            "SetupTechniqueDescription": "",
+        }
         patientSetups = Dataset()
         patientSetups.update(inputs)
 
@@ -42,7 +44,11 @@ class TestSequence:
 
     def testInvalidAssignment(self):
         """Sequence: validate exception for invalid assignment"""
-        seq = Sequence([Dataset(), ])
+        seq = Sequence(
+            [
+                Dataset(),
+            ]
+        )
         # Attempt to assign an integer to the first element
         with pytest.raises(TypeError):
             seq.__setitem__(0, 1)
@@ -50,10 +56,14 @@ class TestSequence:
     def testValidAssignment(self):
         """Sequence: ensure ability to assign a Dataset to a Sequence item"""
         ds = Dataset()
-        ds.add_new((1, 1), 'IS', 1)
+        ds.add_new((1, 1), "IS", 1)
 
         # Create a single element Sequence first
-        seq = Sequence([Dataset(), ])
+        seq = Sequence(
+            [
+                Dataset(),
+            ]
+        )
         seq[0] = ds
 
         assert ds == seq[0]
@@ -62,8 +72,8 @@ class TestSequence:
         """Test string output of the sequence"""
         ds = Dataset()
         ds.BeamSequence = [Dataset()]
-        ds.BeamSequence[0].PatientName = 'TEST'
-        ds.BeamSequence[0].PatientID = '12345'
+        ds.BeamSequence[0].PatientName = "TEST"
+        ds.BeamSequence[0].PatientID = "12345"
 
         out = str(ds.BeamSequence)
         assert "[(0010, 0010) Patient's Name" in out
@@ -178,6 +188,7 @@ class TestSequence:
 
     def test_deepcopy_sequence_subclass(self):
         """Regression test for #1813."""
+
         class MySequenceSubclass(Sequence):
             pass
 

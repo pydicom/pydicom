@@ -16,21 +16,21 @@ python_version = sys.version_info
 class TestMultiValue:
     def testMultiDS(self):
         """MultiValue: Multi-valued data elements can be created........"""
-        multival = MultiValue(DS, ['11.1', '22.2', '33.3'])
+        multival = MultiValue(DS, ["11.1", "22.2", "33.3"])
         for val in multival:
             assert isinstance(val, DSfloat | DSdecimal)
 
     def testEmptyElements(self):
         """MultiValue: Empty number string elements are not converted..."""
-        multival = MultiValue(DSfloat, ['1.0', ''])
+        multival = MultiValue(DSfloat, ["1.0", ""])
         assert 1.0 == multival[0]
-        assert '' == multival[1]
-        multival = MultiValue(IS, ['1', ''])
+        assert "" == multival[1]
+        multival = MultiValue(IS, ["1", ""])
         assert 1 == multival[0]
-        assert '' == multival[1]
-        multival = MultiValue(DSdecimal, ['1', ''])
+        assert "" == multival[1]
+        multival = MultiValue(DSdecimal, ["1", ""])
         assert 1 == multival[0]
-        assert '' == multival[1]
+        assert "" == multival[1]
 
         multival = MultiValue(IS, [])
         assert not multival
@@ -39,21 +39,20 @@ class TestMultiValue:
     def testLimits(self):
         """MultiValue: Raise error if any item outside DICOM limits...."""
         with pytest.raises(OverflowError):
-            MultiValue(IS, [1, -2 ** 31 - 1],
-                       validation_mode=config.RAISE)
+            MultiValue(IS, [1, -(2**31) - 1], validation_mode=config.RAISE)
         # Overflow error not raised for IS out of DICOM valid range
 
     def testAppend(self):
         """MultiValue: Append of item converts it to required type..."""
         multival = MultiValue(IS, [1, 5, 10])
-        multival.append('5')
+        multival.append("5")
         assert isinstance(multival[-1], IS)
         assert 5 == multival[-1]
 
     def testSetIndex(self):
         """MultiValue: Setting list item converts it to required type"""
         multival = MultiValue(IS, [1, 5, 10])
-        multival[1] = '7'
+        multival[1] = "7"
         assert isinstance(multival[1], IS)
         assert 7 == multival[1]
 
@@ -68,7 +67,7 @@ class TestMultiValue:
     def testExtend(self):
         """MultiValue: Extending a list converts all to required type"""
         multival = MultiValue(IS, [1, 5, 10])
-        multival.extend(['7', 42])
+        multival.extend(["7", 42])
         assert isinstance(multival[-2], IS)
         assert isinstance(multival[-1], IS)
         assert 7 == multival[-2]
@@ -107,9 +106,9 @@ class TestMultiValue:
         multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
         assert multival == multival2
         assert not (multival == multival3)
-        multival = MultiValue(str, ['a', 'b', 'c'])
-        multival2 = MultiValue(str, ['a', 'b', 'c'])
-        multival3 = MultiValue(str, ['b', 'c', 'a'])
+        multival = MultiValue(str, ["a", "b", "c"])
+        multival2 = MultiValue(str, ["a", "b", "c"])
+        multival3 = MultiValue(str, ["b", "c", "a"])
         assert multival == multival2
         assert not (multival == multival3)
 
@@ -120,26 +119,26 @@ class TestMultiValue:
         multival3 = MultiValue(DS, [33, 12, 5, 7, 1])
         assert not multival != multival2
         assert multival != multival3
-        multival = MultiValue(str, ['a', 'b', 'c'])
-        multival2 = MultiValue(str, ['a', 'b', 'c'])
-        multival3 = MultiValue(str, ['b', 'c', 'a'])
+        multival = MultiValue(str, ["a", "b", "c"])
+        multival2 = MultiValue(str, ["a", "b", "c"])
+        multival3 = MultiValue(str, ["b", "c", "a"])
         assert not (multival != multival2)
         assert multival != multival3
 
     def test_str_rep(self):
         """MultiValue: test print output"""
         multival = MultiValue(IS, [])
-        assert '' == str(multival)
-        multival.extend(['1', 2, 3, 4])
+        assert "" == str(multival)
+        multival.extend(["1", 2, 3, 4])
         assert "[1, 2, 3, 4]" == str(multival)
         multival = MultiValue(str, [1, 2, 3])
         assert "['1', '2', '3']" == str(multival)
         multival = MultiValue(int, [1, 2, 3])
-        assert '[1, 2, 3]' == str(multival)
+        assert "[1, 2, 3]" == str(multival)
         multival = MultiValue(float, [1.1, 2.2, 3.3])
-        assert '[1.1, 2.2, 3.3]' == str(multival)
+        assert "[1.1, 2.2, 3.3]" == str(multival)
         mv = MultiValue(IS, [])
-        mv._list = ['1234', b'\x01\x00']
+        mv._list = ["1234", b"\x01\x00"]
         assert "['1234', b'\\x01\\x00']" == str(mv)
 
     def test_setitem(self):

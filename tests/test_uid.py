@@ -20,7 +20,8 @@ def test_jpeglossless_warning():
     """Test warning when importing JPEGLossless for Python 3.7+."""
     if sys.version_info[:2] < (3, 7):
         from pydicom.uid import JPEGLossless
-        assert '1.2.840.10008.1.2.4.70' == JPEGLossless
+
+        assert "1.2.840.10008.1.2.4.70" == JPEGLossless
     else:
         msg = (
             r"In pydicom v3.0 the UID for 'JPEGLossless' will change "
@@ -29,7 +30,8 @@ def test_jpeglossless_warning():
         )
         with pytest.warns(UserWarning, match=msg):
             from pydicom.uid import JPEGLossless
-            assert '1.2.840.10008.1.2.4.70' == JPEGLossless
+
+            assert "1.2.840.10008.1.2.4.70" == JPEGLossless
 
 
 def test_deprecation_warnings():
@@ -39,7 +41,8 @@ def test_deprecation_warnings():
         "JPEGExtended": ("1.2.840.10008.1.2.4.51", "JPEGExtended12Bit"),
         "JPEGLSLossy": ("1.2.840.10008.1.2.4.81", "JPEGLSNearLossless"),
         "JPEG2000MultiComponentLossless": (
-            "1.2.840.10008.1.2.4.92", "JPEG2000MCLossless"
+            "1.2.840.10008.1.2.4.92",
+            "JPEG2000MCLossless",
         ),
         "JPEG2000MultiComponent": ("1.2.840.10008.1.2.4.93", "JPEG2000MC"),
     }
@@ -70,31 +73,35 @@ class TestGenerateUID:
 
         # Test standard UID generation with no prefix
         uid = generate_uid(None)
-        assert uid[:5] == '2.25.'
+        assert uid[:5] == "2.25."
         assert len(uid) <= 64
 
         # Test invalid UID prefixes
-        for invalid_prefix in (('1' * 63) + '.',
-                               '',
-                               '.',
-                               '1',
-                               '1.2',
-                               '1.2..3.',
-                               '1.a.2.',
-                               '1.01.1.'):
+        for invalid_prefix in (
+            ("1" * 63) + ".",
+            "",
+            ".",
+            "1",
+            "1.2",
+            "1.2..3.",
+            "1.a.2.",
+            "1.01.1.",
+        ):
             with pytest.raises(ValueError):
                 generate_uid(prefix=invalid_prefix)
 
         # Test some valid prefixes and make sure they survive
-        for valid_prefix in ('0.',
-                             '1.',
-                             '1.23.',
-                             '1.0.23.',
-                             ('1' * 62) + '.',
-                             '1.2.3.444444.'):
+        for valid_prefix in (
+            "0.",
+            "1.",
+            "1.23.",
+            "1.0.23.",
+            ("1" * 62) + ".",
+            "1.2.3.444444.",
+        ):
             uid = generate_uid(prefix=valid_prefix)
 
-            assert uid[:len(valid_prefix)] == valid_prefix
+            assert uid[: len(valid_prefix)] == valid_prefix
             assert len(uid) <= 64
 
     def test_entropy_src(self):
@@ -106,8 +113,8 @@ class TestGenerateUID:
     def test_entropy_src_custom(self):
         """Test UID generator with custom entropy sources"""
         # Should be identical
-        uid = generate_uid(entropy_srcs=['lorem', 'ipsum'])
-        rf = '1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463'
+        uid = generate_uid(entropy_srcs=["lorem", "ipsum"])
+        rf = "1.2.826.0.1.3680043.8.498.87507166259346337659265156363895084463"
         assert uid == rf
         assert len(uid) == 64
 
@@ -115,7 +122,7 @@ class TestGenerateUID:
         """Test generate_uid(None)."""
         uid = generate_uid(prefix=None)
         # Check prefix
-        assert '2.25.' == uid[:5]
+        assert "2.25." == uid[:5]
         # Check UUID suffix
         as_uuid = uuid.UUID(int=int(uid[5:]))
         assert isinstance(as_uuid, uuid.UUID)
@@ -132,34 +139,35 @@ class TestGenerateUID:
 
 class TestUID:
     """Test DICOM UIDs"""
+
     def setup_method(self):
         """Set default UID"""
-        self.uid = UID('1.2.840.10008.1.2')
+        self.uid = UID("1.2.840.10008.1.2")
 
     def test_equality(self):
         """Test that UID.__eq__ works."""
-        assert self.uid == UID('1.2.840.10008.1.2')
-        assert self.uid == '1.2.840.10008.1.2'
-        assert '1.2.840.10008.1.2' == self.uid
-        assert not self.uid == 'Implicit VR Little Endian'
-        assert not 'Implicit VR Little Endian' == self.uid
-        assert not self.uid == UID('1.2.840.10008.1.2.1')
-        assert not self.uid == '1.2.840.10008.1.2.1'
-        assert not '1.2.840.10008.1.2.1' == self.uid
+        assert self.uid == UID("1.2.840.10008.1.2")
+        assert self.uid == "1.2.840.10008.1.2"
+        assert "1.2.840.10008.1.2" == self.uid
+        assert not self.uid == "Implicit VR Little Endian"
+        assert not "Implicit VR Little Endian" == self.uid
+        assert not self.uid == UID("1.2.840.10008.1.2.1")
+        assert not self.uid == "1.2.840.10008.1.2.1"
+        assert not "1.2.840.10008.1.2.1" == self.uid
         # Issue 96
         assert not self.uid == 3
         assert self.uid is not None
 
     def test_inequality(self):
         """Test that UID.__ne__ works."""
-        assert not self.uid != UID('1.2.840.10008.1.2')
-        assert not self.uid != '1.2.840.10008.1.2'
-        assert not '1.2.840.10008.1.2' != self.uid
-        assert self.uid != 'Implicit VR Little Endian'
-        assert 'Implicit VR Little Endian' != self.uid
-        assert self.uid != UID('1.2.840.10008.1.2.1')
-        assert self.uid != '1.2.840.10008.1.2.1'
-        assert '1.2.840.10008.1.2.1' != self.uid
+        assert not self.uid != UID("1.2.840.10008.1.2")
+        assert not self.uid != "1.2.840.10008.1.2"
+        assert not "1.2.840.10008.1.2" != self.uid
+        assert self.uid != "Implicit VR Little Endian"
+        assert "Implicit VR Little Endian" != self.uid
+        assert self.uid != UID("1.2.840.10008.1.2.1")
+        assert self.uid != "1.2.840.10008.1.2.1"
+        assert "1.2.840.10008.1.2.1" != self.uid
         # Issue 96
         assert self.uid != 3
 
@@ -169,7 +177,7 @@ class TestUID:
 
     def test_str(self):
         """Test that UID.__str__ works."""
-        assert self.uid.__str__() == '1.2.840.10008.1.2'
+        assert self.uid.__str__() == "1.2.840.10008.1.2"
 
     def test_is_implicit_vr(self):
         """Test that UID.is_implicit_VR works."""
@@ -178,14 +186,14 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert UID('1.2.840.10008.1.2').is_implicit_VR
-        assert not UID('1.2.840.10008.1.2.1').is_implicit_VR
-        assert not UID('1.2.840.10008.1.2.1.99').is_implicit_VR
-        assert not UID('1.2.840.10008.1.2.2').is_implicit_VR
-        assert not UID('1.2.840.10008.1.2.4.50').is_implicit_VR
+        assert UID("1.2.840.10008.1.2").is_implicit_VR
+        assert not UID("1.2.840.10008.1.2.1").is_implicit_VR
+        assert not UID("1.2.840.10008.1.2.1.99").is_implicit_VR
+        assert not UID("1.2.840.10008.1.2.2").is_implicit_VR
+        assert not UID("1.2.840.10008.1.2.4.50").is_implicit_VR
 
         with pytest.raises(ValueError):
-            UID('1.2.840.10008.5.1.4.1.1.2').is_implicit_VR
+            UID("1.2.840.10008.5.1.4.1.1.2").is_implicit_VR
 
     def test_is_little_endian(self):
         """Test that UID.is_little_endian works."""
@@ -194,14 +202,14 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert UID('1.2.840.10008.1.2').is_little_endian
-        assert UID('1.2.840.10008.1.2.1').is_little_endian
-        assert UID('1.2.840.10008.1.2.1.99').is_little_endian
-        assert not UID('1.2.840.10008.1.2.2').is_little_endian
-        assert UID('1.2.840.10008.1.2.4.50').is_little_endian
+        assert UID("1.2.840.10008.1.2").is_little_endian
+        assert UID("1.2.840.10008.1.2.1").is_little_endian
+        assert UID("1.2.840.10008.1.2.1.99").is_little_endian
+        assert not UID("1.2.840.10008.1.2.2").is_little_endian
+        assert UID("1.2.840.10008.1.2.4.50").is_little_endian
 
         with pytest.raises(ValueError):
-            UID('1.2.840.10008.5.1.4.1.1.2').is_little_endian
+            UID("1.2.840.10008.5.1.4.1.1.2").is_little_endian
 
     def test_is_deflated(self):
         """Test that UID.is_deflated works."""
@@ -210,14 +218,14 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert not UID('1.2.840.10008.1.2').is_deflated
-        assert not UID('1.2.840.10008.1.2.1').is_deflated
-        assert UID('1.2.840.10008.1.2.1.99').is_deflated
-        assert not UID('1.2.840.10008.1.2.2').is_deflated
-        assert not UID('1.2.840.10008.1.2.4.50').is_deflated
+        assert not UID("1.2.840.10008.1.2").is_deflated
+        assert not UID("1.2.840.10008.1.2.1").is_deflated
+        assert UID("1.2.840.10008.1.2.1.99").is_deflated
+        assert not UID("1.2.840.10008.1.2.2").is_deflated
+        assert not UID("1.2.840.10008.1.2.4.50").is_deflated
 
         with pytest.raises(ValueError):
-            UID('1.2.840.10008.5.1.4.1.1.2').is_deflated
+            UID("1.2.840.10008.5.1.4.1.1.2").is_deflated
 
     def test_is_transfer_syntax(self):
         """Test that UID.is_transfer_syntax works."""
@@ -226,13 +234,13 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert UID('1.2.840.10008.1.2').is_transfer_syntax
-        assert UID('1.2.840.10008.1.2.1').is_transfer_syntax
-        assert UID('1.2.840.10008.1.2.1.99').is_transfer_syntax
-        assert UID('1.2.840.10008.1.2.2').is_transfer_syntax
-        assert UID('1.2.840.10008.1.2.4.50').is_transfer_syntax
+        assert UID("1.2.840.10008.1.2").is_transfer_syntax
+        assert UID("1.2.840.10008.1.2.1").is_transfer_syntax
+        assert UID("1.2.840.10008.1.2.1.99").is_transfer_syntax
+        assert UID("1.2.840.10008.1.2.2").is_transfer_syntax
+        assert UID("1.2.840.10008.1.2.4.50").is_transfer_syntax
 
-        assert not UID('1.2.840.10008.5.1.4.1.1.2').is_transfer_syntax
+        assert not UID("1.2.840.10008.5.1.4.1.1.2").is_transfer_syntax
 
     def test_is_compressed(self):
         """Test that UID.is_compressed works."""
@@ -241,14 +249,14 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert not UID('1.2.840.10008.1.2').is_compressed
-        assert not UID('1.2.840.10008.1.2.1').is_compressed
-        assert not UID('1.2.840.10008.1.2.1.99').is_compressed
-        assert not UID('1.2.840.10008.1.2.2').is_compressed
-        assert UID('1.2.840.10008.1.2.4.50').is_compressed
+        assert not UID("1.2.840.10008.1.2").is_compressed
+        assert not UID("1.2.840.10008.1.2.1").is_compressed
+        assert not UID("1.2.840.10008.1.2.1.99").is_compressed
+        assert not UID("1.2.840.10008.1.2.2").is_compressed
+        assert UID("1.2.840.10008.1.2.4.50").is_compressed
 
         with pytest.raises(ValueError):
-            UID('1.2.840.10008.5.1.4.1.1.2').is_compressed
+            UID("1.2.840.10008.5.1.4.1.1.2").is_compressed
 
     def test_is_encapsulated(self):
         """Test that UID.is_encapsulated works."""
@@ -257,23 +265,23 @@ class TestUID:
         # '1.2.840.10008.1.2.1.99' Deflated Explicit VR Little Endian
         # '1.2.840.10008.1.2.2' Explicit VR Big Endian
         # '1.2.840.10008.1.2.4.50'JPEG Baseline (Process 1)
-        assert not UID('1.2.840.10008.1.2').is_encapsulated
-        assert not UID('1.2.840.10008.1.2.1').is_encapsulated
-        assert not UID('1.2.840.10008.1.2.1.99').is_encapsulated
-        assert not UID('1.2.840.10008.1.2.2').is_encapsulated
-        assert UID('1.2.840.10008.1.2.4.50').is_encapsulated
+        assert not UID("1.2.840.10008.1.2").is_encapsulated
+        assert not UID("1.2.840.10008.1.2.1").is_encapsulated
+        assert not UID("1.2.840.10008.1.2.1.99").is_encapsulated
+        assert not UID("1.2.840.10008.1.2.2").is_encapsulated
+        assert UID("1.2.840.10008.1.2.4.50").is_encapsulated
 
         with pytest.raises(ValueError):
-            UID('1.2.840.10008.5.1.4.1.1.2').is_encapsulated
+            UID("1.2.840.10008.5.1.4.1.1.2").is_encapsulated
 
     def test_name(self):
         """Test that UID.name works."""
-        assert self.uid.name == 'Implicit VR Little Endian'
-        assert UID('1.2.840.10008.5.1.4.1.1.2').name == 'CT Image Storage'
+        assert self.uid.name == "Implicit VR Little Endian"
+        assert UID("1.2.840.10008.5.1.4.1.1.2").name == "CT Image Storage"
 
     def test_name_with_equal_hash(self):
-        """Test that UID name works for UID with same hash as predefined UID.
-        """
+        """Test that UID name works for UID with same hash as predefined UID."""
+
         class MockedUID(UID):
             # Force the UID to return the same hash as one of the
             # uid dictionary entries (any will work).
@@ -283,46 +291,43 @@ class TestUID:
             def __hash__(self):
                 return hash(JPEGLSNearLossless)
 
-        uid = MockedUID('1.2.3')
-        assert uid.name == '1.2.3'
+        uid = MockedUID("1.2.3")
+        assert uid.name == "1.2.3"
 
     def test_type(self):
         """Test that UID.type works."""
-        assert self.uid.type == 'Transfer Syntax'
-        assert UID('1.2.840.10008.5.1.4.1.1.2').type == 'SOP Class'
+        assert self.uid.type == "Transfer Syntax"
+        assert UID("1.2.840.10008.5.1.4.1.1.2").type == "SOP Class"
 
     def test_info(self):
         """Test that UID.info works."""
-        assert self.uid.info == 'Default Transfer Syntax for DICOM'
-        assert UID('1.2.840.10008.5.1.4.1.1.2').info == ''
+        assert self.uid.info == "Default Transfer Syntax for DICOM"
+        assert UID("1.2.840.10008.5.1.4.1.1.2").info == ""
 
     def test_is_retired(self):
         """Test that UID.is_retired works."""
         assert not self.uid.is_retired
-        assert UID('1.2.840.10008.1.2.2').is_retired
+        assert UID("1.2.840.10008.1.2.2").is_retired
 
     def test_is_valid(self, disable_value_validation):
         """Test that UID.is_valid works."""
-        for invalid_uid in ('1' * 65,
-                            '1.' + ('2' * 63),
-                            '',
-                            '.',
-                            '1.',
-                            '1.01',
-                            '1.a.2'):
+        for invalid_uid in (
+            "1" * 65,
+            "1." + ("2" * 63),
+            "",
+            ".",
+            "1.",
+            "1.01",
+            "1.a.2",
+        ):
             assert not UID(invalid_uid).is_valid
 
-        for valid_uid in ('0',
-                          '1',
-                          '0.1',
-                          '1' * 64,
-                          '1.' + ('2' * 62),
-                          '1.0.23'):
+        for valid_uid in ("0", "1", "0.1", "1" * 64, "1." + ("2" * 62), "1.0.23"):
             assert UID(valid_uid).is_valid
 
     def test_is_private(self):
         """Test the is_private property"""
-        private_uid = UID('1.2.840.10009.1.2')
+        private_uid = UID("1.2.840.10009.1.2")
         assert private_uid.is_private
         assert not self.uid.is_private
 
@@ -333,10 +338,10 @@ class TestUID:
 
     def test_transitive(self):
         """Test for #256"""
-        a = '1.2.840.10008.1.1'
+        a = "1.2.840.10008.1.1"
         uid = UID(a)
         b = str(uid)
-        assert uid.name == 'Verification SOP Class'
+        assert uid.name == "Verification SOP Class"
         assert uid == a
         assert uid == b
         assert a == b
@@ -348,23 +353,24 @@ class TestUID:
 
 class TestUIDPrivate:
     """Test private UIDs"""
+
     def setup_method(self):
         """Set default UID"""
-        self.uid = UID('9.9.999.90009.1.2')
+        self.uid = UID("9.9.999.90009.1.2")
 
     def test_equality(self):
         """Test that UID.__eq__ works with private UIDs."""
-        assert self.uid == UID('9.9.999.90009.1.2')
-        assert self.uid == '9.9.999.90009.1.2'
-        assert not self.uid == UID('9.9.999.90009.1.3')
-        assert not self.uid == '9.9.999.90009.1.3'
+        assert self.uid == UID("9.9.999.90009.1.2")
+        assert self.uid == "9.9.999.90009.1.2"
+        assert not self.uid == UID("9.9.999.90009.1.3")
+        assert not self.uid == "9.9.999.90009.1.3"
 
     def test_inequality(self):
         """Test that UID.__ne__ works with private UIDs."""
-        assert not self.uid != UID('9.9.999.90009.1.2')
-        assert not self.uid != '9.9.999.90009.1.2'
-        assert self.uid != UID('9.9.999.90009.1.3')
-        assert self.uid != '9.9.999.90009.1.3'
+        assert not self.uid != UID("9.9.999.90009.1.2")
+        assert not self.uid != "9.9.999.90009.1.2"
+        assert self.uid != UID("9.9.999.90009.1.3")
+        assert self.uid != "9.9.999.90009.1.3"
 
     def test_hash(self):
         """Test that UID.__hash_- works with private UIDs."""
@@ -372,7 +378,7 @@ class TestUIDPrivate:
 
     def test_str(self):
         """Test that UID.__str__ works with private UIDs."""
-        assert self.uid.__str__() == '9.9.999.90009.1.2'
+        assert self.uid.__str__() == "9.9.999.90009.1.2"
 
     def test_is_implicit_vr(self):
         """Test that UID.is_implicit_VR works with private UIDs."""
@@ -406,15 +412,15 @@ class TestUIDPrivate:
 
     def test_name(self):
         """Test that UID.name works with private UIDs."""
-        assert self.uid.name == '9.9.999.90009.1.2'
+        assert self.uid.name == "9.9.999.90009.1.2"
 
     def test_type(self):
         """Test that UID.type works with private UIDs."""
-        assert self.uid.type == ''
+        assert self.uid.type == ""
 
     def test_info(self):
         """Test that UID.info works with private UIDs."""
-        assert self.uid.info == ''
+        assert self.uid.info == ""
 
     def test_is_retired(self):
         """Test that UID.is_retired works with private UIDs."""

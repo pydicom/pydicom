@@ -11,20 +11,19 @@ from pydicom.filereader import dcmread
 
 try:
     import numpy as np
+
     HAVE_NP = True
 except ImportError:
     HAVE_NP = False
 
 try:
     from pydicom.waveforms import numpy_handler as NP_HANDLER
-    from pydicom.waveforms.numpy_handler import (
-        generate_multiplex, multiplex_array
-    )
+    from pydicom.waveforms.numpy_handler import generate_multiplex, multiplex_array
 except ImportError:
     NP_HANDLER = None
 
 
-ECG = get_testdata_file('waveform_ecg.dcm')
+ECG = get_testdata_file("waveform_ecg.dcm")
 
 
 @pytest.mark.skipif(HAVE_NP, reason="Numpy available")
@@ -47,13 +46,12 @@ def test_simple():
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerGenerateMultiplex:
     """Tests for the waveform numpy_handler.generate_multiplex."""
+
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)
         del ds.WaveformSequence
-        msg = (
-            r"No \(5400,0100\) Waveform Sequence element found in the dataset"
-        )
+        msg = r"No \(5400,0100\) Waveform Sequence element found in the dataset"
         gen = generate_multiplex(ds)
         with pytest.raises(AttributeError, match=msg):
             next(gen)
@@ -79,7 +77,7 @@ class TestHandlerGenerateMultiplex:
         arr = next(gen)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'int16'
+        assert arr.dtype == "int16"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
@@ -90,7 +88,7 @@ class TestHandlerGenerateMultiplex:
         arr = next(gen)
         assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
         assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'float'
+        assert arr.dtype == "float"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
@@ -98,13 +96,12 @@ class TestHandlerGenerateMultiplex:
 @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
 class TestHandlerMultiplexArray:
     """Tests for the waveform numpy_handler.multiplex_array."""
+
     def test_no_waveform_sequence(self):
         """Test that missing waveform sequence raises exception."""
         ds = dcmread(ECG)
         del ds.WaveformSequence
-        msg = (
-            r"No \(5400,0100\) Waveform Sequence element found in the dataset"
-        )
+        msg = r"No \(5400,0100\) Waveform Sequence element found in the dataset"
         with pytest.raises(AttributeError, match=msg):
             multiplex_array(ds, 0)
 
@@ -127,14 +124,14 @@ class TestHandlerMultiplexArray:
         arr = multiplex_array(ds, index=0, as_raw=True)
         assert [80, 65, 50, 35, 37] == arr[0:5, 0].tolist()
         assert [90, 85, 80, 75, 77] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'int16'
+        assert arr.dtype == "int16"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
 
         arr = multiplex_array(ds, index=1, as_raw=True)
         assert [10, 10, 30, 35, 25] == arr[0:5, 0].tolist()
         assert [80, 80, 80, 85, 80] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'int16'
+        assert arr.dtype == "int16"
         assert arr.flags.writeable
         assert (1200, 12) == arr.shape
 
@@ -144,6 +141,6 @@ class TestHandlerMultiplexArray:
         arr = multiplex_array(ds, index=0, as_raw=False)
         assert [100, 81.25, 62.5, 43.75, 46.25] == arr[0:5, 0].tolist()
         assert [112.5, 106.25, 100, 93.75, 96.25] == arr[0:5, 1].tolist()
-        assert arr.dtype == 'float'
+        assert arr.dtype == "float"
         assert arr.flags.writeable
         assert (10000, 12) == arr.shape
