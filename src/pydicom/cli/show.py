@@ -2,7 +2,7 @@
 """Pydicom command line interface program for `pydicom show`"""
 
 import argparse
-from typing import Optional, List, Union, Callable
+from collections.abc import Callable
 
 from pydicom.dataset import Dataset
 from pydicom.cli.main import filespec_help, filespec_parser
@@ -55,14 +55,14 @@ def do_command(args: argparse.Namespace) -> None:
         print(str(element_val))
 
 
-def SOPClassname(ds: Dataset) -> Optional[str]:
+def SOPClassname(ds: Dataset) -> str | None:
     class_uid = ds.get("SOPClassUID")
     if class_uid is None:
         return None
     return f"SOPClassUID: {class_uid.name}"
 
 
-def quiet_rtplan(ds: Dataset) -> Optional[str]:
+def quiet_rtplan(ds: Dataset) -> str | None:
     if "BeamSequence" not in ds:
         return None
 
@@ -132,7 +132,7 @@ def quiet_rtplan(ds: Dataset) -> Optional[str]:
     return "\n".join(lines)
 
 
-def quiet_image(ds: Dataset) -> Optional[str]:
+def quiet_image(ds: Dataset) -> str | None:
     if "SOPClassUID" not in ds or "Image Storage" not in ds.SOPClassUID.name:
         return None
 
@@ -151,7 +151,7 @@ def quiet_image(ds: Dataset) -> Optional[str]:
 
 # Items to show in quiet mode
 # Item can be a callable or a DICOM keyword
-quiet_items: List[Union[Callable[[Dataset], Optional[str]], str]] = [
+quiet_items: list[Callable[[Dataset], str | None] | str] = [
     SOPClassname,
     "PatientName",
     "PatientID",

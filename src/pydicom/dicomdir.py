@@ -2,7 +2,7 @@
 """Module for DicomDir class."""
 
 import os
-from typing import Optional, List, Dict, Union, BinaryIO
+from typing import BinaryIO
 import warnings
 
 from pydicom import config
@@ -24,10 +24,10 @@ class DicomDir(FileDataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[str, os.PathLike, BinaryIO],
+        filename_or_obj: str | os.PathLike | BinaryIO,
         dataset: Dataset,
-        preamble: Optional[bytes] = None,
-        file_meta: Optional[FileMetaDataset] = None,
+        preamble: bytes | None = None,
+        file_meta: FileMetaDataset | None = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True,
     ) -> None:
@@ -93,7 +93,7 @@ class DicomDir(FileDataset):
             is_little_endian=is_little_endian
         )
 
-        self.patient_records: List[Dataset] = []
+        self.patient_records: list[Dataset] = []
         self.parse_records()
 
     def parse_records(self) -> None:
@@ -106,8 +106,8 @@ class DicomDir(FileDataset):
 
         # Define a helper function for organizing the records
         def get_siblings(
-            record: Dataset, map_offset_to_record: Dict[int, Dataset]
-        ) -> List[Dataset]:
+            record: Dataset, map_offset_to_record: dict[int, Dataset]
+        ) -> list[Dataset]:
             """Return a list of all siblings of the given directory record,
             including itself.
             """

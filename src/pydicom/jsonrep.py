@@ -4,9 +4,9 @@
 import base64
 from inspect import signature
 from typing import (
-    Callable, Optional, Union, Any, cast, Type, Dict, TYPE_CHECKING,
-    List
+    Optional, TypeAlias, Union, Any, cast, TYPE_CHECKING
 )
+from collections.abc import Callable
 import warnings
 
 from pydicom.valuerep import FLOAT_VR, INT_VR, VR
@@ -48,7 +48,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     if value is None or "":
         return value
 
-    number_type: Optional[Union[Type[int], Type[float]]] = None
+    number_type: type[int] | type[float] | None = None
     if vr in (INT_VR - {VR.AT}) | {VR.US_SS}:
         number_type = int
     if vr in FLOAT_VR:
@@ -57,7 +57,7 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     if number_type is None:
         return value
 
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [
             number_type(v) if v is not None
             else empty_value_for_VR(vr)
@@ -67,18 +67,18 @@ def convert_to_python_number(value: Any, vr: str) -> Any:
     return number_type(value)
 
 
-OtherValueType = Union[None, str, int, float]
-PNValueType = Union[None, str, Dict[str, str]]
-SQValueType = Optional[Dict[str, Any]]  # Recursive
+OtherValueType = None | str | int | float
+PNValueType = None | str | dict[str, str]
+SQValueType = dict[str, Any] | None  # Recursive
 
-ValueType = Union[PNValueType, SQValueType, OtherValueType]
-InlineBinaryType = Union[str, List[str]]
-BulkDataURIType = Union[str, List[str]]
+ValueType: TypeAlias = PNValueType | SQValueType | OtherValueType
+InlineBinaryType: TypeAlias = str | list[str]
+BulkDataURIType: TypeAlias = str | list[str]
 
-JSONValueType = Union[List[ValueType], InlineBinaryType, BulkDataURIType]
+JSONValueType = list[ValueType] | InlineBinaryType | BulkDataURIType
 
-BulkDataType = Union[None, str, int, float, bytes]
-BulkDataHandlerType = Optional[Callable[[str, str, str], BulkDataType]]
+BulkDataType = None | str | int | float | bytes
+BulkDataHandlerType = Callable[[str, str, str], BulkDataType] | None
 
 
 class JsonDataElementConverter:
@@ -96,14 +96,12 @@ class JsonDataElementConverter:
 
     def __init__(
         self,
-        dataset_class: Type["Dataset"],
+        dataset_class: type["Dataset"],
         tag: str,
         vr: str,
         value: JSONValueType,
-        value_key: Optional[str],
-        bulk_data_uri_handler: Optional[
-            Union[BulkDataHandlerType, Callable[[str], BulkDataType]]
-        ] = None
+        value_key: str | None,
+        bulk_data_uri_handler: BulkDataHandlerType | Callable[[str], BulkDataType] | None = None
     ) -> None:
         """Create a new converter instance.
 
@@ -115,7 +113,7 @@ class JsonDataElementConverter:
             The data element's tag in uppercase hex format like ``"7FE00010"``.
         vr : str
             The data element value representation.
-        value : str or List[Union[None, str, int, float, dict]]
+        value : str or List[None | str | int | float | dict]
             The attribute value for the JSON object's "Value", "InlineBinary"
             or "BulkDataURI" field. If there's no such attribute then `value`
             will be ``[""]``.
@@ -176,7 +174,7 @@ class JsonDataElementConverter:
             if not self.value:
                 return empty_value_for_VR(self.vr)
 
-            val = cast(List[ValueType], self.value)
+            val = cast(list[ValueType], self.value)
             element_value = [self.get_regular_element_value(v) for v in val]
             if len(element_value) == 1 and self.vr != VR.SQ:
                 element_value = element_value[0]
@@ -188,7 +186,7 @@ class JsonDataElementConverter:
         # PS3.18, Annex F.4 shows the string enclosed in a list.
         # We support both variants, as the standard is ambiguous here,
         # and do the same for "BulkDataURI".
-        value = cast(Union[str, List[str]], self.value)
+        value = cast(str | list[str], self.value)
         if isinstance(value, list):
             value = value[0]
 
@@ -243,14 +241,14 @@ class JsonDataElementConverter:
         # Table F.2.3-1 has JSON type mappings
         if self.vr == VR.SQ:  # Dataset
             # May be an empty dict
-            value = cast(Dict[str, Any], value)
+            value = cast(dict[str, Any], value)
             return self.get_sequence_item(value)
 
         if value is None:
             return empty_value_for_VR(self.vr)
 
         if self.vr == VR.PN:  # str
-            value = cast(Dict[str, str], value)
+            value = cast(dict[str, str], value)
             return self.get_pn_element_value(value)
 
         if self.vr == VR.AT:  # Optional[int]
@@ -323,7 +321,7 @@ class JsonDataElementConverter:
 
         return ds
 
-    def get_pn_element_value(self, value: Union[str, Dict[str, str]]) -> str:
+    def get_pn_element_value(self, value: str | dict[str, str]) -> str:
         """Return a person name from JSON **PN** value as str.
 
         Values with VR PN have a special JSON encoding, see the DICOM Standard,

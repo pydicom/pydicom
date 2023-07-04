@@ -19,7 +19,6 @@ from bisect import bisect_left
 from contextlib import nullcontext
 import io
 from importlib.util import find_spec as have_package
-import inspect  # for __dir__
 from itertools import takewhile
 import json
 import os
@@ -27,10 +26,9 @@ import os.path
 import re
 from types import TracebackType
 from typing import (
-    Optional, Tuple, Union, List, Any, cast, Dict, ValuesView,
-    Iterator, BinaryIO, AnyStr, Callable, TypeVar, Type, overload,
-    MutableSequence, MutableMapping, AbstractSet, TYPE_CHECKING
+    Optional, TypeAlias, Union, Any, cast, BinaryIO, AnyStr, TypeVar, overload, TYPE_CHECKING
 )
+from collections.abc import ValuesView, Iterator, Callable, MutableSequence, MutableMapping, Set
 import warnings
 import weakref
 
@@ -93,7 +91,7 @@ class PrivateBlock:
 
     def __init__(
         self,
-        key: Tuple[int, str],
+        key: tuple[int, str],
         dataset: "Dataset",
         private_creator_element: int
     ) -> None:
@@ -207,7 +205,7 @@ class PrivateBlock:
 
 
 def _dict_equal(
-    a: "Dataset", b: Any, exclude: Optional[List[str]] = None
+    a: "Dataset", b: Any, exclude: list[str] | None = None
 ) -> bool:
     """Common method for Dataset.__eq__ and FileDataset.__eq__
 
@@ -222,8 +220,8 @@ def _dict_equal(
             )
 
 
-_DatasetValue = Union[DataElement, RawDataElement]
-_DatasetType = Union["Dataset", MutableMapping[BaseTag, _DatasetValue]]
+_DatasetValue = DataElement | RawDataElement
+_DatasetType: TypeAlias = "Dataset | MutableMapping[BaseTag, _DatasetValue]"
 
 
 class Dataset:
@@ -372,7 +370,7 @@ class Dataset:
 
     def __init__(self, *args: _DatasetType, **kwargs: Any) -> None:
         """Create a new :class:`Dataset` instance."""
-        self._parent_encoding: List[str] = kwargs.get(
+        self._parent_encoding: list[str] = kwargs.get(
             'parent_encoding', default_encoding
         )
 
@@ -389,31 +387,31 @@ class Dataset:
         # the following read_XXX attributes are used internally to store
         # the properties of the dataset after read from a file
         # set depending on the endianness of the read dataset
-        self.read_little_endian: Optional[bool] = None
+        self.read_little_endian: bool | None = None
         # set depending on the VR handling of the read dataset
-        self.read_implicit_vr: Optional[bool] = None
+        self.read_implicit_vr: bool | None = None
         # The dataset's original character set encoding
-        self.read_encoding: Union[None, str, MutableSequence[str]] = None
+        self.read_encoding: None | str | MutableSequence[str] = None
 
-        self.is_little_endian: Optional[bool] = None
-        self.is_implicit_VR: Optional[bool] = None
+        self.is_little_endian: bool | None = None
+        self.is_implicit_VR: bool | None = None
 
         # True if the dataset is a sequence item with undefined length
         self.is_undefined_length_sequence_item = False
 
         # the parent data set, if this dataset is a sequence item
-        self._parent_seq: "Optional[weakref.ReferenceType[Sequence]]" = None
+        self._parent_seq: "weakref.ReferenceType[Sequence] | None" = None
 
         # known private creator blocks
-        self._private_blocks: Dict[Tuple[int, str], PrivateBlock] = {}
+        self._private_blocks: dict[tuple[int, str], PrivateBlock] = {}
 
         self._pixel_array: Optional["numpy.ndarray"] = None
-        self._pixel_id: Dict[str, int] = {}
+        self._pixel_id: dict[str, int] = {}
 
         self.file_meta: FileMetaDataset
 
     @property
-    def parent_seq(self) -> "Optional[weakref.ReferenceType[Sequence]]":
+    def parent_seq(self) -> "weakref.ReferenceType[Sequence] | None":
         """Return a weak reference to the parent
         :class:`~pydicom.sequence.Sequence`.
 
@@ -433,7 +431,7 @@ class Dataset:
             self._parent_seq = weakref.ref(value)
 
     @property
-    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+    def parent(self) -> "weakref.ReferenceType[Dataset] | None":
         """Return a weak reference to the parent Sequence's
         parent Dataset.
 
@@ -468,7 +466,7 @@ class Dataset:
             )
         self._parent = weakref.ref(value)
 
-    def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Dataset":
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "Dataset":
         cls = self.__class__
         copied = cls.__new__(cls)
         if memo:
@@ -487,10 +485,10 @@ class Dataset:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType]
-    ) -> Optional[bool]:
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None
+    ) -> bool | None:
         """Method invoked on exit from a with statement."""
         # Returning anything other than True will re-raise any exceptions
         return None
@@ -534,7 +532,7 @@ class Dataset:
         """Support accessing the dataset from a numpy array."""
         return numpy.asarray(self._dict)
 
-    def data_element(self, name: str) -> Optional[DataElement]:
+    def data_element(self, name: str) -> DataElement | None:
         """Return the element corresponding to the element keyword `name`.
 
         Parameters
@@ -668,7 +666,7 @@ class Dataset:
         else:
             raise AttributeError(name)
 
-    def __delitem__(self, key: Union[slice, BaseTag, TagType]) -> None:
+    def __delitem__(self, key: "slice | BaseTag | TagType") -> None:
         """Intercept requests to delete an attribute by key.
 
         Examples
@@ -717,7 +715,7 @@ class Dataset:
             if self._private_blocks and tag.is_private_creator:
                 self._private_blocks = {}
 
-    def __dir__(self) -> List[str]:
+    def __dir__(self) -> list[str]:
         """Return a list of methods, properties, attributes and element
         keywords available in the :class:`Dataset`.
 
@@ -729,7 +727,7 @@ class Dataset:
 
         return sorted(names | keywords)
 
-    def dir(self, *filters: str) -> List[str]:
+    def dir(self, *filters: str) -> list[str]:
         """Return an alphabetical list of element keywords in the
         :class:`Dataset`.
 
@@ -786,22 +784,22 @@ class Dataset:
         return NotImplemented
 
     @overload
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
+    def get(self, key: str, default: Any | None = None) -> Any:
         pass  # pragma: no cover
 
     @overload
     def get(
         self,
-        key: Union[int, Tuple[int, int], BaseTag],
-        default: Optional[Any] = None
+        key: int | tuple[int, int] | BaseTag,
+        default: Any | None = None
     ) -> DataElement:
         pass  # pragma: no cover
 
     def get(
         self,
-        key: Union[str, Union[int, Tuple[int, int], BaseTag]],
-        default: Optional[Any] = None
-    ) -> Union[Any, DataElement]:
+        key: str | int | tuple[int, int] | BaseTag,
+        default: Any | None = None
+    ) -> Any | DataElement:
         """Simulate ``dict.get()`` to handle element tags and keywords.
 
         Parameters
@@ -842,7 +840,7 @@ class Dataset:
         except KeyError:
             return default
 
-    def items(self) -> AbstractSet[Tuple[BaseTag, _DatasetValue]]:
+    def items(self) -> Set[tuple[BaseTag, _DatasetValue]]:
         """Return the :class:`Dataset` items to simulate :meth:`dict.items`.
 
         Returns
@@ -854,7 +852,7 @@ class Dataset:
         """
         return self._dict.items()
 
-    def keys(self) -> AbstractSet[BaseTag]:
+    def keys(self) -> Set[BaseTag]:
         """Return the :class:`Dataset` keys to simulate :meth:`dict.keys`.
 
         Returns
@@ -908,7 +906,7 @@ class Dataset:
         return object.__getattribute__(self, name)
 
     @property
-    def _character_set(self) -> List[str]:
+    def _character_set(self) -> list[str]:
         """The character set used to encode text values."""
         char_set = self.get(BaseTag(0x00080005), None)
         if not char_set:
@@ -925,8 +923,8 @@ class Dataset:
         pass  # pragma: no cover
 
     def __getitem__(
-        self, key: Union[slice, TagType]
-    ) -> Union["Dataset", DataElement]:
+        self, key: "slice | TagType"
+    ) -> "Dataset | DataElement":
         """Operator for ``Dataset[key]`` request.
 
         Any deferred data elements will be read in and an attempt will be made
@@ -1097,7 +1095,7 @@ class Dataset:
         self.add_new(Tag(group, first_free_el), 'LO', private_creator)
         return new_block(first_free_el)
 
-    def private_creators(self, group: int) -> List[str]:
+    def private_creators(self, group: int) -> list[str]:
         """Return a list of private creator names in the given group.
 
         .. versionadded:: 1.3
@@ -1180,8 +1178,8 @@ class Dataset:
         pass  # pragma: no cover
 
     def get_item(
-        self, key: Union[slice, TagType]
-    ) -> Union["Dataset", DataElement, RawDataElement, None]:
+        self, key: "slice | TagType"
+    ) -> "Dataset | DataElement | RawDataElement | None":
         """Return the raw data element if possible.
 
         It will be raw if the user has never accessed the value, or set their
@@ -1247,9 +1245,9 @@ class Dataset:
 
     def set_original_encoding(
         self,
-        is_implicit_vr: Optional[bool],
-        is_little_endian: Optional[bool],
-        character_encoding: Union[None, str, MutableSequence[str]]
+        is_implicit_vr: bool | None,
+        is_little_endian: bool | None,
+        character_encoding: None | str | MutableSequence[str]
     ) -> None:
         """Set the values for the original transfer syntax and encoding.
 
@@ -1343,7 +1341,7 @@ class Dataset:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
 
-    def pop(self, key: Union[BaseTag, TagType], *args: Any) -> _DatasetValue:
+    def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
 
         Removes the element for `key` if it exists and returns it,
@@ -1380,7 +1378,7 @@ class Dataset:
 
         return self._dict.pop(cast(BaseTag, key), *args)
 
-    def popitem(self) -> Tuple[BaseTag, _DatasetValue]:
+    def popitem(self) -> tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
 
         Returns
@@ -1390,7 +1388,7 @@ class Dataset:
         return self._dict.popitem()
 
     def setdefault(
-        self, key: TagType, default: Optional[Any] = None
+        self, key: TagType, default: Any | None = None
     ) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
 
@@ -1438,7 +1436,7 @@ class Dataset:
         if tag in self:
             return self[tag]
 
-        vr: Union[str, VR_]
+        vr: str | VR_
         if not isinstance(default, DataElement):
             if tag.is_private:
                 vr = VR_.UN
@@ -1994,7 +1992,7 @@ class Dataset:
         self,
         element_format: str = default_element_format,
         sequence_element_format: str = default_sequence_element_format,
-        indent_format: Optional[str] = None
+        indent_format: str | None = None
     ) -> Iterator[str]:
         """Iterate through the :class:`Dataset` yielding formatted :class:`str`
         for each element.
@@ -2113,7 +2111,7 @@ class Dataset:
 
     def save_as(
         self,
-        filename: Union[str, "os.PathLike[AnyStr]", BinaryIO],
+        filename: "str | os.PathLike[AnyStr] | BinaryIO",
         write_like_original: bool = True
     ) -> None:
         """Write the :class:`Dataset` to `filename`.
@@ -2255,7 +2253,7 @@ class Dataset:
         self.__dict__["file_meta"] = value
 
     def __setitem__(
-        self, key: Union[slice, TagType], elem: _DatasetValue
+        self, key: "slice | TagType", elem: _DatasetValue
     ) -> None:
         """Operator for ``Dataset[key] = elem``.
 
@@ -2286,7 +2284,7 @@ class Dataset:
                 f"Unable to convert the key '{key}' to an element tag"
             ) from exc
 
-        if not isinstance(elem, (DataElement, RawDataElement)):
+        if not isinstance(elem, DataElement | RawDataElement):
             raise TypeError("Dataset items must be 'DataElement' instances")
 
         if isinstance(elem.tag, BaseTag):
@@ -2324,10 +2322,10 @@ class Dataset:
 
     def _slice_dataset(
         self,
-        start: Optional[TagType],
-        stop: Optional[TagType],
-        step: Optional[int]
-    ) -> List[BaseTag]:
+        start: "TagType | None",
+        stop: "TagType | None",
+        step: int | None
+    ) -> list[BaseTag]:
         """Return the element tags in the Dataset that match the slice.
 
         Parameters
@@ -2393,7 +2391,7 @@ class Dataset:
         """Return a :class:`str` representation of the top level elements. """
         return self._pretty_str(top_level_only=True)
 
-    def trait_names(self) -> List[str]:
+    def trait_names(self) -> list[str]:
         """Return a :class:`list` of valid names for auto-completion code.
 
         Used in IPython, so that data element names can be found and offered
@@ -2481,14 +2479,9 @@ class Dataset:
 
     @classmethod
     def from_json(
-        cls: Type["Dataset"],
-        json_dataset: Union[Dict[str, Any], str, bytes, bytearray],
-        bulk_data_uri_handler: Optional[
-            Union[
-                Callable[[str, str, str], Union[None, str, int, float, bytes]],
-                Callable[[str], Union[None, str, int, float, bytes]]
-            ]
-        ] = None
+        cls: type["Dataset"],
+        json_dataset: dict[str, Any] | str | bytes | bytearray,
+        bulk_data_uri_handler: Callable[[str, str, str], None | str | int | float | bytes] | Callable[[str], None | str | int | float | bytes] | None = None
     ) -> "Dataset":
         """Return a :class:`Dataset` from a DICOM JSON Model object.
 
@@ -2516,8 +2509,8 @@ class Dataset:
         -------
         Dataset
         """
-        if isinstance(json_dataset, (str, bytes, bytearray)):
-            json_dataset = cast(Dict[str, Any], json.loads(json_dataset))
+        if isinstance(json_dataset, str | bytes | bytearray):
+            json_dataset = cast(dict[str, Any], json.loads(json_dataset))
 
         dataset = cls()
         for tag, mapping in json_dataset.items():
@@ -2546,7 +2539,7 @@ class Dataset:
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
         suppress_invalid_tags: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`Dataset`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chapter_F.html>`.
@@ -2598,7 +2591,7 @@ class Dataset:
         self,
         bulk_data_threshold: int = 1024,
         bulk_data_element_handler: Optional[Callable[[DataElement], str]] = None,  # noqa
-        dump_handler: Optional[Callable[[Dict[str, Any]], str]] = None,
+        dump_handler: Callable[[dict[str, Any]], str] | None = None,
         suppress_invalid_tags: bool = False,
     ) -> str:
         """Return a JSON representation of the :class:`Dataset`.
@@ -2659,7 +2652,7 @@ class Dataset:
 
     # For Pickle, need to make weakref a strong reference
     # Adapted from https://stackoverflow.com/a/45588812/1987276
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> dict[str, Any]:
         if self.parent_seq is not None:
             s = self.__dict__.copy()
             s['_parent_seq'] = s['_parent_seq']()
@@ -2667,7 +2660,7 @@ class Dataset:
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_seq'] is not None:
             self.__dict__['_parent_seq'] = weakref.ref(
@@ -2712,9 +2705,9 @@ class FileDataset(Dataset):
 
     def __init__(
         self,
-        filename_or_obj: Union[PathType, BinaryIO, DicomFileLike],
+        filename_or_obj: PathType | BinaryIO | DicomFileLike,
         dataset: _DatasetType,
-        preamble: Optional[bytes] = None,
+        preamble: bytes | None = None,
         file_meta: Optional["FileMetaDataset"] = None,
         is_implicit_VR: bool = True,
         is_little_endian: bool = True
@@ -2751,10 +2744,10 @@ class FileDataset(Dataset):
         self.is_implicit_VR: bool = is_implicit_VR
         self.is_little_endian: bool = is_little_endian
 
-        filename: Optional[str] = None
+        filename: str | None = None
         filename_or_obj = path_from_pathlike(filename_or_obj)
         self.fileobj_type: Any = None
-        self.filename: Union[PathType, BinaryIO] = ""
+        self.filename: PathType | BinaryIO = ""
 
         if isinstance(filename_or_obj, str):
             filename = filename_or_obj
@@ -2818,7 +2811,7 @@ class FileDataset(Dataset):
         """
         return self._copy_implementation(copy.copy)
 
-    def __deepcopy__(self, _: Optional[Dict[int, Any]]) -> "FileDataset":
+    def __deepcopy__(self, _: dict[int, Any] | None) -> "FileDataset":
         """Return a deep copy of the file dataset.
         Make sure that the filename is not copied in case it is a file-like
         object.
@@ -2929,13 +2922,13 @@ class FileMetaDataset(Dataset):
         self.MediaStorageSOPInstanceUID: UID  # UI, 1
         self.TransferSyntaxUID: UID  # UI, 1
         self.ImplementationClassUID: UID  # UI, 1
-        self.ImplementationVersionName: Optional[str]  # SH, 3
-        self.SourceApplicationEntityTitle: Optional[str]  # AE, 3
-        self.SendingApplicationEntityTitle: Optional[str]  # AE, 3
-        self.ReceivingApplicationEntityTitle: Optional[str]  # AE, 3
-        self.SourcePresentationAddress: Optional[str]  # UR, 3
-        self.ReceivingPresentationAddress: Optional[str]  # UR, 3
-        self.PrivateInformationCreatorUID: Optional[UID]  # UI, 3
+        self.ImplementationVersionName: str | None  # SH, 3
+        self.SourceApplicationEntityTitle: str | None  # AE, 3
+        self.SendingApplicationEntityTitle: str | None  # AE, 3
+        self.ReceivingApplicationEntityTitle: str | None  # AE, 3
+        self.SourcePresentationAddress: str | None  # UR, 3
+        self.ReceivingPresentationAddress: str | None  # UR, 3
+        self.PrivateInformationCreatorUID: UID | None  # UI, 3
         self.PrivateInformation: bytes  # OB, 1C
 
     @staticmethod
@@ -2957,7 +2950,7 @@ class FileMetaDataset(Dataset):
         if init_value is None:
             return
 
-        if not isinstance(init_value, (Dataset, dict)):
+        if not isinstance(init_value, Dataset | dict):
             raise TypeError(
                 "Argument must be a dict or Dataset, not {}".format(
                     type(init_value)
@@ -2972,7 +2965,7 @@ class FileMetaDataset(Dataset):
             raise ValueError(msg.format(non_group2))
 
     def __setitem__(
-        self, key: Union[slice, TagType], value: _DatasetValue
+        self, key: "slice | TagType", value: _DatasetValue
     ) -> None:
         """Override parent class to only allow setting of group 2 elements.
 

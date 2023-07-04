@@ -7,8 +7,9 @@ import re
 from io import BytesIO
 from struct import (unpack, calcsize)
 from typing import (
-    Optional, Union, List, Tuple, cast, MutableSequence, Any
+    Union, cast, Any
 )
+from collections.abc import MutableSequence
 
 # don't import datetime_conversion directly
 from pydicom import config
@@ -57,15 +58,15 @@ def convert_tag(
         The decoded tag.
     """
     fmt = "<HH" if is_little_endian else ">HH"
-    value = cast(Tuple[int, int], unpack(fmt, byte_string[offset:offset + 4]))
+    value = cast(tuple[int, int], unpack(fmt, byte_string[offset:offset + 4]))
     return TupleTag(value)
 
 
 def convert_AE_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[str, MutableSequence[str]]:
+    struct_format: str | None = None
+) -> str | MutableSequence[str]:
     """Return a decoded 'AE' value.
 
     Elements with VR of 'AE' have non-significant leading and trailing spaces.
@@ -96,8 +97,8 @@ def convert_AE_string(
 def convert_ATvalue(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[BaseTag, MutableSequence[BaseTag]]:
+    struct_format: str | None = None
+) -> BaseTag | MutableSequence[BaseTag]:
     """Return a decoded 'AT' value.
 
     Parameters
@@ -140,8 +141,8 @@ def _DA_from_str(value: str) -> DA:
 def convert_DA_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[str, DA, MutableSequence[str], MutableSequence[DA]]:
+    struct_format: str | None = None
+) -> str | DA | MutableSequence[str] | MutableSequence[DA]:
     """Return a decoded 'DA' value.
 
     Parameters
@@ -174,7 +175,7 @@ def convert_DA_string(
 def convert_DS_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> Union[
     pydicom.valuerep.DSclass, MutableSequence[pydicom.valuerep.DSclass],
     "numpy.float64", "numpy.ndarray"
@@ -256,8 +257,8 @@ def _DT_from_str(value: str) -> DT:
 def convert_DT_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[str, DT, MutableSequence[str], MutableSequence[DT]]:
+    struct_format: str | None = None
+) -> str | DT | MutableSequence[str] | MutableSequence[DT]:
     """Return a decoded 'DT' value.
 
     Parameters
@@ -290,7 +291,7 @@ def convert_DT_string(
 def convert_IS_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> Union[IS, MutableSequence[IS], "numpy.int64", "numpy.ndarray"]:
     """Return a decoded 'IS' value.
 
@@ -352,7 +353,7 @@ def convert_numbers(
     byte_string: bytes,
     is_little_endian: bool,
     struct_format: str
-) -> Union[str, int, float, MutableSequence[int], MutableSequence[float]]:
+) -> str | int | float | MutableSequence[int] | MutableSequence[float]:
     """Return a decoded numerical VR value.
 
     Given an encoded DICOM Element value, use `struct_format` and the
@@ -396,7 +397,7 @@ def convert_numbers(
         )
 
     format_string = f"{endianChar}{length // bytes_per_value}{struct_format}"
-    value: Union[Tuple[int, ...], Tuple[float, ...]] = (
+    value: tuple[int, ...] | tuple[float, ...] = (
         unpack(format_string, byte_string)
     )
 
@@ -415,7 +416,7 @@ def convert_numbers(
 def convert_OBvalue(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> bytes:
     """Return encoded 'OB' value as :class:`bytes`."""
     return byte_string
@@ -424,7 +425,7 @@ def convert_OBvalue(
 def convert_OWvalue(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'OW' value as :class:`bytes`.
 
@@ -437,7 +438,7 @@ def convert_OWvalue(
 def convert_OVvalue(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'OV' value as :class:`bytes`.
 
@@ -450,8 +451,8 @@ def convert_OVvalue(
 
 
 def convert_PN(
-    byte_string: bytes, encodings: Optional[List[str]] = None
-) -> Union[PersonName, MutableSequence[PersonName]]:
+    byte_string: bytes, encodings: list[str] | None = None
+) -> PersonName | MutableSequence[PersonName]:
     """Return a decoded 'PN' value.
 
     Parameters
@@ -487,8 +488,8 @@ def convert_PN(
 def convert_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[str, MutableSequence[str]]:
+    struct_format: str | None = None
+) -> str | MutableSequence[str]:
     """Return a decoded string VR value.
 
     String VRs are 'AE', AS', 'CS' and optionally (depending on
@@ -512,9 +513,9 @@ def convert_string(
 
 
 def convert_text(
-    byte_string: bytes, encodings: Optional[List[str]] = None,
-    vr: Optional[str] = None
-) -> Union[str, MutableSequence[str]]:
+    byte_string: bytes, encodings: list[str] | None = None,
+    vr: str | None = None
+) -> str | MutableSequence[str]:
     """Return a decoded text VR value.
 
     Text VRs are 'SH', 'LO' and 'UC'.
@@ -550,8 +551,8 @@ def convert_text(
 
 
 def convert_single_string(
-    byte_string: bytes, encodings: Optional[List[str]] = None,
-    vr: Optional[str] = None,
+    byte_string: bytes, encodings: list[str] | None = None,
+    vr: str | None = None,
 ) -> str:
     """Return decoded text, ignoring backslashes and trailing spaces.
 
@@ -581,7 +582,7 @@ def convert_SQ(
     byte_string: bytes,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    encoding: Optional[List[str]] = None,
+    encoding: list[str] | None = None,
     offset: int = 0
 ) -> Sequence:
     """Return a decoded 'SQ' value.
@@ -626,8 +627,8 @@ def _TM_from_str(value: str) -> TM:
 def convert_TM_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[str, TM, MutableSequence[str], MutableSequence[TM]]:
+    struct_format: str | None = None
+) -> str | TM | MutableSequence[str] | MutableSequence[TM]:
     """Return a decoded 'TM' value.
 
     Parameters
@@ -660,8 +661,8 @@ def convert_TM_string(
 def convert_UI(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
-) -> Union[pydicom.uid.UID, MutableSequence[pydicom.uid.UID]]:
+    struct_format: str | None = None
+) -> pydicom.uid.UID | MutableSequence[pydicom.uid.UID]:
     """Return a decoded 'UI' value.
 
     Elements with VR of 'UI' may have a non-significant trailing null ``0x00``.
@@ -688,7 +689,7 @@ def convert_UI(
 def convert_UN(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> bytes:
     """Return the encoded 'UN' value as :class:`bytes`."""
     return byte_string
@@ -697,7 +698,7 @@ def convert_UN(
 def convert_UR_string(
     byte_string: bytes,
     is_little_endian: bool,
-    struct_format: Optional[str] = None
+    struct_format: str | None = None
 ) -> str:
     """Return a decoded 'UR' value.
 
@@ -724,8 +725,8 @@ def convert_UR_string(
 def convert_value(
     VR: str,
     raw_data_element: RawDataElement,
-    encodings: Optional[Union[str, MutableSequence[str]]] = None
-) -> Union[Any, MutableSequence[Any]]:
+    encodings: str | MutableSequence[str] | None = None
+) -> Any | MutableSequence[Any]:
     """Return the element value decoded using the appropriate decoder.
 
     Parameters

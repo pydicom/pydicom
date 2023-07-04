@@ -10,9 +10,9 @@ A DataElement has a tag,
 import base64
 import json
 from typing import (
-    Optional, Any, Tuple, Callable, Union, TYPE_CHECKING, Dict, Type,
-    List, NamedTuple, MutableSequence
+    Optional, Any, TYPE_CHECKING, NamedTuple
 )
+from collections.abc import Callable, MutableSequence
 import warnings
 
 from pydicom import config  # don't import datetime_conversion directly
@@ -41,8 +41,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def empty_value_for_VR(
-    VR: Optional[str], raw: bool = False
-) -> Union[bytes, List[str], str, None, PersonName]:
+    VR: str | None, raw: bool = False
+) -> bytes | list[str] | str | None | PersonName:
     """Return the value for an empty element for `VR`.
 
     .. versionadded:: 1.4
@@ -152,13 +152,13 @@ class DataElement:
 
     def __init__(
         self,
-        tag: Union[int, str, Tuple[int, int]],
+        tag: int | str | tuple[int, int],
         VR: str,
         value: Any,
-        file_value_tell: Optional[int] = None,
+        file_value_tell: int | None = None,
         is_undefined_length: bool = False,
         already_converted: bool = False,
-        validation_mode: Optional[int] = None
+        validation_mode: int | None = None
     ) -> None:
         """Create a new :class:`DataElement`.
 
@@ -219,7 +219,7 @@ class DataElement:
             self.value = value  # calls property setter which will convert
         self.file_tell = file_value_tell
         self.is_undefined_length = is_undefined_length
-        self.private_creator: Optional[str] = None
+        self.private_creator: str | None = None
         self.parent: Optional["Dataset"] = None
 
     def validate(self, value: Any) -> None:
@@ -230,18 +230,13 @@ class DataElement:
 
     @classmethod
     def from_json(
-        cls: Type["DataElement"],
-        dataset_class: Type["Dataset"],
+        cls: type["DataElement"],
+        dataset_class: type["Dataset"],
         tag: str,
         vr: str,
         value: Any,
-        value_key: Optional[str],
-        bulk_data_uri_handler: Optional[
-            Union[
-                Callable[[str, str, str], BulkDataType],
-                Callable[[str], BulkDataType]
-            ]
-        ] = None
+        value_key: str | None,
+        bulk_data_uri_handler: Callable[[str, str, str], BulkDataType] | Callable[[str], BulkDataType] | None = None
     ) -> "DataElement":
         """Return a :class:`DataElement` from a DICOM JSON Model attribute
         object.
@@ -256,7 +251,7 @@ class DataElement:
             The data element's tag as uppercase hex.
         vr : str
             The data element's value representation (VR).
-        value : str or List[Union[None, str, int, float, bytes, dict]]
+        value : str or List[None | str | int | float | bytes | dict]
             The data element's value(s).
         value_key : str or None
             The attribute name for `value`, should be one of:
@@ -291,9 +286,9 @@ class DataElement:
 
     def to_json_dict(
         self,
-        bulk_data_element_handler: Optional[Callable[["DataElement"], str]],
+        bulk_data_element_handler: Callable[["DataElement"], str] | None,
         bulk_data_threshold: int
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Return a dictionary representation of the :class:`DataElement`
         conforming to the DICOM JSON Model as described in the DICOM
         Standard, Part 18, :dcm:`Annex F<part18/chaptr_F.html>`.
@@ -317,7 +312,7 @@ class DataElement:
         dict
             Mapping representing a JSON encoded data element as ``{str: Any}``.
         """
-        json_element: Dict[str, Any] = {'vr': self.VR}
+        json_element: dict[str, Any] = {'vr': self.VR}
         if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR_.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
@@ -382,12 +377,8 @@ class DataElement:
     def to_json(
         self,
         bulk_data_threshold: int = 1024,
-        bulk_data_element_handler: Optional[
-            Callable[["DataElement"], str]
-        ] = None,
-        dump_handler: Optional[
-            Callable[[Dict[str, Any]], str]
-        ] = None
+        bulk_data_element_handler: Callable[["DataElement"], str] | None = None,
+        dump_handler: Callable[[dict[str, Any]], str] | None = None
     ) -> str:
         """Return a JSON representation of the :class:`DataElement`.
 
@@ -418,7 +409,7 @@ class DataElement:
         --------
         Dataset.to_json
         """
-        def json_dump(d: Dict[str, Any]) -> str:
+        def json_dump(d: dict[str, Any]) -> str:
             return json.dumps(d, sort_keys=True)
 
         dump_handler = json_dump if dump_handler is None else dump_handler
@@ -454,7 +445,7 @@ class DataElement:
         """Return the value multiplicity of the element as :class:`int`."""
         if self.value is None:
             return 0
-        if isinstance(self.value, (str, bytes, PersonName)):
+        if isinstance(self.value, str | bytes | PersonName):
             return 1 if self.value else 0
         try:
             iter(self.value)
@@ -471,7 +462,7 @@ class DataElement:
         return self.VM == 0
 
     @property
-    def empty_value(self) -> Union[bytes, List[str], None, str, PersonName]:
+    def empty_value(self) -> bytes | list[str] | None | str | PersonName:
         """Return the value for an empty element.
 
         .. versionadded:: 1.4
@@ -733,9 +724,9 @@ class DataElement:
 class RawDataElement(NamedTuple):
     """Container for the data from a raw (mostly) undecoded element."""
     tag: BaseTag
-    VR: Optional[str]
+    VR: str | None
     length: int
-    value: Optional[bytes]
+    value: bytes | None
     value_tell: int
     is_implicit_VR: bool
     is_little_endian: bool
@@ -785,7 +776,7 @@ def _private_vr_for_tag(ds: Optional["Dataset"], tag: BaseTag) -> str:
 
 def DataElement_from_raw(
     raw_data_element: RawDataElement,
-    encoding: Optional[Union[str, MutableSequence[str]]] = None,
+    encoding: str | MutableSequence[str] | None = None,
     dataset: Optional["Dataset"] = None
 ) -> DataElement:
     """Return a :class:`DataElement` created from `raw_data_element`.

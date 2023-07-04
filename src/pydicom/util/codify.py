@@ -18,7 +18,8 @@ import argparse
 import os.path
 import re
 import sys
-from typing import Optional, List, Callable, cast
+from typing import cast
+from collections.abc import Callable
 from collections import deque
 
 import pydicom
@@ -80,9 +81,9 @@ def code_imports() -> str:
 def code_dataelem(
     dataelem: DataElement,
     dataset_name: str = "ds",
-    exclude_size: Optional[int] = None,
+    exclude_size: int | None = None,
     include_private: bool = False,
-    var_names: Optional[deque] = None
+    var_names: deque | None = None
 ) -> str:
     """Code lines for a single DICOM data element
 
@@ -93,12 +94,12 @@ def code_dataelem(
         The DataElement instance to turn into code
     dataset_name : str
         The variable name of the Dataset containing `dataelem`
-    exclude_size : Union[int, None]
+    exclude_size : int | None
         If specified, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,
         and thus prompting the user to remove or fix that line.
-    var_names: Union[deque, None]
+    var_names: deque | None
         Used internally to ensure unique variable names in nested sequences.
     Returns
     -------
@@ -131,7 +132,7 @@ def code_dataelem(
     if exclude_size:
         if (
             dataelem.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR.US_SS}
-            and not isinstance(dataelem.value, (int, float))
+            and not isinstance(dataelem.value, int | float)
             and len(dataelem.value) > exclude_size
         ):
             valuerep = f"# XXX Array of {len(dataelem.value)} bytes excluded"
@@ -149,10 +150,10 @@ def code_dataelem(
 def code_sequence(
     dataelem: DataElement,
     dataset_name: str = "ds",
-    exclude_size: Optional[int] = None,
+    exclude_size: int | None = None,
     include_private: bool = False,
     name_filter: Callable[[str], str] = default_name_filter,
-    var_names: Optional[deque] = None,
+    var_names: deque | None = None,
 ) -> str:
     """Code lines for recreating a Sequence data element
 
@@ -172,7 +173,7 @@ def code_sequence(
     name_filter: Callable[[str], str]
         A callable taking a sequence name or sequence item name, and returning
         a shorter name for easier code reading
-    var_names: Union[deque, None]
+    var_names: deque | None
         Used internally to ensure unique variable names in nested sequences.
 
     Returns
@@ -263,10 +264,10 @@ def code_sequence(
 def code_dataset(
     ds: Dataset,
     dataset_name: str = "ds",
-    exclude_size: Optional[int] = None,
+    exclude_size: int | None = None,
     include_private: bool = False,
     is_file_meta: bool = False,
-    var_names: Optional[deque] = None
+    var_names: deque | None = None
 ) -> str:
     """Return Python code for creating `ds`.
 
@@ -324,7 +325,7 @@ def code_dataset(
 
 def code_file(
     filename: str,
-    exclude_size: Optional[int] = None,
+    exclude_size: int | None = None,
     include_private: bool = False
 ) -> str:
     """Write a complete source code file to recreate a DICOM file
@@ -333,7 +334,7 @@ def code_file(
     ----------
     filename : str
         Complete path and filename of a DICOM file to convert
-    exclude_size : Union[int,None]
+    exclude_size : int |None
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,
@@ -354,7 +355,7 @@ def code_file(
 
 def code_file_from_dataset(
     ds: Dataset,
-    exclude_size: Optional[int] = None,
+    exclude_size: int | None = None,
     include_private: bool = False
 ) -> str:
     """Write a complete source code file to recreate a DICOM file
@@ -363,7 +364,7 @@ def code_file_from_dataset(
     ----------
     ds : Dataset
         A pydicom Dataset to convert
-    exclude_size : Union[int,None]
+    exclude_size : int |None
         If not None, values longer than this (in bytes)
         will only have a commented string for a value,
         causing a syntax error when the code is run,
@@ -507,7 +508,7 @@ def do_codify(args: argparse.Namespace) -> None:
     args.outfile.write(code_str)
 
 
-def main(default_exclude_size: int, args: Optional[List[str]] = None) -> None:
+def main(default_exclude_size: int, args: list[str] | None = None) -> None:
     """Create Python code according to user options
 
     Parameters:

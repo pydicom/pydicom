@@ -2,7 +2,7 @@
 """Code to fix non-standard dicom issues in files
 """
 
-from typing import TYPE_CHECKING, Any, Tuple
+from typing import TYPE_CHECKING, Any
 
 from pydicom import config
 from pydicom import datadict
@@ -54,7 +54,7 @@ def fix_separator_callback(
 
 def fix_separator(
     invalid_separator: bytes,
-    for_VRs: Tuple[str, ...] = ("DS", "IS"),
+    for_VRs: tuple[str, ...] = ("DS", "IS"),
     process_unknown_VRs: bool = True,
 ) -> None:
     """A callback function to fix RawDataElement values using
@@ -104,7 +104,7 @@ def fix_mismatch_callback(
     return raw_elem
 
 
-def fix_mismatch(with_VRs: Tuple[str, ...] = (VR.PN, VR.DS, VR.IS)) -> None:
+def fix_mismatch(with_VRs: tuple[str, ...] = (VR.PN, VR.DS, VR.IS)) -> None:
     """A callback function to check that RawDataElements are translatable
     with their provided VRs.  If not, re-attempt translation using
     some other translators.

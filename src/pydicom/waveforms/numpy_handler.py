@@ -28,7 +28,8 @@ given in the table below.
 
 """
 
-from typing import TYPE_CHECKING, Generator, cast, List
+from typing import TYPE_CHECKING, cast
+from collections.abc import Generator
 
 try:
     import numpy as np
@@ -95,7 +96,7 @@ def generate_multiplex(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
-    for ii, item in enumerate(cast(List["Dataset"], ds.WaveformSequence)):
+    for ii, item in enumerate(cast(list["Dataset"], ds.WaveformSequence)):
         required_elements = [
             'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
             'WaveformBitsAllocated', 'WaveformSampleInterpretation',
@@ -129,7 +130,7 @@ def generate_multiplex(
         if not as_raw:
             # Apply correction factor (if possible)
             arr = arr.astype('float')
-            seq = cast(List["Dataset"], item.ChannelDefinitionSequence)
+            seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
             for jj, ch in enumerate(seq):
                 baseline = ch.get("ChannelBaseline", 0.0)
                 sensitivity = ch.get("ChannelSensitivity", 1.0)
@@ -174,7 +175,7 @@ def multiplex_array(
             "No (5400,0100) Waveform Sequence element found in the dataset"
         )
 
-    item = cast(List["Dataset"], ds.WaveformSequence)[index]
+    item = cast(list["Dataset"], ds.WaveformSequence)[index]
     required_elements = [
         'NumberOfWaveformChannels', 'NumberOfWaveformSamples',
         'WaveformBitsAllocated', 'WaveformSampleInterpretation',
@@ -208,7 +209,7 @@ def multiplex_array(
     if not as_raw:
         # Apply correction factor (if possible)
         arr = arr.astype('float')
-        seq = cast(List["Dataset"], item.ChannelDefinitionSequence)
+        seq = cast(list["Dataset"], item.ChannelDefinitionSequence)
         for jj, ch in enumerate(seq):
             baseline = ch.get("ChannelBaseline", 0.0)
             sensitivity = ch.get("ChannelSensitivity", 1.0)

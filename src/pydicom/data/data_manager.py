@@ -49,7 +49,7 @@ from enum import IntEnum
 import fnmatch
 import os
 from pathlib import Path
-from typing import Dict, List, Union, Optional, TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 import warnings
 
 from pydicom.data.download import (
@@ -104,7 +104,7 @@ def _check_data_hash(fpath: str) -> bool:
     return ext_hash == ref_hash
 
 
-def get_external_sources() -> Dict:
+def get_external_sources() -> dict:
     """Return a :class:`dict` of external data source interfaces.
 
     Returns
@@ -128,10 +128,10 @@ def get_external_sources() -> Dict:
     return out
 
 
-_EXTERNAL_DATA_SOURCES: Optional[Dict] = None
+_EXTERNAL_DATA_SOURCES: dict | None = None
 
 
-def external_data_sources() -> Dict:
+def external_data_sources() -> dict:
     """Return the available external data sources - loaded once."""
     global _EXTERNAL_DATA_SOURCES
     if _EXTERNAL_DATA_SOURCES is None:
@@ -139,7 +139,7 @@ def external_data_sources() -> Dict:
     return _EXTERNAL_DATA_SOURCES
 
 
-def online_test_file_dummy_paths() -> Dict[str, str]:
+def online_test_file_dummy_paths() -> dict[str, str]:
     """Return a :class:`dict` of dummy paths to the downloadable test files.
 
     Returns
@@ -178,8 +178,8 @@ def fetch_data_files() -> None:
 
 
 def get_files(
-    base: Union[str, os.PathLike], pattern: str = "**/*", dtype: int = DataTypes.DATASET
-) -> List[str]:
+    base: str | os.PathLike, pattern: str = "**/*", dtype: int = DataTypes.DATASET
+) -> list[str]:
     """Return all matching file paths from the available data sources.
 
     First searches the local *pydicom* data store, then any locally available
@@ -257,7 +257,7 @@ def get_files(
     return files
 
 
-def get_palette_files(pattern: str = "**/*") -> List[str]:
+def get_palette_files(pattern: str = "**/*") -> list[str]:
     """Return a list of absolute paths to palettes with filenames matching
     `pattern`.
 
@@ -286,7 +286,7 @@ def get_testdata_file(
     name: str,
     read: bool = False,
     download: bool = True,
-) -> Union[str, "Dataset", None]:
+) -> "str | Dataset | None":
     """Return an absolute path to the first matching dataset with filename
     `name`.
 
@@ -334,7 +334,7 @@ def get_testdata_file(
     return path
 
 
-def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
+def _get_testdata_file(name: str, download: bool = True) -> str | None:
     # Check pydicom local
     data_path = Path(DATA_ROOT) / "test_files"
     matches = [m for m in data_path.rglob(name)]
@@ -342,7 +342,7 @@ def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
         return os.fspath(matches[0])
 
     # Check external data sources
-    fpath: Optional[str]
+    fpath: str | None
     for lib, source in external_data_sources().items():
         try:
             fpath = source.get_path(name, dtype=DataTypes.DATASET)
@@ -372,7 +372,7 @@ def _get_testdata_file(name: str, download: bool = True) -> Optional[str]:
     return None
 
 
-def get_testdata_files(pattern: str = "**/*") -> List[str]:
+def get_testdata_files(pattern: str = "**/*") -> list[str]:
     """Return a list of absolute paths to datasets with filenames matching
     `pattern`.
 
@@ -395,7 +395,7 @@ def get_testdata_files(pattern: str = "**/*") -> List[str]:
     return files
 
 
-def get_charset_files(pattern: str = "**/*") -> List[str]:
+def get_charset_files(pattern: str = "**/*") -> list[str]:
     """Return a list of absolute paths to charsets with filenames matching
     `pattern`.
 

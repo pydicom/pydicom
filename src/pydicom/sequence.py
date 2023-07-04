@@ -5,8 +5,9 @@ Sequence is a list of pydicom Dataset objects.
 """
 from copy import deepcopy
 from typing import (
-    Iterable, Optional, List, cast, Union, overload, MutableSequence,
-    Dict, Any)
+    cast, overload,
+    Any)
+from collections.abc import Iterable, MutableSequence
 import weakref
 import warnings
 
@@ -34,7 +35,7 @@ class Sequence(MultiValue[Dataset]):
     :class:`~pydicom.multival.MultiValue` super class.
     """
 
-    def __init__(self, iterable: Optional[Iterable[Dataset]] = None) -> None:
+    def __init__(self, iterable: Iterable[Dataset] | None = None) -> None:
         """Initialize a list of :class:`~pydicom.dataset.Dataset`.
 
         Parameters
@@ -53,10 +54,10 @@ class Sequence(MultiValue[Dataset]):
             raise TypeError('The Sequence constructor requires an iterable')
 
         # the parent dataset
-        self._parent_dataset: "Optional[weakref.ReferenceType[Dataset]]" = None
+        self._parent_dataset: "weakref.ReferenceType[Dataset] | None" = None
 
         # validate_dataset is used as a pseudo type_constructor
-        self._list: List[Dataset] = []
+        self._list: list[Dataset] = []
         # If no inputs are provided, we create an empty Sequence
         super().__init__(validate_dataset, iterable or [])
         for ds in self:
@@ -79,7 +80,7 @@ class Sequence(MultiValue[Dataset]):
         for ds in val:
             ds.parent_seq = self  # type: ignore
 
-    def __deepcopy__(self, memo: Optional[Dict[int, Any]]) -> "Sequence":
+    def __deepcopy__(self, memo: dict[int, Any] | None) -> "Sequence":
         cls = self.__class__
         copied = cls.__new__(cls)
         if memo is not None:
@@ -110,7 +111,7 @@ class Sequence(MultiValue[Dataset]):
         val.parent_seq = self  # type: ignore
 
     @property
-    def parent_dataset(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+    def parent_dataset(self) -> "weakref.ReferenceType[Dataset] | None":
         """Return a weak reference to the parent
         :class:`~pydicom.dataset.Dataset`.
 
@@ -130,7 +131,7 @@ class Sequence(MultiValue[Dataset]):
             self._parent_dataset = weakref.ref(value)
 
     @property
-    def parent(self) -> "Optional[weakref.ReferenceType[Dataset]]":
+    def parent(self) -> "weakref.ReferenceType[Dataset] | None":
         """Return a weak reference to the parent Dataset
 
         .. deprecated:: 2.4
@@ -168,7 +169,7 @@ class Sequence(MultiValue[Dataset]):
         pass  # pragma: no cover
 
     def __setitem__(
-        self, idx: Union[slice, int], val: Union[Iterable[Dataset], Dataset]
+        self, idx: slice | int, val: Iterable[Dataset] | Dataset
     ) -> None:
         """Set the parent :class:`~pydicom.dataset.Dataset` to the new
         :class:`Sequence` item
@@ -193,7 +194,7 @@ class Sequence(MultiValue[Dataset]):
         """String representation of the Sequence."""
         return f"<{self.__class__.__name__}, length {len(self)}>"
 
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> dict[str, Any]:
         if self.parent_dataset is not None:
             s = self.__dict__.copy()
             s['_parent_dataset'] = s['_parent_dataset']()
@@ -201,7 +202,7 @@ class Sequence(MultiValue[Dataset]):
         return self.__dict__
 
     # If recovering from a pickle, turn back into weak ref
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
         if self.__dict__['_parent_dataset'] is not None:
             self.__dict__['_parent_dataset'] = weakref.ref(

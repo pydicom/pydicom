@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, cast
 import warnings
 
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
+    from pydicom.dataset import Dataset
 
 try:
     import numpy

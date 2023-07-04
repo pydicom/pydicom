@@ -2,7 +2,7 @@
 """Functions for working with encapsulated (compressed) pixel data."""
 
 from struct import pack
-from typing import List, Generator, Optional, Tuple
+from collections.abc import Generator
 import warnings
 
 import pydicom.config
@@ -11,7 +11,7 @@ from pydicom.tag import (Tag, ItemTag, SequenceDelimiterTag)
 
 
 # Functions for parsing encapsulated data
-def get_frame_offsets(fp: DicomFileLike) -> Tuple[bool, List[int]]:
+def get_frame_offsets(fp: DicomFileLike) -> tuple[bool, list[int]]:
     """Return a list of the fragment offsets from the Basic Offset Table.
 
     **Basic Offset Table**
@@ -228,7 +228,7 @@ def generate_pixel_data_fragment(
 
 
 def generate_pixel_data_frame(
-    bytestream: bytes, nr_frames: Optional[int] = None
+    bytestream: bytes, nr_frames: int | None = None
 ) -> Generator[bytes, None, None]:
     """Yield an encapsulated pixel data frame.
 
@@ -257,8 +257,8 @@ def generate_pixel_data_frame(
 
 
 def generate_pixel_data(
-    bytestream: bytes, nr_frames: Optional[int] = None
-) -> Generator[Tuple[bytes, ...], None, None]:
+    bytestream: bytes, nr_frames: int | None = None
+) -> Generator[tuple[bytes, ...], None, None]:
     """Yield an encapsulated pixel data frame.
 
     For the following transfer syntaxes, a fragment may not contain encoded
@@ -403,7 +403,7 @@ def generate_pixel_data(
             )
 
 
-def decode_data_sequence(data: bytes) -> List[bytes]:
+def decode_data_sequence(data: bytes) -> list[bytes]:
     """Read encapsulated data and return a list of bytes.
 
     Parameters
@@ -453,7 +453,7 @@ def defragment_data(data: bytes) -> bytes:
 
 
 # read_item modeled after filereader.ReadSequenceItem
-def read_item(fp: DicomFileLike) -> Optional[bytes]:
+def read_item(fp: DicomFileLike) -> bytes | None:
     """Read and return a single Item in the fragmented data stream.
 
     Parameters
@@ -655,7 +655,7 @@ itemise_frame = itemize_frame
 
 
 def encapsulate(
-    frames: List[bytes], fragments_per_frame: int = 1, has_bot: bool = True
+    frames: list[bytes], fragments_per_frame: int = 1, has_bot: bool = True
 ) -> bytes:
     """Return encapsulated `frames`.
 
@@ -755,7 +755,7 @@ def encapsulate(
     return bytes(output)
 
 
-def encapsulate_extended(frames: List[bytes]) -> Tuple[bytes, bytes, bytes]:
+def encapsulate_extended(frames: list[bytes]) -> tuple[bytes, bytes, bytes]:
     """Return encapsulated image data and values for the Extended Offset Table
     elements.
 

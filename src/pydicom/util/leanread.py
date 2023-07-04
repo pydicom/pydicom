@@ -5,8 +5,9 @@ import os
 from struct import Struct, unpack
 from types import TracebackType
 from typing import (
-    Iterator, Tuple, Optional, Union, Type, cast, BinaryIO, Callable
+    cast, BinaryIO
 )
+from collections.abc import Iterator, Callable
 
 from pydicom.misc import size_in_bytes
 from pydicom.datadict import dictionary_VR
@@ -22,19 +23,19 @@ DeflatedExplicitVRLittleEndian = b'1.2.840.10008.1.2.1.99'
 ExplicitVRBigEndian = b'1.2.840.10008.1.2.2'
 
 
-_ElementType = Tuple[
-    Tuple[int, int], Optional[bytes], int, Optional[bytes], int
+_ElementType = tuple[
+    tuple[int, int], bytes | None, int, bytes | None, int
 ]
 
 
 class dicomfile:
     """Context-manager based DICOM file object with data element iteration"""
 
-    def __init__(self, filename: Union[str, bytes, os.PathLike]) -> None:
+    def __init__(self, filename: str | bytes | os.PathLike) -> None:
         self.fobj = fobj = open(filename, "rb")
 
         # Read the DICOM preamble, if present
-        self.preamble: Optional[bytes] = fobj.read(0x80)
+        self.preamble: bytes | None = fobj.read(0x80)
         dicom_prefix = fobj.read(4)
         if dicom_prefix != b"DICM":
             self.preamble = None
@@ -45,17 +46,17 @@ class dicomfile:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType]
-    ) -> Optional[bool]:
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None
+    ) -> bool | None:
         self.fobj.close()
 
         return None  # noqa: PLR1711
 
     def __iter__(self) -> Iterator[_ElementType]:
         # Need the transfer_syntax later
-        tsyntax: Optional[UID] = None
+        tsyntax: UID | None = None
 
         # Yield the file meta info elements
         file_meta = data_element_generator(
@@ -87,8 +88,8 @@ def data_element_generator(
     fp: BinaryIO,
     is_implicit_VR: bool,
     is_little_endian: bool,
-    stop_when: Optional[Callable[[int, int], bool]] = None,
-    defer_size: Optional[Union[str, int, float]] = None,
+    stop_when: Callable[[int, int], bool] | None = None,
+    defer_size: str | int | float | None = None,
 ) -> Iterator[_ElementType]:
     """:return: (tag, VR, length, value, value_tell,
                                  is_implicit_VR, is_little_endian)
@@ -164,7 +165,7 @@ def data_element_generator(
                     # is thus a SQ
                     next_tag = TupleTag(
                         cast(
-                            Tuple[int, int],
+                            tuple[int, int],
                             unpack(endian_chr + "HH", fp_read(4)),
                         )
                     )

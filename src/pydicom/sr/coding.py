@@ -1,6 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 
-from typing import NamedTuple, Any, Optional
+from typing import NamedTuple, Any
 
 from pydicom.sr._snomed_dict import mapping as snomed_mapping
 
@@ -15,7 +15,7 @@ class Code(NamedTuple):
     value: str
     scheme_designator: str
     meaning: str
-    scheme_version: Optional[str] = None
+    scheme_version: str | None = None
 
     def __hash__(self) -> int:
         return hash(self.scheme_designator + self.value)

@@ -1,9 +1,7 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """Access dicom dictionary information"""
 import warnings
-from typing import Tuple, Optional, Dict
 
-from pydicom.config import logger
 from pydicom.tag import Tag, BaseTag, TagType
 
 # the actual dict of {tag: (VR, VM, name, is_retired, keyword), ...}
@@ -16,7 +14,7 @@ from pydicom._private_dict import private_dictionaries
 
 # Generate mask dict for checking repeating groups etc.
 # Map a true bitwise mask to the DICOM mask with "x"'s in it.
-masks: Dict[str, Tuple[int, int]] = {}
+masks: dict[str, tuple[int, int]] = {}
 for mask_x in RepeatersDictionary:
     # mask1 is XOR'd to see that all non-"x" bits
     # are identical (XOR result = 0 if bits same)
@@ -27,7 +25,7 @@ for mask_x in RepeatersDictionary:
     masks[mask_x] = (mask1, mask2)
 
 
-def mask_match(tag: int) -> Optional[str]:
+def mask_match(tag: int) -> str | None:
     """Return the repeaters tag mask for `tag`.
 
     Parameters
@@ -104,7 +102,7 @@ def add_dict_entry(
 
 
 def add_dict_entries(
-    new_entries_dict: Dict[int, Tuple[str, str, str, str, str]]
+    new_entries_dict: dict[int, tuple[str, str, str, str, str]]
 ) -> None:
     """Update the DICOM dictionary with new non-private entries.
 
@@ -193,7 +191,7 @@ def add_private_dict_entry(
 
 def add_private_dict_entries(
     private_creator: str,
-    new_entries_dict: Dict[int, Tuple[str, str, str, str]]
+    new_entries_dict: dict[int, tuple[str, str, str, str]]
 ) -> None:
     """Update pydicom's private DICOM tag dictionary with new entries.
 
@@ -240,7 +238,7 @@ def add_private_dict_entries(
     private_dictionaries.setdefault(private_creator, {}).update(new_entries)
 
 
-def get_entry(tag: TagType) -> Tuple[str, str, str, str, str]:
+def get_entry(tag: TagType) -> tuple[str, str, str, str, str]:
     """Return an entry from the DICOM dictionary as a tuple.
 
     If the `tag` is not in the main DICOM dictionary, then the repeating
@@ -450,12 +448,12 @@ def keyword_for_tag(tag: TagType) -> str:
 
 
 # Provide for the 'reverse' lookup. Given the keyword, what is the tag?
-keyword_dict: Dict[str, int] = {
+keyword_dict: dict[str, int] = {
     dictionary_keyword(tag): tag for tag in DicomDictionary
 }
 
 
-def tag_for_keyword(keyword: str) -> Optional[int]:
+def tag_for_keyword(keyword: str) -> int | None:
     """Return the tag of the element corresponding to `keyword`.
 
     Only performs the lookup for official DICOM elements.
@@ -515,7 +513,7 @@ def repeater_has_keyword(keyword: str) -> bool:
 # functions in analogy with those of main DICOM dict
 def get_private_entry(
     tag: TagType, private_creator: str
-) -> Tuple[str, str, str, str]:
+) -> tuple[str, str, str, str]:
     """Return an entry from the private dictionary corresponding to `tag`.
 
     Parameters
