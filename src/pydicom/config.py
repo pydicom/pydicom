@@ -24,7 +24,8 @@ if TYPE_CHECKING:  # pragma: no cover
             self,
             raw_elem: "RawDataElement",
             **kwargs: Any,
-        ) -> "RawDataElement": ...
+        ) -> "RawDataElement":
+            ...
 
 
 _use_future = False

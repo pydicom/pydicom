@@ -23,6 +23,7 @@ EXPL_32_3_1F = get_testdata_file("SC_rgb_32bit.dcm")
 
 class TimeRLEEncodeFrame:
     """Time tests for rle_handler.rle_encode_frame."""
+
     def setup(self):
         ds = dcmread(EXPL_8_1_1F)
         self.arr8_1 = ds.pixel_array
@@ -73,6 +74,7 @@ class TimeRLEEncodeFrame:
 # Requires numpy, pylibjpeg, pylibjpeg-rle and python-gdcm
 class TimeDatasetCompress:
     """Test Dataset.compress()."""
+
     def setup(self):
         # More real-world like dataset
         self.ds = dcmread(EXPL_8_1_1F)
@@ -83,20 +85,14 @@ class TimeDatasetCompress:
     def time_pydicom(self):
         """Time the native RLE encoder."""
         for _ in range(self.no_runs):
-            self.ds.compress(
-                RLELossless, self.arr8_1, encoding_plugin='pydicom'
-            )
+            self.ds.compress(RLELossless, self.arr8_1, encoding_plugin="pydicom")
 
     def time_pylibjpeg(self):
         """Time the pylibjpeg-rle Rust RLE encoder."""
         for _ in range(self.no_runs):
-            self.ds.compress(
-                RLELossless, self.arr8_1, encoding_plugin='pylibjpeg'
-            )
+            self.ds.compress(RLELossless, self.arr8_1, encoding_plugin="pylibjpeg")
 
     def time_gdcm(self):
         """Time the GDCM C++ RLE encoder."""
         for _ in range(self.no_runs):
-            self.ds.compress(
-                RLELossless, self.arr8_1, encoding_plugin='gdcm'
-            )
+            self.ds.compress(RLELossless, self.arr8_1, encoding_plugin="gdcm")

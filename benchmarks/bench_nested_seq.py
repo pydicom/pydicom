@@ -7,6 +7,7 @@ def create_nested_test_seq(num_items: int = 6280) -> Dataset:
     """Create a simplified version of sequence from issue #1728"""
     # original had 6280 items, but that is probably larger than needed
     from copy import deepcopy
+
     ds = Dataset()
 
     # Per-frame Functional Groups Sequence
@@ -23,9 +24,9 @@ def create_nested_test_seq(num_items: int = 6280) -> Dataset:
 
     # Plane Position Sequence: Plane Position 1
     plane_pos1 = Dataset()
-    plane_pos1.XOffsetInSlideCoordinateSystem = '0.0'
-    plane_pos1.YOffsetInSlideCoordinateSystem = '0.0'
-    plane_pos1.ZOffsetInSlideCoordinateSystem = '0.0'
+    plane_pos1.XOffsetInSlideCoordinateSystem = "0.0"
+    plane_pos1.YOffsetInSlideCoordinateSystem = "0.0"
+    plane_pos1.ZOffsetInSlideCoordinateSystem = "0.0"
     plane_pos1.ColumnPositionInTotalImagePixelMatrix = 1
     plane_pos1.RowPositionInTotalImagePixelMatrix = 1
     plane_pos_seq.append(plane_pos1)
@@ -44,6 +45,7 @@ def create_nested_test_seq(num_items: int = 6280) -> Dataset:
 
 class TimeNestedSeqAccess:
     """Time tests for large nested sequences."""
+
     len_top_sequence = 2000
     dataset = create_nested_test_seq(len_top_sequence)
 
